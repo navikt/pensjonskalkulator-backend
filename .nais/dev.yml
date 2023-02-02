@@ -1,0 +1,27 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: pensjonskalkulator-backend
+  namespace: pensjonskalkulator
+  labels:
+    team: pensjonskalkulator
+spec:
+  image: {{ image }}
+  port: 8080
+  replicas:
+    min: 2
+    max: 2
+  ingresses:
+    - https://pensjonskalkulator-backend.dev.nav.no
+  liveness:
+    path: /internal/alive
+    initialDelay: 30
+    timeout: 1
+    periodSeconds: 30
+    failureThreshold: 5
+  readiness:
+    path: /internal/ready
+    periodSeconds: 30
+  prometheus:
+    enabled: true
+    path: /internal/prometheus
