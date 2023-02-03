@@ -8,10 +8,4 @@ class KalkulatorController {
 
     @GetMapping("api/kalkuler")
     fun kalkuler(): String = """{ "pensjon": 0 }"""
-
-    @GetMapping("internal/alive")
-    fun isAlive(): String = "alive"
-
-    @GetMapping("internal/ready")
-    fun isReady() = "ready"
 }

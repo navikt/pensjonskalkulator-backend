@@ -14,13 +14,13 @@ spec:
   ingresses:
     - https://pensjonskalkulator-backend.dev.nav.no
   liveness:
-    path: /internal/alive
+    path: /internal/health/liveness
     initialDelay: 30
     timeout: 1
     periodSeconds: 30
     failureThreshold: 5
   readiness:
-    path: /internal/ready
+    path: /internal/health/readiness
     periodSeconds: 30
   prometheus:
     enabled: true
