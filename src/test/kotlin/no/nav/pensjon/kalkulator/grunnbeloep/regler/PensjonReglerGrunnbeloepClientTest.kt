@@ -1,6 +1,5 @@
 package no.nav.pensjon.kalkulator.grunnbeloep.regler
 
-
 import no.nav.pensjon.kalkulator.grunnbeloep.regler.dto.SatsResponse
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.regler.ReglerConfiguration
@@ -10,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.WebClient
-import java.util.*
+import java.time.LocalDate
 
 class PensjonReglerGrunnbeloepClientTest : WebClientTest() {
 
@@ -27,10 +26,10 @@ class PensjonReglerGrunnbeloepClientTest : WebClientTest() {
 
         val response: SatsResponse = client.getGrunnbeloep("")
 
-        val satsResultat = response.satsResultater?.get(0)!!
-        assertEquals(Date(1651399200000L), satsResultat.fom)
-        assertEquals(Date(253402254000000L), satsResultat.tom)
-        assertEquals(111477.0, satsResultat.verdi)
+        val resultat = response.satsResultater?.get(0)!!
+        assertEquals(LocalDate.of(2022, 5, 1), resultat.fom)
+        assertEquals(LocalDate.of(9999, 12, 31), resultat.tom)
+        assertEquals(111477.0, resultat.verdi)
     }
 
     companion object {

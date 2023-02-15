@@ -1,5 +1,5 @@
 package no.nav.pensjon.kalkulator.grunnbeloep.regler.dto
 
-import java.util.*
+import java.time.LocalDate
 
-data class SatsResultat(val fom: Date, val tom: Date, val verdi: Double)
+data class SatsResultat(val fom: LocalDate, val tom: LocalDate, val verdi: Double)

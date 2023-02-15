@@ -26,11 +26,18 @@ class ReglerConfigurationTest {
         ]
     ]
 }"""
-        val value = ReglerConfiguration().objectMapper().readValue(json, SatsResponse::class.java)
+        val resultater = ReglerConfiguration()
+            .objectMapper()
+            .readValue(json, SatsResponse::class.java)
+            .satsResultater!!
 
-        assertEquals("SatsResponse(satsResultater=[" +
-                "SatsResultat(fom=Sat May 01 12:00:00 CEST 2021, tom=Sat Apr 30 12:00:00 CEST 2022, verdi=106399.0), " +
-                "SatsResultat(fom=Sun May 01 12:00:00 CEST 2022, tom=Fri Dec 31 12:00:00 CET 9999, verdi=111477.0)])",
-            value.toString())
+        val resultat1 = resultater[0]
+        assertEquals("2021-05-01", resultat1.fom.toString())
+        assertEquals("2022-04-30", resultat1.tom.toString())
+        assertEquals(106399.0, resultat1.verdi)
+        val resultat2 = resultater[1]
+        assertEquals("2022-05-01", resultat2.fom.toString())
+        assertEquals("9999-12-31", resultat2.tom.toString())
+        assertEquals(111477.0, resultat2.verdi)
     }
 }
