@@ -25,3 +25,15 @@ spec:
   prometheus:
     enabled: true
     path: /internal/prometheus
+  accessPolicy:
+    inbound:
+      rules:
+        - application: pensjonskalkulator-frontend
+    outbound:
+      rules:
+        - application: pensjon-selvbetjening-fss-gateway
+          namespace: pensjonselvbetjening
+          cluster: dev-fss
+  env:
+    - name: PENSJON_REGLER_URL
+      value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
