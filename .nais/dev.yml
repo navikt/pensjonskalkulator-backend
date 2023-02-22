@@ -25,6 +25,9 @@ spec:
   prometheus:
     enabled: true
     path: /internal/prometheus
+  azure:
+    application:
+      enabled: true
   accessPolicy:
     inbound:
       rules:
