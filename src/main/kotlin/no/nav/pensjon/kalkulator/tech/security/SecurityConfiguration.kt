@@ -14,7 +14,7 @@ class SecurityConfiguration {
         return http
             .authorizeHttpRequests { registry ->
                 registry
-                    .requestMatchers(HttpMethod.GET, "/internal/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/internal/**", "/api/status").permitAll()
                     .anyRequest().authenticated()
             }
             .oauth2ResourceServer { configurer -> configurer.jwt() }

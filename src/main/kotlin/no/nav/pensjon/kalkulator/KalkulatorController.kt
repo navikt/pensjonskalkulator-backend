@@ -14,4 +14,9 @@ class KalkulatorController(private val grunnbeloepClient: GrunnbeloepClient) {
     fun getGrunnbeloep(): String {
         return grunnbeloepClient.getGrunnbeloep("{\"fom\":1676042011910,\"tom\":1676042011910}").satsResultater.toString()
     }
+
+    @GetMapping("api/status")
+    fun status(): String {
+        return """{ "status": "OK" }"""
+    }
 }
