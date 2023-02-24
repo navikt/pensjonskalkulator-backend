@@ -3,6 +3,9 @@ package no.nav.pensjon.kalkulator.grunnbeloep.regler
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.pensjon.kalkulator.grunnbeloep.GrunnbeloepClient
 import no.nav.pensjon.kalkulator.grunnbeloep.regler.dto.SatsResponse
+import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
+import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
+import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.apache.commons.logging.LogFactory
 import org.springframework.beans.factory.annotation.Value
@@ -11,6 +14,7 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import java.util.*
 
 @Component
 class PensjonReglerGrunnbeloepClient(
@@ -29,7 +33,7 @@ class PensjonReglerGrunnbeloepClient(
             val responseBody = webClient
                 .post()
                 .uri(uri + PATH)
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .headers { setHeaders(it) }
                 .bodyValue(requestBody)
                 .retrieve()
                 .bodyToMono(String::class.java)
@@ -42,6 +46,12 @@ class PensjonReglerGrunnbeloepClient(
         } catch (e: RuntimeException) { // e.g. when connection broken
             throw EgressException("Failed to do POST towards $uri: ${e.message}", e)
         }
+    }
+
+    private fun setHeaders(headers: HttpHeaders) {
+        headers.setBearerAuth(EgressAccess.token(EgressService.PENSJON_REGLER).value)
+        headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_JSON_VALUE
+        headers[CustomHttpHeaders.CALL_ID] = UUID.randomUUID().toString()
     }
 
     companion object {

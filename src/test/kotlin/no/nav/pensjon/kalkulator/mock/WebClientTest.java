@@ -27,7 +27,7 @@ public abstract class WebClientTest {
         server.shutdown();
     }
 
-    protected static void prepare(MockResponse response) {
+    protected static void arrange(MockResponse response) {
         server.enqueue(response);
     }
 

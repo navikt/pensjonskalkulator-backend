@@ -3,11 +3,15 @@ package no.nav.pensjon.kalkulator.grunnbeloep.regler
 import no.nav.pensjon.kalkulator.grunnbeloep.regler.dto.SatsResponse
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.regler.ReglerConfiguration
+import no.nav.pensjon.kalkulator.tech.security.egress.EnrichedAuthentication
+import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import okhttp3.mockwebserver.MockResponse
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
+import org.springframework.security.authentication.TestingAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDate
 
@@ -21,8 +25,9 @@ class PensjonReglerGrunnbeloepClientTest : WebClientTest() {
     }
 
     @Test
-    fun getGrunnbeloep_returns_satsResultater_when_ok_response() {
-        prepare(okResponse())
+    fun `getGrunnbeloep returns satsresultater when OK response`() {
+        arrangeSecurityContext()
+        arrange(okResponse())
 
         val response: SatsResponse = client.getGrunnbeloep("")
 
@@ -33,6 +38,15 @@ class PensjonReglerGrunnbeloepClientTest : WebClientTest() {
     }
 
     companion object {
+
+        private fun arrangeSecurityContext() {
+            SecurityContextHolder.setContext(SecurityContextHolder.createEmptyContext())
+
+            SecurityContextHolder.getContext().authentication = EnrichedAuthentication(
+                TestingAuthenticationToken("TEST_USER", null),
+                EgressTokenSuppliersByService(mapOf())
+            )
+        }
 
         private fun okResponse(): MockResponse {
             // Actual response from pensjon-regler in Q2:
