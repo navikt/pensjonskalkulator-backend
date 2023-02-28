@@ -1,17 +1,13 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.config
 
-import java.util.Arrays.stream
-import java.util.stream.Collectors.toUnmodifiableList
-
 /**
  * Specifies the services that is accessed by pensjonskalkulator-backend, and their characteristics.
  */
-enum class EgressService(val isAccessibleViaProxy: Boolean) {
+enum class EgressService(val description: String, val isAccessibleViaProxy: Boolean) {
 
-    PENSJON_REGLER(true);
+    PENSJON_REGLER("Pensjonsregler", true);
 
     companion object {
-        val servicesAccessibleViaProxy: List<EgressService> =
-            stream(EgressService.values()).filter { it.isAccessibleViaProxy }.collect(toUnmodifiableList())
+        val servicesAccessibleViaProxy = EgressService.values().filter { it.isAccessibleViaProxy }
     }
 }
