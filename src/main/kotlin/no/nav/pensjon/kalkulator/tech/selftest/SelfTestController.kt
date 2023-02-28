@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.tech.selftest
 
 import jakarta.servlet.http.HttpServletRequest
+import no.nav.pensjon.kalkulator.tech.security.egress.SecurityContextEnricher
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -11,10 +12,13 @@ import org.springframework.web.bind.annotation.RestController
 import java.nio.charset.StandardCharsets
 
 @RestController
-class SelfTestController(val selfTest: SelfTest) {
-
+class SelfTestController(
+    private val selfTest: SelfTest,
+    private val securityContextEnricher: SecurityContextEnricher
+) {
     @GetMapping(path = ["internal/selftest"])
     fun selfTest(request: HttpServletRequest): ResponseEntity<String> {
+        securityContextEnricher.enrichAuthentication()
         val accept = request.getHeader(HttpHeaders.ACCEPT)
 
         return if (MediaType.APPLICATION_JSON_VALUE == accept) responseEntity(

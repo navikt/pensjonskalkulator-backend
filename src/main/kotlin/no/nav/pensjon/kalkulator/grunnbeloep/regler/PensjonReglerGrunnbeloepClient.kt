@@ -86,6 +86,7 @@ class PensjonReglerGrunnbeloepClient(
         }
 
         private fun setPingHeaders(headers: HttpHeaders) {
+            headers.setBearerAuth(EgressAccess.token(service).value)
             headers[CustomHttpHeaders.CALL_ID] = callId()
         }
 

@@ -46,7 +46,7 @@ class EnrichedAuthenticationTest {
         `when`(initialAuth.isAuthenticated).thenReturn(true)
 
         assertEquals("name1", enrichedAuthentication.name)
-        assertEquals("authority1", enrichedAuthentication.authorities.stream().findFirst().get().authority)
+        assertEquals("authority1", enrichedAuthentication.authorities.first().authority)
         assertEquals("credentials1", enrichedAuthentication.credentials)
         assertEquals("details1", enrichedAuthentication.details)
         assertEquals("principal1", enrichedAuthentication.principal)

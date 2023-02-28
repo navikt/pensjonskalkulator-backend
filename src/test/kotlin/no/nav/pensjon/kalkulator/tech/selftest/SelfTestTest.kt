@@ -62,14 +62,27 @@ table tbody tr:nth-child(odd) {background-color: #ffffff;}
     }
 
     @Test
-    fun `when service is down then performSelfTestAndReportAsJson returns JSON indicating down`() {
+    fun `when service is down then performSelfTestAndReportAsJson returns JSON containing error message`() {
         `when`(grunnbeloepClient.ping())
             .thenReturn(PingResult(EgressService.PENSJON_REGLER, ServiceStatus.DOWN, "endpoint1", "message1"))
 
         val json = selfTest.performSelfTestAndReportAsJson()
 
         assertEquals(
-            """{"application":"pensjonskalkulator-backend","timestamp":"12:13:14","aggregateResult":0,"checks":[{"endpoint":"endpoint1","description":"Pensjonsregler","errorMessage":"message1","result":0}]}""",
+            """{"application":"pensjonskalkulator-backend","timestamp":"12:13:14","aggregateResult":1,"checks":[{"endpoint":"endpoint1","description":"Pensjonsregler","errorMessage":"message1","result":1}]}""",
+            json
+        )
+    }
+
+    @Test
+    fun `when service is up then performSelfTestAndReportAsJson returns JSON without error message`() {
+        `when`(grunnbeloepClient.ping())
+            .thenReturn(PingResult(EgressService.PENSJON_REGLER, ServiceStatus.UP, "endpoint1", "message1"))
+
+        val json = selfTest.performSelfTestAndReportAsJson()
+
+        assertEquals(
+            """{"application":"pensjonskalkulator-backend","timestamp":"12:13:14","aggregateResult":0,"checks":[{"endpoint":"endpoint1","description":"Pensjonsregler","result":0}]}""",
             json
         )
     }

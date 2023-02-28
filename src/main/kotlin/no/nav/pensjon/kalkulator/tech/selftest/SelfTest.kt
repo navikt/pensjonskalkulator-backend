@@ -9,7 +9,6 @@ class SelfTest(grunnbeloepClient: PensjonReglerGrunnbeloepClient) {
 
     private val services: List<Pingable> = listOf(grunnbeloepClient)
 
-
     /**
      * Returns result of self-test in HTML format.
      */
@@ -24,7 +23,7 @@ class SelfTest(grunnbeloepClient: PensjonReglerGrunnbeloepClient) {
         val pingResults = performSelfTest()
         val aggregateCode = getAggregateResult(pingResults.values).code
         val checks = json(pingResults)
-        return """{"application":"${APPLICATION_NAME}","timestamp":"${now()}","aggregateResult":$aggregateCode,"checks":[$checks]}"""
+        return """{"application":"$APPLICATION_NAME","timestamp":"${now()}","aggregateResult":$aggregateCode,"checks":[$checks]}"""
     }
 
     protected fun now(): LocalTime = LocalTime.now()
@@ -34,7 +33,7 @@ class SelfTest(grunnbeloepClient: PensjonReglerGrunnbeloepClient) {
             .map { it.ping() }
             .associateBy { it.service.name }
 
-    companion object {
+    private companion object {
         private const val APPLICATION_NAME = "pensjonskalkulator-backend"
 
         private fun getAggregateResult(pingResults: Collection<PingResult>) =
@@ -44,8 +43,12 @@ class SelfTest(grunnbeloepClient: PensjonReglerGrunnbeloepClient) {
 
         private fun json(resultsByService: Map<String, PingResult>) = resultsByService.values.joinToString { json(it) }
 
-        private fun json(result: PingResult) =
-            """{"endpoint":"${result.endpoint}","description":"${result.service.description}","errorMessage":"${result.message}","result":${result.status.code}}"""
+        private fun json(result: PingResult): String {
+            val errorMessageEntry =
+                if (result.status == ServiceStatus.DOWN) ""","errorMessage":"${result.message}"""" else ""
+
+            return """{"endpoint":"${result.endpoint}","description":"${result.service.description}"$errorMessageEntry,"result":${result.status.code}}"""
+        }
 
         private fun htmlPage(tableRows: String) = """
             <!DOCTYPE html>

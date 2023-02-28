@@ -86,10 +86,8 @@ abstract class CacheAwareTokenClient(
     private fun removeExpiredTokens(scope: String) {
         val usersOfTokensToBeRemoved = accessTokensByUserByScope[scope]!!
             .entries
-            .stream()
             .filter { isExpired(it.value) }
             .map { it.key }
-            .toList()
 
         for (user in usersOfTokensToBeRemoved) {
             clearTokenData(scope, user)
