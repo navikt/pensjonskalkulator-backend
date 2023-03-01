@@ -11,6 +11,7 @@ import no.nav.pensjon.kalkulator.tech.selftest.ServiceStatus
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.apache.commons.logging.LogFactory
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -23,7 +24,7 @@ import java.util.*
 class PensjonReglerGrunnbeloepClient(
     @Value("\${pensjon-regler.url}") private val baseUrl: String,
     private val webClient: WebClient,
-    private val objectMapper: ObjectMapper
+    @Qualifier("regler") private val objectMapper: ObjectMapper
 ) : GrunnbeloepClient, Pingable {
     private val log = LogFactory.getLog(javaClass)
 

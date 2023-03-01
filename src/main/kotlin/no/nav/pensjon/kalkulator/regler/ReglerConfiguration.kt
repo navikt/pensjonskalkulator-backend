@@ -10,7 +10,7 @@ import java.time.LocalDate
 @Configuration
 class ReglerConfiguration {
 
-    @Bean
+    @Bean("regler")
     fun objectMapper(): ObjectMapper {
         val mapper = jacksonObjectMapper().registerModule(localDateModule())
         return mapper.activateDefaultTyping(mapper.polymorphicTypeValidator)

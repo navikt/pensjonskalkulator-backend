@@ -14,7 +14,13 @@ class SecurityConfiguration {
         return http
             .authorizeHttpRequests { registry ->
                 registry
-                    .requestMatchers(HttpMethod.GET, "/internal/**", "/api/status").permitAll()
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/internal/**",
+                        "/api/status",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**"
+                    ).permitAll()
                     .anyRequest().authenticated()
             }
             .oauth2ResourceServer { configurer -> configurer.jwt() }
