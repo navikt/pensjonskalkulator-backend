@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.mock;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +30,10 @@ public abstract class WebClientTest {
 
     protected static void arrange(MockResponse response) {
         server.enqueue(response);
+    }
+
+    protected static RecordedRequest takeRequest() throws InterruptedException {
+        return server.takeRequest();
     }
 
     protected static MockResponse jsonResponse(HttpStatus status) {
