@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.security
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -10,13 +11,15 @@ import org.springframework.security.web.SecurityFilterChain
 class SecurityConfiguration {
 
     @Bean
-    fun filterChain(http: HttpSecurity): SecurityFilterChain {
+    fun filterChain(http: HttpSecurity,
+                    @Value("\${request-matcher.internal}") internalRequestMatcher : String
+    ): SecurityFilterChain {
         return http
             .authorizeHttpRequests { registry ->
                 registry
                     .requestMatchers(
                         HttpMethod.GET,
-                        "/internal/**",
+                        internalRequestMatcher,
                         "/api/status",
                         "/swagger-ui/**",
                         "/v3/api-docs/**"
