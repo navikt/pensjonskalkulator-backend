@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.selftest
 
-import no.nav.pensjon.kalkulator.grunnbeloep.regler.PensjonReglerGrunnbeloepClient
+import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.PensjonReglerGrunnbeloepClient
 import org.springframework.stereotype.Component
 import java.time.LocalTime
 

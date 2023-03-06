@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.selftest
 
-import no.nav.pensjon.kalkulator.grunnbeloep.regler.PensjonReglerGrunnbeloepClient
+import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.PensjonReglerGrunnbeloepClient
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach

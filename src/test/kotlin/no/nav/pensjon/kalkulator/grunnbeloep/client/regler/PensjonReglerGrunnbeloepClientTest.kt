@@ -1,6 +1,7 @@
-package no.nav.pensjon.kalkulator.grunnbeloep.regler
+package no.nav.pensjon.kalkulator.grunnbeloep.client.regler
 
-import no.nav.pensjon.kalkulator.grunnbeloep.regler.dto.SatsResponse
+import no.nav.pensjon.kalkulator.grunnbeloep.Grunnbeloep
+import no.nav.pensjon.kalkulator.grunnbeloep.client.GrunnbeloepSpec
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.regler.ReglerConfiguration
 import no.nav.pensjon.kalkulator.tech.security.egress.EnrichedAuthentication
@@ -13,6 +14,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.reactive.function.client.WebClient
+import java.io.ByteArrayOutputStream
+import java.nio.charset.StandardCharsets
 import java.time.LocalDate
 
 class PensjonReglerGrunnbeloepClientTest : WebClientTest() {
@@ -25,16 +28,22 @@ class PensjonReglerGrunnbeloepClientTest : WebClientTest() {
     }
 
     @Test
-    fun `getGrunnbeloep returns satsresultater when OK response`() {
+    fun `getGrunnbeloep returns grunnbeloep when OK response`() {
         arrangeSecurityContext()
         arrange(okResponse())
+        val spec = GrunnbeloepSpec(LocalDate.of(2023, 1, 1), LocalDate.of(2023, 1, 2))
 
-        val response: SatsResponse = client.getGrunnbeloep("")
+        val response: Grunnbeloep = client.getGrunnbeloep(spec)
 
-        val resultat = response.satsResultater?.get(0)!!
-        assertEquals(LocalDate.of(2022, 5, 1), resultat.fom)
-        assertEquals(LocalDate.of(9999, 12, 31), resultat.tom)
-        assertEquals(111477.0, resultat.verdi)
+        ByteArrayOutputStream().use {
+            takeRequest().body.copyTo(it)
+            assertEquals(
+                """{"fom":1672567200000,"tom":1672653600000}""",
+                it.toString(StandardCharsets.UTF_8)
+            )
+        }
+
+        assertEquals(111477, response.value)
     }
 
     companion object {

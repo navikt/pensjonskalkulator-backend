@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.regler
 
-import no.nav.pensjon.kalkulator.grunnbeloep.regler.dto.SatsResponse
+import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.dto.SatsResponse
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
