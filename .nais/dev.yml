@@ -41,3 +41,5 @@ spec:
   env:
     - name: PENSJON_REGLER_URL
       value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
+    - name: POPP_URL
+      value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
