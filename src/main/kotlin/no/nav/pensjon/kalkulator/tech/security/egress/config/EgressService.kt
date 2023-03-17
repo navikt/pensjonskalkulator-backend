@@ -6,6 +6,7 @@ package no.nav.pensjon.kalkulator.tech.security.egress.config
 enum class EgressService(val description: String, val isAccessibleViaProxy: Boolean) {
 
     PENSJON_REGLER("Pensjonsregler", true),
+    PERSONDATA("Persondata", true),
     PENSJONSOPPTJENING("Pensjonsopptjening", true);
 
     companion object {
