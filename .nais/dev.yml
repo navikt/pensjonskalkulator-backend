@@ -12,7 +12,6 @@ spec:
     min: 2
     max: 2
   ingresses:
-    - https://pensjonskalkulator-backend.ekstern.dev.nav.no
     - https://pensjonskalkulator-backend.intern.dev.nav.no
   liveness:
     path: /internal/health/liveness
@@ -38,6 +37,8 @@ spec:
         - application: pensjon-selvbetjening-fss-gateway
           namespace: pensjonselvbetjening
           cluster: dev-fss
+      external:
+        - host: pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
   env:
     - name: PDL_URL
       value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
