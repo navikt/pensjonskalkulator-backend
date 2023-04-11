@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Operation
 import no.nav.pensjon.kalkulator.grunnbeloep.Grunnbeloep
 import no.nav.pensjon.kalkulator.grunnbeloep.client.GrunnbeloepClient
 import no.nav.pensjon.kalkulator.grunnbeloep.client.GrunnbeloepSpec
+import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.api.PersonDto
 import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
 import no.nav.pensjon.kalkulator.tech.security.egress.SecurityContextEnricher
 import org.springframework.web.bind.annotation.GetMapping
@@ -45,6 +47,15 @@ class KalkulatorController(
         val now = LocalDate.now()
         val spec = GrunnbeloepSpec(now, now)
         return grunnbeloepClient.getGrunnbeloep(spec)
+    }
+
+    @GetMapping("person")
+    @Operation(
+        summary = "Hent personinformasjon",
+        description = "Hent personinformasjon"
+    )
+    fun person(): PersonDto {
+        return PersonDto(Sivilstand.UGIFT)
     }
 
     @GetMapping("status")
