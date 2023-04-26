@@ -71,6 +71,6 @@ class KalkulatorController(
         description = "Minimum alder for å kunne starte uttak av alderspensjon"
     )
     fun tidligsteUttaksalder(): Uttaksalder {
-        return Uttaksalder(67, 10)
+        return Uttaksalder(62, 10)
     }
 }
