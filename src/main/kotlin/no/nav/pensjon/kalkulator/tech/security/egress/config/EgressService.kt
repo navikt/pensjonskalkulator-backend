@@ -7,7 +7,8 @@ enum class EgressService(val description: String, val isAccessibleViaProxy: Bool
 
     PENSJON_REGLER("Pensjonsregler", true),
     PERSONDATA("Persondata", true),
-    PENSJONSOPPTJENING("Pensjonsopptjening", true);
+    PENSJONSOPPTJENING("Pensjonsopptjening", true),
+    SIMULERING("Simulering", true);
 
     companion object {
         val servicesAccessibleViaProxy = EgressService.values().filter { it.isAccessibleViaProxy }
