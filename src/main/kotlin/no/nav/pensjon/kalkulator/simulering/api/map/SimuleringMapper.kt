@@ -6,10 +6,10 @@ import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringSpecDto
 
 object SimuleringMapper {
 
-    fun asSpec(dto: SimuleringSpecDto, pidValue: String) =
+    fun asSpec(dto: SimuleringSpecDto, pid: Pid) =
         SimuleringSpec(
             dto.simuleringstype,
-            Pid(pidValue),
+            pid,
             dto.forventetInntekt,
             dto.uttaksgrad,
             dto.foersteUttaksdato,

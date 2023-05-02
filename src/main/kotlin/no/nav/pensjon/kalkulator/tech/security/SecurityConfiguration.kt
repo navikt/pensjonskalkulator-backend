@@ -2,6 +2,8 @@ package no.nav.pensjon.kalkulator.tech.security
 
 import no.nav.pensjon.kalkulator.tech.security.egress.SecurityContextEnricher
 import no.nav.pensjon.kalkulator.tech.security.ingress.AuthenticationEnricherFilter
+import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
+import no.nav.pensjon.kalkulator.tech.security.ingress.SecurityContextPidExtractor
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -37,4 +39,7 @@ class SecurityConfiguration {
             .oauth2ResourceServer { it.jwt() }
             .build()
     }
+
+    @Bean
+    fun pidGetter(): PidGetter = SecurityContextPidExtractor()
 }
