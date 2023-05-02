@@ -1,14 +1,11 @@
 package no.nav.pensjon.kalkulator.tech.api
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.swagger.v3.oas.models.ExternalDocumentation
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Info
 import org.springdoc.core.models.GroupedOpenApi
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Primary
 
 /**
  * Configuration of OpenAPI (formerly known as Swagger).
@@ -46,11 +43,5 @@ class OpenApiConfiguration {
             .group("internal")
             .pathsToMatch("/internal/**")
             .build()
-    }
-
-    @Bean
-    @Primary
-    fun objectMapper(): ObjectMapper {
-        return jacksonObjectMapper()
     }
 }
