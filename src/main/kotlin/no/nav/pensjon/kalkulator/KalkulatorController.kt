@@ -8,7 +8,6 @@ import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.api.PersonDto
 import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
 import no.nav.pensjon.kalkulator.simulering.Uttaksalder
-import no.nav.pensjon.kalkulator.tech.security.egress.SecurityContextEnricher
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -18,8 +17,7 @@ import java.time.LocalDate
 @RestController
 @RequestMapping("api")
 class KalkulatorController(
-    private val grunnbeloepClient: GrunnbeloepClient,
-    private val securityContextEnricher: SecurityContextEnricher
+    private val grunnbeloepClient: GrunnbeloepClient
 ) {
     @GetMapping("kalkuler")
     fun kalkuler(): String {
@@ -35,7 +33,8 @@ class KalkulatorController(
         return listOf(
             Simuleringsresultat(2024, BigDecimal("300001"), 67),
             Simuleringsresultat(2025, BigDecimal("300002"), 68),
-            Simuleringsresultat(2026, BigDecimal("300003"), 69))
+            Simuleringsresultat(2026, BigDecimal("300003"), 69)
+        )
     }
 
     @GetMapping("grunnbeloep")
@@ -44,7 +43,6 @@ class KalkulatorController(
         description = "Hent grunnbeløpet i folketrygden (G) for nåværende tidspunkt"
     )
     fun getGrunnbeloep(): Grunnbeloep {
-        securityContextEnricher.enrichAuthentication()
         val now = LocalDate.now()
         val spec = GrunnbeloepSpec(now, now)
         return grunnbeloepClient.getGrunnbeloep(spec)
