@@ -9,6 +9,8 @@ class SecurityContextEnricher(val tokenSuppliers: EgressTokenSuppliersByService)
 
     fun enrichAuthentication() {
         val securityContext = SecurityContextHolder.getContext()
-        securityContext.authentication = EnrichedAuthentication(securityContext.authentication, tokenSuppliers)
+
+        securityContext.authentication =
+            securityContext.authentication?.let { EnrichedAuthentication(it, tokenSuppliers) }
     }
 }
