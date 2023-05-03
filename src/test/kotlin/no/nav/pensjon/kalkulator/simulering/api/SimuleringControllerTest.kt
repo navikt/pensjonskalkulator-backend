@@ -1,10 +1,8 @@
 package no.nav.pensjon.kalkulator.simulering.api
 
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
-import no.nav.pensjon.kalkulator.person.Pid
+import no.nav.pensjon.kalkulator.simulering.SimuleringService
 import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
-import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
-import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
@@ -28,15 +26,11 @@ class SimuleringControllerTest {
     private lateinit var mvc: MockMvc
 
     @MockBean
-    private lateinit var simuleringClient: SimuleringClient
-
-    @MockBean
-    private lateinit var pidGetter: PidGetter
+    private lateinit var simuleringService: SimuleringService
 
     @Test
     fun simulerAlderspensjon() {
-        `when`(simuleringClient.simulerAlderspensjon(anyObject())).thenReturn(simuleringsresultat())
-        `when`(pidGetter.pid()).thenReturn(Pid(FNR))
+        `when`(simuleringService.simulerAlderspensjon(anyObject())).thenReturn(simuleringsresultat())
 
         mvc.perform(
             post(URL)
@@ -51,7 +45,6 @@ class SimuleringControllerTest {
     private companion object {
 
         private const val URL = "/api/alderspensjon/simulering"
-        private const val FNR = "12906498357" // synthetic fødselsnummer for person born 12 Oct 1964
 
         private const val REQUEST_BODY = """{
         "simuleringstype": "AP",

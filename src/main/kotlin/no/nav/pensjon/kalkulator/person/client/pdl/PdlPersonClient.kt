@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.person.client.pdl
 
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.person.Land
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Pid
@@ -9,9 +10,11 @@ import no.nav.pensjon.kalkulator.person.client.pdl.dto.*
 import no.nav.pensjon.kalkulator.person.client.pdl.map.PersonMapper
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
+import no.nav.pensjon.kalkulator.tech.selftest.PingResult
+import no.nav.pensjon.kalkulator.tech.selftest.Pingable
+import no.nav.pensjon.kalkulator.tech.selftest.ServiceStatus
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import org.apache.commons.logging.LogFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -25,26 +28,23 @@ import java.util.*
 class PdlPersonClient(
     @Value("\${pdl.url}") private val baseUrl: String,
     private val webClient: WebClient
-) : PersonClient {
-    private val log = LogFactory.getLog(javaClass)
+) : PersonClient, Pingable {
+    private val log = KotlinLogging.logger {}
 
     override fun getPerson(pid: Pid): Person {
         val uri = baseUrl + PERSON_PATH
-
-        if (log.isDebugEnabled) {
-            log.debug("POST to URI: '$uri'")
-        }
+        log.debug { "POST to URI: '$uri'" }
 
         return try {
             webClient
                 .post()
                 .uri(uri)
-                .headers { setHeaders(it) }
+                .headers(::setHeaders)
                 .bodyValue(query(pid))
                 .retrieve()
                 .bodyToMono(PersonResponseDto::class.java)
                 .block()
-                ?.let { PersonMapper.fromDto(it) }
+                ?.let(PersonMapper::fromDto)
                 ?: emptyPerson()
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
@@ -53,8 +53,29 @@ class PdlPersonClient(
         }
     }
 
+    override fun ping(): PingResult {
+        val uri = baseUrl + PING_PATH
+
+        return try {
+            webClient
+                .options()
+                .uri(uri)
+                .headers(::setHeaders)
+                .retrieve()
+                .toBodilessEntity()
+                .block()
+
+            PingResult(service, ServiceStatus.UP, uri, "Ping OK")
+        } catch (e: WebClientResponseException) {
+            PingResult(service, ServiceStatus.DOWN, uri, e.responseBodyAsString)
+        } catch (e: RuntimeException) { // e.g. when connection broken
+            PingResult(service, ServiceStatus.DOWN, uri, e.message ?: "Ping failed")
+        }
+    }
+
     companion object {
         private const val PERSON_PATH = "/graphql"
+        private const val PING_PATH = "/graphql"
         private const val THEME = "PEN"
         private val service = EgressService.PERSONDATA
 
@@ -75,6 +96,6 @@ class PdlPersonClient(
 
         private fun callId() = UUID.randomUUID().toString()
 
-        private fun emptyPerson() = Person(LocalDate.MIN, Land.OTHER, Sivilstand.OTHER)
+        private fun emptyPerson() = Person(LocalDate.MIN, Land.OTHER, Sivilstand.UOPPGITT)
     }
 }

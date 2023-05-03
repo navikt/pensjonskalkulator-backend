@@ -2,16 +2,22 @@ package no.nav.pensjon.kalkulator.person
 
 /**
  * For pdlCode definitions see: https://pdldocs-navno.msappproxy.net/ekstern/index.html#_sivilstand
- * For reglerCode definitions see:
- * https://github.com/navikt/pesys/blob/main/pen/domain/nav-domain-pensjon-pen-java/src/main/java/no/nav/domain/pensjon/kjerne/kodetabeller/SivilstandTypeCode.java
  */
-enum class Sivilstand(val pdlCode: String, val reglerCode: String) {
+enum class Sivilstand(val pdlCode: String) {
 
-    UGIFT("UGIFT", "UGIF"),
-    OTHER("OTHER", "NULL");
+    UOPPGITT("UOPPGITT"),
+    UGIFT("UGIFT"),
+    GIFT("GIFT"),
+    ENKE_ELLER_ENKEMANN("ENKE_ELLER_ENKEMANN"),
+    SKILT("SKILT"),
+    SEPARERT("SEPARERT"),
+    REGISTRERT_PARTNER("REGISTRERT_PARTNER"),
+    SEPARERT_PARTNER("SEPARERT_PARTNER"),
+    SKILT_PARTNER("SKILT_PARTNER"),
+    GJENLEVENDE_PARTNER("GJENLEVENDE_PARTNER");
 
-    companion object {
-        fun forPdlCode(code: String): Sivilstand =
-            Sivilstand.values().firstOrNull { it.pdlCode == code } ?: OTHER
+   companion object {
+       fun forPdlCode(code: String): Sivilstand =
+            Sivilstand.values().firstOrNull { it.pdlCode == code } ?: UOPPGITT
     }
 }

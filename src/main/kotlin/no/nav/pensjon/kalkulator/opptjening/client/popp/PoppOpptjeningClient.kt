@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.opptjening.client.popp
 
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningsgrunnlag
 import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.opptjening.client.popp.dto.OpptjeningsgrunnlagDto
@@ -13,7 +14,6 @@ import no.nav.pensjon.kalkulator.tech.selftest.Pingable
 import no.nav.pensjon.kalkulator.tech.selftest.ServiceStatus
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import org.apache.commons.logging.LogFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -27,23 +27,20 @@ class PoppOpptjeningClient(
     @Value("\${popp.url}") private val baseUrl: String,
     private val webClient: WebClient
 ) : OpptjeningsgrunnlagClient, Pingable {
-    private val log = LogFactory.getLog(javaClass)
+    private val log = KotlinLogging.logger {}
 
     /**
      * Calls PROPOPP007
      */
     override fun getOpptjeningsgrunnlag(pid: Pid): Opptjeningsgrunnlag {
         val uri = "$baseUrl$OPPTJENINGSGRUNNLAG_PATH/${pid.value}"
-
-        if (log.isDebugEnabled) {
-            log.debug("POST to URI: '${displayableUri(pid)}'")
-        }
+        log.debug { "GET from URI: '${displayableUri(pid)}'" }
 
         try {
             val response = webClient
                 .get()
                 .uri(uri)
-                .headers { setHeaders(it) }
+                .headers(::setHeaders)
                 .retrieve()
                 .bodyToMono(OpptjeningsgrunnlagResponseDto::class.java)
                 .block()
@@ -64,7 +61,7 @@ class PoppOpptjeningClient(
             val responseBody = webClient
                 .get()
                 .uri(uri)
-                .headers { setPingHeaders(it) }
+                .headers(::setPingHeaders)
                 .retrieve()
                 .bodyToMono(String::class.java)
                 .block()
@@ -81,8 +78,8 @@ class PoppOpptjeningClient(
     private fun displayableUri(pid: Pid) = "$baseUrl$OPPTJENINGSGRUNNLAG_PATH/${pid.displayValue}"
 
     companion object {
-        private const val OPPTJENINGSGRUNNLAG_PATH = "/api/opptjeningsgrunnlag"
-        private const val PING_PATH = "/api/ping"
+        private const val OPPTJENINGSGRUNNLAG_PATH = "/popp/api/opptjeningsgrunnlag"
+        private const val PING_PATH = "/popp/api/opptjeningsgrunnlag/ping"
         private val service = EgressService.PENSJONSOPPTJENING
 
         private fun setHeaders(headers: HttpHeaders) {

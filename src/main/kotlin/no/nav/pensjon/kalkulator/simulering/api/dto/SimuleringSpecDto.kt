@@ -5,9 +5,9 @@ import java.time.LocalDate
 
 data class SimuleringSpecDto(
     val simuleringstype: String,
-    val forventetInntekt: Int,
+    val forventetInntekt: Int?,
     val uttaksgrad: Int,
     val foersteUttaksdato: LocalDate,
-    val sivilstand: Sivilstand,
+    val sivilstand: Sivilstand?,
     val epsHarInntektOver2G: Boolean
 )

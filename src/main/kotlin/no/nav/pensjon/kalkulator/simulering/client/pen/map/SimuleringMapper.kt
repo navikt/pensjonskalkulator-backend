@@ -1,6 +1,5 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen.map
 
-import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenSivilstand
@@ -20,7 +19,7 @@ object SimuleringMapper {
     fun toDto(spec: SimuleringSpec) =
         SimuleringRequestDto(
             spec.pid.value,
-            toDto(spec.sivilstand),
+            PenSivilstand.from(spec.sivilstand),
             spec.epsHarInntektOver2G,
             1,
             spec.forventetInntekt,
@@ -28,10 +27,4 @@ object SimuleringMapper {
         )
 
     private fun midnight(date: LocalDate) = Date.from(date.atTime(0, 0).toInstant(ZoneOffset.ofHours(1)))
-
-    private fun toDto(sivilstand: Sivilstand) =
-        when (sivilstand) {
-            Sivilstand.UGIFT -> PenSivilstand.UGIF
-            Sivilstand.OTHER -> PenSivilstand.NULL
-        }
 }

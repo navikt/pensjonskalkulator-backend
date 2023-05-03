@@ -13,6 +13,14 @@ class Pid(argument: String) {
         return displayValue
     }
 
+    override fun hashCode(): Int {
+        return value.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return (other as? Pid)?.let { value == it.value } ?: false
+    }
+
     companion object {
         private const val FNR_LENGTH = 11
         private const val PERSONNUMMER_START_INDEX = 6

@@ -18,20 +18,20 @@ class PersonMapperTest {
 
     @Test
     fun `fromDto picks first sivilstand`() {
-        val dto = responseDto(listOf(SivilstandDto("UGIFT"), SivilstandDto("OTHER")))
+        val dto = responseDto(listOf(SivilstandDto("UGIFT"), SivilstandDto("SKILT")))
         assertEquals(Sivilstand.UGIFT, PersonMapper.fromDto(dto).sivilstand)
     }
 
     @Test
-    fun `fromDto maps missing sivilstand to sivilstand 'other'`() {
-        assertEquals(Sivilstand.OTHER, PersonMapper.fromDto(PersonResponseDto(null, null)).sivilstand)
-        assertEquals(Sivilstand.OTHER, PersonMapper.fromDto(responseDto(emptyList())).sivilstand)
+    fun `fromDto maps missing sivilstand to sivilstand 'uoppgitt'`() {
+        assertEquals(Sivilstand.UOPPGITT, PersonMapper.fromDto(PersonResponseDto(null, null)).sivilstand)
+        assertEquals(Sivilstand.UOPPGITT, PersonMapper.fromDto(responseDto(emptyList())).sivilstand)
     }
 
     @Test
-    fun `fromDto maps unknown sivilstand to sivilstand 'other'`() {
+    fun `fromDto maps unknown sivilstand to sivilstand 'uoppgitt'`() {
         val dto = responseDto("not known")
-        assertEquals(Sivilstand.OTHER, PersonMapper.fromDto(dto).sivilstand)
+        assertEquals(Sivilstand.UOPPGITT, PersonMapper.fromDto(dto).sivilstand)
     }
 
     private fun responseDto(sivilstand: String) = responseDto(listOf(SivilstandDto(sivilstand)))

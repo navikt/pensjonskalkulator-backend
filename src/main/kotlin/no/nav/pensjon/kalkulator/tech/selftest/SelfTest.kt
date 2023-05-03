@@ -1,13 +1,19 @@
 package no.nav.pensjon.kalkulator.tech.selftest
 
 import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.PensjonReglerGrunnbeloepClient
+import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningClient
+import no.nav.pensjon.kalkulator.person.client.pdl.PdlPersonClient
 import org.springframework.stereotype.Component
 import java.time.LocalTime
 
 @Component
-class SelfTest(grunnbeloepClient: PensjonReglerGrunnbeloepClient) {
+class SelfTest(
+    grunnbeloepClient: PensjonReglerGrunnbeloepClient,
+    opptjeningClient: PoppOpptjeningClient,
+    personClient: PdlPersonClient
+) {
 
-    private val services: List<Pingable> = listOf(grunnbeloepClient)
+    private val services: List<Pingable> = listOf(grunnbeloepClient, opptjeningClient, personClient)
 
     /**
      * Returns result of self-test in HTML format.
@@ -79,16 +85,18 @@ class SelfTest(grunnbeloepClient: PensjonReglerGrunnbeloepClient) {
             </html>
             """.trimIndent()
 
-        private fun htmlStatusRows(resultsByService: Map<String, PingResult>): String =
-            resultsByService.entries.joinToString { (key, value) -> htmlRow(key, value) }
+        private fun htmlStatusRows(resultsByService: Map<String, PingResult>) =
+            resultsByService.entries.joinToString(separator = "", transform = ::htmlRow)
 
-        private fun htmlRow(service: String, result: PingResult): String =
+        private fun htmlRow(entry: Map.Entry<String, PingResult>) = htmlRow(entry.key, entry.value)
+
+        private fun htmlRow(service: String, result: PingResult) =
             "<tr>${htmlCell(service)}${htmlStatusCell(result.status)}${htmlCell(result.message)}" +
                     "${htmlCell(result.endpoint)}${htmlCell(result.service.description)}</tr>"
 
-        private fun htmlCell(content: String): String = "<td>$content</td>"
+        private fun htmlCell(content: String) = "<td>$content</td>"
 
-        private fun htmlStatusCell(status: ServiceStatus): String =
+        private fun htmlStatusCell(status: ServiceStatus) =
             """<td style="background-color:${status.color};text-align:center;">${status.name}</td>"""
     }
 }

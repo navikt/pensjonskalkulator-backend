@@ -25,7 +25,7 @@ object PersonMapper {
         dto.firstOrNull()?.land?.let { Land.forCode(it) } ?: Land.OTHER
 
     private fun fromDto(dto: List<SivilstandDto>) =
-        dto.firstOrNull()?.type?.let { Sivilstand.forPdlCode(it) } ?: Sivilstand.OTHER
+        dto.firstOrNull()?.type?.let { Sivilstand.forPdlCode(it) } ?: Sivilstand.UOPPGITT
 
-    private fun emptyPerson() = Person(LocalDate.MIN, Land.OTHER, Sivilstand.OTHER)
+    private fun emptyPerson() = Person(LocalDate.MIN, Land.OTHER, Sivilstand.UOPPGITT)
 }
