@@ -4,12 +4,16 @@ Backend-applikasjon for pensjonskalkulator for brukere født 1963 eller senere.
 
 Dette er brukere som berøres av ny AFP-ordning i offentlig sektor, og som omfattes av kapittel 20 i pensjonsregelverket (ikke kapittel 19).
 
+## API
+
+Applikasjonen har et API – se [Swagger/OpenAPI-dokumentasjon](https://pensjonskalkulator-backend.intern.dev.nav.no/swagger-ui/index.html)
+
 ## Teknologi
 
-* Java 17
-* Kotlin
-* Spring Boot
-* Maven
+* [Java 17](https://openjdk.org/projects/jdk/17/)
+* [Kotlin](https://kotlinlang.org/)
+* [Spring Boot](https://spring.io/projects/spring-boot)
+* [Maven](https://maven.apache.org/)
 
 ## Henvendelser
 
