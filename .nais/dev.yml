@@ -28,13 +28,14 @@ spec:
   azure:
     application:
       enabled: true
+  tokenx:
+    enabled: true
   accessPolicy:
     inbound:
       rules:
         - application: pensjonskalkulator-frontend
         - application: debug-dings
           namespace: plattformsikkerhet
-          cluster: dev-gcp
     outbound:
       rules:
         - application: pensjon-selvbetjening-fss-gateway
