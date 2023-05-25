@@ -36,6 +36,8 @@ spec:
         - application: pensjonskalkulator-frontend
         - application: debug-dings
           namespace: plattformsikkerhet
+        - application: wonderwalled-idporten
+          namespace: aura
     outbound:
       rules:
         - application: pensjon-selvbetjening-fss-gateway
