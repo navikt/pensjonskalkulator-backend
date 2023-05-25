@@ -14,6 +14,7 @@ class MockSecurityConfiguration {
         return http
             .authorizeHttpRequests {
                 it.requestMatchers(HttpMethod.POST, "/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/**").permitAll()
                     .anyRequest().authenticated()
             }
             .build()
