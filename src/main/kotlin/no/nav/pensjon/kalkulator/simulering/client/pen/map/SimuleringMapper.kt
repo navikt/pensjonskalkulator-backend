@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.simulering.client.pen.map
 
 import no.nav.pensjon.kalkulator.simulering.SimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
-import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenSivilstand
+import no.nav.pensjon.kalkulator.pen.PenSivilstand
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringRequestDto
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringResponseDto
 import java.time.LocalDate
