@@ -28,6 +28,6 @@ class PenUttaksalderClient(
     }
 
     companion object {
-        private const val PATH = "/pen/springapi/simulering/alderspensjon"
+        private const val PATH = "/pen/springapi/uttaksalder"
     }
 }
