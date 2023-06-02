@@ -5,6 +5,7 @@ import no.nav.pensjon.kalkulator.grunnbeloep.Grunnbeloep
 import no.nav.pensjon.kalkulator.grunnbeloep.client.GrunnbeloepClient
 import no.nav.pensjon.kalkulator.grunnbeloep.client.GrunnbeloepSpec
 import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
+import no.nav.pensjon.kalkulator.uttaksalder.Uttaksalder
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -44,5 +45,14 @@ class KalkulatorController(
     @Operation(summary = "Sjekk status", description = "Hent status for applikasjonens helsetilstand")
     fun status(): String {
         return """{ "status": "OK" }"""
+    }
+
+    @GetMapping("tidligste-uttaksalder")
+    @Operation(
+        summary = "Tidligste uttaksalder",
+        description = "Minimum alder for å kunne starte uttak av alderspensjon"
+    )
+    fun tidligsteUttaksalder(): Uttaksalder {
+        return Uttaksalder(62, 10)
     }
 }
