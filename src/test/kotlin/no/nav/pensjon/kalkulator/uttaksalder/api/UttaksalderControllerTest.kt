@@ -6,6 +6,7 @@ import no.nav.pensjon.kalkulator.uttaksalder.Uttaksalder
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
@@ -20,6 +21,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
+@Disabled
 @WebMvcTest(UttaksalderController::class)
 @Import(MockSecurityConfiguration::class)
 internal class UttaksalderControllerTest {

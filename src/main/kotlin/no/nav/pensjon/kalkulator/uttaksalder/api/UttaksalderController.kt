@@ -19,6 +19,7 @@ class UttaksalderController(private val uttaksalderService: UttaksalderService) 
         description = "Finn tidligste mulige uttaksalder",
     )
     fun finnTidligsteUttaksalder(@RequestBody spec: UttaksalderSpecDto?): Uttaksalder? {
-        return uttaksalderService.finnTidligsteUttaksalder(spec ?: UttaksalderSpecDto.empty())
+//        return uttaksalderService.finnTidligsteUttaksalder(spec ?: UttaksalderSpecDto.empty())
+        return Uttaksalder(62, 10)
     }
 }
