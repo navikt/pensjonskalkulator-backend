@@ -6,4 +6,8 @@ data class UttaksalderSpecDto(
     val sivilstand: Sivilstand?,
     val harEps: Boolean?,
     val sisteInntekt: Int?,
-)
+) {
+    companion object {
+        fun empty() = UttaksalderSpecDto(null, null, null)
+    }
+}
