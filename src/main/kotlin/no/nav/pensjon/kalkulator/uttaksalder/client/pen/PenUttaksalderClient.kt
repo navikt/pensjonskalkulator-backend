@@ -18,7 +18,7 @@ class PenUttaksalderClient(
 ) : PenClient(baseUrl, webClient), UttaksalderClient {
     override fun finnTidligsteUttaksalder(spec: UttaksalderSpec): Uttaksalder? {
         val response = doPost(
-            "$baseUrl${UTTAKSALDER_PATH}",
+            "$baseUrl${PATH}",
             UttaksalderMapper.toDto(spec),
             UttaksalderRequestDto::class.java,
             UttaksalderResponseDto::class.java,
@@ -28,7 +28,6 @@ class PenUttaksalderClient(
     }
 
     companion object {
-        private const val UTTAKSALDER_PATH = "/pen/springapi/simulering/alderspensjon"
-
+        private const val PATH = "/pen/springapi/simulering/alderspensjon"
     }
 }

@@ -19,7 +19,7 @@ class PenSimuleringClient(
 ) : PenClient(baseUrl, webClient), SimuleringClient, Pingable {
     override fun simulerAlderspensjon(spec: SimuleringSpec): Simuleringsresultat {
         val response = doPost(
-            "$baseUrl${SIMULERING_PATH}",
+            "$baseUrl${PATH}",
             SimuleringMapper.toDto(spec),
             SimuleringRequestDto::class.java,
             SimuleringResponseDto::class.java,
@@ -29,7 +29,7 @@ class PenSimuleringClient(
     }
 
     companion object {
-        private const val SIMULERING_PATH = "/pen/springapi/simulering/alderspensjon"
+        private const val PATH = "/pen/springapi/simulering/alderspensjon"
 
         private fun emptyDto() = SimuleringResponseDto(SimulertAlderspensjonDto(0, 0))
     }
