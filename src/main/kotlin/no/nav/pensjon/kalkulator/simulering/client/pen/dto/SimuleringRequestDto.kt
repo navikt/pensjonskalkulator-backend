@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen.dto
 
+import no.nav.pensjon.kalkulator.pen.PenSivilstand
 import java.util.*
 
 data class SimuleringRequestDto(

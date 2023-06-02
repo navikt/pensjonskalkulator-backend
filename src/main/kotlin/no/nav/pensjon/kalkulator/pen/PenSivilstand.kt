@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.simulering.client.pen.dto
+package no.nav.pensjon.kalkulator.pen
 
 import no.nav.pensjon.kalkulator.person.Sivilstand
 
