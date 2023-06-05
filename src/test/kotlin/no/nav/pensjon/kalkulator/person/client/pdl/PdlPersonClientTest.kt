@@ -36,7 +36,10 @@ class PdlPersonClientTest : WebClientTest() {
         val response: Person = client.getPerson(Pid("12906498357"))
 
         ByteArrayOutputStream().use {
-            takeRequest().body.copyTo(it)
+            val request = takeRequest()
+            request.body.copyTo(it)
+            assertEquals("B353", request.getHeader("behandlingsnummer"))
+            assertEquals("PEN", request.getHeader("tema"))
             assertEquals(
                 """{
 	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { foedsel { foedselsdato }, statsborgerskap { land }, sivilstand(historikk: true) { type } } }",

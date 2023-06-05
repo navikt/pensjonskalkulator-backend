@@ -76,6 +76,7 @@ class PdlPersonClient(
     companion object {
         private const val PERSON_PATH = "/graphql"
         private const val PING_PATH = "/graphql"
+        private const val BEHANDLINGSNUMMER = "B353" // https://behandlingskatalog.nais.adeo.no/process/team/d55cc783-7850-4606-9ff6-1fc44b646c9d/91a4e540-5e39-4c10-971f-49b48f35fe11
         private const val THEME = "PEN"
         private val service = EgressService.PERSONDATA
 
@@ -90,6 +91,7 @@ class PdlPersonClient(
             headers.contentType = MediaType.APPLICATION_JSON
             headers.accept = listOf(MediaType.APPLICATION_JSON)
             headers.setBearerAuth(EgressAccess.token(service).value)
+            headers[CustomHttpHeaders.BEHANDLINGSNUMMER] = BEHANDLINGSNUMMER
             headers[CustomHttpHeaders.THEME] = THEME
             headers[CustomHttpHeaders.CALL_ID] = callId()
         }
