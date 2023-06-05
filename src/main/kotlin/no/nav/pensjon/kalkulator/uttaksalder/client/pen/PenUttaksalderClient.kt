@@ -18,7 +18,7 @@ class PenUttaksalderClient(
 ) : PenClient(baseUrl, webClient), UttaksalderClient {
     override fun finnTidligsteUttaksalder(spec: UttaksalderSpec): Uttaksalder? {
         val response = doPost(
-            "$baseUrl${PATH}",
+            PATH,
             UttaksalderMapper.toDto(spec),
             UttaksalderRequestDto::class.java,
             UttaksalderResponseDto::class.java,

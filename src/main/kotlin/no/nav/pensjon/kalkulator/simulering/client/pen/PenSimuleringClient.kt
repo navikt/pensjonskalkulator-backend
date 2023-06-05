@@ -19,7 +19,7 @@ class PenSimuleringClient(
 ) : PenClient(baseUrl, webClient), SimuleringClient, Pingable {
     override fun simulerAlderspensjon(spec: SimuleringSpec): Simuleringsresultat {
         val response = doPost(
-            "$baseUrl${PATH}",
+            PATH,
             SimuleringMapper.toDto(spec),
             SimuleringRequestDto::class.java,
             SimuleringResponseDto::class.java,
