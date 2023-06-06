@@ -21,6 +21,28 @@ abstract class PenClient(
 ) : Pingable {
     private val log = KotlinLogging.logger {}
 
+    protected fun <Response> doGet(
+        path: String,
+        responseClass: Class<Response>
+    ): Response? {
+        val uri = baseUrl + path
+        log.debug { "GET from URI: '$uri'" }
+
+        try {
+            return webClient
+                .get()
+                .uri(uri)
+                .headers { setHeaders(it) }
+                .retrieve()
+                .bodyToMono(responseClass)
+                .block()
+        } catch (e: WebClientResponseException) {
+            throw EgressException(e.responseBodyAsString, e)
+        } catch (e: RuntimeException) { // e.g. when connection broken
+            throw EgressException("Failed to do GET towards $baseUrl: ${e.message}", e)
+        }
+    }
+
     protected fun <Request : Any, Response> doPost(
         path: String,
         requestBody: Request,
@@ -28,10 +50,7 @@ abstract class PenClient(
         responseClass: Class<Response>
     ): Response? {
         val uri = baseUrl + path
-
-        if (log.isDebugEnabled) {
-            log.debug("POST to URI: '$uri'")
-        }
+        log.debug { "POST to URI: '$uri'" }
 
         try {
             return webClient
@@ -71,6 +90,7 @@ abstract class PenClient(
     }
 
     companion object {
+        const val BASE_PATH = "/pen/springapi"
         private const val PING_PATH = "/api/ping"
         private val service = EgressService.SIMULERING
 
