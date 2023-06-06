@@ -29,7 +29,7 @@ class PenSimuleringClient(
     }
 
     companion object {
-        private const val PATH = "/pen/springapi/simulering/alderspensjon"
+        private const val PATH = "$BASE_PATH/simulering/alderspensjon"
 
         private fun emptyDto() = SimuleringResponseDto(SimulertAlderspensjonDto(0, 0))
     }
