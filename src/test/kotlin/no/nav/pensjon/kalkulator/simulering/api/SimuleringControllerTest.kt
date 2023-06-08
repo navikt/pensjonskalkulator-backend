@@ -3,6 +3,8 @@ package no.nav.pensjon.kalkulator.simulering.api
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.simulering.SimuleringService
 import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
+import no.nav.pensjon.kalkulator.simulering.SimulertAlderspensjon
+import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
@@ -16,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.math.BigDecimal
 
 @WebMvcTest(SimuleringController::class)
 @Import(MockSecurityConfiguration::class)
@@ -46,22 +47,27 @@ class SimuleringControllerTest {
 
         private const val URL = "/api/alderspensjon/simulering"
 
-        private const val REQUEST_BODY = """{
-        "simuleringstype": "AP",
-        "forventetInntekt": 100000,
-        "uttaksgrad": 100,
-        "foersteUttaksdato": "2031-11-01",
-        "sivilstand": "UGIFT",
-        "epsHarInntektOver2G": false
-    }"""
+        @Language("json")
+        private val REQUEST_BODY = """{
+            "simuleringstype": "AP",
+            "forventetInntekt": 100000,
+            "uttaksgrad": 100,
+            "foersteUttaksdato": "2031-11-01",
+            "sivilstand": "UGIFT",
+            "epsHarInntektOver2G": false
+        }""".trimIndent()
 
-        private const val RESPONSE_BODY = """{
-        "pensjonsaar": 2033,
-        "pensjonsbeloep": 215026,
-        "alder": 67
-    }"""
+        @Language("json")
+        private val RESPONSE_BODY = """{
+            "pensjon": [
+              {
+                "belop": 215026,
+                "alder": 67
+              }
+            ]
+        }""".trimIndent()
 
-        private fun simuleringsresultat() = Simuleringsresultat(2033, BigDecimal("215026"), 67)
+        private fun simuleringsresultat() = Simuleringsresultat(listOf(SimulertAlderspensjon(alder = 67, belop = 215026)))
 
         private fun <T> anyObject(): T {
             return Mockito.any()

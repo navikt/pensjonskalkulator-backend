@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.reactive.function.client.WebClient
-import java.math.BigDecimal
 import java.time.LocalDate
 
 class PenSimuleringClientTest : WebClientTest() {
@@ -31,11 +30,10 @@ class PenSimuleringClientTest : WebClientTest() {
         arrangeSecurityContext()
         arrange(okResponse(pensjon()))
 
-        val simuleringsresultat = client.simulerAlderspensjon(simuleringSpec())
+        val response = client.simulerAlderspensjon(simuleringSpec())
 
-        assertEquals(65, simuleringsresultat.alder)
-        assertEquals(BigDecimal("98000"), simuleringsresultat.pensjonsbeloep)
-        assertEquals(2033, simuleringsresultat.pensjonsaar)
+        assertEquals(65, response.pensjon[0].alder)
+        assertEquals(98000, response.pensjon[0].belop)
     }
 
     companion object {
@@ -64,10 +62,12 @@ class PenSimuleringClientTest : WebClientTest() {
 
         @Language("json")
         private fun pensjon() = """{
-            "pensjon": {
-                            "alder": "65",
-                            "belop": "98000"
-                        }
-        }"""
+              "pensjon": [
+                {
+                  "alder": "65",
+                  "belop": "98000"
+                }
+              ]
+            }"""
     }
 }

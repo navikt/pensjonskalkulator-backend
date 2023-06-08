@@ -49,9 +49,9 @@ class SimuleringServiceTest {
         val spec = simuleringSpec(654321, Sivilstand.UOPPGITT)
         arrangePidAndResultat()
 
-        val alderspensjon = service.simulerAlderspensjon(spec)
+        val response = service.simulerAlderspensjon(spec)
 
-        assertEquals(BigDecimal("123456.78"), alderspensjon.pensjonsbeloep)
+        assertEquals(123456, response.pensjon[0].belop)
         verifyNoInteractions(opptjeningsgrunnlagClient, personClient)
     }
 
@@ -62,9 +62,9 @@ class SimuleringServiceTest {
         `when`(opptjeningsgrunnlagClient.getOpptjeningsgrunnlag(anyObject())).thenReturn(opptjeningsgrunnlag)
         `when`(personClient.getPerson(anyObject())).thenReturn(person)
 
-        val alderspensjon = service.simulerAlderspensjon(spec)
+        val response = service.simulerAlderspensjon(spec)
 
-        assertEquals(BigDecimal("123456.78"), alderspensjon.pensjonsbeloep)
+        assertEquals(123456, response.pensjon[0].belop)
         verify(opptjeningsgrunnlagClient, times(1)).getOpptjeningsgrunnlag(pid)
         verify(personClient, times(1)).getPerson(pid)
     }
@@ -86,7 +86,14 @@ class SimuleringServiceTest {
         private val person = Person(foedselsdato, Land.NORGE, Sivilstand.UOPPGITT)
         private val inntekt = Inntekt(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, 2023, BigDecimal("543210"))
         private val opptjeningsgrunnlag = Opptjeningsgrunnlag(listOf(inntekt))
-        private val simuleringsresultat = Simuleringsresultat(2031, BigDecimal("123456.78"), 67)
+        private val simuleringsresultat = Simuleringsresultat(
+            pensjon = listOf(
+                SimulertAlderspensjon(
+                    alder = 67,
+                    belop = 123456,
+                )
+            )
+        )
 
         private fun simuleringSpec(forventetInntekt: Int?, sivilstand: Sivilstand?) =
             SimuleringSpecDto("ALDER", forventetInntekt, 100, foersteUttaksdato, sivilstand, false)
