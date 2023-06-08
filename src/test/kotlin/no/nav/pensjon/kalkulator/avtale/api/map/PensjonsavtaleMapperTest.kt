@@ -1,31 +1,50 @@
 package no.nav.pensjon.kalkulator.avtale.api.map
 
+import no.nav.pensjon.kalkulator.avtale.Alder
 import no.nav.pensjon.kalkulator.avtale.Pensjonsavtale
 import no.nav.pensjon.kalkulator.avtale.Pensjonsavtaler
+import no.nav.pensjon.kalkulator.avtale.Utbetalingsperiode
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
-import java.time.LocalDate
 
 class PensjonsavtaleMapperTest {
 
     @Test
     fun `toDto maps avtaler to DTO`() {
-        val dtos = PensjonsavtaleMapper.toDto(avtaler())
+        val dto = PensjonsavtaleMapper.toDto(pensjonsavtaler())
 
-        val dto = dtos.avtaler[0]
-        assertEquals("avtale1", dto.navn)
-        assertEquals(LocalDate.of(1992, 3, 4), dto.fom)
-        assertEquals(LocalDate.of(2010, 11, 12), dto.tom)
+        val avtale = dto.avtaler[0]
+        assertEquals("produkt1", avtale.produktbetegnelse)
+        assertEquals("kategori1", avtale.kategori)
+        assertEquals(67, avtale.startAlder)
+        assertEquals(77, avtale.sluttAlder)
+        val utbetalingsperiode = avtale.utbetalingsperiode
+        assertEquals(68, utbetalingsperiode.startAlder)
+        assertEquals(1, utbetalingsperiode.startMaaned)
+        assertEquals(78, utbetalingsperiode.sluttAlder)
+        assertEquals(12, utbetalingsperiode.sluttMaaned)
+        assertEquals(123000, utbetalingsperiode.aarligUtbetaling)
+        assertEquals(100, utbetalingsperiode.grad)
     }
 
+
     private companion object {
-        private fun avtaler() = Pensjonsavtaler(listOf(pensjonsavtale()))
+
+        private fun pensjonsavtaler() = Pensjonsavtaler(listOf(pensjonsavtale()))
 
         private fun pensjonsavtale() = Pensjonsavtale(
-            "avtale1",
-            LocalDate.of(1992, 3, 4),
-            LocalDate.of(2010, 11, 12)
+            "produkt1",
+            "kategori1",
+            67,
+            77,
+            utbetalingsperioder()
+        )
+
+        private fun utbetalingsperioder() = Utbetalingsperiode(
+            Alder(68, 1),
+            Alder(78, 12),
+            123000,
+            100
         )
     }
 }

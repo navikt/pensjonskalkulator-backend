@@ -45,7 +45,12 @@ spec:
           cluster: dev-fss
       external:
         - host: pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
+        - host: pep-gw-q1.oera-q.local
+          ports:
+            - port: 9443
   env:
+    - name: NORSK_PENSJON_URL
+      value: https://pep-gw-q1.oera-q.local:9443
     - name: PDL_URL
       value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: PEN_URL
@@ -53,6 +58,8 @@ spec:
     - name: PENSJON_REGLER_URL
       value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: POPP_URL
+      value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
+    - name: STS_URL
       value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: STDOUT_LOG_OUTPUT
       value: JSON

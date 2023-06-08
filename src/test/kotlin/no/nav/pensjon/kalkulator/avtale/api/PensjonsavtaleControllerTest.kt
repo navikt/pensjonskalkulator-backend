@@ -1,8 +1,8 @@
 package no.nav.pensjon.kalkulator.avtale.api
 
-import no.nav.pensjon.kalkulator.avtale.Pensjonsavtale
-import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleService
-import no.nav.pensjon.kalkulator.avtale.Pensjonsavtaler
+import no.nav.pensjon.kalkulator.avtale.*
+import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleSpecDto
+import no.nav.pensjon.kalkulator.avtale.client.np.UttaksperiodeSpec
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
@@ -17,7 +17,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.time.LocalDate
 
 @WebMvcTest(PensjonsavtaleController::class)
 @Import(MockSecurityConfiguration::class)
@@ -31,7 +30,7 @@ class PensjonsavtaleControllerTest {
 
     @Test
     fun getAvtaler() {
-        `when`(avtaleService.fetchAvtaler()).thenReturn(avtaler())
+        `when`(avtaleService.fetchAvtaler(pensjonsavtaleSpecDto())).thenReturn(pensjonsavtale())
 
         mvc.perform(
             get(URL)
@@ -46,23 +45,40 @@ class PensjonsavtaleControllerTest {
 
         private const val URL = "/api/pensjonsavtaler"
 
+        //TODO Corresponds to hardcoded values in PensjonsavtaleController
+        private fun pensjonsavtaleSpecDto() = PensjonsavtaleSpecDto(0, UttaksperiodeSpec(67, 1, 100, 0), 0)
+
         @Language("json")
         private const val RESPONSE_BODY = """{
-            "avtaler": [
-                        {
-                            "navn": "avtale1",
-                            "fom": "1992-03-04",
-                            "tom": "2010-11-12"
-                        }
-                    ]
-        }"""
-
-        private fun avtaler() = Pensjonsavtaler(listOf(pensjonsavtale()))
+	"avtaler": [{
+		"produktbetegnelse": "produkt1",
+		"kategori": "kategori1",
+		"startAlder": 67,
+		"sluttAlder": 77,
+		"utbetalingsperiode": {
+			"startAlder": 68,
+			"startMaaned": 1,
+			"sluttAlder": 78,
+			"sluttMaaned": 12,
+			"aarligUtbetaling": 123000,
+			"grad": 100
+		}
+	}]
+}"""
 
         private fun pensjonsavtale() = Pensjonsavtale(
-            "avtale1",
-            LocalDate.of(1992, 3, 4),
-            LocalDate.of(2010, 11, 12)
+            "produkt1",
+            "kategori1",
+            67,
+            77,
+            utbetalingsperioder()
+        )
+
+        private fun utbetalingsperioder() = Utbetalingsperiode(
+            Alder(68, 1),
+            Alder(78, 12),
+            123000,
+            100
         )
     }
 }

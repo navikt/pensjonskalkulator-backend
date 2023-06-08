@@ -1,17 +1,14 @@
 package no.nav.pensjon.kalkulator.opptjening.client.popp
 
+import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningsgrunnlag
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
 import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.tech.security.egress.EnrichedAuthentication
-import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
-import okhttp3.mockwebserver.MockResponse
+import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.security.authentication.TestingAuthenticationToken
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.reactive.function.client.WebClient
 import java.math.BigDecimal
 
@@ -41,63 +38,53 @@ class PoppOpptjeningClientTest : WebClientTest() {
 
     companion object {
 
-        private fun arrangeSecurityContext() {
-            SecurityContextHolder.setContext(SecurityContextHolder.createEmptyContext())
+        @Language("json")
+        private const val RESPONSE_BODY =
+            """
+             {
+                 "opptjeningsGrunnlag": {
+                     "fnr": "04925398980",
+                     "inntektListe": [
+                         {
+                             "changeStamp": {
+                                 "createdBy": "TESTDATA",
+                                 "createdDate": 1586931866460,
+                                 "updatedBy": "srvpensjon",
+                                 "updatedDate": 1586931866775
+                             },
+                             "inntektId": 585473583,
+                             "fnr": "04925398980",
+                             "inntektAr": 2017,
+                             "kilde": "PEN",
+                             "kommune": "1337",
+                             "piMerke": null,
+                             "inntektType": "INN_LON",
+                             "belop": 280241
+                         },
+                         {
+                             "changeStamp": {
+                                 "createdBy": "srvpensjon",
+                                 "createdDate": 1586931866782,
+                                 "updatedBy": "srvpensjon",
+                                 "updatedDate": 1586931866946
+                             },
+                             "inntektId": 585473584,
+                             "fnr": "04925398980",
+                             "inntektAr": 2018,
+                             "kilde": "POPP",
+                             "kommune": null,
+                             "piMerke": null,
+                             "inntektType": "SUM_PI",
+                             "belop": 280242
+                         }
+                     ],
+                     "omsorgListe": [],
+                     "dagpengerListe": [],
+                     "forstegangstjeneste": null
+                 }
+             }
+             """
 
-            SecurityContextHolder.getContext().authentication = EnrichedAuthentication(
-                TestingAuthenticationToken("TEST_USER", null),
-                EgressTokenSuppliersByService(mapOf())
-            )
-        }
-
-        private fun okResponse(): MockResponse {
-            return jsonResponse()
-                .setBody(
-                    """
-                        {
-                            "opptjeningsGrunnlag": {
-                                "fnr": "04925398980",
-                                "inntektListe": [
-                                    {
-                                        "changeStamp": {
-                                            "createdBy": "TESTDATA",
-                                            "createdDate": 1586931866460,
-                                            "updatedBy": "srvpensjon",
-                                            "updatedDate": 1586931866775
-                                        },
-                                        "inntektId": 585473583,
-                                        "fnr": "04925398980",
-                                        "inntektAr": 2017,
-                                        "kilde": "PEN",
-                                        "kommune": "1337",
-                                        "piMerke": null,
-                                        "inntektType": "INN_LON",
-                                        "belop": 280241
-                                    },
-                                    {
-                                        "changeStamp": {
-                                            "createdBy": "srvpensjon",
-                                            "createdDate": 1586931866782,
-                                            "updatedBy": "srvpensjon",
-                                            "updatedDate": 1586931866946
-                                        },
-                                        "inntektId": 585473584,
-                                        "fnr": "04925398980",
-                                        "inntektAr": 2018,
-                                        "kilde": "POPP",
-                                        "kommune": null,
-                                        "piMerke": null,
-                                        "inntektType": "SUM_PI",
-                                        "belop": 280242
-                                    }
-                                ],
-                                "omsorgListe": [],
-                                "dagpengerListe": [],
-                                "forstegangstjeneste": null
-                            }
-                        }
-                        """.trimIndent()
-                )
-        }
+        private fun okResponse() = jsonResponse().setBody(RESPONSE_BODY.trimIndent())
     }
 }
