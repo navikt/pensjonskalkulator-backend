@@ -1,8 +1,9 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen.map
 
+import no.nav.pensjon.kalkulator.pen.PenSivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
-import no.nav.pensjon.kalkulator.pen.PenSivilstand
+import no.nav.pensjon.kalkulator.simulering.SimulertAfpPrivat
 import no.nav.pensjon.kalkulator.simulering.SimulertAlderspensjon
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringRequestDto
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringResponseDto
@@ -14,9 +15,8 @@ object SimuleringMapper {
 
     fun fromDto(dto: SimuleringResponseDto): Simuleringsresultat =
         Simuleringsresultat(
-            dto.pensjon.map {
-                SimulertAlderspensjon(alder = it.alder, belop = it.belop)
-            }
+            alderspensjon = dto.alderspensjon.map { SimulertAlderspensjon(alder = it.alder, belop = it.belop) },
+            afpPrivat = dto.afpPrivat.map { SimulertAfpPrivat(alder = it.alder, belop = it.belop) }
         )
 
     fun toDto(spec: SimuleringSpec) =

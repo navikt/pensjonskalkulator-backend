@@ -31,6 +31,6 @@ class PenSimuleringClient(
     companion object {
         private const val PATH = "$BASE_PATH/simulering/alderspensjon"
 
-        private fun emptyDto() = SimuleringResponseDto(emptyList())
+        private fun emptyDto() = SimuleringResponseDto(emptyList(), emptyList())
     }
 }
