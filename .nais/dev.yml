@@ -50,7 +50,7 @@ spec:
             - port: 9443
   env:
     - name: NORSK_PENSJON_URL
-      value: https://pep-gw-q1.oera-q.local:9443
+      value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: PDL_URL
       value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: PEN_URL
