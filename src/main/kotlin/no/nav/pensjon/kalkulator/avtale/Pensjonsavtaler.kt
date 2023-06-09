@@ -1,3 +1,6 @@
 package no.nav.pensjon.kalkulator.avtale
 
-data class Pensjonsavtaler(val liste: List<Pensjonsavtale>)
+data class Pensjonsavtaler(
+    val avtaler: List<Pensjonsavtale>,
+    val utilgjengeligeSelskap: List<Selskap>
+)

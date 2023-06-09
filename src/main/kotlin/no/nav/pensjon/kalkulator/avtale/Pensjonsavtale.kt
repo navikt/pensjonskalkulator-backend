@@ -1,5 +1,9 @@
 package no.nav.pensjon.kalkulator.avtale
 
-import java.time.LocalDate
-
-data class Pensjonsavtale(val navn: String, val fom: LocalDate, val tom: LocalDate?)
+data class Pensjonsavtale(
+    val produktbetegnelse: String,
+    val kategori: String,
+    val startAlder: Int,
+    val sluttAlder: Int?,
+    val utbetalingsperiode: Utbetalingsperiode
+)

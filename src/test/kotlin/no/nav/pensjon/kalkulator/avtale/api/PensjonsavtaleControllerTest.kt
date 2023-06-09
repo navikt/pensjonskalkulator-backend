@@ -1,9 +1,10 @@
 package no.nav.pensjon.kalkulator.avtale.api
 
-import no.nav.pensjon.kalkulator.avtale.Pensjonsavtale
-import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleService
-import no.nav.pensjon.kalkulator.avtale.Pensjonsavtaler
+import no.nav.pensjon.kalkulator.avtale.*
+import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleSpecDto
+import no.nav.pensjon.kalkulator.avtale.client.np.UttaksperiodeSpec
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
+import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtaler
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -14,10 +15,9 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.time.LocalDate
 
 @WebMvcTest(PensjonsavtaleController::class)
 @Import(MockSecurityConfiguration::class)
@@ -30,12 +30,13 @@ class PensjonsavtaleControllerTest {
     private lateinit var avtaleService: PensjonsavtaleService
 
     @Test
-    fun getAvtaler() {
-        `when`(avtaleService.fetchAvtaler()).thenReturn(avtaler())
+    fun fetchAvtaler() {
+        `when`(avtaleService.fetchAvtaler(pensjonsavtaleSpecDto())).thenReturn(pensjonsavtaler())
 
         mvc.perform(
-            get(URL)
+            post(URL)
                 .with(csrf())
+                .content(REQUEST_BODY)
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk())
@@ -46,23 +47,43 @@ class PensjonsavtaleControllerTest {
 
         private const val URL = "/api/pensjonsavtaler"
 
+        // Corresponds with REQUEST_BODY
+        private fun pensjonsavtaleSpecDto() = PensjonsavtaleSpecDto(100000, uttaksperiodeSpec(), 1)
+
+        private fun uttaksperiodeSpec() = UttaksperiodeSpec(67, 1, 80, 123000)
+
+        @Language("json")
+        private val REQUEST_BODY = """{
+	"aarligInntektFoerUttak": 100000,
+	"uttaksperiode": {
+		"startAlder": 67,
+		"startMaaned": 1,
+		"grad": 80,
+		"aarligInntekt": 123000
+	},
+	"antallInntektsaarEtterUttak": 1
+}"""
+
         @Language("json")
         private const val RESPONSE_BODY = """{
-            "avtaler": [
-                        {
-                            "navn": "avtale1",
-                            "fom": "1992-03-04",
-                            "tom": "2010-11-12"
-                        }
-                    ]
-        }"""
-
-        private fun avtaler() = Pensjonsavtaler(listOf(pensjonsavtale()))
-
-        private fun pensjonsavtale() = Pensjonsavtale(
-            "avtale1",
-            LocalDate.of(1992, 3, 4),
-            LocalDate.of(2010, 11, 12)
-        )
+	"avtaler": [{
+		"produktbetegnelse": "produkt1",
+		"kategori": "kategori1",
+		"startAlder": 67,
+		"sluttAlder": 77,
+		"utbetalingsperiode": {
+			"startAlder": 68,
+			"startMaaned": 1,
+			"sluttAlder": 78,
+			"sluttMaaned": 12,
+			"aarligUtbetaling": 123000,
+			"grad": 100
+		}
+	}],
+	"utilgjengeligeSelskap": [{
+		"navn": "selskap1",
+		"heltUtilgjengelig": true
+	}]
+}"""
     }
 }
