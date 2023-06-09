@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -30,12 +30,13 @@ class PensjonsavtaleControllerTest {
     private lateinit var avtaleService: PensjonsavtaleService
 
     @Test
-    fun getAvtaler() {
+    fun fetchAvtaler() {
         `when`(avtaleService.fetchAvtaler(pensjonsavtaleSpecDto())).thenReturn(pensjonsavtaler())
 
         mvc.perform(
-            get(URL)
+            post(URL)
                 .with(csrf())
+                .content(REQUEST_BODY)
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk())
@@ -46,10 +47,22 @@ class PensjonsavtaleControllerTest {
 
         private const val URL = "/api/pensjonsavtaler"
 
-        //TODO Corresponds to hardcoded values in PensjonsavtaleController
-        private fun pensjonsavtaleSpecDto() = PensjonsavtaleSpecDto(0, uttaksperiodeSpec(), 0)
+        // Corresponds with REQUEST_BODY
+        private fun pensjonsavtaleSpecDto() = PensjonsavtaleSpecDto(100000, uttaksperiodeSpec(), 1)
 
-        private fun uttaksperiodeSpec() = UttaksperiodeSpec(67, 1, 100, 0)
+        private fun uttaksperiodeSpec() = UttaksperiodeSpec(67, 1, 80, 123000)
+
+        @Language("json")
+        private val REQUEST_BODY = """{
+	"aarligInntektFoerUttak": 100000,
+	"uttaksperiode": {
+		"startAlder": 67,
+		"startMaaned": 1,
+		"grad": 80,
+		"aarligInntekt": 123000
+	},
+	"antallInntektsaarEtterUttak": 1
+}"""
 
         @Language("json")
         private const val RESPONSE_BODY = """{
