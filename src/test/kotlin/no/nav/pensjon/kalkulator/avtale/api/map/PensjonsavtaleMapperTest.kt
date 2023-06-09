@@ -1,10 +1,8 @@
 package no.nav.pensjon.kalkulator.avtale.api.map
 
-import no.nav.pensjon.kalkulator.avtale.Alder
-import no.nav.pensjon.kalkulator.avtale.Pensjonsavtale
-import no.nav.pensjon.kalkulator.avtale.Pensjonsavtaler
-import no.nav.pensjon.kalkulator.avtale.Utbetalingsperiode
+import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtaler
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class PensjonsavtaleMapperTest {
@@ -25,26 +23,8 @@ class PensjonsavtaleMapperTest {
         assertEquals(12, utbetalingsperiode.sluttMaaned)
         assertEquals(123000, utbetalingsperiode.aarligUtbetaling)
         assertEquals(100, utbetalingsperiode.grad)
-    }
-
-
-    private companion object {
-
-        private fun pensjonsavtaler() = Pensjonsavtaler(listOf(pensjonsavtale()))
-
-        private fun pensjonsavtale() = Pensjonsavtale(
-            "produkt1",
-            "kategori1",
-            67,
-            77,
-            utbetalingsperioder()
-        )
-
-        private fun utbetalingsperioder() = Utbetalingsperiode(
-            Alder(68, 1),
-            Alder(78, 12),
-            123000,
-            100
-        )
+        val selskap = dto.utilgjengeligeSelskap[0]
+        assertEquals("selskap1", selskap.navn)
+        assertTrue(selskap.heltUtilgjengelig)
     }
 }

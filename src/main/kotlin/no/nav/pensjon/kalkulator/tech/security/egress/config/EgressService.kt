@@ -5,7 +5,7 @@ package no.nav.pensjon.kalkulator.tech.security.egress.config
  */
 enum class EgressService(val description: String, val gatewayUsage: GatewayUsage) {
 
-    PENSJONSAVTALER("Norsk Pensjon", GatewayUsage.EXTERNAL),
+    PENSJONSAVTALER("Norsk Pensjon", GatewayUsage.INTERNAL),
     PENSJON_REGLER("Pensjonsregler", GatewayUsage.INTERNAL),
     PERSONDATA("Persondata", GatewayUsage.INTERNAL),
     PENSJONSOPPTJENING("Pensjonsopptjening", GatewayUsage.INTERNAL),

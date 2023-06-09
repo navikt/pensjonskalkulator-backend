@@ -4,6 +4,7 @@ import no.nav.pensjon.kalkulator.avtale.*
 import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleSpecDto
 import no.nav.pensjon.kalkulator.avtale.client.np.UttaksperiodeSpec
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
+import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtaler
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -30,7 +31,7 @@ class PensjonsavtaleControllerTest {
 
     @Test
     fun getAvtaler() {
-        `when`(avtaleService.fetchAvtaler(pensjonsavtaleSpecDto())).thenReturn(pensjonsavtale())
+        `when`(avtaleService.fetchAvtaler(pensjonsavtaleSpecDto())).thenReturn(pensjonsavtaler())
 
         mvc.perform(
             get(URL)
@@ -46,7 +47,9 @@ class PensjonsavtaleControllerTest {
         private const val URL = "/api/pensjonsavtaler"
 
         //TODO Corresponds to hardcoded values in PensjonsavtaleController
-        private fun pensjonsavtaleSpecDto() = PensjonsavtaleSpecDto(0, UttaksperiodeSpec(67, 1, 100, 0), 0)
+        private fun pensjonsavtaleSpecDto() = PensjonsavtaleSpecDto(0, uttaksperiodeSpec(), 0)
+
+        private fun uttaksperiodeSpec() = UttaksperiodeSpec(67, 1, 100, 0)
 
         @Language("json")
         private const val RESPONSE_BODY = """{
@@ -63,22 +66,11 @@ class PensjonsavtaleControllerTest {
 			"aarligUtbetaling": 123000,
 			"grad": 100
 		}
+	}],
+	"utilgjengeligeSelskap": [{
+		"navn": "selskap1",
+		"heltUtilgjengelig": true
 	}]
 }"""
-
-        private fun pensjonsavtale() = Pensjonsavtale(
-            "produkt1",
-            "kategori1",
-            67,
-            77,
-            utbetalingsperioder()
-        )
-
-        private fun utbetalingsperioder() = Utbetalingsperiode(
-            Alder(68, 1),
-            Alder(78, 12),
-            123000,
-            100
-        )
     }
 }

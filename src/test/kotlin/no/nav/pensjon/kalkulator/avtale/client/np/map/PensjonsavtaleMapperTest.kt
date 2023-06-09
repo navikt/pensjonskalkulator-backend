@@ -1,15 +1,17 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.map
 
 import no.nav.pensjon.kalkulator.avtale.client.np.dto.*
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class PensjonsavtaleMapperTest {
 
     @Test
-    fun `fromDto maps DTO to avtale`() {
-        val avtale = PensjonsavtaleMapper.fromDto(envelope())
+    fun `fromDto maps DTO to avtale and selskap`() {
+        val result = PensjonsavtaleMapper.fromDto(envelope())
 
+        val avtale = result.avtaler[0]
         assertEquals("produkt1", avtale.produktbetegnelse)
         assertEquals("kategori1", avtale.kategori)
         assertEquals(67, avtale.startAlder)
@@ -23,6 +25,9 @@ class PensjonsavtaleMapperTest {
         assertEquals(12, slutt.maaned)
         assertEquals(123000, utbetalingsperiode.aarligUtbetaling)
         assertEquals(100, utbetalingsperiode.grad)
+        val selskap = result.utilgjengeligeSelskap[0]
+        assertEquals("selskap1", selskap.navn)
+        Assertions.assertTrue(selskap.heltUtilgjengelig)
     }
 
     private companion object {
@@ -31,7 +36,10 @@ class PensjonsavtaleMapperTest {
         private fun body() = BodyDto().apply { privatPensjonsrettigheter = pensjonsrettigheter() }
 
         private fun pensjonsrettigheter() =
-            PrivatPensjonsrettigheterDto().apply { privatAlderRettigheterDto = alderRettigheter() }
+            PrivatPensjonsrettigheterDto().apply {
+                privatAlderRettigheter = alderRettigheter()
+                utilgjengeligeSelskap = selskap()
+            }
 
         private fun alderRettigheter() =
             PrivatAlderRettigheterDto().apply {
@@ -50,6 +58,12 @@ class PensjonsavtaleMapperTest {
                 sluttMaaned = 12
                 aarligUtbetaling = 123000
                 grad = 100
+            }
+
+        private fun selskap() =
+            SelskapDto().apply {
+                navn = "selskap1"
+                heltUtilgjengelig = true
             }
     }
 }

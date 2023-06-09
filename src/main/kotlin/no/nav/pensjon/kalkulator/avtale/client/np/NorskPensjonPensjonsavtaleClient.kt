@@ -1,12 +1,9 @@
 package no.nav.pensjon.kalkulator.avtale.client.np
 
 import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import mu.KotlinLogging
-import no.nav.pensjon.kalkulator.avtale.Alder
-import no.nav.pensjon.kalkulator.avtale.Pensjonsavtale
-import no.nav.pensjon.kalkulator.avtale.Utbetalingsperiode
+import no.nav.pensjon.kalkulator.avtale.Pensjonsavtaler
 import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
 import no.nav.pensjon.kalkulator.avtale.client.np.dto.EnvelopeDto
 import no.nav.pensjon.kalkulator.avtale.client.np.map.PensjonsavtaleMapper.fromDto
@@ -30,19 +27,20 @@ import java.util.*
 class NorskPensjonPensjonsavtaleClient(
     @Value("\${norsk-pensjon.url}") private val baseUrl: String,
     private val samlTokenClient: SamlTokenClient,
-    @Qualifier("soap") private val webClient: WebClient
+    @Qualifier("soap") private val webClient: WebClient,
+    private val xmlMapper: XmlMapper
 ) : PensjonsavtaleClient {
     private val log = KotlinLogging.logger {}
 
-    override fun fetchAvtaler(spec: PensjonsavtaleSpec): Pensjonsavtale {
+    override fun fetchAvtaler(spec: PensjonsavtaleSpec): Pensjonsavtaler {
         val responseXml = fetchAvtalerXml(spec)
 
         return try {
-            val dto: EnvelopeDto = xmlMapper().readValue(responseXml, EnvelopeDto::class.java)
+            val dto = xmlMapper.readValue(responseXml, EnvelopeDto::class.java)
             fromDto(dto)
         } catch (e: JsonProcessingException) {
             log.error(e) { "Failed to process JSON" }
-            emptyAvtale()
+            ingenAvtaler()
         }
     }
 
@@ -100,9 +98,10 @@ class NorskPensjonPensjonsavtaleClient(
         private const val PATH = "/privat.pensjonsrettighetstjeneste/privatPensjonTjenesteV2_0"
 
         // PP01 is the old service user ID for pensjon (replaced by srvpensjon/srvpselv in most apps)
-        const val APPLICATION_USER_ID = "PP01"
+        private const val APPLICATION_USER_ID = "PP01"
 
         private val service = EgressService.PENSJONSAVTALER
+
         private fun callId() = UUID.randomUUID().toString()
 
         private fun setHeaders(headers: HttpHeaders) {
@@ -110,7 +109,7 @@ class NorskPensjonPensjonsavtaleClient(
                 headers.setBearerAuth(EgressAccess.token(service).value)
             }
 
-            headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_JSON_VALUE
+            headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_XML_VALUE
             headers[CustomHttpHeaders.CALL_ID] = callId()
         }
 
@@ -122,7 +121,7 @@ class NorskPensjonPensjonsavtaleClient(
 
         private fun xml(spec: PensjonsavtaleSpec): String {
             return """<np:rettighetshaver xmlns:np="http://norskpensjon.no/api/pensjon/V2_0/typer">
-            <foedselsnummer xmlns="">14117940749</foedselsnummer>
+            <foedselsnummer xmlns="">${spec.pid.value}</foedselsnummer>
             <aarligInntektFoerUttak xmlns="">${spec.aarligInntektFoerUttak}</aarligInntektFoerUttak>
             ${xml(spec.uttaksperiode)}
             <antallInntektsaarEtterUttak xmlns="">${spec.antallInntektsaarEtterUttak}</antallInntektsaarEtterUttak>
@@ -138,59 +137,6 @@ class NorskPensjonPensjonsavtaleClient(
             </uttaksperiode>"""
         }
 
-        private fun xmlMapper(): XmlMapper {
-            val mapper = XmlMapper()
-            mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            return mapper
-        }
-
-        private fun emptyAvtale() = Pensjonsavtale("", "", 0, null, emptyUtbetalingsperiode())
-
-        private fun emptyUtbetalingsperiode() = Utbetalingsperiode(Alder(0, 0), null, 0, 0)
-
-        /* TODO error handling
-            private fun getFaultMessage(envelopeXml: String): String {
-                return try {
-                    val envelope: EnvelopeDto = xmlMapper().readValue(envelopeXml, EnvelopeDto::class.java)
-                    getFaultMessage(envelope, envelopeXml)
-                } catch (e: JsonProcessingException) {
-                    log.error("Failed to process fault message '{}'", envelopeXml, e)
-                    envelopeXml
-                }
-            }
-
-            private fun getFaultMessage(envelope: EnvelopeDto, defaultMessage: String): String {
-                return if (isFaultless(envelope)) defaultMessage else toString(envelope.body.fault)
-            }
-
-            private fun isFaultless(envelope: EnvelopeDto?): Boolean {
-                return envelope == null || envelope.body == null || envelope.body.fault == null
-            }
-
-            private fun toString(fault: FaultDto): String {
-                return format(
-                    "Code: %s | String: %s | Detail: { %s }",
-                    fault.faultcode,
-                    fault.faultstring,
-                    toString(fault.detail)
-                )
-            }
-
-            private fun toString(detail: DetailDto): String {
-                val errorDetail: ErrorDetailDto =
-                    if (detail.personNotFoundError == null) detail.samboerNotFoundError else detail.personNotFoundError
-                return if (errorDetail == null) "" else toString(errorDetail)
-            }
-
-            private fun toString(errorDetail: ErrorDetailDto): String {
-                return format(
-                    "Message: %s | Source: %s | Type: %s | Root cause: %s | Timestamp: %s",
-                    errorDetail.errorMessage,
-                    errorDetail.errorSource,
-                    errorDetail.errorType,
-                    errorDetail.rootCause,
-                    errorDetail.dateTimeStamp
-                )
-            }*/
+        private fun ingenAvtaler() = Pensjonsavtaler(emptyList(), emptyList())
     }
 }

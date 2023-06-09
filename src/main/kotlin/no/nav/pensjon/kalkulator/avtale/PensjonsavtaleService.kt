@@ -11,7 +11,7 @@ class PensjonsavtaleService(
     private val avtaleClient: PensjonsavtaleClient,
     private val pidGetter: PidGetter
 ) {
-    fun fetchAvtaler(spec: PensjonsavtaleSpecDto): Pensjonsavtale {
+    fun fetchAvtaler(spec: PensjonsavtaleSpecDto): Pensjonsavtaler {
         return avtaleClient.fetchAvtaler(fromDto(spec))
     }
 

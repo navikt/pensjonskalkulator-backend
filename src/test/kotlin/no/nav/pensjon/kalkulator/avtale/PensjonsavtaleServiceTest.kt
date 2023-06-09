@@ -4,6 +4,7 @@ import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleSpecDto
 import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
 import no.nav.pensjon.kalkulator.avtale.client.np.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.client.np.UttaksperiodeSpec
+import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtaler
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import org.junit.jupiter.api.Assertions.*
@@ -34,8 +35,9 @@ class PensjonsavtaleServiceTest {
     fun `fetchAvtaler fetches avtaler`() {
         arrangePidAndClient()
 
-        val avtale = service.fetchAvtaler(pensjonsavtaleSpecDto())
+        val result = service.fetchAvtaler(pensjonsavtaleSpecDto())
 
+        val avtale = result.avtaler[0]
         assertEquals("produkt1", avtale.produktbetegnelse)
         assertEquals("kategori1", avtale.kategori)
         assertEquals(67, avtale.startAlder)
@@ -45,20 +47,21 @@ class PensjonsavtaleServiceTest {
         val slutt = utbetalingsperiode.slutt!!
         assertEquals(68, start.aar)
         assertEquals(1, start.maaned)
-        assertEquals(76, slutt.aar)
+        assertEquals(78, slutt.aar)
         assertEquals(12, slutt.maaned)
-        assertEquals(12000, utbetalingsperiode.aarligUtbetaling)
+        assertEquals(123000, utbetalingsperiode.aarligUtbetaling)
         assertEquals(100, utbetalingsperiode.grad)
+        val selskap = result.utilgjengeligeSelskap[0]
+        assertEquals("selskap1", selskap.navn)
+        assertTrue(selskap.heltUtilgjengelig)
     }
 
     private fun arrangePidAndClient() {
         `when`(pidGetter.pid()).thenReturn(pid)
-        `when`(pensjonsavtaleClient.fetchAvtaler(pensjonsavtaleSpec())).thenReturn(pensjonsavtale())
+        `when`(pensjonsavtaleClient.fetchAvtaler(pensjonsavtaleSpec())).thenReturn(pensjonsavtaler())
     }
 
-
     private companion object {
-
         private const val AARLIG_INNTEKT_FOER_UTTAK = 456000
         private const val ANTALL_INNTEKTSAAR_ETTER_UTTAK = 2
         private val pid = Pid("12906498357")
@@ -75,22 +78,5 @@ class PensjonsavtaleServiceTest {
             PensjonsavtaleSpec(pid, AARLIG_INNTEKT_FOER_UTTAK, uttaksperiodeSpec, ANTALL_INNTEKTSAAR_ETTER_UTTAK)
 
         private fun uttaksperiodeSpec() = UttaksperiodeSpec(67, 1, 100, 123000)
-
-        private fun pensjonsavtale() =
-            Pensjonsavtale(
-                "produkt1",
-                "kategori1",
-                67,
-                77,
-                utbetalingsperiode()
-            )
-
-        private fun utbetalingsperiode() =
-            Utbetalingsperiode(
-                Alder(68, 1),
-                Alder(76, 12),
-                12000,
-                100
-            )
     }
 }
