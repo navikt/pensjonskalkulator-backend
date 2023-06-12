@@ -59,15 +59,19 @@ class SimuleringControllerTest {
 
         @Language("json")
         private val RESPONSE_BODY = """{
-            "pensjon": [
+            "alderspensjon": [
               {
-                "belop": 215026,
+                "beloep": 215026,
                 "alder": 67
               }
-            ]
+            ],
+            "afpPrivat": []
         }""".trimIndent()
 
-        private fun simuleringsresultat() = Simuleringsresultat(listOf(SimulertAlderspensjon(alder = 67, belop = 215026)))
+        private fun simuleringsresultat() = Simuleringsresultat(
+            alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = 215026)),
+            afpPrivat = emptyList()
+        )
 
         private fun <T> anyObject(): T {
             return Mockito.any()

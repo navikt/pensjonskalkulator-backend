@@ -32,8 +32,8 @@ class PenSimuleringClientTest : WebClientTest() {
 
         val response = client.simulerAlderspensjon(simuleringSpec())
 
-        assertEquals(65, response.pensjon[0].alder)
-        assertEquals(98000, response.pensjon[0].belop)
+        assertEquals(65, response.alderspensjon[0].alder)
+        assertEquals(98000, response.alderspensjon[0].beloep)
     }
 
     companion object {
@@ -62,12 +62,13 @@ class PenSimuleringClientTest : WebClientTest() {
 
         @Language("json")
         private fun pensjon() = """{
-              "pensjon": [
+              "alderspensjon": [
                 {
                   "alder": "65",
-                  "belop": "98000"
+                  "beloep": "98000"
                 }
-              ]
+              ],
+              "afpPrivat": []
             }"""
     }
 }
