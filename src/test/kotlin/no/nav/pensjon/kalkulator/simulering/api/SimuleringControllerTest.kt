@@ -61,7 +61,7 @@ class SimuleringControllerTest {
         private val RESPONSE_BODY = """{
             "alderspensjon": [
               {
-                "belop": 215026,
+                "beloep": 215026,
                 "alder": 67
               }
             ],
@@ -69,7 +69,7 @@ class SimuleringControllerTest {
         }""".trimIndent()
 
         private fun simuleringsresultat() = Simuleringsresultat(
-            alderspensjon = listOf(SimulertAlderspensjon(alder = 67, belop = 215026)),
+            alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = 215026)),
             afpPrivat = emptyList()
         )
 

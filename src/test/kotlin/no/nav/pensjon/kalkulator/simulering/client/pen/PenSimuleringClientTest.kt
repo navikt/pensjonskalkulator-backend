@@ -33,7 +33,7 @@ class PenSimuleringClientTest : WebClientTest() {
         val response = client.simulerAlderspensjon(simuleringSpec())
 
         assertEquals(65, response.alderspensjon[0].alder)
-        assertEquals(98000, response.alderspensjon[0].belop)
+        assertEquals(98000, response.alderspensjon[0].beloep)
     }
 
     companion object {
@@ -65,7 +65,7 @@ class PenSimuleringClientTest : WebClientTest() {
               "alderspensjon": [
                 {
                   "alder": "65",
-                  "belop": "98000"
+                  "beloep": "98000"
                 }
               ],
               "afpPrivat": []

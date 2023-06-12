@@ -51,7 +51,7 @@ class SimuleringServiceTest {
 
         val response = service.simulerAlderspensjon(spec)
 
-        assertEquals(123456, response.alderspensjon[0].belop)
+        assertEquals(123456, response.alderspensjon[0].beloep)
         verifyNoInteractions(opptjeningsgrunnlagClient, personClient)
     }
 
@@ -64,7 +64,7 @@ class SimuleringServiceTest {
 
         val response = service.simulerAlderspensjon(spec)
 
-        assertEquals(123456, response.alderspensjon[0].belop)
+        assertEquals(123456, response.alderspensjon[0].beloep)
         verify(opptjeningsgrunnlagClient, times(1)).getOpptjeningsgrunnlag(pid)
         verify(personClient, times(1)).getPerson(pid)
     }
@@ -90,7 +90,7 @@ class SimuleringServiceTest {
             alderspensjon = listOf(
                 SimulertAlderspensjon(
                     alder = 67,
-                    belop = 123456,
+                    beloep = 123456,
                 )
             ),
             afpPrivat = emptyList(),

@@ -15,8 +15,8 @@ object SimuleringMapper {
 
     fun fromDto(dto: SimuleringResponseDto): Simuleringsresultat =
         Simuleringsresultat(
-            alderspensjon = dto.alderspensjon.map { SimulertAlderspensjon(alder = it.alder, belop = it.belop) },
-            afpPrivat = dto.afpPrivat.map { SimulertAfpPrivat(alder = it.alder, belop = it.belop) }
+            alderspensjon = dto.alderspensjon.map { SimulertAlderspensjon(alder = it.alder, beloep = it.beloep) },
+            afpPrivat = dto.afpPrivat.map { SimulertAfpPrivat(alder = it.alder, beloep = it.beloep) }
         )
 
     fun toDto(spec: SimuleringSpec) =
