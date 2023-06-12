@@ -7,10 +7,13 @@ data class PersonResponseDto(val data: PersonEnvelopeDto?, val errors: List<Erro
 data class PersonEnvelopeDto(val hentPerson: PersonDto)
 
 data class PersonDto(
+    val navn: List<NavnDto>,
     val foedsel: List<FoedselDto>,
     val statsborgerskap: List<StatsborgerskapDto>,
     val sivilstand: List<SivilstandDto>
 )
+
+data class NavnDto(val fornavn: String)
 
 data class FoedselDto(val foedselsdato: LocalDate)
 

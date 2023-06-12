@@ -1,5 +1,7 @@
 package no.nav.pensjon.kalkulator.person
 
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.mock.PersonFactory.skiltPerson
 import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import org.junit.jupiter.api.Assertions.*
@@ -26,14 +28,8 @@ class PersonServiceTest {
 
         val person = PersonService(client, pidGetter).getPerson()
 
+        assertEquals("Fornavn1", person.fornavn)
+        assertEquals(LocalDate.of(1964, 10, 12), person.foedselsdato)
         assertEquals(Sivilstand.SKILT, person.sivilstand)
-    }
-
-    private companion object {
-
-        private const val FNR = "12906498357"
-        private val pid = Pid(FNR)
-
-        private fun skiltPerson() = Person(LocalDate.of(1964, 1, 1), Land.NORGE, Sivilstand.SKILT)
     }
 }

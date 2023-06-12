@@ -81,7 +81,7 @@ class PdlPersonClient(
         private val service = EgressService.PERSONDATA
 
         private fun query(pid: Pid) = """{
-	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { foedsel { foedselsdato }, statsborgerskap { land }, sivilstand(historikk: true) { type } } }",
+	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { fornavn }, foedsel { foedselsdato }, statsborgerskap { land }, sivilstand(historikk: true) { type } } }",
 	"variables": {
 		"ident": "${pid.value}"
 	}
@@ -98,6 +98,6 @@ class PdlPersonClient(
 
         private fun callId() = UUID.randomUUID().toString()
 
-        private fun emptyPerson() = Person(LocalDate.MIN, Land.OTHER, Sivilstand.UOPPGITT)
+        private fun emptyPerson() = Person("", LocalDate.MIN, Land.OTHER, Sivilstand.UOPPGITT)
     }
 }

@@ -42,7 +42,7 @@ class PdlPersonClientTest : WebClientTest() {
             assertEquals("PEN", request.getHeader("tema"))
             assertEquals(
                 """{
-	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { foedsel { foedselsdato }, statsborgerskap { land }, sivilstand(historikk: true) { type } } }",
+	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { fornavn }, foedsel { foedselsdato }, statsborgerskap { land }, sivilstand(historikk: true) { type } } }",
 	"variables": {
 		"ident": "12906498357"
 	}
@@ -51,6 +51,7 @@ class PdlPersonClientTest : WebClientTest() {
             )
         }
 
+        assertEquals("Ola-Kari", response.fornavn)
         assertEquals(LocalDate.of(1971, 11, 12), response.foedselsdato)
         assertEquals(Land.NORGE, response.statsborgerskap)
         assertEquals(Sivilstand.UGIFT, response.sivilstand)
@@ -74,7 +75,12 @@ class PdlPersonClientTest : WebClientTest() {
                     """{
     "data": {
         "hentPerson": {
-            "foedsel": [
+             "navn": [
+                {
+                    "fornavn": "Ola-Kari"
+                }
+             ],
+             "foedsel": [
                 {
                     "foedselsdato": "1971-11-12"
                 }

@@ -1,12 +1,11 @@
 package no.nav.pensjon.kalkulator.uttaksalder
 
+import no.nav.pensjon.kalkulator.mock.PersonFactory.person
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.opptjening.Inntekt
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningsgrunnlag
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
 import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
-import no.nav.pensjon.kalkulator.person.Land
-import no.nav.pensjon.kalkulator.person.Person
-import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
@@ -20,7 +19,6 @@ import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.math.BigDecimal
-import java.time.LocalDate
 
 @ExtendWith(SpringExtension::class)
 internal class UttaksalderServiceTest {
@@ -62,6 +60,7 @@ internal class UttaksalderServiceTest {
 
     @Test
     fun `finnTidligsteUttaksalder obtains inntekt and sivilstand when not specified`() {
+        val person = person()
         `when`(opptjeningsgrunnlagClient.getOpptjeningsgrunnlag(anyObject())).thenReturn(opptjeningsgrunnlag)
         `when`(personClient.getPerson(pid)).thenReturn(person)
 
@@ -81,10 +80,7 @@ internal class UttaksalderServiceTest {
     }
 
     private companion object {
-        private val pid = Pid("12345678910")
         private val uttaksalder = Uttaksalder(67, 0)
-        private val foedselsdato = LocalDate.of(1964, 10, 12)
-        private val person = Person(foedselsdato, Land.NORGE, Sivilstand.UOPPGITT)
         private val inntekt = Inntekt(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, 2023, BigDecimal("543210"))
         private val opptjeningsgrunnlag = Opptjeningsgrunnlag(listOf(inntekt))
     }

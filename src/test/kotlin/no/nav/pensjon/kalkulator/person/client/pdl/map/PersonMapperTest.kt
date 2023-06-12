@@ -12,8 +12,11 @@ class PersonMapperTest {
 
     @Test
     fun `fromDto maps response DTO to domain object`() {
-        val dto = responseDto("UGIFT")
-        assertEquals(Sivilstand.UGIFT, PersonMapper.fromDto(dto).sivilstand)
+        val person = PersonMapper.fromDto(responseDto("UGIFT"))
+
+        assertEquals("Fornavn1", person.fornavn)
+        assertEquals(LocalDate.MIN, person.foedselsdato)
+        assertEquals(Sivilstand.UGIFT, person.sivilstand)
     }
 
     @Test
@@ -40,6 +43,7 @@ class PersonMapperTest {
         PersonResponseDto(
             PersonEnvelopeDto(
                 PersonDto(
+                    listOf(NavnDto("Fornavn1")),
                     listOf(FoedselDto(LocalDate.MIN)),
                     listOf(StatsborgerskapDto(Land.OTHER.code)),
                     sivilstander

@@ -13,10 +13,14 @@ object PersonMapper {
 
     private fun person(dto: PersonDto) =
         Person(
+            fromDto(dto.navn),
             fromDto(dto.foedsel),
             fromDto(dto.statsborgerskap),
             fromDto(dto.sivilstand)
         )
+
+    private fun fromDto(dto: List<NavnDto>) =
+        dto.firstOrNull()?.fornavn ?: "NN"
 
     private fun fromDto(dto: List<FoedselDto>) =
         dto.firstOrNull()?.foedselsdato ?: LocalDate.MIN
@@ -27,5 +31,5 @@ object PersonMapper {
     private fun fromDto(dto: List<SivilstandDto>) =
         dto.firstOrNull()?.type?.let { Sivilstand.forPdlCode(it) } ?: Sivilstand.UOPPGITT
 
-    private fun emptyPerson() = Person(LocalDate.MIN, Land.OTHER, Sivilstand.UOPPGITT)
+    private fun emptyPerson() = Person("", LocalDate.MIN, Land.OTHER, Sivilstand.UOPPGITT)
 }
