@@ -1,9 +1,8 @@
 package no.nav.pensjon.kalkulator.avtale.client.np
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.WebClientTest
+import no.nav.pensjon.kalkulator.mock.XmlMapperFactory.xmlMapper
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.client.SamlTokenClient
 import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.client.gandalf.dto.SamlTokenDataDto
@@ -101,11 +100,6 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
         private fun okResponse(avtale: String) = jsonResponse(HttpStatus.OK).setBody(avtale)
 
         private fun samlTokenData() = SamlTokenDataDto("", "", "", 0)
-
-        private fun xmlMapper() =
-            XmlMapper().apply {
-                disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            }
 
         private fun spec() =
             PensjonsavtaleSpec(
