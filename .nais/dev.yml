@@ -61,5 +61,9 @@ spec:
       value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: STS_URL
       value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
+    - name: TP_URL
+      value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
+    - name: UNT_URL
+      value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: STDOUT_LOG_OUTPUT
       value: JSON

@@ -10,7 +10,9 @@ enum class EgressService(val description: String, val gatewayUsage: GatewayUsage
     PERSONDATA("Persondata", GatewayUsage.INTERNAL),
     PENSJONSOPPTJENING("Pensjonsopptjening", GatewayUsage.INTERNAL),
     SAML_TOKEN("Gandalf STS", GatewayUsage.INTERNAL),
-    SIMULERING("Simulering", GatewayUsage.INTERNAL);
+    SIMULERING("Simulering", GatewayUsage.INTERNAL),
+    TJENESTEPENSJONSFORHOLD("Tjenestepensjonsforhold", GatewayUsage.INTERNAL),
+    USERNAME_TOKEN("SOAP UsernameToken", GatewayUsage.INTERNAL);
 
     companion object {
         val servicesAccessibleViaProxy = EgressService.values().filter { it.gatewayUsage == GatewayUsage.INTERNAL }

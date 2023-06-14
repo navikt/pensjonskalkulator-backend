@@ -46,6 +46,11 @@ public abstract class WebClientTest {
                 .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
     }
 
+    protected static MockResponse xmlResponse() {
+        return new MockResponse()
+                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE);
+    }
+
     protected static String baseUrl() {
         return baseUrl;
     }
