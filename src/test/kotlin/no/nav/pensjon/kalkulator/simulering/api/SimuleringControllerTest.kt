@@ -59,13 +59,12 @@ class SimuleringControllerTest {
 
         @Language("json")
         private val RESPONSE_BODY = """{
-            "alderspensjon": [
+            "pensjon": [
               {
                 "beloep": 215026,
                 "alder": 67
               }
-            ],
-            "afpPrivat": []
+            ]
         }""".trimIndent()
 
         private fun simuleringsresultat() = Simuleringsresultat(
