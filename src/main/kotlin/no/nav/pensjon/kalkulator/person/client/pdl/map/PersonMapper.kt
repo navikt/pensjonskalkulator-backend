@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.person.client.pdl.map
 
 import no.nav.pensjon.kalkulator.person.Land
+import no.nav.pensjon.kalkulator.person.NavnFormatter
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.pdl.dto.*
@@ -13,7 +14,7 @@ object PersonMapper {
 
     private fun person(dto: PersonDto) =
         Person(
-            fromDto(dto.navn),
+            NavnFormatter.formatNavn(fromDto(dto.navn)),
             fromDto(dto.foedsel),
             fromDto(dto.statsborgerskap),
             fromDto(dto.sivilstand)
