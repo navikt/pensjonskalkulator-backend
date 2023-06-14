@@ -1,12 +1,10 @@
-package no.nav.pensjon.kalkulator.tech.security.egress.token.saml.client.gandalf
+package no.nav.pensjon.kalkulator.tech.security.egress.token.unt.client.fssgw
 
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
-import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.AuthorizationGrantType
-import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.OAuth2ParameterNames
-import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.client.SamlTokenClient
-import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.client.gandalf.dto.SamlTokenDataDto
+import no.nav.pensjon.kalkulator.tech.security.egress.token.unt.client.UsernameTokenClient
+import no.nav.pensjon.kalkulator.tech.security.egress.token.unt.client.fssgw.dto.UsernameTokenDto
 import no.nav.pensjon.kalkulator.tech.selftest.PingResult
 import no.nav.pensjon.kalkulator.tech.selftest.Pingable
 import no.nav.pensjon.kalkulator.tech.selftest.ServiceStatus
@@ -14,46 +12,39 @@ import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.util.*
 
 /**
- * Fetches SAML tokens from Gandalf Security Token Service (STS).
+ * Fetches UsernameToken (UNT) from FSS gateway.
  */
 @Component
-class GandalfSamlTokenClient(
-    @Value("\${sts.url}") private val baseUrl: String,
+class FssGatewayUsernameTokenClient(
+    @Value("\${unt.url}") private val baseUrl: String,
     private val webClient: WebClient
-) : SamlTokenClient, Pingable {
+) : UsernameTokenClient, Pingable {
     private val log = KotlinLogging.logger {}
 
-    override fun fetchSamlToken(): SamlTokenDataDto {
-        val uri = "$baseUrl$TOKEN_EXCHANGE_PATH"
-        log.debug { "POST to URI: '$uri'" }
-        val idToken = SecurityContextHolder.getContext().authentication.credentials as Jwt
+    override fun fetchUsernameToken(): UsernameTokenDto {
+        val uri = "$baseUrl$TOKEN_PATH"
+        log.debug { "GET from URI: '$uri'" }
 
         try {
-            val response = webClient
-                .post()
+            val token = webClient
+                .get()
                 .uri(uri)
                 .headers(::setHeaders)
-                .body(body(idToken))
                 .retrieve()
-                .bodyToMono(SamlTokenDataDto::class.java)
+                .bodyToMono(String::class.java)
                 .block()
-                ?: emptyDto()
-
-            return response
+                ?: ""
+            return UsernameTokenDto(token)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         } catch (e: RuntimeException) { // e.g. when connection broken
-            throw EgressException("Failed to POST to $uri: ${e.message}", e)
+            throw EgressException("Failed to GET $uri: ${e.message}", e)
         }
     }
 
@@ -79,14 +70,12 @@ class GandalfSamlTokenClient(
     }
 
     companion object {
-        private const val TOKEN_TYPE = "urn:ietf:params:oauth:token-type:access_token"
-        private const val TOKEN_EXCHANGE_PATH = "/rest/v1/sts/token/exchange"
+        private const val TOKEN_PATH = "/ws-support/unt"
         private const val PING_PATH = "/ping" //TODO
-        private val service = EgressService.SAML_TOKEN
+        private val service = EgressService.USERNAME_TOKEN
 
         private fun setHeaders(headers: HttpHeaders) {
             headers.setBearerAuth(EgressAccess.token(service).value)
-            headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_FORM_URLENCODED_VALUE
             headers[CustomHttpHeaders.CALL_ID] = callId()
         }
 
@@ -95,14 +84,6 @@ class GandalfSamlTokenClient(
             headers[CustomHttpHeaders.CALL_ID] = callId()
         }
 
-        private fun body(idToken: Jwt) =
-            BodyInserters
-                .fromFormData(OAuth2ParameterNames.GRANT_TYPE, AuthorizationGrantType.TOKEN_EXCHANGE.value)
-                .with(OAuth2ParameterNames.SUBJECT_TOKEN_TYPE, TOKEN_TYPE)
-                .with(OAuth2ParameterNames.SUBJECT_TOKEN, idToken.tokenValue)
-
         private fun callId() = UUID.randomUUID().toString()
-
-        private fun emptyDto() = SamlTokenDataDto("", "", "", 0)
     }
 }
