@@ -31,6 +31,7 @@ class SecurityConfiguration {
                     HttpMethod.GET,
                     internalRequestMatcher,
                     "/api/status",
+                    "/api/feature/**",
                     "/swagger-ui/**",
                     "/v3/api-docs/**"
                 ).permitAll()
