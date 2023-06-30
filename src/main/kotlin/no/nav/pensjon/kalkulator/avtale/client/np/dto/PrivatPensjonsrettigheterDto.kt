@@ -1,6 +1,12 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.dto
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
+
 class PrivatPensjonsrettigheterDto {
-    var privatAlderRettigheter: PrivatAlderRettigheterDto? = null
-    var utilgjengeligeSelskap: SelskapDto? = null
+
+    @JacksonXmlElementWrapper(useWrapping = false)
+    var privatAlderRettigheter: List<PrivatAlderRettigheterDto>? = null
+
+    @JacksonXmlElementWrapper(useWrapping = false)
+    var utilgjengeligeSelskap: List<SelskapDto>? = null
 }

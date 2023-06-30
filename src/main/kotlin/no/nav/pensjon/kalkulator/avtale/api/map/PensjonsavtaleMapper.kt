@@ -11,10 +11,11 @@ import no.nav.pensjon.kalkulator.avtale.api.dto.UtbetalingsperiodeDto
 
 object PensjonsavtaleMapper {
 
-    fun toDto(source: Pensjonsavtaler) = PensjonsavtalerDto(
-        source.avtaler.map(::toAvtaleDto),
-        source.utilgjengeligeSelskap.map(::toSelskapDto)
-    )
+    fun toDto(source: Pensjonsavtaler) =
+        PensjonsavtalerDto(
+            source.avtaler.map(::toAvtaleDto),
+            source.utilgjengeligeSelskap.map(::toSelskapDto)
+        )
 
     private fun toAvtaleDto(source: Pensjonsavtale) =
         PensjonsavtaleDto(
@@ -22,7 +23,7 @@ object PensjonsavtaleMapper {
             source.kategori,
             source.startAlder,
             source.sluttAlder,
-            toPeriodeDto(source.utbetalingsperiode)
+            source.utbetalingsperioder.map(::toPeriodeDto)
         )
 
     private fun toPeriodeDto(source: Utbetalingsperiode) =

@@ -12,10 +12,10 @@ object PensjonsavtaleFactory {
             "kategori1",
             67,
             77,
-            utbetalingsperioder()
+            listOf(utbetalingsperiode())
         )
 
-    private fun utbetalingsperioder() =
+    private fun utbetalingsperiode() =
         Utbetalingsperiode(
             Alder(68, 1),
             Alder(78, 12),

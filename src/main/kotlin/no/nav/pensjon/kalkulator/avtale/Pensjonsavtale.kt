@@ -5,5 +5,5 @@ data class Pensjonsavtale(
     val kategori: String,
     val startAlder: Int,
     val sluttAlder: Int?,
-    val utbetalingsperiode: Utbetalingsperiode
+    val utbetalingsperioder: List<Utbetalingsperiode>
 )

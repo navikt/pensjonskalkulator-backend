@@ -8,27 +8,29 @@ import no.nav.pensjon.kalkulator.avtale.client.np.dto.UtbetalingsperioderDto
 
 object PensjonsavtaleMapper {
 
+    private const val DEFAULT_VALUE = "ukjent"
+
     fun fromDto(dto: EnvelopeDto) =
         Pensjonsavtaler(
-            pensjonsavtale(dto)?.let(::listOf) ?: emptyOrFault(dto),
-            utilgjengeligeSelskap(dto)?.let(::listOf) ?: emptyList()
+            pensjonsavtaler(dto) ?: emptyOrFault(dto),
+            utilgjengeligeSelskap(dto) ?: emptyList()
         )
 
-    private fun pensjonsavtale(dto: EnvelopeDto) =
-        dto.body?.privatPensjonsrettigheter?.privatAlderRettigheter?.let {
+    private fun pensjonsavtaler(dto: EnvelopeDto) =
+        dto.body?.privatPensjonsrettigheter?.privatAlderRettigheter?.map {
             Pensjonsavtale(
-                it.produktbetegnelse ?: "ukjent",
-                it.kategori ?: "ukjent",
+                it.produktbetegnelse ?: DEFAULT_VALUE,
+                it.kategori ?: DEFAULT_VALUE,
                 it.startAlder ?: 0,
                 it.sluttAlder,
-                utbetalingsperiode(it.utbetalingsperioder!!)
+                it.utbetalingsperioder?.map(::utbetalingsperiode) ?: emptyList()
             )
         }
 
     private fun utilgjengeligeSelskap(dto: EnvelopeDto) =
-        dto.body?.privatPensjonsrettigheter?.utilgjengeligeSelskap?.let {
+        dto.body?.privatPensjonsrettigheter?.utilgjengeligeSelskap?.map {
             Selskap(
-                it.navn ?: "ukjent",
+                it.navn ?: DEFAULT_VALUE,
                 it.heltUtilgjengelig ?: false
             )
         }

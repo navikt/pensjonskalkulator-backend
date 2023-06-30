@@ -4,6 +4,6 @@ import no.nav.pensjon.kalkulator.avtale.client.np.UttaksperiodeSpec
 
 data class PensjonsavtaleSpecDto(
     val aarligInntektFoerUttak: Int,
-    val uttaksperiode: UttaksperiodeSpec,
+    val uttaksperioder: List<UttaksperiodeSpec>,
     val antallInntektsaarEtterUttak: Int
 )

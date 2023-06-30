@@ -5,6 +5,6 @@ import no.nav.pensjon.kalkulator.person.Pid
 data class PensjonsavtaleSpec(
     val pid: Pid,
     val aarligInntektFoerUttak: Int,
-    val uttaksperiode: UttaksperiodeSpec,
+    val uttaksperioder: List<UttaksperiodeSpec>,
     val antallInntektsaarEtterUttak: Int
 )

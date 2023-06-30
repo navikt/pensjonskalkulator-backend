@@ -47,20 +47,44 @@ class PensjonsavtaleControllerTest {
 
         private const val URL = "/api/pensjonsavtaler"
 
-        // Corresponds with REQUEST_BODY
-        private fun pensjonsavtaleSpecDto() = PensjonsavtaleSpecDto(100000, uttaksperiodeSpec(), 1)
+        // NB: These spec objects must correspond with REQUEST_BODY below
+        private fun pensjonsavtaleSpecDto() =
+            PensjonsavtaleSpecDto(
+                100000,
+                listOf(uttaksperiodeSpec1(), uttaksperiodeSpec2()),
+                1
+            )
 
-        private fun uttaksperiodeSpec() = UttaksperiodeSpec(67, 1, 80, 123000)
+        private fun uttaksperiodeSpec1() =
+            UttaksperiodeSpec(
+                67,
+                1,
+                80,
+                123000
+            )
+
+        private fun uttaksperiodeSpec2() =
+            UttaksperiodeSpec(
+                70,
+                1,
+                100,
+                45000
+            )
 
         @Language("json")
         private val REQUEST_BODY = """{
 	"aarligInntektFoerUttak": 100000,
-	"uttaksperiode": {
+	"uttaksperioder": [{
 		"startAlder": 67,
 		"startMaaned": 1,
 		"grad": 80,
 		"aarligInntekt": 123000
-	},
+	}, {
+		"startAlder": 70,
+		"startMaaned": 1,
+		"grad": 100,
+		"aarligInntekt": 45000
+	}],
 	"antallInntektsaarEtterUttak": 1
 }"""
 
@@ -71,14 +95,14 @@ class PensjonsavtaleControllerTest {
 		"kategori": "kategori1",
 		"startAlder": 67,
 		"sluttAlder": 77,
-		"utbetalingsperiode": {
+		"utbetalingsperioder": [{
 			"startAlder": 68,
 			"startMaaned": 1,
 			"sluttAlder": 78,
 			"sluttMaaned": 12,
 			"aarligUtbetaling": 123000,
 			"grad": 100
-		}
+		}]
 	}],
 	"utilgjengeligeSelskap": [{
 		"navn": "selskap1",

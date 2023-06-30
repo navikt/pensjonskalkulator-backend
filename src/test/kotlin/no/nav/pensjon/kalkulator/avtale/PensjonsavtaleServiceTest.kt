@@ -7,6 +7,7 @@ import no.nav.pensjon.kalkulator.avtale.client.np.UttaksperiodeSpec
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtaler
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
+import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,11 +25,14 @@ class PensjonsavtaleServiceTest {
     private lateinit var pensjonsavtaleClient: PensjonsavtaleClient
 
     @Mock
+    private lateinit var featureToggleService: FeatureToggleService
+
+    @Mock
     private lateinit var pidGetter: PidGetter
 
     @BeforeEach
     fun initialize() {
-        service = PensjonsavtaleService(pensjonsavtaleClient, pidGetter)
+        service = PensjonsavtaleService(pensjonsavtaleClient, pidGetter, featureToggleService)
     }
 
     @Test
@@ -42,7 +46,7 @@ class PensjonsavtaleServiceTest {
         assertEquals("kategori1", avtale.kategori)
         assertEquals(67, avtale.startAlder)
         assertEquals(77, avtale.sluttAlder)
-        val utbetalingsperiode = avtale.utbetalingsperiode
+        val utbetalingsperiode = avtale.utbetalingsperioder[0]
         val start = utbetalingsperiode.start
         val slutt = utbetalingsperiode.slutt!!
         assertEquals(68, start.aar)
@@ -65,7 +69,7 @@ class PensjonsavtaleServiceTest {
         private const val AARLIG_INNTEKT_FOER_UTTAK = 456000
         private const val ANTALL_INNTEKTSAAR_ETTER_UTTAK = 2
         private val pid = Pid("12906498357")
-        private val uttaksperiodeSpec = uttaksperiodeSpec()
+        private val uttaksperiodeSpec = listOf(uttaksperiodeSpec())
 
         private fun pensjonsavtaleSpecDto() =
             PensjonsavtaleSpecDto(

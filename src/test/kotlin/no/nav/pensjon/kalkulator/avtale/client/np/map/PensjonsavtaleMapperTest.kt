@@ -1,8 +1,8 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.map
 
 import no.nav.pensjon.kalkulator.avtale.client.np.dto.*
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class PensjonsavtaleMapperTest {
@@ -16,7 +16,7 @@ class PensjonsavtaleMapperTest {
         assertEquals("kategori1", avtale.kategori)
         assertEquals(67, avtale.startAlder)
         assertEquals(77, avtale.sluttAlder)
-        val utbetalingsperiode = avtale.utbetalingsperiode
+        val utbetalingsperiode = avtale.utbetalingsperioder[0]
         val start = utbetalingsperiode.start
         val slutt = utbetalingsperiode.slutt!!
         assertEquals(68, start.aar)
@@ -27,7 +27,7 @@ class PensjonsavtaleMapperTest {
         assertEquals(100, utbetalingsperiode.grad)
         val selskap = result.utilgjengeligeSelskap[0]
         assertEquals("selskap1", selskap.navn)
-        Assertions.assertTrue(selskap.heltUtilgjengelig)
+        assertTrue(selskap.heltUtilgjengelig)
     }
 
     private companion object {
@@ -37,20 +37,20 @@ class PensjonsavtaleMapperTest {
 
         private fun pensjonsrettigheter() =
             PrivatPensjonsrettigheterDto().apply {
-                privatAlderRettigheter = alderRettigheter()
-                utilgjengeligeSelskap = selskap()
+                privatAlderRettigheter = listOf(alderRettighet())
+                utilgjengeligeSelskap = listOf(selskap())
             }
 
-        private fun alderRettigheter() =
+        private fun alderRettighet() =
             PrivatAlderRettigheterDto().apply {
                 produktbetegnelse = "produkt1"
                 kategori = "kategori1"
                 startAlder = 67
                 sluttAlder = 77
-                utbetalingsperioder = utbetalingsperioder()
+                utbetalingsperioder = listOf(utbetalingsperiode())
             }
 
-        private fun utbetalingsperioder() =
+        private fun utbetalingsperiode() =
             UtbetalingsperioderDto().apply {
                 startAlder = 68
                 startMaaned = 1

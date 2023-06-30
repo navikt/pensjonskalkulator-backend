@@ -16,7 +16,7 @@ class PensjonsavtaleMapperTest {
         assertEquals("kategori1", avtale.kategori)
         assertEquals(67, avtale.startAlder)
         assertEquals(77, avtale.sluttAlder)
-        val utbetalingsperiode = avtale.utbetalingsperiode
+        val utbetalingsperiode = avtale.utbetalingsperioder[0]
         assertEquals(68, utbetalingsperiode.startAlder)
         assertEquals(1, utbetalingsperiode.startMaaned)
         assertEquals(78, utbetalingsperiode.sluttAlder)
