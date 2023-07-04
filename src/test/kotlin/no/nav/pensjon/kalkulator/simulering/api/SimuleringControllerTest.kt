@@ -1,9 +1,7 @@
 package no.nav.pensjon.kalkulator.simulering.api
 
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
-import no.nav.pensjon.kalkulator.simulering.SimuleringService
-import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
-import no.nav.pensjon.kalkulator.simulering.SimulertAlderspensjon
+import no.nav.pensjon.kalkulator.simulering.*
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
@@ -30,17 +28,31 @@ class SimuleringControllerTest {
     private lateinit var simuleringService: SimuleringService
 
     @Test
-    fun simulerAlderspensjon() {
-        `when`(simuleringService.simulerAlderspensjon(anyObject())).thenReturn(simuleringsresultat())
+    fun `simulerer alderspensjon`() {
+        `when`(simuleringService.simulerAlderspensjon(anyObject())).thenReturn(simuleringsresultat(SimuleringType.ALDERSPENSJON))
 
         mvc.perform(
             post(URL)
                 .with(csrf())
-                .content(REQUEST_BODY)
+                .content(requestBody(SimuleringType.ALDERSPENSJON))
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY))
+            .andExpect(content().json(responseBody(SimuleringType.ALDERSPENSJON)))
+    }
+
+    @Test
+    fun `simulerer alderspensjon med afp privat`() {
+        `when`(simuleringService.simulerAlderspensjon(anyObject())).thenReturn(simuleringsresultat(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT))
+
+        mvc.perform(
+            post(URL)
+                .with(csrf())
+                .content(requestBody(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT))
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk())
+            .andExpect(content().json(responseBody(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)))
     }
 
     private companion object {
@@ -48,8 +60,8 @@ class SimuleringControllerTest {
         private const val URL = "/api/alderspensjon/simulering"
 
         @Language("json")
-        private val REQUEST_BODY = """{
-            "simuleringstype": "AP",
+        private fun requestBody(simuleringstype: SimuleringType) = """{
+            "simuleringstype": "$simuleringstype",
             "forventetInntekt": 100000,
             "uttaksgrad": 100,
             "foersteUttaksdato": "2031-11-01",
@@ -58,19 +70,41 @@ class SimuleringControllerTest {
         }""".trimIndent()
 
         @Language("json")
-        private val RESPONSE_BODY = """{
-            "pensjon": [
+        private fun responseBody(simuleringstype: SimuleringType) = """{
+            "alderspensjon": [
               {
                 "beloep": 215026,
                 "alder": 67
               }
-            ]
+            ],
+            "afpPrivat": ${
+            when (simuleringstype) {
+                SimuleringType.ALDERSPENSJON -> "[]"
+                SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT -> """
+              [
+                {
+                  "beloep": 22056,
+                  "alder": 67
+                }
+              ]
+              """
+            }
+        }
         }""".trimIndent()
 
-        private fun simuleringsresultat() = Simuleringsresultat(
-            alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = 215026)),
-            afpPrivat = emptyList()
-        )
+        private fun simuleringsresultat(simuleringType: SimuleringType) =
+            when (simuleringType) {
+                SimuleringType.ALDERSPENSJON -> Simuleringsresultat(
+                    alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = 215026)),
+                    afpPrivat = emptyList()
+                )
+
+                SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT -> Simuleringsresultat(
+                    alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = 215026)),
+                    afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 22056)),
+                )
+            }
+
 
         private fun <T> anyObject(): T {
             return Mockito.any()

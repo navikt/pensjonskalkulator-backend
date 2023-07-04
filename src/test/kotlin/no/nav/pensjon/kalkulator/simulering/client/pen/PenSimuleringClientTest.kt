@@ -4,6 +4,7 @@ import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringSpec
+import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.tech.security.egress.EnrichedAuthentication
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import org.intellij.lang.annotations.Language
@@ -48,7 +49,7 @@ class PenSimuleringClientTest : WebClientTest() {
         }
 
         private fun simuleringSpec() = SimuleringSpec(
-            " simuleringstype1",
+            SimuleringType.ALDERSPENSJON,
             Pid("12906498357"),
             123000,
             80,

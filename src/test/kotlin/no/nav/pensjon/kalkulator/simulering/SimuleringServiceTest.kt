@@ -93,6 +93,6 @@ class SimuleringServiceTest {
         )
 
         private fun simuleringSpec(forventetInntekt: Int?, sivilstand: Sivilstand?) =
-            SimuleringSpecDto("ALDER", forventetInntekt, 100, foersteUttaksdato, sivilstand, false)
+            SimuleringSpecDto(SimuleringType.ALDERSPENSJON, forventetInntekt, 100, foersteUttaksdato, sivilstand, false)
     }
 }

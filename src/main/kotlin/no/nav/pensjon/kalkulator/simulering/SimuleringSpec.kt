@@ -5,7 +5,7 @@ import no.nav.pensjon.kalkulator.person.Sivilstand
 import java.time.LocalDate
 
 data class SimuleringSpec(
-    val simuleringstype: String,
+    val simuleringstype: SimuleringType,
     val pid: Pid,
     val forventetInntekt: Int,
     val uttaksgrad: Int,

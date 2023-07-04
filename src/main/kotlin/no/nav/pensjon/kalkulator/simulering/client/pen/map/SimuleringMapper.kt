@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen.map
 
+import no.nav.pensjon.kalkulator.pen.PenSimuleringstype
 import no.nav.pensjon.kalkulator.pen.PenSivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
@@ -26,7 +27,8 @@ object SimuleringMapper {
             harEps = spec.epsHarInntektOver2G,
             uttaksar = 1,
             sisteInntekt = spec.forventetInntekt,
-            forsteUttaksdato = midnight(spec.foersteUttaksdato)
+            forsteUttaksdato = midnight(spec.foersteUttaksdato),
+            simuleringstype = PenSimuleringstype.from(spec.simuleringstype)
         )
 
     private fun midnight(date: LocalDate) = Date.from(date.atTime(0, 0).toInstant(ZoneOffset.ofHours(1)))

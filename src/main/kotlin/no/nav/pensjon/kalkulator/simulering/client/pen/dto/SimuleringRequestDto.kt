@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen.dto
 
+import no.nav.pensjon.kalkulator.pen.PenSimuleringstype
 import no.nav.pensjon.kalkulator.pen.PenSivilstand
 import java.util.*
 
@@ -9,5 +10,6 @@ data class SimuleringRequestDto(
     val harEps: Boolean,
     val uttaksar: Int,
     val sisteInntekt: Int,
-    val forsteUttaksdato: Date
+    val forsteUttaksdato: Date,
+    val simuleringstype: PenSimuleringstype,
 )
