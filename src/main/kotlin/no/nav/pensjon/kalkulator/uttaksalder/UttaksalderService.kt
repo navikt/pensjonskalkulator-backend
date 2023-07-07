@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.uttaksalder
 import no.nav.pensjon.kalkulator.opptjening.InntektUtil
 import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.Pid
+import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderSpecDto
@@ -29,7 +30,7 @@ class UttaksalderService(
         return uttaksalderClient.finnTidligsteUttaksalder(uttaksalderSpec)
     }
 
-    private fun sivilstand(pid: Pid) = personClient.getPerson(pid).sivilstand
+    private fun sivilstand(pid: Pid) = personClient.getPerson(pid)?.sivilstand ?: Sivilstand.UOPPGITT
 
     private fun sistePensjonsgivendeInntekt(pid: Pid): Int {
         val grunnlag = opptjeningsgrunnlagClient.getOpptjeningsgrunnlag(pid)

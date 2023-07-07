@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.simulering
 import no.nav.pensjon.kalkulator.opptjening.InntektUtil
 import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.Pid
+import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringSpecDto
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
@@ -32,7 +33,7 @@ class SimuleringService(
         return simuleringClient.simulerAlderspensjon(simuleringSpec)
     }
 
-    private fun sivilstand(pid: Pid) = personClient.getPerson(pid).sivilstand
+    private fun sivilstand(pid: Pid) = personClient.getPerson(pid)?.sivilstand ?: Sivilstand.UOPPGITT
 
     private fun sistePensjonsgivendeInntekt(pid: Pid): Int {
         val grunnlag = opptjeningsgrunnlagClient.getOpptjeningsgrunnlag(pid)

@@ -10,7 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import java.time.LocalDate
 
 @ExtendWith(SpringExtension::class)
 class PersonServiceTest {
@@ -28,8 +27,7 @@ class PersonServiceTest {
 
         val person = PersonService(client, pidGetter).getPerson()
 
-        assertEquals("Fornavn1", person.fornavn)
-        assertEquals(LocalDate.of(1964, 10, 12), person.foedselsdato)
-        assertEquals(Sivilstand.SKILT, person.sivilstand)
+        assertEquals("Fornavn1", person?.fornavn)
+        assertEquals(Sivilstand.SKILT, person?.sivilstand)
     }
 }

@@ -1,10 +1,8 @@
 package no.nav.pensjon.kalkulator.person.client.pdl
 
 import mu.KotlinLogging
-import no.nav.pensjon.kalkulator.person.Land
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.person.client.pdl.dto.*
 import no.nav.pensjon.kalkulator.person.client.pdl.map.PersonMapper
@@ -21,7 +19,6 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import java.time.LocalDate
 import java.util.*
 
 @Component
@@ -31,7 +28,7 @@ class PdlPersonClient(
 ) : PersonClient, Pingable {
     private val log = KotlinLogging.logger {}
 
-    override fun getPerson(pid: Pid): Person {
+    override fun getPerson(pid: Pid): Person? {
         val uri = baseUrl + PERSON_PATH
         log.debug { "POST to URI: '$uri'" }
 
@@ -45,7 +42,6 @@ class PdlPersonClient(
                 .bodyToMono(PersonResponseDto::class.java)
                 .block()
                 ?.let(PersonMapper::fromDto)
-                ?: emptyPerson()
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         } catch (e: RuntimeException) { // e.g. when connection broken
@@ -81,7 +77,7 @@ class PdlPersonClient(
         private val service = EgressService.PERSONDATA
 
         private fun query(pid: Pid) = """{
-	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { fornavn }, foedsel { foedselsdato }, statsborgerskap { land }, sivilstand(historikk: true) { type } } }",
+	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { fornavn }, sivilstand(historikk: true) { type } } }",
 	"variables": {
 		"ident": "${pid.value}"
 	}
@@ -97,7 +93,5 @@ class PdlPersonClient(
         }
 
         private fun callId() = UUID.randomUUID().toString()
-
-        private fun emptyPerson() = Person("", LocalDate.MIN, Land.OTHER, Sivilstand.UOPPGITT)
     }
 }

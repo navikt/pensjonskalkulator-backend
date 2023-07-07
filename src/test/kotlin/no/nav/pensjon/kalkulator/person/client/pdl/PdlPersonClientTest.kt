@@ -1,13 +1,13 @@
 package no.nav.pensjon.kalkulator.person.client.pdl
 
 import no.nav.pensjon.kalkulator.mock.WebClientTest
-import no.nav.pensjon.kalkulator.person.Land
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.tech.security.egress.EnrichedAuthentication
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import okhttp3.mockwebserver.MockResponse
+import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -17,7 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.reactive.function.client.WebClient
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
-import java.time.LocalDate
 
 class PdlPersonClientTest : WebClientTest() {
 
@@ -29,11 +28,11 @@ class PdlPersonClientTest : WebClientTest() {
     }
 
     @Test
-    fun `getPerson returns person when OK response`() {
+    fun `getPerson uses supplied PID in request to PDL`() {
         arrangeSecurityContext()
         arrange(okResponse())
 
-        val response: Person = client.getPerson(Pid("12906498357"))
+        client.getPerson(Pid("12906498357"))!!
 
         ByteArrayOutputStream().use {
             val request = takeRequest()
@@ -42,7 +41,7 @@ class PdlPersonClientTest : WebClientTest() {
             assertEquals("PEN", request.getHeader("tema"))
             assertEquals(
                 """{
-	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { fornavn }, foedsel { foedselsdato }, statsborgerskap { land }, sivilstand(historikk: true) { type } } }",
+	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { fornavn }, sivilstand(historikk: true) { type } } }",
 	"variables": {
 		"ident": "12906498357"
 	}
@@ -50,11 +49,28 @@ class PdlPersonClientTest : WebClientTest() {
                 it.toString(StandardCharsets.UTF_8)
             )
         }
+    }
+
+    @Test
+    fun `getPerson returns person when OK response`() {
+        arrangeSecurityContext()
+        arrange(okResponse())
+
+        val response: Person = client.getPerson(Pid("12906498357"))!!
 
         assertEquals("Ola-Kari", response.fornavn)
-        assertEquals(LocalDate.of(1971, 11, 12), response.foedselsdato)
-        assertEquals(Land.NORGE, response.statsborgerskap)
         assertEquals(Sivilstand.UGIFT, response.sivilstand)
+    }
+
+    @Test
+    fun `getPerson returns partial person when receiving partial graphql-response`() {
+        arrangeSecurityContext()
+        arrange(partialResponse())
+
+        val response: Person = client.getPerson(Pid("12906498357"))!!
+
+        assertEquals("Ola-Kari", response.fornavn)
+        assertEquals(null, response.sivilstand)
     }
 
     companion object {
@@ -70,35 +86,43 @@ class PdlPersonClientTest : WebClientTest() {
 
         private fun okResponse(): MockResponse {
             // Actual response from PDL in Q2:
+            @Language("JSON")
+            val body = """{
+              "data": {
+                "hentPerson": {
+                  "navn": [
+                    {
+                      "fornavn": "Ola-Kari"
+                    }
+                  ],
+                  "sivilstand": [
+                    {
+                      "type": "UGIFT"
+                    }
+                  ]
+                }
+              }
+            }""".trimIndent()
             return jsonResponse(HttpStatus.OK)
-                .setBody(
-                    """{
-    "data": {
-        "hentPerson": {
-             "navn": [
-                {
-                    "fornavn": "Ola-Kari"
-                }
-             ],
-             "foedsel": [
-                {
-                    "foedselsdato": "1971-11-12"
-                }
-            ],
-            "statsborgerskap": [
-                {
-                    "land": "NOR"
-                }
-            ],
-            "sivilstand": [
-                {
-                    "type": "UGIFT"
-                }
-            ]
+                .setBody(body)
         }
-    }
-}""".trimIndent()
-                )
+
+        private fun partialResponse(): MockResponse {
+            @Language("JSON")
+            val body = """{
+              "data": {
+                "hentPerson": {
+                  "navn": [
+                    {
+                      "fornavn": "Ola-Kari"
+                    }
+                  ],
+                  "sivilstand": null
+                }
+              }
+            }""".trimIndent()
+            return jsonResponse(HttpStatus.OK)
+                .setBody(body)
         }
     }
 }

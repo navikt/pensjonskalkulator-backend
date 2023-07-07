@@ -69,7 +69,7 @@ internal class UttaksalderServiceTest {
 
         assertNotNull(uttaksalder)
         verify(uttaksalderClient, times(1)).finnTidligsteUttaksalder(
-            UttaksalderSpec(pid, person.sivilstand, false, inntekt.beloep.toInt())
+            UttaksalderSpec(pid, person.sivilstand!!, false, inntekt.beloep.toInt())
         )
         verify(personClient, times(1)).getPerson(pid)
         verify(opptjeningsgrunnlagClient, times(1)).getOpptjeningsgrunnlag(pid)
