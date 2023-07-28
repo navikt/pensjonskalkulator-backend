@@ -55,13 +55,13 @@ internal class UttaksalderServiceTest {
             UttaksalderSpec(pid, Sivilstand.GIFT, true, 100_000)
         )
         verify(personClient, never()).fetchPerson(anyObject())
-        verify(opptjeningsgrunnlagClient, never()).getOpptjeningsgrunnlag(anyObject())
+        verify(opptjeningsgrunnlagClient, never()).fetchOpptjeningsgrunnlag(anyObject())
     }
 
     @Test
     fun `finnTidligsteUttaksalder obtains inntekt and sivilstand when not specified`() {
         val person = person()
-        `when`(opptjeningsgrunnlagClient.getOpptjeningsgrunnlag(anyObject())).thenReturn(opptjeningsgrunnlag)
+        `when`(opptjeningsgrunnlagClient.fetchOpptjeningsgrunnlag(anyObject())).thenReturn(opptjeningsgrunnlag)
         `when`(personClient.fetchPerson(pid)).thenReturn(person)
 
         val spec = UttaksalderSpecDto(null, null, null)
@@ -72,7 +72,7 @@ internal class UttaksalderServiceTest {
             UttaksalderSpec(pid, person.sivilstand!!, false, inntekt.beloep.toInt())
         )
         verify(personClient, times(1)).fetchPerson(pid)
-        verify(opptjeningsgrunnlagClient, times(1)).getOpptjeningsgrunnlag(pid)
+        verify(opptjeningsgrunnlagClient, times(1)).fetchOpptjeningsgrunnlag(pid)
     }
 
     private fun <T> anyObject(): T {

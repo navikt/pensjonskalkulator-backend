@@ -1,32 +1,42 @@
 package no.nav.pensjon.kalkulator.opptjening.client.popp
 
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningsgrunnlag
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
-import no.nav.pensjon.kalkulator.person.Pid
+import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.web.EgressException
+import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.web.reactive.function.client.WebClient
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mock
+import org.springframework.http.HttpStatus
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.math.BigDecimal
 
+@ExtendWith(SpringExtension::class)
 class PoppOpptjeningClientTest : WebClientTest() {
 
     private lateinit var client: PoppOpptjeningClient
 
+    @Mock
+    private lateinit var callIdGenerator: CallIdGenerator
+
     @BeforeEach
     fun initialize() {
-        client = PoppOpptjeningClient(baseUrl(), WebClient.create())
+        client = PoppOpptjeningClient(baseUrl(), WebClientConfig().regularWebClient(), callIdGenerator)
     }
 
     @Test
-    fun `getOpptjeningsgrunnlag returns opptjeningsgrunnlag when OK response`() {
+    fun `fetchOpptjeningsgrunnlag returns opptjeningsgrunnlag when OK response`() {
         arrangeSecurityContext()
         arrange(okResponse())
 
-        val response: Opptjeningsgrunnlag = client.getOpptjeningsgrunnlag(Pid("04925398980"))
+        val response: Opptjeningsgrunnlag = client.fetchOpptjeningsgrunnlag(pid)
 
         val inntekt2017 = response.inntekter.first { it.aar == 2017 }
         val inntekt2018 = response.inntekter.first { it.aar == 2018 }
@@ -34,6 +44,45 @@ class PoppOpptjeningClientTest : WebClientTest() {
         assertEquals(Opptjeningstype.OTHER, inntekt2017.type)
         assertEquals(BigDecimal("280242"), inntekt2018.beloep)
         assertEquals(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, inntekt2018.type)
+    }
+
+    @Test
+    fun `fetchOpptjeningsgrunnlag retries in case of server error`() {
+        arrangeSecurityContext()
+        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
+        arrange(okResponse())
+
+        val response: Opptjeningsgrunnlag = client.fetchOpptjeningsgrunnlag(pid)
+
+        val inntekt2017 = response.inntekter.first { it.aar == 2017 }
+        val inntekt2018 = response.inntekter.first { it.aar == 2018 }
+        assertEquals(BigDecimal("280241"), inntekt2017.beloep)
+        assertEquals(Opptjeningstype.OTHER, inntekt2017.type)
+        assertEquals(BigDecimal("280242"), inntekt2018.beloep)
+        assertEquals(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, inntekt2018.type)
+    }
+
+    @Test
+    fun `fetchOpptjeningsgrunnlag does not retry in case of client error`() {
+        arrangeSecurityContext()
+        arrange(jsonResponse(HttpStatus.BAD_REQUEST).setBody("My bad"))
+        // No 2nd response arranged, since no retry
+
+        val exception = assertThrows(EgressException::class.java) { client.fetchOpptjeningsgrunnlag(pid) }
+
+        assertEquals("My bad", exception.message)
+    }
+
+    @Test
+    fun `fetchOpptjeningsgrunnlag handles server error`() {
+        arrangeSecurityContext()
+        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
+        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil")) // for retry
+
+        val exception = assertThrows(EgressException::class.java) { client.fetchOpptjeningsgrunnlag(pid) }
+
+        assertEquals("Failed calling ${baseUrl()}/popp/api/opptjeningsgrunnlag", exception.message)
+        assertEquals("Feil", (exception.cause as EgressException).message)
     }
 
     companion object {

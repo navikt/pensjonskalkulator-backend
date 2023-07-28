@@ -58,13 +58,13 @@ class SimuleringServiceTest {
     fun `simulerAlderspensjon obtains inntekt and sivilstand when not specified`() {
         val spec = simuleringSpec(null, null)
         arrangePidAndResultat()
-        `when`(opptjeningsgrunnlagClient.getOpptjeningsgrunnlag(anyObject())).thenReturn(opptjeningsgrunnlag)
+        `when`(opptjeningsgrunnlagClient.fetchOpptjeningsgrunnlag(anyObject())).thenReturn(opptjeningsgrunnlag)
         `when`(personClient.fetchPerson(anyObject())).thenReturn(person())
 
         val response = service.simulerAlderspensjon(spec)
 
         assertEquals(123456, response.alderspensjon[0].beloep)
-        verify(opptjeningsgrunnlagClient, times(1)).getOpptjeningsgrunnlag(pid)
+        verify(opptjeningsgrunnlagClient, times(1)).fetchOpptjeningsgrunnlag(pid)
         verify(personClient, times(1)).fetchPerson(pid)
     }
 

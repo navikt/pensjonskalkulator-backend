@@ -4,5 +4,5 @@ import no.nav.pensjon.kalkulator.opptjening.Opptjeningsgrunnlag
 import no.nav.pensjon.kalkulator.person.Pid
 
 interface OpptjeningsgrunnlagClient {
-    fun getOpptjeningsgrunnlag(pid: Pid): Opptjeningsgrunnlag
+    fun fetchOpptjeningsgrunnlag(pid: Pid): Opptjeningsgrunnlag
 }

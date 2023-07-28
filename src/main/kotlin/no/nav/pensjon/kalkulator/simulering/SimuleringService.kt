@@ -36,7 +36,7 @@ class SimuleringService(
     private fun sivilstand(pid: Pid) = personClient.fetchPerson(pid)?.sivilstand ?: Sivilstand.UOPPGITT
 
     private fun sistePensjonsgivendeInntekt(pid: Pid): Int {
-        val grunnlag = opptjeningsgrunnlagClient.getOpptjeningsgrunnlag(pid)
+        val grunnlag = opptjeningsgrunnlagClient.fetchOpptjeningsgrunnlag(pid)
         return InntektUtil.sistePensjonsgivendeInntekt(grunnlag).intValueExact()
     }
 }
