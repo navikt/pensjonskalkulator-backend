@@ -18,13 +18,12 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.nio.charset.StandardCharsets
 import java.util.*
 
-@Component
+//@Component <--- Using v3 of client instead
 class NorskPensjonPensjonsavtaleClient(
     @Value("\${norsk-pensjon.url}") private val baseUrl: String,
     private val samlTokenClient: SamlTokenClient,
@@ -133,9 +132,9 @@ class NorskPensjonPensjonsavtaleClient(
 
         private fun xml(spec: UttaksperiodeSpec): String {
             return """<uttaksperiode xmlns="">
-                <startAlder>${spec.startAlder}</startAlder>
-                <startMaaned>${spec.startMaaned}</startMaaned>
-                <grad>${spec.grad}</grad>
+                <startAlder>${spec.start.aar}</startAlder>
+                <startMaaned>${spec.start.maaned}</startMaaned>
+                <grad>${spec.grad.prosentsats}</grad>
                 <aarligInntekt>${spec.aarligInntekt}</aarligInntekt>
             </uttaksperiode>"""
         }

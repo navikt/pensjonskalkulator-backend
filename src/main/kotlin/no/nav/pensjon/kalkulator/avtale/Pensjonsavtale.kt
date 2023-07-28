@@ -1,9 +1,68 @@
 package no.nav.pensjon.kalkulator.avtale
 
+/**
+ * Beskrivelse av felter:
+ * selskapsnavn: Påkrevd; navn på selskap som leverer produktet
+ * produktbetegnelse: Påkrevd; produktbetegnelse
+ * arbeidsgiver: Navn på arbeidsgiver
+ * kategori: Påkrevd; kategori
+ * naavaerendeAvtaltAarligInnskudd: Nåværende avtalt årlig innskudd
+ * beregningsmodell: Leverandør av prognosen
+ * startAlder: Første startalder
+ * sluttAlder: Siste sluttalder
+ * opplysningsdato: Dato (YYYY-MM-DD)
+ * aarsakManglendeGradering: Årsak til manglende gradering; attributtet er satt hvis pensjonen ikke kan bestå av graderte data, eller ikke kan simuleres fleksibelt (dvs. startalder ulik ordinær startalder for pensjon 67 år)
+ * utbetalingsperioder: Hvis en rettighet ikke kan leveres med utbetalingsperioder, så skal «Årsak til manglende utbetaling» ha en relevant feilkode.
+ */
 data class Pensjonsavtale(
+    val avtalenummer: Int,
+    val arbeidsgiver: String,
+    val selskapsnavn: String,
     val produktbetegnelse: String,
-    val kategori: String,
-    val startAlder: Int,
-    val sluttAlder: Int?,
+    val kategori: AvtaleKategori,
+    val underkategori: AvtaleUnderkategori,
+    val innskuddssaldo: Int,
+    val naavaerendeAvtaltAarligInnskudd: Int,
+    val pensjonsbeholdningForventet: Int,
+    val pensjonsbeholdningNedreGrense: Int,
+    val pensjonsbeholdningOvreGrense: Int,
+    val avkastningsgaranti: Boolean,
+    val beregningsmodell: EksternBeregningsmodell,
+    val startalder: Int,
+    val sluttalder: Int?,
+    val opplysningsdato: String,
+    val manglendeGraderingAarsak: ManglendeEksternGraderingAarsak,
+    val manglendeBeregningAarsak: ManglendeEksternBeregningAarsak,
     val utbetalingsperioder: List<Utbetalingsperiode>
-)
+) {
+    val harStartalder = startalder > 0
+    val erLivsvarig = sluttalder == null
+
+    constructor(
+        produktbetegnelse: String,
+        kategori: AvtaleKategori,
+        startalder: Int,
+        sluttalder: Int?,
+        utbetalingsperioder: List<Utbetalingsperiode>
+    ) : this(
+        0,
+        "",
+        "",
+        produktbetegnelse,
+        kategori,
+        AvtaleUnderkategori.NONE,
+        0,
+        0,
+        0,
+        0,
+        0,
+        false,
+        EksternBeregningsmodell.NONE,
+        startalder,
+        sluttalder,
+                "1901-01-01",
+        ManglendeEksternGraderingAarsak.NONE,
+        ManglendeEksternBeregningAarsak.NONE,
+        utbetalingsperioder
+    )
+}

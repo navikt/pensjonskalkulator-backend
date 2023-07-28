@@ -5,10 +5,12 @@ import no.nav.pensjon.kalkulator.avtale.client.np.dto.EnvelopeDto
 import no.nav.pensjon.kalkulator.avtale.client.np.dto.FaultDetailDto
 import no.nav.pensjon.kalkulator.avtale.client.np.dto.FaultDto
 import no.nav.pensjon.kalkulator.avtale.client.np.dto.UtbetalingsperioderDto
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.map.Kategori
 
 object PensjonsavtaleMapper {
 
     private const val DEFAULT_VALUE = "ukjent"
+    private val DEFAULT_UTTAKSGRAD = Uttaksgrad.HUNDRE_PROSENT
 
     fun fromDto(dto: EnvelopeDto) =
         Pensjonsavtaler(
@@ -20,7 +22,7 @@ object PensjonsavtaleMapper {
         dto.body?.privatPensjonsrettigheter?.privatAlderRettigheter?.map {
             Pensjonsavtale(
                 it.produktbetegnelse ?: DEFAULT_VALUE,
-                it.kategori ?: DEFAULT_VALUE,
+                Kategori.fromExternalValue(it.kategori).internalValue,
                 it.startAlder ?: 0,
                 it.sluttAlder,
                 it.utbetalingsperioder?.map(::utbetalingsperiode) ?: emptyList()
@@ -40,7 +42,7 @@ object PensjonsavtaleMapper {
             Alder(source.startAlder!!, source.startMaaned!!),
             source.sluttAlder?.let { Alder(it, source.sluttMaaned!!) },
             source.aarligUtbetaling ?: 0,
-            source.grad ?: 0
+            source.grad?.let { Uttaksgrad.from(it) } ?: DEFAULT_UTTAKSGRAD
         )
 
     private fun emptyOrFault(dto: EnvelopeDto) =

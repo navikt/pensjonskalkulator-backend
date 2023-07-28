@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.avtale.api.dto
 data class PensjonsavtaleDto(
     val produktbetegnelse: String,
     val kategori: String,
-    val startAlder: Int,
+    val startAlder: Int?, // NB: not mandatory
     val sluttAlder: Int?,
     val utbetalingsperioder: List<UtbetalingsperiodeDto>
 )

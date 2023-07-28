@@ -1,30 +1,49 @@
 package no.nav.pensjon.kalkulator.avtale.api.map
 
+import io.kotest.matchers.shouldBe
+import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleDto
+import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtalerDto
+import no.nav.pensjon.kalkulator.avtale.api.dto.SelskapDto
+import no.nav.pensjon.kalkulator.avtale.api.dto.UtbetalingsperiodeDto
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtaler
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class PensjonsavtaleMapperTest {
 
     @Test
-    fun `toDto maps avtaler to DTO`() {
-        val dto = PensjonsavtaleMapper.toDto(pensjonsavtaler())
-
-        val avtale = dto.avtaler[0]
-        assertEquals("produkt1", avtale.produktbetegnelse)
-        assertEquals("kategori1", avtale.kategori)
-        assertEquals(67, avtale.startAlder)
-        assertEquals(77, avtale.sluttAlder)
-        val utbetalingsperiode = avtale.utbetalingsperioder[0]
-        assertEquals(68, utbetalingsperiode.startAlder)
-        assertEquals(1, utbetalingsperiode.startMaaned)
-        assertEquals(78, utbetalingsperiode.sluttAlder)
-        assertEquals(12, utbetalingsperiode.sluttMaaned)
-        assertEquals(123000, utbetalingsperiode.aarligUtbetaling)
-        assertEquals(100, utbetalingsperiode.grad)
-        val selskap = dto.utilgjengeligeSelskap[0]
-        assertEquals("selskap1", selskap.navn)
-        assertTrue(selskap.heltUtilgjengelig)
+    fun `toDto maps pensjonsavtaler to DTO`() {
+        PensjonsavtaleMapper.toDto(pensjonsavtaler(67)) shouldBe pensjonsavtalerDto(67)
     }
+
+    @Test
+    fun `toDto maps zero avtale-startalder to null`() {
+        PensjonsavtaleMapper.toDto(pensjonsavtaler(0)) shouldBe pensjonsavtalerDto(null)
+    }
+
+    private fun pensjonsavtalerDto(startalder: Int?) =
+        PensjonsavtalerDto(
+            listOf(avtale(startalder)),
+            listOf(selskap())
+        )
+
+    private fun avtale(startalder: Int?) =
+        PensjonsavtaleDto(
+            "produkt1",
+            "INDIVIDUELL_ORDNING",
+            startalder,
+            77,
+            listOf(utbetalingsperiode())
+        )
+
+    private fun utbetalingsperiode() =
+        UtbetalingsperiodeDto(
+            68,
+            1,
+            78,
+            12,
+            123000,
+            100
+        )
+
+    private fun selskap() = SelskapDto("selskap1", true)
 }

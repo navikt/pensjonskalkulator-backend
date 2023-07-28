@@ -1,5 +1,7 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.map
 
+import no.nav.pensjon.kalkulator.avtale.AvtaleKategori
+import no.nav.pensjon.kalkulator.avtale.Uttaksgrad
 import no.nav.pensjon.kalkulator.avtale.client.np.dto.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -13,9 +15,9 @@ class PensjonsavtaleMapperTest {
 
         val avtale = result.avtaler[0]
         assertEquals("produkt1", avtale.produktbetegnelse)
-        assertEquals("kategori1", avtale.kategori)
-        assertEquals(67, avtale.startAlder)
-        assertEquals(77, avtale.sluttAlder)
+        assertEquals(AvtaleKategori.PRIVAT_TJENESTEPENSJON, avtale.kategori)
+        assertEquals(67, avtale.startalder)
+        assertEquals(77, avtale.sluttalder)
         val utbetalingsperiode = avtale.utbetalingsperioder[0]
         val start = utbetalingsperiode.start
         val slutt = utbetalingsperiode.slutt!!
@@ -23,8 +25,8 @@ class PensjonsavtaleMapperTest {
         assertEquals(1, start.maaned)
         assertEquals(78, slutt.aar)
         assertEquals(12, slutt.maaned)
-        assertEquals(123000, utbetalingsperiode.aarligUtbetaling)
-        assertEquals(100, utbetalingsperiode.grad)
+        assertEquals(123000, utbetalingsperiode.aarligUtbetalingForventet)
+        assertEquals(Uttaksgrad.HUNDRE_PROSENT, utbetalingsperiode.grad)
         val selskap = result.utilgjengeligeSelskap[0]
         assertEquals("selskap1", selskap.navn)
         assertTrue(selskap.heltUtilgjengelig)
@@ -44,7 +46,7 @@ class PensjonsavtaleMapperTest {
         private fun alderRettighet() =
             PrivatAlderRettigheterDto().apply {
                 produktbetegnelse = "produkt1"
-                kategori = "kategori1"
+                kategori = "privatTjenestepensjon"
                 startAlder = 67
                 sluttAlder = 77
                 utbetalingsperioder = listOf(utbetalingsperiode())

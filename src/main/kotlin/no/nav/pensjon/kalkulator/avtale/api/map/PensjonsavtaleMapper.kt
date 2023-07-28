@@ -20,9 +20,9 @@ object PensjonsavtaleMapper {
     private fun toAvtaleDto(source: Pensjonsavtale) =
         PensjonsavtaleDto(
             source.produktbetegnelse,
-            source.kategori,
-            source.startAlder,
-            source.sluttAlder,
+            source.kategori.name,
+            if (source.harStartalder) source.startalder else null,
+            source.sluttalder,
             source.utbetalingsperioder.map(::toPeriodeDto)
         )
 
@@ -32,8 +32,8 @@ object PensjonsavtaleMapper {
             source.start.maaned,
             source.slutt?.aar,
             source.slutt?.maaned,
-            source.aarligUtbetaling,
-            source.grad
+            source.aarligUtbetalingForventet,
+            source.grad.prosentsats
         )
 
     private fun toSelskapDto(source: Selskap) =

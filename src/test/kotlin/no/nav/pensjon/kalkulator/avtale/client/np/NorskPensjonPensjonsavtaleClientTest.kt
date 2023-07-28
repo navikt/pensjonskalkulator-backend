@@ -130,12 +130,12 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
             <uttaksperiode xmlns="">
                 <startAlder>1</startAlder>
                 <startMaaned>1</startMaaned>
-                <grad>1</grad>
+                <grad>80</grad>
                 <aarligInntekt>1</aarligInntekt>
             </uttaksperiode><uttaksperiode xmlns="">
                 <startAlder>2</startAlder>
                 <startMaaned>2</startMaaned>
-                <grad>2</grad>
+                <grad>100</grad>
                 <aarligInntekt>2</aarligInntekt>
             </uttaksperiode>
             <antallInntektsaarEtterUttak xmlns="">0</antallInntektsaarEtterUttak>
@@ -160,7 +160,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
         <ns2:privatPensjonsrettigheter xmlns:ns2="http://norskpensjon.no/api/pensjon/V2_0/typer">
             <privatAlderRettigheter>
                 <produktbetegnelse>PENSJONSKAPITALBEVIjS</produktbetegnelse>
-                <kategori>innskuddsbasertKollektiv</kategori>
+                <kategori>individuellOrdning</kategori>
                 <startAlder>70</startAlder>
                 <sluttAlder>80</sluttAlder>
                 <utbetalingsperioder>
@@ -190,7 +190,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
         <ns2:privatPensjonsrettigheter xmlns:ns2="http://norskpensjon.no/api/pensjon/V2_0/typer">
             <privatAlderRettigheter>
                 <produktbetegnelse>PENSJONSKAPITALBEVIjS</produktbetegnelse>
-                <kategori>innskuddsbasertKollektiv</kategori>
+                <kategori>individuellOrdning</kategori>
                 <startAlder>70</startAlder>
                 <sluttAlder>80</sluttAlder>
                 <utbetalingsperioder>
@@ -204,7 +204,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
             </privatAlderRettigheter>
             <privatAlderRettigheter>
                 <produktbetegnelse>AFP</produktbetegnelse>
-                <kategori>ytelsesbasertIndividuell</kategori>
+                <kategori>Folketrygd</kategori>
                 <startAlder>75</startAlder>
                 <sluttAlder>85</sluttAlder>
             </privatAlderRettigheter>
@@ -267,12 +267,17 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
                 0
             )
 
-        private fun uttaksperiodeSpec(value: Int) = UttaksperiodeSpec(value, value, value, value)
+        private fun uttaksperiodeSpec(value: Int) =
+            UttaksperiodeSpec(
+                Alder(value, value),
+                if (value < 2) Uttaksgrad.AATTI_PROSENT else Uttaksgrad.HUNDRE_PROSENT,
+                value
+            )
 
         private fun avtaleUtenUtbetalingsperioder() =
             Pensjonsavtale(
                 "AFP",
-                "ytelsesbasertIndividuell",
+                AvtaleKategori.FOLKETRYGD,
                 75,
                 85,
                 emptyList()
@@ -281,7 +286,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
         private fun avtaleMedEnUtbetalingsperiode() =
             Pensjonsavtale(
                 "PENSJONSKAPITALBEVIjS",
-                "innskuddsbasertKollektiv",
+                AvtaleKategori.INDIVIDUELL_ORDNING,
                 70,
                 80,
                 listOf(utbetalingsperiodeMedSluttalder())
@@ -290,7 +295,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
         private fun avtaleMedToUtbetalingsperioder() =
             Pensjonsavtale(
                 "PENSJONSKAPITALBEVIjS",
-                "innskuddsbasertKollektiv",
+                AvtaleKategori.INDIVIDUELL_ORDNING,
                 70,
                 80,
                 listOf(
@@ -304,7 +309,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
                 Alder(71, 1),
                 Alder(81, 2),
                 10000,
-                100
+                Uttaksgrad.HUNDRE_PROSENT
             )
 
         private fun utbetalingsperiodeUtenSluttalder() =
@@ -312,14 +317,14 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
                 Alder(72, 2),
                 null,
                 20000,
-                50
+                Uttaksgrad.FEMTI_PROSENT
             )
 
         private fun assertAvtale(expected: Pensjonsavtale, actual: Pensjonsavtale) {
             assertEquals(expected.kategori, actual.kategori)
             assertEquals(expected.produktbetegnelse, actual.produktbetegnelse)
-            assertEquals(expected.startAlder, actual.startAlder)
-            assertEquals(expected.sluttAlder, actual.sluttAlder)
+            assertEquals(expected.startalder, actual.startalder)
+            assertEquals(expected.sluttalder, actual.sluttalder)
             assertEquals(expected.utbetalingsperioder.size, actual.utbetalingsperioder.size)
 
             if (actual.utbetalingsperioder.isNotEmpty()) {
@@ -330,7 +335,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
         private fun assertUtbetalingsperiode(expected: Utbetalingsperiode, actual: Utbetalingsperiode) {
             assertAlder(expected.start, actual.start)
             assertAlder(expected.slutt, actual.slutt)
-            assertEquals(expected.aarligUtbetaling, actual.aarligUtbetaling)
+            assertEquals(expected.aarligUtbetalingForventet, actual.aarligUtbetalingForventet)
             assertEquals(expected.grad, actual.grad)
         }
 

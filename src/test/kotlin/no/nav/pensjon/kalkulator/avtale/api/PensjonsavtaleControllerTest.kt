@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.avtale.api
 
 import no.nav.pensjon.kalkulator.avtale.*
 import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleSpecDto
-import no.nav.pensjon.kalkulator.avtale.client.np.UttaksperiodeSpec
+import no.nav.pensjon.kalkulator.avtale.api.dto.UttaksperiodeSpecDto
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtaler
 import org.intellij.lang.annotations.Language
@@ -56,7 +56,7 @@ class PensjonsavtaleControllerTest {
             )
 
         private fun uttaksperiodeSpec1() =
-            UttaksperiodeSpec(
+            UttaksperiodeSpecDto(
                 67,
                 1,
                 80,
@@ -64,7 +64,7 @@ class PensjonsavtaleControllerTest {
             )
 
         private fun uttaksperiodeSpec2() =
-            UttaksperiodeSpec(
+            UttaksperiodeSpecDto(
                 70,
                 1,
                 100,
@@ -92,7 +92,7 @@ class PensjonsavtaleControllerTest {
         private const val RESPONSE_BODY = """{
 	"avtaler": [{
 		"produktbetegnelse": "produkt1",
-		"kategori": "kategori1",
+		"kategori": "INDIVIDUELL_ORDNING",
 		"startAlder": 67,
 		"sluttAlder": 77,
 		"utbetalingsperioder": [{
