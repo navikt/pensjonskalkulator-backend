@@ -5,10 +5,9 @@ import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 
 object PersonFactory {
-    val pid = Pid("12906498357")
+    val pid = Pid("12906498357") // synthetic fødselsnummer
 
     fun person() = Person("Fornavn1", Sivilstand.UOPPGITT)
 
     fun skiltPerson() = Person("Fornavn1", Sivilstand.SKILT)
-
 }

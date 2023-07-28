@@ -59,13 +59,13 @@ class SimuleringServiceTest {
         val spec = simuleringSpec(null, null)
         arrangePidAndResultat()
         `when`(opptjeningsgrunnlagClient.getOpptjeningsgrunnlag(anyObject())).thenReturn(opptjeningsgrunnlag)
-        `when`(personClient.getPerson(anyObject())).thenReturn(person())
+        `when`(personClient.fetchPerson(anyObject())).thenReturn(person())
 
         val response = service.simulerAlderspensjon(spec)
 
         assertEquals(123456, response.alderspensjon[0].beloep)
         verify(opptjeningsgrunnlagClient, times(1)).getOpptjeningsgrunnlag(pid)
-        verify(personClient, times(1)).getPerson(pid)
+        verify(personClient, times(1)).fetchPerson(pid)
     }
 
     private fun arrangePidAndResultat() {

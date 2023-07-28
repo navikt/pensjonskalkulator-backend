@@ -11,6 +11,7 @@ import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.selftest.PingResult
 import no.nav.pensjon.kalkulator.tech.selftest.Pingable
 import no.nav.pensjon.kalkulator.tech.selftest.ServiceStatus
+import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.beans.factory.annotation.Value
@@ -18,17 +19,22 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import reactor.util.retry.Retry
+import reactor.util.retry.RetryBackoffSpec
+import java.time.Duration
 import java.util.*
 
 @Component
 class PdlPersonClient(
     @Value("\${pdl.url}") private val baseUrl: String,
-    private val webClient: WebClient
+    private val webClient: WebClient,
+    private val callIdGenerator: CallIdGenerator
 ) : PersonClient, Pingable {
     private val log = KotlinLogging.logger {}
 
-    override fun getPerson(pid: Pid): Person? {
+    override fun fetchPerson(pid: Pid): Person? {
         val uri = baseUrl + PERSON_PATH
         log.debug { "POST to URI: '$uri'" }
 
@@ -40,12 +46,14 @@ class PdlPersonClient(
                 .bodyValue(query(pid))
                 .retrieve()
                 .bodyToMono(PersonResponseDto::class.java)
+                .retryWhen(
+                    Retry.backoff(RETRY_ATTEMPTS, Duration.ofSeconds(1))
+                        .filter { it is EgressException && !it.isClientError }
+                        .onRetryExhaustedThrow { backoff, signal -> handleFailure(backoff, signal) })
                 .block()
                 ?.let(PersonMapper::fromDto)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
-        } catch (e: RuntimeException) { // e.g. when connection broken
-            throw EgressException("Failed to GET $uri: ${e.message}", e)
         }
     }
 
@@ -69,11 +77,31 @@ class PdlPersonClient(
         }
     }
 
+    private fun setHeaders(headers: HttpHeaders) {
+        headers.contentType = MediaType.APPLICATION_JSON
+        headers.accept = listOf(MediaType.APPLICATION_JSON)
+        headers.setBearerAuth(EgressAccess.token(service).value)
+        headers[CustomHttpHeaders.BEHANDLINGSNUMMER] = BEHANDLINGSNUMMER
+        headers[CustomHttpHeaders.THEME] = THEME
+        headers[CustomHttpHeaders.CALL_ID] = callIdGenerator.newId()
+    }
+
+    private fun handleFailure(backoff: RetryBackoffSpec, retrySignal: Retry.RetrySignal): Throwable {
+        log.info { "Retried calling $baseUrl$PERSON_PATH ${backoff.maxAttempts} times" }
+
+        return when (val failure = retrySignal.failure()) {
+            is WebClientRequestException -> EgressException(true, "Failed calling ${failure.uri}", failure)
+            is EgressException -> EgressException(failure.isClientError, "Failed calling $baseUrl$PERSON_PATH", failure)
+            else -> failure
+        }
+    }
+
     companion object {
         private const val PERSON_PATH = "/graphql"
         private const val PING_PATH = "/graphql"
         private const val BEHANDLINGSNUMMER = "B353" // https://behandlingskatalog.nais.adeo.no/process/team/d55cc783-7850-4606-9ff6-1fc44b646c9d/91a4e540-5e39-4c10-971f-49b48f35fe11
         private const val THEME = "PEN"
+        private const val RETRY_ATTEMPTS = 1L
         private val service = EgressService.PERSONDATA
 
         private fun query(pid: Pid) = """{
@@ -82,16 +110,5 @@ class PdlPersonClient(
 		"ident": "${pid.value}"
 	}
 }"""
-
-        private fun setHeaders(headers: HttpHeaders) {
-            headers.contentType = MediaType.APPLICATION_JSON
-            headers.accept = listOf(MediaType.APPLICATION_JSON)
-            headers.setBearerAuth(EgressAccess.token(service).value)
-            headers[CustomHttpHeaders.BEHANDLINGSNUMMER] = BEHANDLINGSNUMMER
-            headers[CustomHttpHeaders.THEME] = THEME
-            headers[CustomHttpHeaders.CALL_ID] = callId()
-        }
-
-        private fun callId() = UUID.randomUUID().toString()
     }
 }

@@ -20,6 +20,14 @@ class WebClientConfig {
 
     @Bean
     @Primary
+    fun regularWebClient(): WebClient {
+        return WebClient.builder()
+            .filter(filterResponse())
+            .build()
+    }
+
+    @Bean
+    @Qualifier("large-response")
     fun largeBufferWebClient(): WebClient {
         val httpClient = HttpClient.create().wiretap(true)
 
@@ -29,7 +37,9 @@ class WebClientConfig {
 
         return WebClient.builder()
             .clientConnector(ReactorClientHttpConnector(httpClient))
-            .exchangeStrategies(strategies).build()
+            .exchangeStrategies(strategies)
+            .filter(filterResponse())
+            .build()
     }
 
     @Bean

@@ -23,7 +23,7 @@ class PersonServiceTest {
     @Test
     fun getPerson() {
         `when`(pidGetter.pid()).thenReturn(pid)
-        `when`(client.getPerson(pid)).thenReturn(skiltPerson())
+        `when`(client.fetchPerson(pid)).thenReturn(skiltPerson())
 
         val person = PersonService(client, pidGetter).getPerson()
 

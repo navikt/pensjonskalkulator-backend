@@ -30,7 +30,7 @@ class UttaksalderService(
         return uttaksalderClient.finnTidligsteUttaksalder(uttaksalderSpec)
     }
 
-    private fun sivilstand(pid: Pid) = personClient.getPerson(pid)?.sivilstand ?: Sivilstand.UOPPGITT
+    private fun sivilstand(pid: Pid) = personClient.fetchPerson(pid)?.sivilstand ?: Sivilstand.UOPPGITT
 
     private fun sistePensjonsgivendeInntekt(pid: Pid): Int {
         val grunnlag = opptjeningsgrunnlagClient.getOpptjeningsgrunnlag(pid)

@@ -10,5 +10,5 @@ class PersonService(
     private val pidGetter: PidGetter
 ) {
 
-    fun getPerson() = client.getPerson(pidGetter.pid())
+    fun getPerson() = client.fetchPerson(pidGetter.pid())
 }
