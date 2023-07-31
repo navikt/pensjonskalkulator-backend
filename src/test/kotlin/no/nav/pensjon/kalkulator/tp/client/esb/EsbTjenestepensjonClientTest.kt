@@ -6,14 +6,17 @@ import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.mock.XmlMapperFactory.xmlMapper
 import no.nav.pensjon.kalkulator.tech.security.egress.token.unt.client.UsernameTokenClient
 import no.nav.pensjon.kalkulator.tech.security.egress.token.unt.client.fssgw.dto.UsernameTokenDto
+import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.web.EgressException
+import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.web.reactive.function.client.WebClient
 
 /**
  * ESB = Enterprise Service Bus (tjenestebuss)
@@ -26,10 +29,14 @@ class EsbTjenestepensjonClientTest : WebClientTest() {
     @Mock
     private lateinit var usernameTokenClient: UsernameTokenClient
 
+    @Mock
+    private lateinit var callIdGenerator: CallIdGenerator
+
     @BeforeEach
     fun initialize() {
         `when`(usernameTokenClient.fetchUsernameToken()).thenReturn(UsernameTokenDto(WS_SECURITY_ELEMENT))
-        client = EsbTjenestepensjonClient(baseUrl(), usernameTokenClient, WebClient.create(), xmlMapper())
+        `when`(callIdGenerator.newId()).thenReturn("id1")
+        client = EsbTjenestepensjonClient(baseUrl(), usernameTokenClient, WebClientConfig().webClientForSoapRequests(), xmlMapper(), callIdGenerator, RETRY_ATTEMPTS.toString())
     }
 
     @Test
@@ -52,7 +59,42 @@ class EsbTjenestepensjonClientTest : WebClientTest() {
         assertFalse(forholdExists)
     }
 
+    @Test
+    fun `harTjenestepensjonsforhold retries in case of server error`() {
+        arrangeSecurityContext()
+        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
+        arrange(ingenForholdResponse())
+
+        val forholdExists = client.harTjenestepensjonsforhold(pid)
+
+        assertFalse(forholdExists)
+    }
+
+    @Test
+    fun `harTjenestepensjonsforhold does not retry in case of client error`() {
+        arrangeSecurityContext()
+        arrange(jsonResponse(HttpStatus.BAD_REQUEST).setBody("My bad"))
+        // No 2nd response arranged, since no retry
+
+        val exception = assertThrows(EgressException::class.java) { client.harTjenestepensjonsforhold(pid) }
+
+        assertEquals("My bad", exception.message)
+    }
+
+    @Test
+    fun `harTjenestepensjonsforhold handles server error`() {
+        arrangeSecurityContext()
+        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
+        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil")) // for retry
+
+        val exception = assertThrows(EgressException::class.java) { client.harTjenestepensjonsforhold(pid) }
+
+        assertEquals("Failed calling ${baseUrl()}/nav-cons-pen-pselv-tjenestepensjonWeb/sca/PSELVTjenestepensjonWSEXP", exception.message)
+        assertEquals("Feil", (exception.cause as EgressException).message)
+    }
+
     private companion object {
+        private const val RETRY_ATTEMPTS = 1
 
         private const val WS_SECURITY_ELEMENT =
             """<wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" soapenv:mustUnderstand="1">

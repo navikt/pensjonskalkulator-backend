@@ -8,16 +8,21 @@ import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.config.GatewayUsage
 import no.nav.pensjon.kalkulator.tech.security.egress.token.unt.client.UsernameTokenClient
-import no.nav.pensjon.kalkulator.tp.client.esb.dto.EnvelopeDto
+import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tp.client.TjenestepensjonClient
+import no.nav.pensjon.kalkulator.tp.client.esb.dto.EnvelopeDto
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import reactor.util.retry.Retry
+import reactor.util.retry.RetryBackoffSpec
+import java.time.Duration
 import java.util.*
 
 @Component
@@ -25,8 +30,10 @@ class EsbTjenestepensjonClient(
     @Value("\${tp.url}") private val baseUrl: String,
     private val usernameTokenClient: UsernameTokenClient,
     @Qualifier("soap") private val webClient: WebClient,
-    private val xmlMapper: XmlMapper
-) : TjenestepensjonClient {
+    private val xmlMapper: XmlMapper,
+    private val callIdGenerator: CallIdGenerator,
+    @Value("\${web-client.retry-attempts}") private val retryAttempts: String
+    ) : TjenestepensjonClient {
     private val log = KotlinLogging.logger {}
 
     override fun harTjenestepensjonsforhold(pid: Pid): Boolean {
@@ -43,36 +50,46 @@ class EsbTjenestepensjonClient(
 
     private fun fetchTjenestepensjonsforholdXml(pid: Pid): String {
         val uri = "$baseUrl$PATH"
-        val body = soapEnvelope(pid.value, soapBody(pid))
+        val callId = callIdGenerator.newId()
+        val body = soapEnvelope(pid.value, soapBody(pid), callId)
         log.debug { "POST to URI: '$uri' with body '$body'" }
 
         try {
             return webClient
                 .post()
                 .uri(uri)
-                .headers(::setHeaders)
+                .headers { setHeaders(it, callId) }
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono(String::class.java)
+                .retryWhen(
+                    Retry.backoff(retryAttempts.toLong(), Duration.ofSeconds(1))
+                        .filter { it is EgressException && !it.isClientError }
+                        .onRetryExhaustedThrow { backoff, signal -> handleFailure(backoff, signal) })
                 .block()
                 ?: ""
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
-        } catch (e: RuntimeException) { // e.g. when connection broken
-            throw EgressException("Failed to GET $uri: ${e.message}", e)
         }
     }
 
-    private fun soapEnvelope(userId: String, body: String): String {
+    private fun setHeaders(headers: HttpHeaders, callId: String) {
+        if (service.gatewayUsage == GatewayUsage.INTERNAL) {
+            headers.setBearerAuth(EgressAccess.token(service).value)
+        }
+
+        headers[CustomHttpHeaders.CALL_ID] = callId
+    }
+
+    private fun soapEnvelope(userId: String, body: String, callId: String): String {
         return """<?xml version='1.0' encoding='UTF-8'?>
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-    ${soapHeader(userId)}
+    ${soapHeader(userId, callId)}
     $body
 </soapenv:Envelope>"""
     }
 
-    private fun soapHeader(userId: String): String {
-        val callId = callId()
+    private fun soapHeader(userId: String, callId: String): String {
 
         return """<soapenv:Header>
         <callId xmlns="uri:no.nav.applikasjonsrammeverk">$callId</callId>
@@ -87,6 +104,16 @@ class EsbTjenestepensjonClient(
 
     private fun usernameToken() = usernameTokenClient.fetchUsernameToken().token
 
+    private fun handleFailure(backoff: RetryBackoffSpec, retrySignal: Retry.RetrySignal): Throwable {
+        log.info { "Retried calling $baseUrl$PATH ${backoff.maxAttempts} times" }
+
+        return when (val failure = retrySignal.failure()) {
+            is WebClientRequestException -> EgressException(true, "Failed calling ${failure.uri}", failure)
+            is EgressException -> EgressException(failure.isClientError, "Failed calling $baseUrl$PATH", failure)
+            else -> failure
+        }
+    }
+
     companion object {
         private const val PATH = "/nav-cons-pen-pselv-tjenestepensjonWeb/sca/PSELVTjenestepensjonWSEXP"
 
@@ -94,16 +121,6 @@ class EsbTjenestepensjonClient(
         private const val APPLICATION_USER_ID = "PP01"
 
         private val service = EgressService.TJENESTEPENSJONSFORHOLD
-
-        private fun callId() = UUID.randomUUID().toString()
-
-        private fun setHeaders(headers: HttpHeaders) {
-            if (service.gatewayUsage == GatewayUsage.INTERNAL) {
-                headers.setBearerAuth(EgressAccess.token(service).value)
-            }
-
-            headers[CustomHttpHeaders.CALL_ID] = callId()
-        }
 
         private fun soapBody(pid: Pid): String {
             return """<soapenv:Body>
