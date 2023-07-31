@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.avtale.api.map
 
 import io.kotest.matchers.shouldBe
+import no.nav.pensjon.kalkulator.avtale.AvtaleKategori
 import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleDto
 import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtalerDto
 import no.nav.pensjon.kalkulator.avtale.api.dto.SelskapDto
@@ -29,7 +30,7 @@ class PensjonsavtaleMapperTest {
     private fun avtale(startalder: Int?) =
         PensjonsavtaleDto(
             "produkt1",
-            "INDIVIDUELL_ORDNING",
+            AvtaleKategori.INDIVIDUELL_ORDNING,
             startalder,
             77,
             listOf(utbetalingsperiode())
