@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.tp.client.esb
+package no.nav.pensjon.kalkulator.tjenestepensjon.client.esb
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
@@ -11,21 +11,25 @@ import no.nav.pensjon.kalkulator.tech.security.egress.token.unt.client.UsernameT
 import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import no.nav.pensjon.kalkulator.tp.client.TjenestepensjonClient
-import no.nav.pensjon.kalkulator.tp.client.esb.dto.EnvelopeDto
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.TjenestepensjonClient
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.esb.dto.EnvelopeDto
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
-import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.util.retry.Retry
 import reactor.util.retry.RetryBackoffSpec
 import java.time.Duration
+import java.time.LocalDate
 import java.util.*
 
-@Component
+/**
+ * Client for accessing the 'tp' service via ESB (Enterprise Service Bus, tjenestebuss), using SOAP
+ * See https://github.com/navikt/tp
+ */
+//@Component
 class EsbTjenestepensjonClient(
     @Value("\${tp.url}") private val baseUrl: String,
     private val usernameTokenClient: UsernameTokenClient,
@@ -36,7 +40,7 @@ class EsbTjenestepensjonClient(
     ) : TjenestepensjonClient {
     private val log = KotlinLogging.logger {}
 
-    override fun harTjenestepensjonsforhold(pid: Pid): Boolean {
+    override fun harTjenestepensjonsforhold(pid: Pid, dato: LocalDate): Boolean {
         val responseXml = fetchTjenestepensjonsforholdXml(pid)
 
         return try {

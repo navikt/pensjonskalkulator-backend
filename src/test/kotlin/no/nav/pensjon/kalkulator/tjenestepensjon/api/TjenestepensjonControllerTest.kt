@@ -1,8 +1,8 @@
-package no.nav.pensjon.kalkulator.tp.api
+package no.nav.pensjon.kalkulator.tjenestepensjon.api
 
 import no.nav.pensjon.kalkulator.avtale.*
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
-import no.nav.pensjon.kalkulator.tp.TjenestepensjonService
+import no.nav.pensjon.kalkulator.tjenestepensjon.TjenestepensjonService
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`

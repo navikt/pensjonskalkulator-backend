@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.tp.client.esb.dto
+package no.nav.pensjon.kalkulator.tjenestepensjon.client.esb.dto
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement

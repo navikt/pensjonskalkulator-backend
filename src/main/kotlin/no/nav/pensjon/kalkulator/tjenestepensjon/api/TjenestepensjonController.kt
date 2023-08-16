@@ -1,9 +1,9 @@
-package no.nav.pensjon.kalkulator.tp.api
+package no.nav.pensjon.kalkulator.tjenestepensjon.api
 
 import io.swagger.v3.oas.annotations.Operation
 import no.nav.pensjon.kalkulator.tech.time.Timed
-import no.nav.pensjon.kalkulator.tp.TjenestepensjonService
-import no.nav.pensjon.kalkulator.tp.api.dto.TjenestepensjonsforholdDto
+import no.nav.pensjon.kalkulator.tjenestepensjon.TjenestepensjonService
+import no.nav.pensjon.kalkulator.tjenestepensjon.api.dto.TjenestepensjonsforholdDto
 import org.springframework.web.bind.annotation.*
 
 @RestController

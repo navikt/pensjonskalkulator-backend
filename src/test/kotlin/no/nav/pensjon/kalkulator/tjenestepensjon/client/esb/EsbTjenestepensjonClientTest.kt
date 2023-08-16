@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.tp.client.esb
+package no.nav.pensjon.kalkulator.tjenestepensjon.client.esb
 
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
@@ -17,6 +17,7 @@ import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import java.time.LocalDate
 
 /**
  * ESB = Enterprise Service Bus (tjenestebuss)
@@ -36,7 +37,14 @@ class EsbTjenestepensjonClientTest : WebClientTest() {
     fun initialize() {
         `when`(usernameTokenClient.fetchUsernameToken()).thenReturn(UsernameTokenDto(WS_SECURITY_ELEMENT))
         `when`(callIdGenerator.newId()).thenReturn("id1")
-        client = EsbTjenestepensjonClient(baseUrl(), usernameTokenClient, WebClientConfig().webClientForSoapRequests(), xmlMapper(), callIdGenerator, RETRY_ATTEMPTS.toString())
+        client = EsbTjenestepensjonClient(
+            baseUrl(),
+            usernameTokenClient,
+            WebClientConfig().webClientForSoapRequests(),
+            xmlMapper(),
+            callIdGenerator,
+            RETRY_ATTEMPTS.toString()
+        )
     }
 
     @Test
@@ -44,7 +52,7 @@ class EsbTjenestepensjonClientTest : WebClientTest() {
         arrangeSecurityContext()
         arrange(ettForholdResponse())
 
-        val forholdExists = client.harTjenestepensjonsforhold(pid)
+        val forholdExists = client.harTjenestepensjonsforhold(pid, dato)
 
         assertTrue(forholdExists)
     }
@@ -54,7 +62,7 @@ class EsbTjenestepensjonClientTest : WebClientTest() {
         arrangeSecurityContext()
         arrange(ingenForholdResponse())
 
-        val forholdExists = client.harTjenestepensjonsforhold(pid)
+        val forholdExists = client.harTjenestepensjonsforhold(pid, dato)
 
         assertFalse(forholdExists)
     }
@@ -65,7 +73,7 @@ class EsbTjenestepensjonClientTest : WebClientTest() {
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
         arrange(ingenForholdResponse())
 
-        val forholdExists = client.harTjenestepensjonsforhold(pid)
+        val forholdExists = client.harTjenestepensjonsforhold(pid, dato)
 
         assertFalse(forholdExists)
     }
@@ -76,7 +84,7 @@ class EsbTjenestepensjonClientTest : WebClientTest() {
         arrange(jsonResponse(HttpStatus.BAD_REQUEST).setBody("My bad"))
         // No 2nd response arranged, since no retry
 
-        val exception = assertThrows(EgressException::class.java) { client.harTjenestepensjonsforhold(pid) }
+        val exception = assertThrows(EgressException::class.java) { client.harTjenestepensjonsforhold(pid, dato) }
 
         assertEquals("My bad", exception.message)
     }
@@ -87,14 +95,18 @@ class EsbTjenestepensjonClientTest : WebClientTest() {
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil")) // for retry
 
-        val exception = assertThrows(EgressException::class.java) { client.harTjenestepensjonsforhold(pid) }
+        val exception = assertThrows(EgressException::class.java) { client.harTjenestepensjonsforhold(pid, dato) }
 
-        assertEquals("Failed calling ${baseUrl()}/nav-cons-pen-pselv-tjenestepensjonWeb/sca/PSELVTjenestepensjonWSEXP", exception.message)
+        assertEquals(
+            "Failed calling ${baseUrl()}/nav-cons-pen-pselv-tjenestepensjonWeb/sca/PSELVTjenestepensjonWSEXP",
+            exception.message
+        )
         assertEquals("Feil", (exception.cause as EgressException).message)
     }
 
     private companion object {
         private const val RETRY_ATTEMPTS = 1
+        private val dato = LocalDate.of(2023, 1, 1)
 
         private const val WS_SECURITY_ELEMENT =
             """<wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" soapenv:mustUnderstand="1">
