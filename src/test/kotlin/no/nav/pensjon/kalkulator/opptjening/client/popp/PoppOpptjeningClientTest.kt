@@ -28,7 +28,7 @@ class PoppOpptjeningClientTest : WebClientTest() {
 
     @BeforeEach
     fun initialize() {
-        client = PoppOpptjeningClient(baseUrl(), WebClientConfig().regularWebClient(), callIdGenerator)
+        client = PoppOpptjeningClient(baseUrl(), WebClientConfig().regularWebClient(), callIdGenerator, RETRY_ATTEMPTS)
     }
 
     @Test
@@ -81,11 +81,12 @@ class PoppOpptjeningClientTest : WebClientTest() {
 
         val exception = assertThrows(EgressException::class.java) { client.fetchOpptjeningsgrunnlag(pid) }
 
-        assertEquals("Failed calling ${baseUrl()}/popp/api/opptjeningsgrunnlag", exception.message)
+        assertEquals("Failed calling ${baseUrl()}/popp/api/opptjeningsgrunnlag/129064*****", exception.message)
         assertEquals("Feil", (exception.cause as EgressException).message)
     }
 
     companion object {
+        private const val RETRY_ATTEMPTS = "1"
 
         @Language("json")
         private const val RESPONSE_BODY =

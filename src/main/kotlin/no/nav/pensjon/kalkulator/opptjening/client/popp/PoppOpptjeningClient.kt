@@ -27,11 +27,15 @@ import reactor.util.retry.RetryBackoffSpec
 import java.time.Duration
 import java.util.*
 
+/**
+ * Client for accessing the 'popp' service (see https://github.com/navikt/popp)
+ */
 @Component
 class PoppOpptjeningClient(
     @Value("\${popp.url}") private val baseUrl: String,
     private val webClient: WebClient,
-    private val callIdGenerator: CallIdGenerator
+    private val callIdGenerator: CallIdGenerator,
+    @Value("\${web-client.retry-attempts}") private val retryAttempts: String
 ) : OpptjeningsgrunnlagClient, Pingable {
     private val log = KotlinLogging.logger {}
 
@@ -39,20 +43,16 @@ class PoppOpptjeningClient(
      * Calls PROPOPP007
      */
     override fun fetchOpptjeningsgrunnlag(pid: Pid): Opptjeningsgrunnlag {
-        val uri = "$baseUrl$OPPTJENINGSGRUNNLAG_PATH/${pid.value}"
         log.debug { "GET from URI: '${displayableUri(pid)}'" }
 
         try {
             val response = webClient
                 .get()
-                .uri(uri)
+                .uri(uri(pid))
                 .headers(::setHeaders)
                 .retrieve()
                 .bodyToMono(OpptjeningsgrunnlagResponseDto::class.java)
-                .retryWhen(
-                    Retry.backoff(RETRY_ATTEMPTS, Duration.ofSeconds(1))
-                        .filter { it is EgressException && !it.isClientError }
-                        .onRetryExhaustedThrow { backoff, signal -> handleFailure(backoff, signal) })
+                .retryWhen(retryBackoffSpec(displayableUri(pid)))
                 .block()
                 ?: emptyDto()
 
@@ -94,22 +94,28 @@ class PoppOpptjeningClient(
         headers[CustomHttpHeaders.CALL_ID] = callIdGenerator.newId()
     }
 
+    private fun uri(pid: Pid) = "$baseUrl$OPPTJENINGSGRUNNLAG_PATH/${pid.value}"
+
     private fun displayableUri(pid: Pid) = "$baseUrl$OPPTJENINGSGRUNNLAG_PATH/${pid.displayValue}"
 
-    private fun handleFailure(backoff: RetryBackoffSpec, retrySignal: Retry.RetrySignal): Throwable {
-        log.info { "Retried calling $baseUrl$OPPTJENINGSGRUNNLAG_PATH ${backoff.maxAttempts} times" }
+    private fun retryBackoffSpec(uri: String): RetryBackoffSpec =
+        Retry.backoff(retryAttempts.toLong(), Duration.ofSeconds(1))
+            .filter { it is EgressException && !it.isClientError }
+            .onRetryExhaustedThrow { backoff, signal -> handleFailure(backoff, signal, uri) }
+
+    private fun handleFailure(backoff: RetryBackoffSpec, retrySignal: Retry.RetrySignal, uri: String): Throwable {
+        log.info { "Retried calling $uri ${backoff.maxAttempts} times" }
 
         return when (val failure = retrySignal.failure()) {
             is WebClientRequestException -> EgressException(true, "Failed calling ${failure.uri}", failure)
-            is EgressException -> EgressException(failure.isClientError, "Failed calling $baseUrl$OPPTJENINGSGRUNNLAG_PATH", failure)
+            is EgressException -> EgressException(failure.isClientError, "Failed calling $uri", failure)
             else -> failure
         }
     }
 
     companion object {
         private const val OPPTJENINGSGRUNNLAG_PATH = "/popp/api/opptjeningsgrunnlag"
-        private const val PING_PATH = "/popp/api/opptjeningsgrunnlag/ping"
-        private const val RETRY_ATTEMPTS = 1L
+        private const val PING_PATH = "$OPPTJENINGSGRUNNLAG_PATH/ping"
         private val service = EgressService.PENSJONSOPPTJENING
 
         private fun emptyDto() = OpptjeningsgrunnlagResponseDto(OpptjeningsgrunnlagDto(emptyList()))

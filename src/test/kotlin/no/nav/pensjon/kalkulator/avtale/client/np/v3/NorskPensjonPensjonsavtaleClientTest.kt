@@ -41,19 +41,20 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
     fun initialize() {
         `when`(tokenService.assertion()).thenReturn(SAML_ASSERTION)
         `when`(callIdGenerator.newId()).thenReturn("id1")
+        arrangeSecurityContext()
 
         client = NorskPensjonPensjonsavtaleClient(
             baseUrl(),
             tokenService,
             WebClientConfig().webClientForSoapRequests(),
             xmlMapper(),
-            callIdGenerator
+            callIdGenerator,
+            "1"
         )
     }
 
     @Test
     fun `fetchAvtaler handles 1 avtale with 2 utbetalingsperioder`() {
-        arrangeSecurityContext()
         arrange(okResponse(EN_AVTALE_RESPONSE_BODY))
 
         val avtaler = client.fetchAvtaler(spec()).avtaler
@@ -65,7 +66,6 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
 
     @Test
     fun `fetchAvtaler handles 2 pensjonsavtaler with 1 utbetalingsperiode each`() {
-        arrangeSecurityContext()
         arrange(okResponse(TO_AVTALER_RESPONSE_BODY))
 
         val avtaler = client.fetchAvtaler(spec()).avtaler
@@ -77,7 +77,6 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
 
     @Test
     fun `fetchAvtaler handles 0 pensjonsavtaler`() {
-        arrangeSecurityContext()
         arrange(okResponse(INGEN_AVTALER_RESPONSE_BODY))
 
         val avtaler = client.fetchAvtaler(spec()).avtaler
@@ -87,7 +86,6 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
 
     @Test
     fun `fetchAvtaler handles utilgjengelige selskaper`() {
-        arrangeSecurityContext()
         arrange(okResponse(UTILGJENGELIGE_SELSKAP_RESPONSE_BODY))
 
         val selskaper = client.fetchAvtaler(spec()).utilgjengeligeSelskap
@@ -99,7 +97,6 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
 
     @Test
     fun `fetchAvtaler retries in case of server error`() {
-        arrangeSecurityContext()
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody(ERROR_RESPONSE_BODY))
         arrange(okResponse(INGEN_AVTALER_RESPONSE_BODY))
 
@@ -110,7 +107,6 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
 
     @Test
     fun `fetchAvtaler does not retry in case of client error`() {
-        arrangeSecurityContext()
         arrange(jsonResponse(HttpStatus.BAD_REQUEST).setBody("My bad"))
         // No 2nd response arranged, since no retry
 
@@ -121,7 +117,6 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
 
     @Test
     fun `fetchAvtaler handles server error`() {
-        arrangeSecurityContext()
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody(ERROR_RESPONSE_BODY))
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody(ERROR_RESPONSE_BODY)) // for retry
 

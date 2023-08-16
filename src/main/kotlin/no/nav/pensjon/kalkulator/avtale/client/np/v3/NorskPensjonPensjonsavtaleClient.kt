@@ -36,7 +36,8 @@ class NorskPensjonPensjonsavtaleClient(
     private val tokenGetter: SamlTokenService,
     @Qualifier("soap") private val webClient: WebClient,
     private val xmlMapper: XmlMapper,
-    private val callIdGenerator: CallIdGenerator
+    private val callIdGenerator: CallIdGenerator,
+    @Value("\${web-client.retry-attempts}") private val retryAttempts: String
 ) : PensjonsavtaleClient {
     private val log = KotlinLogging.logger {}
 
@@ -66,10 +67,7 @@ class NorskPensjonPensjonsavtaleClient(
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono(String::class.java)
-                .retryWhen(
-                    Retry.backoff(RETRY_ATTEMPTS, Duration.ofSeconds(1))
-                        .filter { it is EgressException && !it.isClientError }
-                        .onRetryExhaustedThrow { backoff, signal -> handleFailure(backoff, signal) })
+                .retryWhen(retryBackoffSpec(uri))
                 .block()
                 ?: ""
         } catch (e: WebClientResponseException) {
@@ -98,26 +96,30 @@ class NorskPensjonPensjonsavtaleClient(
         headers[CustomHttpHeaders.CALL_ID] = callId
     }
 
-    private fun handleFailure(backoff: RetryBackoffSpec, retrySignal: Retry.RetrySignal): Throwable {
-        log.info { "Retried calling $baseUrl$PATH ${backoff.maxAttempts} times" }
+    private fun retryBackoffSpec(uri: String): RetryBackoffSpec =
+        Retry.backoff(retryAttempts.toLong(), Duration.ofSeconds(1))
+            .filter { it is EgressException && !it.isClientError }
+            .onRetryExhaustedThrow { backoff, signal -> handleFailure(backoff, signal, uri) }
+
+    private fun handleFailure(backoff: RetryBackoffSpec, retrySignal: Retry.RetrySignal, uri: String): Throwable {
+        log.info { "Retried calling $uri ${backoff.maxAttempts} times" }
 
         return when (val failure = retrySignal.failure()) {
             is WebClientRequestException -> EgressException(true, "Failed calling ${failure.uri}", failure)
-            is EgressException -> EgressException(failure.isClientError, toString(failure), failure)
+            is EgressException -> EgressException(failure.isClientError, toString(failure, uri), failure)
             else -> failure
         }
     }
 
-    private fun toString(e: EgressException) =
+    private fun toString(e: EgressException, uri: String) =
         xmlMapper.readValue(
             e.message,
             EnvelopeDto::class.java
-        ).body?.fault?.let(PensjonsavtaleMapper::faultToString) ?: e.message ?: "Failed to call $baseUrl$PATH"
+        ).body?.fault?.let(PensjonsavtaleMapper::faultToString) ?: e.message ?: "Failed to call $uri"
 
     companion object {
         private const val PATH = "/kalkulator.pensjonsrettighetstjeneste/v3/kalkulatorPensjonTjeneste"
         private const val ORGANISASJONSNUMMER = "889640782" // ARBEIDS- OG VELFERDSETATEN
-        private const val RETRY_ATTEMPTS = 1L
 
         private val service = EgressService.PENSJONSAVTALER
 

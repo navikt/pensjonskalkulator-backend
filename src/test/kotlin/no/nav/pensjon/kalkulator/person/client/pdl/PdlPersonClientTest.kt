@@ -36,7 +36,7 @@ class PdlPersonClientTest : WebClientTest() {
     @BeforeEach
     fun initialize() {
         `when`(callIdGenerator.newId()).thenReturn("id1")
-        client = PdlPersonClient(baseUrl(), WebClientConfig().regularWebClient(), callIdGenerator)
+        client = PdlPersonClient(baseUrl(), WebClientConfig().regularWebClient(), callIdGenerator, "1")
     }
 
     @Test

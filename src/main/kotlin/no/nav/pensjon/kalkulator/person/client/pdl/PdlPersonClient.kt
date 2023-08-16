@@ -30,12 +30,13 @@ import java.util.*
 class PdlPersonClient(
     @Value("\${pdl.url}") private val baseUrl: String,
     private val webClient: WebClient,
-    private val callIdGenerator: CallIdGenerator
+    private val callIdGenerator: CallIdGenerator,
+    @Value("\${web-client.retry-attempts}") private val retryAttempts: String
 ) : PersonClient, Pingable {
     private val log = KotlinLogging.logger {}
 
     override fun fetchPerson(pid: Pid): Person? {
-        val uri = baseUrl + PERSON_PATH
+        val uri = "$baseUrl/$PATH"
         log.debug { "POST to URI: '$uri'" }
 
         return try {
@@ -46,10 +47,7 @@ class PdlPersonClient(
                 .bodyValue(query(pid))
                 .retrieve()
                 .bodyToMono(PersonResponseDto::class.java)
-                .retryWhen(
-                    Retry.backoff(RETRY_ATTEMPTS, Duration.ofSeconds(1))
-                        .filter { it is EgressException && !it.isClientError }
-                        .onRetryExhaustedThrow { backoff, signal -> handleFailure(backoff, signal) })
+                .retryWhen(retryBackoffSpec(uri))
                 .block()
                 ?.let(PersonMapper::fromDto)
         } catch (e: WebClientResponseException) {
@@ -58,7 +56,7 @@ class PdlPersonClient(
     }
 
     override fun ping(): PingResult {
-        val uri = baseUrl + PING_PATH
+        val uri = "$baseUrl/$PATH"
 
         return try {
             webClient
@@ -86,22 +84,28 @@ class PdlPersonClient(
         headers[CustomHttpHeaders.CALL_ID] = callIdGenerator.newId()
     }
 
-    private fun handleFailure(backoff: RetryBackoffSpec, retrySignal: Retry.RetrySignal): Throwable {
-        log.info { "Retried calling $baseUrl$PERSON_PATH ${backoff.maxAttempts} times" }
+    private fun retryBackoffSpec(uri: String): RetryBackoffSpec =
+        Retry.backoff(retryAttempts.toLong(), Duration.ofSeconds(1))
+            .filter { it is EgressException && !it.isClientError }
+            .onRetryExhaustedThrow { backoff, signal -> handleFailure(backoff, signal, uri) }
+
+    private fun handleFailure(backoff: RetryBackoffSpec, retrySignal: Retry.RetrySignal, uri: String): Throwable {
+        log.info { "Retried calling $uri ${backoff.maxAttempts} times" }
 
         return when (val failure = retrySignal.failure()) {
             is WebClientRequestException -> EgressException(true, "Failed calling ${failure.uri}", failure)
-            is EgressException -> EgressException(failure.isClientError, "Failed calling $baseUrl$PERSON_PATH", failure)
+            is EgressException -> EgressException(failure.isClientError, "Failed calling $uri", failure)
             else -> failure
         }
     }
 
     companion object {
-        private const val PERSON_PATH = "/graphql"
-        private const val PING_PATH = "/graphql"
-        private const val BEHANDLINGSNUMMER = "B353" // https://behandlingskatalog.nais.adeo.no/process/team/d55cc783-7850-4606-9ff6-1fc44b646c9d/91a4e540-5e39-4c10-971f-49b48f35fe11
+        private const val PATH = "graphql"
         private const val THEME = "PEN"
-        private const val RETRY_ATTEMPTS = 1L
+
+        // https://behandlingskatalog.nais.adeo.no/process/team/d55cc783-7850-4606-9ff6-1fc44b646c9d/91a4e540-5e39-4c10-971f-49b48f35fe11
+        private const val BEHANDLINGSNUMMER = "B353"
+
         private val service = EgressService.PERSONDATA
 
         private fun query(pid: Pid) = """{
