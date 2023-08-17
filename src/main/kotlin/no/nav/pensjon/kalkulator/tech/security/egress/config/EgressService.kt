@@ -7,7 +7,7 @@ enum class EgressService(val description: String, val gatewayUsage: GatewayUsage
 
     PENSJONSAVTALER("Norsk Pensjon", GatewayUsage.INTERNAL),
     PENSJON_REGLER("Pensjonsregler", GatewayUsage.INTERNAL),
-    PERSONDATA("Persondata", GatewayUsage.INTERNAL),
+    PERSONDATA("Persondata", GatewayUsage.NONE),
     PENSJONSOPPTJENING("Pensjonsopptjening", GatewayUsage.INTERNAL),
     SAML_TOKEN("Gandalf STS", GatewayUsage.INTERNAL),
     SIMULERING("Simulering", GatewayUsage.INTERNAL),

@@ -28,7 +28,7 @@ import java.util.*
 
 @Component
 class PdlPersonClient(
-    @Value("\${pdl.url}") private val baseUrl: String,
+    @Value("\${persondata.url}") private val baseUrl: String,
     private val webClient: WebClient,
     private val callIdGenerator: CallIdGenerator,
     @Value("\${web-client.retry-attempts}") private val retryAttempts: String

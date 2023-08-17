@@ -15,10 +15,14 @@ class EgressServiceSecurityConfiguration {
     @Bean
     fun egressServiceListsByAudience(
         @Value("\${pensjon-regler.service-id}") pensjonReglerServiceId: String,
+        @Value("\${persondata.service-id}") persondataServiceId: String,
         @Value("\${proxy.service-id}") proxyServiceId: String
     ): EgressServiceListsByAudience {
         return EgressServiceListsByAudience(
-            mapOf(proxyServiceId to EgressService.servicesAccessibleViaProxy)
+            mapOf(
+                persondataServiceId to listOf(EgressService.PERSONDATA),
+                proxyServiceId to EgressService.servicesAccessibleViaProxy
+            )
         )
     }
 
