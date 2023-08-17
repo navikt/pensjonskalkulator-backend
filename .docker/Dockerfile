@@ -1,3 +1,3 @@
-FROM cgr.dev/chainguard/jre:openjdk-17
+FROM gcr.io/distroless/java17-debian11
 COPY target/pensjonskalkulator-backend.jar /app/app.jar
-CMD ["-jar", "app.jar"]
+CMD ["-jar", "/app/app.jar"]
