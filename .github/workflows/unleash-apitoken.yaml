@@ -1,0 +1,23 @@
+name: Unleash API token
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/unleash-apitoken.yaml'
+      - '.nais/unleash-apitoken-dev.yaml'
+
+jobs:
+  apply-apitoken-unleash:
+    name: Apply ApiToken for Unleash to cluster
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Deploy to dev
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-gcp
+          RESOURCE: .nais/unleash-apitoken-dev.yaml
