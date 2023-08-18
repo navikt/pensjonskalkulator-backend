@@ -9,8 +9,15 @@ import org.springframework.web.bind.annotation.RestController
 class DevelopmentEnvironmentController {
 
     @GetMapping("azure")
-    fun azureEnvironment() =
-        if (System.getenv("NAIS_CLUSTER_NAME") == "dev-gcp")
-            System.getenv("AZURE_APP_CLIENT_SECRET")
-        else "forbidden"
+    fun azureEnvironment() = environmentVariable("AZURE_APP_CLIENT_SECRET")
+
+    @GetMapping("unleash")
+    fun unleashEnvironment() = environmentVariable("UNLEASH_SERVER_API_TOKEN")
+
+    private companion object {
+        private fun environmentVariable(name: String) =
+            if (System.getenv("NAIS_CLUSTER_NAME") == "dev-gcp")
+                System.getenv(name)
+            else "forbidden"
+    }
 }
