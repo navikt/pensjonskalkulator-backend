@@ -17,7 +17,7 @@ class PensjonsavtaleService(
     private val featureToggleService: FeatureToggleService
 ) {
     fun fetchAvtaler(spec: PensjonsavtaleSpecDto): Pensjonsavtaler {
-        return if (featureToggleService.isEnabled("pensjonskalkulator.mock-norsk-pensjon"))
+        return if (featureToggleService.isEnabled("mock-norsk-pensjon"))
             mockAvtaler(spec)
         else
             avtaleClient.fetchAvtaler(fromDto(spec))

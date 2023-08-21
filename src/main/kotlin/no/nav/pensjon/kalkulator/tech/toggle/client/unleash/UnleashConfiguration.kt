@@ -9,21 +9,24 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class UnleashConfiguration(
-    @Value("\${unleash.url}") private val endpoint: String,
+    @Value("\${unleash.server.api.url}") private val endpoint: String,
+    @Value("\${unleash.server.api.token}") private val apiKey: String,
     @Value("\${unleash.toggle.interval}") private val toggleInterval: String,
     @Value("\${nais.cluster.name}") private val clusterName: String
 ) {
     @Bean
-    fun unleashConfig(@Value("\${nais.app.name}") appName: String) = UnleashConfig.builder()
-        .appName(appName)
-        .environment(environment())
-        .instanceId(instanceId())
-        .fetchTogglesInterval(toggleInterval.toLong())
-        .unleashAPI(endpoint)
-        .build()
+    fun unleashConfig(@Value("\${nais.app.name}") appName: String) =
+        UnleashConfig.builder()
+            .appName(appName)
+            .environment(environment())
+            .instanceId(instanceId())
+            .fetchTogglesInterval(toggleInterval.toLong())
+            .unleashAPI("$endpoint/api")
+            .apiKey(apiKey)
+            .build()
 
     @Bean
-    fun defaultUnleash(config: UnleashConfig) = DefaultUnleash(config, IsNotProductionStrategy(clusterName))
+    fun defaultUnleash(config: UnleashConfig) = DefaultUnleash(config)
 
     private fun environment() =
         if (clusterName == NaisEnvironment.PRODUCTION_CLUSTER_NAME)
