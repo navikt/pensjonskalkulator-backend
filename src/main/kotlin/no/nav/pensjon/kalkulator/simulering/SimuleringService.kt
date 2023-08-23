@@ -25,7 +25,7 @@ class SimuleringService(
             pid,
             specDto.forventetInntekt ?: sistePensjonsgivendeInntekt(pid),
             specDto.uttaksgrad,
-            specDto.foersteUttaksdato,
+            PensjonUtil.foersteUttaksdato(specDto.foedselsdato, specDto.foersteUttaksalder.aar),
             specDto.sivilstand ?: sivilstand(pid),
             specDto.epsHarInntektOver2G
         )

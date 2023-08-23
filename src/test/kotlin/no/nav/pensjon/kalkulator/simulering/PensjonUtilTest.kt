@@ -8,14 +8,21 @@ import java.time.LocalDate
 class PensjonUtilTest {
 
     @Test
-    fun `pensjonsaar is foedselsaar plus pensjonsalder when fodselsmaaned is not December`() {
+    fun `pensjoneringsaar is foedselsaar + pensjoneringsalder when foedselsmaaned is not December`() {
         val foedselsdato = LocalDate.of(1963, 11, 30)
-        assertEquals(2030, PensjonUtil.pensjonsaar(foedselsdato, 67))
+        assertEquals(2030, PensjonUtil.pensjoneringsaar(foedselsdato, 67))
     }
 
     @Test
-    fun `pensjonsaar is foedselsaar plus pensjonsalder + 1 when fodselsmaaned is December`() {
+    fun `pensjoneringsaar is foedselsaar + pensjoneringsalder + 1 when foedselsmaaned is December`() {
         val foedselsdato = LocalDate.of(1963, 12, 1)
-        assertEquals(2031, PensjonUtil.pensjonsaar(foedselsdato, 67))
+        assertEquals(2031, PensjonUtil.pensjoneringsaar(foedselsdato, 67))
+    }
+
+    @Test
+    fun `foersteUttaksdato is first in month after pensjoneringsalder`() {
+        val foedselsdato = LocalDate.of(1963, 2, 10)
+        val uttaksdato = PensjonUtil.foersteUttaksdato(foedselsdato, 67)
+        assertEquals(LocalDate.of(2030, 3, 1), uttaksdato)
     }
 }

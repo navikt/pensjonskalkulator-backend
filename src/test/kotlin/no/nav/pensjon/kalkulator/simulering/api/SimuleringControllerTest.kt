@@ -58,13 +58,15 @@ class SimuleringControllerTest {
     private companion object {
 
         private const val URL = "/api/alderspensjon/simulering"
+        private const val PENSJONSBELOEP = 123456
 
         @Language("json")
         private fun requestBody(simuleringstype: SimuleringType) = """{
             "simuleringstype": "$simuleringstype",
             "forventetInntekt": 100000,
             "uttaksgrad": 100,
-            "foersteUttaksdato": "2031-11-01",
+            "foersteUttaksalder": { "aar": 67, "maaned": 1 },
+            "foedselsdato": "1963-12-31",
             "sivilstand": "UGIFT",
             "epsHarInntektOver2G": false
         }""".trimIndent()
@@ -73,7 +75,7 @@ class SimuleringControllerTest {
         private fun responseBody(simuleringstype: SimuleringType) = """{
             "alderspensjon": [
               {
-                "beloep": 215026,
+                "beloep": $PENSJONSBELOEP,
                 "alder": 67
               }
             ],
@@ -95,12 +97,12 @@ class SimuleringControllerTest {
         private fun simuleringsresultat(simuleringType: SimuleringType) =
             when (simuleringType) {
                 SimuleringType.ALDERSPENSJON -> Simuleringsresultat(
-                    alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = 215026)),
+                    alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
                     afpPrivat = emptyList()
                 )
 
                 SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT -> Simuleringsresultat(
-                    alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = 215026)),
+                    alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
                     afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 22056)),
                 )
             }
