@@ -5,7 +5,7 @@ import java.time.LocalDate
 data class Person(
     val fornavn: String?,
     val foedselsdato: LocalDate,
-    val sivilstand: Sivilstand?
+    val sivilstand: Sivilstand = Sivilstand.UOPPGITT
 ) {
     val harFoedselsdato = foedselsdato >= minimumFoedselsdato
 

@@ -86,7 +86,7 @@ class PdlPersonClientTest : WebClientTest() {
         assertEquals("Ola-Kari", response.fornavn)
         assertEquals(LocalDate.MIN, response.foedselsdato)
         assertFalse(response.harFoedselsdato)
-        assertEquals(null, response.sivilstand)
+        assertEquals(Sivilstand.UOPPGITT, response.sivilstand)
     }
 
     @Test

@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.person.client.pdl.map
 
 import no.nav.pensjon.kalkulator.person.NavnFormatter
 import no.nav.pensjon.kalkulator.person.Person
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.client.pdl.dto.PdlSivilstand
 import no.nav.pensjon.kalkulator.person.client.pdl.dto.*
 import java.time.LocalDate
 
@@ -25,5 +25,5 @@ object PersonMapper {
         dto?.firstOrNull()?.fornavn
 
     private fun fromDto(dto: List<SivilstandDto>?) =
-        dto?.firstOrNull()?.type?.let { Sivilstand.forPdlCode(it) }
+        PdlSivilstand.fromExternalValue(dto?.firstOrNull()?.type).internalValue
 }

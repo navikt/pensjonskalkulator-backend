@@ -61,13 +61,13 @@ class PersonMapperTest {
 
     @Test
     fun `fromDto maps missing sivilstand to sivilstand null`() {
-        assertNull(PersonMapper.fromDto(responseDto(sivilstander = emptyList()))?.sivilstand)
+        assertEquals(Sivilstand.UOPPGITT, PersonMapper.fromDto(responseDto(sivilstander = emptyList()))?.sivilstand)
     }
 
     @Test
     fun `fromDto maps unknown sivilstand to sivilstand 'uoppgitt'`() {
         val dto = responseDto(sivilstander = listOf("not known"))
-        assertEquals(Sivilstand.UOPPGITT, PersonMapper.fromDto(dto)?.sivilstand)
+        assertEquals(Sivilstand.UNKNOWN, PersonMapper.fromDto(dto)?.sivilstand)
     }
 
     private companion object {
