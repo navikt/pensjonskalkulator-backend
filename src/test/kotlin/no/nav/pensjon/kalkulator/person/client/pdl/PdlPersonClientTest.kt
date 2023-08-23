@@ -11,8 +11,7 @@ import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import okhttp3.mockwebserver.MockResponse
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -24,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
+import java.time.LocalDate
 
 @ExtendWith(SpringExtension::class)
 class PdlPersonClientTest : WebClientTest() {
@@ -53,7 +53,7 @@ class PdlPersonClientTest : WebClientTest() {
             assertEquals("PEN", request.getHeader("tema"))
             assertEquals(
                 """{
-	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { fornavn }, sivilstand(historikk: true) { type } } }",
+	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { fornavn }, foedsel { foedselsdato }, sivilstand(historikk: true) { type } } }",
 	"variables": {
 		"ident": "12906498357"
 	}
@@ -71,6 +71,8 @@ class PdlPersonClientTest : WebClientTest() {
         val response: Person = client.fetchPerson(pid)!!
 
         assertEquals("Ola-Kari", response.fornavn)
+        assertEquals(LocalDate.of(1963, 12, 31), response.foedselsdato)
+        assertTrue(response.harFoedselsdato)
         assertEquals(Sivilstand.UGIFT, response.sivilstand)
     }
 
@@ -82,6 +84,8 @@ class PdlPersonClientTest : WebClientTest() {
         val response: Person = client.fetchPerson(pid)!!
 
         assertEquals("Ola-Kari", response.fornavn)
+        assertEquals(LocalDate.MIN, response.foedselsdato)
+        assertFalse(response.harFoedselsdato)
         assertEquals(null, response.sivilstand)
     }
 
@@ -140,6 +144,11 @@ class PdlPersonClientTest : WebClientTest() {
                   "navn": [
                     {
                       "fornavn": "Ola-Kari"
+                    }
+                  ],
+                  "foedsel": [
+                    {
+                      "foedselsdato": "1963-12-31"
                     }
                   ],
                   "sivilstand": [
