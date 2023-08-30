@@ -15,15 +15,6 @@ class DevelopmentEnvironmentController(@Value("\${spring.security.oauth2.resourc
     @GetMapping("unleash")
     fun unleashEnvironment() = environmentVariable("UNLEASH_SERVER_API_TOKEN")
 
-    @GetMapping("idporten")
-    fun idPortenEnvironment() = listOf(
-        environmentVariable("IDPORTEN_CLIENT_ID"),
-        environmentVariable("IDPORTEN_WELL_KNOWN_URL"),
-        environmentVariable("IDPORTEN_ISSUER"),
-        environmentVariable("IDPORTEN_JWKS_URI"),
-        uri
-    ).joinToString()
-
     private companion object {
         private fun environmentVariable(name: String) =
             if (System.getenv("NAIS_CLUSTER_NAME") == "dev-gcp")

@@ -54,6 +54,8 @@ spec:
           ports:
             - port: 9443
   env:
+    - name: IDPORTEN_ISSUER
+      value: https://test.idporten.no
     - name: NORSK_PENSJON_URL
       value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: PEN_URL
