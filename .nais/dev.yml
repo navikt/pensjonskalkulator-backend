@@ -53,6 +53,7 @@ spec:
         - host: pep-gw-q1.oera-q.local
           ports:
             - port: 9443
+        - host: test.idporten.no
   env:
     - name: IDPORTEN_ISSUER
       value: https://test.idporten.no
