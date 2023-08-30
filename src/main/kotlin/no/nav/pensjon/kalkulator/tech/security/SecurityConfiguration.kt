@@ -31,6 +31,7 @@ class SecurityConfiguration {
                 it.requestMatchers(
                     HttpMethod.GET,
                     internalRequestMatcher,
+                    "/error",
                     "/api/status",
                     "/api/feature/**",
                     "/swagger-ui/**",
