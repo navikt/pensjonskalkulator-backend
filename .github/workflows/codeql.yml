@@ -18,22 +18,25 @@ jobs:
         language: [ 'java' ]
         # 'java' covers Java and Kotlin
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
-      with:
-        languages: ${{ matrix.language }}
-        queries: security-extended
-    - name: Configure JDK
-      uses: actions/setup-java@v3
-      with:
-        cache: maven
-        java-version: 17
-        distribution: temurin
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
-    - name: Perform CodeQL analysis
-      uses: github/codeql-action/analyze@v2
-      with:
-        category: "/language:${{matrix.language}}"
+      - uses: GitHubSecurityLab/actions-permissions/monitor@v1
+        with:
+          config: ${{ vars.PERMISSIONS_CONFIG }}
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended
+      - name: Configure JDK
+        uses: actions/setup-java@v3
+        with:
+          cache: maven
+          java-version: 17
+          distribution: temurin
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:${{matrix.language}}"
