@@ -23,7 +23,7 @@ class PensjonsavtaleTest {
     }
 
     private fun pensjonsavtale1(startalder: Int, sluttalder: Int?) = Pensjonsavtale(
-        1,
+        "Avtale",
         "Firma1",
         "Selskap1",
         "Produkt1",

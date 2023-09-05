@@ -15,7 +15,7 @@ package no.nav.pensjon.kalkulator.avtale
  * utbetalingsperioder: Hvis en rettighet ikke kan leveres med utbetalingsperioder, så skal «Årsak til manglende utbetaling» ha en relevant feilkode.
  */
 data class Pensjonsavtale(
-    val avtalenummer: Int,
+    val avtalenummer: String,
     val arbeidsgiver: String,
     val selskapsnavn: String,
     val produktbetegnelse: String,
@@ -45,7 +45,7 @@ data class Pensjonsavtale(
         sluttalder: Int?,
         utbetalingsperioder: List<Utbetalingsperiode>
     ) : this(
-        0,
+        "",
         "",
         "",
         produktbetegnelse,

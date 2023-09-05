@@ -25,7 +25,7 @@ class PensjonsavtaleMapperTest {
 
         private fun pensjonsrettighet() =
             PensjonsrettighetDto().apply {
-                avtalenummer = 1
+                avtalenummer = "Avtale1"
                 arbeidsgiver = "Firma1"
                 selskapsnavn = "Selskap1"
                 produktbetegnelse = "Produkt1"

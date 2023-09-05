@@ -13,7 +13,7 @@ object PensjonsavtaleFactory {
 
     fun avtaleMedToUtbetalingsperioder() =
         Pensjonsavtale(
-            1,
+            "Avtale1",
             "Firma1",
             "Selskap1",
             "Produkt1",

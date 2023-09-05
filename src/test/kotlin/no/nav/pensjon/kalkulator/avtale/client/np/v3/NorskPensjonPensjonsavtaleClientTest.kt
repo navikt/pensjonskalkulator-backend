@@ -184,7 +184,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
     <soap:Body wsu:Id="x" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
         <ns2:pensjonsrettigheter xmlns:ns2="http://x.no/api/pensjonskalkulator/v3/typer">
             <pensjonsRettigheter>
-                <avtalenummer>1</avtalenummer>
+                <avtalenummer>Avtale1</avtalenummer>
                 <arbeidsgiver>Firma1</arbeidsgiver>
                 <selskapsnavn>Selskap1</selskapsnavn>
                 <produktbetegnelse>Produkt1</produktbetegnelse>
@@ -228,7 +228,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
     <soap:Body wsu:Id="x" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
         <ns2:pensjonsrettigheter xmlns:ns2="http://x.no/api/pensjonskalkulator/v3/typer">
             <pensjonsRettigheter>
-                <avtalenummer>1</avtalenummer>
+                <avtalenummer>Avtale1</avtalenummer>
                 <arbeidsgiver>Firma1</arbeidsgiver>
                 <selskapsnavn>Selskap1</selskapsnavn>
                 <produktbetegnelse>Produkt1</produktbetegnelse>
@@ -321,7 +321,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
 
         private fun avtaleUtenUtbetalingsperioder() =
             Pensjonsavtale(
-                0,
+                "",
                 "ukjent",
                 "Selskap2",
                 "Produkt2",
@@ -344,7 +344,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
 
         private fun avtaleMedEnUtbetalingsperiode() =
             Pensjonsavtale(
-                1,
+                "Avtale1",
                 "Firma1",
                 "Selskap1",
                 "Produkt1",
@@ -367,7 +367,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
 
         private fun avtaleMedToUtbetalingsperioder() =
             Pensjonsavtale(
-                1,
+                "Avtale1",
                 "Firma1",
                 "Selskap1",
                 "Produkt1",

@@ -26,7 +26,7 @@ object PensjonsavtaleMapper {
     private fun pensjonsavtaler(dto: EnvelopeDto) =
         dto.body?.pensjonsrettigheter?.pensjonsRettigheter?.map {
             Pensjonsavtale(
-                it.avtalenummer ?: 0,
+                it.avtalenummer ?: "",
                 it.arbeidsgiver ?: DEFAULT_VALUE,
                 it.selskapsnavn ?: DEFAULT_VALUE,
                 it.produktbetegnelse ?: DEFAULT_VALUE,

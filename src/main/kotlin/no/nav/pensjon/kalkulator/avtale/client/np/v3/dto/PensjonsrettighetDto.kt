@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.avtale.client.np.v3.dto
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 
 class PensjonsrettighetDto {
-    var avtalenummer: Int? = null
+    var avtalenummer: String? = null
     var arbeidsgiver: String? = null
     var selskapsnavn: String? = null
     var produktbetegnelse: String? = null
