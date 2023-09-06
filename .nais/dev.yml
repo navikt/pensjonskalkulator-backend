@@ -57,6 +57,7 @@ spec:
           ports:
             - port: 9443
         - host: test.idporten.no
+        - host: tp-api-q2.dev-fss-pub.nais.io
   env:
     - name: IDPORTEN_ISSUER
       value: https://test.idporten.no
@@ -77,7 +78,7 @@ spec:
     - name: TJENESTEPENSJON_SERVICE_ID
       value: dev-fss:pensjonsamhandling:tp-q2
     - name: TJENESTEPENSJON_URL
-      value: https://tp-q2.dev.intern.nav.no
+      value: https://tp-api-q2.dev-fss-pub.nais.io
     - name: UNT_URL
       value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: STDOUT_LOG_OUTPUT
