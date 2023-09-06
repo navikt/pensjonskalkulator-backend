@@ -10,6 +10,12 @@ import no.nav.pensjon.kalkulator.avtale.client.np.UttaksperiodeSpec
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.EnvelopeDto
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.map.PensjonsavtaleMapper
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.map.PensjonsavtaleMapper.fromDto
+import no.nav.pensjon.kalkulator.tech.metric.MetricResult.BAD_CLIENT
+import no.nav.pensjon.kalkulator.tech.metric.MetricResult.BAD_OTHER
+import no.nav.pensjon.kalkulator.tech.metric.MetricResult.BAD_SERVER
+import no.nav.pensjon.kalkulator.tech.metric.MetricResult.BAD_XML
+import no.nav.pensjon.kalkulator.tech.metric.MetricResult.OK
+import no.nav.pensjon.kalkulator.tech.metric.Metrics.countEvent
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.config.GatewayUsage
@@ -43,12 +49,14 @@ class NorskPensjonPensjonsavtaleClient(
 
     override fun fetchAvtaler(spec: PensjonsavtaleSpec): Pensjonsavtaler {
         val responseXml = fetchAvtalerXml(spec)
+        countCalls(OK)
 
         return try {
             val dto = xmlMapper.readValue(responseXml, EnvelopeDto::class.java)
             fromDto(dto)
         } catch (e: JsonProcessingException) {
-            log.error(e) { "Failed to process JSON" }
+            log.error(e) { "Failed to process XML" }
+            countCalls(BAD_XML)
             ingenAvtaler()
         }
     }
@@ -105,9 +113,19 @@ class NorskPensjonPensjonsavtaleClient(
         log.info { "Retried calling $uri ${backoff.maxAttempts} times" }
 
         return when (val failure = retrySignal.failure()) {
-            is WebClientRequestException -> EgressException(true, "Failed calling ${failure.uri}", failure)
-            is EgressException -> EgressException(failure.isClientError, toString(failure, uri), failure)
-            else -> failure
+            is WebClientRequestException -> EgressException(
+                isClientError = true,
+                message = "Failed calling ${failure.uri}",
+                cause = failure
+            ).also { countCalls(BAD_CLIENT) }
+
+            is EgressException -> EgressException(
+                isClientError = failure.isClientError,
+                message = toString(failure, uri),
+                cause = failure
+            ).also { countCalls(metricResult(failure)) }
+
+            else -> failure.also { countCalls(BAD_OTHER) }
         }
     }
 
@@ -163,5 +181,11 @@ class NorskPensjonPensjonsavtaleClient(
         }
 
         private fun ingenAvtaler() = Pensjonsavtaler(emptyList(), emptyList())
+
+        private fun countCalls(result: String) {
+            countEvent("norsk-pensjon-kall", result)
+        }
+
+        private fun metricResult(failure: EgressException) = if (failure.isClientError) BAD_CLIENT else BAD_SERVER
     }
 }

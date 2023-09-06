@@ -28,7 +28,7 @@ import java.time.LocalDate
  */
 @Component
 class TpTjenestepensjonClient(
-    @Value("\${tp.url}") private val baseUrl: String,
+    @Value("\${tjenestepensjon.url}") private val baseUrl: String,
     private val webClient: WebClient,
     private val callIdGenerator: CallIdGenerator,
     @Value("\${web-client.retry-attempts}") private val retryAttempts: String
