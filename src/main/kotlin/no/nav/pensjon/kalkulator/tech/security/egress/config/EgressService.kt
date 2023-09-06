@@ -11,7 +11,7 @@ enum class EgressService(val description: String, val gatewayUsage: GatewayUsage
     PENSJONSOPPTJENING("Pensjonsopptjening", GatewayUsage.INTERNAL),
     SAML_TOKEN("Gandalf STS", GatewayUsage.INTERNAL),
     SIMULERING("Simulering", GatewayUsage.INTERNAL),
-    TJENESTEPENSJONSFORHOLD("Tjenestepensjonsforhold", GatewayUsage.INTERNAL),
+    TJENESTEPENSJONSFORHOLD("Tjenestepensjonsforhold", GatewayUsage.NONE),
     USERNAME_TOKEN("SOAP UsernameToken", GatewayUsage.INTERNAL);
 
     companion object {

@@ -31,7 +31,7 @@ import java.util.*
  */
 //@Component
 class EsbTjenestepensjonClient(
-    @Value("\${tp.url}") private val baseUrl: String,
+    @Value("\${tjenestepensjon.url}") private val baseUrl: String,
     private val usernameTokenClient: UsernameTokenClient,
     @Qualifier("soap") private val webClient: WebClient,
     private val xmlMapper: XmlMapper,
