@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.uttaksalder.client.pen
 
-import no.nav.pensjon.kalkulator.pen.PenClient
-import no.nav.pensjon.kalkulator.uttaksalder.Uttaksalder
+import no.nav.pensjon.kalkulator.common.client.pen.PenClient
+import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.client.UttaksalderClient
 import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderRequestDto
@@ -15,19 +15,18 @@ import org.springframework.web.reactive.function.client.WebClient
 class PenUttaksalderClient(
     @Value("\${pen.url}") baseUrl: String,
     webClient: WebClient,
-) : PenClient(baseUrl, webClient), UttaksalderClient {
-    override fun finnTidligsteUttaksalder(spec: UttaksalderSpec): Uttaksalder? {
-        val response = doPost(
+    callIdGenerator: CallIdGenerator,
+    @Value("\${web-client.retry-attempts}") private val retryAttempts: String
+) : PenClient(baseUrl, webClient, callIdGenerator, retryAttempts), UttaksalderClient {
+    override fun finnTidligsteUttaksalder(spec: UttaksalderSpec) =
+        doPost(
             PATH,
             UttaksalderMapper.toDto(spec),
             UttaksalderRequestDto::class.java,
             UttaksalderResponseDto::class.java,
-        )
+        )?.let(UttaksalderMapper::fromDto)
 
-        return response?.let { UttaksalderMapper.fromDto(response) }
-    }
-
-    companion object {
-        private const val PATH = "/pen/springapi/uttaksalder"
+    private companion object {
+        private const val PATH = "uttaksalder"
     }
 }

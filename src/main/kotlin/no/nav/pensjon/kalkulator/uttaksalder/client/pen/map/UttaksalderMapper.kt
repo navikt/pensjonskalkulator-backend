@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.uttaksalder.client.pen.map
 
-import no.nav.pensjon.kalkulator.pen.PenSivilstand
+import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
 import no.nav.pensjon.kalkulator.uttaksalder.Uttaksalder
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderRequestDto

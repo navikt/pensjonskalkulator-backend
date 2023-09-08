@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.tech.selftest
 
 import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.PensjonReglerGrunnbeloepClient
-import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningClient
+import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.client.pdl.PdlPersonClient
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import org.junit.jupiter.api.Assertions.*
@@ -22,7 +22,7 @@ class SelfTestTest {
     private lateinit var grunnbeloepClient: PensjonReglerGrunnbeloepClient
 
     @Mock
-    private lateinit var opptjeningClient: PoppOpptjeningClient
+    private lateinit var opptjeningClient: PoppOpptjeningsgrunnlagClient
 
     @Mock
     private lateinit var personClient: PdlPersonClient
@@ -113,7 +113,7 @@ table tbody tr:nth-child(odd) {background-color: #ffffff;}
 
     private class TestClass(
         grunnbeloepClient: PensjonReglerGrunnbeloepClient,
-        opptjeningClient: PoppOpptjeningClient,
+        opptjeningClient: PoppOpptjeningsgrunnlagClient,
         personClient: PdlPersonClient
     ) :
         SelfTest(grunnbeloepClient, opptjeningClient, personClient) {

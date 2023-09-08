@@ -1,7 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen.map
 
-import no.nav.pensjon.kalkulator.pen.PenSimuleringstype
-import no.nav.pensjon.kalkulator.pen.PenSivilstand
+import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
 import no.nav.pensjon.kalkulator.simulering.SimulertAfpPrivat
@@ -28,8 +27,9 @@ object SimuleringMapper {
             uttaksar = 1,
             sisteInntekt = spec.forventetInntekt,
             forsteUttaksdato = midnight(spec.foersteUttaksdato),
-            simuleringstype = PenSimuleringstype.from(spec.simuleringstype)
+            simuleringstype = PenSimuleringstype.fromInternalValue(spec.simuleringstype)
         )
 
-    private fun midnight(date: LocalDate) = Date.from(date.atTime(0, 0).toInstant(ZoneOffset.ofHours(1)))
+    private fun midnight(date: LocalDate) =
+        Date.from(date.atTime(0, 0).toInstant(ZoneOffset.ofHours(1)))
 }

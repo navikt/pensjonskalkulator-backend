@@ -19,16 +19,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.math.BigDecimal
 
 @ExtendWith(SpringExtension::class)
-class PoppOpptjeningClientTest : WebClientTest() {
+class PoppOpptjeningsgrunnlagClientTest : WebClientTest() {
 
-    private lateinit var client: PoppOpptjeningClient
+    private lateinit var client: PoppOpptjeningsgrunnlagClient
 
     @Mock
     private lateinit var callIdGenerator: CallIdGenerator
 
     @BeforeEach
     fun initialize() {
-        client = PoppOpptjeningClient(baseUrl(), WebClientConfig().regularWebClient(), callIdGenerator, RETRY_ATTEMPTS)
+        client = PoppOpptjeningsgrunnlagClient(baseUrl(), WebClientConfig().regularWebClient(), callIdGenerator, RETRY_ATTEMPTS)
     }
 
     @Test

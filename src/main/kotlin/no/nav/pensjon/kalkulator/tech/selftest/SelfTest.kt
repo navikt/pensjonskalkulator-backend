@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.tech.selftest
 
 import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.PensjonReglerGrunnbeloepClient
-import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningClient
+import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.client.pdl.PdlPersonClient
 import org.springframework.stereotype.Component
 import java.time.LocalTime
@@ -9,7 +9,7 @@ import java.time.LocalTime
 @Component
 class SelfTest(
     grunnbeloepClient: PensjonReglerGrunnbeloepClient,
-    opptjeningClient: PoppOpptjeningClient,
+    opptjeningClient: PoppOpptjeningsgrunnlagClient,
     personClient: PdlPersonClient
 ) {
 

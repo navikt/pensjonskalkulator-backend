@@ -1,68 +1,53 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen
 
+import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
-import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
-import no.nav.pensjon.kalkulator.tech.security.egress.EnrichedAuthentication
-import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
+import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mock
 import org.springframework.http.HttpStatus
-import org.springframework.security.authentication.TestingAuthenticationToken
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDate
 
+@ExtendWith(SpringExtension::class)
 class PenSimuleringClientTest : WebClientTest() {
 
     private lateinit var client: PenSimuleringClient
 
+    @Mock
+    private lateinit var callIdGenerator: CallIdGenerator
+
     @BeforeEach
     fun initialize() {
-        client = PenSimuleringClient(baseUrl(), WebClient.create())
+        client = PenSimuleringClient(baseUrl(), WebClientConfig().regularWebClient(), callIdGenerator, "1")
+        arrangeSecurityContext()
     }
 
     @Test
     fun `simulerAlderspensjon handles single pensjonsavtale`() {
-        arrangeSecurityContext()
-        arrange(okResponse(pensjon()))
+        arrange(okResponse())
 
-        val response = client.simulerAlderspensjon(simuleringSpec())
+        val response = client.simulerAlderspensjon(spec())
 
-        assertEquals(65, response.alderspensjon[0].alder)
-        assertEquals(98000, response.alderspensjon[0].beloep)
+        with(response.alderspensjon[0]) {
+            assertEquals(65, alder)
+            assertEquals(98000, beloep)
+        }
     }
 
-    companion object {
-
-        private fun arrangeSecurityContext() {
-            SecurityContextHolder.setContext(SecurityContextHolder.createEmptyContext())
-
-            SecurityContextHolder.getContext().authentication = EnrichedAuthentication(
-                TestingAuthenticationToken("TEST_USER", null),
-                EgressTokenSuppliersByService(mapOf())
-            )
-        }
-
-        private fun simuleringSpec() = SimuleringSpec(
-            SimuleringType.ALDERSPENSJON,
-            Pid("12906498357"),
-            123000,
-            80,
-            LocalDate.of(2034, 5, 6),
-            Sivilstand.ENKE_ELLER_ENKEMANN,
-            true
-        )
-
-        private fun okResponse(pensjon: String) =
-            jsonResponse(HttpStatus.OK).setBody(pensjon)
+    private companion object {
 
         @Language("json")
-        private fun pensjon() = """{
+        private const val PENSJON = """{
               "alderspensjon": [
                 {
                   "alder": "65",
@@ -71,5 +56,18 @@ class PenSimuleringClientTest : WebClientTest() {
               ],
               "afpPrivat": []
             }"""
+
+        private fun spec() =
+            SimuleringSpec(
+                simuleringstype = SimuleringType.ALDERSPENSJON,
+                pid = pid,
+                forventetInntekt = 123000,
+                uttaksgrad = 80,
+                foersteUttaksdato = LocalDate.of(2034, 5, 6),
+                sivilstand = Sivilstand.ENKE_ELLER_ENKEMANN,
+                epsHarInntektOver2G = true
+            )
+
+        private fun okResponse() = jsonResponse(HttpStatus.OK).setBody(PENSJON)
     }
 }

@@ -21,7 +21,7 @@ enum class PdlSivilstand(val externalValue: String, val internalValue: Sivilstan
     GJENLEVENDE_PARTNER("GJENLEVENDE_PARTNER", Sivilstand.GJENLEVENDE_PARTNER);
 
     companion object {
-        private val values = PdlSivilstand.values()
+        private val values = values()
 
         fun fromExternalValue(value: String?) =
             values.singleOrNull { it.externalValue.equals(value, true) } ?: default(value)
