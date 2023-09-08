@@ -1,0 +1,39 @@
+package no.nav.pensjon.kalkulator.ufoere.client.pen
+
+import no.nav.pensjon.kalkulator.common.client.pen.PenClient
+import no.nav.pensjon.kalkulator.person.Pid
+import no.nav.pensjon.kalkulator.person.client.pdl.dto.*
+import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.ufoere.Vedtak
+import no.nav.pensjon.kalkulator.ufoere.client.VedtakClient
+import no.nav.pensjon.kalkulator.ufoere.client.pen.map.VedtakMapper
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.ParameterizedTypeReference
+import org.springframework.format.annotation.DateTimeFormat
+import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.client.WebClient
+import java.time.LocalDate
+import java.util.*
+
+@Component
+class PenVedtakClient(
+    @Value("\${pen.url}") private val baseUrl: String,
+    webClient: WebClient,
+    callIdGenerator: CallIdGenerator,
+    @Value("\${web-client.retry-attempts}") private val retryAttempts: String
+) : PenClient(baseUrl, webClient, callIdGenerator, retryAttempts), VedtakClient {
+    override fun bestemGjeldendeVedtak(
+        pid: Pid,
+        @DateTimeFormat(pattern = "yyyy-MM-dd") fom: LocalDate
+    ): List<Vedtak> =
+        doGet(
+            object : ParameterizedTypeReference<List<VedtakDto>>() {},
+            "$PATH$fom",
+            pid
+        )?.let(VedtakMapper::fromDto)
+            ?: emptyList()
+
+    private companion object {
+        private const val PATH = "vedtak/bestemgjeldende?fom="
+    }
+}
