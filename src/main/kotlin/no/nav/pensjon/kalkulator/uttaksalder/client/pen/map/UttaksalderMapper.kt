@@ -14,7 +14,7 @@ object UttaksalderMapper {
     fun toDto(spec: UttaksalderSpec) =
         UttaksalderRequestDto(
             pid = spec.pid.value,
-            sivilstand = PenSivilstand.from(spec.sivilstand),
+            sivilstand = PenSivilstand.from(spec.sivilstand).externalValue,
             harEps = spec.harEps,
             sisteInntekt = spec.sisteInntekt,
         )

@@ -22,7 +22,7 @@ object SimuleringMapper {
     fun toDto(spec: SimuleringSpec) =
         SimuleringRequestDto(
             pid = spec.pid.value,
-            sivilstand = PenSivilstand.from(spec.sivilstand),
+            sivilstand = PenSivilstand.from(spec.sivilstand).externalValue,
             harEps = spec.epsHarInntektOver2G,
             uttaksar = 1,
             sisteInntekt = spec.forventetInntekt,
