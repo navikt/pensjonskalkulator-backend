@@ -83,5 +83,7 @@ spec:
       value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: STDOUT_LOG_OUTPUT
       value: JSON
+    - name: JAVA_TOOL_OPTIONS
+      value: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
   envFrom:
     - secret: pensjonskalkulator-backend-unleash-api-token
