@@ -1,6 +1,5 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen.dto
 
-import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenSimuleringstype
 import java.util.*
 
 data class SimuleringRequestDto(
@@ -10,5 +9,5 @@ data class SimuleringRequestDto(
     val uttaksar: Int,
     val sisteInntekt: Int,
     val forsteUttaksdato: Date,
-    val simuleringstype: PenSimuleringstype,
+    val simuleringstype: String,
 )

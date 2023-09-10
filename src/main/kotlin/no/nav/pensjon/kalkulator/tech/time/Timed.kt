@@ -20,4 +20,16 @@ open class Timed {
         log.info { "$functionName took ${currentTimeMillis() - startTimeMillis} ms to process" }
         return result
     }
+
+    fun extractMessageRecursively(ex: Throwable): String {
+        val builder = StringBuilder()
+        builder.append(ex.message)
+
+        if (ex.cause == null) {
+            return builder.toString()
+        }
+
+        builder.append(" | Cause: ").append(extractMessageRecursively(ex.cause!!))
+        return builder.toString()
+    }
 }

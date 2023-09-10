@@ -27,7 +27,7 @@ object SimuleringMapper {
             uttaksar = 1,
             sisteInntekt = spec.forventetInntekt,
             forsteUttaksdato = midnight(spec.foersteUttaksdato),
-            simuleringstype = PenSimuleringstype.fromInternalValue(spec.simuleringstype)
+            simuleringstype = PenSimuleringstype.fromInternalValue(spec.simuleringstype).externalValue
         )
 
     private fun midnight(date: LocalDate) =

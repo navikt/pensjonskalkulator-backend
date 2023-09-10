@@ -81,6 +81,8 @@ spec:
       value: https://tp-api-q2.dev-fss-pub.nais.io
     - name: UNT_URL
       value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
+    - name: SERVER_ERROR_INCLUDE_STACKTRACE
+      value: always
     - name: STDOUT_LOG_OUTPUT
       value: JSON
     - name: JAVA_TOOL_OPTIONS
