@@ -6,12 +6,12 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.2</version>
+        <version>3.1.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>no.nav.pensjon</groupId>
     <artifactId>pensjonskalkulator-backend</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.3.0-SNAPSHOT</version>
     <name>pensjonskalkulator-backend</name>
     <description>Backend for pensjonskalkulator for brukere født 1963 eller senere</description>
     <packaging>jar</packaging>
