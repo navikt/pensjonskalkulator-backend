@@ -109,7 +109,7 @@ class PdlPersonClient(
         private val service = EgressService.PERSONDATA
 
         private fun query(pid: Pid) = """{
-	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { fornavn }, foedsel { foedselsdato }, sivilstand(historikk: true) { type } } }",
+	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { fornavn }, foedsel { foedselsdato }, sivilstand(historikk: false) { type } } }",
 	"variables": {
 		"ident": "${pid.value}"
 	}
