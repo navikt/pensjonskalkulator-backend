@@ -1,11 +1,10 @@
 package no.nav.pensjon.kalkulator.person.client.pdl
 
+import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.tech.security.egress.EnrichedAuthentication
-import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
@@ -18,8 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.springframework.http.HttpStatus
-import org.springframework.security.authentication.TestingAuthenticationToken
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
@@ -37,11 +34,11 @@ class PdlPersonClientTest : WebClientTest() {
     fun initialize() {
         `when`(callIdGenerator.newId()).thenReturn("id1")
         client = PdlPersonClient(baseUrl(), WebClientConfig().regularWebClient(), callIdGenerator, "1")
+        arrangeSecurityContext()
     }
 
     @Test
     fun `fetchPerson uses supplied PID in request to PDL`() {
-        arrangeSecurityContext()
         arrange(okResponse())
 
         client.fetchPerson(pid)
@@ -65,7 +62,6 @@ class PdlPersonClientTest : WebClientTest() {
 
     @Test
     fun `fetchPerson returns person when OK response`() {
-        arrangeSecurityContext()
         arrange(okResponse())
 
         val response: Person = client.fetchPerson(pid)!!
@@ -78,7 +74,6 @@ class PdlPersonClientTest : WebClientTest() {
 
     @Test
     fun `fetchPerson returns partial person when receiving partial graphql-response`() {
-        arrangeSecurityContext()
         arrange(partialResponse())
 
         val response: Person = client.fetchPerson(pid)!!
@@ -91,7 +86,6 @@ class PdlPersonClientTest : WebClientTest() {
 
     @Test
     fun `fetchPerson retries in case of server error`() {
-        arrangeSecurityContext()
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
         arrange(okResponse())
 
@@ -103,7 +97,6 @@ class PdlPersonClientTest : WebClientTest() {
 
     @Test
     fun `fetchPerson does not retry in case of client error`() {
-        arrangeSecurityContext()
         arrange(jsonResponse(HttpStatus.BAD_REQUEST).setBody("My bad"))
         // No 2nd response arranged, since no retry
 
@@ -114,7 +107,6 @@ class PdlPersonClientTest : WebClientTest() {
 
     @Test
     fun `fetchPerson handles server error`() {
-        arrangeSecurityContext()
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil")) // for retry
 
@@ -124,16 +116,14 @@ class PdlPersonClientTest : WebClientTest() {
         assertEquals("Feil", (exception.cause as EgressException).message)
     }
 
+    @Test
+    fun `fetchPerson handles extended response`() {
+        arrange(extendedResponse())
+        // extension data is only logged, so just check that no exception occurs:
+        assertDoesNotThrow { client.fetchPerson(pid) }
+    }
+
     companion object {
-
-        private fun arrangeSecurityContext() {
-            SecurityContextHolder.setContext(SecurityContextHolder.createEmptyContext())
-
-            SecurityContextHolder.getContext().authentication = EnrichedAuthentication(
-                TestingAuthenticationToken("TEST_USER", null),
-                EgressTokenSuppliersByService(mapOf())
-            )
-        }
 
         private fun okResponse(): MockResponse {
             // Actual response from PDL in Q2:
@@ -175,6 +165,46 @@ class PdlPersonClientTest : WebClientTest() {
                   ],
                   "sivilstand": null
                 }
+              }
+            }""".trimIndent()
+
+            return jsonResponse(HttpStatus.OK).setBody(body)
+        }
+
+        private fun extendedResponse(): MockResponse {
+            @Language("JSON")
+            val body = """{
+              "data": {
+                "hentPerson": {
+                  "navn": [
+                    {
+                      "fornavn": "Ola-Kari"
+                    }
+                  ],
+                  "sivilstand": null
+                }
+              },
+              "extensions": {
+              	"warnings": [{
+              			"query": "N/A",
+              			"id": "deprecated_token",
+              			"code": null,
+              			"message": "bruk av deprecated token",
+              			"details": "STS token er markert som deprecated, vi oppfordrer å bytte til AzureAD system token"
+              		},
+              		{
+              			"query": "hentPerson",
+              			"id": "tilgangsstyring",
+              			"code": "mangler_opplysninger_i_katalog",
+              			"message": "Behandling mangler opplysningstyper",
+              			"details": {
+              				"missing": [
+              					"INNFLYTTING_TIL_NORGE",
+              					"STATSBORGERSKAP_V1"
+              				]
+              			}
+              		}
+              	]
               }
             }""".trimIndent()
 

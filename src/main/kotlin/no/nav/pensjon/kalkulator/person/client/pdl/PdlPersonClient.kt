@@ -49,6 +49,7 @@ class PdlPersonClient(
                 .bodyToMono(PersonResponseDto::class.java)
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
+                ?.also { log.warn { warnings(it) } }
                 ?.let(PersonMapper::fromDto)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
@@ -114,5 +115,17 @@ class PdlPersonClient(
 		"ident": "${pid.value}"
 	}
 }"""
+
+        private fun warnings(response: PersonResponseDto) =
+            response.extensions?.warnings?.joinToString {
+                (it.message ?: "-") + " (${warningDetails(it.details)})"
+            } ?: ""
+
+        private fun warningDetails(details: Any?) =
+            when (details) {
+                is String -> details
+                is LinkedHashMap<*, *> -> (details["missing"] as ArrayList<*>).joinToString()
+                else -> details.toString()
+            }
     }
 }

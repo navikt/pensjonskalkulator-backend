@@ -4,7 +4,11 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonValue
 import java.time.LocalDate
 
-data class PersonResponseDto(val data: PersonEnvelopeDto?, val errors: List<ErrorDto>?)
+data class PersonResponseDto(
+    val data: PersonEnvelopeDto?,
+    val extensions: ExtensionsDto?,
+    val errors: List<ErrorDto>?
+)
 
 data class PersonEnvelopeDto(val hentPerson: PersonDto)
 
@@ -21,6 +25,16 @@ data class FoedselDto(val foedselsdato: DateDto)
 data class SivilstandDto(val type: String)
 
 data class ErrorDto(val message: String)
+
+data class ExtensionsDto(val warnings: List<WarningDto>?)
+
+data class WarningDto(
+    val query: String?,
+    val id: String?,
+    val code: String?,
+    val message: String?,
+    val details: Any?
+)
 
 data class DateDto(val value: LocalDate) {
     @JsonValue

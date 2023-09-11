@@ -44,7 +44,7 @@ class PersonMapperTest {
 
     @Test
     fun `fromDto maps DTO with null data to null`() {
-        assertNull(PersonMapper.fromDto(PersonResponseDto(null, null)))
+        assertNull(PersonMapper.fromDto(PersonResponseDto(null, null, null)))
     }
 
     @Test
@@ -85,7 +85,7 @@ class PersonMapperTest {
                         fodselsdatoer.map { FoedselDto(DateDto(it)) },
                         sivilstander.map(::SivilstandDto)
                     )
-                ), null
+                ), null, null
             )
     }
 }
