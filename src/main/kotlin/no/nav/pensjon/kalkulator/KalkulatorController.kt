@@ -24,10 +24,4 @@ class KalkulatorController(
         val spec = GrunnbeloepSpec(now, now)
         return grunnbeloepClient.getGrunnbeloep(spec)
     }
-
-    @GetMapping("status")
-    @Operation(summary = "Sjekk status", description = "Hent status for applikasjonens helsetilstand")
-    fun status(): String {
-        return """{ "status": "OK" }"""
-    }
 }
