@@ -35,7 +35,7 @@ class UttaksalderService(
 
     private fun sistePensjonsgivendeInntekt(pid: Pid): Int {
         val grunnlag = opptjeningsgrunnlagClient.fetchOpptjeningsgrunnlag(pid)
-        return InntektUtil.sistePensjonsgivendeInntekt(grunnlag).intValueExact()
+        return InntektUtil.sistePensjonsgivendeInntekt(grunnlag).beloep.intValueExact()
     }
 
     private fun updateMetric(alder: Uttaksalder?) {

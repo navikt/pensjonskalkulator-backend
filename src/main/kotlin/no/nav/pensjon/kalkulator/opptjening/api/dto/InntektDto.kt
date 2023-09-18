@@ -1,3 +1,3 @@
 package no.nav.pensjon.kalkulator.opptjening.api.dto
 
-data class InntektDto(val beloep: Int)
+data class InntektDto(val beloep: Int, val aar: Int)

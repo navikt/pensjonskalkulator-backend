@@ -31,15 +31,21 @@ class InntektServiceTest {
     @Test
     fun `sistePensjonsgivendeInntekt returns beloep for 'sum pensjonsgivende inntekt'`() {
         arrangePidAndResultat(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT)
+
         val result = service.sistePensjonsgivendeInntekt()
-        assertEquals(123000, result)
+
+        assertEquals(BigDecimal("123000"), result.beloep)
+        assertEquals(2021, result.aar)
     }
 
     @Test
     fun `sistePensjonsgivendeInntekt returns zero when no 'sum pensjonsgivende inntekt' entries`() {
         arrangePidAndResultat(Opptjeningstype.PENSJONSGIVENDE_INNTEKT)
+
         val result = service.sistePensjonsgivendeInntekt()
-        assertEquals(0, result)
+
+        assertEquals(BigDecimal.ZERO, result.beloep)
+        assertEquals(0, result.aar)
     }
 
     private fun arrangePidAndResultat(opptjeningstype: Opptjeningstype) {

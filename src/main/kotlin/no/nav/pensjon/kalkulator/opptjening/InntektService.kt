@@ -9,8 +9,8 @@ class InntektService(
     private val client: OpptjeningsgrunnlagClient,
     private val pidGetter: PidGetter
 ) {
-    fun sistePensjonsgivendeInntekt(): Int {
+    fun sistePensjonsgivendeInntekt(): Inntekt {
         val grunnlag = client.fetchOpptjeningsgrunnlag(pidGetter.pid())
-        return InntektUtil.sistePensjonsgivendeInntekt(grunnlag).intValueExact()
+        return InntektUtil.sistePensjonsgivendeInntekt(grunnlag)
     }
 }

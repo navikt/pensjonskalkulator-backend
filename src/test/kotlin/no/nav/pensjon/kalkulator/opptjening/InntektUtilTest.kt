@@ -10,15 +10,21 @@ class InntektUtilTest {
     @Test
     fun `sistePensjonsgivendeInntekt returns zero when no inntekter`() {
         val grunnlag = Opptjeningsgrunnlag(emptyList())
+
         val inntekt = InntektUtil.sistePensjonsgivendeInntekt(grunnlag)
-        assertEquals(BigDecimal.ZERO, inntekt)
+
+        assertEquals(BigDecimal.ZERO, inntekt.beloep)
+        assertEquals(0, inntekt.aar)
     }
 
     @Test
     fun `sistePensjonsgivendeInntekt returns zero when no pensjonsgivende inntekter`() {
         val grunnlag = Opptjeningsgrunnlag(listOf(Inntekt(Opptjeningstype.OTHER, 2023, BigDecimal.ONE)))
+
         val inntekt = InntektUtil.sistePensjonsgivendeInntekt(grunnlag)
-        assertEquals(BigDecimal.ZERO, inntekt)
+
+        assertEquals(BigDecimal.ZERO, inntekt.beloep)
+        assertEquals(0, inntekt.aar)
     }
 
     @Test
@@ -33,7 +39,8 @@ class InntektUtilTest {
 
         val inntekt = InntektUtil.sistePensjonsgivendeInntekt(grunnlag)
 
-        assertEquals(BigDecimal.TEN, inntekt)
+        assertEquals(BigDecimal.TEN, inntekt.beloep)
+        assertEquals(2023, inntekt.aar)
     }
 
     @Test
@@ -48,7 +55,8 @@ class InntektUtilTest {
 
         val inntekt = InntektUtil.sistePensjonsgivendeInntekt(grunnlag)
 
-        assertEquals(BigDecimal.ONE, inntekt)
+        assertEquals(BigDecimal.ONE, inntekt.beloep)
+        assertEquals(2022, inntekt.aar)
     }
 
     companion object {
