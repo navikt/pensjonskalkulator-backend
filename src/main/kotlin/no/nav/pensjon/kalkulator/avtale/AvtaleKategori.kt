@@ -1,11 +1,11 @@
 package no.nav.pensjon.kalkulator.avtale
 
-enum class AvtaleKategori {
-    NONE,
-    UNKNOWN,
-    INDIVIDUELL_ORDNING,
-    PRIVAT_AFP,
-    PRIVAT_TJENESTEPENSJON,
-    OFFENTLIG_TJENESTEPENSJON,
-    FOLKETRYGD
+enum class AvtaleKategori(val included: Boolean) {
+    NONE(true),
+    UNKNOWN(true),
+    INDIVIDUELL_ORDNING(true),
+    PRIVAT_AFP(true),
+    PRIVAT_TJENESTEPENSJON(true),
+    OFFENTLIG_TJENESTEPENSJON(false),
+    FOLKETRYGD(false);
 }

@@ -6,6 +6,8 @@ object PensjonsavtaleFactory {
 
     fun pensjonsavtaler() = pensjonsavtaler(67)
 
+    fun pensjonsavtalerV3(kategorier: List<AvtaleKategori>) = Pensjonsavtaler(kategorier.map(::pensjonsavtale), listOf(selskapV3()))
+
     fun pensjonsavtaler(startalder: Int) = Pensjonsavtaler(listOf(pensjonsavtale(startalder)), listOf(selskap()))
 
     // Avtaler med felter støttet i versjon 3 av tjenesten til Norsk Pensjon
@@ -59,6 +61,15 @@ object PensjonsavtaleFactory {
             "produkt1",
             AvtaleKategori.INDIVIDUELL_ORDNING,
             startalder,
+            77,
+            listOf(utbetalingsperiode())
+        )
+
+    private fun pensjonsavtale(kategori: AvtaleKategori) =
+        Pensjonsavtale(
+            "produkt1",
+            kategori,
+            67,
             77,
             listOf(utbetalingsperiode())
         )

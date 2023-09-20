@@ -20,7 +20,7 @@ class PensjonsavtaleService(
         return if (featureToggleService.isEnabled("mock-norsk-pensjon"))
             mockAvtaler(spec)
         else
-            avtaleClient.fetchAvtaler(fromDto(spec))
+            filter(avtaleClient.fetchAvtaler(fromDto(spec)))
     }
 
     private fun fromDto(dto: PensjonsavtaleSpecDto) =
@@ -45,6 +45,12 @@ class PensjonsavtaleService(
         )
 
     private companion object {
+
+        private fun filter(avtaler: Pensjonsavtaler) =
+            Pensjonsavtaler(
+                avtaler.avtaler.filter { it.kategori.included },
+                avtaler.utilgjengeligeSelskap
+            )
 
         /**
          * Temporary function for testing pensjonsavtaler with synthetic persons

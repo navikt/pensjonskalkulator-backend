@@ -36,20 +36,37 @@ class PensjonsavtaleServiceTest {
     @BeforeEach
     fun initialize() {
         pensjonsavtaleService = PensjonsavtaleService(pensjonsavtaleClient, pidGetter, featureToggleService)
+        `when`(pidGetter.pid()).thenReturn(pid)
     }
 
     @Test
     fun `fetchAvtaler fetches avtaler`() {
-        arrangePidAndClient()
-
+        arrangeClient()
         val result = pensjonsavtaleService.fetchAvtaler(pensjonsavtaleSpecDto())
-
         result shouldBe pensjonsavtaler
     }
 
-    private fun arrangePidAndClient() {
-        `when`(pidGetter.pid()).thenReturn(pid)
+    @Test
+    fun `fetchAvtaler excludes avtaler of kategori 'Folketrygd' and 'Offentlig tjenestepensjon'`() {
+        arrangeClient(
+            listOf(
+                AvtaleKategori.FOLKETRYGD,
+                AvtaleKategori.PRIVAT_AFP,
+                AvtaleKategori.OFFENTLIG_TJENESTEPENSJON
+            )
+        )
+
+        val result = pensjonsavtaleService.fetchAvtaler(pensjonsavtaleSpecDto())
+
+        result shouldBe pensjonsavtalerV3(listOf(AvtaleKategori.PRIVAT_AFP))
+    }
+
+    private fun arrangeClient() {
         `when`(pensjonsavtaleClient.fetchAvtaler(pensjonsavtaleSpec())).thenReturn(pensjonsavtaler)
+    }
+
+    private fun arrangeClient(kategorier: List<AvtaleKategori>) {
+        `when`(pensjonsavtaleClient.fetchAvtaler(pensjonsavtaleSpec())).thenReturn(pensjonsavtalerV3(kategorier))
     }
 
     private companion object {
