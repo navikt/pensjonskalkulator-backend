@@ -11,7 +11,7 @@ import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringSpecDto
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
-import no.nav.pensjon.kalkulator.uttaksalder.Uttaksalder
+import no.nav.pensjon.kalkulator.uttaksalder.Alder
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -98,7 +98,7 @@ class SimuleringServiceTest {
                 SimuleringType.ALDERSPENSJON,
                 forventetInntekt,
                 100,
-                Uttaksalder(67, 1),
+                Alder(67, 1),
                 foedselsdato,
                 sivilstand,
                 false

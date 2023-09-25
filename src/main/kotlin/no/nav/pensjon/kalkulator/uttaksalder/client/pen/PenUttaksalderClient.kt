@@ -4,8 +4,8 @@ import no.nav.pensjon.kalkulator.common.client.pen.PenClient
 import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.client.UttaksalderClient
-import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderRequestDto
-import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderResponseDto
+import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderEgressSpecDto
+import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderDto
 import no.nav.pensjon.kalkulator.uttaksalder.client.pen.map.UttaksalderMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -22,8 +22,8 @@ class PenUttaksalderClient(
         doPost(
             PATH,
             UttaksalderMapper.toDto(spec),
-            UttaksalderRequestDto::class.java,
-            UttaksalderResponseDto::class.java,
+            UttaksalderEgressSpecDto::class.java,
+            UttaksalderDto::class.java,
         )?.let(UttaksalderMapper::fromDto)
 
     private companion object {

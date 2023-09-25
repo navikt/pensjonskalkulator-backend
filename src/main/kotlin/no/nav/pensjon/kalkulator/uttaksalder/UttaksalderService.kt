@@ -7,7 +7,7 @@ import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.tech.metric.Metrics
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
-import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderSpecDto
+import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
 import no.nav.pensjon.kalkulator.uttaksalder.client.UttaksalderClient
 import org.springframework.stereotype.Service
 
@@ -18,7 +18,7 @@ class UttaksalderService(
     private val personClient: PersonClient,
     private val pidGetter: PidGetter
 ) {
-    fun finnTidligsteUttaksalder(specDto: UttaksalderSpecDto): Uttaksalder? {
+    fun finnTidligsteUttaksalder(specDto: UttaksalderIngressSpecDto): Alder? {
         val pid = pidGetter.pid()
 
         val uttaksalderSpec = UttaksalderSpec(
@@ -38,8 +38,8 @@ class UttaksalderService(
         return InntektUtil.sistePensjonsgivendeInntekt(grunnlag).beloep.intValueExact()
     }
 
-    private fun updateMetric(alder: Uttaksalder?) {
-        val result = alder?.let { if (it.aar == 62 && it.maaned == 1) "621" else it.aar.toString() } ?: "null"
+    private fun updateMetric(alder: Alder?) {
+        val result = alder?.let { if (it.aar == 62 && it.maaneder == 1) "621" else it.aar.toString() } ?: "null"
         Metrics.countEvent("uttaksalder", result)
     }
 }

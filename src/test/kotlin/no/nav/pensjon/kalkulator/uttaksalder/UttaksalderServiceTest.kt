@@ -9,7 +9,7 @@ import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
-import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderSpecDto
+import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
 import no.nav.pensjon.kalkulator.uttaksalder.client.UttaksalderClient
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -47,7 +47,7 @@ internal class UttaksalderServiceTest {
 
     @Test
     fun `finnTidligsteUttaksalder uses properties from spec`() {
-        val spec = UttaksalderSpecDto(Sivilstand.GIFT, true, 100_000)
+        val spec = UttaksalderIngressSpecDto(Sivilstand.GIFT, true, 100_000)
         val uttaksalder = service.finnTidligsteUttaksalder(spec)
 
         assertNotNull(uttaksalder)
@@ -64,7 +64,7 @@ internal class UttaksalderServiceTest {
         `when`(opptjeningsgrunnlagClient.fetchOpptjeningsgrunnlag(anyObject())).thenReturn(opptjeningsgrunnlag)
         `when`(personClient.fetchPerson(pid)).thenReturn(person)
 
-        val spec = UttaksalderSpecDto(null, null, null)
+        val spec = UttaksalderIngressSpecDto(null, null, null)
         val uttaksalder = service.finnTidligsteUttaksalder(spec)
 
         assertNotNull(uttaksalder)
@@ -80,7 +80,7 @@ internal class UttaksalderServiceTest {
     }
 
     private companion object {
-        private val uttaksalder = Uttaksalder(67, 0)
+        private val uttaksalder = Alder(67, 0)
         private val inntekt = Inntekt(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, 2023, BigDecimal("543210"))
         private val opptjeningsgrunnlag = Opptjeningsgrunnlag(listOf(inntekt))
     }

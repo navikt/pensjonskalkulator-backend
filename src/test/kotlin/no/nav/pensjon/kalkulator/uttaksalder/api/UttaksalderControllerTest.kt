@@ -2,8 +2,9 @@ package no.nav.pensjon.kalkulator.uttaksalder.api
 
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.uttaksalder.Uttaksalder
+import no.nav.pensjon.kalkulator.uttaksalder.Alder
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
+import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -28,11 +29,11 @@ internal class UttaksalderControllerTest {
     private lateinit var mvc: MockMvc
 
     @MockBean
-    private lateinit var uttaksalderService: UttaksalderService
+    private lateinit var service: UttaksalderService
 
     @Test
-    fun finnTidligsteUttaksalder() {
-        `when`(uttaksalderService.finnTidligsteUttaksalder(anyObject())).thenReturn(uttaksalder)
+    fun `finnTidligsteUttaksalder verion 0`() {
+        `when`(service.finnTidligsteUttaksalder(anyObject())).thenReturn(uttaksalder)
 
         mvc.perform(
             post("/api/tidligste-uttaksalder")
@@ -41,13 +42,28 @@ internal class UttaksalderControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk)
-            .andExpect(content().json(responseBody()))
+            .andExpect(content().json(responseBodyV0()))
+    }
+
+    @Test
+    fun `finnTidligsteUttaksalder verion 1`() {
+        val spec = UttaksalderIngressSpecDto(Sivilstand.UGIFT, true, 100_000)
+        `when`(service.finnTidligsteUttaksalder(spec)).thenReturn(uttaksalder)
+
+        mvc.perform(
+            post("/api/v1/tidligste-uttaksalder")
+                .with(csrf())
+                .content(requestBody())
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().json(responseBodyV1()))
     }
 
     @Language("json")
     private fun requestBody(
-        sivilstand: Sivilstand = Sivilstand.GIFT,
-        harEps: Boolean = false,
+        sivilstand: Sivilstand = Sivilstand.UGIFT,
+        harEps: Boolean = true,
         sisteInntekt: Int = 100_000,
     ): String = """
             {
@@ -58,10 +74,18 @@ internal class UttaksalderControllerTest {
         """.trimIndent()
 
     @Language("json")
-    private fun responseBody(aar: Int = uttaksalder.aar, maaned: Int = uttaksalder.maaned): String = """
+    private fun responseBodyV0(aar: Int = uttaksalder.aar, maaned: Int = uttaksalder.maaneder): String = """
             {
                 "aar": $aar,
-                "maaned": $maaned
+                "maaned": ${maaned + 1}
+            }
+        """.trimIndent()
+
+    @Language("json")
+    private fun responseBodyV1(aar: Int = uttaksalder.aar, maaned: Int = uttaksalder.maaneder): String = """
+            {
+                "aar": $aar,
+                "maaneder": $maaned
             }
         """.trimIndent()
 
@@ -70,6 +94,6 @@ internal class UttaksalderControllerTest {
     }
 
     private companion object {
-        private val uttaksalder = Uttaksalder(67, 10)
+        private val uttaksalder = Alder(67, 10)
     }
 }

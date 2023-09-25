@@ -29,23 +29,29 @@ class PenUttaksalderClientTest : WebClientTest() {
         client = PenUttaksalderClient(baseUrl(), WebClientConfig().regularWebClient(), callIdGenerator, "1")
     }
 
+    /**
+     * PEN returnerer måned som i dato, mens vi opererer med måneder som i alder.
+     * Eksempel: Fødselsdato 15.1.1963 gir teoretisk første uttaksdato 1.2.2025.
+     * Da er brukerens alder 62 år, 0 måneder (og 16 dager), og vi opererer følgelig med 62 år, 0 måneder.
+     * PEN på sin side returnerer 62 år, 1 måned – siden uttaksdato-måned (februar) er måneden etter fødselsmåneden (januar).
+     */
     @Test
-    fun `finnTidligsteUttaksalder returns aar and maaned`() {
+    fun `finnTidligsteUttaksalder returns aar and maaneder`() {
         arrangeSecurityContext()
         arrange(okResponse())
 
         val response = client.finnTidligsteUttaksalder(spec())
 
-        assertEquals(63, response?.aar)
-        assertEquals(10, response?.maaned)
+        assertEquals(62, response?.aar)
+        assertEquals(0, response?.maaneder) // PEN-måned minus 1
     }
 
     private companion object {
 
         @Language("json")
-        private const val ALDER = """{
-    "aar": 63,
-    "maaned": 10
+        private const val PEN_ALDER = """{
+    "aar": 62,
+    "maaned": 1
 }"""
     }
 
@@ -57,5 +63,5 @@ class PenUttaksalderClientTest : WebClientTest() {
             sisteInntekt = 80
         )
 
-    private fun okResponse() = jsonResponse(HttpStatus.OK).setBody(ALDER)
+    private fun okResponse() = jsonResponse(HttpStatus.OK).setBody(PEN_ALDER)
 }

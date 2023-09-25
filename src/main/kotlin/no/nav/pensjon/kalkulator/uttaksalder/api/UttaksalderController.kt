@@ -1,11 +1,19 @@
 package no.nav.pensjon.kalkulator.uttaksalder.api
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.ExampleObject
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.pensjon.kalkulator.tech.time.Timed
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import no.nav.pensjon.kalkulator.uttaksalder.Uttaksalder
+import no.nav.pensjon.kalkulator.uttaksalder.Alder
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
-import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderSpecDto
+import no.nav.pensjon.kalkulator.uttaksalder.api.dto.AlderDto
+import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
+import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderV0Dto
+import no.nav.pensjon.kalkulator.uttaksalder.api.dto.map.UttaksalderMapper
+import org.intellij.lang.annotations.Language
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -17,24 +25,95 @@ import org.springframework.web.server.ResponseStatusException
 @RequestMapping("api")
 class UttaksalderController(private val service: UttaksalderService) : Timed() {
 
+    @PostMapping("v1/tidligste-uttaksalder")
+    @Operation(
+        summary = "Første mulige uttaksalder",
+        description = "Finn første mulige uttaksalder for innlogget bruker. NB: Verdi av maaneder er 0..11.",
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Søk etter uttaksalder utført"
+            ),
+            ApiResponse(
+                responseCode = "503", description = "Søk etter uttaksalder kunne ikke utføres av tekniske årsaker",
+                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVALABLE_EXAMPLE)])]
+            ),
+        ]
+    )
+    fun finnTidligsteUttaksalderV1(@RequestBody spec: UttaksalderIngressSpecDto?): AlderDto? =
+        try {
+            toV1Dto(
+                timed(
+                    service::finnTidligsteUttaksalder,
+                    spec ?: UttaksalderIngressSpecDto.empty(),
+                    "finnTidligsteUttaksalder"
+                )
+            )
+        } catch (e: EgressException) {
+            if (e.isClientError) clientError(e) else serviceUnavailable(e)
+        }
+
+
     @PostMapping("tidligste-uttaksalder")
     @Operation(
-        summary = "Tidligste mulige uttaksalder",
-        description = "Finn tidligste mulige uttaksalder for innlogget bruker",
+        summary = "Første mulige uttaksalder",
+        description = "Finn første mulige uttaksalder for innlogget bruker",
     )
-    fun finnTidligsteUttaksalder(@RequestBody spec: UttaksalderSpecDto?): Uttaksalder? {
+    fun finnTidligsteUttaksalderV0(@RequestBody spec: UttaksalderIngressSpecDto?): UttaksalderV0Dto? {
         try {
-            return timed(
-                service::finnTidligsteUttaksalder,
-                spec ?: UttaksalderSpecDto.empty(),
-                "finnTidligsteUttaksalder"
+            return toV0Dto(
+                timed(
+                    service::finnTidligsteUttaksalder,
+                    spec ?: UttaksalderIngressSpecDto.empty(),
+                    "finnTidligsteUttaksalder"
+                )
             )
         } catch (e: EgressException) {
             throw ResponseStatusException(
                 HttpStatus.SERVICE_UNAVAILABLE,
-                "Feil ved bestemmelse av tidligste mulige uttaksalder: ${extractMessageRecursively(e)}",
+                "Feil ved bestemmelse av første mulige uttaksalder: ${extractMessageRecursively(e)}",
                 e
             )
         }
     }
+
+
+    // The "client" is in this case the backend server itself (calling other back services)
+    private fun clientError(e: EgressException): AlderDto? {
+        throw ResponseStatusException(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "${ERROR_MESSAGE}: ${extractMessageRecursively(e)}",
+            e
+        )
+    }
+
+    private fun serviceUnavailable(e: EgressException): AlderDto? {
+        throw ResponseStatusException(
+            HttpStatus.SERVICE_UNAVAILABLE,
+            "${ERROR_MESSAGE}: ${extractMessageRecursively(e)}",
+            e
+        )
+    }
+
+    private companion object {
+        private const val ERROR_MESSAGE = "Feil ved bestemmelse av første mulige uttaksalder"
+
+        private fun toV0Dto(uttaksalder: Alder?): UttaksalderV0Dto? =
+            uttaksalder?.let { UttaksalderMapper.toV0Dto(uttaksalder) }
+
+        private fun toV1Dto(uttaksalder: Alder?): AlderDto? =
+            uttaksalder?.let { UttaksalderMapper.toV1Dto(uttaksalder) }
+
+        @Language("json")
+        private const val SERVICE_UNAVALABLE_EXAMPLE = """{
+    "timestamp": "2023-09-12T10:37:47.056+00:00",
+    "status": 503,
+    "error": "Service Unavailable",
+    "message": "En feil inntraff",
+    "path": "/api/v1/tidligste-uttaksalder"
+}"""
+    }
+
 }

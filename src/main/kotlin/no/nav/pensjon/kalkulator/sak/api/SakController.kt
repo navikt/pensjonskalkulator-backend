@@ -35,13 +35,12 @@ class SakController(private val service: SakService) : Timed() {
             ),
         ]
     )
-    fun harRelevantSak(): SakDto {
-        return try {
+    fun harRelevantSak(): SakDto =
+        try {
             toDto(timed(service::harRelevantSak, "harRelevantSak"))
         } catch (e: EgressException) {
             if (e.isClientError) clientError(e) else serviceUnavailable(e)
         }
-    }
 
     // The "client" is in this case the backend server itself (calling other back services)
     private fun clientError(e: EgressException): SakDto {
@@ -71,7 +70,7 @@ class SakController(private val service: SakService) : Timed() {
     "status": 503,
     "error": "Service Unavailable",
     "message": "En feil inntraff",
-    "path": "/api/sak"
+    "path": "/api/sak-status"
 }"""
     }
 }
