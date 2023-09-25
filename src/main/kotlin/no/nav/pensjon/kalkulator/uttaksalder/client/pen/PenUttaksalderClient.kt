@@ -6,7 +6,7 @@ import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.client.UttaksalderClient
 import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderEgressSpecDto
 import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderDto
-import no.nav.pensjon.kalkulator.uttaksalder.client.pen.map.UttaksalderMapper
+import no.nav.pensjon.kalkulator.uttaksalder.client.pen.map.PenUttaksalderMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -21,10 +21,10 @@ class PenUttaksalderClient(
     override fun finnTidligsteUttaksalder(spec: UttaksalderSpec) =
         doPost(
             PATH,
-            UttaksalderMapper.toDto(spec),
+            PenUttaksalderMapper.toDto(spec),
             UttaksalderEgressSpecDto::class.java,
             UttaksalderDto::class.java,
-        )?.let(UttaksalderMapper::fromDto)
+        )?.let(PenUttaksalderMapper::fromDto)
 
     private companion object {
         private const val PATH = "uttaksalder"

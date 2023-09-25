@@ -6,14 +6,15 @@ import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderEgressSpecDto
 import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderDto
 
-object UttaksalderMapper {
+object PenUttaksalderMapper {
 
     private const val MAANEDER_PER_AAR = 12
 
     fun fromDto(dto: UttaksalderDto) =
         Alder(
             aar = if (dto.maaned == 0) dto.aar - 1 else dto.aar,
-            maaneder = if (dto.maaned == 0) MAANEDER_PER_AAR else dto.maaned - 1)
+            maaneder = oneBasedMaaned(dto.maaned) - 1
+        )
 
     fun toDto(spec: UttaksalderSpec) =
         UttaksalderEgressSpecDto(
@@ -22,4 +23,7 @@ object UttaksalderMapper {
             harEps = spec.harEps,
             sisteInntekt = spec.sisteInntekt,
         )
+
+    private fun oneBasedMaaned(zeroBasedMaaned: Int) =
+        if (zeroBasedMaaned == 0) MAANEDER_PER_AAR else zeroBasedMaaned
 }

@@ -8,31 +8,31 @@ import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 
-class UttaksalderMapperTest {
+class PenUttaksalderMapperTest {
 
     @Test
     fun `toDto maps sivilstand to PEN's value`() {
         val spec = UttaksalderSpec(pid, Sivilstand.UGIFT, false, 1)
-        assertEquals("UGIF", UttaksalderMapper.toDto(spec).sivilstand)
+        assertEquals("UGIF", PenUttaksalderMapper.toDto(spec).sivilstand)
     }
 
     @Test
-    fun `fromDto subtracts 1 from month`() {
-        val dto = UttaksalderDto(62, 12)
+    fun `fromDto obtains maaneder by subtracting 1 from maaned`() {
+        val dto = UttaksalderDto(62, 11)
 
-        val uttaksalder = UttaksalderMapper.fromDto(dto)
+        val uttaksalder = PenUttaksalderMapper.fromDto(dto)
 
         assertEquals(62, uttaksalder.aar)
-        assertEquals(11, uttaksalder.maaneder)
+        assertEquals(10, uttaksalder.maaneder)
     }
 
     @Test
-    fun `fromDto subtracts 1 from month and handles zero month`() {
+    fun `fromDto returns previous aar if maaned is zero`() {
         val dto = UttaksalderDto(64, 0)
 
-        val uttaksalder = UttaksalderMapper.fromDto(dto)
+        val uttaksalder = PenUttaksalderMapper.fromDto(dto)
 
         assertEquals(63, uttaksalder.aar)
-        assertEquals(12, uttaksalder.maaneder)
+        assertEquals(11, uttaksalder.maaneder)
     }
 }
