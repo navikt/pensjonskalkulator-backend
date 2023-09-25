@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering
 
+import no.nav.pensjon.kalkulator.general.Alder
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -8,21 +9,16 @@ import java.time.LocalDate
 class PensjonUtilTest {
 
     @Test
-    fun `pensjoneringsaar is foedselsaar + pensjoneringsalder when foedselsmaaned is not December`() {
-        val foedselsdato = LocalDate.of(1963, 11, 30)
-        assertEquals(2030, PensjonUtil.pensjoneringsaar(foedselsdato, 67))
-    }
-
-    @Test
-    fun `pensjoneringsaar is foedselsaar + pensjoneringsalder + 1 when foedselsmaaned is December`() {
-        val foedselsdato = LocalDate.of(1963, 12, 1)
-        assertEquals(2031, PensjonUtil.pensjoneringsaar(foedselsdato, 67))
-    }
-
-    @Test
-    fun `foersteUttaksdato is first in month after pensjoneringsalder`() {
-        val foedselsdato = LocalDate.of(1963, 2, 10)
-        val uttaksdato = PensjonUtil.foersteUttaksdato(foedselsdato, 67)
+    fun `foersteUttaksdato is first in month after foerste uttaksalder`() {
+        val foedselsdato = LocalDate.of(1963, 2, 1)
+        val uttaksdato = PensjonUtil.foersteUttaksdato(foedselsdato, Alder(67, 0))
         assertEquals(LocalDate.of(2030, 3, 1), uttaksdato)
+    }
+
+    @Test
+    fun `foersteUttaksdato includes uttaksmaaned in calculation`() {
+        val foedselsdato = LocalDate.of(1963, 3, 31)
+        val uttaksdato = PensjonUtil.foersteUttaksdato(foedselsdato, Alder(67, 11))
+        assertEquals(LocalDate.of(2031, 3, 1), uttaksdato)
     }
 }

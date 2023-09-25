@@ -1,6 +1,5 @@
 package no.nav.pensjon.kalkulator.simulering
 
-import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.PersonFactory.person
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.opptjening.Inntekt
@@ -9,6 +8,7 @@ import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
 import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.PersonClient
+import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringAlderDto
 import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringSpecDto
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
@@ -87,7 +87,7 @@ class SimuleringServiceTest {
         private const val FORVENTET_INNTEKT = 654321
         private const val REGISTRERT_INNTEKT = 543210
         private const val PENSJONSBELOEP = 123456
-        private val foersteUttaksdato = LocalDate.of(2031, 1, 1)
+        private val foersteUttaksdato = LocalDate.of(2031, 2, 1)
         private val foedselsdato = LocalDate.of(1963, 12, 31)
         private val inntekt =
             Inntekt(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, 2023, REGISTRERT_INNTEKT.toBigDecimal())
@@ -98,7 +98,7 @@ class SimuleringServiceTest {
                 SimuleringType.ALDERSPENSJON,
                 forventetInntekt,
                 100,
-                Alder(67, 1),
+                SimuleringAlderDto(67, 1),
                 foedselsdato,
                 sivilstand,
                 false

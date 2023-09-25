@@ -1,10 +1,12 @@
 package no.nav.pensjon.kalkulator.simulering.api
 
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
+import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.*
+import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringAlderDto
+import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringSpecDto
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -16,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.LocalDate
 
 @WebMvcTest(SimuleringController::class)
 @Import(MockSecurityConfiguration::class)
@@ -29,7 +32,8 @@ class SimuleringControllerTest {
 
     @Test
     fun `simulerer alderspensjon`() {
-        `when`(simuleringService.simulerAlderspensjon(anyObject())).thenReturn(simuleringsresultat(SimuleringType.ALDERSPENSJON))
+        val spec = simuleringSpecDto(SimuleringType.ALDERSPENSJON)
+        `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringstype))
 
         mvc.perform(
             post(URL)
@@ -42,8 +46,9 @@ class SimuleringControllerTest {
     }
 
     @Test
-    fun `simulerer alderspensjon med afp privat`() {
-        `when`(simuleringService.simulerAlderspensjon(anyObject())).thenReturn(simuleringsresultat(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT))
+    fun `simulerer alderspensjon med AFP privat`() {
+        val spec = simuleringSpecDto(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
+        `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringstype))
 
         mvc.perform(
             post(URL)
@@ -70,6 +75,18 @@ class SimuleringControllerTest {
             "sivilstand": "UGIFT",
             "epsHarInntektOver2G": false
         }""".trimIndent()
+
+
+        private fun simuleringSpecDto(simuleringType: SimuleringType) =
+            SimuleringSpecDto(
+                simuleringstype = simuleringType,
+                forventetInntekt = 100_000,
+                uttaksgrad = 100,
+                foersteUttaksalder = SimuleringAlderDto(67, 1),
+                foedselsdato = LocalDate.of(1963, 12, 31),
+                sivilstand = Sivilstand.UGIFT,
+                epsHarInntektOver2G = false
+            )
 
         @Language("json")
         private fun responseBody(simuleringstype: SimuleringType) = """{
@@ -106,10 +123,5 @@ class SimuleringControllerTest {
                     afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 22056)),
                 )
             }
-
-
-        private fun <T> anyObject(): T {
-            return Mockito.any()
-        }
     }
 }

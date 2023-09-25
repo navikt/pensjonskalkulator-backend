@@ -5,7 +5,9 @@ import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.PersonClient
+import no.nav.pensjon.kalkulator.simulering.PensjonUtil.foersteUttaksdato
 import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringSpecDto
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.alder
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import org.springframework.stereotype.Service
@@ -21,13 +23,13 @@ class SimuleringService(
         val pid = pidGetter.pid()
 
         val simuleringSpec = SimuleringSpec(
-            specDto.simuleringstype,
-            pid,
-            specDto.forventetInntekt ?: sistePensjonsgivendeInntekt(pid),
-            specDto.uttaksgrad,
-            PensjonUtil.foersteUttaksdato(specDto.foedselsdato, specDto.foersteUttaksalder.aar),
-            specDto.sivilstand ?: sivilstand(pid),
-            specDto.epsHarInntektOver2G
+            simuleringstype = specDto.simuleringstype,
+            pid = pid,
+            forventetInntekt = specDto.forventetInntekt ?: sistePensjonsgivendeInntekt(pid),
+            uttaksgrad = specDto.uttaksgrad,
+            foersteUttaksdato = foersteUttaksdato(specDto.foedselsdato, alder(specDto.foersteUttaksalder)),
+            sivilstand = specDto.sivilstand ?: sivilstand(pid),
+            epsHarInntektOver2G = specDto.epsHarInntektOver2G
         )
 
         return simuleringClient.simulerAlderspensjon(simuleringSpec)
