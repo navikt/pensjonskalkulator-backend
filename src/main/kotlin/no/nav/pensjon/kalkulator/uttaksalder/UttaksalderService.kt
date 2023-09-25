@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.uttaksalder
 
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.opptjening.InntektUtil
 import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.Pid

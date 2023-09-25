@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.uttaksalder.api.dto.map
 
-import no.nav.pensjon.kalkulator.uttaksalder.Alder
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderV0Dto
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.AlderDto
 

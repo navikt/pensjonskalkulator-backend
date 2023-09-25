@@ -1,15 +1,40 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.v3.map
 
 import no.nav.pensjon.kalkulator.avtale.*
-import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.EnvelopeDto
-import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.FaultDetailDto
-import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.FaultDto
-import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.UtbetalingsperiodeDto
+import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.Sivilstatus
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.*
+import no.nav.pensjon.kalkulator.general.Alder
 
 object PensjonsavtaleMapper {
 
     private const val DEFAULT_VALUE = "ukjent"
     private val DEFAULT_UTTAKSGRAD = Uttaksgrad.HUNDRE_PROSENT
+    private val DEFAULT_HAR_EPS_PENSJON = true // Norsk Pensjon default
+    private val DEFAULT_HAR_EPS_PENSJONSGIVENDE_INNTEKT_OVER_2G = true // Norsk Pensjon default
+
+    fun toDto(spec: PensjonsavtaleSpec) =
+        NorskPensjonPensjonsavtaleSpecDto(
+            pid = spec.pid,
+            aarligInntektFoerUttak = spec.aarligInntektFoerUttak,
+            uttaksperioder = spec.uttaksperioder.map(::toUttaksperiodeEgressSpecDto),
+            antallInntektsaarEtterUttak = spec.antallInntektsaarEtterUttak,
+            harAfp = spec.harAfp,
+            harEpsPensjon = spec.harEpsPensjon ?: DEFAULT_HAR_EPS_PENSJON,
+            harEpsPensjonsgivendeInntektOver2G = spec.harEpsPensjonsgivendeInntektOver2G
+                ?: DEFAULT_HAR_EPS_PENSJONSGIVENDE_INNTEKT_OVER_2G,
+            antallAarIUtlandetEtter16 = spec.antallAarIUtlandetEtter16,
+            sivilstatus = Sivilstatus.fromInternalValue(spec.sivilstatus),
+            oenskesSimuleringAvFolketrygd = spec.oenskesSimuleringAvFolketrygd
+        )
+
+    // Norsk Pensjon bruker månedsverdier 1..12 (dermed '+ 1')
+    private fun toUttaksperiodeEgressSpecDto(spec: UttaksperiodeSpec) =
+        NorskPensjonUttaksperiodeSpecDto(
+            start = NorskPensjonAlderDto(spec.start.aar, spec.start.maaneder + 1),
+            grad = spec.grad,
+            aarligInntekt = spec.aarligInntekt
+        )
 
     fun fromDto(dto: EnvelopeDto) =
         Pensjonsavtaler(
@@ -61,8 +86,8 @@ object PensjonsavtaleMapper {
 
     private fun utbetalingsperiode(source: UtbetalingsperiodeDto) =
         Utbetalingsperiode(
-            Alder(source.startAlder!!, source.startMaaned!!),
-            source.sluttAlder?.let { Alder(it, source.sluttMaaned!!) },
+            Alder(source.startAlder!!, source.startMaaned!! - 1),
+            source.sluttAlder?.let { Alder(it, source.sluttMaaned!! - 1) },
             source.aarligUtbetalingForventet ?: 0,
             source.aarligUtbetalingNedreGrense ?: 0,
             source.aarligUtbetalingOvreGrense ?: 0,

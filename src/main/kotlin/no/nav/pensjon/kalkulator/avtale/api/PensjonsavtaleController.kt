@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.avtale.api
 
 import io.swagger.v3.oas.annotations.Operation
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleService
-import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleSpecDto
+import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleIngressSpecDto
 import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtalerDto
 import no.nav.pensjon.kalkulator.avtale.api.map.PensjonsavtaleMapper.toDto
 import no.nav.pensjon.kalkulator.tech.time.Timed
@@ -17,7 +17,7 @@ class PensjonsavtaleController(private val service: PensjonsavtaleService) : Tim
         summary = "Hent pensjonsavtaler",
         description = "Henter pensjonsavtalene til den innloggede brukeren"
     )
-    fun fetchAvtaler(@RequestBody spec: PensjonsavtaleSpecDto): PensjonsavtalerDto {
+    fun fetchAvtaler(@RequestBody spec: PensjonsavtaleIngressSpecDto): PensjonsavtalerDto {
         return toDto(timed(service::fetchAvtaler, spec, "pensjonsavtaler"))
     }
 }

@@ -1,5 +1,7 @@
 package no.nav.pensjon.kalkulator.avtale
 
+import no.nav.pensjon.kalkulator.general.Alder
+
 /**
  * start: Påkrevd; startalder
  * slutt: Sluttalder; utelates hvis utbetalingen er livsvarig
@@ -16,6 +18,18 @@ data class Utbetalingsperiode(
 ) {
     val erLivsvarig = slutt == null
 
-    constructor(start: Alder, slutt: Alder?, aarligUtbetaling: Int, grad: Uttaksgrad) :
-            this(start, slutt, aarligUtbetaling, 0, 0, grad)
+    constructor(
+        start: Alder,
+        slutt: Alder?,
+        aarligUtbetaling: Int,
+        grad: Uttaksgrad
+    ) :
+            this(
+                start = start,
+                slutt = slutt,
+                aarligUtbetalingForventet = aarligUtbetaling,
+                aarligUtbetalingNedreGrense = 0,
+                aarligUtbetalingOvreGrense = 0,
+                grad = grad
+            )
 }

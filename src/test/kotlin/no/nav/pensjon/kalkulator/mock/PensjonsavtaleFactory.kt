@@ -1,12 +1,14 @@
 package no.nav.pensjon.kalkulator.mock
 
 import no.nav.pensjon.kalkulator.avtale.*
+import no.nav.pensjon.kalkulator.general.Alder
 
 object PensjonsavtaleFactory {
 
     fun pensjonsavtaler() = pensjonsavtaler(67)
 
-    fun pensjonsavtalerV3(kategorier: List<AvtaleKategori>) = Pensjonsavtaler(kategorier.map(::pensjonsavtale), listOf(selskapV3()))
+    fun pensjonsavtalerV3(kategorier: List<AvtaleKategori>) =
+        Pensjonsavtaler(kategorier.map(::pensjonsavtale), listOf(selskapV3()))
 
     fun pensjonsavtaler(startalder: Int) = Pensjonsavtaler(listOf(pensjonsavtale(startalder)), listOf(selskap()))
 
@@ -41,15 +43,15 @@ object PensjonsavtaleFactory {
 
     private fun utbetalingsperiodeMedSluttalder() =
         Utbetalingsperiode(
-            Alder(71, 1),
-            Alder(81, 2),
+            Alder(71, 0),
+            Alder(81, 1),
             10000,
             Uttaksgrad.HUNDRE_PROSENT
         )
 
     private fun utbetalingsperiodeUtenSluttalder() =
         Utbetalingsperiode(
-            Alder(72, 2),
+            Alder(72, 1),
             null,
             20000,
             Uttaksgrad.AATTI_PROSENT
@@ -77,7 +79,7 @@ object PensjonsavtaleFactory {
     private fun utbetalingsperiode() =
         Utbetalingsperiode(
             Alder(68, 1),
-            Alder(78, 12),
+            Alder(78, 11),
             123000,
             Uttaksgrad.HUNDRE_PROSENT
         )

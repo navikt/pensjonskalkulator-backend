@@ -1,8 +1,8 @@
 package no.nav.pensjon.kalkulator.avtale.api
 
 import no.nav.pensjon.kalkulator.avtale.*
-import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleSpecDto
-import no.nav.pensjon.kalkulator.avtale.api.dto.UttaksperiodeSpecDto
+import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleIngressSpecDto
+import no.nav.pensjon.kalkulator.avtale.api.dto.UttaksperiodeIngressSpecDto
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtaler
 import org.intellij.lang.annotations.Language
@@ -49,14 +49,14 @@ class PensjonsavtaleControllerTest {
 
         // NB: These spec objects must correspond with REQUEST_BODY below
         private fun pensjonsavtaleSpecDto() =
-            PensjonsavtaleSpecDto(
+            PensjonsavtaleIngressSpecDto(
                 100000,
                 listOf(uttaksperiodeSpec1(), uttaksperiodeSpec2()),
                 1
             )
 
         private fun uttaksperiodeSpec1() =
-            UttaksperiodeSpecDto(
+            UttaksperiodeIngressSpecDto(
                 67,
                 1,
                 80,
@@ -64,7 +64,7 @@ class PensjonsavtaleControllerTest {
             )
 
         private fun uttaksperiodeSpec2() =
-            UttaksperiodeSpecDto(
+            UttaksperiodeIngressSpecDto(
                 70,
                 1,
                 100,
@@ -97,7 +97,7 @@ class PensjonsavtaleControllerTest {
 		"sluttAlder": 77,
 		"utbetalingsperioder": [{
 			"startAlder": 68,
-			"startMaaned": 1,
+			"startMaaned": 2,
 			"sluttAlder": 78,
 			"sluttMaaned": 12,
 			"aarligUtbetaling": 123000,

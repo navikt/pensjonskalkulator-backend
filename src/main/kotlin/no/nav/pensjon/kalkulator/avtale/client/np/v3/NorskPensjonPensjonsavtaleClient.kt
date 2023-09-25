@@ -5,9 +5,10 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.avtale.Pensjonsavtaler
 import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
-import no.nav.pensjon.kalkulator.avtale.client.np.PensjonsavtaleSpec
-import no.nav.pensjon.kalkulator.avtale.client.np.UttaksperiodeSpec
+import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.EnvelopeDto
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.NorskPensjonPensjonsavtaleSpecDto
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.NorskPensjonUttaksperiodeSpecDto
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.map.PensjonsavtaleMapper
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.map.PensjonsavtaleMapper.fromDto
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult.BAD_CLIENT
@@ -48,7 +49,7 @@ class NorskPensjonPensjonsavtaleClient(
     private val log = KotlinLogging.logger {}
 
     override fun fetchAvtaler(spec: PensjonsavtaleSpec): Pensjonsavtaler {
-        val responseXml = fetchAvtalerXml(spec)
+        val responseXml = fetchAvtalerXml(PensjonsavtaleMapper.toDto(spec))
         countCalls(OK)
 
         return try {
@@ -61,7 +62,7 @@ class NorskPensjonPensjonsavtaleClient(
         }
     }
 
-    private fun fetchAvtalerXml(spec: PensjonsavtaleSpec): String {
+    private fun fetchAvtalerXml(spec: NorskPensjonPensjonsavtaleSpecDto): String {
         val uri = "$baseUrl$PATH"
         val callId = callIdGenerator.newId()
         val body = soapEnvelope(soapBody(spec, callId))
@@ -141,14 +142,14 @@ class NorskPensjonPensjonsavtaleClient(
 
         private val service = EgressService.PENSJONSAVTALER
 
-        private fun soapBody(spec: PensjonsavtaleSpec, callId: String): String {
+        private fun soapBody(spec: NorskPensjonPensjonsavtaleSpecDto, callId: String): String {
             return """<S:Body>
         ${xml(spec, callId)}
     </S:Body>"""
         }
 
         // NB: Order of XML elements is important (otherwise response may be 500)
-        private fun xml(spec: PensjonsavtaleSpec, callId: String): String {
+        private fun xml(spec: NorskPensjonPensjonsavtaleSpecDto, callId: String): String {
             return """<typ:kalkulatorForespoersel>
             <userSessionCorrelationID>$callId</userSessionCorrelationID>
             <organisasjonsnummer>$ORGANISASJONSNUMMER</organisasjonsnummer>
@@ -167,11 +168,11 @@ class NorskPensjonPensjonsavtaleClient(
         </typ:kalkulatorForespoersel>"""
         }
 
-        private fun xml(specs: List<UttaksperiodeSpec>): String {
+        private fun xml(specs: List<NorskPensjonUttaksperiodeSpecDto>): String {
             return specs.joinToString("", transform = ::xml)
         }
 
-        private fun xml(spec: UttaksperiodeSpec): String {
+        private fun xml(spec: NorskPensjonUttaksperiodeSpecDto): String {
             return """<uttaksperiode>
                     <startAlder>${spec.start.aar}</startAlder>
                     <startMaaned>${spec.start.maaned}</startMaaned>

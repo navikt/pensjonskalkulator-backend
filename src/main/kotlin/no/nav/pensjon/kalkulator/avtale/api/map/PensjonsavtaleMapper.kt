@@ -29,9 +29,9 @@ object PensjonsavtaleMapper {
     private fun toPeriodeDto(source: Utbetalingsperiode) =
         UtbetalingsperiodeDto(
             source.start.aar,
-            source.start.maaned,
+            source.start.maaneder + 1,
             source.slutt?.aar,
-            source.slutt?.maaned,
+            source.slutt?.let { it.maaneder + 1 },
             source.aarligUtbetalingForventet,
             source.grad.prosentsats
         )

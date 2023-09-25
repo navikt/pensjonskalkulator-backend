@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.uttaksalder.api
 
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.uttaksalder.Alder
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
 import org.intellij.lang.annotations.Language

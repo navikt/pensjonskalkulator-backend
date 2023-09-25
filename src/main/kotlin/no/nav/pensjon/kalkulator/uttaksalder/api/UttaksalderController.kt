@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.pensjon.kalkulator.tech.time.Timed
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import no.nav.pensjon.kalkulator.uttaksalder.Alder
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.AlderDto
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
@@ -28,13 +28,14 @@ class UttaksalderController(private val service: UttaksalderService) : Timed() {
     @PostMapping("v1/tidligste-uttaksalder")
     @Operation(
         summary = "Første mulige uttaksalder",
-        description = "Finn første mulige uttaksalder for innlogget bruker. NB: Verdi av maaneder er 0..11.",
+        description = "Finn første mulige uttaksalder for innlogget bruker." +
+                " Parameter 'harEps' angir hvorvidt brukeren har ektefelle, partner eller samboer",
     )
     @ApiResponses(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "Søk etter uttaksalder utført"
+                description = "Søk etter uttaksalder utført. I resultatet er verdi av 'maaneder' 0..11."
             ),
             ApiResponse(
                 responseCode = "503", description = "Søk etter uttaksalder kunne ikke utføres av tekniske årsaker",
@@ -115,5 +116,4 @@ class UttaksalderController(private val service: UttaksalderService) : Timed() {
     "path": "/api/v1/tidligste-uttaksalder"
 }"""
     }
-
 }

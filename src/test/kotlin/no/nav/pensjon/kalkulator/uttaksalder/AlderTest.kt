@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.uttaksalder
 
+import no.nav.pensjon.kalkulator.general.Alder
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test

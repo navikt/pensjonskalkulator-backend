@@ -1,14 +1,13 @@
 package no.nav.pensjon.kalkulator.avtale
 
 import io.kotest.matchers.shouldBe
-import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleSpecDto
-import no.nav.pensjon.kalkulator.avtale.api.dto.UttaksperiodeSpecDto
+import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleIngressSpecDto
+import no.nav.pensjon.kalkulator.avtale.api.dto.UttaksperiodeIngressSpecDto
 import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
-import no.nav.pensjon.kalkulator.avtale.client.np.PensjonsavtaleSpec
-import no.nav.pensjon.kalkulator.avtale.client.np.Sivilstatus
-import no.nav.pensjon.kalkulator.avtale.client.np.UttaksperiodeSpec
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtalerV3
-import no.nav.pensjon.kalkulator.person.Pid
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import org.junit.jupiter.api.Assertions.*
@@ -72,38 +71,49 @@ class PensjonsavtaleServiceTest {
     private companion object {
         private const val AARLIG_INNTEKT_FOER_UTTAK = 456000
         private const val ANTALL_INNTEKTSAAR_ETTER_UTTAK = 2
-        private val pid = Pid("12906498357")
+
         private val pensjonsavtaler = pensjonsavtalerV3()
 
         private fun pensjonsavtaleSpecDto() =
-            PensjonsavtaleSpecDto(
-                AARLIG_INNTEKT_FOER_UTTAK,
-                listOf(uttaksperiodeSpecDto()),
-                ANTALL_INNTEKTSAAR_ETTER_UTTAK,
+            PensjonsavtaleIngressSpecDto(
+                aarligInntektFoerUttak = AARLIG_INNTEKT_FOER_UTTAK,
+                uttaksperioder = listOf(uttaksperiodeSpecDto()),
+                antallInntektsaarEtterUttak = ANTALL_INNTEKTSAAR_ETTER_UTTAK,
                 harAfp = false,
                 harEpsPensjon = true,
                 harEpsPensjonsgivendeInntektOver2G = true,
                 antallAarIUtlandetEtter16 = 0,
-                Sivilstatus.UGIFT,
+                sivilstatus = Sivilstand.UGIFT,
                 oenskesSimuleringAvFolketrygd = false
             )
 
         private fun pensjonsavtaleSpec() =
             PensjonsavtaleSpec(
-                pid,
-                AARLIG_INNTEKT_FOER_UTTAK,
-                listOf(uttaksperiodeSpec()),
-                ANTALL_INNTEKTSAAR_ETTER_UTTAK,
+                pid = pid,
+                aarligInntektFoerUttak = AARLIG_INNTEKT_FOER_UTTAK,
+                uttaksperioder = listOf(uttaksperiodeSpec()),
+                antallInntektsaarEtterUttak = ANTALL_INNTEKTSAAR_ETTER_UTTAK,
                 harAfp = false,
                 harEpsPensjon = true,
                 harEpsPensjonsgivendeInntektOver2G = true,
                 antallAarIUtlandetEtter16 = 0,
-                Sivilstatus.UGIFT,
+                sivilstatus = Sivilstand.UGIFT,
                 oenskesSimuleringAvFolketrygd = false
             )
 
-        private fun uttaksperiodeSpec() = UttaksperiodeSpec(Alder(67, 1), Uttaksgrad.HUNDRE_PROSENT, 123000)
+        private fun uttaksperiodeSpec() =
+            UttaksperiodeSpec(
+                start = Alder(67, 1),
+                grad = Uttaksgrad.HUNDRE_PROSENT,
+                aarligInntekt = 123000
+            )
 
-        private fun uttaksperiodeSpecDto() = UttaksperiodeSpecDto(67, 1, 100, 123000)
+        private fun uttaksperiodeSpecDto() =
+            UttaksperiodeIngressSpecDto(
+                startAlder = 67,
+                startMaaned = 2, // DTO startMaaned = alder-maaneder + 1
+                grad = 100,
+                aarligInntekt = 123000
+            )
     }
 }

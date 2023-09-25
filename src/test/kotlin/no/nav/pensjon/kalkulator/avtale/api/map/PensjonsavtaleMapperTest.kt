@@ -29,21 +29,21 @@ class PensjonsavtaleMapperTest {
 
     private fun avtale(startalder: Int?) =
         PensjonsavtaleDto(
-            "produkt1",
-            AvtaleKategori.INDIVIDUELL_ORDNING,
-            startalder,
-            77,
-            listOf(utbetalingsperiode())
+            produktbetegnelse = "produkt1",
+            kategori = AvtaleKategori.INDIVIDUELL_ORDNING,
+            startAlder = startalder,
+            sluttAlder = 77,
+            utbetalingsperioder = listOf(utbetalingsperiode())
         )
 
     private fun utbetalingsperiode() =
         UtbetalingsperiodeDto(
-            68,
-            1,
-            78,
-            12,
-            123000,
-            100
+            startAlder = 68,
+            startMaaned = 2,
+            sluttAlder = 78,
+            sluttMaaned = 12,
+            aarligUtbetaling = 123000,
+            grad = 100
         )
 
     private fun selskap() = SelskapDto("selskap1", true)

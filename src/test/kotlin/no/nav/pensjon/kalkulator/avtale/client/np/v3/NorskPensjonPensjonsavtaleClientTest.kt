@@ -2,12 +2,11 @@ package no.nav.pensjon.kalkulator.avtale.client.np.v3
 
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.avtale.*
-import no.nav.pensjon.kalkulator.avtale.client.np.PensjonsavtaleSpec
-import no.nav.pensjon.kalkulator.avtale.client.np.UttaksperiodeSpec
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.mock.XmlMapperFactory.xmlMapper
-import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.SamlTokenService
 import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.SamlTokenServiceTest.Companion.SAML_ASSERTION
 import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
@@ -147,12 +146,12 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
                 <aarligInntektFoerUttak>123000</aarligInntektFoerUttak>
                 <uttaksperiode>
                     <startAlder>63</startAlder>
-                    <startMaaned>1</startMaaned>
+                    <startMaaned>2</startMaaned>
                     <grad>80</grad>
                     <aarligInntekt>100000</aarligInntekt>
                 </uttaksperiode><uttaksperiode>
                     <startAlder>64</startAlder>
-                    <startMaaned>2</startMaaned>
+                    <startMaaned>3</startMaaned>
                     <grad>100</grad>
                     <aarligInntekt>200000</aarligInntekt>
                 </uttaksperiode>
@@ -304,10 +303,10 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
 
         private fun spec() =
             PensjonsavtaleSpec(
-                Pid("12906498357"),
-                123000,
-                listOf(uttaksperiodeSpec(1), uttaksperiodeSpec(2)),
-                1,
+                pid = pid,
+                aarligInntektFoerUttak = 123000,
+                uttaksperioder = listOf(uttaksperiodeSpec(1), uttaksperiodeSpec(2)),
+                antallInntektsaarEtterUttak = 1,
                 harAfp = false,
                 oenskesSimuleringAvFolketrygd = true
             )
@@ -393,15 +392,15 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
 
         private fun utbetalingsperiodeMedSluttalder() =
             Utbetalingsperiode(
-                Alder(71, 1),
-                Alder(81, 2),
+                Alder(71, 0),
+                Alder(81, 1),
                 10000,
                 Uttaksgrad.HUNDRE_PROSENT
             )
 
         private fun utbetalingsperiodeUtenSluttalder() =
             Utbetalingsperiode(
-                Alder(72, 2),
+                Alder(72, 1),
                 null,
                 20000,
                 Uttaksgrad.AATTI_PROSENT
