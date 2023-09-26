@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.ufoere.client.pen
 import no.nav.pensjon.kalkulator.common.client.pen.PenClient
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.client.pdl.dto.*
-import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.ufoere.Vedtak
 import no.nav.pensjon.kalkulator.ufoere.client.VedtakClient
 import no.nav.pensjon.kalkulator.ufoere.client.pen.map.VedtakMapper
@@ -19,9 +19,9 @@ import java.util.*
 class PenVedtakClient(
     @Value("\${pen.url}") private val baseUrl: String,
     webClient: WebClient,
-    callIdGenerator: CallIdGenerator,
+    traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") private val retryAttempts: String
-) : PenClient(baseUrl, webClient, callIdGenerator, retryAttempts), VedtakClient {
+) : PenClient(baseUrl, webClient, traceAid, retryAttempts), VedtakClient {
     override fun bestemGjeldendeVedtak(
         pid: Pid,
         @DateTimeFormat(pattern = "yyyy-MM-dd") fom: LocalDate

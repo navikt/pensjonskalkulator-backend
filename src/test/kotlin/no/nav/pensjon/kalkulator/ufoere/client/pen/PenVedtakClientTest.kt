@@ -4,7 +4,7 @@ import no.nav.pensjon.kalkulator.mock.DateFactory.date
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
-import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import no.nav.pensjon.kalkulator.ufoere.Sakstype
@@ -24,12 +24,12 @@ class PenVedtakClientTest : WebClientTest() {
     private lateinit var client: PenVedtakClient
 
     @Mock
-    private lateinit var callIdGenerator: CallIdGenerator
+    private lateinit var traceAid: TraceAid
 
     @BeforeEach
     fun initialize() {
-        `when`(callIdGenerator.newId()).thenReturn("id1")
-        client = PenVedtakClient(baseUrl(), WebClientConfig().regularWebClient(), callIdGenerator, "1")
+        `when`(traceAid.callId()).thenReturn("id1")
+        client = PenVedtakClient(baseUrl(), WebClientConfig().regularWebClient(), traceAid, "1")
         arrangeSecurityContext()
     }
 
@@ -76,7 +76,10 @@ class PenVedtakClientTest : WebClientTest() {
             client.bestemGjeldendeVedtak(pid, date)
         }
 
-        assertEquals("Failed calling ${baseUrl()}/pen/springapi/vedtak/bestemgjeldende?fom=2023-04-05", exception.message)
+        assertEquals(
+            "Failed calling ${baseUrl()}/pen/springapi/vedtak/bestemgjeldende?fom=2023-04-05",
+            exception.message
+        )
         assertEquals("Feil", (exception.cause as EgressException).message)
     }
 

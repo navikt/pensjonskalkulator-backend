@@ -6,7 +6,7 @@ import no.nav.pensjon.kalkulator.person.client.pdl.dto.*
 import no.nav.pensjon.kalkulator.sak.Sak
 import no.nav.pensjon.kalkulator.sak.SakClient
 import no.nav.pensjon.kalkulator.sak.client.pen.map.SakMapper
-import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.stereotype.Component
@@ -17,9 +17,9 @@ import java.util.*
 class PenSakClient(
     @Value("\${pen.url}") private val baseUrl: String,
     webClient: WebClient,
-    callIdGenerator: CallIdGenerator,
+    traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") private val retryAttempts: String
-) : PenClient(baseUrl, webClient, callIdGenerator, retryAttempts), SakClient {
+) : PenClient(baseUrl, webClient, traceAid, retryAttempts), SakClient {
     override fun fetchSaker(pid: Pid): List<Sak> =
         doGet(
             object : ParameterizedTypeReference<List<SakDto>>() {},

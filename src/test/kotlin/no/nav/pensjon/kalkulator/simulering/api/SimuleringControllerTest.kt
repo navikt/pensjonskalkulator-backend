@@ -5,6 +5,7 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.*
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -29,6 +30,9 @@ class SimuleringControllerTest {
 
     @MockBean
     private lateinit var service: SimuleringService
+
+    @MockBean
+    private lateinit var traceAid: TraceAid
 
     @Test
     fun `simulerer alderspensjon`() {

@@ -4,7 +4,7 @@ import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrang
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderSpec
 import org.intellij.lang.annotations.Language
@@ -22,11 +22,11 @@ class PenUttaksalderClientTest : WebClientTest() {
     private lateinit var client: PenUttaksalderClient
 
     @Mock
-    private lateinit var callIdGenerator: CallIdGenerator
+    private lateinit var traceAid: TraceAid
 
     @BeforeEach
     fun initialize() {
-        client = PenUttaksalderClient(baseUrl(), WebClientConfig().regularWebClient(), callIdGenerator, "1")
+        client = PenUttaksalderClient(baseUrl(), WebClientConfig().regularWebClient(), traceAid, "1")
     }
 
     /**

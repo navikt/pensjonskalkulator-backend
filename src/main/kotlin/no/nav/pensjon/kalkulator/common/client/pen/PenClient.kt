@@ -7,7 +7,7 @@ import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.selftest.PingResult
 import no.nav.pensjon.kalkulator.tech.selftest.Pingable
 import no.nav.pensjon.kalkulator.tech.selftest.ServiceStatus
-import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.core.ParameterizedTypeReference
@@ -24,7 +24,7 @@ import java.time.Duration
 abstract class PenClient(
     private val baseUrl: String,
     private val webClient: WebClient,
-    private val callIdGenerator: CallIdGenerator,
+    private val traceAid: TraceAid,
     private val retryAttempts: String
 ) : Pingable {
     private val log = KotlinLogging.logger {}
@@ -101,13 +101,13 @@ abstract class PenClient(
         headers.contentType = MediaType.APPLICATION_JSON
         headers.accept = listOf(MediaType.APPLICATION_JSON)
         headers.setBearerAuth(EgressAccess.token(service).value)
-        headers[CustomHttpHeaders.CALL_ID] = callIdGenerator.newId()
+        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
         pid?.let { headers[CustomHttpHeaders.PID] = it.value }
     }
 
     private fun setPingHeaders(headers: HttpHeaders) {
         headers.setBearerAuth(EgressAccess.token(service).value)
-        headers[CustomHttpHeaders.CALL_ID] = callIdGenerator.newId()
+        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
     }
 
     private fun retryBackoffSpec(uri: String): RetryBackoffSpec =

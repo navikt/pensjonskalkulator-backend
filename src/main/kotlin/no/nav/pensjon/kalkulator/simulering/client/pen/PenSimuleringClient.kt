@@ -8,7 +8,7 @@ import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.*
 import no.nav.pensjon.kalkulator.simulering.client.pen.map.SimuleringMapper
 import no.nav.pensjon.kalkulator.tech.selftest.Pingable
-import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -18,9 +18,9 @@ import java.util.*
 class PenSimuleringClient(
     @Value("\${pen.url}") baseUrl: String,
     webClient: WebClient,
-    callIdGenerator: CallIdGenerator,
+    traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") private val retryAttempts: String
-) : PenClient(baseUrl, webClient, callIdGenerator, retryAttempts), SimuleringClient, Pingable {
+) : PenClient(baseUrl, webClient, traceAid, retryAttempts), SimuleringClient, Pingable {
 
     override fun simulerAlderspensjon(
         impersonalSpec: ImpersonalSimuleringSpec,

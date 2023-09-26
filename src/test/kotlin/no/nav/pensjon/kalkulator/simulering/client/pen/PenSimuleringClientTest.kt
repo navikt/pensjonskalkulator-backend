@@ -1,13 +1,13 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen
 
-import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.*
-import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -25,11 +25,11 @@ class PenSimuleringClientTest : WebClientTest() {
     private lateinit var client: PenSimuleringClient
 
     @Mock
-    private lateinit var callIdGenerator: CallIdGenerator
+    private lateinit var traceAid: TraceAid
 
     @BeforeEach
     fun initialize() {
-        client = PenSimuleringClient(baseUrl(), WebClientConfig().regularWebClient(), callIdGenerator, "1")
+        client = PenSimuleringClient(baseUrl(), WebClientConfig().regularWebClient(), traceAid, "1")
         arrangeSecurityContext()
     }
 

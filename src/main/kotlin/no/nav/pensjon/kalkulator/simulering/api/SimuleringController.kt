@@ -14,6 +14,7 @@ import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.fromV0SpecD
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.resultatDto
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.vilkaarsbruddDto
 import no.nav.pensjon.kalkulator.tech.time.Timed
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.intellij.lang.annotations.Language
 import org.springframework.http.HttpStatus
@@ -22,7 +23,10 @@ import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("api")
-class SimuleringController(private val service: SimuleringService) : Timed() {
+class SimuleringController(
+    private val service: SimuleringService,
+    private val traceAid: TraceAid
+) : Timed() {
 
     @PostMapping("v1/alderspensjon/simulering")
     @Operation(
@@ -50,13 +54,16 @@ class SimuleringController(private val service: SimuleringService) : Timed() {
         ]
     )
     fun simulerAlderspensjonV1(@RequestBody spec: SimuleringSpecDto): SimuleringsresultatDto {
+        traceAid.initialize()
         log.info { "Request for simulering V1: $spec" }
 
         return try {
             resultatDto(timed(service::simulerAlderspensjon, fromSpecDto(spec), "alderspensjon/simulering"))
+                .also { log.info { "Simulering respons V1: $it" } }
         } catch (e: EgressException) {
-            log.error { "Feil ved simulering V1: ${extractMessageRecursively(e)}" }
-            if (e.isClientError) vilkaarsbruddDto() else serviceUnavailable(e)
+            handleError(e, "V1")
+        } finally {
+            traceAid.finalize()
         }
     }
 
@@ -83,14 +90,37 @@ class SimuleringController(private val service: SimuleringService) : Timed() {
         ]
     )
     fun simulerAlderspensjonV0(@RequestBody spec: SimuleringSpecV0Dto): SimuleringsresultatDto {
+        traceAid.initialize()
         log.info { "Request for simulering V0: $spec" }
 
         return try {
             resultatDto(timed(service::simulerAlderspensjon, fromV0SpecDto(spec), "alderspensjon/simulering"))
+                .also { log.info { "Simulering respons V0: $it" } }
         } catch (e: EgressException) {
-            log.error { "Feil ved simulering V0: ${extractMessageRecursively(e)}" }
-            if (e.isClientError) vilkaarsbruddDto() else serviceUnavailable(e)
+            handleError(e, "V0")
+        } finally {
+            traceAid.finalize()
         }
+    }
+
+    private fun handleError(e: EgressException, version: String) =
+        if (e.isClientError)
+            handleInternalError(e, version)
+        else
+            handleExternalError(e, version)
+
+    private fun handleInternalError(e: EgressException, version: String): SimuleringsresultatDto {
+        logError(e, "Intern", version)
+        return vilkaarsbruddDto()
+    }
+
+    private fun handleExternalError(e: EgressException, version: String): SimuleringsresultatDto {
+        logError(e, "Ekstern", version)
+        return serviceUnavailable(e)
+    }
+
+    private fun logError(e: EgressException, category: String, version: String) {
+        log.error { "$category feil ved simulering $version: ${extractMessageRecursively(e)}" }
     }
 
     private fun serviceUnavailable(e: EgressException): SimuleringsresultatDto {

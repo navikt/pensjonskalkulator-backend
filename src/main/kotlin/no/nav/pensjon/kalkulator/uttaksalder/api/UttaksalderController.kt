@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.pensjon.kalkulator.tech.time.Timed
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.AlderDto
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
@@ -23,7 +24,10 @@ import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("api")
-class UttaksalderController(private val service: UttaksalderService) : Timed() {
+class UttaksalderController(
+    private val service: UttaksalderService,
+    private val traceAid: TraceAid
+) : Timed() {
 
     @PostMapping("v1/tidligste-uttaksalder")
     @Operation(
@@ -44,6 +48,7 @@ class UttaksalderController(private val service: UttaksalderService) : Timed() {
         ]
     )
     fun finnTidligsteUttaksalderV1(@RequestBody spec: UttaksalderIngressSpecDto?): AlderDto? {
+        traceAid.initialize()
         log.info { "Request for uttaksalder-søk V1: $spec" }
 
         return try {
@@ -54,9 +59,11 @@ class UttaksalderController(private val service: UttaksalderService) : Timed() {
                     "finnTidligsteUttaksalder"
                 )
             )
+                .also { log.info { "Uttaksalder-søk respons V1: $it" } }
         } catch (e: EgressException) {
-            log.error { "Feil ved uttaksalder-søk V1: ${extractMessageRecursively(e)}" }
-            if (e.isClientError) clientError(e) else serviceUnavailable(e)
+            handleError(e, "V1")
+        } finally {
+            traceAid.finalize()
         }
     }
 
@@ -66,29 +73,35 @@ class UttaksalderController(private val service: UttaksalderService) : Timed() {
         description = "Finn første mulige uttaksalder for innlogget bruker",
     )
     fun finnTidligsteUttaksalderV0(@RequestBody spec: UttaksalderIngressSpecDto?): UttaksalderV0Dto? {
+        traceAid.initialize()
         log.info { "Request for uttaksalder-søk V0: $spec" }
 
-        try {
-            return toV0Dto(
+        return try {
+            toV0Dto(
                 timed(
                     service::finnTidligsteUttaksalder,
                     spec ?: UttaksalderIngressSpecDto.empty(),
                     "finnTidligsteUttaksalder"
                 )
             )
+                .also { log.info { "Uttaksalder-søk respons V0: $it" } }
         } catch (e: EgressException) {
-            log.error { "Feil ved uttaksalder-søk V0: ${extractMessageRecursively(e)}" }
-            throw ResponseStatusException(
-                HttpStatus.SERVICE_UNAVAILABLE,
-                "Feil ved bestemmelse av første mulige uttaksalder: ${extractMessageRecursively(e)}",
-                e
-            )
+            //handleError<UttaksalderV0Dto>(e, "V0")
+            handleError(e, "V0")
+        } finally {
+            traceAid.finalize()
         }
     }
 
+    private fun <T> handleError(e: EgressException, version: String) =
+        if (e.isClientError) // "client" is here the backend server itself (calling other services)
+            handleInternalError<T>(e, version)
+        else
+            handleExternalError<T>(e, version)
 
-    // The "client" is in this case the backend server itself (calling other back services)
-    private fun clientError(e: EgressException): AlderDto? {
+    private fun <T> handleInternalError(e: EgressException, version: String): T? {
+        logError(e, "Intern", version)
+
         throw ResponseStatusException(
             HttpStatus.INTERNAL_SERVER_ERROR,
             "${ERROR_MESSAGE}: ${extractMessageRecursively(e)}",
@@ -96,7 +109,16 @@ class UttaksalderController(private val service: UttaksalderService) : Timed() {
         )
     }
 
-    private fun serviceUnavailable(e: EgressException): AlderDto? {
+    private fun <T> handleExternalError(e: EgressException, version: String): T? {
+        logError(e, "Ekstern", version)
+        return serviceUnavailable(e)
+    }
+
+    private fun logError(e: EgressException, category: String, version: String) {
+        log.error { "$category $ERROR_MESSAGE $version: ${extractMessageRecursively(e)}" }
+    }
+
+    private fun <T> serviceUnavailable(e: EgressException): T? {
         throw ResponseStatusException(
             HttpStatus.SERVICE_UNAVAILABLE,
             "${ERROR_MESSAGE}: ${extractMessageRecursively(e)}",
@@ -105,7 +127,7 @@ class UttaksalderController(private val service: UttaksalderService) : Timed() {
     }
 
     private companion object {
-        private const val ERROR_MESSAGE = "Feil ved bestemmelse av første mulige uttaksalder"
+        private const val ERROR_MESSAGE = "feil ved bestemmelse av første mulige uttaksalder"
 
         private fun toV0Dto(uttaksalder: Alder?): UttaksalderV0Dto? =
             uttaksalder?.let { UttaksalderMapper.toV0Dto(uttaksalder) }
