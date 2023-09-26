@@ -43,8 +43,10 @@ class UttaksalderController(private val service: UttaksalderService) : Timed() {
             ),
         ]
     )
-    fun finnTidligsteUttaksalderV1(@RequestBody spec: UttaksalderIngressSpecDto?): AlderDto? =
-        try {
+    fun finnTidligsteUttaksalderV1(@RequestBody spec: UttaksalderIngressSpecDto?): AlderDto? {
+        log.info { "Request for uttaksalder-søk V1: $spec" }
+
+        return try {
             toV1Dto(
                 timed(
                     service::finnTidligsteUttaksalder,
@@ -53,9 +55,10 @@ class UttaksalderController(private val service: UttaksalderService) : Timed() {
                 )
             )
         } catch (e: EgressException) {
+            log.error { "Feil ved uttaksalder-søk V1: ${extractMessageRecursively(e)}" }
             if (e.isClientError) clientError(e) else serviceUnavailable(e)
         }
-
+    }
 
     @PostMapping("tidligste-uttaksalder")
     @Operation(
@@ -63,6 +66,8 @@ class UttaksalderController(private val service: UttaksalderService) : Timed() {
         description = "Finn første mulige uttaksalder for innlogget bruker",
     )
     fun finnTidligsteUttaksalderV0(@RequestBody spec: UttaksalderIngressSpecDto?): UttaksalderV0Dto? {
+        log.info { "Request for uttaksalder-søk V0: $spec" }
+
         try {
             return toV0Dto(
                 timed(
@@ -72,6 +77,7 @@ class UttaksalderController(private val service: UttaksalderService) : Timed() {
                 )
             )
         } catch (e: EgressException) {
+            log.error { "Feil ved uttaksalder-søk V0: ${extractMessageRecursively(e)}" }
             throw ResponseStatusException(
                 HttpStatus.SERVICE_UNAVAILABLE,
                 "Feil ved bestemmelse av første mulige uttaksalder: ${extractMessageRecursively(e)}",

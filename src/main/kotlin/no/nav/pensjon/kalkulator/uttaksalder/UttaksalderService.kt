@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.uttaksalder
 
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.opptjening.InntektUtil
 import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
@@ -19,6 +20,8 @@ class UttaksalderService(
     private val personClient: PersonClient,
     private val pidGetter: PidGetter
 ) {
+    private val log = KotlinLogging.logger {}
+
     fun finnTidligsteUttaksalder(specDto: UttaksalderIngressSpecDto): Alder? {
         val pid = pidGetter.pid()
 
@@ -29,6 +32,7 @@ class UttaksalderService(
             sisteInntekt = specDto.sisteInntekt ?: sistePensjonsgivendeInntekt(pid),
         )
 
+        log.info { "Finner første mulige uttaksalder med parametre $uttaksalderSpec" }
         return uttaksalderClient.finnTidligsteUttaksalder(uttaksalderSpec).also(::updateMetric)
     }
 

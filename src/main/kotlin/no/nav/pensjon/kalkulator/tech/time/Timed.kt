@@ -5,7 +5,7 @@ import java.lang.System.currentTimeMillis
 
 open class Timed {
 
-    private val log = KotlinLogging.logger {}
+    protected val log = KotlinLogging.logger {}
 
     fun <R> timed(function: () -> R, functionName: String): R {
         val startTimeMillis = currentTimeMillis()

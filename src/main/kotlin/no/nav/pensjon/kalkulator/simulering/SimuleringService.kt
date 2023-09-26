@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering
 
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.opptjening.InntektUtil
 import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.Pid
@@ -16,6 +17,8 @@ class SimuleringService(
     private val personClient: PersonClient,
     private val pidGetter: PidGetter
 ) {
+    private val log = KotlinLogging.logger {}
+
     fun simulerAlderspensjon(impersonalSpec: ImpersonalSimuleringSpec): Simuleringsresultat {
         val pid = pidGetter.pid()
 
@@ -25,6 +28,7 @@ class SimuleringService(
             impersonalSpec.sivilstand ?: sivilstand(pid)
         )
 
+        log.info { "Simulerer med parametre $impersonalSpec og $personalSpec" }
         return simuleringClient.simulerAlderspensjon(impersonalSpec, personalSpec)
     }
 

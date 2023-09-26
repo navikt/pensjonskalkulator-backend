@@ -50,9 +50,12 @@ class SimuleringController(private val service: SimuleringService) : Timed() {
         ]
     )
     fun simulerAlderspensjonV1(@RequestBody spec: SimuleringSpecDto): SimuleringsresultatDto {
+        log.info { "Request for simulering V1: $spec" }
+
         return try {
             resultatDto(timed(service::simulerAlderspensjon, fromSpecDto(spec), "alderspensjon/simulering"))
         } catch (e: EgressException) {
+            log.error { "Feil ved simulering V1: ${extractMessageRecursively(e)}" }
             if (e.isClientError) vilkaarsbruddDto() else serviceUnavailable(e)
         }
     }
@@ -80,9 +83,12 @@ class SimuleringController(private val service: SimuleringService) : Timed() {
         ]
     )
     fun simulerAlderspensjonV0(@RequestBody spec: SimuleringSpecV0Dto): SimuleringsresultatDto {
+        log.info { "Request for simulering V0: $spec" }
+
         return try {
             resultatDto(timed(service::simulerAlderspensjon, fromV0SpecDto(spec), "alderspensjon/simulering"))
         } catch (e: EgressException) {
+            log.error { "Feil ved simulering V0: ${extractMessageRecursively(e)}" }
             if (e.isClientError) vilkaarsbruddDto() else serviceUnavailable(e)
         }
     }
