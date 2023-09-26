@@ -1,10 +1,10 @@
 package no.nav.pensjon.kalkulator.simulering.api
 
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.*
-import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringAlderDto
-import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringSpecDto
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -28,12 +28,12 @@ class SimuleringControllerTest {
     private lateinit var mvc: MockMvc
 
     @MockBean
-    private lateinit var simuleringService: SimuleringService
+    private lateinit var service: SimuleringService
 
     @Test
     fun `simulerer alderspensjon`() {
-        val spec = simuleringSpecDto(SimuleringType.ALDERSPENSJON)
-        `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringstype))
+        val spec = impersonalSpec(SimuleringType.ALDERSPENSJON)
+        `when`(service.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
         mvc.perform(
             post(URL)
@@ -47,8 +47,8 @@ class SimuleringControllerTest {
 
     @Test
     fun `simulerer alderspensjon med AFP privat`() {
-        val spec = simuleringSpecDto(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
-        `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringstype))
+        val spec = impersonalSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
+        `when`(service.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
         mvc.perform(
             post(URL)
@@ -62,30 +62,29 @@ class SimuleringControllerTest {
 
     private companion object {
 
-        private const val URL = "/api/alderspensjon/simulering"
+        private const val URL = "/api/v1/alderspensjon/simulering"
         private const val PENSJONSBELOEP = 123456
 
         @Language("json")
-        private fun requestBody(simuleringstype: SimuleringType) = """{
-            "simuleringstype": "$simuleringstype",
+        private fun requestBody(simuleringType: SimuleringType) = """{
+            "simuleringstype": "$simuleringType",
             "forventetInntekt": 100000,
             "uttaksgrad": 100,
-            "foersteUttaksalder": { "aar": 67, "maaned": 1 },
+            "foersteUttaksalder": { "aar": 67, "maaneder": 1 },
             "foedselsdato": "1963-12-31",
             "sivilstand": "UGIFT",
             "epsHarInntektOver2G": false
         }""".trimIndent()
 
-
-        private fun simuleringSpecDto(simuleringType: SimuleringType) =
-            SimuleringSpecDto(
-                simuleringstype = simuleringType,
-                forventetInntekt = 100_000,
-                uttaksgrad = 100,
-                foersteUttaksalder = SimuleringAlderDto(67, 1),
+        private fun impersonalSpec(simuleringType: SimuleringType) =
+            ImpersonalSimuleringSpec(
+                simuleringType = simuleringType,
+                uttaksgrad = Uttaksgrad.HUNDRE_PROSENT,
+                foersteUttaksalder = Alder(67, 1),
                 foedselsdato = LocalDate.of(1963, 12, 31),
-                sivilstand = Sivilstand.UGIFT,
-                epsHarInntektOver2G = false
+                epsHarInntektOver2G = false,
+                forventetInntekt = 100_000,
+                sivilstand = Sivilstand.UGIFT
             )
 
         @Language("json")

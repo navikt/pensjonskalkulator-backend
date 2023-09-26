@@ -28,7 +28,7 @@ enum class PenSivilstand(val externalValue: String, val internalValue: Sivilstan
 
 
     companion object {
-        fun from(sivilstand: Sivilstand): PenSivilstand =
+        fun fromInternalValue(sivilstand: Sivilstand?): PenSivilstand =
             when (sivilstand) {
                 Sivilstand.UOPPGITT -> UDEFINERT // ambiguous UDEFINERT/GJENLEVENDE_*
                 Sivilstand.GIFT -> GIFT // ambiguous GIFT/-_LEVER_ADSKILT

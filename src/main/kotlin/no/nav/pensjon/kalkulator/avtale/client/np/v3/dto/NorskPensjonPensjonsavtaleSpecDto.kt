@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.v3.dto
 
-import no.nav.pensjon.kalkulator.avtale.Uttaksgrad
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.person.Pid
 
 /**

@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.avtale
+package no.nav.pensjon.kalkulator.general
 
 enum class Uttaksgrad(val prosentsats: Int) {
     NULL(0),

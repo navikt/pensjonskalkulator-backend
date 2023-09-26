@@ -1,11 +1,12 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen
 
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.simulering.SimuleringSpec
-import no.nav.pensjon.kalkulator.simulering.SimuleringType
+import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
 import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.intellij.lang.annotations.Language
@@ -36,7 +37,7 @@ class PenSimuleringClientTest : WebClientTest() {
     fun `simulerAlderspensjon handles single pensjonsavtale`() {
         arrange(okResponse())
 
-        val response = client.simulerAlderspensjon(spec())
+        val response = client.simulerAlderspensjon(impersonalSpec(), personalSpec())
 
         with(response.alderspensjon[0]) {
             assertEquals(65, alder)
@@ -57,15 +58,22 @@ class PenSimuleringClientTest : WebClientTest() {
               "afpPrivat": []
             }"""
 
-        private fun spec() =
-            SimuleringSpec(
-                simuleringstype = SimuleringType.ALDERSPENSJON,
+        private fun impersonalSpec() =
+            ImpersonalSimuleringSpec(
+                simuleringType = SimuleringType.ALDERSPENSJON,
+                uttaksgrad = Uttaksgrad.AATTI_PROSENT,
+                foersteUttaksalder = Alder(67, 1),
+                foedselsdato = LocalDate.of(1963, 1, 1),
+                epsHarInntektOver2G = true,
+                forventetInntekt = null,
+                sivilstand = null
+            )
+
+        private fun personalSpec() =
+            PersonalSimuleringSpec(
                 pid = pid,
                 forventetInntekt = 123000,
-                uttaksgrad = 80,
-                foersteUttaksdato = LocalDate.of(2034, 5, 6),
-                sivilstand = Sivilstand.ENKE_ELLER_ENKEMANN,
-                epsHarInntektOver2G = true
+                sivilstand = Sivilstand.ENKE_ELLER_ENKEMANN
             )
 
         private fun okResponse() = jsonResponse(HttpStatus.OK).setBody(PENSJON)

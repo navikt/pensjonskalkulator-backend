@@ -7,7 +7,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.pensjon.kalkulator.simulering.SimuleringService
 import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringSpecDto
+import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringSpecV0Dto
 import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringsresultatDto
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.fromSpecDto
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.fromV0SpecDto
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.resultatDto
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.vilkaarsbruddDto
 import no.nav.pensjon.kalkulator.tech.time.Timed
@@ -21,9 +24,42 @@ import org.springframework.web.server.ResponseStatusException
 @RequestMapping("api")
 class SimuleringController(private val service: SimuleringService) : Timed() {
 
-    @PostMapping("alderspensjon/simulering")
+    @PostMapping("v1/alderspensjon/simulering")
     @Operation(
         summary = "Simuler alderspensjon",
+        description = "Lag en prognose for framtidig alderspensjon." +
+                " Feltet 'epsHarInntektOver2G' brukes til å angi om ektefelle/partner/samboer har inntekt" +
+                " over 2 ganger grunnbeløpet eller ei.",
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Simulering utført" +
+                        " (men dersom vilkår ikke oppfylt vil responsen ikke inneholde pensjonsbeløp).",
+                content = [Content(
+                    examples = [
+                        ExampleObject(name = "Vilkår oppfylt", value = VILKAAR_OPPFYLT_EXAMPLE),
+                        ExampleObject(name = "Vilkår ikke oppfylt", value = VILKAAR_IKKE_OPPFYLT_EXAMPLE)]
+                )]
+            ),
+            ApiResponse(
+                responseCode = "503", description = "Simulering kunne ikke utføres av tekniske årsaker",
+                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVALABLE_EXAMPLE)])]
+            ),
+        ]
+    )
+    fun simulerAlderspensjonV1(@RequestBody spec: SimuleringSpecDto): SimuleringsresultatDto {
+        return try {
+            resultatDto(timed(service::simulerAlderspensjon, fromSpecDto(spec), "alderspensjon/simulering"))
+        } catch (e: EgressException) {
+            if (e.isClientError) vilkaarsbruddDto() else serviceUnavailable(e)
+        }
+    }
+
+    @PostMapping("alderspensjon/simulering")
+    @Operation(
+        summary = "Simuler alderspensjon – FORELDET; bruk v1/alderspensjon/simulering",
         description = "Lag en prognose for framtidig alderspensjon",
     )
     @ApiResponses(
@@ -43,9 +79,9 @@ class SimuleringController(private val service: SimuleringService) : Timed() {
             ),
         ]
     )
-    fun simulerAlderspensjon(@RequestBody spec: SimuleringSpecDto): SimuleringsresultatDto {
+    fun simulerAlderspensjonV0(@RequestBody spec: SimuleringSpecV0Dto): SimuleringsresultatDto {
         return try {
-            resultatDto(timed(service::simulerAlderspensjon, spec, "alderspensjon/simulering"))
+            resultatDto(timed(service::simulerAlderspensjon, fromV0SpecDto(spec), "alderspensjon/simulering"))
         } catch (e: EgressException) {
             if (e.isClientError) vilkaarsbruddDto() else serviceUnavailable(e)
         }
@@ -91,7 +127,7 @@ class SimuleringController(private val service: SimuleringService) : Timed() {
     "status": 503,
     "error": "Service Unavailable",
     "message": "En feil inntraff",
-    "path": "/api/alderspensjon/simulering"
+    "path": "/api/v1/alderspensjon/simulering"
 }"""
     }
 }

@@ -1,10 +1,7 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen.map
 
 import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
-import no.nav.pensjon.kalkulator.simulering.SimuleringSpec
-import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
-import no.nav.pensjon.kalkulator.simulering.SimulertAfpPrivat
-import no.nav.pensjon.kalkulator.simulering.SimulertAlderspensjon
+import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringRequestDto
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringResponseDto
 import java.time.LocalDate
@@ -19,15 +16,18 @@ object SimuleringMapper {
             afpPrivat = dto.afpPrivat.map { SimulertAfpPrivat(alder = it.alder, beloep = it.beloep) }
         )
 
-    fun toDto(spec: SimuleringSpec) =
+    fun toDto(
+        impersonalSpec: ImpersonalSimuleringSpec,
+        personalSpec: PersonalSimuleringSpec
+    ) =
         SimuleringRequestDto(
-            pid = spec.pid.value,
-            sivilstand = PenSivilstand.from(spec.sivilstand).externalValue,
-            harEps = spec.epsHarInntektOver2G,
+            pid = personalSpec.pid.value,
+            sivilstand = PenSivilstand.fromInternalValue(personalSpec.sivilstand).externalValue,
+            harEps = impersonalSpec.epsHarInntektOver2G,
             uttaksar = 1,
-            sisteInntekt = spec.forventetInntekt,
-            forsteUttaksdato = midnight(spec.foersteUttaksdato),
-            simuleringstype = PenSimuleringstype.fromInternalValue(spec.simuleringstype).externalValue
+            sisteInntekt = personalSpec.forventetInntekt,
+            forsteUttaksdato = midnight(impersonalSpec.foersteUttaksdato),
+            simuleringstype = PenSimuleringstype.fromInternalValue(impersonalSpec.simuleringType).externalValue
         )
 
     private fun midnight(date: LocalDate) =

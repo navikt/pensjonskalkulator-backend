@@ -29,7 +29,7 @@ class UttaksalderController(private val service: UttaksalderService) : Timed() {
     @Operation(
         summary = "Første mulige uttaksalder",
         description = "Finn første mulige uttaksalder for innlogget bruker." +
-                " Parameter 'harEps' angir hvorvidt brukeren har ektefelle, partner eller samboer",
+                " Feltet 'harEps' brukes til å angi om brukeren har ektefelle/partner/samboer eller ei",
     )
     @ApiResponses(
         value = [
@@ -59,7 +59,7 @@ class UttaksalderController(private val service: UttaksalderService) : Timed() {
 
     @PostMapping("tidligste-uttaksalder")
     @Operation(
-        summary = "Første mulige uttaksalder",
+        summary = "Første mulige uttaksalder – FORELDET; bruk v1/tidligste-uttaksalder",
         description = "Finn første mulige uttaksalder for innlogget bruker",
     )
     fun finnTidligsteUttaksalderV0(@RequestBody spec: UttaksalderIngressSpecDto?): UttaksalderV0Dto? {

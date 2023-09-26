@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.avtale.client.np.v3
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.avtale.*
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest

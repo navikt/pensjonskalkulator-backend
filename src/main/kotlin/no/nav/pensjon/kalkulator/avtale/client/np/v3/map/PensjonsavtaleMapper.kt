@@ -5,6 +5,7 @@ import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.Sivilstatus
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.*
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 
 object PensjonsavtaleMapper {
 

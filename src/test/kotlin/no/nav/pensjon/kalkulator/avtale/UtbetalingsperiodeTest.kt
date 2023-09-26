@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.avtale
 
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 

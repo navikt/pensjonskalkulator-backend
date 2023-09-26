@@ -1,7 +1,8 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen
 
 import no.nav.pensjon.kalkulator.common.client.pen.PenClient
-import no.nav.pensjon.kalkulator.simulering.SimuleringSpec
+import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
+import no.nav.pensjon.kalkulator.simulering.PersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.*
@@ -21,10 +22,13 @@ class PenSimuleringClient(
     @Value("\${web-client.retry-attempts}") private val retryAttempts: String
 ) : PenClient(baseUrl, webClient, callIdGenerator, retryAttempts), SimuleringClient, Pingable {
 
-    override fun simulerAlderspensjon(spec: SimuleringSpec) =
+    override fun simulerAlderspensjon(
+        impersonalSpec: ImpersonalSimuleringSpec,
+        personalSpec: PersonalSimuleringSpec
+    ) =
         doPost(
             PATH,
-            SimuleringMapper.toDto(spec),
+            SimuleringMapper.toDto(impersonalSpec, personalSpec),
             SimuleringRequestDto::class.java,
             SimuleringResponseDto::class.java
         )?.let(SimuleringMapper::fromDto)

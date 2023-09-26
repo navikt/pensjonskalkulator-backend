@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.mock
 
 import no.nav.pensjon.kalkulator.avtale.*
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 
 object PensjonsavtaleFactory {
 

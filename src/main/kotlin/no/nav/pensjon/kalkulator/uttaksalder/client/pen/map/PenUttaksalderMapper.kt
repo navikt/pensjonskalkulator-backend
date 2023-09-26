@@ -19,7 +19,7 @@ object PenUttaksalderMapper {
     fun toDto(spec: UttaksalderSpec) =
         UttaksalderEgressSpecDto(
             pid = spec.pid.value,
-            sivilstand = PenSivilstand.from(spec.sivilstand).externalValue,
+            sivilstand = PenSivilstand.fromInternalValue(spec.sivilstand).externalValue,
             harEps = spec.harEps,
             sisteInntekt = spec.sisteInntekt,
         )

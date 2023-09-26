@@ -4,6 +4,7 @@ import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleIngressSpecDto
 import no.nav.pensjon.kalkulator.avtale.api.dto.UttaksperiodeIngressSpecDto
 import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import org.springframework.stereotype.Service
