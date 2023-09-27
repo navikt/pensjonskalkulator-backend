@@ -6,6 +6,7 @@ import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleDto
 import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtalerDto
 import no.nav.pensjon.kalkulator.avtale.api.dto.SelskapDto
 import no.nav.pensjon.kalkulator.avtale.api.dto.UtbetalingsperiodeDto
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtaler
 import org.junit.jupiter.api.Test
 
@@ -38,10 +39,8 @@ class PensjonsavtaleMapperTest {
 
     private fun utbetalingsperiode() =
         UtbetalingsperiodeDto(
-            startAlder = 68,
-            startMaaned = 2,
-            sluttAlder = 78,
-            sluttMaaned = 12,
+            start = Alder(68, 1),
+            slutt = Alder(78, 11),
             aarligUtbetaling = 123000,
             grad = 100
         )

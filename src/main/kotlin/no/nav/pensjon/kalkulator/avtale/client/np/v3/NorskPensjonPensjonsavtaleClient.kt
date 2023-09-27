@@ -9,8 +9,9 @@ import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.EnvelopeDto
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.NorskPensjonPensjonsavtaleSpecDto
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.NorskPensjonUttaksperiodeSpecDto
-import no.nav.pensjon.kalkulator.avtale.client.np.v3.map.PensjonsavtaleMapper
-import no.nav.pensjon.kalkulator.avtale.client.np.v3.map.PensjonsavtaleMapper.fromDto
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.map.NorskPensjonPensjonsavtaleMapper
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.map.NorskPensjonPensjonsavtaleMapper.fromDto
+import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult.BAD_CLIENT
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult.BAD_OTHER
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult.BAD_SERVER
@@ -48,8 +49,8 @@ class NorskPensjonPensjonsavtaleClient(
 ) : PensjonsavtaleClient {
     private val log = KotlinLogging.logger {}
 
-    override fun fetchAvtaler(spec: PensjonsavtaleSpec): Pensjonsavtaler {
-        val responseXml = fetchAvtalerXml(PensjonsavtaleMapper.toDto(spec))
+    override fun fetchAvtaler(spec: PensjonsavtaleSpec, pid: Pid): Pensjonsavtaler {
+        val responseXml = fetchAvtalerXml(NorskPensjonPensjonsavtaleMapper.toDto(spec, pid))
         countCalls(OK)
 
         return try {
@@ -134,7 +135,7 @@ class NorskPensjonPensjonsavtaleClient(
         xmlMapper.readValue(
             e.message,
             EnvelopeDto::class.java
-        ).body?.fault?.let(PensjonsavtaleMapper::faultToString) ?: e.message ?: "Failed to call $uri"
+        ).body?.fault?.let(NorskPensjonPensjonsavtaleMapper::faultToString) ?: e.message ?: "Failed to call $uri"
 
     companion object {
         private const val PATH = "/kalkulator.pensjonsrettighetstjeneste/v3/kalkulatorPensjonTjeneste"

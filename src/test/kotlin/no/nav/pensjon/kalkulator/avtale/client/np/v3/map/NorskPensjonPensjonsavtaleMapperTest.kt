@@ -5,11 +5,11 @@ import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.*
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtalerV3
 import org.junit.jupiter.api.Test
 
-class PensjonsavtaleMapperTest {
+class NorskPensjonPensjonsavtaleMapperTest {
 
     @Test
     fun `fromDto maps DTO to avtale and selskap`() {
-        PensjonsavtaleMapper.fromDto(envelope()) shouldBe pensjonsavtalerV3()
+        NorskPensjonPensjonsavtaleMapper.fromDto(envelope()) shouldBe pensjonsavtalerV3()
     }
 
     private companion object {

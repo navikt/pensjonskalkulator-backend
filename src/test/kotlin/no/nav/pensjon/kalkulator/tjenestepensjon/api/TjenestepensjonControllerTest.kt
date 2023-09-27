@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.tjenestepensjon.api
 
 import no.nav.pensjon.kalkulator.avtale.*
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tjenestepensjon.TjenestepensjonService
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
@@ -26,6 +27,9 @@ class TjenestepensjonControllerTest {
 
     @MockBean
     private lateinit var service: TjenestepensjonService
+
+    @MockBean
+    private lateinit var traceAid: TraceAid
 
     @Test
     fun fetchTjenestepensjonsforhold() {

@@ -12,21 +12,18 @@ import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringsresultatDto
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.fromSpecDto
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.fromV0SpecDto
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.resultatDto
-import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.vilkaarsbruddDto
-import no.nav.pensjon.kalkulator.tech.time.Timed
+import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.intellij.lang.annotations.Language
-import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("api")
 class SimuleringController(
     private val service: SimuleringService,
     private val traceAid: TraceAid
-) : Timed() {
+) : ControllerBase() {
 
     @PostMapping("v1/alderspensjon/simulering")
     @Operation(
@@ -49,7 +46,7 @@ class SimuleringController(
             ),
             ApiResponse(
                 responseCode = "503", description = "Simulering kunne ikke utføres av tekniske årsaker",
-                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVALABLE_EXAMPLE)])]
+                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
             ),
         ]
     )
@@ -61,7 +58,7 @@ class SimuleringController(
             resultatDto(timed(service::simulerAlderspensjon, fromSpecDto(spec), "alderspensjon/simulering"))
                 .also { log.info { "Simulering respons V1: $it" } }
         } catch (e: EgressException) {
-            handleError(e, "V1")
+            handleError(e, "V1")!!
         } finally {
             traceAid.finalize()
         }
@@ -85,7 +82,7 @@ class SimuleringController(
             ),
             ApiResponse(
                 responseCode = "503", description = "Simulering kunne ikke utføres av tekniske årsaker",
-                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVALABLE_EXAMPLE)])]
+                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
             ),
         ]
     )
@@ -97,41 +94,17 @@ class SimuleringController(
             resultatDto(timed(service::simulerAlderspensjon, fromV0SpecDto(spec), "alderspensjon/simulering"))
                 .also { log.info { "Simulering respons V0: $it" } }
         } catch (e: EgressException) {
-            handleError(e, "V0")
+            handleError(e, "V0")!!
         } finally {
             traceAid.finalize()
         }
     }
 
-    private fun handleError(e: EgressException, version: String) =
-        if (e.isClientError)
-            handleInternalError(e, version)
-        else
-            handleExternalError(e, version)
-
-    private fun handleInternalError(e: EgressException, version: String): SimuleringsresultatDto {
-        logError(e, "Intern", version)
-        return vilkaarsbruddDto()
-    }
-
-    private fun handleExternalError(e: EgressException, version: String): SimuleringsresultatDto {
-        logError(e, "Ekstern", version)
-        return serviceUnavailable(e)
-    }
-
-    private fun logError(e: EgressException, category: String, version: String) {
-        log.error { "$category feil ved simulering $version: ${extractMessageRecursively(e)}" }
-    }
-
-    private fun serviceUnavailable(e: EgressException): SimuleringsresultatDto {
-        throw ResponseStatusException(
-            HttpStatus.SERVICE_UNAVAILABLE,
-            "Feil ved simulering av alderspensjon: ${extractMessageRecursively(e)}",
-            e
-        )
-    }
+    override fun errorMessage() = ERROR_MESSAGE
 
     private companion object {
+        private const val ERROR_MESSAGE = "feil ved simulering"
+
 
         @Language("json")
         private const val VILKAAR_OPPFYLT_EXAMPLE = """{
@@ -155,15 +128,6 @@ class SimuleringController(
   "alderspensjon": [],
   "afpPrivat": [],
   "vilkaarErOppfylt": false
-}"""
-
-        @Language("json")
-        private const val SERVICE_UNAVALABLE_EXAMPLE = """{
-    "timestamp": "2023-09-12T10:37:47.056+00:00",
-    "status": 503,
-    "error": "Service Unavailable",
-    "message": "En feil inntraff",
-    "path": "/api/v1/alderspensjon/simulering"
 }"""
     }
 }

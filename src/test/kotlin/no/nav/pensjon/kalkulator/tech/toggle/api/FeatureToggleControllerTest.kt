@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.tech.toggle.api
 
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -22,6 +23,9 @@ class FeatureToggleControllerTest {
 
     @MockBean
     private lateinit var service: FeatureToggleService
+
+    @MockBean
+    private lateinit var traceAid: TraceAid
 
     @Test
     fun isEnabled() {

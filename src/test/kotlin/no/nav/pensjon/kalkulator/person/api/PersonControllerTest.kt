@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.person.api
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PersonFactory.skiltPerson
 import no.nav.pensjon.kalkulator.person.PersonService
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,6 +24,9 @@ class PersonControllerTest {
 
     @MockBean
     private lateinit var service: PersonService
+
+    @MockBean
+    private lateinit var traceAid: TraceAid
 
     @Test
     fun person() {

@@ -6,17 +6,18 @@ import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.Sivilstatus
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.*
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
+import no.nav.pensjon.kalkulator.person.Pid
 
-object PensjonsavtaleMapper {
+object NorskPensjonPensjonsavtaleMapper {
 
     private const val DEFAULT_VALUE = "ukjent"
     private val DEFAULT_UTTAKSGRAD = Uttaksgrad.HUNDRE_PROSENT
     private val DEFAULT_HAR_EPS_PENSJON = true // Norsk Pensjon default
     private val DEFAULT_HAR_EPS_PENSJONSGIVENDE_INNTEKT_OVER_2G = true // Norsk Pensjon default
 
-    fun toDto(spec: PensjonsavtaleSpec) =
+    fun toDto(spec: PensjonsavtaleSpec, pid: Pid) =
         NorskPensjonPensjonsavtaleSpecDto(
-            pid = spec.pid,
+            pid = pid,
             aarligInntektFoerUttak = spec.aarligInntektFoerUttak,
             uttaksperioder = spec.uttaksperioder.map(::toUttaksperiodeEgressSpecDto),
             antallInntektsaarEtterUttak = spec.antallInntektsaarEtterUttak,
@@ -25,8 +26,8 @@ object PensjonsavtaleMapper {
             harEpsPensjonsgivendeInntektOver2G = spec.harEpsPensjonsgivendeInntektOver2G
                 ?: DEFAULT_HAR_EPS_PENSJONSGIVENDE_INNTEKT_OVER_2G,
             antallAarIUtlandetEtter16 = spec.antallAarIUtlandetEtter16,
-            sivilstatus = Sivilstatus.fromInternalValue(spec.sivilstatus),
-            oenskesSimuleringAvFolketrygd = spec.oenskesSimuleringAvFolketrygd
+            sivilstatus = Sivilstatus.fromInternalValue(spec.sivilstand),
+            oenskesSimuleringAvFolketrygd = false
         )
 
     // Norsk Pensjon bruker månedsverdier 1..12 (dermed '+ 1')

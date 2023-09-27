@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.ufoere.api
 import no.nav.pensjon.kalkulator.avtale.*
 import no.nav.pensjon.kalkulator.mock.DateFactory
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.ufoere.UfoerepensjonService
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
@@ -27,6 +28,9 @@ class UfoerepensjonControllerTest {
 
     @MockBean
     private lateinit var service: UfoerepensjonService
+
+    @MockBean
+    private lateinit var traceAid: TraceAid
 
     @Test
     fun harLoependeUfoerepensjon() {

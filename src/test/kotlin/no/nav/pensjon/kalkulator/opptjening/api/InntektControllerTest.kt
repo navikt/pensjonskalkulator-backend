@@ -5,6 +5,7 @@ import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.opptjening.Inntekt
 import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -29,6 +30,9 @@ class InntektControllerTest {
 
     @MockBean
     private lateinit var service: InntektService
+
+    @MockBean
+    private lateinit var traceAid: TraceAid
 
     @Test
     fun fetchInntektsforhold() {

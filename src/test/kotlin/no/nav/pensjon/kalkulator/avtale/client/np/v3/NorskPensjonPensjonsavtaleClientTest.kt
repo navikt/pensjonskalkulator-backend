@@ -14,9 +14,11 @@ import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
@@ -57,7 +59,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
     fun `fetchAvtaler handles 1 avtale with 2 utbetalingsperioder`() {
         arrange(okResponse(EN_AVTALE_RESPONSE_BODY))
 
-        val avtaler = client.fetchAvtaler(spec()).avtaler
+        val avtaler = client.fetchAvtaler(spec(), pid).avtaler
 
         assertRequestBody()
         assertEquals(1, avtaler.size)
@@ -68,7 +70,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
     fun `fetchAvtaler handles 2 pensjonsavtaler with 1 utbetalingsperiode each`() {
         arrange(okResponse(TO_AVTALER_RESPONSE_BODY))
 
-        val avtaler = client.fetchAvtaler(spec()).avtaler
+        val avtaler = client.fetchAvtaler(spec(), pid).avtaler
 
         assertEquals(2, avtaler.size)
         avtaler[0] shouldBe avtaleMedEnUtbetalingsperiode()
@@ -79,7 +81,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
     fun `fetchAvtaler handles 0 pensjonsavtaler`() {
         arrange(okResponse(INGEN_AVTALER_RESPONSE_BODY))
 
-        val avtaler = client.fetchAvtaler(spec()).avtaler
+        val avtaler = client.fetchAvtaler(spec(), pid).avtaler
 
         assertTrue(avtaler.isEmpty())
     }
@@ -88,7 +90,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
     fun `fetchAvtaler handles utilgjengelige selskaper`() {
         arrange(okResponse(UTILGJENGELIGE_SELSKAP_RESPONSE_BODY))
 
-        val selskaper = client.fetchAvtaler(spec()).utilgjengeligeSelskap
+        val selskaper = client.fetchAvtaler(spec(), pid).utilgjengeligeSelskap
 
         assertEquals(2, selskaper.size)
         selskaper[0] shouldBe Selskap("Selskap1", true, 1, AvtaleKategori.PRIVAT_AFP, "Feil1")
@@ -100,7 +102,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody(ERROR_RESPONSE_BODY))
         arrange(okResponse(INGEN_AVTALER_RESPONSE_BODY))
 
-        val avtaler = client.fetchAvtaler(spec()).avtaler
+        val avtaler = client.fetchAvtaler(spec(), pid).avtaler
 
         assertTrue(avtaler.isEmpty())
     }
@@ -110,7 +112,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
         arrange(jsonResponse(HttpStatus.BAD_REQUEST).setBody("My bad"))
         // No 2nd response arranged, since no retry
 
-        val exception = assertThrows(EgressException::class.java) { client.fetchAvtaler(spec()) }
+        val exception = assertThrows<EgressException> { client.fetchAvtaler(spec(), pid) }
 
         assertEquals("My bad", exception.message)
     }
@@ -120,7 +122,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody(ERROR_RESPONSE_BODY))
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody(ERROR_RESPONSE_BODY)) // for retry
 
-        val exception = assertThrows(EgressException::class.java) { client.fetchAvtaler(spec()) }
+        val exception = assertThrows<EgressException> { client.fetchAvtaler(spec(), pid) }
 
         assertEquals(
             "Code: soap11:Client | String: A problem occurred." +
@@ -162,7 +164,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
                 <sivilstatus>gift</sivilstatus>
                 <harEpsPensjon>true</harEpsPensjon>
                 <harEpsPensjonsgivendeInntektOver2G>true</harEpsPensjonsgivendeInntektOver2G>
-                <oenskesSimuleringAvFolketrygd>true</oenskesSimuleringAvFolketrygd>
+                <oenskesSimuleringAvFolketrygd>false</oenskesSimuleringAvFolketrygd>
             </rettighetshaver>
         </typ:kalkulatorForespoersel>
     </S:Body>
@@ -304,12 +306,10 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
 
         private fun spec() =
             PensjonsavtaleSpec(
-                pid = pid,
                 aarligInntektFoerUttak = 123000,
                 uttaksperioder = listOf(uttaksperiodeSpec(1), uttaksperiodeSpec(2)),
                 antallInntektsaarEtterUttak = 1,
                 harAfp = false,
-                oenskesSimuleringAvFolketrygd = true
             )
 
         private fun uttaksperiodeSpec(value: Int) =

@@ -1,10 +1,10 @@
 package no.nav.pensjon.kalkulator.avtale.api
 
 import no.nav.pensjon.kalkulator.avtale.*
-import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleIngressSpecDto
-import no.nav.pensjon.kalkulator.avtale.api.dto.UttaksperiodeIngressSpecDto
+import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleServiceTest.Companion.pensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtaler
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -29,9 +29,12 @@ class PensjonsavtaleControllerTest {
     @MockBean
     private lateinit var avtaleService: PensjonsavtaleService
 
+    @MockBean
+    private lateinit var traceAid: TraceAid
+
     @Test
     fun fetchAvtaler() {
-        `when`(avtaleService.fetchAvtaler(pensjonsavtaleSpecDto())).thenReturn(pensjonsavtaler())
+        `when`(avtaleService.fetchAvtaler(pensjonsavtaleSpec())).thenReturn(pensjonsavtaler())
 
         mvc.perform(
             post(URL)
@@ -45,47 +48,32 @@ class PensjonsavtaleControllerTest {
 
     private companion object {
 
-        private const val URL = "/api/pensjonsavtaler"
-
-        // NB: These spec objects must correspond with REQUEST_BODY below
-        private fun pensjonsavtaleSpecDto() =
-            PensjonsavtaleIngressSpecDto(
-                100000,
-                listOf(uttaksperiodeSpec1(), uttaksperiodeSpec2()),
-                1
-            )
-
-        private fun uttaksperiodeSpec1() =
-            UttaksperiodeIngressSpecDto(
-                67,
-                1,
-                80,
-                123000
-            )
-
-        private fun uttaksperiodeSpec2() =
-            UttaksperiodeIngressSpecDto(
-                70,
-                1,
-                100,
-                45000
-            )
+        private const val URL = "/api/v1/pensjonsavtaler"
 
         @Language("json")
         private val REQUEST_BODY = """{
-	"aarligInntektFoerUttak": 100000,
+	"aarligInntektFoerUttak": 456000,
 	"uttaksperioder": [{
-		"startAlder": 67,
-		"startMaaned": 1,
+        "start": {
+	  	    "aar": 67,
+		    "maaneder": 1
+	    },
 		"grad": 80,
 		"aarligInntekt": 123000
 	}, {
-		"startAlder": 70,
-		"startMaaned": 1,
+       "start": {
+	  	    "aar": 70,
+		    "maaneder": 1
+	    },
 		"grad": 100,
 		"aarligInntekt": 45000
 	}],
-	"antallInntektsaarEtterUttak": 1
+	"antallInntektsaarEtterUttak": 2,
+    "harAfp": false,
+    "harEpsPensjon": true,
+    "harEpsPensjonsgivendeInntektOver2G": true,
+    "antallAarIUtlandetEtter16": 0,
+    "sivilstand": "UGIFT"
 }"""
 
         @Language("json")
@@ -96,10 +84,14 @@ class PensjonsavtaleControllerTest {
 		"startAlder": 67,
 		"sluttAlder": 77,
 		"utbetalingsperioder": [{
-			"startAlder": 68,
-			"startMaaned": 2,
-			"sluttAlder": 78,
-			"sluttMaaned": 12,
+            "start": {
+	   	        "aar": 68,
+	 	        "maaneder": 1
+	        },
+            "slutt": {
+	   	        "aar": 78,
+	 	        "maaneder": 11
+	        },
 			"aarligUtbetaling": 123000,
 			"grad": 100
 		}]

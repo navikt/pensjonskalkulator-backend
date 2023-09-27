@@ -1,14 +1,19 @@
 package no.nav.pensjon.kalkulator.tjenestepensjon.api
 
 import io.swagger.v3.oas.annotations.Operation
-import no.nav.pensjon.kalkulator.tech.time.Timed
+import no.nav.pensjon.kalkulator.common.api.ControllerBase
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tjenestepensjon.TjenestepensjonService
 import no.nav.pensjon.kalkulator.tjenestepensjon.api.dto.TjenestepensjonsforholdDto
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("api")
-class TjenestepensjonController(private val service: TjenestepensjonService) : Timed() {
+class TjenestepensjonController(
+    private val service: TjenestepensjonService,
+    private val traceAid: TraceAid
+) : ControllerBase() {
 
     @GetMapping("tpo-medlemskap")
     @Operation(
@@ -16,10 +21,24 @@ class TjenestepensjonController(private val service: TjenestepensjonService) : T
         description = "Hvorvidt den innloggede brukeren har offentlig tjenestepensjonsforhold"
     )
     fun harTjenestepensjonsforhold(): TjenestepensjonsforholdDto {
-        return toDto(timed(service::harTjenestepensjonsforhold, "harTjenestepensjonsforhold"))
+        traceAid.initialize()
+        log.info { "Request for tjenestepensjonsforhold-status" }
+
+        return try {
+            toDto(timed(service::harTjenestepensjonsforhold, "harTjenestepensjonsforhold"))
+                .also { log.info { "Tjenestepensjonsforhold-status respons: $it" } }
+        } catch (e: EgressException) {
+            handleError(e)!!
+        } finally {
+            traceAid.finalize()
+        }
     }
 
+    override fun errorMessage() = ERROR_MESSAGE
+
     private companion object {
+        private const val ERROR_MESSAGE = "feil ved sjekking av tjenestepensjonsforhold-status"
+
         private fun toDto(harForhold: Boolean) = TjenestepensjonsforholdDto(harForhold)
     }
 }

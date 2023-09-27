@@ -1,8 +1,6 @@
 package no.nav.pensjon.kalkulator.avtale
 
 import io.kotest.matchers.shouldBe
-import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleIngressSpecDto
-import no.nav.pensjon.kalkulator.avtale.api.dto.UttaksperiodeIngressSpecDto
 import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
@@ -22,10 +20,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension::class)
 class PensjonsavtaleServiceTest {
 
-    private lateinit var pensjonsavtaleService: PensjonsavtaleService
+    private lateinit var avtaleService: PensjonsavtaleService
 
     @Mock
-    private lateinit var pensjonsavtaleClient: PensjonsavtaleClient
+    private lateinit var avtaleClient: PensjonsavtaleClient
 
     @Mock
     private lateinit var featureToggleService: FeatureToggleService
@@ -35,14 +33,14 @@ class PensjonsavtaleServiceTest {
 
     @BeforeEach
     fun initialize() {
-        pensjonsavtaleService = PensjonsavtaleService(pensjonsavtaleClient, pidGetter, featureToggleService)
+        avtaleService = PensjonsavtaleService(avtaleClient, pidGetter, featureToggleService)
         `when`(pidGetter.pid()).thenReturn(pid)
     }
 
     @Test
     fun `fetchAvtaler fetches avtaler`() {
         arrangeClient()
-        val result = pensjonsavtaleService.fetchAvtaler(pensjonsavtaleSpecDto())
+        val result = avtaleService.fetchAvtaler(pensjonsavtaleSpec())
         result shouldBe pensjonsavtaler
     }
 
@@ -56,65 +54,49 @@ class PensjonsavtaleServiceTest {
             )
         )
 
-        val result = pensjonsavtaleService.fetchAvtaler(pensjonsavtaleSpecDto())
+        val result = avtaleService.fetchAvtaler(pensjonsavtaleSpec())
 
         result shouldBe pensjonsavtalerV3(listOf(AvtaleKategori.PRIVAT_AFP))
     }
 
     private fun arrangeClient() {
-        `when`(pensjonsavtaleClient.fetchAvtaler(pensjonsavtaleSpec())).thenReturn(pensjonsavtaler)
+        `when`(avtaleClient.fetchAvtaler(pensjonsavtaleSpec(), pid)).thenReturn(pensjonsavtaler)
     }
 
     private fun arrangeClient(kategorier: List<AvtaleKategori>) {
-        `when`(pensjonsavtaleClient.fetchAvtaler(pensjonsavtaleSpec())).thenReturn(pensjonsavtalerV3(kategorier))
+        `when`(avtaleClient.fetchAvtaler(pensjonsavtaleSpec(), pid)).thenReturn(pensjonsavtalerV3(kategorier))
     }
 
-    private companion object {
+    companion object {
         private const val AARLIG_INNTEKT_FOER_UTTAK = 456000
         private const val ANTALL_INNTEKTSAAR_ETTER_UTTAK = 2
 
         private val pensjonsavtaler = pensjonsavtalerV3()
 
-        private fun pensjonsavtaleSpecDto() =
-            PensjonsavtaleIngressSpecDto(
-                aarligInntektFoerUttak = AARLIG_INNTEKT_FOER_UTTAK,
-                uttaksperioder = listOf(uttaksperiodeSpecDto()),
-                antallInntektsaarEtterUttak = ANTALL_INNTEKTSAAR_ETTER_UTTAK,
-                harAfp = false,
-                harEpsPensjon = true,
-                harEpsPensjonsgivendeInntektOver2G = true,
-                antallAarIUtlandetEtter16 = 0,
-                sivilstatus = Sivilstand.UGIFT,
-                oenskesSimuleringAvFolketrygd = false
-            )
-
-        private fun pensjonsavtaleSpec() =
+        fun pensjonsavtaleSpec() =
             PensjonsavtaleSpec(
-                pid = pid,
                 aarligInntektFoerUttak = AARLIG_INNTEKT_FOER_UTTAK,
-                uttaksperioder = listOf(uttaksperiodeSpec()),
+                uttaksperioder = listOf(uttaksperiodeSpec1(), uttaksperiodeSpec2()),
                 antallInntektsaarEtterUttak = ANTALL_INNTEKTSAAR_ETTER_UTTAK,
                 harAfp = false,
                 harEpsPensjon = true,
                 harEpsPensjonsgivendeInntektOver2G = true,
                 antallAarIUtlandetEtter16 = 0,
-                sivilstatus = Sivilstand.UGIFT,
-                oenskesSimuleringAvFolketrygd = false
+                sivilstand = Sivilstand.UGIFT
             )
 
-        private fun uttaksperiodeSpec() =
+        private fun uttaksperiodeSpec1() =
             UttaksperiodeSpec(
                 start = Alder(67, 1),
-                grad = Uttaksgrad.HUNDRE_PROSENT,
+                grad = Uttaksgrad.AATTI_PROSENT,
                 aarligInntekt = 123000
             )
 
-        private fun uttaksperiodeSpecDto() =
-            UttaksperiodeIngressSpecDto(
-                startAlder = 67,
-                startMaaned = 2, // DTO startMaaned = alder-maaneder + 1
-                grad = 100,
-                aarligInntekt = 123000
+        private fun uttaksperiodeSpec2() =
+            UttaksperiodeSpec(
+                start = Alder(70, 1),
+                grad = Uttaksgrad.HUNDRE_PROSENT,
+                aarligInntekt = 45000
             )
     }
 }
