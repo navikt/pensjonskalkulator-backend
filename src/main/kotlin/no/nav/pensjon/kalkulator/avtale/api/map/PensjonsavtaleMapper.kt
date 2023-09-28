@@ -61,8 +61,8 @@ object PensjonsavtaleMapper {
         PensjonsavtaleDto(
             produktbetegnelse = source.produktbetegnelse,
             kategori = source.kategori,
-            startAlder = if (source.harStartalder) source.startalder else null,
-            sluttAlder = source.sluttalder,
+            startAar = if (source.harStartAar) source.startAar else null,
+            sluttAar = source.sluttAar,
             utbetalingsperioder = source.utbetalingsperioder.map(::toPeriodeDto)
         )
 
@@ -70,8 +70,8 @@ object PensjonsavtaleMapper {
         PensjonsavtaleV0Dto(
             produktbetegnelse = source.produktbetegnelse,
             kategori = source.kategori,
-            startAlder = if (source.harStartalder) source.startalder else null,
-            sluttAlder = source.sluttalder,
+            startAlder = if (source.harStartAar) source.startAar else null,
+            sluttAlder = source.sluttAar,
             utbetalingsperioder = source.utbetalingsperioder.map(::toPeriodeV0Dto)
         )
 

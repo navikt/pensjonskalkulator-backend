@@ -16,10 +16,10 @@ class PensjonsavtaleTest {
 
     @Test
     fun `harStartalder is true when startalder greater than zero, false otherwise`() {
-        assertTrue(pensjonsavtale1(67, 99).harStartalder)
-        assertTrue(pensjonsavtale2(1, 99).harStartalder)
-        assertFalse(pensjonsavtale1(0, 99).harStartalder)
-        assertFalse(pensjonsavtale2(-67, 99).harStartalder)
+        assertTrue(pensjonsavtale1(67, 99).harStartAar)
+        assertTrue(pensjonsavtale2(1, 99).harStartAar)
+        assertFalse(pensjonsavtale1(0, 99).harStartAar)
+        assertFalse(pensjonsavtale2(-67, 99).harStartAar)
     }
 
     private fun pensjonsavtale1(startalder: Int, sluttalder: Int?) = Pensjonsavtale(

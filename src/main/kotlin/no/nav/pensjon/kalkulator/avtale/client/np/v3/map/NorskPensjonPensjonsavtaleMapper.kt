@@ -40,8 +40,8 @@ object NorskPensjonPensjonsavtaleMapper {
 
     fun fromDto(dto: EnvelopeDto) =
         Pensjonsavtaler(
-            pensjonsavtaler(dto) ?: emptyOrFault(dto),
-            utilgjengeligeSelskap(dto) ?: emptyList()
+            avtaler = pensjonsavtaler(dto) ?: emptyOrFault(dto),
+            utilgjengeligeSelskap = utilgjengeligeSelskap(dto) ?: emptyList()
         )
 
     fun faultToString(fault: FaultDto) =
@@ -53,47 +53,47 @@ object NorskPensjonPensjonsavtaleMapper {
     private fun pensjonsavtaler(dto: EnvelopeDto) =
         dto.body?.pensjonsrettigheter?.pensjonsRettigheter?.map {
             Pensjonsavtale(
-                it.avtalenummer ?: "",
-                it.arbeidsgiver ?: DEFAULT_VALUE,
-                it.selskapsnavn ?: DEFAULT_VALUE,
-                it.produktbetegnelse ?: DEFAULT_VALUE,
-                Kategori.fromExternalValue(it.kategori).internalValue,
-                Underkategori.fromExternalValue(it.underkategori).internalValue,
-                it.innskuddssaldo ?: 0,
-                it.naavaerendeAvtaltAarligInnskudd ?: 0,
-                it.pensjonsbeholdningForventet ?: 0,
-                it.pensjonsbeholdningNedreGrense ?: 0,
-                it.pensjonsbeholdningOvreGrense ?: 0,
-                it.avkastningsgaranti ?: false,
-                Beregningsmodell.fromExternalValue(it.beregningsmodell).internalValue,
-                it.startAlder ?: 0,
-                it.sluttAlder,
-                it.opplysningsdato ?: DEFAULT_VALUE,
-                it.aarsakManglendeGradering?.internalValue ?: ManglendeEksternGraderingAarsak.NONE,
-                it.aarsakIkkeBeregnet?.internalValue ?: ManglendeEksternBeregningAarsak.NONE,
-                it.utbetalingsperioder?.map(::utbetalingsperiode) ?: emptyList()
+                avtalenummer = it.avtalenummer ?: "",
+                arbeidsgiver = it.arbeidsgiver ?: DEFAULT_VALUE,
+                selskapsnavn = it.selskapsnavn ?: DEFAULT_VALUE,
+                produktbetegnelse = it.produktbetegnelse ?: DEFAULT_VALUE,
+                kategori = Kategori.fromExternalValue(it.kategori).internalValue,
+                underkategori = Underkategori.fromExternalValue(it.underkategori).internalValue,
+                innskuddssaldo = it.innskuddssaldo ?: 0,
+                naavaerendeAvtaltAarligInnskudd = it.naavaerendeAvtaltAarligInnskudd ?: 0,
+                pensjonsbeholdningForventet = it.pensjonsbeholdningForventet ?: 0,
+                pensjonsbeholdningNedreGrense = it.pensjonsbeholdningNedreGrense ?: 0,
+                pensjonsbeholdningOvreGrense = it.pensjonsbeholdningOvreGrense ?: 0,
+                avkastningsgaranti = it.avkastningsgaranti ?: false,
+                beregningsmodell = Beregningsmodell.fromExternalValue(it.beregningsmodell).internalValue,
+                startAar = it.startAlder ?: 0,
+                sluttAar = it.sluttAlder,
+                opplysningsdato = it.opplysningsdato ?: DEFAULT_VALUE,
+                manglendeGraderingAarsak = it.aarsakManglendeGradering?.internalValue ?: ManglendeEksternGraderingAarsak.NONE,
+                manglendeBeregningAarsak = it.aarsakIkkeBeregnet?.internalValue ?: ManglendeEksternBeregningAarsak.NONE,
+                utbetalingsperioder = it.utbetalingsperioder?.map(::utbetalingsperiode) ?: emptyList()
             )
         }
 
     private fun utilgjengeligeSelskap(dto: EnvelopeDto) =
         dto.body?.pensjonsrettigheter?.utilgjengeligeInnretninger?.map {
             Selskap(
-                it.selskapsnavn ?: DEFAULT_VALUE,
-                it.heltUtilgjengelig ?: false,
-                it.antallManglendeRettigheter ?: 0,
-                Kategori.fromExternalValue(it.kategori).internalValue,
-                it.feilkode ?: ""
+                navn = it.selskapsnavn ?: DEFAULT_VALUE,
+                heltUtilgjengelig = it.heltUtilgjengelig ?: false,
+                antallManglendeRettigheter = it.antallManglendeRettigheter ?: 0,
+                kategori = Kategori.fromExternalValue(it.kategori).internalValue,
+                feilkode = it.feilkode ?: ""
             )
         }
 
     private fun utbetalingsperiode(source: UtbetalingsperiodeDto) =
         Utbetalingsperiode(
-            Alder(source.startAlder!!, source.startMaaned!! - 1),
-            source.sluttAlder?.let { Alder(it, source.sluttMaaned!! - 1) },
-            source.aarligUtbetalingForventet ?: 0,
-            source.aarligUtbetalingNedreGrense ?: 0,
-            source.aarligUtbetalingOvreGrense ?: 0,
-            source.grad?.let { Uttaksgrad.from(it) } ?: DEFAULT_UTTAKSGRAD
+            startAlder = Alder(source.startAlder!!, source.startMaaned!! - 1),
+            sluttAlder = source.sluttAlder?.let { Alder(it, source.sluttMaaned!! - 1) },
+            aarligUtbetalingForventet = source.aarligUtbetalingForventet ?: 0,
+            aarligUtbetalingNedreGrense = source.aarligUtbetalingNedreGrense ?: 0,
+            aarligUtbetalingOvreGrense = source.aarligUtbetalingOvreGrense ?: 0,
+            grad = source.grad?.let { Uttaksgrad.from(it) } ?: DEFAULT_UTTAKSGRAD
         )
 
     private fun emptyOrFault(dto: EnvelopeDto) =

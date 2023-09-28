@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
 import java.lang.System.currentTimeMillis
 
-abstract class ControllerBase(    private val traceAid: TraceAid) {
+abstract class ControllerBase(private val traceAid: TraceAid) {
 
     protected val log = KotlinLogging.logger {}
 

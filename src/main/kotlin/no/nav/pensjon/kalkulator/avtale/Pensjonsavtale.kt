@@ -8,8 +8,8 @@ package no.nav.pensjon.kalkulator.avtale
  * kategori: Påkrevd; kategori
  * naavaerendeAvtaltAarligInnskudd: Nåværende avtalt årlig innskudd
  * beregningsmodell: Leverandør av prognosen
- * startAlder: Første startalder
- * sluttAlder: Siste sluttalder
+ * startAar: Første startår (alder)
+ * sluttAar: Siste sluttår (alder)
  * opplysningsdato: Dato (YYYY-MM-DD)
  * aarsakManglendeGradering: Årsak til manglende gradering; attributtet er satt hvis pensjonen ikke kan bestå av graderte data, eller ikke kan simuleres fleksibelt (dvs. startalder ulik ordinær startalder for pensjon 67 år)
  * utbetalingsperioder: Hvis en rettighet ikke kan leveres med utbetalingsperioder, så skal «Årsak til manglende utbetaling» ha en relevant feilkode.
@@ -28,15 +28,15 @@ data class Pensjonsavtale(
     val pensjonsbeholdningOvreGrense: Int,
     val avkastningsgaranti: Boolean,
     val beregningsmodell: EksternBeregningsmodell,
-    val startalder: Int,
-    val sluttalder: Int?,
+    val startAar: Int, // år som i alder (antall fylte år etter fødselsdato)
+    val sluttAar: Int?, // år som i alder
     val opplysningsdato: String,
     val manglendeGraderingAarsak: ManglendeEksternGraderingAarsak,
     val manglendeBeregningAarsak: ManglendeEksternBeregningAarsak,
     val utbetalingsperioder: List<Utbetalingsperiode>
 ) {
-    val harStartalder = startalder > 0
-    val erLivsvarig = sluttalder == null
+    val harStartAar = startAar > 0
+    val erLivsvarig = sluttAar == null
 
     constructor(
         produktbetegnelse: String,

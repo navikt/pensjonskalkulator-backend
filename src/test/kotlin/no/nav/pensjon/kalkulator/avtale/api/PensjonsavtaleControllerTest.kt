@@ -81,8 +81,8 @@ class PensjonsavtaleControllerTest {
 	"avtaler": [{
 		"produktbetegnelse": "produkt1",
 		"kategori": "INDIVIDUELL_ORDNING",
-		"startAlder": 67,
-		"sluttAlder": 77,
+		"startAar": 67,
+		"sluttAar": 77,
 		"utbetalingsperioder": [{
             "startAlder": {
 	   	        "aar": 68,

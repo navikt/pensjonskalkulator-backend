@@ -32,8 +32,8 @@ class PensjonsavtaleMapperTest {
         PensjonsavtaleDto(
             produktbetegnelse = "produkt1",
             kategori = AvtaleKategori.INDIVIDUELL_ORDNING,
-            startAlder = startalder,
-            sluttAlder = 77,
+            startAar = startalder,
+            sluttAar = 77,
             utbetalingsperioder = listOf(utbetalingsperiode())
         )
 
