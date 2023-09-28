@@ -3,9 +3,9 @@ package no.nav.pensjon.kalkulator.avtale.client.np.v3
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.Pensjonsavtaler
 import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
-import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.EnvelopeDto
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.NorskPensjonPensjonsavtaleSpecDto
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.NorskPensjonUttaksperiodeSpecDto
@@ -22,7 +22,7 @@ import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.config.GatewayUsage
 import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.SamlTokenService
-import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.beans.factory.annotation.Qualifier
@@ -44,7 +44,7 @@ class NorskPensjonPensjonsavtaleClient(
     private val tokenGetter: SamlTokenService,
     @Qualifier("soap") private val webClient: WebClient,
     private val xmlMapper: XmlMapper,
-    private val callIdGenerator: CallIdGenerator,
+    private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") private val retryAttempts: String
 ) : PensjonsavtaleClient {
     private val log = KotlinLogging.logger {}
@@ -65,7 +65,7 @@ class NorskPensjonPensjonsavtaleClient(
 
     private fun fetchAvtalerXml(spec: NorskPensjonPensjonsavtaleSpecDto): String {
         val uri = "$baseUrl$PATH"
-        val callId = callIdGenerator.newId()
+        val callId = traceAid.callId()
         val body = soapEnvelope(soapBody(spec, callId))
         log.debug { "POST to URI: '$uri' with body '$body'" }
 
@@ -175,8 +175,8 @@ class NorskPensjonPensjonsavtaleClient(
 
         private fun xml(spec: NorskPensjonUttaksperiodeSpecDto): String {
             return """<uttaksperiode>
-                    <startAlder>${spec.start.aar}</startAlder>
-                    <startMaaned>${spec.start.maaned}</startMaaned>
+                    <startAlder>${spec.startAlder.aar}</startAlder>
+                    <startMaaned>${spec.startAlder.maaned}</startMaaned>
                     <grad>${spec.grad.prosentsats}</grad>
                     <aarligInntekt>${spec.aarligInntekt}</aarligInntekt>
                 </uttaksperiode>"""

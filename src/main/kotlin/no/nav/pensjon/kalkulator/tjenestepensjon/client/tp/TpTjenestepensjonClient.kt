@@ -4,7 +4,7 @@ import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
-import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.TjenestepensjonClient
@@ -30,7 +30,7 @@ import java.time.LocalDate
 class TpTjenestepensjonClient(
     @Value("\${tjenestepensjon.url}") private val baseUrl: String,
     private val webClient: WebClient,
-    private val callIdGenerator: CallIdGenerator,
+    private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") private val retryAttempts: String
 ) : TjenestepensjonClient {
     private val log = KotlinLogging.logger {}
@@ -67,7 +67,7 @@ class TpTjenestepensjonClient(
     private fun setHeaders(headers: HttpHeaders, pid: Pid) {
         headers.setBearerAuth(EgressAccess.token(service).value)
         headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_JSON_VALUE
-        headers[CustomHttpHeaders.CALL_ID] = callIdGenerator.newId()
+        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
 
         // https://github.com/navikt/tp/blob/main/tp-api/src/main/kotlin/no/nav/samhandling/tp/provider/Headers.kt
         headers[CustomHttpHeaders.PID] = pid.value

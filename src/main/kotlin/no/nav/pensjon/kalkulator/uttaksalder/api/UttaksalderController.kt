@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -13,7 +12,8 @@ import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.AlderDto
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderV0Dto
-import no.nav.pensjon.kalkulator.uttaksalder.api.dto.map.UttaksalderMapper
+import no.nav.pensjon.kalkulator.uttaksalder.api.dto.map.UttaksalderMapper.toV0Dto
+import no.nav.pensjon.kalkulator.uttaksalder.api.dto.map.UttaksalderMapper.toV1Dto
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -93,11 +93,5 @@ class UttaksalderController(
 
     private companion object {
         private const val ERROR_MESSAGE = "feil ved bestemmelse av første mulige uttaksalder"
-
-        private fun toV0Dto(uttaksalder: Alder?): UttaksalderV0Dto? =
-            uttaksalder?.let { UttaksalderMapper.toV0Dto(uttaksalder) }
-
-        private fun toV1Dto(uttaksalder: Alder?): AlderDto? =
-            uttaksalder?.let { UttaksalderMapper.toV1Dto(uttaksalder) }
     }
 }

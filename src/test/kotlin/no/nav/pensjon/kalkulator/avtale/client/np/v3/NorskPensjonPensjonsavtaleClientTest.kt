@@ -10,7 +10,7 @@ import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.mock.XmlMapperFactory.xmlMapper
 import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.SamlTokenService
 import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.SamlTokenServiceTest.Companion.SAML_ASSERTION
-import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.intellij.lang.annotations.Language
@@ -37,21 +37,21 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
     private lateinit var tokenService: SamlTokenService
 
     @Mock
-    private lateinit var callIdGenerator: CallIdGenerator
+    private lateinit var traceAid: TraceAid
 
     @BeforeEach
     fun initialize() {
         `when`(tokenService.assertion()).thenReturn(SAML_ASSERTION)
-        `when`(callIdGenerator.newId()).thenReturn("id1")
+        `when`(traceAid.callId()).thenReturn("id1")
         arrangeSecurityContext()
 
         client = NorskPensjonPensjonsavtaleClient(
-            baseUrl(),
-            tokenService,
-            WebClientConfig().webClientForSoapRequests(),
-            xmlMapper(),
-            callIdGenerator,
-            "1"
+            baseUrl = baseUrl(),
+            tokenGetter = tokenService,
+            webClient = WebClientConfig().webClientForSoapRequests(),
+            xmlMapper = xmlMapper(),
+            traceAid = traceAid,
+            retryAttempts = "1"
         )
     }
 

@@ -43,7 +43,7 @@ class PensjonsavtaleService(
                 else
                     spec.uttaksperioder[0]
 
-            val startAlderAar = uttaksperiode.start.aar
+            val startAlderAar = uttaksperiode.startAlder.aar
             val someNumber = System.currentTimeMillis().toString().substring(7).toInt()
             val startAlderMaaneder = someNumber % 12 + 1
             val sluttAlderMaaneder = (someNumber + startAlderAar) % 12 + 1
@@ -57,8 +57,8 @@ class PensjonsavtaleService(
                         startAlderAar + 10,
                         listOf(
                             Utbetalingsperiode(
-                                start = Alder(startAlderAar, startAlderMaaneder),
-                                slutt = Alder(startAlderAar + 10, sluttAlderMaaneder),
+                                startAlder = Alder(startAlderAar, startAlderMaaneder),
+                                sluttAlder = Alder(startAlderAar + 10, sluttAlderMaaneder),
                                 aarligUtbetaling = someNumber,
                                 grad = uttaksperiode.grad
                             )

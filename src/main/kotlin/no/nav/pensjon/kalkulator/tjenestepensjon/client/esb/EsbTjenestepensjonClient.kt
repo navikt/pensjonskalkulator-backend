@@ -8,7 +8,7 @@ import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.config.GatewayUsage
 import no.nav.pensjon.kalkulator.tech.security.egress.token.unt.client.UsernameTokenClient
-import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.TjenestepensjonClient
@@ -35,7 +35,7 @@ class EsbTjenestepensjonClient(
     private val usernameTokenClient: UsernameTokenClient,
     @Qualifier("soap") private val webClient: WebClient,
     private val xmlMapper: XmlMapper,
-    private val callIdGenerator: CallIdGenerator,
+    private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") private val retryAttempts: String
     ) : TjenestepensjonClient {
     private val log = KotlinLogging.logger {}
@@ -54,7 +54,7 @@ class EsbTjenestepensjonClient(
 
     private fun fetchTjenestepensjonsforholdXml(pid: Pid): String {
         val uri = "$baseUrl$PATH"
-        val callId = callIdGenerator.newId()
+        val callId = traceAid.callId()
         val body = soapEnvelope(pid.value, soapBody(pid), callId)
         log.debug { "POST to URI: '$uri' with body '$body'" }
 

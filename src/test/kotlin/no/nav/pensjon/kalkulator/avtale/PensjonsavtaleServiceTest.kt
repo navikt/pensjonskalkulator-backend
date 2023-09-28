@@ -87,14 +87,14 @@ class PensjonsavtaleServiceTest {
 
         private fun uttaksperiodeSpec1() =
             UttaksperiodeSpec(
-                start = Alder(67, 1),
+                startAlder = Alder(67, 1),
                 grad = Uttaksgrad.AATTI_PROSENT,
                 aarligInntekt = 123000
             )
 
         private fun uttaksperiodeSpec2() =
             UttaksperiodeSpec(
-                start = Alder(70, 1),
+                startAlder = Alder(70, 1),
                 grad = Uttaksgrad.HUNDRE_PROSENT,
                 aarligInntekt = 45000
             )

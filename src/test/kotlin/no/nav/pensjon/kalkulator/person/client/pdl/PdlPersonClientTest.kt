@@ -5,7 +5,7 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import okhttp3.mockwebserver.MockResponse
@@ -28,12 +28,12 @@ class PdlPersonClientTest : WebClientTest() {
     private lateinit var client: PdlPersonClient
 
     @Mock
-    private lateinit var callIdGenerator: CallIdGenerator
+    private lateinit var traceAid: TraceAid
 
     @BeforeEach
     fun initialize() {
-        `when`(callIdGenerator.newId()).thenReturn("id1")
-        client = PdlPersonClient(baseUrl(), WebClientConfig().regularWebClient(), callIdGenerator, "1")
+        `when`(traceAid.callId()).thenReturn("id1")
+        client = PdlPersonClient(baseUrl(), WebClientConfig().regularWebClient(), traceAid, "1")
         arrangeSecurityContext()
     }
 

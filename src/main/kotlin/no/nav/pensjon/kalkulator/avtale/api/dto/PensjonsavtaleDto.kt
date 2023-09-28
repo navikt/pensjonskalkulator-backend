@@ -20,8 +20,8 @@ data class PensjonsavtaleV0Dto(
 )
 
 data class UtbetalingsperiodeDto(
-    val start: Alder, // maaneder = 0..11
-    val slutt: Alder?, // maaneder = 0..11
+    val startAlder: Alder, // maaneder = 0..11
+    val sluttAlder: Alder?, // maaneder = 0..11
     val aarligUtbetaling: Int,
     val grad: Int
 )

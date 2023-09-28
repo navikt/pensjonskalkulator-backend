@@ -8,9 +8,15 @@ object UttaksalderMapper {
 
     private const val MAANEDER_PER_AAR = 12
 
-    fun toV0Dto(uttaksalder: Alder) = nesteMaaned(uttaksalder)
+    fun toV0Dto(uttaksalder: Alder?): UttaksalderV0Dto? =
+        uttaksalder?.let { toAlderV0Dto(uttaksalder) }
 
-    fun toV1Dto(uttaksalder: Alder) =
+    fun toV1Dto(uttaksalder: Alder?): AlderDto? =
+        uttaksalder?.let { toAlderV1Dto(uttaksalder) }
+
+    private fun toAlderV0Dto(uttaksalder: Alder) = nesteMaaned(uttaksalder)
+
+    private fun toAlderV1Dto(uttaksalder: Alder) =
         AlderDto(uttaksalder.aar, uttaksalder.maaneder)
 
     private fun nesteMaaned(alder: Alder) =

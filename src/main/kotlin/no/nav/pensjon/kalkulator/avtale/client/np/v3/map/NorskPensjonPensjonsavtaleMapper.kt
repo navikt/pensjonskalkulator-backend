@@ -33,7 +33,7 @@ object NorskPensjonPensjonsavtaleMapper {
     // Norsk Pensjon bruker månedsverdier 1..12 (dermed '+ 1')
     private fun toUttaksperiodeEgressSpecDto(spec: UttaksperiodeSpec) =
         NorskPensjonUttaksperiodeSpecDto(
-            start = NorskPensjonAlderDto(spec.start.aar, spec.start.maaneder + 1),
+            startAlder = NorskPensjonAlderDto(spec.startAlder.aar, spec.startAlder.maaneder + 1),
             grad = spec.grad,
             aarligInntekt = spec.aarligInntekt
         )

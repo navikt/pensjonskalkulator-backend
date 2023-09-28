@@ -27,7 +27,7 @@ data class PensjonsavtaleIngressSpecV0Dto(
 )
 
 data class UttaksperiodeIngressSpecDto(
-    val start: Alder, // månedsverdi 0..11 (antall helt fylte måneder)
+    val startAlder: Alder, // månedsverdi 0..11 (antall helt fylte måneder)
     val grad: Int,
     val aarligInntekt: Int
 )

@@ -45,14 +45,14 @@ object PensjonsavtaleMapper {
 
     private fun fromUttaksperiodeSpecDto(dto: UttaksperiodeIngressSpecDto) =
         UttaksperiodeSpec(
-            start = dto.start,
+            startAlder = dto.startAlder,
             grad = Uttaksgrad.from(dto.grad),
             aarligInntekt = dto.aarligInntekt
         )
 
     private fun fromUttaksperiodeSpecV0Dto(dto: UttaksperiodeIngressSpecV0Dto) =
         UttaksperiodeSpec(
-            start = Alder(dto.startAlder, dto.startMaaned - 1), // input is 1..12, we use 0..11 => minus 1
+            startAlder = Alder(dto.startAlder, dto.startMaaned - 1), // input is 1..12, we use 0..11 => minus 1
             grad = Uttaksgrad.from(dto.grad),
             aarligInntekt = dto.aarligInntekt
         )
@@ -77,18 +77,18 @@ object PensjonsavtaleMapper {
 
     private fun toPeriodeDto(source: Utbetalingsperiode) =
         UtbetalingsperiodeDto(
-            start = source.start,
-            slutt = source.slutt,
+            startAlder = source.startAlder,
+            sluttAlder = source.sluttAlder,
             aarligUtbetaling = source.aarligUtbetalingForventet,
             grad = source.grad.prosentsats
         )
 
     private fun toPeriodeV0Dto(source: Utbetalingsperiode) =
         UtbetalingsperiodeV0Dto(
-            startAlder = source.start.aar,
-            startMaaned = source.start.maaneder + 1,
-            sluttAlder = source.slutt?.aar,
-            sluttMaaned = source.slutt?.let { it.maaneder + 1 },
+            startAlder = source.startAlder.aar,
+            startMaaned = source.startAlder.maaneder + 1,
+            sluttAlder = source.sluttAlder?.aar,
+            sluttMaaned = source.sluttAlder?.let { it.maaneder + 1 },
             aarligUtbetaling = source.aarligUtbetalingForventet,
             grad = source.grad.prosentsats
         )

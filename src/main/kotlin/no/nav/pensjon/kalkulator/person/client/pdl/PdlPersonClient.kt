@@ -11,7 +11,7 @@ import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.selftest.PingResult
 import no.nav.pensjon.kalkulator.tech.selftest.Pingable
 import no.nav.pensjon.kalkulator.tech.selftest.ServiceStatus
-import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.beans.factory.annotation.Value
@@ -30,7 +30,7 @@ import java.util.*
 class PdlPersonClient(
     @Value("\${persondata.url}") private val baseUrl: String,
     private val webClient: WebClient,
-    private val callIdGenerator: CallIdGenerator,
+    private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") private val retryAttempts: String
 ) : PersonClient, Pingable {
     private val log = KotlinLogging.logger {}
@@ -82,7 +82,7 @@ class PdlPersonClient(
         headers.setBearerAuth(EgressAccess.token(service).value)
         headers[CustomHttpHeaders.BEHANDLINGSNUMMER] = BEHANDLINGSNUMMER
         headers[CustomHttpHeaders.THEME] = THEME
-        headers[CustomHttpHeaders.CALL_ID] = callIdGenerator.newId()
+        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
     }
 
     private fun retryBackoffSpec(uri: String): RetryBackoffSpec =

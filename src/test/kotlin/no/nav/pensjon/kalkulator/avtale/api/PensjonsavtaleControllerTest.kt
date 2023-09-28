@@ -54,14 +54,14 @@ class PensjonsavtaleControllerTest {
         private val REQUEST_BODY = """{
 	"aarligInntektFoerUttak": 456000,
 	"uttaksperioder": [{
-        "start": {
+        "startAlder": {
 	  	    "aar": 67,
 		    "maaneder": 1
 	    },
 		"grad": 80,
 		"aarligInntekt": 123000
 	}, {
-       "start": {
+       "startAlder": {
 	  	    "aar": 70,
 		    "maaneder": 1
 	    },
@@ -84,11 +84,11 @@ class PensjonsavtaleControllerTest {
 		"startAlder": 67,
 		"sluttAlder": 77,
 		"utbetalingsperioder": [{
-            "start": {
+            "startAlder": {
 	   	        "aar": 68,
 	 	        "maaneder": 1
 	        },
-            "slutt": {
+            "sluttAlder": {
 	   	        "aar": 78,
 	 	        "maaneder": 11
 	        },

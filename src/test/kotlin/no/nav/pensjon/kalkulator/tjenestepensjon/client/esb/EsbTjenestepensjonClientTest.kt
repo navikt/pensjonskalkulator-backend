@@ -6,7 +6,7 @@ import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.mock.XmlMapperFactory.xmlMapper
 import no.nav.pensjon.kalkulator.tech.security.egress.token.unt.client.UsernameTokenClient
 import no.nav.pensjon.kalkulator.tech.security.egress.token.unt.client.fssgw.dto.UsernameTokenDto
-import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.junit.jupiter.api.Assertions.*
@@ -31,19 +31,20 @@ class EsbTjenestepensjonClientTest : WebClientTest() {
     private lateinit var usernameTokenClient: UsernameTokenClient
 
     @Mock
-    private lateinit var callIdGenerator: CallIdGenerator
+    private lateinit var traceAid: TraceAid
 
     @BeforeEach
     fun initialize() {
         `when`(usernameTokenClient.fetchUsernameToken()).thenReturn(UsernameTokenDto(WS_SECURITY_ELEMENT))
-        `when`(callIdGenerator.newId()).thenReturn("id1")
+        `when`(traceAid.callId()).thenReturn("id1")
+
         client = EsbTjenestepensjonClient(
-            baseUrl(),
-            usernameTokenClient,
-            WebClientConfig().webClientForSoapRequests(),
-            xmlMapper(),
-            callIdGenerator,
-            RETRY_ATTEMPTS.toString()
+            baseUrl = baseUrl(),
+            usernameTokenClient = usernameTokenClient,
+            webClient = WebClientConfig().webClientForSoapRequests(),
+            xmlMapper = xmlMapper(),
+            traceAid = traceAid,
+            retryAttempts = RETRY_ATTEMPTS.toString()
         )
     }
 

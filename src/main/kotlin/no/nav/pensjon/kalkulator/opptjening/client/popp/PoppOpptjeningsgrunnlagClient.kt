@@ -12,7 +12,7 @@ import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.selftest.PingResult
 import no.nav.pensjon.kalkulator.tech.selftest.Pingable
 import no.nav.pensjon.kalkulator.tech.selftest.ServiceStatus
-import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.beans.factory.annotation.Value
@@ -34,7 +34,7 @@ import java.util.*
 class PoppOpptjeningsgrunnlagClient(
     @Value("\${popp.url}") private val baseUrl: String,
     private val webClient: WebClient,
-    private val callIdGenerator: CallIdGenerator,
+    private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") private val retryAttempts: String
 ) : OpptjeningsgrunnlagClient, Pingable {
     private val log = KotlinLogging.logger {}
@@ -86,12 +86,12 @@ class PoppOpptjeningsgrunnlagClient(
     private fun setHeaders(headers: HttpHeaders) {
         headers.setBearerAuth(EgressAccess.token(service).value)
         headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_JSON_VALUE
-        headers[CustomHttpHeaders.CALL_ID] = callIdGenerator.newId()
+        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
     }
 
     private fun setPingHeaders(headers: HttpHeaders) {
         headers.setBearerAuth(EgressAccess.token(service).value)
-        headers[CustomHttpHeaders.CALL_ID] = callIdGenerator.newId()
+        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
     }
 
     private fun uri(pid: Pid) = "$baseUrl$OPPTJENINGSGRUNNLAG_PATH/${pid.value}"

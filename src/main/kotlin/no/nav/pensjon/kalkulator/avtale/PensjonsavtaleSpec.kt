@@ -16,7 +16,7 @@ data class PensjonsavtaleSpec(
 )
 
 data class UttaksperiodeSpec(
-    val start: Alder,
+    val startAlder: Alder,
     val grad: Uttaksgrad,
     val aarligInntekt: Int
 )

@@ -5,7 +5,7 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningsgrunnlag
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
-import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.intellij.lang.annotations.Language
@@ -24,11 +24,11 @@ class PoppOpptjeningsgrunnlagClientTest : WebClientTest() {
     private lateinit var client: PoppOpptjeningsgrunnlagClient
 
     @Mock
-    private lateinit var callIdGenerator: CallIdGenerator
+    private lateinit var traceAid: TraceAid
 
     @BeforeEach
     fun initialize() {
-        client = PoppOpptjeningsgrunnlagClient(baseUrl(), WebClientConfig().regularWebClient(), callIdGenerator, RETRY_ATTEMPTS)
+        client = PoppOpptjeningsgrunnlagClient(baseUrl(), WebClientConfig().regularWebClient(), traceAid, RETRY_ATTEMPTS)
     }
 
     @Test

@@ -7,9 +7,6 @@ import org.junit.jupiter.api.Assertions.*
 
 class UtbetalingsperiodeTest {
 
-    private val startalder = Alder(67, 0)
-    private val angittSluttalder = Alder(99, 11)
-
     @Test
     fun `erLivsvarig is true when sluttalder not defined, false otherwise`() {
         assertTrue(utbetalingsperiode1(null).erLivsvarig)
@@ -18,10 +15,26 @@ class UtbetalingsperiodeTest {
         assertFalse(utbetalingsperiode2(angittSluttalder).erLivsvarig)
     }
 
-    private fun utbetalingsperiode1(slutt: Alder?) =
-        Utbetalingsperiode(startalder, slutt, 123, 1, 999, Uttaksgrad.NULL)
+    private companion object {
+        private val startalder = Alder(67, 0)
+        private val angittSluttalder = Alder(99, 11)
 
-    private fun utbetalingsperiode2(slutt: Alder?) =
-        Utbetalingsperiode(startalder, slutt, 0, Uttaksgrad.HUNDRE_PROSENT)
+        private fun utbetalingsperiode1(sluttAlder: Alder?) =
+            Utbetalingsperiode(
+                startAlder = startalder,
+                sluttAlder = sluttAlder,
+                aarligUtbetalingForventet = 123,
+                aarligUtbetalingNedreGrense = 1,
+                aarligUtbetalingOvreGrense = 999,
+                grad = Uttaksgrad.NULL
+            )
 
+        private fun utbetalingsperiode2(sluttAlder: Alder?) =
+            Utbetalingsperiode(
+                startAlder = startalder,
+                sluttAlder = sluttAlder,
+                aarligUtbetaling = 0,
+                grad = Uttaksgrad.HUNDRE_PROSENT
+            )
+    }
 }

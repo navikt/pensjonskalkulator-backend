@@ -39,8 +39,8 @@ class PensjonsavtaleMapperTest {
 
     private fun utbetalingsperiode() =
         UtbetalingsperiodeDto(
-            start = Alder(68, 1),
-            slutt = Alder(78, 11),
+            startAlder = Alder(68, 1),
+            sluttAlder = Alder(78, 11),
             aarligUtbetaling = 123000,
             grad = 100
         )

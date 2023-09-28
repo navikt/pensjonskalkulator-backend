@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.tjenestepensjon.client.tp
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
-import no.nav.pensjon.kalkulator.tech.trace.CallIdGenerator
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.intellij.lang.annotations.Language
@@ -22,12 +22,17 @@ class TpTjenestepensjonClientTest : WebClientTest() {
     private lateinit var client: TpTjenestepensjonClient
 
     @Mock
-    private lateinit var callIdGenerator: CallIdGenerator
+    private lateinit var traceAid: TraceAid
 
     @BeforeEach
     fun initialize() {
-        client =
-            TpTjenestepensjonClient(baseUrl(), WebClientConfig().regularWebClient(), callIdGenerator, RETRY_ATTEMPTS)
+        client = TpTjenestepensjonClient(
+            baseUrl = baseUrl(),
+            webClient = WebClientConfig().regularWebClient(),
+            traceAid = traceAid,
+            retryAttempts = RETRY_ATTEMPTS
+        )
+
         arrangeSecurityContext()
     }
 
