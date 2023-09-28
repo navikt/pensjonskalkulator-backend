@@ -4,9 +4,7 @@ import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringRequestDto
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringResponseDto
-import java.time.LocalDate
-import java.time.ZoneOffset
-import java.util.*
+import no.nav.pensjon.kalkulator.tech.time.DateUtil.toDate
 
 object SimuleringMapper {
 
@@ -26,10 +24,7 @@ object SimuleringMapper {
             harEps = impersonalSpec.epsHarInntektOver2G,
             uttaksar = 1,
             sisteInntekt = personalSpec.forventetInntekt,
-            forsteUttaksdato = midnight(impersonalSpec.foersteUttaksdato),
+            forsteUttaksdato = toDate(impersonalSpec.foersteUttaksdato),
             simuleringstype = PenSimuleringstype.fromInternalValue(impersonalSpec.simuleringType).externalValue
         )
-
-    private fun midnight(date: LocalDate) =
-        Date.from(date.atTime(0, 0).toInstant(ZoneOffset.ofHours(1)))
 }

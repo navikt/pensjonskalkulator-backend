@@ -1,7 +1,8 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen.map
 
-import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
+import no.nav.pensjon.kalkulator.mock.DateFactory
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
@@ -10,14 +11,16 @@ import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.util.*
 
 class SimuleringMapperTest {
 
     @Test
-    fun `toDto maps sivilstand, simuleringstype to PEN values`() {
+    fun `toDto maps sivilstand, simuleringstype, dato to PEN values`() {
         with(SimuleringMapper.toDto(impersonalSpec(), personalSpec())) {
             assertEquals("UGIF", sivilstand)
             assertEquals("ALDER", simuleringstype)
+            assertEquals(DateFactory.date(2030, Calendar.MARCH), forsteUttaksdato)
         }
     }
 
