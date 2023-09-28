@@ -5,4 +5,5 @@ data class UttaksalderEgressSpecDto(
     val sivilstand: String,
     val harEps: Boolean,
     val sisteInntekt: Int,
+    val simuleringType: String,
 )

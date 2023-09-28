@@ -22,6 +22,7 @@ object PenUttaksalderMapper {
             sivilstand = PenSivilstand.fromInternalValue(spec.sivilstand).externalValue,
             harEps = spec.harEps,
             sisteInntekt = spec.sisteInntekt,
+            simuleringType = spec.simuleringType.toString(),
         )
 
     private fun oneBasedMaaned(zeroBasedMaaned: Int) =

@@ -7,6 +7,7 @@ import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.PersonClient
+import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.tech.metric.Metrics
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
@@ -30,6 +31,7 @@ class UttaksalderService(
             sivilstand = specDto.sivilstand ?: sivilstand(pid),
             harEps = specDto.harEps ?: false,
             sisteInntekt = specDto.sisteInntekt ?: sistePensjonsgivendeInntekt(pid),
+            simuleringType = specDto.simuleringType ?: SimuleringType.ALDERSPENSJON,
         )
 
         log.info { "Finner første mulige uttaksalder med parametre $uttaksalderSpec" }

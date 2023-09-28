@@ -4,6 +4,7 @@ import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrang
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
@@ -81,7 +82,8 @@ class PenUttaksalderClientTest : WebClientTest() {
                 pid = pid,
                 sivilstand = Sivilstand.UGIFT,
                 harEps = true,
-                sisteInntekt = 80
+                sisteInntekt = 80,
+                SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT
             )
 
         private fun okResponse() = jsonResponse(HttpStatus.OK).setBody(PEN_ALDER)
