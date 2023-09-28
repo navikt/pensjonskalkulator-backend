@@ -5,10 +5,10 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import no.nav.pensjon.kalkulator.opptjening.Inntekt
+import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.opptjening.api.dto.InntektDto
-import no.nav.pensjon.kalkulator.common.api.ControllerBase
+import no.nav.pensjon.kalkulator.opptjening.api.map.InntektMapper.toDto
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.web.bind.annotation.*
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*
 class InntektController(
     private val service: InntektService,
     private val traceAid: TraceAid
-) : ControllerBase() {
+) : ControllerBase(traceAid) {
 
     @GetMapping("inntekt")
     @Operation(
@@ -55,7 +55,5 @@ class InntektController(
 
     private companion object {
         private const val ERROR_MESSAGE = "feil ved henting av inntekt"
-
-        private fun toDto(inntekt: Inntekt) = InntektDto(inntekt.beloep.intValueExact(), inntekt.aar)
     }
 }

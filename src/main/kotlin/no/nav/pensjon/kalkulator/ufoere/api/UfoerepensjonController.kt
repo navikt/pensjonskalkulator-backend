@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*
 class UfoerepensjonController(
     private val service: UfoerepensjonService,
     private val traceAid: TraceAid
-) : ControllerBase() {
+) : ControllerBase(traceAid) {
 
     @PostMapping("ufoerepensjon")
     @Operation(

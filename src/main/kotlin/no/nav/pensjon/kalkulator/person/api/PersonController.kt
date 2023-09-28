@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*
 class PersonController(
     private val service: PersonService,
     private val traceAid: TraceAid
-) : ControllerBase() {
+) : ControllerBase(traceAid) {
     @GetMapping("person")
     @Operation(
         summary = "Hent personinformasjon",

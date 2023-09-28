@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*
 class SimuleringController(
     private val service: SimuleringService,
     private val traceAid: TraceAid
-) : ControllerBase() {
+) : ControllerBase(traceAid) {
 
     @PostMapping("v1/alderspensjon/simulering")
     @Operation(

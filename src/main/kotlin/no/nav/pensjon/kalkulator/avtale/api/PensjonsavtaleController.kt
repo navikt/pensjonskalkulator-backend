@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*
 class PensjonsavtaleController(
     private val service: PensjonsavtaleService,
     private val traceAid: TraceAid
-) : ControllerBase() {
+) : ControllerBase(traceAid) {
 
     @PostMapping("v1/pensjonsavtaler")
     @Operation(

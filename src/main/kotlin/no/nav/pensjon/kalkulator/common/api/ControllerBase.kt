@@ -1,13 +1,14 @@
 package no.nav.pensjon.kalkulator.common.api
 
 import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.intellij.lang.annotations.Language
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
 import java.lang.System.currentTimeMillis
 
-abstract class ControllerBase {
+abstract class ControllerBase(    private val traceAid: TraceAid) {
 
     protected val log = KotlinLogging.logger {}
 
@@ -38,7 +39,7 @@ abstract class ControllerBase {
 
         throw ResponseStatusException(
             HttpStatus.INTERNAL_SERVER_ERROR,
-            "${errorMessage()}: ${extractMessageRecursively(e)}",
+            "Call ID: ${traceAid.callId()} | Error: ${errorMessage()} | Details: ${extractMessageRecursively(e)}",
             e
         )
     }
@@ -51,7 +52,7 @@ abstract class ControllerBase {
     private fun <T> serviceUnavailable(e: EgressException): T? {
         throw ResponseStatusException(
             HttpStatus.SERVICE_UNAVAILABLE,
-            "${errorMessage()}: ${extractMessageRecursively(e)}",
+            "Call ID: ${traceAid.callId()} | Error: ${errorMessage()} | Details: ${extractMessageRecursively(e)}",
             e
         )
     }

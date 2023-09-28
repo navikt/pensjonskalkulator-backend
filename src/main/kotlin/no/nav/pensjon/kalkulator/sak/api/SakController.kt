@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.pensjon.kalkulator.sak.SakService
 import no.nav.pensjon.kalkulator.sak.api.dto.SakDto
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
+import no.nav.pensjon.kalkulator.sak.api.map.SakMapper.toDto
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.web.bind.annotation.*
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*
 class SakController(
     private val service: SakService,
     private val traceAid: TraceAid
-) : ControllerBase() {
+) : ControllerBase(traceAid) {
 
     @GetMapping("sak-status")
     @Operation(
@@ -54,7 +55,5 @@ class SakController(
 
     private companion object {
         private const val ERROR_MESSAGE = "Feil ved sjekking av saker"
-
-        private fun toDto(harSak: Boolean) = SakDto(harSak)
     }
 }

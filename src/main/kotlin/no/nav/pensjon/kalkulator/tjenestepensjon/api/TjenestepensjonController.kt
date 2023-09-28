@@ -6,6 +6,7 @@ import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tjenestepensjon.TjenestepensjonService
 import no.nav.pensjon.kalkulator.tjenestepensjon.api.dto.TjenestepensjonsforholdDto
+import no.nav.pensjon.kalkulator.tjenestepensjon.api.map.TjenestepensjonMapper.toDto
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 class TjenestepensjonController(
     private val service: TjenestepensjonService,
     private val traceAid: TraceAid
-) : ControllerBase() {
+) : ControllerBase(traceAid) {
 
     @GetMapping("tpo-medlemskap")
     @Operation(
@@ -38,7 +39,5 @@ class TjenestepensjonController(
 
     private companion object {
         private const val ERROR_MESSAGE = "feil ved sjekking av tjenestepensjonsforhold-status"
-
-        private fun toDto(harForhold: Boolean) = TjenestepensjonsforholdDto(harForhold)
     }
 }

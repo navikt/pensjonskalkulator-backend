@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 class FeatureToggleController(
     val service: FeatureToggleService,
     private val traceAid: TraceAid
-) : ControllerBase() {
+) : ControllerBase(traceAid) {
 
     @GetMapping("feature/{name}")
     @Operation(

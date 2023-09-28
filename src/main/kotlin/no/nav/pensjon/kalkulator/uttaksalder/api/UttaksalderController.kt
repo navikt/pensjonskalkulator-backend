@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController
 class UttaksalderController(
     private val service: UttaksalderService,
     private val traceAid: TraceAid
-) : ControllerBase() {
+) : ControllerBase(traceAid) {
 
     @PostMapping("v1/tidligste-uttaksalder")
     @Operation(
