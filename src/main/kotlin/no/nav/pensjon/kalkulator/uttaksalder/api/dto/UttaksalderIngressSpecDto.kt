@@ -7,7 +7,7 @@ data class UttaksalderIngressSpecDto(
     val sivilstand: Sivilstand?,
     val harEps: Boolean?,
     val sisteInntekt: Int?,
-    val simuleringType: SimuleringType?,
+    val simuleringstype: SimuleringType?,
 ) {
     companion object {
         fun empty() = UttaksalderIngressSpecDto(null, null, null, null)
