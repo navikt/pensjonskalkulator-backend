@@ -11,9 +11,7 @@ import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.AlderDto
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
-import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderV0Dto
-import no.nav.pensjon.kalkulator.uttaksalder.api.dto.map.UttaksalderMapper.toV0Dto
-import no.nav.pensjon.kalkulator.uttaksalder.api.dto.map.UttaksalderMapper.toV1Dto
+import no.nav.pensjon.kalkulator.uttaksalder.api.dto.map.UttaksalderMapper.toDto
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -49,7 +47,7 @@ class UttaksalderController(
         log.info { "Request for uttaksalder-søk V1: $spec" }
 
         return try {
-            toV1Dto(
+            toDto(
                 timed(
                     service::finnTidligsteUttaksalder,
                     spec ?: UttaksalderIngressSpecDto.empty(),
@@ -59,31 +57,6 @@ class UttaksalderController(
                 .also { log.info { "Uttaksalder-søk respons V1: $it" } }
         } catch (e: EgressException) {
             handleError(e, "V1")
-        } finally {
-            traceAid.finalize()
-        }
-    }
-
-    @PostMapping("tidligste-uttaksalder")
-    @Operation(
-        summary = "Første mulige uttaksalder – FORELDET; bruk v1/tidligste-uttaksalder",
-        description = "Finn første mulige uttaksalder for innlogget bruker",
-    )
-    fun finnTidligsteUttaksalderV0(@RequestBody spec: UttaksalderIngressSpecDto?): UttaksalderV0Dto? {
-        traceAid.initialize()
-        log.info { "Request for uttaksalder-søk V0: $spec" }
-
-        return try {
-            toV0Dto(
-                timed(
-                    service::finnTidligsteUttaksalder,
-                    spec ?: UttaksalderIngressSpecDto.empty(),
-                    "finnTidligsteUttaksalder"
-                )
-            )
-                .also { log.info { "Uttaksalder-søk respons V0: $it" } }
-        } catch (e: EgressException) {
-            handleError(e, "V0")
         } finally {
             traceAid.finalize()
         }

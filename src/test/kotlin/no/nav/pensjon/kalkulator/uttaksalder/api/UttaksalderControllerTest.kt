@@ -1,8 +1,8 @@
 package no.nav.pensjon.kalkulator.uttaksalder.api
 
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
@@ -10,7 +10,6 @@ import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -37,22 +36,9 @@ internal class UttaksalderControllerTest {
     private lateinit var traceAid: TraceAid
 
     @Test
-    fun `finnTidligsteUttaksalder version 0`() {
-        `when`(service.finnTidligsteUttaksalder(anyObject())).thenReturn(uttaksalder)
-
-        mvc.perform(
-            post("/api/tidligste-uttaksalder")
-                .with(csrf())
-                .content(requestBody())
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(status().isOk)
-            .andExpect(content().json(responseBodyV0()))
-    }
-
-    @Test
     fun `finnTidligsteUttaksalder version 1`() {
-        val spec = UttaksalderIngressSpecDto(Sivilstand.UGIFT, true, 100_000, SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
+        val spec =
+            UttaksalderIngressSpecDto(Sivilstand.UGIFT, true, 100_000, SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
         `when`(service.finnTidligsteUttaksalder(spec)).thenReturn(uttaksalder)
 
         mvc.perform(
@@ -81,24 +67,12 @@ internal class UttaksalderControllerTest {
         """.trimIndent()
 
     @Language("json")
-    private fun responseBodyV0(aar: Int = uttaksalder.aar, maaned: Int = uttaksalder.maaneder): String = """
-            {
-                "aar": $aar,
-                "maaned": ${maaned + 1}
-            }
-        """.trimIndent()
-
-    @Language("json")
     private fun responseBodyV1(aar: Int = uttaksalder.aar, maaned: Int = uttaksalder.maaneder): String = """
             {
                 "aar": $aar,
                 "maaneder": $maaned
             }
         """.trimIndent()
-
-    private fun <T> anyObject(): T {
-        return Mockito.any()
-    }
 
     private companion object {
         private val uttaksalder = Alder(67, 10)
