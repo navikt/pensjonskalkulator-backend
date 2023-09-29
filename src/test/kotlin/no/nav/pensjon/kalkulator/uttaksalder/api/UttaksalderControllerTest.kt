@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.uttaksalder.api
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
@@ -51,7 +52,7 @@ internal class UttaksalderControllerTest {
 
     @Test
     fun `finnTidligsteUttaksalder version 1`() {
-        val spec = UttaksalderIngressSpecDto(Sivilstand.UGIFT, true, 100_000)
+        val spec = UttaksalderIngressSpecDto(Sivilstand.UGIFT, true, 100_000, SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
         `when`(service.finnTidligsteUttaksalder(spec)).thenReturn(uttaksalder)
 
         mvc.perform(
@@ -69,11 +70,13 @@ internal class UttaksalderControllerTest {
         sivilstand: Sivilstand = Sivilstand.UGIFT,
         harEps: Boolean = true,
         sisteInntekt: Int = 100_000,
+        simuleringType: SimuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT
     ): String = """
             {
               "sivilstand": "$sivilstand",
               "harEps": $harEps,
-              "sisteInntekt": $sisteInntekt
+              "sisteInntekt": $sisteInntekt,
+              "simuleringType": "${simuleringType.name}"
             }
         """.trimIndent()
 

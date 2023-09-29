@@ -9,6 +9,7 @@ import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
 import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.PersonClient
+import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
 import no.nav.pensjon.kalkulator.uttaksalder.client.UttaksalderClient
@@ -48,12 +49,12 @@ internal class UttaksalderServiceTest {
 
     @Test
     fun `finnTidligsteUttaksalder uses properties from spec`() {
-        val spec = UttaksalderIngressSpecDto(Sivilstand.GIFT, true, 100_000)
+        val spec = UttaksalderIngressSpecDto(Sivilstand.GIFT, true, 100_000, SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
         val uttaksalder = service.finnTidligsteUttaksalder(spec)
 
         assertNotNull(uttaksalder)
         verify(uttaksalderClient, times(1)).finnTidligsteUttaksalder(
-            UttaksalderSpec(pid, Sivilstand.GIFT, true, 100_000)
+            UttaksalderSpec(pid, Sivilstand.GIFT, true, 100_000, SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
         )
         verify(personClient, never()).fetchPerson(anyObject())
         verify(opptjeningsgrunnlagClient, never()).fetchOpptjeningsgrunnlag(anyObject())
@@ -65,12 +66,12 @@ internal class UttaksalderServiceTest {
         `when`(opptjeningsgrunnlagClient.fetchOpptjeningsgrunnlag(anyObject())).thenReturn(opptjeningsgrunnlag)
         `when`(personClient.fetchPerson(pid)).thenReturn(person)
 
-        val spec = UttaksalderIngressSpecDto(null, null, null)
+        val spec = UttaksalderIngressSpecDto(null, null, null, SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
         val uttaksalder = service.finnTidligsteUttaksalder(spec)
 
         assertNotNull(uttaksalder)
         verify(uttaksalderClient, times(1)).finnTidligsteUttaksalder(
-            UttaksalderSpec(pid, person.sivilstand, false, inntekt.beloep.toInt())
+            UttaksalderSpec(pid, person.sivilstand, false, inntekt.beloep.toInt(), SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
         )
         verify(personClient, times(1)).fetchPerson(pid)
         verify(opptjeningsgrunnlagClient, times(1)).fetchOpptjeningsgrunnlag(pid)

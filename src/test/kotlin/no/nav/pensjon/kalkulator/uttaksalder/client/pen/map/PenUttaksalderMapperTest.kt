@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.uttaksalder.client.pen.map
 
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderDto
 import org.junit.jupiter.api.Test
@@ -12,7 +13,7 @@ class PenUttaksalderMapperTest {
 
     @Test
     fun `toDto maps sivilstand to PEN's value`() {
-        val spec = UttaksalderSpec(pid, Sivilstand.UGIFT, false, 1)
+        val spec = UttaksalderSpec(pid, Sivilstand.UGIFT, false, 1, SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
         assertEquals("UGIF", PenUttaksalderMapper.toDto(spec).sivilstand)
     }
 
