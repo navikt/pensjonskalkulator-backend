@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.uttaksalder.client.pen.map
 
 import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenSimuleringstype
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderEgressSpecDto
 import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderDto
@@ -22,7 +23,7 @@ object PenUttaksalderMapper {
             sivilstand = PenSivilstand.fromInternalValue(spec.sivilstand).externalValue,
             harEps = spec.harEps,
             sisteInntekt = spec.sisteInntekt,
-            simuleringType = spec.simuleringType.toString(),
+            simuleringType = PenSimuleringstype.fromInternalValue(spec.simuleringType).externalValue,
         )
 
     private fun oneBasedMaaned(zeroBasedMaaned: Int) =
