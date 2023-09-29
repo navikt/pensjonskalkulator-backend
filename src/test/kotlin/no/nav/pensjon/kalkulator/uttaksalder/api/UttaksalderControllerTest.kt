@@ -76,7 +76,7 @@ internal class UttaksalderControllerTest {
               "sivilstand": "$sivilstand",
               "harEps": $harEps,
               "sisteInntekt": $sisteInntekt,
-              "simuleringType": "${simuleringType.name}"
+              "simuleringstype": "${simuleringType.name}"
             }
         """.trimIndent()
 

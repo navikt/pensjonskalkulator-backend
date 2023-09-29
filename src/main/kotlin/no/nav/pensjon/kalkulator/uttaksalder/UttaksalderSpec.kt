@@ -9,5 +9,5 @@ data class UttaksalderSpec(
     val sivilstand: Sivilstand,
     val harEps: Boolean,
     val sisteInntekt: Int,
-    val simuleringType: SimuleringType,
+    val simuleringstype: SimuleringType,
 )
