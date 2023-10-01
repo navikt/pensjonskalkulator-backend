@@ -2,7 +2,6 @@ package no.nav.pensjon.kalkulator.avtale.client.np.v3
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
-import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.Pensjonsavtaler
 import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
@@ -11,13 +10,10 @@ import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.NorskPensjonPensjonsavt
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.NorskPensjonUttaksperiodeSpecDto
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.map.NorskPensjonPensjonsavtaleMapper
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.map.NorskPensjonPensjonsavtaleMapper.fromDto
+import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.tech.metric.MetricResult.BAD_CLIENT
-import no.nav.pensjon.kalkulator.tech.metric.MetricResult.BAD_OTHER
-import no.nav.pensjon.kalkulator.tech.metric.MetricResult.BAD_SERVER
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult.BAD_XML
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult.OK
-import no.nav.pensjon.kalkulator.tech.metric.Metrics.countEvent
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.config.GatewayUsage
@@ -31,11 +27,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import reactor.util.retry.Retry
-import reactor.util.retry.RetryBackoffSpec
-import java.time.Duration
 import java.util.*
 
 @Component
@@ -45,9 +37,10 @@ class NorskPensjonPensjonsavtaleClient(
     @Qualifier("soap") private val webClient: WebClient,
     private val xmlMapper: XmlMapper,
     private val traceAid: TraceAid,
-    @Value("\${web-client.retry-attempts}") private val retryAttempts: String
-) : PensjonsavtaleClient {
-    private val log = KotlinLogging.logger {}
+    @Value("\${web-client.retry-attempts}") retryAttempts: String
+) : ExternalServiceClient(retryAttempts), PensjonsavtaleClient {
+
+    override fun service() = service
 
     override fun fetchAvtaler(spec: PensjonsavtaleSpec, pid: Pid): Pensjonsavtaler {
         val responseXml = fetchAvtalerXml(NorskPensjonPensjonsavtaleMapper.toDto(spec, pid))
@@ -106,32 +99,7 @@ class NorskPensjonPensjonsavtaleClient(
         headers[CustomHttpHeaders.CALL_ID] = callId
     }
 
-    private fun retryBackoffSpec(uri: String): RetryBackoffSpec =
-        Retry.backoff(retryAttempts.toLong(), Duration.ofSeconds(1))
-            .filter { it is EgressException && !it.isClientError }
-            .onRetryExhaustedThrow { backoff, signal -> handleFailure(backoff, signal, uri) }
-
-    private fun handleFailure(backoff: RetryBackoffSpec, retrySignal: Retry.RetrySignal, uri: String): Throwable {
-        log.info { "Retried calling $uri ${backoff.maxAttempts} times" }
-
-        return when (val failure = retrySignal.failure()) {
-            is WebClientRequestException -> EgressException(
-                isClientError = true,
-                message = "Failed calling ${failure.uri}",
-                cause = failure
-            ).also { countCalls(BAD_CLIENT) }
-
-            is EgressException -> EgressException(
-                isClientError = failure.isClientError,
-                message = toString(failure, uri),
-                cause = failure
-            ).also { countCalls(metricResult(failure)) }
-
-            else -> failure.also { countCalls(BAD_OTHER) }
-        }
-    }
-
-    private fun toString(e: EgressException, uri: String) =
+    override fun toString(e: EgressException, uri: String) =
         xmlMapper.readValue(
             e.message,
             EnvelopeDto::class.java
@@ -183,11 +151,5 @@ class NorskPensjonPensjonsavtaleClient(
         }
 
         private fun ingenAvtaler() = Pensjonsavtaler(emptyList(), emptyList())
-
-        private fun countCalls(result: String) {
-            countEvent("norsk-pensjon-kall", result)
-        }
-
-        private fun metricResult(failure: EgressException) = if (failure.isClientError) BAD_CLIENT else BAD_SERVER
     }
 }

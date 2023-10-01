@@ -16,9 +16,14 @@ import java.util.*
 abstract class CacheAwareTokenClient(
     webClient: WebClient,
     oauth2ConfigGetter: OAuth2ConfigurationGetter,
-    expirationChecker: ExpirationChecker
-) : OAuth2TokenClient(webClient, expirationChecker, oauth2ConfigGetter) {
-
+    expirationChecker: ExpirationChecker,
+    retryAttempts: String
+) : OAuth2TokenClient(
+    webClient,
+    expirationChecker,
+    oauth2ConfigGetter,
+    retryAttempts
+) {
     private var accessTokensByUserByScope: MutableMap<String, MutableMap<String, TokenData>> = HashMap()
     private var cleanupNeed = 0
 

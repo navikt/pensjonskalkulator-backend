@@ -10,7 +10,7 @@ import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderSpec
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -50,7 +50,23 @@ class PenUttaksalderClientTest : WebClientTest() {
     }
 
     @Test
-    fun `finnTidligsteUttaksalder throws EgressException when response is 4xx`() {
+    fun `finnTidligsteUttaksalder throws EgressException when response is non-Conflict 4xx`() {
+        arrange(other4xxResponse())
+
+        val exception = assertThrows<EgressException> { client.finnTidligsteUttaksalder(spec) }
+
+        assertEquals(
+            """{
+    "feilmelding": "Søk etter første uttaksdato feilet - antall måneder: 30 | Cause: PERSONOPPLYSNINGER_KontrollerPersonDetaljKonsistensRS.RolleFomDatoErNull SOKER",
+    "merknader": []
+}""", exception.message
+        )
+        assertTrue(exception.isClientError)
+        assertFalse(exception.isConflict)
+    }
+
+    @Test
+    fun `finnTidligsteUttaksalder throws EgressException when response is 409 Conflict`() {
         arrange(conflictResponse())
 
         val exception = assertThrows<EgressException> { client.finnTidligsteUttaksalder(spec) }
@@ -61,6 +77,8 @@ class PenUttaksalderClientTest : WebClientTest() {
     "merknader": []
 }""", exception.message
         )
+        assertTrue(exception.isClientError)
+        assertTrue(exception.isConflict)
     }
 
     private companion object {
@@ -89,5 +107,7 @@ class PenUttaksalderClientTest : WebClientTest() {
         private fun okResponse() = jsonResponse(HttpStatus.OK).setBody(PEN_ALDER)
 
         private fun conflictResponse() = jsonResponse(HttpStatus.CONFLICT).setBody(PEN_ERROR)
+
+        private fun other4xxResponse() = jsonResponse(HttpStatus.GONE).setBody(PEN_ERROR)
     }
 }

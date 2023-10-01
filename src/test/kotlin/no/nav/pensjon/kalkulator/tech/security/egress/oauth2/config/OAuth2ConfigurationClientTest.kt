@@ -1,13 +1,13 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.oauth2.config
 
 import no.nav.pensjon.kalkulator.mock.WebClientTest
+import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import okhttp3.mockwebserver.MockResponse
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.spy
 import org.springframework.http.HttpStatus
-import org.springframework.web.reactive.function.client.WebClient
 import java.util.function.Supplier
 
 class OAuth2ConfigurationClientTest : WebClientTest() {
@@ -16,8 +16,8 @@ class OAuth2ConfigurationClientTest : WebClientTest() {
 
     @BeforeEach
     fun initialize() {
-        val webClient = spy(WebClient.create())
-        configGetter = OAuth2ConfigurationClient(webClient, baseUrl())
+        val webClient = spy(WebClientConfig().regularWebClient())
+        configGetter = OAuth2ConfigurationClient(baseUrl(), webClient, "1")
     }
 
     @Test

@@ -1,11 +1,12 @@
 package no.nav.pensjon.kalkulator.simulering.api
 
-import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import org.springframework.test.web.servlet.MockMvc
@@ -62,6 +64,21 @@ class SimuleringControllerTest {
         )
             .andExpect(status().isOk())
             .andExpect(content().json(responseBody(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)))
+    }
+
+    @Test
+    fun `simulering responds 'vilkaar ikke oppfylt' when Conflict`() {
+        val spec = impersonalSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
+        `when`(service.simulerAlderspensjon(spec)).thenThrow(EgressException("", statusCode = HttpStatus.CONFLICT))
+
+        mvc.perform(
+            post(URL)
+                .with(csrf())
+                .content(requestBody(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT))
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk())
+            .andExpect(content().json(SimuleringController.VILKAAR_IKKE_OPPFYLT_EXAMPLE))
     }
 
     private companion object {

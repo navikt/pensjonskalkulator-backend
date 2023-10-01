@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.token.unt.client.fssgw
 
-import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.token.unt.client.UsernameTokenClient
@@ -8,6 +8,7 @@ import no.nav.pensjon.kalkulator.tech.security.egress.token.unt.client.fssgw.dto
 import no.nav.pensjon.kalkulator.tech.selftest.PingResult
 import no.nav.pensjon.kalkulator.tech.selftest.Pingable
 import no.nav.pensjon.kalkulator.tech.selftest.ServiceStatus
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.beans.factory.annotation.Value
@@ -23,9 +24,11 @@ import java.util.*
 @Component
 class FssGatewayUsernameTokenClient(
     @Value("\${unt.url}") private val baseUrl: String,
-    private val webClient: WebClient
-) : UsernameTokenClient, Pingable {
-    private val log = KotlinLogging.logger {}
+    private val webClient: WebClient,
+    private val traceAid: TraceAid,
+    @Value("\${web-client.retry-attempts}") retryAttempts: String
+) : ExternalServiceClient(retryAttempts), UsernameTokenClient, Pingable {
+    override fun service() = service
 
     override fun fetchUsernameToken(): UsernameTokenDto {
         val uri = "$baseUrl$TOKEN_PATH"
@@ -69,21 +72,21 @@ class FssGatewayUsernameTokenClient(
         }
     }
 
+    private fun setHeaders(headers: HttpHeaders) {
+        headers.setBearerAuth(EgressAccess.token(service).value)
+        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
+    }
+
+    private fun setPingHeaders(headers: HttpHeaders) {
+        headers.setBearerAuth(EgressAccess.token(service).value)
+        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
+    }
+
+    override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
+
     companion object {
         private const val TOKEN_PATH = "/ws-support/unt"
         private const val PING_PATH = "/ping" //TODO
         private val service = EgressService.USERNAME_TOKEN
-
-        private fun setHeaders(headers: HttpHeaders) {
-            headers.setBearerAuth(EgressAccess.token(service).value)
-            headers[CustomHttpHeaders.CALL_ID] = callId()
-        }
-
-        private fun setPingHeaders(headers: HttpHeaders) {
-            headers.setBearerAuth(EgressAccess.token(service).value)
-            headers[CustomHttpHeaders.CALL_ID] = callId()
-        }
-
-        private fun callId() = UUID.randomUUID().toString()
     }
 }

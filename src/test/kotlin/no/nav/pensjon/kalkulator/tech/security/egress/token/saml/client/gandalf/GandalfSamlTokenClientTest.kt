@@ -2,19 +2,32 @@ package no.nav.pensjon.kalkulator.tech.security.egress.token.saml.client.gandalf
 
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.WebClientTest
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.web.reactive.function.client.WebClient
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mock
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
+@ExtendWith(SpringExtension::class)
 class GandalfSamlTokenClientTest : WebClientTest() {
 
     private lateinit var client: GandalfSamlTokenClient
 
+    @Mock
+    private lateinit var traceAid: TraceAid
+
     @BeforeEach
     fun initialize() {
-        client = GandalfSamlTokenClient(baseUrl(), WebClient.create())
+        client = GandalfSamlTokenClient(
+            baseUrl = baseUrl(),
+            webClient = WebClientConfig().regularWebClient(),
+            traceAid = traceAid,
+            retryAttempts = "1"
+        )
     }
 
     @Test

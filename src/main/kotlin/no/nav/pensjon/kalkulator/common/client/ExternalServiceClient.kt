@@ -1,0 +1,55 @@
+package no.nav.pensjon.kalkulator.common.client
+
+import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.tech.metric.MetricResult.BAD_CLIENT
+import no.nav.pensjon.kalkulator.tech.metric.MetricResult.BAD_SERVER
+import no.nav.pensjon.kalkulator.tech.metric.Metrics
+import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
+import no.nav.pensjon.kalkulator.tech.web.EgressException
+import org.springframework.http.HttpStatus
+import org.springframework.web.reactive.function.client.WebClientRequestException
+import reactor.util.retry.Retry
+import reactor.util.retry.RetryBackoffSpec
+import java.time.Duration
+
+abstract class ExternalServiceClient(
+    private val retryAttempts: String
+) {
+
+    abstract fun toString(e: EgressException, uri: String): String
+
+    abstract fun service(): EgressService
+
+    protected val log = KotlinLogging.logger {}
+
+    protected fun retryBackoffSpec(uri: String): RetryBackoffSpec =
+        Retry.backoff(retryAttempts.toLong(), Duration.ofSeconds(1))
+            .filter { it is EgressException && !it.isClientError }
+            .onRetryExhaustedThrow { backoff, signal -> handleFailure(backoff, signal, uri) }
+
+    private fun handleFailure(backoff: RetryBackoffSpec, retrySignal: Retry.RetrySignal, uri: String): Throwable {
+        log.info { "Retried calling $uri ${backoff.maxAttempts} times" }
+
+        return when (val failure = retrySignal.failure()) {
+            is WebClientRequestException -> EgressException(
+                message = "Failed calling ${failure.uri}",
+                cause = failure,
+                statusCode = HttpStatus.BAD_REQUEST
+            ).also { countCalls(BAD_CLIENT) }
+
+            is EgressException -> EgressException(
+                message = toString(failure, uri),
+                cause = failure,
+                statusCode = failure.statusCode
+            ).also { countCalls(metricResult(failure)) }
+
+            else -> failure
+        }
+    }
+
+    protected fun countCalls(result: String) {
+        Metrics.countEgressCall("${service().description}-kall", result)
+    }
+
+    private fun metricResult(failure: EgressException) = if (failure.isClientError) BAD_CLIENT else BAD_SERVER
+}

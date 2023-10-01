@@ -45,8 +45,16 @@ class UttaksalderService(
         return InntektUtil.sistePensjonsgivendeInntekt(grunnlag).beloep.intValueExact()
     }
 
-    private fun updateMetric(alder: Alder?) {
-        val result = alder?.let { if (it.aar == 62 && it.maaneder == 1) "621" else it.aar.toString() } ?: "null"
-        Metrics.countEvent("uttaksalder", result)
+    private companion object {
+        private val teoretiskLavesteUttaksalder = Alder(62, 0)
+
+        private fun updateMetric(alder: Alder?) {
+            val maaneder = alder?.let {
+                if (teoretiskLavesteUttaksalder == it) it.maaneder.toString() else "x"
+            }
+
+            val result = maaneder?.let { "${alder.aar}/$maaneder" } ?: "null"
+            Metrics.countEvent("uttaksalder", result)
+        }
     }
 }

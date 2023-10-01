@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.tjenestepensjon.client.tp
 
-import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
@@ -14,13 +14,8 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.util.DefaultUriBuilderFactory
-import reactor.util.retry.Retry
-import reactor.util.retry.RetryBackoffSpec
-import java.net.URI
-import java.time.Duration
 import java.time.LocalDate
 
 /**
@@ -31,9 +26,10 @@ class TpTjenestepensjonClient(
     @Value("\${tjenestepensjon.url}") private val baseUrl: String,
     private val webClient: WebClient,
     private val traceAid: TraceAid,
-    @Value("\${web-client.retry-attempts}") private val retryAttempts: String
-) : TjenestepensjonClient {
-    private val log = KotlinLogging.logger {}
+    @Value("\${web-client.retry-attempts}") retryAttempts: String
+) : ExternalServiceClient(retryAttempts), TjenestepensjonClient {
+
+    override fun service() = service
 
     override fun harTjenestepensjonsforhold(pid: Pid, dato: LocalDate): Boolean {
         val uri = uri(dato)
@@ -46,7 +42,7 @@ class TpTjenestepensjonClient(
                 .headers { setHeaders(it, pid) }
                 .retrieve()
                 .bodyToMono(HarTjenestepensjonDto::class.java)
-                .retryWhen(retryBackoffSpec(uri))
+                .retryWhen(retryBackoffSpec(uri.toString()))
                 .block()
                 ?: emptyDto()
 
@@ -55,6 +51,8 @@ class TpTjenestepensjonClient(
             throw EgressException(e.responseBodyAsString, e)
         }
     }
+
+    override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
 
     private fun uri(date: LocalDate) =
         DefaultUriBuilderFactory(baseUrl)
@@ -71,21 +69,6 @@ class TpTjenestepensjonClient(
 
         // https://github.com/navikt/tp/blob/main/tp-api/src/main/kotlin/no/nav/samhandling/tp/provider/Headers.kt
         headers[CustomHttpHeaders.PID] = pid.value
-    }
-
-    private fun retryBackoffSpec(uri: URI): RetryBackoffSpec =
-        Retry.backoff(retryAttempts.toLong(), Duration.ofSeconds(1))
-            .filter { it is EgressException && !it.isClientError }
-            .onRetryExhaustedThrow { backoff, signal -> handleFailure(backoff, signal, uri.toString()) }
-
-    private fun handleFailure(backoff: RetryBackoffSpec, retrySignal: Retry.RetrySignal, uri: String): Throwable {
-        log.info { "Retried calling $uri ${backoff.maxAttempts} times" }
-
-        return when (val failure = retrySignal.failure()) {
-            is WebClientRequestException -> EgressException(true, "Failed calling ${failure.uri}", failure)
-            is EgressException -> EgressException(failure.isClientError, "Failed calling $uri", failure)
-            else -> failure
-        }
     }
 
     companion object {

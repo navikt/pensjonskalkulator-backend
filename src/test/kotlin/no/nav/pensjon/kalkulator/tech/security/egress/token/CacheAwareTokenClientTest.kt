@@ -79,7 +79,7 @@ class CacheAwareTokenClientTest : WebClientTest() {
         webClient: WebClient,
         oauth2ConfigGetter: OAuth2ConfigurationGetter,
         expirationChecker: ExpirationChecker
-    ) : CacheAwareTokenClient(webClient, oauth2ConfigGetter, expirationChecker) {
+    ) : CacheAwareTokenClient(webClient, oauth2ConfigGetter, expirationChecker, "1") {
         private var cleanupTrigger = 1000
 
         override fun getCleanupTrigger(): Int {

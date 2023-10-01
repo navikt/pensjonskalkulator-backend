@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.common.client.pen
 
-import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
@@ -14,20 +14,16 @@ import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Mono
-import reactor.util.retry.Retry
-import reactor.util.retry.RetryBackoffSpec
-import java.time.Duration
 
 abstract class PenClient(
     private val baseUrl: String,
     private val webClient: WebClient,
     private val traceAid: TraceAid,
-    private val retryAttempts: String
-) : Pingable {
-    private val log = KotlinLogging.logger {}
+    retryAttempts: String
+) : ExternalServiceClient(retryAttempts), Pingable {
+    override fun service() = service
 
     protected fun <T> doGet(
         elementTypeRef: ParameterizedTypeReference<T>,
@@ -97,6 +93,8 @@ abstract class PenClient(
         }
     }
 
+    override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
+
     private fun setHeaders(headers: HttpHeaders, pid: Pid? = null) {
         headers.contentType = MediaType.APPLICATION_JSON
         headers.accept = listOf(MediaType.APPLICATION_JSON)
@@ -108,21 +106,6 @@ abstract class PenClient(
     private fun setPingHeaders(headers: HttpHeaders) {
         headers.setBearerAuth(EgressAccess.token(service).value)
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
-    }
-
-    private fun retryBackoffSpec(uri: String): RetryBackoffSpec =
-        Retry.backoff(retryAttempts.toLong(), Duration.ofSeconds(1))
-            .filter { it is EgressException && !it.isClientError }
-            .onRetryExhaustedThrow { backoff, signal -> handleFailure(backoff, signal, uri) }
-
-    private fun handleFailure(backoff: RetryBackoffSpec, retrySignal: Retry.RetrySignal, uri: String): Throwable {
-        log.info { "Retried calling $uri ${backoff.maxAttempts} times" }
-
-        return when (val failure = retrySignal.failure()) {
-            is WebClientRequestException -> EgressException(true, "Failed calling ${failure.uri}", failure)
-            is EgressException -> EgressException(failure.isClientError, "Failed calling $uri", failure)
-            else -> failure
-        }
     }
 
     companion object {

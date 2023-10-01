@@ -1,11 +1,13 @@
 package no.nav.pensjon.kalkulator.tech.web
 
-class EgressException(
-    val isClientError: Boolean,
-    message: String,
-    cause: Throwable?
-) : RuntimeException(message, cause) {
-    constructor(message: String, cause: Throwable?) : this(false, message, cause)
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 
-    constructor(isClientError: Boolean, message: String) : this(isClientError, message, null)
+class EgressException(
+    message: String,
+    cause: Throwable? = null,
+    val statusCode: HttpStatusCode? = null
+) : RuntimeException(message, cause) {
+    val isClientError: Boolean = statusCode?.is4xxClientError ?: false
+    val isConflict: Boolean = statusCode == HttpStatus.CONFLICT
 }

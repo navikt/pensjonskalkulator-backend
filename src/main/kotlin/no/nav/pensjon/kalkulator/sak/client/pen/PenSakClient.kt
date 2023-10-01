@@ -15,10 +15,10 @@ import java.util.*
 
 @Component
 class PenSakClient(
-    @Value("\${pen.url}") private val baseUrl: String,
+    @Value("\${pen.url}") baseUrl: String,
     webClient: WebClient,
     traceAid: TraceAid,
-    @Value("\${web-client.retry-attempts}") private val retryAttempts: String
+    @Value("\${web-client.retry-attempts}") retryAttempts: String
 ) : PenClient(baseUrl, webClient, traceAid, retryAttempts), SakClient {
     override fun fetchSaker(pid: Pid): List<Sak> =
         doGet(

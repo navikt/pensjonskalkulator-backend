@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.opptjening.client.popp
 
-import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningsgrunnlag
 import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.opptjening.client.popp.dto.OpptjeningsgrunnlagDto
@@ -20,11 +20,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import reactor.util.retry.Retry
-import reactor.util.retry.RetryBackoffSpec
-import java.time.Duration
 import java.util.*
 
 /**
@@ -35,9 +31,10 @@ class PoppOpptjeningsgrunnlagClient(
     @Value("\${popp.url}") private val baseUrl: String,
     private val webClient: WebClient,
     private val traceAid: TraceAid,
-    @Value("\${web-client.retry-attempts}") private val retryAttempts: String
-) : OpptjeningsgrunnlagClient, Pingable {
-    private val log = KotlinLogging.logger {}
+    @Value("\${web-client.retry-attempts}") retryAttempts: String
+) : ExternalServiceClient(retryAttempts), OpptjeningsgrunnlagClient, Pingable {
+
+    override fun service() = service
 
     /**
      * Calls PROPOPP007
@@ -83,6 +80,8 @@ class PoppOpptjeningsgrunnlagClient(
         }
     }
 
+    override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
+
     private fun setHeaders(headers: HttpHeaders) {
         headers.setBearerAuth(EgressAccess.token(service).value)
         headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_JSON_VALUE
@@ -97,21 +96,6 @@ class PoppOpptjeningsgrunnlagClient(
     private fun uri(pid: Pid) = "$baseUrl$OPPTJENINGSGRUNNLAG_PATH/${pid.value}"
 
     private fun displayableUri(pid: Pid) = "$baseUrl$OPPTJENINGSGRUNNLAG_PATH/${pid.displayValue}"
-
-    private fun retryBackoffSpec(uri: String): RetryBackoffSpec =
-        Retry.backoff(retryAttempts.toLong(), Duration.ofSeconds(1))
-            .filter { it is EgressException && !it.isClientError }
-            .onRetryExhaustedThrow { backoff, signal -> handleFailure(backoff, signal, uri) }
-
-    private fun handleFailure(backoff: RetryBackoffSpec, retrySignal: Retry.RetrySignal, uri: String): Throwable {
-        log.info { "Retried calling $uri ${backoff.maxAttempts} times" }
-
-        return when (val failure = retrySignal.failure()) {
-            is WebClientRequestException -> EgressException(true, "Failed calling ${failure.uri}", failure)
-            is EgressException -> EgressException(failure.isClientError, "Failed calling $uri", failure)
-            else -> failure
-        }
-    }
 
     companion object {
         private const val OPPTJENINGSGRUNNLAG_PATH = "/popp/api/opptjeningsgrunnlag"

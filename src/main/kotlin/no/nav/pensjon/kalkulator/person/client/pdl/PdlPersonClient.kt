@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.person.client.pdl
 
-import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.client.PersonClient
@@ -19,11 +19,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import reactor.util.retry.Retry
-import reactor.util.retry.RetryBackoffSpec
-import java.time.Duration
 import java.util.*
 
 @Component
@@ -31,9 +27,10 @@ class PdlPersonClient(
     @Value("\${persondata.url}") private val baseUrl: String,
     private val webClient: WebClient,
     private val traceAid: TraceAid,
-    @Value("\${web-client.retry-attempts}") private val retryAttempts: String
-) : PersonClient, Pingable {
-    private val log = KotlinLogging.logger {}
+    @Value("\${web-client.retry-attempts}") retryAttempts: String
+) : ExternalServiceClient(retryAttempts), PersonClient, Pingable {
+
+    override fun service() = service
 
     override fun fetchPerson(pid: Pid): Person? {
         val uri = "$baseUrl/$PATH"
@@ -76,6 +73,8 @@ class PdlPersonClient(
         }
     }
 
+    override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
+
     private fun setHeaders(headers: HttpHeaders) {
         headers.contentType = MediaType.APPLICATION_JSON
         headers.accept = listOf(MediaType.APPLICATION_JSON)
@@ -85,28 +84,12 @@ class PdlPersonClient(
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
     }
 
-    private fun retryBackoffSpec(uri: String): RetryBackoffSpec =
-        Retry.backoff(retryAttempts.toLong(), Duration.ofSeconds(1))
-            .filter { it is EgressException && !it.isClientError }
-            .onRetryExhaustedThrow { backoff, signal -> handleFailure(backoff, signal, uri) }
-
-    private fun handleFailure(backoff: RetryBackoffSpec, retrySignal: Retry.RetrySignal, uri: String): Throwable {
-        log.info { "Retried calling $uri ${backoff.maxAttempts} times" }
-
-        return when (val failure = retrySignal.failure()) {
-            is WebClientRequestException -> EgressException(true, "Failed calling ${failure.uri}", failure)
-            is EgressException -> EgressException(failure.isClientError, "Failed calling $uri", failure)
-            else -> failure
-        }
-    }
-
     companion object {
         private const val PATH = "graphql"
         private const val THEME = "PEN"
 
         // https://behandlingskatalog.nais.adeo.no/process/team/d55cc783-7850-4606-9ff6-1fc44b646c9d/91a4e540-5e39-4c10-971f-49b48f35fe11
         private const val BEHANDLINGSNUMMER = "B353"
-
         private val service = EgressService.PERSONDATA
 
         private fun query(pid: Pid) = """{

@@ -36,7 +36,8 @@ class ClientCredentialsTokenRequestClientTest : WebClientTest() {
             WebClient.create(),
             oauth2ConfigGetter,
             expirationChecker,
-            ClientCredentials("id1", "secret1")
+            ClientCredentials("id1", "secret1"),
+            "1"
         )
     }
 

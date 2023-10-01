@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.token.saml.client.gandalf
 
-import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.AuthorizationGrantType
@@ -10,6 +10,7 @@ import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.client.gandalf.
 import no.nav.pensjon.kalkulator.tech.selftest.PingResult
 import no.nav.pensjon.kalkulator.tech.selftest.Pingable
 import no.nav.pensjon.kalkulator.tech.selftest.ServiceStatus
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.beans.factory.annotation.Value
@@ -29,9 +30,11 @@ import java.util.*
 @Component
 class GandalfSamlTokenClient(
     @Value("\${sts.url}") private val baseUrl: String,
-    private val webClient: WebClient
-) : SamlTokenClient, Pingable {
-    private val log = KotlinLogging.logger {}
+    private val webClient: WebClient,
+    private val traceAid: TraceAid,
+    @Value("\${web-client.retry-attempts}") retryAttempts: String
+) : ExternalServiceClient(retryAttempts), SamlTokenClient, Pingable {
+    override fun service() = service
 
     override fun fetchSamlToken(): SamlTokenDataDto {
         val uri = "$baseUrl$TOKEN_EXCHANGE_PATH"
@@ -46,6 +49,7 @@ class GandalfSamlTokenClient(
                 .body(body(idToken))
                 .retrieve()
                 .bodyToMono(SamlTokenDataDto::class.java)
+                .retryWhen(retryBackoffSpec(uri))
                 .block()
                 ?: emptyDto()
 
@@ -78,22 +82,24 @@ class GandalfSamlTokenClient(
         }
     }
 
+    override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
+
+    private fun setHeaders(headers: HttpHeaders) {
+        headers.setBearerAuth(EgressAccess.token(service).value)
+        headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_FORM_URLENCODED_VALUE
+        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
+    }
+
+    private fun setPingHeaders(headers: HttpHeaders) {
+        headers.setBearerAuth(EgressAccess.token(service).value)
+        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
+    }
+
     companion object {
         private const val TOKEN_TYPE = "urn:ietf:params:oauth:token-type:access_token"
         private const val TOKEN_EXCHANGE_PATH = "/rest/v1/sts/token/exchange"
         private const val PING_PATH = "/ping" //TODO
         private val service = EgressService.SAML_TOKEN
-
-        private fun setHeaders(headers: HttpHeaders) {
-            headers.setBearerAuth(EgressAccess.token(service).value)
-            headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_FORM_URLENCODED_VALUE
-            headers[CustomHttpHeaders.CALL_ID] = callId()
-        }
-
-        private fun setPingHeaders(headers: HttpHeaders) {
-            headers.setBearerAuth(EgressAccess.token(service).value)
-            headers[CustomHttpHeaders.CALL_ID] = callId()
-        }
 
         private fun body(idToken: Jwt) =
             BodyInserters
@@ -101,8 +107,12 @@ class GandalfSamlTokenClient(
                 .with(OAuth2ParameterNames.SUBJECT_TOKEN_TYPE, TOKEN_TYPE)
                 .with(OAuth2ParameterNames.SUBJECT_TOKEN, idToken.tokenValue)
 
-        private fun callId() = UUID.randomUUID().toString()
-
-        private fun emptyDto() = SamlTokenDataDto("", "", "", 0)
+        private fun emptyDto() =
+            SamlTokenDataDto(
+                access_token = "",
+                issued_token_type = "",
+                token_type = "",
+                expires_in = 0
+            )
     }
 }

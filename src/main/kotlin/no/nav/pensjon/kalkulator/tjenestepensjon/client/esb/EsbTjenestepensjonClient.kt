@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.tjenestepensjon.client.esb
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
-import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
@@ -17,11 +17,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import reactor.util.retry.Retry
-import reactor.util.retry.RetryBackoffSpec
-import java.time.Duration
 import java.time.LocalDate
 import java.util.*
 
@@ -36,9 +32,10 @@ class EsbTjenestepensjonClient(
     @Qualifier("soap") private val webClient: WebClient,
     private val xmlMapper: XmlMapper,
     private val traceAid: TraceAid,
-    @Value("\${web-client.retry-attempts}") private val retryAttempts: String
-    ) : TjenestepensjonClient {
-    private val log = KotlinLogging.logger {}
+    @Value("\${web-client.retry-attempts}") retryAttempts: String
+) : ExternalServiceClient(retryAttempts), TjenestepensjonClient {
+
+   override fun service()= service
 
     override fun harTjenestepensjonsforhold(pid: Pid, dato: LocalDate): Boolean {
         val responseXml = fetchTjenestepensjonsforholdXml(pid)
@@ -51,6 +48,8 @@ class EsbTjenestepensjonClient(
             false
         }
     }
+
+    override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
 
     private fun fetchTjenestepensjonsforholdXml(pid: Pid): String {
         val uri = "$baseUrl$PATH"
@@ -66,10 +65,7 @@ class EsbTjenestepensjonClient(
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono(String::class.java)
-                .retryWhen(
-                    Retry.backoff(retryAttempts.toLong(), Duration.ofSeconds(1))
-                        .filter { it is EgressException && !it.isClientError }
-                        .onRetryExhaustedThrow { backoff, signal -> handleFailure(backoff, signal) })
+                .retryWhen(retryBackoffSpec(uri))
                 .block()
                 ?: ""
         } catch (e: WebClientResponseException) {
@@ -107,16 +103,6 @@ class EsbTjenestepensjonClient(
     }
 
     private fun usernameToken() = usernameTokenClient.fetchUsernameToken().token
-
-    private fun handleFailure(backoff: RetryBackoffSpec, retrySignal: Retry.RetrySignal): Throwable {
-        log.info { "Retried calling $baseUrl$PATH ${backoff.maxAttempts} times" }
-
-        return when (val failure = retrySignal.failure()) {
-            is WebClientRequestException -> EgressException(true, "Failed calling ${failure.uri}", failure)
-            is EgressException -> EgressException(failure.isClientError, "Failed calling $baseUrl$PATH", failure)
-            else -> failure
-        }
-    }
 
     companion object {
         private const val PATH = "/nav-cons-pen-pselv-tjenestepensjonWeb/sca/PSELVTjenestepensjonWSEXP"

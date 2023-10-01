@@ -5,6 +5,8 @@ package no.nav.pensjon.kalkulator.tech.security.egress.config
  */
 enum class EgressService(val description: String, val gatewayUsage: GatewayUsage) {
 
+    OAUTH2_CONFIGURATION("OAuth2 configuration", GatewayUsage.NONE),
+    OAUTH2_TOKEN("OAuth2 token", GatewayUsage.NONE),
     PENSJONSAVTALER("Norsk Pensjon", GatewayUsage.INTERNAL),
     PENSJON_REGLER("Pensjonsregler", GatewayUsage.INTERNAL),
     PERSONDATA("Persondata", GatewayUsage.NONE),

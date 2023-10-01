@@ -1,9 +1,13 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.oauth2
 
+import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
+import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.config.OAuth2ConfigurationGetter
-import no.nav.pensjon.kalkulator.tech.security.egress.token.*
+import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenAccessParameter
+import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenData
+import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenDataGetter
 import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.ExpirationChecker
-import org.slf4j.LoggerFactory
+import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.http.MediaType
 import org.springframework.util.MultiValueMap
 import org.springframework.web.reactive.function.client.WebClient
@@ -12,21 +16,25 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 abstract class OAuth2TokenClient(
     private val webClient: WebClient,
     private val expirationChecker: ExpirationChecker,
-    private val oauth2ConfigGetter: OAuth2ConfigurationGetter
-) : TokenDataGetter {
+    private val oauth2ConfigGetter: OAuth2ConfigurationGetter,
+    retryAttempts: String
+) : ExternalServiceClient(retryAttempts), TokenDataGetter {
+    override fun service() = service
 
     override fun getTokenData(accessParameter: TokenAccessParameter, audience: String): TokenData {
         log.debug("Getting token for audience '{}'...", audience)
+        val uri = getTokenEndpoint()
 
         return try {
             val body: OAuth2TokenDto = webClient
                 .post()
-                .uri(getTokenEndpoint())
+                .uri(uri)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(prepareTokenRequestBody(accessParameter, audience))
                 .retrieve()
                 .bodyToMono(OAuth2TokenDto::class.java)
+                .retryWhen(retryBackoffSpec(uri))
                 .block()!!
             // Note: Do not use .body instead of .bodyValue, since this results in chunked encoding,
             // which the endpoint may not support, resulting in 404 Not Found
@@ -34,11 +42,11 @@ abstract class OAuth2TokenClient(
             log.info("Token obtained for audience '{}'", audience)
             OAuth2TokenDataMapper.map(body, expirationChecker.time())
         } catch (e: WebClientResponseException) {
-            throw TokenGetterException("Failed to obtain token: " + e.responseBodyAsString, e)
-        } catch (e: RuntimeException) { // e.g. when connection broken
-            throw TokenGetterException("Failed to obtain token", e)
+            throw EgressException(e.responseBodyAsString, e)
         }
     }
+
+    override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
 
     private fun getTokenEndpoint(): String = oauth2ConfigGetter.getTokenEndpoint()
 
@@ -49,7 +57,7 @@ abstract class OAuth2TokenClient(
         accessParameter: TokenAccessParameter, audience: String
     ): MultiValueMap<String, String>
 
-    companion object {
-        private val log = LoggerFactory.getLogger(OAuth2TokenClient::class.java)
+    private companion object {
+        private val service = EgressService.OAUTH2_TOKEN
     }
 }
