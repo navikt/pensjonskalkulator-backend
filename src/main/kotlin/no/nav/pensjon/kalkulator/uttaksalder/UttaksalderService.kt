@@ -31,7 +31,7 @@ class UttaksalderService(
             sivilstand = specDto.sivilstand ?: sivilstand(pid),
             harEps = specDto.harEps ?: false,
             sisteInntekt = specDto.sisteInntekt ?: sistePensjonsgivendeInntekt(pid),
-            simuleringType = specDto.simuleringType ?: SimuleringType.ALDERSPENSJON,
+            simuleringstype = specDto.simuleringstype ?: SimuleringType.ALDERSPENSJON,
         )
 
         log.info { "Finner første mulige uttaksalder med parametre $uttaksalderSpec" }
