@@ -45,18 +45,19 @@ class PensjonsavtaleServiceTest {
     }
 
     @Test
-    fun `fetchAvtaler excludes avtaler of kategori 'Folketrygd' and 'Offentlig tjenestepensjon'`() {
+    fun `fetchAvtaler excludes avtaler of kategori 'Folketrygd', 'Offentlig tjenestepensjon', 'Privat AFP'`() {
         arrangeClient(
             listOf(
                 AvtaleKategori.FOLKETRYGD,
-                AvtaleKategori.PRIVAT_AFP,
-                AvtaleKategori.OFFENTLIG_TJENESTEPENSJON
+                AvtaleKategori.OFFENTLIG_TJENESTEPENSJON,
+                AvtaleKategori.INDIVIDUELL_ORDNING,
+                AvtaleKategori.PRIVAT_AFP
             )
         )
 
         val result = avtaleService.fetchAvtaler(pensjonsavtaleSpec())
 
-        result shouldBe pensjonsavtalerV3(listOf(AvtaleKategori.PRIVAT_AFP))
+        result shouldBe pensjonsavtalerV3(listOf(AvtaleKategori.INDIVIDUELL_ORDNING))
     }
 
     private fun arrangeClient() {
