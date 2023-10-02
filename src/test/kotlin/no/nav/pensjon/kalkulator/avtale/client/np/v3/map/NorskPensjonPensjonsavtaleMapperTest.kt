@@ -1,15 +1,24 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.v3.map
 
 import io.kotest.matchers.shouldBe
+import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.*
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtalerV3
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import org.junit.jupiter.api.Test
 
 class NorskPensjonPensjonsavtaleMapperTest {
 
     @Test
-    fun `fromDto maps DTO to avtale and selskap`() {
+    fun `fromDto maps data transfer object to domain object comprising avtale and selskap`() {
         NorskPensjonPensjonsavtaleMapper.fromDto(envelope()) shouldBe pensjonsavtalerV3()
+    }
+
+    @Test
+    fun `toDto maps domain object to data transfer object`() {
+        val domainObject = PensjonsavtaleSpec(1, emptyList(), 2)
+        val expectedDto = NorskPensjonPensjonsavtaleSpecDto(pid, 1, emptyList(), 2)
+        NorskPensjonPensjonsavtaleMapper.toDto(domainObject, pid) shouldBe expectedDto
     }
 
     private companion object {

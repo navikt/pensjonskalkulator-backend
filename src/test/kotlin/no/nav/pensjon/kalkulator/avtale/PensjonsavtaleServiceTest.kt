@@ -79,7 +79,6 @@ class PensjonsavtaleServiceTest {
                 aarligInntektFoerUttak = AARLIG_INNTEKT_FOER_UTTAK,
                 uttaksperioder = listOf(uttaksperiodeSpec1(), uttaksperiodeSpec2()),
                 antallInntektsaarEtterUttak = ANTALL_INNTEKTSAAR_ETTER_UTTAK,
-                harAfp = false,
                 harEpsPensjon = true,
                 harEpsPensjonsgivendeInntektOver2G = true,
                 antallAarIUtlandetEtter16 = 0,

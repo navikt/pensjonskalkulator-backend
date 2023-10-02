@@ -21,7 +21,7 @@ object NorskPensjonPensjonsavtaleMapper {
             aarligInntektFoerUttak = spec.aarligInntektFoerUttak,
             uttaksperioder = spec.uttaksperioder.map(::toUttaksperiodeEgressSpecDto),
             antallInntektsaarEtterUttak = spec.antallInntektsaarEtterUttak,
-            harAfp = spec.harAfp,
+            harAfp = false, // avoids Norsk Pensjon calling NAV's AFP simulation
             harEpsPensjon = spec.harEpsPensjon ?: DEFAULT_HAR_EPS_PENSJON,
             harEpsPensjonsgivendeInntektOver2G = spec.harEpsPensjonsgivendeInntektOver2G
                 ?: DEFAULT_HAR_EPS_PENSJONSGIVENDE_INNTEKT_OVER_2G,

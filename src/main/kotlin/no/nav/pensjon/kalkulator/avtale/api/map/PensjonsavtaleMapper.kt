@@ -11,7 +11,6 @@ object PensjonsavtaleMapper {
             aarligInntektFoerUttak = dto.aarligInntektFoerUttak,
             uttaksperioder = dto.uttaksperioder.map(::fromUttaksperiodeSpecDto),
             antallInntektsaarEtterUttak = dto.antallInntektsaarEtterUttak,
-            harAfp = dto.harAfp ?: false,
             harEpsPensjon = dto.harEpsPensjon,
             harEpsPensjonsgivendeInntektOver2G = dto.harEpsPensjonsgivendeInntektOver2G,
             antallAarIUtlandetEtter16 = dto.antallAarIUtlandetEtter16 ?: 0,

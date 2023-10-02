@@ -8,7 +8,6 @@ data class PensjonsavtaleSpec(
     val aarligInntektFoerUttak: Int,
     val uttaksperioder: List<UttaksperiodeSpec>,
     val antallInntektsaarEtterUttak: Int,
-    val harAfp: Boolean = false,
     val harEpsPensjon: Boolean? = null,
     val harEpsPensjonsgivendeInntektOver2G: Boolean? = null,
     val antallAarIUtlandetEtter16: Int = 0,

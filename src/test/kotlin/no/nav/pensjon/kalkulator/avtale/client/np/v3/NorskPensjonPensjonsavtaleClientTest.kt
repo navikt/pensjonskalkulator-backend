@@ -308,8 +308,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
             PensjonsavtaleSpec(
                 aarligInntektFoerUttak = 123000,
                 uttaksperioder = listOf(uttaksperiodeSpec(1), uttaksperiodeSpec(2)),
-                antallInntektsaarEtterUttak = 1,
-                harAfp = false,
+                antallInntektsaarEtterUttak = 1
             )
 
         private fun uttaksperiodeSpec(value: Int) =
