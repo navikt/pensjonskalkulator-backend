@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.token.unt.client.fssgw
 
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
+import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.token.unt.client.UsernameTokenClient
@@ -34,20 +35,19 @@ class FssGatewayUsernameTokenClient(
         val uri = "$baseUrl$TOKEN_PATH"
         log.debug { "GET from URI: '$uri'" }
 
-        try {
-            val token = webClient
+        return try {
+            webClient
                 .get()
                 .uri(uri)
                 .headers(::setHeaders)
                 .retrieve()
                 .bodyToMono(String::class.java)
                 .block()
-                ?: ""
-            return UsernameTokenDto(token)
+                ?.let { UsernameTokenDto(it) }
+                .also { countCalls(MetricResult.OK) }
+                ?: UsernameTokenDto("")
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
-        } catch (e: RuntimeException) { // e.g. when connection broken
-            throw EgressException("Failed to GET $uri: ${e.message}", e)
         }
     }
 
@@ -87,6 +87,6 @@ class FssGatewayUsernameTokenClient(
     companion object {
         private const val TOKEN_PATH = "/ws-support/unt"
         private const val PING_PATH = "/ping" //TODO
-        private val service = EgressService.USERNAME_TOKEN
+        private val service = EgressService.FSS_GATEWAY
     }
 }

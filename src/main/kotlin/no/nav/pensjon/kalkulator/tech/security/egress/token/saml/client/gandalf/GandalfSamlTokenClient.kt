@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.token.saml.client.gandalf
 
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
+import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.AuthorizationGrantType
@@ -39,25 +40,21 @@ class GandalfSamlTokenClient(
     override fun fetchSamlToken(): SamlTokenDataDto {
         val uri = "$baseUrl$TOKEN_EXCHANGE_PATH"
         log.debug { "POST to URI: '$uri'" }
-        val idToken = SecurityContextHolder.getContext().authentication.credentials as Jwt
 
-        try {
-            val response = webClient
+        return try {
+            webClient
                 .post()
                 .uri(uri)
                 .headers(::setHeaders)
-                .body(body(idToken))
+                .body(body(idToken()))
                 .retrieve()
                 .bodyToMono(SamlTokenDataDto::class.java)
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
+                ?.also { countCalls(MetricResult.OK) }
                 ?: emptyDto()
-
-            return response
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
-        } catch (e: RuntimeException) { // e.g. when connection broken
-            throw EgressException("Failed to POST to $uri: ${e.message}", e)
         }
     }
 
@@ -99,13 +96,15 @@ class GandalfSamlTokenClient(
         private const val TOKEN_TYPE = "urn:ietf:params:oauth:token-type:access_token"
         private const val TOKEN_EXCHANGE_PATH = "/rest/v1/sts/token/exchange"
         private const val PING_PATH = "/ping" //TODO
-        private val service = EgressService.SAML_TOKEN
+        private val service = EgressService.GANDALF_STS
 
         private fun body(idToken: Jwt) =
             BodyInserters
                 .fromFormData(OAuth2ParameterNames.GRANT_TYPE, AuthorizationGrantType.TOKEN_EXCHANGE.value)
                 .with(OAuth2ParameterNames.SUBJECT_TOKEN_TYPE, TOKEN_TYPE)
                 .with(OAuth2ParameterNames.SUBJECT_TOKEN, idToken.tokenValue)
+
+        private fun idToken() = SecurityContextHolder.getContext().authentication.credentials as Jwt
 
         private fun emptyDto() =
             SamlTokenDataDto(

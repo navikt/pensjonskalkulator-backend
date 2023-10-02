@@ -48,7 +48,7 @@ abstract class ExternalServiceClient(
     }
 
     protected fun countCalls(result: String) {
-        Metrics.countEgressCall("${service().description}-kall", result)
+        Metrics.countEgressCall(service().shortName, result)
     }
 
     private fun metricResult(failure: EgressException) = if (failure.isClientError) BAD_CLIENT else BAD_SERVER

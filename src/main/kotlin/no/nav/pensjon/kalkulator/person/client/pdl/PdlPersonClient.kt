@@ -6,6 +6,7 @@ import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.person.client.pdl.dto.*
 import no.nav.pensjon.kalkulator.person.client.pdl.map.PersonMapper
+import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.selftest.PingResult
@@ -46,7 +47,10 @@ class PdlPersonClient(
                 .bodyToMono(PersonResponseDto::class.java)
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
-                ?.also { log.warn { warnings(it) } }
+                ?.also {
+                    log.warn { warnings(it) }
+                    countCalls(MetricResult.OK)
+                }
                 ?.let(PersonMapper::fromDto)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
@@ -90,7 +94,7 @@ class PdlPersonClient(
 
         // https://behandlingskatalog.nais.adeo.no/process/team/d55cc783-7850-4606-9ff6-1fc44b646c9d/91a4e540-5e39-4c10-971f-49b48f35fe11
         private const val BEHANDLINGSNUMMER = "B353"
-        private val service = EgressService.PERSONDATA
+        private val service = EgressService.PERSONDATALOESNINGEN
 
         private fun query(pid: Pid) = """{
 	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { fornavn }, foedsel { foedselsdato }, sivilstand(historikk: false) { type } } }",

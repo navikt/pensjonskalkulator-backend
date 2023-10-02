@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.oauth2
 
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
+import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.config.OAuth2ConfigurationGetter
 import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenAccessParameter
@@ -19,10 +20,11 @@ abstract class OAuth2TokenClient(
     private val oauth2ConfigGetter: OAuth2ConfigurationGetter,
     retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), TokenDataGetter {
+
     override fun service() = service
 
     override fun getTokenData(accessParameter: TokenAccessParameter, audience: String): TokenData {
-        log.debug("Getting token for audience '{}'...", audience)
+        log.debug { "Fetching token for audience '$audience'" }
         val uri = getTokenEndpoint()
 
         return try {
@@ -36,10 +38,11 @@ abstract class OAuth2TokenClient(
                 .bodyToMono(OAuth2TokenDto::class.java)
                 .retryWhen(retryBackoffSpec(uri))
                 .block()!!
+                .also { countCalls(MetricResult.OK) }
             // Note: Do not use .body instead of .bodyValue, since this results in chunked encoding,
             // which the endpoint may not support, resulting in 404 Not Found
 
-            log.info("Token obtained for audience '{}'", audience)
+            log.info { "Token obtained for audience '$audience'" }
             OAuth2TokenDataMapper.map(body, expirationChecker.time())
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)

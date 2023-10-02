@@ -12,8 +12,7 @@ import no.nav.pensjon.kalkulator.avtale.client.np.v3.map.NorskPensjonPensjonsavt
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.map.NorskPensjonPensjonsavtaleMapper.fromDto
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.tech.metric.MetricResult.BAD_XML
-import no.nav.pensjon.kalkulator.tech.metric.MetricResult.OK
+import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.config.GatewayUsage
@@ -44,14 +43,14 @@ class NorskPensjonPensjonsavtaleClient(
 
     override fun fetchAvtaler(spec: PensjonsavtaleSpec, pid: Pid): Pensjonsavtaler {
         val responseXml = fetchAvtalerXml(NorskPensjonPensjonsavtaleMapper.toDto(spec, pid))
-        countCalls(OK)
+        countCalls(MetricResult.OK)
 
         return try {
             val dto = xmlMapper.readValue(responseXml, EnvelopeDto::class.java)
             fromDto(dto)
         } catch (e: JsonProcessingException) {
-            log.error(e) { "Failed to process XML" }
-            countCalls(BAD_XML)
+            log.error(e) { "Failed to process XML: $responseXml" }
+            countCalls(MetricResult.BAD_XML)
             ingenAvtaler()
         }
     }
@@ -109,7 +108,7 @@ class NorskPensjonPensjonsavtaleClient(
         private const val PATH = "/kalkulator.pensjonsrettighetstjeneste/v3/kalkulatorPensjonTjeneste"
         private const val ORGANISASJONSNUMMER = "889640782" // ARBEIDS- OG VELFERDSETATEN
 
-        private val service = EgressService.PENSJONSAVTALER
+        private val service = EgressService.NORSK_PENSJON
 
         private fun soapBody(spec: NorskPensjonPensjonsavtaleSpecDto, callId: String): String {
             return """<S:Body>

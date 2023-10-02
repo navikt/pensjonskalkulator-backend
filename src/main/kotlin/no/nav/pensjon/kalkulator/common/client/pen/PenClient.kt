@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.common.client.pen
 
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.person.Pid
+import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.selftest.PingResult
@@ -41,7 +42,7 @@ abstract class PenClient(
                 .retrieve()
                 .bodyToMono(elementTypeRef)
                 .retryWhen(retryBackoffSpec(uri))
-                .block()
+                .block().also { countCalls(MetricResult.OK) }
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }

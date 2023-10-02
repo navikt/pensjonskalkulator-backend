@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.oauth2.config
 
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
+import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.web.reactive.function.client.WebClient
@@ -38,7 +39,7 @@ open class OAuth2ConfigurationClient(
             .retrieve()
             .bodyToMono(OAuth2ConfigurationDto::class.java)
             .retryWhen(retryBackoffSpec(uri))
-            .block()!!
+            .block()!!.also { countCalls(MetricResult.OK) }
 
     private fun cachedConfig(): OAuth2ConfigurationDto =
         if (cachedConfig == null)
@@ -47,6 +48,6 @@ open class OAuth2ConfigurationClient(
             cachedConfig!!
 
     companion object {
-        private val service = EgressService.OAUTH2_CONFIGURATION
+        private val service = EgressService.MICROSOFT_ENTRA_ID
     }
 }

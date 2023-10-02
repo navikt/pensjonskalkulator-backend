@@ -3,10 +3,10 @@ package no.nav.pensjon.kalkulator.opptjening.client.popp
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningsgrunnlag
 import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
-import no.nav.pensjon.kalkulator.opptjening.client.popp.dto.OpptjeningsgrunnlagDto
 import no.nav.pensjon.kalkulator.opptjening.client.popp.dto.OpptjeningsgrunnlagResponseDto
 import no.nav.pensjon.kalkulator.opptjening.client.popp.map.OpptjeningsgrunnlagMapper
 import no.nav.pensjon.kalkulator.person.Pid
+import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.selftest.PingResult
@@ -42,8 +42,8 @@ class PoppOpptjeningsgrunnlagClient(
     override fun fetchOpptjeningsgrunnlag(pid: Pid): Opptjeningsgrunnlag {
         log.debug { "GET from URI: '${displayableUri(pid)}'" }
 
-        try {
-            val response = webClient
+        return try {
+            webClient
                 .get()
                 .uri(uri(pid))
                 .headers(::setHeaders)
@@ -51,9 +51,9 @@ class PoppOpptjeningsgrunnlagClient(
                 .bodyToMono(OpptjeningsgrunnlagResponseDto::class.java)
                 .retryWhen(retryBackoffSpec(displayableUri(pid)))
                 .block()
-                ?: emptyDto()
-
-            return OpptjeningsgrunnlagMapper.fromDto(response)
+                ?.let { OpptjeningsgrunnlagMapper.fromDto(it) }
+                .also { countCalls(MetricResult.OK) }
+                ?: Opptjeningsgrunnlag(emptyList())
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }
@@ -101,7 +101,5 @@ class PoppOpptjeningsgrunnlagClient(
         private const val OPPTJENINGSGRUNNLAG_PATH = "/popp/api/opptjeningsgrunnlag"
         private const val PING_PATH = "$OPPTJENINGSGRUNNLAG_PATH/ping"
         private val service = EgressService.PENSJONSOPPTJENING
-
-        private fun emptyDto() = OpptjeningsgrunnlagResponseDto(OpptjeningsgrunnlagDto(emptyList()))
     }
 }

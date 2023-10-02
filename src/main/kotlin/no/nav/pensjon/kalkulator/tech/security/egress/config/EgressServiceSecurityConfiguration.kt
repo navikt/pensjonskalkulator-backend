@@ -21,8 +21,8 @@ class EgressServiceSecurityConfiguration {
     ): EgressServiceListsByAudience {
         return EgressServiceListsByAudience(
             mapOf(
-                persondataServiceId to listOf(EgressService.PERSONDATA),
-                tjenestepensjonServiceId to listOf(EgressService.TJENESTEPENSJONSFORHOLD),
+                persondataServiceId to listOf(EgressService.PERSONDATALOESNINGEN),
+                tjenestepensjonServiceId to listOf(EgressService.TJENESTEPENSJON),
                 proxyServiceId to EgressService.servicesAccessibleViaProxy
             )
         )

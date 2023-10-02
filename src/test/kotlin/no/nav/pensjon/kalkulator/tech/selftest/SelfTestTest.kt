@@ -60,7 +60,7 @@ table tbody tr:nth-child(odd) {background-color: #ffffff;}
 <th>Tjeneste</th><th>Status</th><th>Informasjon</th><th>Endepunkt</th><th>Beskrivelse</th>
 </tr>
 </thead>
-<tbody><tr><td>PENSJON_REGLER</td><td style="background-color:green;text-align:center;">UP</td><td>message1</td><td>endpoint1</td><td>Pensjonsregler</td></tr><tr><td>PENSJONSOPPTJENING</td><td style="background-color:green;text-align:center;">UP</td><td>message2</td><td>endpoint2</td><td>Pensjonsopptjening</td></tr><tr><td>PERSONDATA</td><td style="background-color:green;text-align:center;">UP</td><td>message3</td><td>endpoint3</td><td>Persondata</td></tr></tbody>
+<tbody><tr><td>PENSJON_REGLER</td><td style="background-color:green;text-align:center;">UP</td><td>message1</td><td>endpoint1</td><td>Pensjon-regler</td></tr><tr><td>PENSJONSOPPTJENING</td><td style="background-color:green;text-align:center;">UP</td><td>message2</td><td>endpoint2</td><td>Pensjonsopptjening</td></tr><tr><td>PERSONDATALOESNINGEN</td><td style="background-color:green;text-align:center;">UP</td><td>message3</td><td>endpoint3</td><td>Persondataløsningen</td></tr></tbody>
 </table>
 </div>
 </body>
@@ -75,7 +75,7 @@ table tbody tr:nth-child(odd) {background-color: #ffffff;}
         val json = selfTest.performSelfTestAndReportAsJson()
 
         assertEquals(
-            """{"application":"pensjonskalkulator-backend","timestamp":"12:13:14","aggregateResult":1,"checks":[{"endpoint":"endpoint1","description":"Pensjonsregler","errorMessage":"message1","result":1}, {"endpoint":"endpoint2","description":"Pensjonsopptjening","errorMessage":"message2","result":1}, {"endpoint":"endpoint3","description":"Persondata","errorMessage":"message3","result":1}]}""",
+            """{"application":"pensjonskalkulator-backend","timestamp":"12:13:14","aggregateResult":1,"checks":[{"endpoint":"endpoint1","description":"Pensjon-regler","errorMessage":"message1","result":1}, {"endpoint":"endpoint2","description":"Pensjonsopptjening","errorMessage":"message2","result":1}, {"endpoint":"endpoint3","description":"Persondataløsningen","errorMessage":"message3","result":1}]}""",
             json
         )
     }
@@ -87,7 +87,7 @@ table tbody tr:nth-child(odd) {background-color: #ffffff;}
         val json = selfTest.performSelfTestAndReportAsJson()
 
         assertEquals(
-            """{"application":"pensjonskalkulator-backend","timestamp":"12:13:14","aggregateResult":0,"checks":[{"endpoint":"endpoint1","description":"Pensjonsregler","result":0}, {"endpoint":"endpoint2","description":"Pensjonsopptjening","result":0}, {"endpoint":"endpoint3","description":"Persondata","result":0}]}""",
+            """{"application":"pensjonskalkulator-backend","timestamp":"12:13:14","aggregateResult":0,"checks":[{"endpoint":"endpoint1","description":"Pensjon-regler","result":0}, {"endpoint":"endpoint2","description":"Pensjonsopptjening","result":0}, {"endpoint":"endpoint3","description":"Persondataløsningen","result":0}]}""",
             json
         )
     }
@@ -108,7 +108,7 @@ table tbody tr:nth-child(odd) {background-color: #ffffff;}
             .thenReturn(PingResult(EgressService.PENSJONSOPPTJENING, status, "endpoint2", "message2"))
 
         `when`(personClient.ping())
-            .thenReturn(PingResult(EgressService.PERSONDATA, status, "endpoint3", "message3"))
+            .thenReturn(PingResult(EgressService.PERSONDATALOESNINGEN, status, "endpoint3", "message3"))
     }
 
     private class TestClass(

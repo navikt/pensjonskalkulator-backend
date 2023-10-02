@@ -2,13 +2,15 @@ package no.nav.pensjon.kalkulator.tjenestepensjon.client.tp
 
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.person.Pid
+import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.TjenestepensjonClient
-import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.HarTjenestepensjonDto
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpTjenestepensjonDto
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.map.TpTjenestepensjonMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -35,18 +37,18 @@ class TpTjenestepensjonClient(
         val uri = uri(dato)
         log.debug { "GET from URI: '$uri'" }
 
-        try {
-            val status = webClient
+        return try {
+            webClient
                 .get()
                 .uri(uri)
                 .headers { setHeaders(it, pid) }
                 .retrieve()
-                .bodyToMono(HarTjenestepensjonDto::class.java)
+                .bodyToMono(TpTjenestepensjonDto::class.java)
                 .retryWhen(retryBackoffSpec(uri.toString()))
                 .block()
-                ?: emptyDto()
-
-            return status.value
+                ?.let(TpTjenestepensjonMapper::fromDto)
+                .also { countCalls(MetricResult.OK) }
+                ?: false
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }
@@ -77,8 +79,6 @@ class TpTjenestepensjonClient(
         // https://github.com/navikt/tp/blob/main/tp-api/src/main/kotlin/no/nav/samhandling/tp/controller/TjenestepensjonController.kt
         private const val API_RESOURCE = "haveYtelse"
 
-        private val service = EgressService.TJENESTEPENSJONSFORHOLD
-
-        private fun emptyDto() = HarTjenestepensjonDto(false)
+        private val service = EgressService.TJENESTEPENSJON
     }
 }

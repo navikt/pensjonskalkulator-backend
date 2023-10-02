@@ -30,10 +30,7 @@ abstract class PensjonReglerClient(
         responseClass: Class<Res>
     ): Res {
         val uri = baseUrl + path
-
-        if (log.isDebugEnabled) {
-            log.debug("POST to URI: '$uri'")
-        }
+        log.debug { "POST to URI: '$uri'" }
 
         try {
             val responseBody = webClient
