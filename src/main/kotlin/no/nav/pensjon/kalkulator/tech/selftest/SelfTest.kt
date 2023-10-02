@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.selftest
 
+import no.nav.pensjon.kalkulator.common.client.pen.PenPingClient
 import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.PensjonReglerGrunnbeloepClient
 import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.client.pdl.PdlPersonClient
@@ -11,6 +12,7 @@ import java.time.LocalTime
 class SelfTest(
     grunnbeloepClient: PensjonReglerGrunnbeloepClient,
     opptjeningClient: PoppOpptjeningsgrunnlagClient,
+    penClient: PenPingClient,
     personClient: PdlPersonClient,
     tjenestepensjonClient: TpTjenestepensjonClient
 ) {
@@ -18,6 +20,7 @@ class SelfTest(
     private val services: List<Pingable> = listOf(
         grunnbeloepClient,
         opptjeningClient,
+        penClient,
         personClient,
         tjenestepensjonClient)
 
@@ -94,11 +97,11 @@ class SelfTest(
         private fun htmlStatusRows(resultsByService: Map<String, PingResult>) =
             resultsByService.entries.joinToString(separator = "", transform = ::htmlRow)
 
-        private fun htmlRow(entry: Map.Entry<String, PingResult>) = htmlRow(entry.key, entry.value)
+        private fun htmlRow(entry: Map.Entry<String, PingResult>) = htmlRow(entry.value)
 
-        private fun htmlRow(service: String, result: PingResult) =
-            "<tr>${htmlCell(service)}${htmlStatusCell(result.status)}${htmlCell(result.message)}" +
-                    "${htmlCell(result.endpoint)}${htmlCell(result.service.description)}</tr>"
+        private fun htmlRow(result: PingResult) =
+            "<tr>${htmlCell(result.service.description)}${htmlStatusCell(result.status)}${htmlCell(result.message)}" +
+                    "${htmlCell(result.endpoint)}${htmlCell(result.service.purpose)}</tr>"
 
         private fun htmlCell(content: String) = "<td>$content</td>"
 

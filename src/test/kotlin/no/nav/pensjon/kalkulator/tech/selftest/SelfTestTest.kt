@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.selftest
 
+import no.nav.pensjon.kalkulator.common.client.pen.PenPingClient
 import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.PensjonReglerGrunnbeloepClient
 import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.client.pdl.PdlPersonClient
@@ -27,6 +28,9 @@ class SelfTestTest {
     private lateinit var opptjeningClient: PoppOpptjeningsgrunnlagClient
 
     @Mock
+    private lateinit var penClient: PenPingClient
+
+    @Mock
     private lateinit var personClient: PdlPersonClient
 
     @Mock
@@ -34,7 +38,7 @@ class SelfTestTest {
 
     @BeforeEach
     fun initialize() {
-        selfTest = TestClass(grunnbeloepClient, opptjeningClient, personClient, tjenestepensjonClient)
+        selfTest = TestClass(grunnbeloepClient, opptjeningClient, penClient, personClient, tjenestepensjonClient)
     }
 
     @Test
@@ -112,6 +116,9 @@ $TABLE_BODY
         `when`(opptjeningClient.ping())
             .thenReturn(PingResult(EgressService.PENSJONSOPPTJENING, status, "endpoint2", "message2"))
 
+        `when`(penClient.ping())
+            .thenReturn(PingResult(EgressService.PENSJONSFAGLIG_KJERNE, status, "endpoint5", "message5"))
+
         `when`(personClient.ping())
             .thenReturn(PingResult(EgressService.PERSONDATALOESNINGEN, status, "endpoint3", "message3"))
 
@@ -122,10 +129,12 @@ $TABLE_BODY
     private class TestClass(
         grunnbeloepClient: PensjonReglerGrunnbeloepClient,
         opptjeningClient: PoppOpptjeningsgrunnlagClient,
+        penClient: PenPingClient,
         personClient: PdlPersonClient,
         tjenestepensjonClient: TpTjenestepensjonClient
     ) :
-        SelfTest(grunnbeloepClient, opptjeningClient, personClient, tjenestepensjonClient) {
+        SelfTest(grunnbeloepClient, opptjeningClient, penClient, personClient, tjenestepensjonClient) {
+
         override fun now(): LocalTime {
             return LocalTime.of(12, 13, 14)
         }
@@ -137,6 +146,7 @@ $TABLE_BODY
             "[" +
                     "{\"endpoint\":\"endpoint1\",\"description\":\"Pensjon-regler\",\"result\":0}," +
                     " {\"endpoint\":\"endpoint2\",\"description\":\"Pensjonsopptjening\",\"result\":0}," +
+                    " {\"endpoint\":\"endpoint5\",\"description\":\"Pensjonsfaglig kjerne\",\"result\":0}," +
                     " {\"endpoint\":\"endpoint3\",\"description\":\"Persondataløsningen\",\"result\":0}," +
                     " {\"endpoint\":\"endpoint4\",\"description\":\"Tjenestepensjon\",\"result\":0}" +
                     "]"
@@ -146,6 +156,7 @@ $TABLE_BODY
             "[" +
                     "{\"endpoint\":\"endpoint1\",\"description\":\"Pensjon-regler\",\"errorMessage\":\"message1\",\"result\":1}," +
                     " {\"endpoint\":\"endpoint2\",\"description\":\"Pensjonsopptjening\",\"errorMessage\":\"message2\",\"result\":1}," +
+                    " {\"endpoint\":\"endpoint5\",\"description\":\"Pensjonsfaglig kjerne\",\"errorMessage\":\"message5\",\"result\":1}," +
                     " {\"endpoint\":\"endpoint3\",\"description\":\"Persondataløsningen\",\"errorMessage\":\"message3\",\"result\":1}," +
                     " {\"endpoint\":\"endpoint4\",\"description\":\"Tjenestepensjon\",\"errorMessage\":\"message4\",\"result\":1}" +
                     "]"
@@ -153,10 +164,11 @@ $TABLE_BODY
         @Language("html")
         private const val TABLE_BODY: String =
             "<tbody>" +
-                    "<tr><td>PENSJON_REGLER</td><td style=\"background-color:green;text-align:center;\">UP</td><td>message1</td><td>endpoint1</td><td>Pensjon-regler</td></tr>" +
-                    "<tr><td>PENSJONSOPPTJENING</td><td style=\"background-color:green;text-align:center;\">UP</td><td>message2</td><td>endpoint2</td><td>Pensjonsopptjening</td></tr>" +
-                    "<tr><td>PERSONDATALOESNINGEN</td><td style=\"background-color:green;text-align:center;\">UP</td><td>message3</td><td>endpoint3</td><td>Persondataløsningen</td></tr>" +
-                    "<tr><td>TJENESTEPENSJON</td><td style=\"background-color:green;text-align:center;\">UP</td><td>message4</td><td>endpoint4</td><td>Tjenestepensjon</td></tr>" +
+                    "<tr><td>Pensjon-regler</td><td style=\"background-color:green;text-align:center;\">UP</td><td>message1</td><td>endpoint1</td><td>Pensjonsregler</td></tr>" +
+                    "<tr><td>Pensjonsopptjening</td><td style=\"background-color:green;text-align:center;\">UP</td><td>message2</td><td>endpoint2</td><td>Pensjonsopptjeningsdata</td></tr>" +
+                    "<tr><td>Pensjonsfaglig kjerne</td><td style=\"background-color:green;text-align:center;\">UP</td><td>message5</td><td>endpoint5</td><td>Simulering, pensjonsdata</td></tr>" +
+                    "<tr><td>Persondataløsningen</td><td style=\"background-color:green;text-align:center;\">UP</td><td>message3</td><td>endpoint3</td><td>Persondata</td></tr>" +
+                    "<tr><td>Tjenestepensjon</td><td style=\"background-color:green;text-align:center;\">UP</td><td>message4</td><td>endpoint4</td><td>Tjenestepensjonsforhold</td></tr>" +
                     "</tbody>"
     }
 }

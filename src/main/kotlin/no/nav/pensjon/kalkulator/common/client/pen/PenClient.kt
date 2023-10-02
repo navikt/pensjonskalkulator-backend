@@ -109,7 +109,7 @@ abstract class PenClient(
 
     companion object {
         private const val BASE_PATH = "pen/springapi"
-        private const val PING_PATH = "api/ping"
+        private const val PING_PATH = "$BASE_PATH/ping"
         private val service = EgressService.PENSJONSFAGLIG_KJERNE
     }
 }
