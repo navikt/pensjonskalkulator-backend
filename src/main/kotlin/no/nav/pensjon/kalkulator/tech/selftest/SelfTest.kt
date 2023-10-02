@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.tech.selftest
 import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.PensjonReglerGrunnbeloepClient
 import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.client.pdl.PdlPersonClient
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClient
 import org.springframework.stereotype.Component
 import java.time.LocalTime
 
@@ -10,10 +11,15 @@ import java.time.LocalTime
 class SelfTest(
     grunnbeloepClient: PensjonReglerGrunnbeloepClient,
     opptjeningClient: PoppOpptjeningsgrunnlagClient,
-    personClient: PdlPersonClient
+    personClient: PdlPersonClient,
+    tjenestepensjonClient: TpTjenestepensjonClient
 ) {
 
-    private val services: List<Pingable> = listOf(grunnbeloepClient, opptjeningClient, personClient)
+    private val services: List<Pingable> = listOf(
+        grunnbeloepClient,
+        opptjeningClient,
+        personClient,
+        tjenestepensjonClient)
 
     /**
      * Returns result of self-test in HTML format.

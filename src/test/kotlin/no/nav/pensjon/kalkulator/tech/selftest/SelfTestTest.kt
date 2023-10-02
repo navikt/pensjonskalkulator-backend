@@ -4,6 +4,8 @@ import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.PensjonReglerGrunnbel
 import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.client.pdl.PdlPersonClient
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClient
+import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,9 +29,12 @@ class SelfTestTest {
     @Mock
     private lateinit var personClient: PdlPersonClient
 
+    @Mock
+    private lateinit var tjenestepensjonClient: TpTjenestepensjonClient
+
     @BeforeEach
     fun initialize() {
-        selfTest = TestClass(grunnbeloepClient, opptjeningClient, personClient)
+        selfTest = TestClass(grunnbeloepClient, opptjeningClient, personClient, tjenestepensjonClient)
     }
 
     @Test
@@ -60,7 +65,7 @@ table tbody tr:nth-child(odd) {background-color: #ffffff;}
 <th>Tjeneste</th><th>Status</th><th>Informasjon</th><th>Endepunkt</th><th>Beskrivelse</th>
 </tr>
 </thead>
-<tbody><tr><td>PENSJON_REGLER</td><td style="background-color:green;text-align:center;">UP</td><td>message1</td><td>endpoint1</td><td>Pensjon-regler</td></tr><tr><td>PENSJONSOPPTJENING</td><td style="background-color:green;text-align:center;">UP</td><td>message2</td><td>endpoint2</td><td>Pensjonsopptjening</td></tr><tr><td>PERSONDATALOESNINGEN</td><td style="background-color:green;text-align:center;">UP</td><td>message3</td><td>endpoint3</td><td>Persondataløsningen</td></tr></tbody>
+$TABLE_BODY
 </table>
 </div>
 </body>
@@ -75,7 +80,7 @@ table tbody tr:nth-child(odd) {background-color: #ffffff;}
         val json = selfTest.performSelfTestAndReportAsJson()
 
         assertEquals(
-            """{"application":"pensjonskalkulator-backend","timestamp":"12:13:14","aggregateResult":1,"checks":[{"endpoint":"endpoint1","description":"Pensjon-regler","errorMessage":"message1","result":1}, {"endpoint":"endpoint2","description":"Pensjonsopptjening","errorMessage":"message2","result":1}, {"endpoint":"endpoint3","description":"Persondataløsningen","errorMessage":"message3","result":1}]}""",
+            """{"application":"pensjonskalkulator-backend","timestamp":"12:13:14","aggregateResult":1,"checks":$ERROR_CHECKS}""",
             json
         )
     }
@@ -87,7 +92,7 @@ table tbody tr:nth-child(odd) {background-color: #ffffff;}
         val json = selfTest.performSelfTestAndReportAsJson()
 
         assertEquals(
-            """{"application":"pensjonskalkulator-backend","timestamp":"12:13:14","aggregateResult":0,"checks":[{"endpoint":"endpoint1","description":"Pensjon-regler","result":0}, {"endpoint":"endpoint2","description":"Pensjonsopptjening","result":0}, {"endpoint":"endpoint3","description":"Persondataløsningen","result":0}]}""",
+            """{"application":"pensjonskalkulator-backend","timestamp":"12:13:14","aggregateResult":0,"checks":$OK_CHECKS}""",
             json
         )
     }
@@ -109,16 +114,49 @@ table tbody tr:nth-child(odd) {background-color: #ffffff;}
 
         `when`(personClient.ping())
             .thenReturn(PingResult(EgressService.PERSONDATALOESNINGEN, status, "endpoint3", "message3"))
+
+        `when`(tjenestepensjonClient.ping())
+            .thenReturn(PingResult(EgressService.TJENESTEPENSJON, status, "endpoint4", "message4"))
     }
 
     private class TestClass(
         grunnbeloepClient: PensjonReglerGrunnbeloepClient,
         opptjeningClient: PoppOpptjeningsgrunnlagClient,
-        personClient: PdlPersonClient
+        personClient: PdlPersonClient,
+        tjenestepensjonClient: TpTjenestepensjonClient
     ) :
-        SelfTest(grunnbeloepClient, opptjeningClient, personClient) {
+        SelfTest(grunnbeloepClient, opptjeningClient, personClient, tjenestepensjonClient) {
         override fun now(): LocalTime {
             return LocalTime.of(12, 13, 14)
         }
+    }
+
+    private companion object {
+        @Language("json")
+        private const val OK_CHECKS: String =
+            "[" +
+                    "{\"endpoint\":\"endpoint1\",\"description\":\"Pensjon-regler\",\"result\":0}," +
+                    " {\"endpoint\":\"endpoint2\",\"description\":\"Pensjonsopptjening\",\"result\":0}," +
+                    " {\"endpoint\":\"endpoint3\",\"description\":\"Persondataløsningen\",\"result\":0}," +
+                    " {\"endpoint\":\"endpoint4\",\"description\":\"Tjenestepensjon\",\"result\":0}" +
+                    "]"
+
+        @Language("json")
+        private const val ERROR_CHECKS: String =
+            "[" +
+                    "{\"endpoint\":\"endpoint1\",\"description\":\"Pensjon-regler\",\"errorMessage\":\"message1\",\"result\":1}," +
+                    " {\"endpoint\":\"endpoint2\",\"description\":\"Pensjonsopptjening\",\"errorMessage\":\"message2\",\"result\":1}," +
+                    " {\"endpoint\":\"endpoint3\",\"description\":\"Persondataløsningen\",\"errorMessage\":\"message3\",\"result\":1}," +
+                    " {\"endpoint\":\"endpoint4\",\"description\":\"Tjenestepensjon\",\"errorMessage\":\"message4\",\"result\":1}" +
+                    "]"
+
+        @Language("html")
+        private const val TABLE_BODY: String =
+            "<tbody>" +
+                    "<tr><td>PENSJON_REGLER</td><td style=\"background-color:green;text-align:center;\">UP</td><td>message1</td><td>endpoint1</td><td>Pensjon-regler</td></tr>" +
+                    "<tr><td>PENSJONSOPPTJENING</td><td style=\"background-color:green;text-align:center;\">UP</td><td>message2</td><td>endpoint2</td><td>Pensjonsopptjening</td></tr>" +
+                    "<tr><td>PERSONDATALOESNINGEN</td><td style=\"background-color:green;text-align:center;\">UP</td><td>message3</td><td>endpoint3</td><td>Persondataløsningen</td></tr>" +
+                    "<tr><td>TJENESTEPENSJON</td><td style=\"background-color:green;text-align:center;\">UP</td><td>message4</td><td>endpoint4</td><td>Tjenestepensjon</td></tr>" +
+                    "</tbody>"
     }
 }

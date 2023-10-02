@@ -48,7 +48,7 @@ class PdlPersonClient(
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
                 ?.also {
-                    log.warn { warnings(it) }
+                    warnings(it)?.let { log.warn { it } }
                     countCalls(MetricResult.OK)
                 }
                 ?.let(PersonMapper::fromDto)
@@ -103,12 +103,12 @@ class PdlPersonClient(
 	}
 }"""
 
-        private fun warnings(response: PersonResponseDto) =
+        private fun warnings(response: PersonResponseDto): String? =
             response.extensions?.warnings?.joinToString {
                 (it.message ?: "-") + " (${warningDetails(it.details)})"
-            } ?: ""
+            }
 
-        private fun warningDetails(details: Any?) =
+        private fun warningDetails(details: Any?): String =
             when (details) {
                 is String -> details
                 is LinkedHashMap<*, *> -> (details["missing"] as ArrayList<*>).joinToString()

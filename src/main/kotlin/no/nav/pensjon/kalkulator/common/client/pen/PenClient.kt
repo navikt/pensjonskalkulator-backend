@@ -75,7 +75,7 @@ abstract class PenClient(
     override fun ping(): PingResult {
         val uri = "$baseUrl/$PING_PATH"
 
-        try {
+        return try {
             val responseBody = webClient
                 .get()
                 .uri(uri)
@@ -86,11 +86,9 @@ abstract class PenClient(
                 .block()
                 ?: ""
 
-            return PingResult(service, ServiceStatus.UP, uri, responseBody)
+            PingResult(service, ServiceStatus.UP, uri, responseBody)
         } catch (e: WebClientResponseException) {
-            return PingResult(service, ServiceStatus.DOWN, uri, e.responseBodyAsString)
-        } catch (e: RuntimeException) {
-            return PingResult(service, ServiceStatus.DOWN, uri, e.message ?: "Ping failed")
+            PingResult(service, ServiceStatus.DOWN, uri, e.responseBodyAsString)
         }
     }
 
