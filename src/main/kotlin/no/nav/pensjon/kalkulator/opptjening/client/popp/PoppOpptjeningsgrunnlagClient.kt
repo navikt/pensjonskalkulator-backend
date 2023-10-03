@@ -60,23 +60,22 @@ class PoppOpptjeningsgrunnlagClient(
     }
 
     override fun ping(): PingResult {
-        val uri = baseUrl + PING_PATH
+        val uri = "$baseUrl/$PING_PATH"
 
-        try {
+        return try {
             val responseBody = webClient
                 .get()
                 .uri(uri)
                 .headers(::setPingHeaders)
                 .retrieve()
                 .bodyToMono(String::class.java)
+                .retryWhen(retryBackoffSpec(uri))
                 .block()
                 ?: ""
 
-            return PingResult(service, ServiceStatus.UP, uri, responseBody)
+            PingResult(service, ServiceStatus.UP, uri, responseBody)
         } catch (e: WebClientResponseException) {
-            return PingResult(service, ServiceStatus.DOWN, uri, e.responseBodyAsString)
-        } catch (e: RuntimeException) { // e.g. when connection broken
-            return PingResult(service, ServiceStatus.DOWN, uri, e.message ?: "Ping failed")
+            PingResult(service, ServiceStatus.DOWN, uri, e.responseBodyAsString)
         }
     }
 
@@ -93,12 +92,12 @@ class PoppOpptjeningsgrunnlagClient(
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
     }
 
-    private fun uri(pid: Pid) = "$baseUrl$OPPTJENINGSGRUNNLAG_PATH/${pid.value}"
+    private fun uri(pid: Pid) = "$baseUrl/$OPPTJENINGSGRUNNLAG_PATH/${pid.value}"
 
-    private fun displayableUri(pid: Pid) = "$baseUrl$OPPTJENINGSGRUNNLAG_PATH/${pid.displayValue}"
+    private fun displayableUri(pid: Pid) = "$baseUrl/$OPPTJENINGSGRUNNLAG_PATH/${pid.displayValue}"
 
     companion object {
-        private const val OPPTJENINGSGRUNNLAG_PATH = "/popp/api/opptjeningsgrunnlag"
+        private const val OPPTJENINGSGRUNNLAG_PATH = "popp/api/opptjeningsgrunnlag"
         private const val PING_PATH = "$OPPTJENINGSGRUNNLAG_PATH/ping"
         private val service = EgressService.PENSJONSOPPTJENING
     }

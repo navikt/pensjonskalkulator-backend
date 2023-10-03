@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.selftest
 
+import no.nav.pensjon.kalkulator.common.client.fssgw.FssGatewayPingClient
 import no.nav.pensjon.kalkulator.common.client.pen.PenPingClient
 import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.PensjonReglerGrunnbeloepClient
 import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningsgrunnlagClient
@@ -22,6 +23,9 @@ class SelfTestTest {
     private lateinit var selfTest: SelfTest
 
     @Mock
+    private lateinit var fssGatewayClient: FssGatewayPingClient
+
+    @Mock
     private lateinit var grunnbeloepClient: PensjonReglerGrunnbeloepClient
 
     @Mock
@@ -38,7 +42,14 @@ class SelfTestTest {
 
     @BeforeEach
     fun initialize() {
-        selfTest = TestClass(grunnbeloepClient, opptjeningClient, penClient, personClient, tjenestepensjonClient)
+        selfTest = TestClass(
+            fssGatewayClient,
+            grunnbeloepClient,
+            opptjeningClient,
+            penClient,
+            personClient,
+            tjenestepensjonClient
+        )
     }
 
     @Test
@@ -84,7 +95,7 @@ $TABLE_BODY
         val json = selfTest.performSelfTestAndReportAsJson()
 
         assertEquals(
-            """{"application":"pensjonskalkulator-backend","timestamp":"12:13:14","aggregateResult":1,"checks":$ERROR_CHECKS}""",
+            """{"application":"pensjonskalkulator-backend","timestamp":"12:13:14","aggregateResult":1,"checks":$DOWN_CHECKS}""",
             json
         )
     }
@@ -96,7 +107,7 @@ $TABLE_BODY
         val json = selfTest.performSelfTestAndReportAsJson()
 
         assertEquals(
-            """{"application":"pensjonskalkulator-backend","timestamp":"12:13:14","aggregateResult":0,"checks":$OK_CHECKS}""",
+            """{"application":"pensjonskalkulator-backend","timestamp":"12:13:14","aggregateResult":0,"checks":$UP_CHECKS}""",
             json
         )
     }
@@ -110,30 +121,41 @@ $TABLE_BODY
     }
 
     private fun arrangeStatus(status: ServiceStatus) {
+        `when`(fssGatewayClient.ping())
+            .thenReturn(PingResult(EgressService.FSS_GATEWAY, status, "fssgw-endpoint", "fssgw-message"))
+
         `when`(grunnbeloepClient.ping())
-            .thenReturn(PingResult(EgressService.PENSJON_REGLER, status, "endpoint1", "message1"))
+            .thenReturn(PingResult(EgressService.PENSJON_REGLER, status, "regler-endpoint", "regler-message"))
 
         `when`(opptjeningClient.ping())
-            .thenReturn(PingResult(EgressService.PENSJONSOPPTJENING, status, "endpoint2", "message2"))
+            .thenReturn(PingResult(EgressService.PENSJONSOPPTJENING, status, "popp-endpoint", "popp-message"))
 
         `when`(penClient.ping())
-            .thenReturn(PingResult(EgressService.PENSJONSFAGLIG_KJERNE, status, "endpoint5", "message5"))
+            .thenReturn(PingResult(EgressService.PENSJONSFAGLIG_KJERNE, status, "pen-endpoint", "pen-message"))
 
         `when`(personClient.ping())
-            .thenReturn(PingResult(EgressService.PERSONDATALOESNINGEN, status, "endpoint3", "message3"))
+            .thenReturn(PingResult(EgressService.PERSONDATALOESNINGEN, status, "pdl-endpoint", "pdl-message"))
 
         `when`(tjenestepensjonClient.ping())
-            .thenReturn(PingResult(EgressService.TJENESTEPENSJON, status, "endpoint4", "message4"))
+            .thenReturn(PingResult(EgressService.TJENESTEPENSJON, status, "tp-endpoint", "tp-message"))
     }
 
     private class TestClass(
+        fssGatewayClient: FssGatewayPingClient,
         grunnbeloepClient: PensjonReglerGrunnbeloepClient,
         opptjeningClient: PoppOpptjeningsgrunnlagClient,
         penClient: PenPingClient,
         personClient: PdlPersonClient,
         tjenestepensjonClient: TpTjenestepensjonClient
     ) :
-        SelfTest(grunnbeloepClient, opptjeningClient, penClient, personClient, tjenestepensjonClient) {
+        SelfTest(
+            fssGatewayClient,
+            grunnbeloepClient,
+            opptjeningClient,
+            penClient,
+            personClient,
+            tjenestepensjonClient
+        ) {
 
         override fun now(): LocalTime {
             return LocalTime.of(12, 13, 14)
@@ -142,33 +164,33 @@ $TABLE_BODY
 
     private companion object {
         @Language("json")
-        private const val OK_CHECKS: String =
-            "[" +
-                    "{\"endpoint\":\"endpoint1\",\"description\":\"Pensjon-regler\",\"result\":0}," +
-                    " {\"endpoint\":\"endpoint2\",\"description\":\"Pensjonsopptjening\",\"result\":0}," +
-                    " {\"endpoint\":\"endpoint5\",\"description\":\"Pensjonsfaglig kjerne\",\"result\":0}," +
-                    " {\"endpoint\":\"endpoint3\",\"description\":\"Persondataløsningen\",\"result\":0}," +
-                    " {\"endpoint\":\"endpoint4\",\"description\":\"Tjenestepensjon\",\"result\":0}" +
-                    "]"
+        private const val UP_CHECKS: String = "[" +
+                "{\"endpoint\":\"fssgw-endpoint\",\"description\":\"Fagsystemsone-gateway\",\"result\":0}, " +
+                "{\"endpoint\":\"regler-endpoint\",\"description\":\"Pensjon-regler\",\"result\":0}, " +
+                "{\"endpoint\":\"popp-endpoint\",\"description\":\"Pensjonsopptjening\",\"result\":0}, " +
+                "{\"endpoint\":\"pen-endpoint\",\"description\":\"Pensjonsfaglig kjerne\",\"result\":0}, " +
+                "{\"endpoint\":\"pdl-endpoint\",\"description\":\"Persondataløsningen\",\"result\":0}, " +
+                "{\"endpoint\":\"tp-endpoint\",\"description\":\"Tjenestepensjon\",\"result\":0}" +
+                "]"
 
         @Language("json")
-        private const val ERROR_CHECKS: String =
-            "[" +
-                    "{\"endpoint\":\"endpoint1\",\"description\":\"Pensjon-regler\",\"errorMessage\":\"message1\",\"result\":1}," +
-                    " {\"endpoint\":\"endpoint2\",\"description\":\"Pensjonsopptjening\",\"errorMessage\":\"message2\",\"result\":1}," +
-                    " {\"endpoint\":\"endpoint5\",\"description\":\"Pensjonsfaglig kjerne\",\"errorMessage\":\"message5\",\"result\":1}," +
-                    " {\"endpoint\":\"endpoint3\",\"description\":\"Persondataløsningen\",\"errorMessage\":\"message3\",\"result\":1}," +
-                    " {\"endpoint\":\"endpoint4\",\"description\":\"Tjenestepensjon\",\"errorMessage\":\"message4\",\"result\":1}" +
-                    "]"
+        private const val DOWN_CHECKS: String = "[" +
+                "{\"endpoint\":\"fssgw-endpoint\",\"description\":\"Fagsystemsone-gateway\",\"errorMessage\":\"fssgw-message\",\"result\":1}, " +
+                "{\"endpoint\":\"regler-endpoint\",\"description\":\"Pensjon-regler\",\"errorMessage\":\"regler-message\",\"result\":1}, " +
+                "{\"endpoint\":\"popp-endpoint\",\"description\":\"Pensjonsopptjening\",\"errorMessage\":\"popp-message\",\"result\":1}, " +
+                "{\"endpoint\":\"pen-endpoint\",\"description\":\"Pensjonsfaglig kjerne\",\"errorMessage\":\"pen-message\",\"result\":1}, " +
+                "{\"endpoint\":\"pdl-endpoint\",\"description\":\"Persondataløsningen\",\"errorMessage\":\"pdl-message\",\"result\":1}, " +
+                "{\"endpoint\":\"tp-endpoint\",\"description\":\"Tjenestepensjon\",\"errorMessage\":\"tp-message\",\"result\":1}" +
+                "]"
 
         @Language("html")
-        private const val TABLE_BODY: String =
-            "<tbody>" +
-                    "<tr><td>Pensjon-regler</td><td style=\"background-color:green;text-align:center;\">UP</td><td>message1</td><td>endpoint1</td><td>Pensjonsregler</td></tr>" +
-                    "<tr><td>Pensjonsopptjening</td><td style=\"background-color:green;text-align:center;\">UP</td><td>message2</td><td>endpoint2</td><td>Pensjonsopptjeningsdata</td></tr>" +
-                    "<tr><td>Pensjonsfaglig kjerne</td><td style=\"background-color:green;text-align:center;\">UP</td><td>message5</td><td>endpoint5</td><td>Simulering, pensjonsdata</td></tr>" +
-                    "<tr><td>Persondataløsningen</td><td style=\"background-color:green;text-align:center;\">UP</td><td>message3</td><td>endpoint3</td><td>Persondata</td></tr>" +
-                    "<tr><td>Tjenestepensjon</td><td style=\"background-color:green;text-align:center;\">UP</td><td>message4</td><td>endpoint4</td><td>Tjenestepensjonsforhold</td></tr>" +
-                    "</tbody>"
+        private const val TABLE_BODY: String = "<tbody>" +
+                "<tr><td>Fagsystemsone-gateway</td><td style=\"background-color:green;text-align:center;\">UP</td><td>fssgw-message</td><td>fssgw-endpoint</td><td>SOAP UsernameToken</td></tr>" +
+                "<tr><td>Pensjon-regler</td><td style=\"background-color:green;text-align:center;\">UP</td><td>regler-message</td><td>regler-endpoint</td><td>Pensjonsregler</td></tr>" +
+                "<tr><td>Pensjonsopptjening</td><td style=\"background-color:green;text-align:center;\">UP</td><td>popp-message</td><td>popp-endpoint</td><td>Pensjonsopptjeningsdata</td></tr>" +
+                "<tr><td>Pensjonsfaglig kjerne</td><td style=\"background-color:green;text-align:center;\">UP</td><td>pen-message</td><td>pen-endpoint</td><td>Simulering, pensjonsdata</td></tr>" +
+                "<tr><td>Persondataløsningen</td><td style=\"background-color:green;text-align:center;\">UP</td><td>pdl-message</td><td>pdl-endpoint</td><td>Persondata</td></tr>" +
+                "<tr><td>Tjenestepensjon</td><td style=\"background-color:green;text-align:center;\">UP</td><td>tp-message</td><td>tp-endpoint</td><td>Tjenestepensjonsforhold</td></tr>" +
+                "</tbody>"
     }
 }
