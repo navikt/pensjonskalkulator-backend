@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.avtale
 import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
+import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import org.springframework.stereotype.Service
@@ -14,8 +15,8 @@ class PensjonsavtaleService(
     private val featureToggleService: FeatureToggleService
 ) {
     fun fetchAvtaler(spec: PensjonsavtaleSpec): Pensjonsavtaler {
-        return if (featureToggleService.isEnabled("mock-norsk-pensjon"))
-            mockAvtaler(spec)
+        return if (featureToggleService.isEnabled("mock-norsk-pensjon") && pidGetter.pid() == Pid("02817996259"))
+            mockAvtaler()
         else
             filter(avtaleClient.fetchAvtaler(spec, pidGetter.pid()))
     }
@@ -29,24 +30,10 @@ class PensjonsavtaleService(
             )
 
         /**
-         * Temporary function for testing pensjonsavtaler with synthetic persons
-         * (per June 2023 Norsk Pensjon does not support synthetic persons)
+         * Temporary function for testing pensjonsavtaler with start before uttaksalder
          */
-        private fun mockAvtaler(spec: PensjonsavtaleSpec): Pensjonsavtaler {
-            val uttaksperiode =
-                if (spec.uttaksperioder.isEmpty())
-                    UttaksperiodeSpec(
-                        Alder(67, 0),
-                        Uttaksgrad.HUNDRE_PROSENT,
-                        10000
-                    )
-                else
-                    spec.uttaksperioder[0]
-
-            val startAlderAar = uttaksperiode.startAlder.aar
-            val someNumber = System.currentTimeMillis().toString().substring(7).toInt()
-            val startAlderMaaneder = someNumber % 12 + 1
-            val sluttAlderMaaneder = (someNumber + startAlderAar) % 12 + 1
+        private fun mockAvtaler(): Pensjonsavtaler {
+            val startAlderAar = 57
 
             return Pensjonsavtaler(
                 listOf(
@@ -54,13 +41,13 @@ class PensjonsavtaleService(
                         "PENSJONSKAPITALBEVIS",
                         AvtaleKategori.INDIVIDUELL_ORDNING,
                         startAlderAar,
-                        startAlderAar + 10,
+                        null,
                         listOf(
                             Utbetalingsperiode(
-                                startAlder = Alder(startAlderAar, startAlderMaaneder),
-                                sluttAlder = Alder(startAlderAar + 10, sluttAlderMaaneder),
-                                aarligUtbetaling = someNumber,
-                                grad = uttaksperiode.grad
+                                startAlder = Alder(startAlderAar, 0),
+                                null,
+                                aarligUtbetaling = 32001,
+                                grad = Uttaksgrad.HUNDRE_PROSENT
                             )
                         )
                     )
