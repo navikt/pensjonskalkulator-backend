@@ -1,0 +1,89 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: pensjonskalkulator-backend
+  namespace: pensjonskalkulator
+  labels:
+    team: pensjonskalkulator
+spec:
+  image: {{ image }}
+  port: 8080
+  replicas:
+    min: 2
+    max: 2
+  ingresses:
+    - https://pensjonskalkulator-backend.intern.nav.no
+  liveness:
+    path: /internal/health/liveness
+    initialDelay: 30
+    timeout: 1
+    periodSeconds: 30
+    failureThreshold: 5
+  readiness:
+    path: /internal/health/readiness
+    periodSeconds: 30
+  prometheus:
+    enabled: true
+    path: /internal/prometheus
+  azure:
+    application:
+      enabled: true
+  tokenx:
+    enabled: true
+  accessPolicy:
+    inbound:
+      rules:
+        - application: pensjonskalkulator-frontend
+    outbound:
+      rules:
+        - application: pdl-api
+          namespace: pdl
+          cluster: prod-fss
+        - application: pensjon-selvbetjening-fss-gateway
+          namespace: pensjonselvbetjening
+          cluster: prod-fss
+        - application: tp
+          namespace: pensjonsamhandling
+          cluster: prod-fss
+      external:
+        - host: pdl-api.prod-fss-pub.nais.io
+        - host: pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
+        - host: pensjonskalkulator-unleash-api.nav.cloud.nais.io
+        - host: oidc.difi.no
+        - host: pep-gw.oera.no
+          ports:
+            - port: 9443
+        - host: tp-api.prod-fss-pub.nais.io
+  env:
+    - name: IDPORTEN_ISSUER
+      value: https://oidc.difi.no/idporten-oidc-provider/
+    - name: FSS_GATEWAY_SERVICE_ID
+      value: prod-fss:pensjonselvbetjening:pensjon-selvbetjening-fss-gateway
+    - name: FSS_GATEWAY_URL
+      value: https://pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
+    - name: NORSK_PENSJON_URL
+      value: https://pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
+    - name: PEN_URL
+      value: https://pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
+    - name: PENSJON_REGLER_URL
+      value: https://pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
+    - name: PERSONDATA_SERVICE_ID
+      value: prod-fss:pdl:pdl-api
+    - name: PERSONDATA_URL
+      value: https://pdl-api.prod-fss-pub.nais.io
+    - name: POPP_URL
+      value: https://pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
+    - name: STS_URL
+      value: https://pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
+    - name: TJENESTEPENSJON_SERVICE_ID
+      value: prod-fss:pensjonsamhandling:tp
+    - name: TJENESTEPENSJON_URL
+      value: https://tp-api.prod-fss-pub.nais.io
+    - name: UNT_URL
+      value: https://pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
+    - name: SERVER_ERROR_INCLUDE_STACKTRACE
+      value: never
+    - name: STDOUT_LOG_OUTPUT
+      value: JSON
+  envFrom:
+    - secret: pensjonskalkulator-backend-unleash-api-token

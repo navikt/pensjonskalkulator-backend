@@ -61,6 +61,10 @@ spec:
   env:
     - name: IDPORTEN_ISSUER
       value: https://test.idporten.no
+    - name: FSS_GATEWAY_SERVICE_ID
+      value: dev-fss:pensjonselvbetjening:pensjon-selvbetjening-fss-gateway
+    - name: FSS_GATEWAY_URL
+      value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: NORSK_PENSJON_URL
       value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: PEN_URL
