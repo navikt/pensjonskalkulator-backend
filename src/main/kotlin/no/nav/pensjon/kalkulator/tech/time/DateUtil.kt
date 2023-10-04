@@ -1,12 +1,16 @@
 package no.nav.pensjon.kalkulator.tech.time
 
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 
 object DateUtil {
     private const val TIME_ZONE_ID = "Europe/Oslo"
     private val locale = Locale("nb", "NO")
     private val timeZone = TimeZone.getTimeZone(TIME_ZONE_ID)
+
+    fun toLocalDate(dateTime: ZonedDateTime) = dateTime.withZoneSameInstant(ZoneId.of(TIME_ZONE_ID)).toLocalDate()
 
     fun toDate(localDate: LocalDate): Date =
         Calendar.getInstance(timeZone, locale).also {

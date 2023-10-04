@@ -13,13 +13,3 @@ data class SimuleringSpecDto(
     val forventetInntekt: Int?,
     val sivilstand: Sivilstand?
 )
-
-data class SimuleringSpecV0Dto(
-    val simuleringstype: SimuleringType,
-    val forventetInntekt: Int?,
-    val uttaksgrad: Int,
-    val foersteUttaksalder: SimuleringAlderV0Dto,
-    val foedselsdato: LocalDate,
-    val sivilstand: Sivilstand?,
-    val epsHarInntektOver2G: Boolean
-)
