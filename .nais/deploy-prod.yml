@@ -1,5 +1,5 @@
-apiVersion: "nais.io/v1alpha1"
-kind: "Application"
+apiVersion: nais.io/v1alpha1
+kind: Application
 metadata:
   name: pensjonskalkulator-backend
   namespace: pensjonskalkulator
@@ -46,13 +46,11 @@ spec:
           namespace: pensjonsamhandling
           cluster: prod-fss
       external:
+        - host: oidc.difi.no
         - host: pdl-api.prod-fss-pub.nais.io
+        - host: pensjon-pen.prod-fss-pub.nais.io
         - host: pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
         - host: pensjonskalkulator-unleash-api.nav.cloud.nais.io
-        - host: oidc.difi.no
-        - host: pep-gw.oera.no
-          ports:
-            - port: 9443
         - host: tp-api.prod-fss-pub.nais.io
   env:
     - name: IDPORTEN_ISSUER
