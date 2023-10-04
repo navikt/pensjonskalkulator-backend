@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
@@ -14,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import reactor.netty.http.client.HttpClient
 import java.nio.charset.StandardCharsets
+
 
 @Configuration
 class WebClientConfig {
@@ -66,11 +69,27 @@ class WebClientConfig {
         private fun clientError(statusCode: HttpStatusCode, response: ClientResponse): Mono<ClientResponse> =
             response
                 .bodyToMono(String::class.java)
+                .defaultIfEmpty(emptyResponseInfo(response))
                 .flatMap { Mono.error(EgressException(message = it, statusCode = statusCode)) }
 
         private fun serverError(response: ClientResponse): Mono<ClientResponse> =
             response
                 .bodyToMono(String::class.java)
                 .flatMap { Mono.error(EgressException(message = it)) }
+
+        private fun emptyResponseInfo(response: ClientResponse): String {
+            val statusCode = response.statusCode()
+
+            return if (isAccessDenied(statusCode))
+                "$statusCode: ${reasonForAccessDenial(response)}"
+            else
+                statusCode.toString()
+        }
+
+        private fun isAccessDenied(statusCode: HttpStatusCode) =
+            statusCode == HttpStatus.FORBIDDEN || statusCode == HttpStatus.UNAUTHORIZED
+
+        private fun reasonForAccessDenial(response: ClientResponse): String =
+            response.headers().asHttpHeaders()[HttpHeaders.WWW_AUTHENTICATE]?.firstOrNull() ?: "(access denied)"
     }
 }

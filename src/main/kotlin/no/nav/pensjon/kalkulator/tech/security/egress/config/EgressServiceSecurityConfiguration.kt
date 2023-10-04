@@ -15,12 +15,14 @@ class EgressServiceSecurityConfiguration {
     @Bean
     fun egressServiceListsByAudience(
         @Value("\${pensjon-regler.service-id}") pensjonReglerServiceId: String,
+        @Value("\${pen.service-id}") pensjonsfagligKjerneServiceId: String,
         @Value("\${persondata.service-id}") persondataServiceId: String,
         @Value("\${tjenestepensjon.service-id}") tjenestepensjonServiceId: String,
         @Value("\${proxy.service-id}") proxyServiceId: String
     ): EgressServiceListsByAudience {
         return EgressServiceListsByAudience(
             mapOf(
+                pensjonsfagligKjerneServiceId to listOf(EgressService.PENSJONSFAGLIG_KJERNE),
                 persondataServiceId to listOf(EgressService.PERSONDATALOESNINGEN),
                 tjenestepensjonServiceId to listOf(EgressService.TJENESTEPENSJON),
                 proxyServiceId to EgressService.servicesAccessibleViaProxy
@@ -37,10 +39,10 @@ class EgressServiceSecurityConfiguration {
 
         serviceListsByAudience.entries.forEach { (audience, services) ->
             obtainImpersonalTokenSupplier(
-                audience,
-                services,
-                egressTokenGetter,
-                suppliersByService
+                audience = audience,
+                services = services,
+                egressTokenGetter = egressTokenGetter,
+                tokenSuppliersByService = suppliersByService
             )
         }
 
