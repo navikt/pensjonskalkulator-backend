@@ -58,6 +58,9 @@ jobs:
   deploy-dev:
     name: Deploy to dev-gcp
     needs: [ build ]
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
