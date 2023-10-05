@@ -1,7 +1,6 @@
-name: Dev build, push, deploy
+name: Build, push, deploy
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
@@ -10,6 +9,12 @@ on:
       - 'CODEOWNERS'
       - 'LICENSE.md'
       - 'README.md'
+  workflow_dispatch:
+    inputs:
+      prod:
+        description: Deploy to production
+        type: boolean
+        required: false
 
 jobs:
   build:
@@ -64,3 +69,21 @@ jobs:
           CLUSTER: dev-gcp
           IMAGE: ${{ needs.build.outputs.image }}
           RESOURCE: .nais/deploy-dev.yml
+  deploy-prod:
+    name: Deploy to prod-gcp
+    needs: [ build ]
+    if: |
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'workflow_dispatch' &&
+      github.event.inputs.prod == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Deploy to prod-gcp
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-gcp
+          IMAGE: ${{ needs.build.outputs.image }}
+          RESOURCE: .nais/deploy-prod.yml
