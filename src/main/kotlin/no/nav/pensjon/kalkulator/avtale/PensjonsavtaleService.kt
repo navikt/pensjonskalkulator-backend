@@ -17,10 +17,7 @@ class PensjonsavtaleService(
         val fnr = pidGetter.pid().value
 
         return if (featureToggleService.isEnabled("mock-norsk-pensjon") && mockFnrs.contains(fnr))
-            if (fnr == "46918903739")
-                mockGjensidigeAvtaler()
-            else
-                mockAvtaler()
+            mockPensjonsavtaler(fnr)
         else
             filter(avtaleClient.fetchAvtaler(spec, pidGetter.pid()))
     }
@@ -35,10 +32,17 @@ class PensjonsavtaleService(
 
         private val mockFnrs = listOf("46918903739", "02817996259")
 
+
+        /**
+         * Temporary function for testing pensjonsavtaler with specific characteristics
+         */
+        private fun mockPensjonsavtaler(fnr: String) =
+            if (fnr == "46918903739") mockGjensidigeAvtaler() else mockTidligeAvtaler()
+
         /**
          * Temporary function for testing pensjonsavtaler with start before uttaksalder
          */
-        private fun mockAvtaler(): Pensjonsavtaler {
+        private fun mockTidligeAvtaler(): Pensjonsavtaler {
             val startAlderAar = 57
 
             return Pensjonsavtaler(

@@ -49,12 +49,13 @@ internal class UttaksalderServiceTest {
 
     @Test
     fun `finnTidligsteUttaksalder uses properties from spec`() {
-        val spec = UttaksalderIngressSpecDto(Sivilstand.GIFT, true, 100_000, SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
+        val spec = UttaksalderIngressSpecDto(Sivilstand.GIFT, true, 100_000, SimuleringType.ALDERSPENSJON)
+
         val uttaksalder = service.finnTidligsteUttaksalder(spec)
 
         assertNotNull(uttaksalder)
         verify(uttaksalderClient, times(1)).finnTidligsteUttaksalder(
-            UttaksalderSpec(pid, Sivilstand.GIFT, true, 100_000, SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
+            UttaksalderSpec(pid, Sivilstand.GIFT, true, 100_000, SimuleringType.ALDERSPENSJON)
         )
         verify(personClient, never()).fetchPerson(anyObject())
         verify(opptjeningsgrunnlagClient, never()).fetchOpptjeningsgrunnlag(anyObject())
@@ -65,8 +66,8 @@ internal class UttaksalderServiceTest {
         val person = person()
         `when`(opptjeningsgrunnlagClient.fetchOpptjeningsgrunnlag(anyObject())).thenReturn(opptjeningsgrunnlag)
         `when`(personClient.fetchPerson(pid)).thenReturn(person)
-
         val spec = UttaksalderIngressSpecDto(null, null, null, SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
+
         val uttaksalder = service.finnTidligsteUttaksalder(spec)
 
         assertNotNull(uttaksalder)
@@ -75,6 +76,84 @@ internal class UttaksalderServiceTest {
         )
         verify(personClient, times(1)).fetchPerson(pid)
         verify(opptjeningsgrunnlagClient, times(1)).fetchOpptjeningsgrunnlag(pid)
+    }
+
+    @Test
+    fun `when 'har EPS' and sivilstand not specified then service deduces it from person's sivilstand`() {
+        val person = person(Sivilstand.SAMBOER)
+        `when`(personClient.fetchPerson(pid)).thenReturn(person)
+        val spec = UttaksalderIngressSpecDto(
+            sivilstand = null, // <----- sivilstand not specified
+            harEps = null, // <----- 'har EPS' not specified
+            sisteInntekt = 1,
+            simuleringstype = SimuleringType.ALDERSPENSJON
+        )
+
+        val uttaksalder = service.finnTidligsteUttaksalder(spec)
+
+        assertNotNull(uttaksalder)
+        verify(uttaksalderClient, times(1)).finnTidligsteUttaksalder(
+            UttaksalderSpec(
+                pid = pid,
+                sivilstand = Sivilstand.SAMBOER,
+                harEps = true, // <----- since person's sivilstand is 'samboer'
+                sisteInntekt = 1,
+                simuleringstype = SimuleringType.ALDERSPENSJON
+            )
+        )
+    }
+
+    @Test
+    fun `when 'har EPS' not specified then service deduces it from specified sivilstand`() {
+        val person = person()
+        `when`(personClient.fetchPerson(pid)).thenReturn(person)
+
+        val spec = UttaksalderIngressSpecDto(
+            sivilstand = Sivilstand.REGISTRERT_PARTNER, // <----- sivilstand specified
+            harEps = null, // <----- 'har EPS' not specified
+            sisteInntekt = 1,
+            simuleringstype = SimuleringType.ALDERSPENSJON
+        )
+
+        val uttaksalder = service.finnTidligsteUttaksalder(spec)
+
+        assertNotNull(uttaksalder)
+        verify(uttaksalderClient, times(1)).finnTidligsteUttaksalder(
+            UttaksalderSpec(
+                pid = pid,
+                sivilstand = Sivilstand.REGISTRERT_PARTNER,
+                harEps = true, // <----- since person's sivilstand is 'registrert partner'
+                sisteInntekt = 1,
+                simuleringstype = SimuleringType.ALDERSPENSJON
+            )
+        )
+    }
+
+    @Test
+    fun `when 'har EPS' specified then service does not override it based on sivilstand`() {
+        val person = person(Sivilstand.GIFT)
+        `when`(opptjeningsgrunnlagClient.fetchOpptjeningsgrunnlag(anyObject())).thenReturn(opptjeningsgrunnlag)
+        `when`(personClient.fetchPerson(pid)).thenReturn(person)
+
+        val spec = UttaksalderIngressSpecDto(
+            sivilstand = null,
+            harEps = false, // <----- 'har EPS' specified
+            sisteInntekt = null,
+            simuleringstype = SimuleringType.ALDERSPENSJON
+        )
+
+        val uttaksalder = service.finnTidligsteUttaksalder(spec)
+
+        assertNotNull(uttaksalder)
+        verify(uttaksalderClient, times(1)).finnTidligsteUttaksalder(
+            UttaksalderSpec(
+                pid = pid,
+                sivilstand = Sivilstand.GIFT,
+                harEps = false, // <----- not overridden (despite sivistand 'gift')
+                sisteInntekt = inntekt.beloep.toInt(),
+                simuleringstype = SimuleringType.ALDERSPENSJON
+            )
+        )
     }
 
     private fun <T> anyObject(): T {

@@ -25,11 +25,12 @@ class UttaksalderService(
 
     fun finnTidligsteUttaksalder(specDto: UttaksalderIngressSpecDto): Alder? {
         val pid = pidGetter.pid()
+        val sivilstand = specDto.sivilstand ?: sivilstand(pid)
 
         val uttaksalderSpec = UttaksalderSpec(
             pid = pid,
-            sivilstand = specDto.sivilstand ?: sivilstand(pid),
-            harEps = specDto.harEps ?: false,
+            sivilstand = specDto.sivilstand ?: sivilstand,
+            harEps = specDto.harEps ?: sivilstand.harEps,
             sisteInntekt = specDto.sisteInntekt ?: sistePensjonsgivendeInntekt(pid),
             simuleringstype = specDto.simuleringstype ?: SimuleringType.ALDERSPENSJON,
         )
@@ -38,12 +39,13 @@ class UttaksalderService(
         return uttaksalderClient.finnTidligsteUttaksalder(uttaksalderSpec).also(::updateMetric)
     }
 
-    private fun sivilstand(pid: Pid) = personClient.fetchPerson(pid)?.sivilstand ?: Sivilstand.UOPPGITT
+    private fun sivilstand(pid: Pid): Sivilstand =
+        personClient.fetchPerson(pid)?.sivilstand ?: Sivilstand.UOPPGITT
 
-    private fun sistePensjonsgivendeInntekt(pid: Pid): Int {
-        val grunnlag = opptjeningsgrunnlagClient.fetchOpptjeningsgrunnlag(pid)
-        return InntektUtil.sistePensjonsgivendeInntekt(grunnlag).beloep.intValueExact()
-    }
+    private fun sistePensjonsgivendeInntekt(pid: Pid): Int =
+        opptjeningsgrunnlagClient.fetchOpptjeningsgrunnlag(pid).let {
+            InntektUtil.sistePensjonsgivendeInntekt(it).beloep.intValueExact()
+        }
 
     private companion object {
         private val teoretiskLavesteUttaksalder = Alder(62, 0)
