@@ -26,18 +26,17 @@ class PensjonsavtaleService(
 
         private fun filter(avtaler: Pensjonsavtaler) =
             Pensjonsavtaler(
-                avtaler = avtaler.avtaler.filter { it.kategori.included },
+                avtaler = avtaler.avtaler.filter { it.kategori.included && it.harStartAar },
                 utilgjengeligeSelskap = avtaler.utilgjengeligeSelskap
             )
 
         private val mockFnrs = listOf("46918903739", "02817996259")
 
-
         /**
          * Temporary function for testing pensjonsavtaler with specific characteristics
          */
         private fun mockPensjonsavtaler(fnr: String) =
-            if (fnr == "46918903739") mockGjensidigeAvtaler() else mockTidligeAvtaler()
+            if (fnr == "02817996259") mockGjensidigeAvtaler() else mockTidligeAvtaler()
 
         /**
          * Temporary function for testing pensjonsavtaler with start before uttaksalder

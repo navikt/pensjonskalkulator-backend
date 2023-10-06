@@ -18,25 +18,25 @@ object PensjonsavtaleFactory {
 
     fun avtaleMedToUtbetalingsperioder() =
         Pensjonsavtale(
-            "Avtale1",
-            "Firma1",
-            "Selskap1",
-            "Produkt1",
-            AvtaleKategori.INDIVIDUELL_ORDNING,
-            AvtaleUnderkategori.FORENINGSKOLLEKTIV,
-            1000,
-            100,
-            1000000,
-            900000,
-            1100000,
-            false,
-            EksternBeregningsmodell.BRANSJEAVTALE,
-            70,
-            80,
-            "2023-01-01",
-            ManglendeEksternGraderingAarsak.IKKE_STOETTET,
-            ManglendeEksternBeregningAarsak.UKJENT_PRODUKTTYPE,
-            listOf(
+            avtalenummer = "Avtale1",
+            arbeidsgiver = "Firma1",
+            selskapsnavn = "Selskap1",
+            produktbetegnelse = "Produkt1",
+            kategori = AvtaleKategori.INDIVIDUELL_ORDNING,
+            underkategori = AvtaleUnderkategori.FORENINGSKOLLEKTIV,
+            innskuddssaldo = 1000,
+            naavaerendeAvtaltAarligInnskudd = 100,
+            pensjonsbeholdningForventet = 1000000,
+            pensjonsbeholdningNedreGrense = 900000,
+            pensjonsbeholdningOvreGrense = 1100000,
+            avkastningsgaranti = false,
+            beregningsmodell = EksternBeregningsmodell.BRANSJEAVTALE,
+            startAar = 70,
+            sluttAar = 80,
+            opplysningsdato = "2023-01-01",
+            manglendeGraderingAarsak = ManglendeEksternGraderingAarsak.IKKE_STOETTET,
+            manglendeBeregningAarsak = ManglendeEksternBeregningAarsak.UKJENT_PRODUKTTYPE,
+            utbetalingsperioder = listOf(
                 utbetalingsperiodeMedSluttalder(),
                 utbetalingsperiodeUtenSluttalder()
             )
@@ -44,55 +44,55 @@ object PensjonsavtaleFactory {
 
     private fun utbetalingsperiodeMedSluttalder() =
         Utbetalingsperiode(
-            Alder(71, 0),
-            Alder(81, 1),
-            10000,
-            Uttaksgrad.HUNDRE_PROSENT
+            startAlder = Alder(71, 0),
+            sluttAlder = Alder(81, 1),
+            aarligUtbetaling = 10000,
+            grad = Uttaksgrad.HUNDRE_PROSENT
         )
 
     private fun utbetalingsperiodeUtenSluttalder() =
         Utbetalingsperiode(
-            Alder(72, 1),
-            null,
-            20000,
-            Uttaksgrad.AATTI_PROSENT
+            startAlder = Alder(72, 1),
+            sluttAlder = null,
+            aarligUtbetaling = 20000,
+            grad = Uttaksgrad.AATTI_PROSENT
         )
-
 
     private fun pensjonsavtale(startalder: Int) =
         Pensjonsavtale(
-            "produkt1",
-            AvtaleKategori.INDIVIDUELL_ORDNING,
-            startalder,
-            77,
-            listOf(utbetalingsperiode())
+            produktbetegnelse = "produkt1",
+            kategori = AvtaleKategori.INDIVIDUELL_ORDNING,
+            startalder = startalder,
+            sluttalder = 77,
+            utbetalingsperioder = listOf(utbetalingsperiode())
         )
 
     private fun pensjonsavtale(kategori: AvtaleKategori) =
         Pensjonsavtale(
-            "produkt1",
-            kategori,
-            67,
-            77,
-            listOf(utbetalingsperiode())
+            produktbetegnelse = "produkt1",
+            kategori = kategori,
+            startalder = 67,
+            sluttalder = 77,
+            utbetalingsperioder = listOf(utbetalingsperiode())
         )
 
     private fun utbetalingsperiode() =
         Utbetalingsperiode(
-            Alder(68, 1),
-            Alder(78, 11),
-            123000,
-            Uttaksgrad.HUNDRE_PROSENT
+            startAlder = Alder(68, 1),
+            sluttAlder = Alder(78, 11),
+            aarligUtbetaling = 123000,
+            grad = Uttaksgrad.HUNDRE_PROSENT
         )
 
     private fun selskap() = Selskap("selskap1", true)
 
     // Selskap med felter støttet i versjon 3 av tjenesten til Norsk Pensjon
-    private fun selskapV3() = Selskap(
-        "Selskap1",
-        true,
-        1,
-        AvtaleKategori.FOLKETRYGD,
-        "Feil1"
-    )
+    private fun selskapV3() =
+        Selskap(
+            navn = "Selskap1",
+            heltUtilgjengelig = true,
+            antallManglendeRettigheter = 1,
+            kategori = AvtaleKategori.FOLKETRYGD,
+            feilkode = "Feil1"
+        )
 }

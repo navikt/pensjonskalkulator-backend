@@ -60,6 +60,13 @@ class PensjonsavtaleServiceTest {
         result shouldBe pensjonsavtalerV3(listOf(AvtaleKategori.INDIVIDUELL_ORDNING))
     }
 
+    @Test
+    fun `fetchAvtaler excludes avtaler without start-aar`() {
+        `when`(avtaleClient.fetchAvtaler(pensjonsavtaleSpec(), pid)).thenReturn(enAvtaleUtenStart())
+        val result = avtaleService.fetchAvtaler(pensjonsavtaleSpec())
+        result shouldBe Pensjonsavtaler(emptyList(), emptyList())
+    }
+
     private fun arrangeClient() {
         `when`(avtaleClient.fetchAvtaler(pensjonsavtaleSpec(), pid)).thenReturn(pensjonsavtaler)
     }
@@ -97,6 +104,17 @@ class PensjonsavtaleServiceTest {
                 startAlder = Alder(70, 1),
                 grad = Uttaksgrad.HUNDRE_PROSENT,
                 aarligInntekt = 45000
+            )
+
+        private fun enAvtaleUtenStart() = Pensjonsavtaler(listOf(avtaleUtenStart()), emptyList())
+
+        private fun avtaleUtenStart() =
+            Pensjonsavtale(
+                produktbetegnelse = "produkt1",
+                kategori = AvtaleKategori.INDIVIDUELL_ORDNING,
+                startalder = 0,
+                sluttalder = null,
+                utbetalingsperioder = emptyList()
             )
     }
 }
