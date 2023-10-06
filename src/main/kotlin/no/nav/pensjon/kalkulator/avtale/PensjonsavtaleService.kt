@@ -3,7 +3,6 @@ package no.nav.pensjon.kalkulator.avtale
 import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
-import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import org.springframework.stereotype.Service
@@ -15,8 +14,13 @@ class PensjonsavtaleService(
     private val featureToggleService: FeatureToggleService
 ) {
     fun fetchAvtaler(spec: PensjonsavtaleSpec): Pensjonsavtaler {
-        return if (featureToggleService.isEnabled("mock-norsk-pensjon") && pidGetter.pid() == Pid("02817996259"))
-            mockAvtaler()
+        val fnr = pidGetter.pid().value
+
+        return if (featureToggleService.isEnabled("mock-norsk-pensjon") && mockFnrs.contains(fnr))
+            if (fnr == "46918903739")
+                mockGjensidigeAvtaler()
+            else
+                mockAvtaler()
         else
             filter(avtaleClient.fetchAvtaler(spec, pidGetter.pid()))
     }
@@ -29,6 +33,8 @@ class PensjonsavtaleService(
                 utilgjengeligeSelskap = avtaler.utilgjengeligeSelskap
             )
 
+        private val mockFnrs = listOf("46918903739", "02817996259")
+
         /**
          * Temporary function for testing pensjonsavtaler with start before uttaksalder
          */
@@ -38,7 +44,7 @@ class PensjonsavtaleService(
             return Pensjonsavtaler(
                 listOf(
                     Pensjonsavtale(
-                        "PENSJONSKAPITALBEVIS",
+                        "Mock livsvarig individuell ordning",
                         AvtaleKategori.INDIVIDUELL_ORDNING,
                         startAlderAar,
                         null,
@@ -47,6 +53,33 @@ class PensjonsavtaleService(
                                 startAlder = Alder(startAlderAar, 0),
                                 null,
                                 aarligUtbetaling = 32001,
+                                grad = Uttaksgrad.HUNDRE_PROSENT
+                            )
+                        )
+                    )
+                ), emptyList()
+            )
+        }
+
+        /**
+         * Temporary function for testing pensjonsavtaler with start/end maaneder not 0
+         */
+        private fun mockGjensidigeAvtaler(): Pensjonsavtaler {
+            val startAlderAar = 66
+            val startAlderMaaneder = 6
+
+            return Pensjonsavtaler(
+                listOf(
+                    Pensjonsavtale(
+                        "Mock privat tjenestepensjon",
+                        AvtaleKategori.PRIVAT_TJENESTEPENSJON,
+                        startAlderAar,
+                        null,
+                        listOf(
+                            Utbetalingsperiode(
+                                startAlder = Alder(startAlderAar, startAlderMaaneder),
+                                sluttAlder = Alder(startAlderAar + 10, startAlderMaaneder),
+                                aarligUtbetaling = 29008,
                                 grad = Uttaksgrad.HUNDRE_PROSENT
                             )
                         )
