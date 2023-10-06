@@ -39,11 +39,11 @@ class UfoerepensjonController(
     )
     fun harUfoeretrygd(@RequestBody spec: UfoerepensjonSpecDto): UfoerepensjonDto {
         traceAid.initialize()
-        log.info { "Request for uføretrygd-status" }
+        log.debug { "Request for uføretrygd-status" }
 
         return try {
             toDto(timed(service::harLoependeUfoerepensjon, spec.fom, "harLoependeUfoerepensjon"))
-                .also { log.info { "Uføretrygd-status respons: $it" } }
+                .also { log.debug { "Uføretrygd-status respons: $it" } }
         } catch (e: EgressException) {
             handleError(e)!!
         } finally {

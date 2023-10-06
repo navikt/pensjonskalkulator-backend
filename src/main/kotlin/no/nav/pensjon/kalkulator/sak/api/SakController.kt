@@ -39,11 +39,11 @@ class SakController(
     )
     fun harRelevantSak(): SakDto {
         traceAid.initialize()
-        log.info { "Request for sak-status" }
+        log.debug { "Request for sak-status" }
 
         return try {
             toDto(timed(service::harRelevantSak, "harRelevantSak"))
-                .also { log.info { "Sak-status respons: $it" } }
+                .also { log.debug { "Sak-status respons: $it" } }
         } catch (e: EgressException) {
             handleError(e)!!
         } finally {

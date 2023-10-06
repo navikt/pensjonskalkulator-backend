@@ -85,5 +85,7 @@ spec:
       value: never
     - name: STDOUT_LOG_OUTPUT
       value: JSON
+    - name: LOGGING_LEVEL
+      value: INFO
   envFrom:
     - secret: pensjonskalkulator-backend-unleash-api-token

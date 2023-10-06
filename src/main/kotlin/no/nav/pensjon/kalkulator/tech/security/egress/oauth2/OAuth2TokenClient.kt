@@ -42,7 +42,7 @@ abstract class OAuth2TokenClient(
             // Note: Do not use .body instead of .bodyValue, since this results in chunked encoding,
             // which the endpoint may not support, resulting in 404 Not Found
 
-            log.info { "Token obtained for audience '$audience'" }
+            log.debug { "Token obtained for audience '$audience'" }
             OAuth2TokenDataMapper.map(body, expirationChecker.time())
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)

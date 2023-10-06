@@ -39,11 +39,11 @@ class PersonController(
     )
     fun person(@RequestBody spec: UttaksalderIngressSpecDto?): PersonDto {
         traceAid.initialize()
-        log.info { "Request for personinformasjon: $spec" }
+        log.debug { "Request for personinformasjon: $spec" }
 
         return try {
             toDto(timed(service::getPerson, "person"))
-                .also { log.info { "Personinformasjon respons: $it" } }
+                .also { log.debug { "Personinformasjon respons: $it" } }
         } catch (e: EgressException) {
             handleError(e, "V0")!!
         } finally {

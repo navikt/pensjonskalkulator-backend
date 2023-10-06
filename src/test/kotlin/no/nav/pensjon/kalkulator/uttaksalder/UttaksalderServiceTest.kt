@@ -1,6 +1,5 @@
 package no.nav.pensjon.kalkulator.uttaksalder
 
-import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.PersonFactory.person
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.opptjening.Inntekt
@@ -42,18 +41,15 @@ internal class UttaksalderServiceTest {
     @BeforeEach
     fun initialize() {
         service = UttaksalderService(uttaksalderClient, opptjeningsgrunnlagClient, personClient, pidGetter)
-
         `when`(pidGetter.pid()).thenReturn(pid)
-        `when`(uttaksalderClient.finnTidligsteUttaksalder(anyObject())).thenReturn(uttaksalder)
     }
 
     @Test
     fun `finnTidligsteUttaksalder uses properties from spec`() {
         val spec = UttaksalderIngressSpecDto(Sivilstand.GIFT, true, 100_000, SimuleringType.ALDERSPENSJON)
 
-        val uttaksalder = service.finnTidligsteUttaksalder(spec)
+        service.finnTidligsteUttaksalder(spec)
 
-        assertNotNull(uttaksalder)
         verify(uttaksalderClient, times(1)).finnTidligsteUttaksalder(
             UttaksalderSpec(pid, Sivilstand.GIFT, true, 100_000, SimuleringType.ALDERSPENSJON)
         )
@@ -68,11 +64,16 @@ internal class UttaksalderServiceTest {
         `when`(personClient.fetchPerson(pid)).thenReturn(person)
         val spec = UttaksalderIngressSpecDto(null, null, null, SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
 
-        val uttaksalder = service.finnTidligsteUttaksalder(spec)
+        service.finnTidligsteUttaksalder(spec)
 
-        assertNotNull(uttaksalder)
         verify(uttaksalderClient, times(1)).finnTidligsteUttaksalder(
-            UttaksalderSpec(pid, person.sivilstand, false, inntekt.beloep.toInt(), SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
+            UttaksalderSpec(
+                pid = pid,
+                sivilstand = person.sivilstand,
+                harEps = false,
+                sisteInntekt = inntekt.beloep.toInt(),
+                simuleringstype = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT
+            )
         )
         verify(personClient, times(1)).fetchPerson(pid)
         verify(opptjeningsgrunnlagClient, times(1)).fetchOpptjeningsgrunnlag(pid)
@@ -89,9 +90,8 @@ internal class UttaksalderServiceTest {
             simuleringstype = SimuleringType.ALDERSPENSJON
         )
 
-        val uttaksalder = service.finnTidligsteUttaksalder(spec)
+        service.finnTidligsteUttaksalder(spec)
 
-        assertNotNull(uttaksalder)
         verify(uttaksalderClient, times(1)).finnTidligsteUttaksalder(
             UttaksalderSpec(
                 pid = pid,
@@ -115,14 +115,13 @@ internal class UttaksalderServiceTest {
             simuleringstype = SimuleringType.ALDERSPENSJON
         )
 
-        val uttaksalder = service.finnTidligsteUttaksalder(spec)
+        service.finnTidligsteUttaksalder(spec)
 
-        assertNotNull(uttaksalder)
         verify(uttaksalderClient, times(1)).finnTidligsteUttaksalder(
             UttaksalderSpec(
                 pid = pid,
                 sivilstand = Sivilstand.REGISTRERT_PARTNER,
-                harEps = true, // <----- since person's sivilstand is 'registrert partner'
+                harEps = true, // <----- since specified sivilstand is 'registrert partner'
                 sisteInntekt = 1,
                 simuleringstype = SimuleringType.ALDERSPENSJON
             )
@@ -142,14 +141,13 @@ internal class UttaksalderServiceTest {
             simuleringstype = SimuleringType.ALDERSPENSJON
         )
 
-        val uttaksalder = service.finnTidligsteUttaksalder(spec)
+        service.finnTidligsteUttaksalder(spec)
 
-        assertNotNull(uttaksalder)
         verify(uttaksalderClient, times(1)).finnTidligsteUttaksalder(
             UttaksalderSpec(
                 pid = pid,
                 sivilstand = Sivilstand.GIFT,
-                harEps = false, // <----- not overridden (despite sivistand 'gift')
+                harEps = false, // <----- not overridden (despite sivilstand 'gift')
                 sisteInntekt = inntekt.beloep.toInt(),
                 simuleringstype = SimuleringType.ALDERSPENSJON
             )
@@ -161,7 +159,6 @@ internal class UttaksalderServiceTest {
     }
 
     private companion object {
-        private val uttaksalder = Alder(67, 0)
         private val inntekt = Inntekt(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, 2023, BigDecimal("543210"))
         private val opptjeningsgrunnlag = Opptjeningsgrunnlag(listOf(inntekt))
     }

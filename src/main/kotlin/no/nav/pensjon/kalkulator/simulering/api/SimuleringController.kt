@@ -50,11 +50,11 @@ class SimuleringController(
     )
     fun simulerAlderspensjon(@RequestBody spec: SimuleringSpecDto): SimuleringsresultatDto {
         traceAid.initialize()
-        log.info { "Request for simulering: $spec" }
+        log.debug { "Request for simulering: $spec" }
 
         return try {
             resultatDto(timed(service::simulerAlderspensjon, fromSpecDto(spec), "alderspensjon/simulering"))
-                .also { log.info { "Simulering respons: $it" } }
+                .also { log.debug { "Simulering respons: $it" } }
         } catch (e: EgressException) {
             if (e.isConflict) vilkaarIkkeOppfylt() else handleError(e, "V1")!!
         } finally {

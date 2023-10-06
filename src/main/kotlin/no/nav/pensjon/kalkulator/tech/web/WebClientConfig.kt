@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.web
 
+import io.netty.handler.logging.LogLevel
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -15,8 +16,8 @@ import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import reactor.netty.http.client.HttpClient
+import reactor.netty.transport.logging.AdvancedByteBufFormat
 import java.nio.charset.StandardCharsets
-
 
 @Configuration
 class WebClientConfig {
@@ -32,7 +33,7 @@ class WebClientConfig {
     @Qualifier("large-response")
     fun largeBufferWebClient(): WebClient =
         WebClient.builder()
-            .clientConnector(ReactorClientHttpConnector(HttpClient.create()))
+            .clientConnector(ReactorClientHttpConnector(wiretap()))
             .exchangeStrategies(largeBufferStrategies())
             .filter(filterResponse())
             .build()
@@ -91,5 +92,12 @@ class WebClientConfig {
 
         private fun reasonForAccessDenial(response: ClientResponse): String =
             response.headers().asHttpHeaders()[HttpHeaders.WWW_AUTHENTICATE]?.firstOrNull() ?: "(access denied)"
+
+        private fun wiretap(): HttpClient =
+            HttpClient.create().wiretap(
+                "reactor.netty.http.client.HttpClient",
+                LogLevel.DEBUG,
+                AdvancedByteBufFormat.TEXTUAL
+            )
     }
 }

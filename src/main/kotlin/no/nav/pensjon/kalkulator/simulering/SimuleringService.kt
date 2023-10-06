@@ -28,7 +28,7 @@ class SimuleringService(
             impersonalSpec.sivilstand ?: sivilstand(pid)
         )
 
-        log.info { "Simulerer med parametre $impersonalSpec og $personalSpec" }
+        log.debug { "Simulerer med parametre $impersonalSpec og $personalSpec" }
         return simuleringClient.simulerAlderspensjon(impersonalSpec, personalSpec)
     }
 

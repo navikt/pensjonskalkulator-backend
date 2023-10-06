@@ -88,6 +88,8 @@ spec:
       value: always
     - name: STDOUT_LOG_OUTPUT
       value: JSON
+    - name: LOGGING_LEVEL
+      value: DEBUG
     - name: JAVA_TOOL_OPTIONS
       value: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
   envFrom:

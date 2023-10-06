@@ -39,11 +39,11 @@ class InntektController(
     )
     fun sistePensjonsgivendeInntekt(): InntektDto {
         traceAid.initialize()
-        log.info { "Request for inntekt" }
+        log.debug { "Request for inntekt" }
 
         return try {
             toDto(timed(service::sistePensjonsgivendeInntekt, "sistePensjonsgivendeInntekt"))
-                .also { log.info { "Inntekt respons: $it" } }
+                .also { log.debug { "Inntekt respons: $it" } }
         } catch (e: EgressException) {
             handleError(e, "V0")!!
         } finally {

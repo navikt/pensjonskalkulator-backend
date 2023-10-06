@@ -23,11 +23,11 @@ class TjenestepensjonController(
     )
     fun harTjenestepensjonsforhold(): TjenestepensjonsforholdDto {
         traceAid.initialize()
-        log.info { "Request for tjenestepensjonsforhold-status" }
+        log.debug { "Request for tjenestepensjonsforhold-status" }
 
         return try {
             toDto(timed(service::harTjenestepensjonsforhold, "harTjenestepensjonsforhold"))
-                .also { log.info { "Tjenestepensjonsforhold-status respons: $it" } }
+                .also { log.debug { "Tjenestepensjonsforhold-status respons: $it" } }
         } catch (e: EgressException) {
             handleError(e)!!
         } finally {

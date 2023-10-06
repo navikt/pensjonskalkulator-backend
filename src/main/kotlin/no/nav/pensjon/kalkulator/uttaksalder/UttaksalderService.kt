@@ -35,7 +35,7 @@ class UttaksalderService(
             simuleringstype = specDto.simuleringstype ?: SimuleringType.ALDERSPENSJON,
         )
 
-        log.info { "Finner første mulige uttaksalder med parametre $uttaksalderSpec" }
+        log.debug { "Finner første mulige uttaksalder med parametre $uttaksalderSpec" }
         return uttaksalderClient.finnTidligsteUttaksalder(uttaksalderSpec).also(::updateMetric)
     }
 

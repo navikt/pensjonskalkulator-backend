@@ -41,11 +41,11 @@ class PensjonsavtaleController(
     )
     fun fetchAvtalerV1(@RequestBody spec: PensjonsavtaleIngressSpecDto): PensjonsavtalerDto {
         traceAid.initialize()
-        log.info { "Request for pensjonsavtaler V1: $spec" }
+        log.debug { "Request for pensjonsavtaler V1: $spec" }
 
         return try {
             toDto(timed(service::fetchAvtaler, fromDto(spec), "pensjonsavtaler V1"))
-                .also { log.info { "Pensjonsavtaler respons V1: $it" } }
+                .also { log.debug { "Pensjonsavtaler respons V1: $it" } }
         } catch (e: EgressException) {
             handleError(e, "V1")!!
         } finally {
