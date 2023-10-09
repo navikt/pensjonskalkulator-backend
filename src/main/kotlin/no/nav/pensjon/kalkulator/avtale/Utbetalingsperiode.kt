@@ -19,6 +19,10 @@ data class Utbetalingsperiode(
 ) {
     val erLivsvarig = sluttAlder == null
 
+    init {
+        require(startAlder lessThanOrEqualTo sluttAlder) { "startAlder <= sluttAlder" }
+    }
+
     constructor(
         startAlder: Alder,
         sluttAlder: Alder?,

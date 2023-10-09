@@ -17,12 +17,7 @@ class PensjonsavtaleMapperTest {
 
     @Test
     fun `toDto maps domain object (pensjonsavtaler) to data transfer object`() {
-        PensjonsavtaleMapper.toDto(pensjonsavtaler(67)) shouldBe pensjonsavtalerDto(67)
-    }
-
-    @Test
-    fun `toDto maps zero avtale-startalder to null`() {
-        PensjonsavtaleMapper.toDto(pensjonsavtaler(0)) shouldBe pensjonsavtalerDto(null)
+        PensjonsavtaleMapper.toDto(pensjonsavtaler(67)) shouldBe pensjonsavtalerDto()
     }
 
     private companion object {
@@ -41,17 +36,17 @@ class PensjonsavtaleMapperTest {
                 antallInntektsaarEtterUttak = 2
             )
 
-        private fun pensjonsavtalerDto(startalder: Int?) =
+        private fun pensjonsavtalerDto() =
             PensjonsavtalerDto(
-                avtaler = listOf(avtale(startalder)),
+                avtaler = listOf(avtale()),
                 utilgjengeligeSelskap = listOf(selskap())
             )
 
-        private fun avtale(startalder: Int?) =
+        private fun avtale() =
             PensjonsavtaleDto(
                 produktbetegnelse = "produkt1",
                 kategori = AvtaleKategori.INDIVIDUELL_ORDNING,
-                startAar = startalder,
+                startAar = 67,
                 sluttAar = 77,
                 utbetalingsperioder = listOf(utbetalingsperiode())
             )

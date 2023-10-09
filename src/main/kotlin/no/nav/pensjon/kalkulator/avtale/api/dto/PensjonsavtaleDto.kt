@@ -8,7 +8,7 @@ import no.nav.pensjon.kalkulator.general.Alder
 data class PensjonsavtaleDto(
     val produktbetegnelse: String,
     val kategori: AvtaleKategori,
-    val startAar: Int?, // år som i alder – NB: ikke påkrevd
+    val startAar: Int, // år som i alder – NB: avtaler uten startår returneres ikke
     val sluttAar: Int?, // år som i alder
     val utbetalingsperioder: List<UtbetalingsperiodeDto>
 )

@@ -34,7 +34,7 @@ object PensjonsavtaleMapper {
         PensjonsavtaleDto(
             produktbetegnelse = source.produktbetegnelse,
             kategori = source.kategori,
-            startAar = if (source.harStartAar) source.startAar else null,
+            startAar = source.startAar,
             sluttAar = source.sluttAar,
             utbetalingsperioder = source.utbetalingsperioder.map(::toPeriodeDto)
         )
