@@ -6,6 +6,7 @@ import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.PensjonReglerGrunnbel
 import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.client.pdl.PdlPersonClient
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
+import no.nav.pensjon.kalkulator.tech.security.ingress.ping.IdPortenPingClient
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClient
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
@@ -29,6 +30,9 @@ class SelfTestTest {
     private lateinit var grunnbeloepClient: PensjonReglerGrunnbeloepClient
 
     @Mock
+    private lateinit var idPortenClient: IdPortenPingClient
+
+    @Mock
     private lateinit var opptjeningClient: PoppOpptjeningsgrunnlagClient
 
     @Mock
@@ -45,6 +49,7 @@ class SelfTestTest {
         selfTest = TestClass(
             fssGatewayClient,
             grunnbeloepClient,
+            idPortenClient,
             opptjeningClient,
             penClient,
             personClient,
@@ -127,6 +132,9 @@ $TABLE_BODY
         `when`(grunnbeloepClient.ping())
             .thenReturn(PingResult(EgressService.PENSJON_REGLER, status, "regler-endpoint", "regler-message"))
 
+        `when`(idPortenClient.ping())
+            .thenReturn(PingResult(EgressService.ID_PORTEN, status, "idporten-endpoint", "idporten-message"))
+
         `when`(opptjeningClient.ping())
             .thenReturn(PingResult(EgressService.PENSJONSOPPTJENING, status, "popp-endpoint", "popp-message"))
 
@@ -143,6 +151,7 @@ $TABLE_BODY
     private class TestClass(
         fssGatewayClient: FssGatewayPingClient,
         grunnbeloepClient: PensjonReglerGrunnbeloepClient,
+        idPortenClient: IdPortenPingClient,
         opptjeningClient: PoppOpptjeningsgrunnlagClient,
         penClient: PenPingClient,
         personClient: PdlPersonClient,
@@ -151,6 +160,7 @@ $TABLE_BODY
         SelfTest(
             fssGatewayClient,
             grunnbeloepClient,
+            idPortenClient,
             opptjeningClient,
             penClient,
             personClient,
@@ -167,6 +177,7 @@ $TABLE_BODY
         private const val UP_CHECKS: String = "[" +
                 "{\"endpoint\":\"fssgw-endpoint\",\"description\":\"Fagsystemsone-gateway\",\"result\":0}, " +
                 "{\"endpoint\":\"regler-endpoint\",\"description\":\"Pensjon-regler\",\"result\":0}, " +
+                "{\"endpoint\":\"idporten-endpoint\",\"description\":\"ID-porten\",\"result\":0}, " +
                 "{\"endpoint\":\"popp-endpoint\",\"description\":\"Pensjonsopptjening\",\"result\":0}, " +
                 "{\"endpoint\":\"pen-endpoint\",\"description\":\"Pensjonsfaglig kjerne\",\"result\":0}, " +
                 "{\"endpoint\":\"pdl-endpoint\",\"description\":\"Persondataløsningen\",\"result\":0}, " +
@@ -177,6 +188,7 @@ $TABLE_BODY
         private const val DOWN_CHECKS: String = "[" +
                 "{\"endpoint\":\"fssgw-endpoint\",\"description\":\"Fagsystemsone-gateway\",\"errorMessage\":\"fssgw-message\",\"result\":1}, " +
                 "{\"endpoint\":\"regler-endpoint\",\"description\":\"Pensjon-regler\",\"errorMessage\":\"regler-message\",\"result\":1}, " +
+                "{\"endpoint\":\"idporten-endpoint\",\"description\":\"ID-porten\",\"errorMessage\":\"idporten-message\",\"result\":1}, " +
                 "{\"endpoint\":\"popp-endpoint\",\"description\":\"Pensjonsopptjening\",\"errorMessage\":\"popp-message\",\"result\":1}, " +
                 "{\"endpoint\":\"pen-endpoint\",\"description\":\"Pensjonsfaglig kjerne\",\"errorMessage\":\"pen-message\",\"result\":1}, " +
                 "{\"endpoint\":\"pdl-endpoint\",\"description\":\"Persondataløsningen\",\"errorMessage\":\"pdl-message\",\"result\":1}, " +
@@ -185,8 +197,9 @@ $TABLE_BODY
 
         @Language("html")
         private const val TABLE_BODY: String = "<tbody>" +
-                "<tr><td>Fagsystemsone-gateway</td><td style=\"background-color:green;text-align:center;\">UP</td><td>fssgw-message</td><td>fssgw-endpoint</td><td>SOAP UsernameToken</td></tr>" +
+                "<tr><td>Fagsystemsone-gateway</td><td style=\"background-color:green;text-align:center;\">UP</td><td>fssgw-message</td><td>fssgw-endpoint</td><td>Tilgang til Fagsystemsonen</td></tr>" +
                 "<tr><td>Pensjon-regler</td><td style=\"background-color:green;text-align:center;\">UP</td><td>regler-message</td><td>regler-endpoint</td><td>Pensjonsregler</td></tr>" +
+                "<tr><td>ID-porten</td><td style=\"background-color:green;text-align:center;\">UP</td><td>idporten-message</td><td>idporten-endpoint</td><td>Token-utsteder</td></tr>" +
                 "<tr><td>Pensjonsopptjening</td><td style=\"background-color:green;text-align:center;\">UP</td><td>popp-message</td><td>popp-endpoint</td><td>Pensjonsopptjeningsdata</td></tr>" +
                 "<tr><td>Pensjonsfaglig kjerne</td><td style=\"background-color:green;text-align:center;\">UP</td><td>pen-message</td><td>pen-endpoint</td><td>Simulering, pensjonsdata</td></tr>" +
                 "<tr><td>Persondataløsningen</td><td style=\"background-color:green;text-align:center;\">UP</td><td>pdl-message</td><td>pdl-endpoint</td><td>Persondata</td></tr>" +

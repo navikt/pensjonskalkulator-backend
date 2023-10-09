@@ -22,9 +22,9 @@ import java.util.*
 /**
  * Fetches UsernameToken (UNT) from FSS gateway.
  */
-@Component
+//@Component <--- FssGatewayUsernameTokenClient is not used at the moment
 class FssGatewayUsernameTokenClient(
-    @Value("\${unt.url}") private val baseUrl: String,
+    @Value("\${proxy.url}") private val baseUrl: String,
     private val webClient: WebClient,
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String

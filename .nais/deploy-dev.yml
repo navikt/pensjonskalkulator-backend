@@ -58,6 +58,8 @@ spec:
   env:
     - name: IDPORTEN_ISSUER
       value: https://test.idporten.no
+    - name: IDPORTEN_PING_URL
+      value: https://test.idporten.no/.well-known/openid-configuration
     - name: FSS_GATEWAY_SERVICE_ID
       value: dev-fss:pensjonselvbetjening:pensjon-selvbetjening-fss-gateway
     - name: FSS_GATEWAY_URL
@@ -74,16 +76,16 @@ spec:
       value: dev-fss:pdl:pdl-api
     - name: PERSONDATA_URL
       value: https://pdl-api.dev-fss-pub.nais.io
+    - name: POPP_SERVICE_ID
+      value: dev-fss:pensjonopptjening:pensjon-popp-q2
     - name: POPP_URL
-      value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
+      value: https://pensjon-popp.dev-fss-pub.nais.io
     - name: STS_URL
       value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: TJENESTEPENSJON_SERVICE_ID
       value: dev-fss:pensjonsamhandling:tp-q2
     - name: TJENESTEPENSJON_URL
       value: https://tp-api-q2.dev-fss-pub.nais.io
-    - name: UNT_URL
-      value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: SERVER_ERROR_INCLUDE_STACKTRACE
       value: always
     - name: STDOUT_LOG_OUTPUT
