@@ -5,6 +5,7 @@ import no.nav.pensjon.kalkulator.common.client.pen.PenPingClient
 import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.PensjonReglerGrunnbeloepClient
 import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.client.pdl.PdlPersonClient
+import no.nav.pensjon.kalkulator.tech.security.egress.azuread.AzureAdOAuth2MetadataClient
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.ingress.ping.IdPortenPingClient
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClient
@@ -30,6 +31,9 @@ class SelfTestTest {
     private lateinit var grunnbeloepClient: PensjonReglerGrunnbeloepClient
 
     @Mock
+    private lateinit var entraIdClient: AzureAdOAuth2MetadataClient
+
+    @Mock
     private lateinit var idPortenClient: IdPortenPingClient
 
     @Mock
@@ -50,6 +54,7 @@ class SelfTestTest {
             fssGatewayClient,
             grunnbeloepClient,
             idPortenClient,
+            entraIdClient,
             opptjeningClient,
             penClient,
             personClient,
@@ -135,6 +140,9 @@ $TABLE_BODY
         `when`(idPortenClient.ping())
             .thenReturn(PingResult(EgressService.ID_PORTEN, status, "idporten-endpoint", "idporten-message"))
 
+        `when`(entraIdClient.ping())
+            .thenReturn(PingResult(EgressService.MICROSOFT_ENTRA_ID, status, "entraid-endpoint", "entraid-message"))
+
         `when`(opptjeningClient.ping())
             .thenReturn(PingResult(EgressService.PENSJONSOPPTJENING, status, "popp-endpoint", "popp-message"))
 
@@ -152,6 +160,7 @@ $TABLE_BODY
         fssGatewayClient: FssGatewayPingClient,
         grunnbeloepClient: PensjonReglerGrunnbeloepClient,
         idPortenClient: IdPortenPingClient,
+        entraIdOAuth2MetadataClient: AzureAdOAuth2MetadataClient,
         opptjeningClient: PoppOpptjeningsgrunnlagClient,
         penClient: PenPingClient,
         personClient: PdlPersonClient,
@@ -161,6 +170,7 @@ $TABLE_BODY
             fssGatewayClient,
             grunnbeloepClient,
             idPortenClient,
+            entraIdOAuth2MetadataClient,
             opptjeningClient,
             penClient,
             personClient,
@@ -178,6 +188,7 @@ $TABLE_BODY
                 "{\"endpoint\":\"fssgw-endpoint\",\"description\":\"Fagsystemsone-gateway\",\"result\":0}, " +
                 "{\"endpoint\":\"regler-endpoint\",\"description\":\"Pensjon-regler\",\"result\":0}, " +
                 "{\"endpoint\":\"idporten-endpoint\",\"description\":\"ID-porten\",\"result\":0}, " +
+                "{\"endpoint\":\"entraid-endpoint\",\"description\":\"Microsoft Entra ID\",\"result\":0}, " +
                 "{\"endpoint\":\"popp-endpoint\",\"description\":\"Pensjonsopptjening\",\"result\":0}, " +
                 "{\"endpoint\":\"pen-endpoint\",\"description\":\"Pensjonsfaglig kjerne\",\"result\":0}, " +
                 "{\"endpoint\":\"pdl-endpoint\",\"description\":\"Persondataløsningen\",\"result\":0}, " +
@@ -189,6 +200,7 @@ $TABLE_BODY
                 "{\"endpoint\":\"fssgw-endpoint\",\"description\":\"Fagsystemsone-gateway\",\"errorMessage\":\"fssgw-message\",\"result\":1}, " +
                 "{\"endpoint\":\"regler-endpoint\",\"description\":\"Pensjon-regler\",\"errorMessage\":\"regler-message\",\"result\":1}, " +
                 "{\"endpoint\":\"idporten-endpoint\",\"description\":\"ID-porten\",\"errorMessage\":\"idporten-message\",\"result\":1}, " +
+                "{\"endpoint\":\"entraid-endpoint\",\"description\":\"Microsoft Entra ID\",\"errorMessage\":\"entraid-message\",\"result\":1}, " +
                 "{\"endpoint\":\"popp-endpoint\",\"description\":\"Pensjonsopptjening\",\"errorMessage\":\"popp-message\",\"result\":1}, " +
                 "{\"endpoint\":\"pen-endpoint\",\"description\":\"Pensjonsfaglig kjerne\",\"errorMessage\":\"pen-message\",\"result\":1}, " +
                 "{\"endpoint\":\"pdl-endpoint\",\"description\":\"Persondataløsningen\",\"errorMessage\":\"pdl-message\",\"result\":1}, " +
@@ -200,6 +212,7 @@ $TABLE_BODY
                 "<tr><td>Fagsystemsone-gateway</td><td style=\"background-color:green;text-align:center;\">UP</td><td>fssgw-message</td><td>fssgw-endpoint</td><td>Tilgang til Fagsystemsonen</td></tr>" +
                 "<tr><td>Pensjon-regler</td><td style=\"background-color:green;text-align:center;\">UP</td><td>regler-message</td><td>regler-endpoint</td><td>Pensjonsregler</td></tr>" +
                 "<tr><td>ID-porten</td><td style=\"background-color:green;text-align:center;\">UP</td><td>idporten-message</td><td>idporten-endpoint</td><td>Token-utsteder</td></tr>" +
+                "<tr><td>Microsoft Entra ID</td><td style=\"background-color:green;text-align:center;\">UP</td><td>entraid-message</td><td>entraid-endpoint</td><td>OAuth2 configuration data</td></tr>" +
                 "<tr><td>Pensjonsopptjening</td><td style=\"background-color:green;text-align:center;\">UP</td><td>popp-message</td><td>popp-endpoint</td><td>Pensjonsopptjeningsdata</td></tr>" +
                 "<tr><td>Pensjonsfaglig kjerne</td><td style=\"background-color:green;text-align:center;\">UP</td><td>pen-message</td><td>pen-endpoint</td><td>Simulering, pensjonsdata</td></tr>" +
                 "<tr><td>Persondataløsningen</td><td style=\"background-color:green;text-align:center;\">UP</td><td>pdl-message</td><td>pdl-endpoint</td><td>Persondata</td></tr>" +
