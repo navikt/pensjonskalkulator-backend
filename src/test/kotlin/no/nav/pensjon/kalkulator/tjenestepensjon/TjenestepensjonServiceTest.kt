@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.tjenestepensjon
 import no.nav.pensjon.kalkulator.mock.DateFactory.date
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
+import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.TjenestepensjonClient
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -23,9 +24,12 @@ class TjenestepensjonServiceTest {
     @Mock
     private lateinit var pidGetter: PidGetter
 
+    @Mock
+    private lateinit var featureToggleService: FeatureToggleService
+
     @BeforeEach
     fun initialize() {
-        service = TjenestepensjonService(client, pidGetter) { date }
+        service = TjenestepensjonService(client, pidGetter, featureToggleService) { date }
     }
 
     @Test

@@ -81,7 +81,7 @@ class PensjonsavtaleService(
                         listOf(
                             Utbetalingsperiode(
                                 startAlder = Alder(startAlderAar, startAlderMaaneder),
-                                sluttAlder = Alder(startAlderAar + 10, startAlderMaaneder),
+                                sluttAlder = Alder(startAlderAar + 10, startAlderMaaneder - 1), // NP bruker 'til', vi bruker 't.o.m.' => -1
                                 aarligUtbetaling = 29008,
                                 grad = Uttaksgrad.HUNDRE_PROSENT
                             )
