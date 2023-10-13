@@ -208,7 +208,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
                     <startAlder>71</startAlder>
                     <startMaaned>1</startMaaned>
                     <sluttAlder>81</sluttAlder>
-                    <sluttMaaned>2</sluttMaaned>
+                    <sluttMaaned>3</sluttMaaned>
                     <aarligUtbetalingForventet>10000</aarligUtbetalingForventet>
                     <grad>100</grad>
                 </utbetalingsperioder>
@@ -246,7 +246,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
                     <startAlder>71</startAlder>
                     <startMaaned>1</startMaaned>
                     <sluttAlder>81</sluttAlder>
-                    <sluttMaaned>2</sluttMaaned>
+                    <sluttMaaned>3</sluttMaaned>
                     <aarligUtbetalingForventet>10000</aarligUtbetalingForventet>
                     <grad>100</grad>
                 </utbetalingsperioder>

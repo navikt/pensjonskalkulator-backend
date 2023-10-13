@@ -4,14 +4,23 @@ import no.nav.pensjon.kalkulator.avtale.*
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.Sivilstatus
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.*
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.map.NorskPensjonSluttAlderMapper.sluttAar
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.person.Pid
+import no.nav.pensjon.kalkulator.tech.time.DateUtil.MAANEDER_PER_AAR
 
 object NorskPensjonPensjonsavtaleMapper {
 
+    // Norsk Pensjon angir måned 1..12, vi angir antall måneder 0..11 => forskyvning 1
+    private const val STARTMAANED_FORSKYVNING = 1
+
+    // Norsk Pensjon regner "til", vi regner "til og med" => forskyvning 1
+    // Norsk Pensjon angir måned 1..12, vi angir antall måneder 0..11 => forskyvning 1
+    // Total forskyvning: 2
+    const val SLUTTMAANED_FORSKYVNING = 2
+
     private const val DEFAULT_VALUE = "ukjent"
-    private val DEFAULT_UTTAKSGRAD = Uttaksgrad.HUNDRE_PROSENT
     private val DEFAULT_HAR_EPS_PENSJON = true // Norsk Pensjon default
     private val DEFAULT_HAR_EPS_PENSJONSGIVENDE_INNTEKT_OVER_2G = true // Norsk Pensjon default
 
@@ -30,10 +39,9 @@ object NorskPensjonPensjonsavtaleMapper {
             oenskesSimuleringAvFolketrygd = false
         )
 
-    // Norsk Pensjon bruker månedsverdier 1..12 (dermed '+ 1')
     private fun toUttaksperiodeEgressSpecDto(spec: UttaksperiodeSpec) =
         NorskPensjonUttaksperiodeSpecDto(
-            startAlder = NorskPensjonAlderDto(spec.startAlder.aar, spec.startAlder.maaneder + 1),
+            startAlder = NorskPensjonAlderDto(spec.startAlder.aar, spec.startAlder.maaneder + STARTMAANED_FORSKYVNING),
             grad = spec.grad,
             aarligInntekt = spec.aarligInntekt
         )
@@ -67,9 +75,10 @@ object NorskPensjonPensjonsavtaleMapper {
                 avkastningsgaranti = it.avkastningsgaranti ?: false,
                 beregningsmodell = Beregningsmodell.fromExternalValue(it.beregningsmodell).internalValue,
                 startAar = it.startAlder ?: 0,
-                sluttAar = it.sluttAlder,
+                sluttAar = sluttAar(it.sluttAlder, it.utbetalingsperioder),
                 opplysningsdato = it.opplysningsdato ?: DEFAULT_VALUE,
-                manglendeGraderingAarsak = it.aarsakManglendeGradering?.internalValue ?: ManglendeEksternGraderingAarsak.NONE,
+                manglendeGraderingAarsak = it.aarsakManglendeGradering?.internalValue
+                    ?: ManglendeEksternGraderingAarsak.NONE,
                 manglendeBeregningAarsak = it.aarsakIkkeBeregnet?.internalValue ?: ManglendeEksternBeregningAarsak.NONE,
                 utbetalingsperioder = it.utbetalingsperioder?.map(::utbetalingsperiode) ?: emptyList()
             )
@@ -88,13 +97,22 @@ object NorskPensjonPensjonsavtaleMapper {
 
     private fun utbetalingsperiode(source: UtbetalingsperiodeDto) =
         Utbetalingsperiode(
-            startAlder = Alder(source.startAlder!!, source.startMaaned!! - 1),
-            sluttAlder = source.sluttAlder?.let { Alder(it, source.sluttMaaned!! - 1) },
+            startAlder = Alder(source.startAlder, source.startMaaned - STARTMAANED_FORSKYVNING),
+            sluttAlder = source.sluttAlder?.let { sluttalder(it, source.sluttMaaned!!) },
             aarligUtbetalingForventet = source.aarligUtbetalingForventet ?: 0,
             aarligUtbetalingNedreGrense = source.aarligUtbetalingNedreGrense ?: 0,
             aarligUtbetalingOvreGrense = source.aarligUtbetalingOvreGrense ?: 0,
-            grad = source.grad?.let { Uttaksgrad.from(it) } ?: DEFAULT_UTTAKSGRAD
+            grad = source.grad.let { Uttaksgrad.from(it) }
         )
+
+    private fun sluttalder(norskPensjonSluttAlder: Int, norskPensjonSluttMaaned: Int): Alder {
+        val maaneder = norskPensjonSluttMaaned - SLUTTMAANED_FORSKYVNING
+
+        return if (maaneder < 0)
+            Alder(norskPensjonSluttAlder - 1, maaneder + MAANEDER_PER_AAR)
+        else
+            Alder(norskPensjonSluttAlder, maaneder)
+    }
 
     private fun emptyOrFault(dto: EnvelopeDto) =
         dto.body?.fault?.run { throw RuntimeException(faultToString(this)) }

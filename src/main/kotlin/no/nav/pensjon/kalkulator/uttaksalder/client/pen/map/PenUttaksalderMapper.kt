@@ -3,13 +3,12 @@ package no.nav.pensjon.kalkulator.uttaksalder.client.pen.map
 import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenSimuleringstype
+import no.nav.pensjon.kalkulator.tech.time.DateUtil.MAANEDER_PER_AAR
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderEgressSpecDto
 import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderDto
 
 object PenUttaksalderMapper {
-
-    private const val MAANEDER_PER_AAR = 12
 
     fun fromDto(dto: UttaksalderDto) =
         Alder(

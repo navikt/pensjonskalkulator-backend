@@ -63,7 +63,7 @@ class NorskPensjonPensjonsavtaleMapperTest {
                 startAlder = 71
                 startMaaned = 1
                 sluttAlder = 81
-                sluttMaaned = 2
+                sluttMaaned = 3
                 aarligUtbetalingForventet = 10000
                 aarligUtbetalingNedreGrense = 0
                 aarligUtbetalingOvreGrense = 0
