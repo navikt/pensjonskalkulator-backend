@@ -8,6 +8,7 @@ import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.dto.GrunnbeloepReques
 import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.dto.GrunnbeloepResponseDto
 import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.map.GrunnbeloepMapper
 import no.nav.pensjon.kalkulator.regler.PensjonReglerClient
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -18,8 +19,10 @@ import java.util.*
 class PensjonReglerGrunnbeloepClient(
     @Value("\${pensjon-regler.url}") baseUrl: String,
     webClient: WebClient,
-    @Qualifier("regler") objectMapper: ObjectMapper
-) : PensjonReglerClient(baseUrl, webClient, objectMapper), GrunnbeloepClient {
+    @Qualifier("regler") objectMapper: ObjectMapper,
+    traceAid: TraceAid,
+    @Value("\${web-client.retry-attempts}") retryAttempts: String
+) : PensjonReglerClient(baseUrl, webClient, objectMapper, traceAid, retryAttempts), GrunnbeloepClient {
 
     override fun getGrunnbeloep(spec: GrunnbeloepSpec): Grunnbeloep {
         val requestSpec = GrunnbeloepMapper.toDto(spec)
@@ -31,6 +34,6 @@ class PensjonReglerGrunnbeloepClient(
     }
 
     companion object {
-        private const val GRUNNBELOEP_PATH = "/api/hentGrunnbelopListe"
+        private const val GRUNNBELOEP_PATH = "api/hentGrunnbelopListe"
     }
 }

@@ -20,6 +20,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.util.*
 
@@ -67,13 +68,14 @@ class PdlPersonClient(
                 .headers(::setHeaders)
                 .retrieve()
                 .toBodilessEntity()
+                .retryWhen(retryBackoffSpec(uri))
                 .block()
 
             PingResult(service, ServiceStatus.UP, uri, "Ping OK")
+        } catch (e: WebClientRequestException) {
+            PingResult(service, ServiceStatus.DOWN, uri, e.message ?: "forespørsel feilet")
         } catch (e: WebClientResponseException) {
             PingResult(service, ServiceStatus.DOWN, uri, e.responseBodyAsString)
-        } catch (e: RuntimeException) { // e.g. when connection broken
-            PingResult(service, ServiceStatus.DOWN, uri, e.message ?: "Ping failed")
         }
     }
 

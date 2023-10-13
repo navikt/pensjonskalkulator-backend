@@ -8,6 +8,7 @@ import no.nav.pensjon.kalkulator.opptjening.client.regler.dto.OpptjeningRequestD
 import no.nav.pensjon.kalkulator.opptjening.client.regler.dto.OpptjeningResponseDto
 import no.nav.pensjon.kalkulator.opptjening.client.regler.map.OpptjeningMapper
 import no.nav.pensjon.kalkulator.regler.PensjonReglerClient
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -18,8 +19,10 @@ import java.util.*
 class PensjonReglerOpptjeningClient(
     @Value("\${pensjon-regler.url}") baseUrl: String,
     webClient: WebClient,
-    @Qualifier("regler") objectMapper: ObjectMapper
-) : PensjonReglerClient(baseUrl, webClient, objectMapper), OpptjeningClient {
+    @Qualifier("regler") objectMapper: ObjectMapper,
+    traceAid: TraceAid,
+    @Value("\${web-client.retry-attempts}") retryAttempts: String
+) : PensjonReglerClient(baseUrl, webClient, objectMapper, traceAid, retryAttempts), OpptjeningClient {
 
     override fun getOpptjeningshistorikk(spec: OpptjeningshistorikkSpec): Opptjeningshistorikk {
         val requestSpec = OpptjeningMapper.toDto(spec)
@@ -31,6 +34,6 @@ class PensjonReglerOpptjeningClient(
     }
 
     companion object {
-        private const val OPPTJENING_PATH = "/api/beregnPoengtallBatch"
+        private const val OPPTJENING_PATH = "api/beregnPoengtallBatch"
     }
 }

@@ -8,6 +8,7 @@ import no.nav.pensjon.kalkulator.tech.selftest.Pingable
 import no.nav.pensjon.kalkulator.tech.selftest.ServiceStatus
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
 open class OAuth2ConfigurationClient(
@@ -54,6 +55,8 @@ open class OAuth2ConfigurationClient(
 
             PingResult(service, ServiceStatus.UP, uri, responseBody.substring(0, 150) + "...")
                 .also { status = ServiceStatus.UP }
+        } catch (e: WebClientRequestException) {
+            PingResult(service, ServiceStatus.DOWN, uri, e.message ?: "forespørsel feilet")
         } catch (e: WebClientResponseException) {
             PingResult(service, ServiceStatus.DOWN, uri, e.responseBodyAsString)
         }

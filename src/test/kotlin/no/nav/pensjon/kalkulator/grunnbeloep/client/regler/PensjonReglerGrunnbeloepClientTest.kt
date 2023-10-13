@@ -6,30 +6,45 @@ import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.regler.ReglerConfiguration
 import no.nav.pensjon.kalkulator.tech.security.egress.EnrichedAuthentication
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import okhttp3.mockwebserver.MockResponse
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mock
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
 import java.time.LocalDate
 
+@ExtendWith(SpringExtension::class)
 class PensjonReglerGrunnbeloepClientTest : WebClientTest() {
 
     private lateinit var client: PensjonReglerGrunnbeloepClient
 
+    @Mock
+    private lateinit var traceAid: TraceAid
+
     @BeforeEach
     fun initialize() {
-        client = PensjonReglerGrunnbeloepClient(baseUrl(), WebClient.create(), ReglerConfiguration().objectMapper())
+        client = PensjonReglerGrunnbeloepClient(
+            baseUrl = baseUrl(),
+            webClient = WebClientConfig().regularWebClient(),
+            objectMapper = ReglerConfiguration().objectMapper(),
+            traceAid = traceAid,
+            retryAttempts = "1"
+        )
+
+        arrangeSecurityContext()
     }
 
     @Test
     fun `getGrunnbeloep returns grunnbeloep when OK response`() {
-        arrangeSecurityContext()
         arrange(okResponse())
         val spec = GrunnbeloepSpec(LocalDate.of(2023, 1, 1), LocalDate.of(2023, 1, 2))
 

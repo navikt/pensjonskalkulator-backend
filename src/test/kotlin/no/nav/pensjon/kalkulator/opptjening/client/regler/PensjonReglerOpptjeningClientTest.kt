@@ -8,36 +8,47 @@ import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningshistorikkSpec
 import no.nav.pensjon.kalkulator.regler.ReglerConfiguration
 import no.nav.pensjon.kalkulator.tech.security.egress.EnrichedAuthentication
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import okhttp3.mockwebserver.MockResponse
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mock
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.io.ByteArrayOutputStream
 import java.math.BigDecimal
 import java.nio.charset.StandardCharsets
 import java.time.LocalDate
 
+@ExtendWith(SpringExtension::class)
 class PensjonReglerOpptjeningClientTest : WebClientTest() {
 
     private lateinit var client: PensjonReglerOpptjeningClient
+
+    @Mock
+    private lateinit var traceAid: TraceAid
 
     @BeforeEach
     fun initialize() {
         client =
             PensjonReglerOpptjeningClient(
-                baseUrl(),
-                WebClient.create(),
-                ReglerConfiguration().objectMapper()
+                baseUrl = baseUrl(),
+                webClient = WebClientConfig().regularWebClient(),
+                objectMapper = ReglerConfiguration().objectMapper(),
+                traceAid = traceAid,
+                retryAttempts = "1"
             )
+
+        arrangeSecurityContext()
     }
 
     @Test
     fun `getOpptjening returns opptjening when OK response`() {
-        arrangeSecurityContext()
         arrange(okResponse())
 
         val response: Opptjeningshistorikk = client.getOpptjeningshistorikk(opptjeningshistorikkSpec())

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
 /**
@@ -43,6 +44,8 @@ class FssGatewayPingClient(
                 ?: ""
 
             PingResult(service, ServiceStatus.UP, uri, responseBody)
+        } catch (e: WebClientRequestException) {
+            PingResult(service, ServiceStatus.DOWN, uri, e.message ?: "forespørsel feilet")
         } catch (e: WebClientResponseException) {
             PingResult(service, ServiceStatus.DOWN, uri, e.responseBodyAsString)
         }

@@ -6,6 +6,7 @@ import java.time.ZonedDateTime
 import java.util.*
 
 object DateUtil {
+    const val MAANEDER_PER_AAR = 12
     private const val TIME_ZONE_ID = "Europe/Oslo"
     private val locale = Locale("nb", "NO")
     private val timeZone = TimeZone.getTimeZone(TIME_ZONE_ID)

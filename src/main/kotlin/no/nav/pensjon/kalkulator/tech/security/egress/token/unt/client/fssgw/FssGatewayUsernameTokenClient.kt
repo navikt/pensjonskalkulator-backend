@@ -14,8 +14,8 @@ import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
-import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.util.*
 
@@ -54,21 +54,22 @@ class FssGatewayUsernameTokenClient(
     override fun ping(): PingResult {
         val uri = baseUrl + PING_PATH
 
-        try {
+        return try {
             val responseBody = webClient
                 .get()
                 .uri(uri)
                 .headers(::setPingHeaders)
                 .retrieve()
                 .bodyToMono(String::class.java)
+                .retryWhen(retryBackoffSpec(uri))
                 .block()
                 ?: ""
 
             return PingResult(service, ServiceStatus.UP, uri, responseBody)
+        } catch (e: WebClientRequestException) {
+            PingResult(service, ServiceStatus.DOWN, uri, e.message ?: "forespørsel feilet")
         } catch (e: WebClientResponseException) {
-            return PingResult(service, ServiceStatus.DOWN, uri, e.responseBodyAsString)
-        } catch (e: RuntimeException) { // e.g. when connection broken
-            return PingResult(service, ServiceStatus.DOWN, uri, e.message ?: "Ping failed")
+             PingResult(service, ServiceStatus.DOWN, uri, e.responseBodyAsString)
         }
     }
 
