@@ -11,7 +11,7 @@
     </parent>
     <groupId>no.nav.pensjon</groupId>
     <artifactId>pensjonskalkulator-backend</artifactId>
-    <version>0.3.0-SNAPSHOT</version>
+    <version>0.4.0-SNAPSHOT</version>
     <name>pensjonskalkulator-backend</name>
     <description>Backend for pensjonskalkulator for brukere født 1963 eller senere</description>
     <packaging>jar</packaging>
@@ -184,11 +184,21 @@
             <version>${okhttp3.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- maven-surefire-plugin 3.1.2 uses vulnerable version: -->
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-core</artifactId>
+            <version>3.9.5</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <version>3.1.2</version>
             <exclusions>
+                <exclusion>
+                    <groupId>org.apache.maven</groupId>
+                    <artifactId>maven-core</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
