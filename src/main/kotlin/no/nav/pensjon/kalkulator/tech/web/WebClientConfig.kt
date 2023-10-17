@@ -1,6 +1,9 @@
 package no.nav.pensjon.kalkulator.tech.web
 
+import io.netty.channel.ChannelOption
 import io.netty.handler.logging.LogLevel
+import io.netty.handler.timeout.ReadTimeoutHandler
+import io.netty.handler.timeout.WriteTimeoutHandler
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,6 +21,8 @@ import reactor.core.publisher.Mono
 import reactor.netty.http.client.HttpClient
 import reactor.netty.transport.logging.AdvancedByteBufFormat
 import java.nio.charset.StandardCharsets
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 @Configuration
 class WebClientConfig {
@@ -26,6 +31,13 @@ class WebClientConfig {
     @Primary
     fun regularWebClient(): WebClient =
         WebClient.builder()
+            .clientConnector(ReactorClientHttpConnector(HttpClient.create()
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, TIMEOUT.toInt())
+                .responseTimeout(Duration.ofMillis(TIMEOUT))
+                .doOnConnected { conn ->
+                    conn.addHandlerLast(ReadTimeoutHandler(TIMEOUT, TimeUnit.MILLISECONDS))
+                    conn.addHandlerLast(WriteTimeoutHandler(TIMEOUT, TimeUnit.MILLISECONDS))
+                }))
             .filter(filterResponse())
             .build()
 
@@ -48,6 +60,7 @@ class WebClientConfig {
 
     companion object {
         private const val MAX_IN_MEMORY_SIZE = 10485760 // 10 MB (10 * 1024 * 1024)
+        private const val TIMEOUT : Long = 20_000
 
         private fun largeBufferStrategies(): ExchangeStrategies =
             ExchangeStrategies.builder()
