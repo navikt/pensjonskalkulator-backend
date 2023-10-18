@@ -228,6 +228,7 @@
                     <groupId>commons-io</groupId>
                     <artifactId>commons-io</artifactId>
                 </exclusion>
+                <!-- This exclusion does not work, probably due to shaded dependencies in surefire-shared-utils: -->
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-compress</artifactId>
