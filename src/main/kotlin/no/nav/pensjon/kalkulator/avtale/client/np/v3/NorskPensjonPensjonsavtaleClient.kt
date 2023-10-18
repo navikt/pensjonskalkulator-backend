@@ -10,6 +10,7 @@ import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.NorskPensjonPensjonsavt
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.NorskPensjonUttaksperiodeSpecDto
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.map.NorskPensjonPensjonsavtaleMapper
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.map.NorskPensjonPensjonsavtaleMapper.fromDto
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.metric.NorskPensjonPensjonsavtaleMetrics.updateMetrics
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
@@ -46,7 +47,7 @@ class NorskPensjonPensjonsavtaleClient(
         countCalls(MetricResult.OK)
 
         return try {
-            val dto = xmlMapper.readValue(responseXml, EnvelopeDto::class.java)
+            val dto = xmlMapper.readValue(responseXml, EnvelopeDto::class.java).also(::updateMetrics)
             fromDto(dto)
         } catch (e: JsonProcessingException) {
             log.error(e) { "Failed to process XML: $responseXml" }
