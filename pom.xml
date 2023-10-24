@@ -184,24 +184,10 @@
             <version>${okhttp3.version}</version>
             <scope>test</scope>
         </dependency>
-        <!-- ************ Overriding vulnerable transitive dependencies: ************ -->
-        <!-- maven-surefire-plugin 3.1.2 uses vulnerable version 1.23.0: -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-compress</artifactId>
-            <version>1.24.0</version>
-        </dependency>
-        <!-- maven-surefire-plugin 3.1.2 uses vulnerable version 3.1.0: -->
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-core</artifactId>
-            <version>3.9.5</version>
-        </dependency>
-        <!-- ******** (end of overriding vulnerable transitive dependencies) ******** -->
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
-            <version>3.1.2</version>
+            <version>3.2.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.guava</groupId>
@@ -210,11 +196,6 @@
                 <exclusion>
                     <groupId>commons-io</groupId>
                     <artifactId>commons-io</artifactId>
-                </exclusion>
-                <!-- This exclusion does not work, probably due to shaded dependencies in surefire-shared-utils: -->
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-compress</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.apache.maven</groupId>
