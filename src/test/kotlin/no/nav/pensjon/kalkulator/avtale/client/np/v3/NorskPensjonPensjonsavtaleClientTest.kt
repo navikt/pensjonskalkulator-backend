@@ -190,7 +190,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
                 <arbeidsgiver>Firma1</arbeidsgiver>
                 <selskapsnavn>Selskap1</selskapsnavn>
                 <produktbetegnelse>Produkt1</produktbetegnelse>
-                <kategori>individuellOrdning</kategori>
+                <kategori>individuelleOrdninger</kategori>
                 <underkategori>foreningskollektiv</underkategori>
                 <innskuddssaldo>1000</innskuddssaldo>
                 <naavaerendeAvtaltAarligInnskudd>100</naavaerendeAvtaltAarligInnskudd>
@@ -234,7 +234,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
                 <arbeidsgiver>Firma1</arbeidsgiver>
                 <selskapsnavn>Selskap1</selskapsnavn>
                 <produktbetegnelse>Produkt1</produktbetegnelse>
-                <kategori>individuellOrdning</kategori>
+                <kategori>individuelleOrdninger</kategori>
                 <underkategori>foreningskollektiv</underkategori>
                 <innskuddssaldo>1000</innskuddssaldo>
                 <naavaerendeAvtaltAarligInnskudd>100</naavaerendeAvtaltAarligInnskudd>

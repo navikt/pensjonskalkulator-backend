@@ -38,7 +38,7 @@ class NorskPensjonPensjonsavtaleMapperTest {
                 arbeidsgiver = "Firma1"
                 selskapsnavn = "Selskap1"
                 produktbetegnelse = "Produkt1"
-                kategori = "individuellOrdning"
+                kategori = "individuelleOrdninger"
                 underkategori = "Foreningskollektiv"
                 innskuddssaldo = 1000
                 naavaerendeAvtaltAarligInnskudd = 100

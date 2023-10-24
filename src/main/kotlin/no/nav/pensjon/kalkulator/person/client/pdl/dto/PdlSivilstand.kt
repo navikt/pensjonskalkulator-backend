@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.person.client.pdl.dto
 
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import org.springframework.util.StringUtils.hasLength
 
@@ -22,9 +23,11 @@ enum class PdlSivilstand(val externalValue: String, val internalValue: Sivilstan
 
     companion object {
         private val values = values()
+        private val log = KotlinLogging.logger {}
 
         fun fromExternalValue(value: String?) =
-            values.singleOrNull { it.externalValue.equals(value, true) } ?: default(value)
+            values.singleOrNull { it.externalValue.equals(value, true) }
+                ?: default(value).also { log.warn { "Unknown PDL sivilstand '$value'" } }
 
         private fun default(externalValue: String?) = if (hasLength(externalValue)) UNKNOWN else UOPPGITT
     }
