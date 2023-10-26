@@ -20,7 +20,7 @@ class OpenApiConfiguration {
                 Info()
                     .title("pensjonskalkulator API")
                     .description("Pensjonskalkulator for brukere født i 1963 eller senere")
-                    .version("v0.4.0-SNAPSHOT")
+                    .version("v1.0.0")
             )
             .externalDocs(
                 ExternalDocumentation()
