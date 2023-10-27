@@ -69,7 +69,7 @@ spec:
     - name: NORSK_PENSJON_URL
       value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: PEN_SERVICE_ID
-      value: dev-fss:teampensjon:pensjon-pen-q2
+      value: dev-fss:pensjon-q2:pensjon-pen-q2
     - name: PEN_URL
       value: https://pensjon-pen-q2.dev-fss-pub.nais.io
     - name: PENSJON_REGLER_URL
