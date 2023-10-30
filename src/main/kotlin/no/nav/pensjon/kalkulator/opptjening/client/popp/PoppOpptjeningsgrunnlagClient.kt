@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.opptjening.client.popp
 
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningsgrunnlag
 import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
@@ -35,6 +36,8 @@ class PoppOpptjeningsgrunnlagClient(
     @Value("\${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), OpptjeningsgrunnlagClient, Pingable {
 
+    private val log = KotlinLogging.logger {}
+
     override fun service() = service
 
     /**
@@ -42,11 +45,12 @@ class PoppOpptjeningsgrunnlagClient(
      */
     override fun fetchOpptjeningsgrunnlag(pid: Pid): Opptjeningsgrunnlag {
         log.debug { "GET from URI: '${displayableUri(pid)}'" }
+        val uri = uri(pid)
 
         return try {
             webClient
                 .get()
-                .uri(uri(pid))
+                .uri(uri)
                 .headers(::setHeaders)
                 .retrieve()
                 .bodyToMono(OpptjeningsgrunnlagResponseDto::class.java)
@@ -55,6 +59,8 @@ class PoppOpptjeningsgrunnlagClient(
                 ?.let { OpptjeningsgrunnlagMapper.fromDto(it) }
                 .also { countCalls(MetricResult.OK) }
                 ?: Opptjeningsgrunnlag(emptyList())
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $uri", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }

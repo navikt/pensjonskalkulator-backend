@@ -1,8 +1,8 @@
 package no.nav.pensjon.kalkulator.regler
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
-import no.nav.pensjon.kalkulator.common.client.pen.PenClient
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.selftest.PingResult
@@ -11,14 +11,12 @@ import no.nav.pensjon.kalkulator.tech.selftest.ServiceStatus
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import org.apache.commons.logging.LogFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import reactor.core.publisher.Mono
-import java.util.*
 
 abstract class PensjonReglerClient(
     private val baseUrl: String,
@@ -27,6 +25,8 @@ abstract class PensjonReglerClient(
     private val traceAid: TraceAid,
     retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), Pingable {
+
+    private val log = KotlinLogging.logger {}
 
     override fun service() = service
 
@@ -51,10 +51,10 @@ abstract class PensjonReglerClient(
                 ?: ""
 
             return objectMapper.readValue(responseBody, responseClass)
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $uri", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
-        } catch (e: RuntimeException) { // e.g. when connection broken
-            throw EgressException("Failed to do POST towards $baseUrl: ${e.message}", e)
         }
     }
 

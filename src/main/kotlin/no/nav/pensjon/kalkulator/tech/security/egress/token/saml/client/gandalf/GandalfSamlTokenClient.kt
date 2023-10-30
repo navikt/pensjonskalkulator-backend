@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.token.saml.client.gandalf
 
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
@@ -36,6 +37,9 @@ class GandalfSamlTokenClient(
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), SamlTokenClient, Pingable {
+
+    private val log = KotlinLogging.logger {}
+
     override fun service() = service
 
     override fun fetchSamlToken(): SamlTokenDataDto {
@@ -54,6 +58,8 @@ class GandalfSamlTokenClient(
                 .block()
                 ?.also { countCalls(MetricResult.OK) }
                 ?: emptyDto()
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $uri", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }

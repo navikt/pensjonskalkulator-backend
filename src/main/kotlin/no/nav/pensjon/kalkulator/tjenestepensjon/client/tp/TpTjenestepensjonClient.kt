@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tjenestepensjon.client.tp
 
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
@@ -33,6 +34,8 @@ class TpTjenestepensjonClient(
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), TjenestepensjonClient, Pingable {
+
+    private val log = KotlinLogging.logger {}
 
     override fun service() = service
 

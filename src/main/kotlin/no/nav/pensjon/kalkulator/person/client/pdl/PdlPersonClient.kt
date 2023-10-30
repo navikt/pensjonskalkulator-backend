@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.person.client.pdl
 
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Pid
@@ -32,6 +33,8 @@ class PdlPersonClient(
     @Value("\${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), PersonClient, Pingable {
 
+    private val log = KotlinLogging.logger {}
+
     override fun service() = service
 
     override fun fetchPerson(pid: Pid): Person? {
@@ -53,6 +56,8 @@ class PdlPersonClient(
                     countCalls(MetricResult.OK)
                 }
                 ?.let(PersonMapper::fromDto)
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $uri", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }

@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.common.client.pen
 
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
@@ -21,6 +22,8 @@ abstract class PenClient(
     private val traceAid: TraceAid,
     retryAttempts: String
 ) : PingableServiceClient(baseUrl, webClient, traceAid, retryAttempts) {
+
+    private val log = KotlinLogging.logger {}
 
     override fun pingPath(): String = PING_PATH
 
@@ -44,7 +47,7 @@ abstract class PenClient(
                 .retryWhen(retryBackoffSpec(uri))
                 .block().also { countCalls(MetricResult.OK) }
         } catch (e: WebClientRequestException) {
-            throw EgressException("Failed calling $service", e)
+            throw EgressException("Failed calling $uri", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }

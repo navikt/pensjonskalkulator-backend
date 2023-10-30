@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.oauth2
 
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
@@ -12,6 +13,7 @@ import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.http.MediaType
 import org.springframework.util.MultiValueMap
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
 abstract class OAuth2TokenClient(
@@ -20,6 +22,8 @@ abstract class OAuth2TokenClient(
     private val oauth2ConfigGetter: OAuth2ConfigurationGetter,
     retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), TokenDataGetter {
+
+    private val log = KotlinLogging.logger {}
 
     override fun service() = service
 
@@ -44,8 +48,8 @@ abstract class OAuth2TokenClient(
 
             log.debug { "Token obtained for audience '$audience'" }
             OAuth2TokenDataMapper.map(body, expirationChecker.time())
-        } catch (e: EgressException) {
-            throw EgressException(e.message!!, e, e.statusCode)
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $uri", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }

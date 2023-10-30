@@ -20,7 +20,7 @@ abstract class ExternalServiceClient(
 
     abstract fun service(): EgressService
 
-    protected val log = KotlinLogging.logger {}
+    private val log = KotlinLogging.logger {}
 
     protected fun retryBackoffSpec(uri: String): RetryBackoffSpec =
         Retry.backoff(retryAttempts.toLong(), Duration.ofSeconds(1))

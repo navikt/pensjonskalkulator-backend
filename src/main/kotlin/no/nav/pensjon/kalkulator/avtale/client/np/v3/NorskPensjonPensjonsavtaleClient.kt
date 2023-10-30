@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.avtale.client.np.v3
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.Pensjonsavtaler
 import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
@@ -27,6 +28,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.util.*
 
@@ -39,6 +41,8 @@ class NorskPensjonPensjonsavtaleClient(
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), PensjonsavtaleClient {
+
+    private val log = KotlinLogging.logger {}
 
     override fun service() = service
 
@@ -73,6 +77,8 @@ class NorskPensjonPensjonsavtaleClient(
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
                 ?: ""
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $uri", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }

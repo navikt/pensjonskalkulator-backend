@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.token.unt.client.fssgw
 
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
@@ -29,6 +30,9 @@ class FssGatewayUsernameTokenClient(
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), UsernameTokenClient, Pingable {
+
+    private val log = KotlinLogging.logger {}
+
     override fun service() = service
 
     override fun fetchUsernameToken(): UsernameTokenDto {
@@ -46,6 +50,8 @@ class FssGatewayUsernameTokenClient(
                 ?.let { UsernameTokenDto(it) }
                 .also { countCalls(MetricResult.OK) }
                 ?: UsernameTokenDto("")
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $uri", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }
