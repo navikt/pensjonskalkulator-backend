@@ -35,9 +35,12 @@ enum class Underkategori(val externalValue: String, val internalValue: AvtaleUnd
         private val log = KotlinLogging.logger {}
 
         fun fromExternalValue(value: String?) =
-            values.singleOrNull { it.externalValue.equals(value, true) }
-                ?: default(value).also { log.warn { "Unknown NP underkategori '$value'" } }
+            values.singleOrNull { it.externalValue.equals(value, true) } ?: default(value)
 
-        private fun default(externalValue: String?) = if (hasLength(externalValue)) UNKNOWN else NONE
+        private fun default(externalValue: String?) =
+            if (hasLength(externalValue))
+                UNKNOWN.also { log.warn { "Unknown NP underkategori '$externalValue'" } }
+            else
+                NONE
     }
 }

@@ -1,13 +1,9 @@
 package no.nav.pensjon.kalkulator.common.client.pen
 
-import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
-import no.nav.pensjon.kalkulator.tech.selftest.PingResult
-import no.nav.pensjon.kalkulator.tech.selftest.Pingable
-import no.nav.pensjon.kalkulator.tech.selftest.ServiceStatus
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -24,8 +20,11 @@ abstract class PenClient(
     private val webClient: WebClient,
     private val traceAid: TraceAid,
     retryAttempts: String
-) : ExternalServiceClient(retryAttempts), Pingable {
-    override fun service() = service
+) : PingableServiceClient(baseUrl, webClient, traceAid, retryAttempts) {
+
+    override fun pingPath(): String = PING_PATH
+
+    override fun service(): EgressService = service
 
     protected fun <T> doGet(
         elementTypeRef: ParameterizedTypeReference<T>,
@@ -44,6 +43,8 @@ abstract class PenClient(
                 .bodyToMono(elementTypeRef)
                 .retryWhen(retryBackoffSpec(uri))
                 .block().also { countCalls(MetricResult.OK) }
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $service", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }
@@ -62,36 +63,16 @@ abstract class PenClient(
             return webClient
                 .post()
                 .uri(uri)
-                .headers { setHeaders(it) }
+                .headers(::setHeaders)
                 .body(Mono.just(requestBody), requestClass)
                 .retrieve()
                 .bodyToMono(responseClass)
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $service", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
-        }
-    }
-
-    override fun ping(): PingResult {
-        val uri = "$baseUrl/$PING_PATH"
-
-        return try {
-            val responseBody = webClient
-                .get()
-                .uri(uri)
-                .headers { setPingHeaders(it) }
-                .retrieve()
-                .bodyToMono(String::class.java)
-                .retryWhen(retryBackoffSpec(uri))
-                .block()
-                ?: ""
-
-            PingResult(service, ServiceStatus.UP, uri, responseBody)
-        } catch (e: WebClientRequestException) {
-            PingResult(service, ServiceStatus.DOWN, uri, e.message ?: "forespørsel feilet")
-        } catch (e: WebClientResponseException) {
-            PingResult(service, ServiceStatus.DOWN, uri, e.responseBodyAsString)
         }
     }
 
@@ -103,11 +84,6 @@ abstract class PenClient(
         headers.setBearerAuth(EgressAccess.token(service).value)
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
         pid?.let { headers[CustomHttpHeaders.PID] = it.value }
-    }
-
-    private fun setPingHeaders(headers: HttpHeaders) {
-        headers.setBearerAuth(EgressAccess.token(service).value)
-        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
     }
 
     companion object {

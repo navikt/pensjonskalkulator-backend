@@ -44,6 +44,8 @@ abstract class OAuth2TokenClient(
 
             log.debug { "Token obtained for audience '$audience'" }
             OAuth2TokenDataMapper.map(body, expirationChecker.time())
+        } catch (e: EgressException) {
+            throw EgressException(e.message!!, e, e.statusCode)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }

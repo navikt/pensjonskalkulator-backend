@@ -18,9 +18,12 @@ enum class Kategori(val externalValue: String, val internalValue: AvtaleKategori
         private val log = KotlinLogging.logger {}
 
         fun fromExternalValue(value: String?) =
-            values.singleOrNull { it.externalValue.equals(value, true) }
-                ?: default(value).also { log.warn { "Unknown NP kategori '$value'" } }
+            values.singleOrNull { it.externalValue.equals(value, true) } ?: default(value)
 
-        private fun default(externalValue: String?) = if (hasLength(externalValue)) UNKNOWN else NONE
+        private fun default(externalValue: String?) =
+            if (hasLength(externalValue))
+                UNKNOWN.also { log.warn { "Unknown NP kategori '$externalValue'" } }
+            else
+                NONE
     }
 }

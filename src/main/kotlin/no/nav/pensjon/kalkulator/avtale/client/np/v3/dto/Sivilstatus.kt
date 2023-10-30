@@ -16,12 +16,15 @@ enum class Sivilstatus(val externalValue: String, val internalValue: Sivilstand)
         private val log = KotlinLogging.logger {}
 
         fun fromExternalValue(value: String?) =
-            values.singleOrNull { it.externalValue.equals(value, true) }
-                ?: default(value).also { log.warn { "Unknown NP sivilstatus '$value'" } }
+            values.singleOrNull { it.externalValue.equals(value, true) } ?: default(value)
 
         fun fromInternalValue(value: Sivilstand?) =
             values.singleOrNull { it.internalValue == value } ?: defaultValue
 
-        private fun default(externalValue: String?) = if (StringUtils.hasLength(externalValue)) UNKNOWN else NONE
+        private fun default(externalValue: String?) =
+            if (StringUtils.hasLength(externalValue))
+                UNKNOWN.also { log.warn { "Unknown NP sivilstatus '$externalValue'" } }
+            else
+                NONE
     }
 }

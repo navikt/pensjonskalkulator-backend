@@ -16,9 +16,12 @@ enum class PenSakstype(val externalValue: String, val internalValue: Sakstype) {
         private val log = KotlinLogging.logger {}
 
         fun fromExternalValue(value: String?) =
-            values.singleOrNull { it.externalValue.equals(value, true) }
-                ?: default(value).also { log.warn { "Unknown PEN sakstype '$value'" } }
+            values.singleOrNull { it.externalValue.equals(value, true) } ?: default(value)
 
-        private fun default(externalValue: String?) = if (hasLength(externalValue)) UNKNOWN else NONE
+        private fun default(externalValue: String?) =
+            if (hasLength(externalValue))
+                UNKNOWN.also { log.warn { "Unknown PEN sakstype '$externalValue'" } }
+            else
+                NONE
     }
 }

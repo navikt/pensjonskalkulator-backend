@@ -26,9 +26,12 @@ enum class PdlSivilstand(val externalValue: String, val internalValue: Sivilstan
         private val log = KotlinLogging.logger {}
 
         fun fromExternalValue(value: String?) =
-            values.singleOrNull { it.externalValue.equals(value, true) }
-                ?: default(value).also { log.warn { "Unknown PDL sivilstand '$value'" } }
+            values.singleOrNull { it.externalValue.equals(value, true) } ?: default(value)
 
-        private fun default(externalValue: String?) = if (hasLength(externalValue)) UNKNOWN else UOPPGITT
+        private fun default(externalValue: String?) =
+            if (hasLength(externalValue))
+                UNKNOWN.also { log.warn { "Unknown PDL sivilstand '$externalValue'" } }
+            else
+                UOPPGITT
     }
 }

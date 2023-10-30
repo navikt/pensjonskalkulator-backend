@@ -40,7 +40,7 @@ class PenSakClientTest : WebClientTest() {
 
         with(response[0]) {
             assertEquals(SakStatus.LOEPENDE, status)
-            assertEquals(SakType.UFOEREPENSJON, type)
+            assertEquals(SakType.UFOERETRYGD, type)
         }
     }
 
