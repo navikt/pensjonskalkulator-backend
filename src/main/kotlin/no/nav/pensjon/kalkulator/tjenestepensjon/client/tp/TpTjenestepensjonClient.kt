@@ -16,7 +16,6 @@ import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpTjenestepensjon
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.map.TpTjenestepensjonMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
@@ -53,13 +52,15 @@ class TpTjenestepensjonClient(
                 ?.let(TpTjenestepensjonMapper::fromDto)
                 .also { countCalls(MetricResult.OK) }
                 ?: false
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $uri", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }
     }
 
     override fun ping(): PingResult {
-        val uri = "$baseUrl/${PING_PATH}"
+        val uri = "$baseUrl/$PING_PATH"
 
         return try {
             val responseBody = webClient
@@ -73,7 +74,7 @@ class TpTjenestepensjonClient(
 
             PingResult(service, ServiceStatus.UP, uri, responseBody)
         } catch (e: WebClientRequestException) {
-            PingResult(service, ServiceStatus.DOWN, uri, e.message ?: "forespørsel feilet")
+            PingResult(service, ServiceStatus.DOWN, uri, e.message ?: "Failed calling $uri")
         } catch (e: WebClientResponseException) {
             PingResult(service, ServiceStatus.DOWN, uri, e.responseBodyAsString)
         }
@@ -91,11 +92,11 @@ class TpTjenestepensjonClient(
 
     private fun setHeaders(headers: HttpHeaders, pid: Pid) {
         headers.setBearerAuth(EgressAccess.token(service).value)
-        headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_JSON_VALUE
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
 
         // https://github.com/navikt/tp/blob/main/tp-api/src/main/kotlin/no/nav/samhandling/tp/provider/Headers.kt
         headers[CustomHttpHeaders.PID] = pid.value
+        log.debug { "Calling TP for $pid" }
     }
 
     companion object {
