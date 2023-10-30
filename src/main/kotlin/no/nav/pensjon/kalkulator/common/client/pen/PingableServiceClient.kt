@@ -24,6 +24,8 @@ abstract class PingableServiceClient(
 
     abstract fun pingPath(): String
 
+    abstract fun setPingHeaders(headers: HttpHeaders)
+
     override fun ping(): PingResult {
         val uri = "$baseUrl/${pingPath()}"
 
@@ -57,11 +59,6 @@ abstract class PingableServiceClient(
         headers.setBearerAuth(EgressAccess.token(service()).value)
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
         pid?.let { headers[CustomHttpHeaders.PID] = it.value }
-    }
-
-    private fun setPingHeaders(headers: HttpHeaders) {
-        headers.setBearerAuth(EgressAccess.token(service()).value)
-        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
     }
 
     private fun down(uri: String, e: Throwable) = down(uri, e.message ?: "Failed calling ${service()}")

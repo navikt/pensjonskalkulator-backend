@@ -1,6 +1,5 @@
 package no.nav.pensjon.kalkulator.tjenestepensjon
 
-import no.nav.pensjon.kalkulator.mock.DateFactory.date
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
@@ -29,7 +28,7 @@ class TjenestepensjonServiceTest {
 
     @BeforeEach
     fun initialize() {
-        service = TjenestepensjonService(client, pidGetter, featureToggleService) { date }
+        service = TjenestepensjonService(client, pidGetter, featureToggleService)
     }
 
     @Test
@@ -41,6 +40,12 @@ class TjenestepensjonServiceTest {
 
     private fun arrangePidAndResultat() {
         `when`(pidGetter.pid()).thenReturn(pid)
-        `when`(client.harTjenestepensjonsforhold(pid, date)).thenReturn(true)
+        `when`(client.tjenestepensjon(pid)).thenReturn(tjenestepensjon())
+    }
+
+    private companion object {
+        private fun tjenestepensjon() = Tjenestepensjon(listOf(forhold()))
+
+        private fun forhold() = Forhold("", emptyList(), null)
     }
 }

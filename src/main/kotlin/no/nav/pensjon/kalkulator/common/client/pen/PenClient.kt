@@ -79,6 +79,11 @@ abstract class PenClient(
         }
     }
 
+    override fun setPingHeaders(headers: HttpHeaders) {
+        headers.setBearerAuth(EgressAccess.token(service()).value)
+        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
+    }
+
     override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
 
     private fun setHeaders(headers: HttpHeaders, pid: Pid? = null) {
