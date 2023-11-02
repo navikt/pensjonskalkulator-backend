@@ -1,16 +1,11 @@
-package no.nav.pensjon.kalkulator.common.client.pen
+package no.nav.pensjon.kalkulator.common.client
 
-import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
-import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.selftest.PingResult
 import no.nav.pensjon.kalkulator.tech.selftest.Pingable
 import no.nav.pensjon.kalkulator.tech.selftest.ServiceStatus
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
-import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -33,7 +28,7 @@ abstract class PingableServiceClient(
             val responseBody = webClient
                 .get()
                 .uri(uri)
-                .headers { setPingHeaders(it) }
+                .headers(::setPingHeaders)
                 .retrieve()
                 .bodyToMono(String::class.java)
                 .retryWhen(retryBackoffSpec(uri))
@@ -52,14 +47,6 @@ abstract class PingableServiceClient(
     }
 
     override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
-
-    private fun setHeaders(headers: HttpHeaders, pid: Pid? = null) {
-        headers.contentType = MediaType.APPLICATION_JSON
-        headers.accept = listOf(MediaType.APPLICATION_JSON)
-        headers.setBearerAuth(EgressAccess.token(service()).value)
-        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
-        pid?.let { headers[CustomHttpHeaders.PID] = it.value }
-    }
 
     private fun down(uri: String, e: Throwable) = down(uri, e.message ?: "Failed calling ${service()}")
 

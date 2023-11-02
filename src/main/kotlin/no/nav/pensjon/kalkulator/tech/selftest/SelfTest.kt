@@ -6,6 +6,7 @@ import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.PensjonReglerGrunnbel
 import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.client.pdl.PdlPersonClient
 import no.nav.pensjon.kalkulator.tech.security.egress.azuread.AzureAdOAuth2MetadataClient
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.client.nom.NomSkjermingClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.ping.IdPortenPingClient
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClient
 import org.springframework.stereotype.Component
@@ -20,6 +21,7 @@ class SelfTest(
     opptjeningClient: PoppOpptjeningsgrunnlagClient,
     penClient: PenPingClient,
     personClient: PdlPersonClient,
+    skjermingClient: NomSkjermingClient,
     tjenestepensjonClient: TpTjenestepensjonClient
 ) {
 
@@ -31,14 +33,13 @@ class SelfTest(
         opptjeningClient,
         penClient,
         personClient,
+        skjermingClient,
         tjenestepensjonClient)
 
     /**
      * Returns result of self-test in HTML format.
      */
-    fun performSelfTestAndReportAsHtml(): String {
-        return htmlPage(htmlStatusRows(performSelfTest()))
-    }
+    fun performSelfTestAndReportAsHtml(): String = htmlPage(htmlStatusRows(performSelfTest()))
 
     /**
      * Returns result of self-test in JSON format.

@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.tech.security
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.pensjon.kalkulator.tech.security.egress.SecurityContextEnricher
 import no.nav.pensjon.kalkulator.tech.security.ingress.*
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.ImpersonalAccessFilter
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -11,6 +12,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManagerResolver
 import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
 import org.springframework.security.oauth2.core.OAuth2TokenValidator
 import org.springframework.security.oauth2.jwt.*
@@ -20,12 +22,14 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.util.StringUtils.hasLength
 
 @Configuration
+@EnableWebSecurity
 class SecurityConfiguration {
 
     @Bean
     fun filterChain(
         http: HttpSecurity,
         securityContextEnricher: SecurityContextEnricher,
+        impersonalAccessFilter: ImpersonalAccessFilter,
         @Value("\${idporten.issuer}") personalIssuerUri1: String,
         @Value("\${idporten.audience}") personalAudience1: String,
         @Value("\${token.x.issuer}") personalIssuerUri2: String,
@@ -34,8 +38,8 @@ class SecurityConfiguration {
         @Value("\${azure.app.client.id}") impersonalAudience: String,
         @Value("\${request-matcher.internal}") internalRequestMatcher: String
     ): SecurityFilterChain {
-        http.addFilterAfter(ImpersonalAccessFilter(), BasicAuthenticationFilter::class.java)
-            .addFilterAfter(AuthenticationEnricherFilter(securityContextEnricher), ImpersonalAccessFilter::class.java)
+        http.addFilterAfter(AuthenticationEnricherFilter(securityContextEnricher), BasicAuthenticationFilter::class.java)
+            .addFilterAfter(impersonalAccessFilter, AuthenticationEnricherFilter::class.java)
 
         val resolver = tokenAuthenticationManagerResolver(
             if (hasLength(personalIssuerUri1)) personalIssuerUri1 else personalIssuerUri2,
@@ -61,10 +65,11 @@ class SecurityConfiguration {
             .build()
     }
 
-    @Bean
-    fun pidGetter(): PidGetter = SecurityContextPidExtractor()
-
     companion object {
+
+        /**
+         * "Impersonal" means that the logged-in user acts on behalf of another person
+         */
         fun isImpersonal(request: HttpServletRequest): Boolean =
             hasLength(request.getHeader(CustomHttpHeaders.PID))
 

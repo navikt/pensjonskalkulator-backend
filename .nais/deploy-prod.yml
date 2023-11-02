@@ -50,6 +50,8 @@ spec:
         - application: pensjon-selvbetjening-fss-gateway
           namespace: pensjonselvbetjening
           cluster: prod-fss
+        - application: skjermede-personer-pip
+          namespace: nom
         - application: tp
           namespace: pensjonsamhandling
           cluster: prod-fss
@@ -60,6 +62,7 @@ spec:
         - host: pensjon-popp.prod-fss-pub.nais.io
         - host: pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
         - host: pensjonskalkulator-unleash-api.nav.cloud.nais.io
+        - host: skjermede-personer-pip.intern.nav.no
         - host: tp-api.prod-fss-pub.nais.io
   env:
     - name: IDPORTEN_ISSUER
@@ -86,6 +89,10 @@ spec:
       value: prod-fss:pensjonopptjening:pensjon-popp
     - name: POPP_URL
       value: https://pensjon-popp.prod-fss-pub.nais.io
+    - name: SKJERMEDE_PERSONER_SERVICE_ID
+      value: prod-gcp:nom:skjermede-personer-pip
+    - name: SKJERMEDE_PERSONER_URL
+      value: https://skjermede-personer-pip.intern.nav.no
     - name: STS_URL
       value: https://pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
     - name: TJENESTEPENSJON_SERVICE_ID

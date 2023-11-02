@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.tjenestepensjon.client.tp
 
 import mu.KotlinLogging
-import no.nav.pensjon.kalkulator.common.client.pen.PingableServiceClient
+import no.nav.pensjon.kalkulator.common.client.PingableServiceClient
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess

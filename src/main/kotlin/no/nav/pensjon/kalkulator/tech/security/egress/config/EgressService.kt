@@ -19,9 +19,10 @@ enum class EgressService(
     PENSJONSFAGLIG_KJERNE("Pensjonsfaglig kjerne", "PEN", "Simulering, pensjonsdata", GatewayUsage.NONE),
     PENSJONSOPPTJENING("Pensjonsopptjening", "POPP", "Pensjonsopptjeningsdata", GatewayUsage.NONE),
     PERSONDATALOESNINGEN("Persondataløsningen", "PDL", "Persondata", GatewayUsage.NONE),
+    SKJERMEDE_PERSONER("Skjermede personer", "SP", "Skjerming", GatewayUsage.NONE),
     TJENESTEPENSJON("Tjenestepensjon", "TP", "Tjenestepensjonsforhold", GatewayUsage.NONE);
 
     companion object {
-        val servicesAccessibleViaProxy = EgressService.values().filter { it.gatewayUsage == GatewayUsage.INTERNAL }
+        val servicesAccessibleViaProxy = entries.filter { it.gatewayUsage == GatewayUsage.INTERNAL }
     }
 }

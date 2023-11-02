@@ -2,6 +2,8 @@ package no.nav.pensjon.kalkulator.tjenestepensjon.api
 
 import no.nav.pensjon.kalkulator.avtale.*
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.SkjermingService
+import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tjenestepensjon.TjenestepensjonService
 import org.intellij.lang.annotations.Language
@@ -26,14 +28,20 @@ class TjenestepensjonControllerTest {
     private lateinit var mvc: MockMvc
 
     @MockBean
-    private lateinit var service: TjenestepensjonService
+    private lateinit var tjenestepensjonService: TjenestepensjonService
 
     @MockBean
     private lateinit var traceAid: TraceAid
 
+    @MockBean
+    private lateinit var pidExtractor: PidExtractor
+
+    @MockBean
+    private lateinit var skjermingService: SkjermingService
+
     @Test
     fun fetchTjenestepensjonsforhold() {
-        `when`(service.harTjenestepensjonsforhold()).thenReturn(true)
+        `when`(tjenestepensjonService.harTjenestepensjonsforhold()).thenReturn(true)
 
         mvc.perform(
             get(URL)

@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.security.egress
 
+import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import no.nav.pensjon.kalkulator.tech.security.egress.token.RawJwt
@@ -10,10 +11,12 @@ import org.springframework.security.core.GrantedAuthority
  * Authentication data is initially obtained by Spring Security.
  * This class augments that data by adding a mechanism for obtaining egress tokens
  * (used by backend for accessing other services).
+ * It also keeps the person ID (if available).
  */
 class EnrichedAuthentication(
     private val initialAuth: Authentication,
-    private val egressTokenSuppliersByService: EgressTokenSuppliersByService
+    private val egressTokenSuppliersByService: EgressTokenSuppliersByService,
+    val pid: Pid?
 ) : Authentication {
 
     fun getEgressAccessToken(service: EgressService): RawJwt {
@@ -36,3 +39,5 @@ class EnrichedAuthentication(
         initialAuth.isAuthenticated = isAuthenticated
     }
 }
+
+fun Authentication.enriched(): EnrichedAuthentication = this as EnrichedAuthentication

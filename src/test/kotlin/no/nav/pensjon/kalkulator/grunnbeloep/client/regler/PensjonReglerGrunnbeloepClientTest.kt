@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.grunnbeloep.client.regler
 
 import no.nav.pensjon.kalkulator.grunnbeloep.Grunnbeloep
 import no.nav.pensjon.kalkulator.grunnbeloep.client.GrunnbeloepSpec
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.regler.ReglerConfiguration
 import no.nav.pensjon.kalkulator.tech.security.egress.EnrichedAuthentication
@@ -67,8 +68,9 @@ class PensjonReglerGrunnbeloepClientTest : WebClientTest() {
             SecurityContextHolder.setContext(SecurityContextHolder.createEmptyContext())
 
             SecurityContextHolder.getContext().authentication = EnrichedAuthentication(
-                TestingAuthenticationToken("TEST_USER", null),
-                EgressTokenSuppliersByService(mapOf())
+                initialAuth = TestingAuthenticationToken("TEST_USER", null),
+                egressTokenSuppliersByService = EgressTokenSuppliersByService(mapOf()),
+                pid = pid
             )
         }
 

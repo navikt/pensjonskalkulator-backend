@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.mock
 
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.egress.EnrichedAuthentication
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import org.springframework.boot.test.context.TestComponent
@@ -31,7 +32,8 @@ class MockSecurityConfiguration {
 
             SecurityContextHolder.getContext().authentication = EnrichedAuthentication(
                 TestingAuthenticationToken("TEST_USER", jwt()),
-                EgressTokenSuppliersByService(mapOf())
+                EgressTokenSuppliersByService(mapOf()),
+                pid
             )
         }
 
