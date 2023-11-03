@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.security.egress
 
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import no.nav.pensjon.kalkulator.tech.security.egress.token.RawJwt
@@ -27,7 +28,7 @@ class EnrichedAuthenticationTest {
         val tokenSuppliersByService =
             EgressTokenSuppliersByService(mapOf(EgressService.PENSJON_REGLER to Supplier { RawJwt("token1") }))
 
-        enrichedAuthentication = EnrichedAuthentication(initialAuth, tokenSuppliersByService)
+        enrichedAuthentication = EnrichedAuthentication(initialAuth, tokenSuppliersByService, pid)
     }
 
     @Test
@@ -38,19 +39,23 @@ class EnrichedAuthenticationTest {
 
     @Test
     fun `verify that getters return values from wrapped class`() {
-        `when`(initialAuth.name).thenReturn("name1")
-        `when`(initialAuth.authorities).thenReturn(mutableListOf(GrantedAuthority { "authority1" }))
-        `when`(initialAuth.credentials).thenReturn("credentials1")
-        `when`(initialAuth.details).thenReturn("details1")
-        `when`(initialAuth.principal).thenReturn("principal1")
-        `when`(initialAuth.isAuthenticated).thenReturn(true)
+        with(initialAuth) {
+            `when`(name).thenReturn("name1")
+            `when`(authorities).thenReturn(mutableListOf(GrantedAuthority { "authority1" }))
+            `when`(credentials).thenReturn("credentials1")
+            `when`(details).thenReturn("details1")
+            `when`(principal).thenReturn("principal1")
+            `when`(isAuthenticated).thenReturn(true)
+        }
 
-        assertEquals("name1", enrichedAuthentication.name)
-        assertEquals("authority1", enrichedAuthentication.authorities.first().authority)
-        assertEquals("credentials1", enrichedAuthentication.credentials)
-        assertEquals("details1", enrichedAuthentication.details)
-        assertEquals("principal1", enrichedAuthentication.principal)
-        assertTrue(enrichedAuthentication.isAuthenticated)
+        with(enrichedAuthentication) {
+            assertEquals("name1", name)
+            assertEquals("authority1", authorities.first().authority)
+            assertEquals("credentials1", credentials)
+            assertEquals("details1", details)
+            assertEquals("principal1", principal)
+            assertTrue(isAuthenticated)
+        }
     }
 
     @Test

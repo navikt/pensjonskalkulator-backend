@@ -18,6 +18,7 @@ class EgressServiceSecurityConfiguration {
         @Value("\${pen.service-id}") pensjonsfagligKjerneServiceId: String,
         @Value("\${popp.service-id}") pensjonsopptjeningServiceId: String,
         @Value("\${persondata.service-id}") persondataServiceId: String,
+        @Value("\${skjermede-personer.service-id}") skjermedePersonerServiceId: String,
         @Value("\${tjenestepensjon.service-id}") tjenestepensjonServiceId: String,
         @Value("\${proxy.service-id}") proxyServiceId: String
     ): EgressServiceListsByAudience {
@@ -26,6 +27,7 @@ class EgressServiceSecurityConfiguration {
                 pensjonsfagligKjerneServiceId to listOf(EgressService.PENSJONSFAGLIG_KJERNE),
                 pensjonsopptjeningServiceId to listOf(EgressService.PENSJONSOPPTJENING),
                 persondataServiceId to listOf(EgressService.PERSONDATALOESNINGEN),
+                skjermedePersonerServiceId to listOf(EgressService.SKJERMEDE_PERSONER),
                 tjenestepensjonServiceId to listOf(EgressService.TJENESTEPENSJON),
                 proxyServiceId to EgressService.servicesAccessibleViaProxy
             )

@@ -2,9 +2,10 @@ package no.nav.pensjon.kalkulator
 
 import io.prometheus.client.hotspot.DefaultExports
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
 import org.springframework.boot.runApplication
 
-@SpringBootApplication
+@SpringBootApplication(exclude = arrayOf(UserDetailsServiceAutoConfiguration::class))
 class PensjonskalkulatorBackendApplication
 
 fun main(args: Array<String>) {

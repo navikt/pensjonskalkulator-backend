@@ -1,6 +1,8 @@
 package no.nav.pensjon.kalkulator.tech.toggle.api
 
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.SkjermingService
+import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.junit.jupiter.api.Assertions.*
@@ -22,14 +24,20 @@ class FeatureToggleControllerTest {
     private lateinit var mvc: MockMvc
 
     @MockBean
-    private lateinit var service: FeatureToggleService
+    private lateinit var featureToggleService: FeatureToggleService
 
     @MockBean
     private lateinit var traceAid: TraceAid
 
+    @MockBean
+    private lateinit var pidExtractor: PidExtractor
+
+    @MockBean
+    private lateinit var skjermingService: SkjermingService
+
     @Test
     fun isEnabled() {
-        `when`(service.isEnabled("feature1")).thenReturn(true)
+        `when`(featureToggleService.isEnabled("feature1")).thenReturn(true)
 
         mvc.perform(MockMvcRequestBuilders.get(URL))
             .andExpect(MockMvcResultMatchers.status().isOk())

@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.opptjening.client.regler
 
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningshistorikk
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
@@ -69,8 +70,15 @@ class PensjonReglerOpptjeningClientTest : WebClientTest() {
     companion object {
         private fun opptjeningshistorikkSpec() =
             OpptjeningshistorikkSpec(
-                listOf(OpptjeningSpec(2022, 1000000, Opptjeningstype.PENSJONSGIVENDE_INNTEKT)), foedselsdato()
+                opptjeninger = listOf(opptjeningSpec()),
+                foedselsdato = foedselsdato()
             )
+
+        private fun opptjeningSpec() = OpptjeningSpec(
+            aar = 2022,
+            pensjonsgivendeInntekt = 1000000,
+            opptjeningstype = Opptjeningstype.PENSJONSGIVENDE_INNTEKT
+        )
 
         private fun foedselsdato() = LocalDate.of(1963, 1, 1)
 
@@ -79,7 +87,8 @@ class PensjonReglerOpptjeningClientTest : WebClientTest() {
 
             SecurityContextHolder.getContext().authentication = EnrichedAuthentication(
                 TestingAuthenticationToken("TEST_USER", null),
-                EgressTokenSuppliersByService(mapOf())
+                EgressTokenSuppliersByService(mapOf()),
+                pid
             )
         }
 

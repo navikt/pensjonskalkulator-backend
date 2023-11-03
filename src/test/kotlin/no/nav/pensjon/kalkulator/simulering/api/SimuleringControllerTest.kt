@@ -5,6 +5,8 @@ import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.*
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.SkjermingService
+import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.intellij.lang.annotations.Language
@@ -31,15 +33,21 @@ class SimuleringControllerTest {
     private lateinit var mvc: MockMvc
 
     @MockBean
-    private lateinit var service: SimuleringService
+    private lateinit var simuleringService: SimuleringService
 
     @MockBean
     private lateinit var traceAid: TraceAid
 
+    @MockBean
+    private lateinit var pidExtractor: PidExtractor
+
+    @MockBean
+    private lateinit var skjermingService: SkjermingService
+
     @Test
     fun `simulerer alderspensjon`() {
         val spec = impersonalSpec(SimuleringType.ALDERSPENSJON)
-        `when`(service.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
+        `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
         mvc.perform(
             post(URL)
@@ -54,7 +62,7 @@ class SimuleringControllerTest {
     @Test
     fun `simulerer alderspensjon med AFP privat`() {
         val spec = impersonalSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
-        `when`(service.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
+        `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
         mvc.perform(
             post(URL)
@@ -69,7 +77,7 @@ class SimuleringControllerTest {
     @Test
     fun `simulering responds 'vilkaar ikke oppfylt' when Conflict`() {
         val spec = impersonalSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
-        `when`(service.simulerAlderspensjon(spec)).thenThrow(EgressException("", statusCode = HttpStatus.CONFLICT))
+        `when`(simuleringService.simulerAlderspensjon(spec)).thenThrow(EgressException("", statusCode = HttpStatus.CONFLICT))
 
         mvc.perform(
             post(URL)

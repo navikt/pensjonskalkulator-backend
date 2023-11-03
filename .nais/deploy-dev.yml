@@ -28,14 +28,17 @@ spec:
   azure:
     application:
       enabled: true
+      claims:
+        groups:
+          - id: "8bb9b8d1-f46a-4ade-8ee8-5895eccdf8cf" # 0000-GA-PENSJON_SAKSBEHANDLER
   tokenx:
     enabled: true
   accessPolicy:
     inbound:
       rules:
         - application: pensjonskalkulator-frontend
-        - application: debug-dings
-          namespace: plattformsikkerhet
+        - application: wonderwalled-azure
+          namespace: aura
         - application: wonderwalled-idporten
           namespace: aura
     outbound:
@@ -46,6 +49,8 @@ spec:
         - application: pensjon-selvbetjening-fss-gateway
           namespace: pensjonselvbetjening
           cluster: dev-fss
+        - application: skjermede-personer-pip
+          namespace: nom
         - application: tp-q2
           namespace: pensjonsamhandling
           cluster: dev-fss
@@ -55,6 +60,7 @@ spec:
         - host: pensjon-popp-q2.dev-fss-pub.nais.io
         - host: pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
         - host: pensjonskalkulator-unleash-api.nav.cloud.nais.io
+        - host: skjermede-personer-pip.intern.dev.nav.no
         - host: test.idporten.no
         - host: tp-api-q2.dev-fss-pub.nais.io
   env:
@@ -82,6 +88,10 @@ spec:
       value: dev-fss:pensjonopptjening:pensjon-popp-q2
     - name: POPP_URL
       value: https://pensjon-popp-q2.dev-fss-pub.nais.io
+    - name: SKJERMEDE_PERSONER_SERVICE_ID
+      value: dev-gcp:nom:skjermede-personer-pip
+    - name: SKJERMEDE_PERSONER_URL
+      value: https://skjermede-personer-pip.intern.dev.nav.no
     - name: STS_URL
       value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: TJENESTEPENSJON_SERVICE_ID

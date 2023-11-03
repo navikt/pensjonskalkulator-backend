@@ -18,7 +18,7 @@ class SelfTestController(
 ) {
     @GetMapping(path = ["internal/selftest"])
     fun selfTest(request: HttpServletRequest): ResponseEntity<String> {
-        securityContextEnricher.enrichAuthentication()
+        securityContextEnricher.enrichAuthentication(request)
         val accept = request.getHeader(HttpHeaders.ACCEPT)
 
         return if (MediaType.APPLICATION_JSON_VALUE == accept) responseEntity(

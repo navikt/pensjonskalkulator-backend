@@ -3,6 +3,8 @@ package no.nav.pensjon.kalkulator.ufoere.api
 import no.nav.pensjon.kalkulator.avtale.*
 import no.nav.pensjon.kalkulator.mock.DateFactory
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.SkjermingService
+import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.ufoere.UfoerepensjonService
 import org.intellij.lang.annotations.Language
@@ -27,14 +29,20 @@ class UfoerepensjonControllerTest {
     private lateinit var mvc: MockMvc
 
     @MockBean
-    private lateinit var service: UfoerepensjonService
+    private lateinit var ufoeretrygdService: UfoerepensjonService
 
     @MockBean
     private lateinit var traceAid: TraceAid
 
+    @MockBean
+    private lateinit var pidExtractor: PidExtractor
+
+    @MockBean
+    private lateinit var skjermingService: SkjermingService
+
     @Test
     fun harLoependeUfoerepensjon() {
-        `when`(service.harLoependeUfoerepensjon(DateFactory.date)).thenReturn(true)
+        `when`(ufoeretrygdService.harLoependeUfoerepensjon(DateFactory.date)).thenReturn(true)
 
         mvc.perform(
             MockMvcRequestBuilders.post(URL)

@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.tech.security.ingress
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletRequest
 import jakarta.servlet.ServletResponse
+import jakarta.servlet.http.HttpServletRequest
 import no.nav.pensjon.kalkulator.tech.security.egress.SecurityContextEnricher
 import org.springframework.web.filter.GenericFilterBean
 
@@ -12,7 +13,7 @@ import org.springframework.web.filter.GenericFilterBean
 class AuthenticationEnricherFilter(private val enricher: SecurityContextEnricher) : GenericFilterBean() {
 
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
-        enricher.enrichAuthentication()
+        enricher.enrichAuthentication(request as HttpServletRequest)
         chain.doFilter(request, response)
     }
 }

@@ -4,6 +4,8 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.SkjermingService
+import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
@@ -30,16 +32,22 @@ internal class UttaksalderControllerTest {
     private lateinit var mvc: MockMvc
 
     @MockBean
-    private lateinit var service: UttaksalderService
+    private lateinit var uttaksalderService: UttaksalderService
 
     @MockBean
     private lateinit var traceAid: TraceAid
+
+    @MockBean
+    private lateinit var pidExtractor: PidExtractor
+
+    @MockBean
+    private lateinit var skjermingService: SkjermingService
 
     @Test
     fun `finnTidligsteUttaksalder version 1`() {
         val spec =
             UttaksalderIngressSpecDto(Sivilstand.UGIFT, true, 100_000, SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
-        `when`(service.finnTidligsteUttaksalder(spec)).thenReturn(uttaksalder)
+        `when`(uttaksalderService.finnTidligsteUttaksalder(spec)).thenReturn(uttaksalder)
 
         mvc.perform(
             post("/api/v1/tidligste-uttaksalder")

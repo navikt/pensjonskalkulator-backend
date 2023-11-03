@@ -3,6 +3,8 @@ package no.nav.pensjon.kalkulator.person.api
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PersonFactory.skiltPerson
 import no.nav.pensjon.kalkulator.person.PersonService
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.SkjermingService
+import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -27,6 +29,12 @@ class PersonControllerTest {
 
     @MockBean
     private lateinit var traceAid: TraceAid
+
+    @MockBean
+    private lateinit var pidExtractor: PidExtractor
+
+    @MockBean
+    private lateinit var skjermingService: SkjermingService
 
     @Test
     fun person() {
