@@ -19,7 +19,7 @@ enum class PenSakType(val externalValue: String, val internalValue: SakType) {
     UFOERETRYGD("UFOREP", SakType.UFOERETRYGD); // UFOREP = Uførepensjon
 
     companion object {
-        private val values = PenSakType.values()
+        private val values = entries.toTypedArray()
         private val log = KotlinLogging.logger {}
 
         fun fromExternalValue(value: String?) =
@@ -42,7 +42,7 @@ enum class PenSakStatus(val externalValue: String, val internalValue: SakStatus)
     AVSLUTTET("AVSLUTTET", SakStatus.AVSLUTTET);
 
     companion object {
-        private val values = PenSakStatus.values()
+        private val values = entries.toTypedArray()
         private val log = KotlinLogging.logger {}
 
         fun fromExternalValue(value: String?) =

@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.cli
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.PingableServiceClient
 import no.nav.pensjon.kalkulator.person.Pid
+import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.client.SkjermingClient
@@ -47,7 +48,9 @@ class NomSkjermingClient(
                 .retrieve()
                 .bodyToMono(Boolean::class.java)
                 .retryWhen(retryBackoffSpec(uri))
-                .block() ?: true
+                .block()
+                .also { countCalls(MetricResult.OK) }
+                ?: true
 
             return !erSkjermet
         } catch (e: WebClientRequestException) {
