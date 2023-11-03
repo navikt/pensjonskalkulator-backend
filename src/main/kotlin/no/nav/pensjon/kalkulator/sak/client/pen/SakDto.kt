@@ -10,7 +10,10 @@ data class SakDto(val sakType: String, val sakStatus: String)
 enum class PenSakType(val externalValue: String, val internalValue: SakType) {
     NONE("", SakType.NONE),
     UNKNOWN("?", SakType.UNKNOWN),
+    AVTALEFESTET_PENSJON("AFP", SakType.AVTALEFESTET_PENSJON),
+    BARNEPENSJON("BARNEP", SakType.BARNEPENSJON),
     GENERELL("GENRL", SakType.GENERELL),
+    GRUNNBLANKETTER("GRBL", SakType.GRUNNBLANKETTER),
     GJENLEVENDEYTELSE("GJENLEV", SakType.GJENLEVENDEYTELSE),
     OMSORGSOPPTJENING("OMSORG", SakType.OMSORGSOPPTJENING),
     UFOERETRYGD("UFOREP", SakType.UFOERETRYGD); // UFOREP = Uførepensjon
