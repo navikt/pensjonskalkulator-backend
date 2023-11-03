@@ -38,7 +38,7 @@ class SakController(
         ]
     )
     fun harRelevantSak(): SakDto {
-        traceAid.initialize()
+        traceAid.begin()
         log.debug { "Request for sak-status" }
 
         return try {
@@ -47,7 +47,7 @@ class SakController(
         } catch (e: EgressException) {
             handleError(e)!!
         } finally {
-            traceAid.finalize()
+            traceAid.end()
         }
     }
 

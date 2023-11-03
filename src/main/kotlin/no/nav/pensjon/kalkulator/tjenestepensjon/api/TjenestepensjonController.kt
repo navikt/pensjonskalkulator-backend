@@ -22,7 +22,7 @@ class TjenestepensjonController(
         description = "Hvorvidt den innloggede brukeren har offentlig tjenestepensjonsforhold"
     )
     fun harTjenestepensjonsforhold(): TjenestepensjonsforholdDto {
-        traceAid.initialize()
+        traceAid.begin()
         log.debug { "Request for tjenestepensjonsforhold-status" }
 
         return try {
@@ -31,7 +31,7 @@ class TjenestepensjonController(
         } catch (e: EgressException) {
             handleError(e)!!
         } finally {
-            traceAid.finalize()
+            traceAid.end()
         }
     }
 

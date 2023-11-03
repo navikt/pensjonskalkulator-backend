@@ -43,7 +43,7 @@ class UttaksalderController(
         ]
     )
     fun finnTidligsteUttaksalderV1(@RequestBody spec: UttaksalderIngressSpecDto?): AlderDto? {
-        traceAid.initialize()
+        traceAid.begin()
         log.debug { "Request for uttaksalder-søk V1: $spec" }
 
         return try {
@@ -58,7 +58,7 @@ class UttaksalderController(
         } catch (e: EgressException) {
             handleError(e, "V1")
         } finally {
-            traceAid.finalize()
+            traceAid.end()
         }
     }
 

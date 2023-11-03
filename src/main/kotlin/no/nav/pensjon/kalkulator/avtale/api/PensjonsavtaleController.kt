@@ -40,7 +40,7 @@ class PensjonsavtaleController(
         ]
     )
     fun fetchAvtalerV1(@RequestBody spec: PensjonsavtaleIngressSpecDto): PensjonsavtalerDto {
-        traceAid.initialize()
+        traceAid.begin()
         log.debug { "Request for pensjonsavtaler V1: $spec" }
 
         return try {
@@ -49,7 +49,7 @@ class PensjonsavtaleController(
         } catch (e: EgressException) {
             handleError(e, "V1")!!
         } finally {
-            traceAid.finalize()
+            traceAid.end()
         }
     }
 

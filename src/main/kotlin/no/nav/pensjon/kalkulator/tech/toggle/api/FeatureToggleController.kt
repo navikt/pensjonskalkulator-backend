@@ -40,7 +40,7 @@ class FeatureToggleController(
         ]
     )
     fun isEnabled(@PathVariable(value = "name") featureName: String): EnablementDto {
-        traceAid.initialize()
+        traceAid.begin()
         log.debug { "Request for status for funksjonsbryter '$featureName'" }
 
         return try {
@@ -49,7 +49,7 @@ class FeatureToggleController(
         } catch (e: EgressException) {
             handleError(e)!!
         } finally {
-            traceAid.finalize()
+            traceAid.end()
         }
     }
 

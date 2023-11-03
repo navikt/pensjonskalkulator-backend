@@ -6,14 +6,14 @@ import org.springframework.stereotype.Component
 @Component
 class TraceAid(private val callIdGenerator: CallIdGenerator) {
 
-    fun initialize() {
+    fun begin() {
         MDC.put(CALL_ID_KEY, callIdGenerator.newId())
     }
 
     fun callId(): String =
         MDC.get(CALL_ID_KEY) ?: callIdGenerator.newId().also { MDC.put(CALL_ID_KEY, it) }
 
-    fun finalize() {
+    fun end() {
         MDC.clear()
     }
 

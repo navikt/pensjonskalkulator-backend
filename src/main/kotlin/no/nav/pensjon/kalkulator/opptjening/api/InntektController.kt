@@ -38,7 +38,7 @@ class InntektController(
         ]
     )
     fun sistePensjonsgivendeInntekt(): InntektDto {
-        traceAid.initialize()
+        traceAid.begin()
         log.debug { "Request for inntekt" }
 
         return try {
@@ -47,7 +47,7 @@ class InntektController(
         } catch (e: EgressException) {
             handleError(e, "V0")!!
         } finally {
-            traceAid.finalize()
+            traceAid.end()
         }
     }
 

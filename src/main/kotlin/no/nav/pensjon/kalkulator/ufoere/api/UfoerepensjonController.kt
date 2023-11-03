@@ -38,7 +38,7 @@ class UfoerepensjonController(
         ]
     )
     fun harUfoeretrygd(@RequestBody spec: UfoerepensjonSpecDto): UfoerepensjonDto {
-        traceAid.initialize()
+        traceAid.begin()
         log.debug { "Request for uføretrygd-status" }
 
         return try {
@@ -47,7 +47,7 @@ class UfoerepensjonController(
         } catch (e: EgressException) {
             handleError(e)!!
         } finally {
-            traceAid.finalize()
+            traceAid.end()
         }
     }
 

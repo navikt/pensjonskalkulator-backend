@@ -38,7 +38,7 @@ class PersonController(
         ]
     )
     fun person(@RequestBody spec: UttaksalderIngressSpecDto?): PersonDto {
-        traceAid.initialize()
+        traceAid.begin()
         log.debug { "Request for personinformasjon: $spec" }
 
         return try {
@@ -47,7 +47,7 @@ class PersonController(
         } catch (e: EgressException) {
             handleError(e, "V0")!!
         } finally {
-            traceAid.finalize()
+            traceAid.end()
         }
     }
 

@@ -49,7 +49,7 @@ class SimuleringController(
         ]
     )
     fun simulerAlderspensjon(@RequestBody spec: SimuleringSpecDto): SimuleringsresultatDto {
-        traceAid.initialize()
+        traceAid.begin()
         log.debug { "Request for simulering: $spec" }
 
         return try {
@@ -58,7 +58,7 @@ class SimuleringController(
         } catch (e: EgressException) {
             if (e.isConflict) vilkaarIkkeOppfylt() else handleError(e, "V1")!!
         } finally {
-            traceAid.finalize()
+            traceAid.end()
         }
     }
 
