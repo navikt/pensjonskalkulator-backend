@@ -5,8 +5,8 @@ import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.*
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.SkjermingService
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.intellij.lang.annotations.Language
@@ -42,7 +42,7 @@ class SimuleringControllerTest {
     private lateinit var pidExtractor: PidExtractor
 
     @MockBean
-    private lateinit var skjermingService: SkjermingService
+    private lateinit var groupMembershipService: GroupMembershipService
 
     @Test
     fun `simulerer alderspensjon`() {

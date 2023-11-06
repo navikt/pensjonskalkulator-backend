@@ -37,7 +37,11 @@ class PdlPersonClient(
 
     override fun service() = service
 
-    override fun fetchPerson(pid: Pid): Person? {
+    override fun fetchPerson(pid: Pid): Person? = fetch(personaliaQuery(pid))
+
+    override fun fetchAdressebeskyttelse(pid: Pid): Person? = fetch(adressebeskyttelseQuery(pid))
+
+    private fun fetch(query: String): Person? {
         val uri = "$baseUrl/$PATH"
         log.debug { "POST to URI: '$uri'" }
 
@@ -46,7 +50,7 @@ class PdlPersonClient(
                 .post()
                 .uri(uri)
                 .headers(::setHeaders)
-                .bodyValue(query(pid))
+                .bodyValue(query)
                 .retrieve()
                 .bodyToMono(PersonResponseDto::class.java)
                 .retryWhen(retryBackoffSpec(uri))
@@ -77,10 +81,13 @@ class PdlPersonClient(
                 .block()
 
             PingResult(service, ServiceStatus.UP, uri, "Ping OK")
+        } catch (e: EgressException) {
+            // Happens if failing to obtain access token
+            down(uri, e)
         } catch (e: WebClientRequestException) {
-            PingResult(service, ServiceStatus.DOWN, uri, e.message ?: "forespørsel feilet")
+            down(uri, e)
         } catch (e: WebClientResponseException) {
-            PingResult(service, ServiceStatus.DOWN, uri, e.responseBodyAsString)
+            down(uri, e.responseBodyAsString)
         }
     }
 
@@ -95,6 +102,10 @@ class PdlPersonClient(
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
     }
 
+    private fun down(uri: String, e: Throwable) = down(uri, e.message ?: "Failed calling ${service()}")
+
+    private fun down(uri: String, message: String) = PingResult(service(), ServiceStatus.DOWN, uri, message)
+
     companion object {
         private const val PATH = "graphql"
         private const val THEME = "PEN"
@@ -103,8 +114,15 @@ class PdlPersonClient(
         private const val BEHANDLINGSNUMMER = "B353"
         private val service = EgressService.PERSONDATALOESNINGEN
 
-        private fun query(pid: Pid) = """{
+        private fun personaliaQuery(pid: Pid) = """{
 	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { fornavn }, foedsel { foedselsdato }, sivilstand(historikk: false) { type } } }",
+	"variables": {
+		"ident": "${pid.value}"
+	}
+}"""
+
+        private fun adressebeskyttelseQuery(pid: Pid) = """{
+	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { adressebeskyttelse { gradering } } }",
 	"variables": {
 		"ident": "${pid.value}"
 	}

@@ -2,8 +2,8 @@ package no.nav.pensjon.kalkulator.tjenestepensjon.api
 
 import no.nav.pensjon.kalkulator.avtale.*
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.SkjermingService
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tjenestepensjon.TjenestepensjonService
 import org.intellij.lang.annotations.Language
@@ -37,7 +37,7 @@ class TjenestepensjonControllerTest {
     private lateinit var pidExtractor: PidExtractor
 
     @MockBean
-    private lateinit var skjermingService: SkjermingService
+    private lateinit var groupMembershipService: GroupMembershipService
 
     @Test
     fun fetchTjenestepensjonsforhold() {

@@ -22,7 +22,7 @@ enum class PdlSivilstand(val externalValue: String, val internalValue: Sivilstan
     GJENLEVENDE_PARTNER("GJENLEVENDE_PARTNER", Sivilstand.GJENLEVENDE_PARTNER);
 
     companion object {
-        private val values = values()
+        private val values = entries.toTypedArray()
         private val log = KotlinLogging.logger {}
 
         fun fromExternalValue(value: String?) =

@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.person.client.pdl.map
 
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.pdl.dto.*
+import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -43,6 +44,12 @@ class PersonMapperTest {
     }
 
     @Test
+    fun `fromDto picks first adressebeskyttelsegradering`() {
+        val dto = responseDto(adressebeskyttelser = listOf("FORTROLIG", "STRENGT_FORTROLIG"))
+        assertEquals(AdressebeskyttelseGradering.FORTROLIG, PersonMapper.fromDto(dto)?.adressebeskyttelse)
+    }
+
+    @Test
     fun `fromDto maps DTO with null data to null`() {
         assertNull(PersonMapper.fromDto(PersonResponseDto(null, null, null)))
     }
@@ -76,16 +83,20 @@ class PersonMapperTest {
         private fun responseDto(
             fornavnliste: List<String> = emptyList(),
             fodselsdatoer: List<LocalDate> = emptyList(),
-            sivilstander: List<String> = emptyList()
+            sivilstander: List<String> = emptyList(),
+            adressebeskyttelser: List<String> = emptyList()
         ) =
             PersonResponseDto(
-                PersonEnvelopeDto(
+                data = PersonEnvelopeDto(
                     PersonDto(
                         fornavnliste.map(::NavnDto),
                         fodselsdatoer.map { FoedselDto(DateDto(it)) },
-                        sivilstander.map(::SivilstandDto)
+                        sivilstander.map(::SivilstandDto),
+                        adressebeskyttelser.map(::AdressebeskyttelseDto)
                     )
-                ), null, null
+                ),
+                extensions = null,
+                errors = null
             )
     }
 }

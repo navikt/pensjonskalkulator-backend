@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.ImpersonalAccessFilter
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.SkjermingService
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -29,18 +29,40 @@ class ImpersonalAccessFilterTest {
     private lateinit var pidExtractor: PidExtractor
 
     @Mock
-    private lateinit var skjermingService: SkjermingService
+    private lateinit var groupMembershipService: GroupMembershipService
 
     @Test
-    fun `when fnr in header then doFilter reports unauthorized and breaks filter chain`() {
+    fun `when fnr in header then doFilter reports 'forbidden' and breaks filter chain`() {
         `when`(request.getHeader("fnr")).thenReturn(pid.value)
+        `when`(pidExtractor.pid()).thenReturn(pid)
+        `when`(groupMembershipService.innloggetBrukerHarTilgang(pid)).thenReturn(false)
 
-        ImpersonalAccessFilter(pidExtractor, skjermingService).doFilter(request, response, chain)
+        ImpersonalAccessFilter(pidExtractor, groupMembershipService).doFilter(request, response, chain)
 
-        verify(response, times(1)).sendError(
-            401,
-            "Adgang nektet pga. mulig skjerming, adressebeskyttelse eller manglende gruppemedlemskap"
-        )
+        verify(response, times(1)).sendError(403, "Adgang nektet pga. manglende gruppemedlemskap")
         verify(chain, never()).doFilter(request, response)
+    }
+
+    @Test
+    fun `when innlogget bruker mangler gruppemedlemskap then doFilter reports 'forbidden' and breaks filter chain`() {
+        `when`(request.getHeader("fnr")).thenReturn(pid.value)
+        `when`(pidExtractor.pid()).thenReturn(pid)
+        `when`(groupMembershipService.innloggetBrukerHarTilgang(pid)).thenReturn(false)
+
+        ImpersonalAccessFilter(pidExtractor, groupMembershipService).doFilter(request, response, chain)
+
+        verify(response, times(1)).sendError(403, "Adgang nektet pga. manglende gruppemedlemskap")
+        verify(chain, never()).doFilter(request, response)
+    }
+
+    @Test
+    fun `when innlogget bruker har tilgang then filter chain continues`() {
+        `when`(request.getHeader("fnr")).thenReturn(pid.value)
+        `when`(pidExtractor.pid()).thenReturn(pid)
+        `when`(groupMembershipService.innloggetBrukerHarTilgang(pid)).thenReturn(true)
+
+        ImpersonalAccessFilter(pidExtractor, groupMembershipService).doFilter(request, response, chain)
+
+        verify(chain, times(1)).doFilter(request, response)
     }
 }
