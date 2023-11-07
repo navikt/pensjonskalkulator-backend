@@ -5,11 +5,12 @@ import java.time.LocalDate
 data class Person(
     val fornavn: String?,
     val foedselsdato: LocalDate,
-    val sivilstand: Sivilstand = Sivilstand.UOPPGITT
+    val sivilstand: Sivilstand = Sivilstand.UOPPGITT,
+    val adressebeskyttelse: AdressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT
 ) {
     val harFoedselsdato = foedselsdato >= minimumFoedselsdato
 
     private companion object {
-        val minimumFoedselsdato: LocalDate = LocalDate.of(1901, 1, 1)
+        private val minimumFoedselsdato: LocalDate = LocalDate.of(1901, 1, 1)
     }
 }

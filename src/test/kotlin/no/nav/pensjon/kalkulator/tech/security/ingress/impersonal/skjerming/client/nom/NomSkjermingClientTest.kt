@@ -36,13 +36,13 @@ class NomSkjermingClientTest : WebClientTest() {
     @Test
     fun `harTilgangTilPerson returns true when person is not skjermet`() {
         arrange(skjermingResponse(erSkjermet = false))
-        assertTrue(client.harTilgangTilPerson(pid))
+        assertTrue(client.personErTilgjengelig(pid))
     }
 
     @Test
     fun `harTilgangTilPerson returns false when person is skjermet`() {
         arrange(skjermingResponse(erSkjermet = true))
-        assertFalse(client.harTilgangTilPerson(pid))
+        assertFalse(client.personErTilgjengelig(pid))
     }
 
     companion object {

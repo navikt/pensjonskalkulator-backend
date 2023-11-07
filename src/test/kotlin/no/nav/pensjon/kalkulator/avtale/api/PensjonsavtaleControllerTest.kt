@@ -4,8 +4,8 @@ import no.nav.pensjon.kalkulator.avtale.*
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleServiceTest.Companion.pensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtaler
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.SkjermingService
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
@@ -38,7 +38,7 @@ class PensjonsavtaleControllerTest {
     private lateinit var pidExtractor: PidExtractor
 
     @MockBean
-    private lateinit var skjermingService: SkjermingService
+    private lateinit var groupMembershipService: GroupMembershipService
 
     @Test
     fun fetchAvtaler() {

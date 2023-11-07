@@ -4,5 +4,5 @@ import no.nav.pensjon.kalkulator.person.Pid
 
 interface SkjermingClient {
 
-    fun harTilgangTilPerson(pid: Pid): Boolean
+    fun personErTilgjengelig(pid: Pid): Boolean
 }

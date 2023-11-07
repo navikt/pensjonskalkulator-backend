@@ -15,7 +15,8 @@ data class PersonEnvelopeDto(val hentPerson: PersonDto)
 data class PersonDto(
     val navn: List<NavnDto>?,
     val foedsel: List<FoedselDto>?,
-    val sivilstand: List<SivilstandDto>?
+    val sivilstand: List<SivilstandDto>?,
+    val adressebeskyttelse: List<AdressebeskyttelseDto>?
 )
 
 data class NavnDto(val fornavn: String)
@@ -23,6 +24,8 @@ data class NavnDto(val fornavn: String)
 data class FoedselDto(val foedselsdato: DateDto)
 
 data class SivilstandDto(val type: String)
+
+data class AdressebeskyttelseDto(val gradering: String)
 
 data class ErrorDto(val message: String)
 

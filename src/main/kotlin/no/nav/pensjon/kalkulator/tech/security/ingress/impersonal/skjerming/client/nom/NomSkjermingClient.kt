@@ -36,7 +36,7 @@ class NomSkjermingClient(
 
     override fun service(): EgressService = service
 
-    override fun harTilgangTilPerson(pid: Pid): Boolean {
+    override fun personErTilgjengelig(pid: Pid): Boolean {
         val uri = "$baseUrl/${path(pid.value)}"
         log.debug { "GET from URI: '$uri'" }
 

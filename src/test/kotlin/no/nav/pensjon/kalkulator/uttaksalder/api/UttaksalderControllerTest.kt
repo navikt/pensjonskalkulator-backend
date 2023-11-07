@@ -4,8 +4,8 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.SkjermingService
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
@@ -41,7 +41,7 @@ internal class UttaksalderControllerTest {
     private lateinit var pidExtractor: PidExtractor
 
     @MockBean
-    private lateinit var skjermingService: SkjermingService
+    private lateinit var groupMembershipService: GroupMembershipService
 
     @Test
     fun `finnTidligsteUttaksalder version 1`() {

@@ -5,6 +5,7 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
@@ -39,7 +40,7 @@ class PdlPersonClientTest : WebClientTest() {
 
     @Test
     fun `fetchPerson uses supplied PID in request to PDL`() {
-        arrange(okResponse())
+        arrange(okPersonaliaResponse())
 
         client.fetchPerson(pid)
 
@@ -62,7 +63,7 @@ class PdlPersonClientTest : WebClientTest() {
 
     @Test
     fun `fetchPerson returns person when OK response`() {
-        arrange(okResponse())
+        arrange(okPersonaliaResponse())
 
         val response: Person = client.fetchPerson(pid)!!
 
@@ -74,7 +75,7 @@ class PdlPersonClientTest : WebClientTest() {
 
     @Test
     fun `fetchPerson returns partial person when receiving partial graphql-response`() {
-        arrange(partialResponse())
+        arrange(partialPersonaliaResponse())
 
         val response: Person = client.fetchPerson(pid)!!
 
@@ -87,7 +88,7 @@ class PdlPersonClientTest : WebClientTest() {
     @Test
     fun `fetchPerson retries in case of server error`() {
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
-        arrange(okResponse())
+        arrange(okPersonaliaResponse())
 
         val response: Person = client.fetchPerson(pid)!!
 
@@ -123,12 +124,20 @@ class PdlPersonClientTest : WebClientTest() {
         assertDoesNotThrow { client.fetchPerson(pid) }
     }
 
+    @Test
+    fun `fetchAdressebeskyttelse returns adressebeskyttelsesgradering when OK response`() {
+        arrange(okAdressebeskyttelseResponse())
+
+        val response: Person = client.fetchAdressebeskyttelse(pid)!!
+
+        assertEquals(AdressebeskyttelseGradering.STRENGT_FORTROLIG, response.adressebeskyttelse)
+    }
+
     companion object {
 
-        private fun okResponse(): MockResponse {
-            // Actual response from PDL in Q2:
-            @Language("JSON")
-            val body = """{
+        // Actual response from PDL in Q2:
+        @Language("JSON")
+        private const val PERSONALIA_JSON = """{
               "data": {
                 "hentPerson": {
                   "navn": [
@@ -148,14 +157,10 @@ class PdlPersonClientTest : WebClientTest() {
                   ]
                 }
               }
-            }""".trimIndent()
+            }"""
 
-            return jsonResponse(HttpStatus.OK).setBody(body)
-        }
-
-        private fun partialResponse(): MockResponse {
-            @Language("JSON")
-            val body = """{
+        @Language("JSON")
+        private const val PARTIAL_PERSONALIA_JSON = """{
               "data": {
                 "hentPerson": {
                   "navn": [
@@ -166,10 +171,29 @@ class PdlPersonClientTest : WebClientTest() {
                   "sivilstand": null
                 }
               }
-            }""".trimIndent()
+            }"""
 
-            return jsonResponse(HttpStatus.OK).setBody(body)
-        }
+        @Language("JSON")
+        private const val ADRESSEBESKYTTELSE_JSON = """{
+              "data": {
+                "hentPerson": {
+                  "adressebeskyttelse": [
+                    {
+                      "gradering": "STRENGT_FORTROLIG"
+                    }
+                  ]
+                }
+              }
+            }"""
+
+        private fun okPersonaliaResponse(): MockResponse =
+            jsonResponse(HttpStatus.OK).setBody(PERSONALIA_JSON.trimIndent())
+
+        private fun okAdressebeskyttelseResponse(): MockResponse =
+            jsonResponse(HttpStatus.OK).setBody(ADRESSEBESKYTTELSE_JSON.trimIndent())
+
+        private fun partialPersonaliaResponse(): MockResponse =
+            jsonResponse(HttpStatus.OK).setBody(PARTIAL_PERSONALIA_JSON.trimIndent())
 
         private fun extendedResponse(): MockResponse {
             @Language("JSON")

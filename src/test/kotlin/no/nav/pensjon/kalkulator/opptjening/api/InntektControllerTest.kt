@@ -5,8 +5,8 @@ import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.opptjening.Inntekt
 import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.SkjermingService
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
@@ -40,7 +40,7 @@ class InntektControllerTest {
     private lateinit var pidExtractor: PidExtractor
 
     @MockBean
-    private lateinit var skjermingService: SkjermingService
+    private lateinit var groupMembershipService: GroupMembershipService
 
     @Test
     fun fetchInntektsforhold() {
