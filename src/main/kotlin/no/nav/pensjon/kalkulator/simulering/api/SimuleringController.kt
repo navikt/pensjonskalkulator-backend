@@ -35,12 +35,7 @@ class SimuleringController(
             ApiResponse(
                 responseCode = "200",
                 description = "Simulering utført" +
-                        " (men dersom vilkår ikke oppfylt vil responsen ikke inneholde pensjonsbeløp).",
-                content = [Content(
-                    examples = [
-                        ExampleObject(name = "Vilkår oppfylt", value = VILKAAR_OPPFYLT_EXAMPLE),
-                        ExampleObject(name = "Vilkår ikke oppfylt", value = VILKAAR_IKKE_OPPFYLT_EXAMPLE)]
-                )]
+                        " (men dersom vilkår ikke oppfylt vil responsen ikke inneholde pensjonsbeløp)."
             ),
             ApiResponse(
                 responseCode = "503", description = "Simulering kunne ikke utføres av tekniske årsaker",
@@ -73,23 +68,6 @@ class SimuleringController(
                 afpPrivat = emptyList(),
                 vilkaarErOppfylt = false
             )
-
-        @Language("json")
-        private const val VILKAAR_OPPFYLT_EXAMPLE = """{
-  "alderspensjon": [
-    {
-      "alder": 67,
-      "beloep": 300000
-    }
-  ],
-  "afpPrivat": [
-    {
-      "alder": 62,
-      "beloep": 50000
-    }
-  ],
-  "vilkaarErOppfylt": true
-}"""
 
         @Language("json")
         const val VILKAAR_IKKE_OPPFYLT_EXAMPLE = """{
