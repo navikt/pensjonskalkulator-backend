@@ -55,8 +55,8 @@ class PersonMapperTest {
     }
 
     @Test
-    fun `fromDto maps missing fornavn to fornavn null`() {
-        assertNull(PersonMapper.fromDto(responseDto(fornavnliste = emptyList()))?.fornavn)
+    fun `fromDto maps missing fornavn to empty string`() {
+        assertEquals("", PersonMapper.fromDto(responseDto(fornavnliste = emptyList()))?.fornavn)
     }
 
     @Test

@@ -9,7 +9,7 @@ import org.springframework.security.core.context.SecurityContextImpl
 class SecurityContextNavIdExtractorTest {
 
     @Test
-    fun `id returns PID if found in JWT 'NAVident' claim`() {
+    fun `id returns NAV identifier if found in JWT 'NAVident' claim`() {
         SecurityContextHolder.setContext(SecurityContextImpl(MockAuthentication("NAVident", "X123456")))
         assertEquals("X123456", SecurityContextNavIdExtractor().id())
     }

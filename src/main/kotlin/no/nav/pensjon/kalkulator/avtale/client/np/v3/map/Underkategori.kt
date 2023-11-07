@@ -31,7 +31,7 @@ enum class Underkategori(val externalValue: String, val internalValue: AvtaleUnd
     PENSJONSKAPITALBEVIS_IPS_2017("pensjonskapitalbevis ips 2017", AvtaleUnderkategori.PENSJONSKAPITALBEVIS_IPS_2017);
 
     companion object {
-        private val values = values()
+        private val values = entries.toTypedArray()
         private val log = KotlinLogging.logger {}
 
         fun fromExternalValue(value: String?) =

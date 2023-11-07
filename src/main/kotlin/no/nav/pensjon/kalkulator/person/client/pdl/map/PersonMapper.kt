@@ -1,12 +1,10 @@
 package no.nav.pensjon.kalkulator.person.client.pdl.map
 
-import no.nav.pensjon.kalkulator.person.NavnFormatter
+import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
+import no.nav.pensjon.kalkulator.person.NavnFormatter.formatNavn
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.person.client.pdl.dto.PdlSivilstand
 import no.nav.pensjon.kalkulator.person.client.pdl.dto.*
-import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
-import no.nav.pensjon.kalkulator.person.client.pdl.dto.PdlAdressebeskyttelseGradering
 import java.time.LocalDate
 
 object PersonMapper {
@@ -16,7 +14,7 @@ object PersonMapper {
 
     private fun person(dto: PersonDto) =
         Person(
-            fornavn = fromDto(dto.navn)?.let { NavnFormatter.formatNavn(it) },
+            fornavn = fromDto(dto.navn)?.let(::formatNavn) ?: "",
             foedselsdato = fromDto(dto.foedsel) ?: LocalDate.MIN,
             sivilstand = fromDto(dto.sivilstand),
             adressebeskyttelse = fromDto(dto.adressebeskyttelse)
