@@ -6,6 +6,7 @@ import no.nav.pensjon.kalkulator.opptjening.Inntekt
 import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.intellij.lang.annotations.Language
@@ -41,6 +42,9 @@ class InntektControllerTest {
 
     @MockBean
     private lateinit var groupMembershipService: GroupMembershipService
+
+    @MockBean
+    private lateinit var auditor: Auditor
 
     @Test
     fun fetchInntektsforhold() {

@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.tech.toggle.api
 
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
@@ -34,6 +35,9 @@ class FeatureToggleControllerTest {
 
     @MockBean
     private lateinit var groupMembershipService: GroupMembershipService
+
+    @MockBean
+    private lateinit var auditor: Auditor
 
     @Test
     fun isEnabled() {

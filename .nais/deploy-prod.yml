@@ -101,6 +101,8 @@ spec:
       value: https://tp-api.prod-fss-pub.nais.io
     - name: SERVER_ERROR_INCLUDE_STACKTRACE
       value: never
+    - name: AUDIT_LOG_OUTPUT
+      value: SYSLOG
     - name: STDOUT_LOG_OUTPUT
       value: JSON
     - name: LOGGING_LEVEL

@@ -6,6 +6,7 @@ import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -43,6 +44,9 @@ class SimuleringControllerTest {
 
     @MockBean
     private lateinit var groupMembershipService: GroupMembershipService
+
+    @MockBean
+    private lateinit var auditor: Auditor
 
     @Test
     fun `simulerer alderspensjon`() {

@@ -1,0 +1,16 @@
+package no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit
+
+import no.nav.pensjon.kalkulator.tech.security.ingress.jwt.SecurityContextClaimExtractor
+import org.springframework.stereotype.Component
+
+@Component
+class SecurityContextNavIdExtractor {
+
+    fun id(): String = idFromSecurityContext() ?: ""
+
+    private companion object {
+        private const val CLAIM_KEY = "NAVident"
+
+        private fun idFromSecurityContext(): String? = SecurityContextClaimExtractor.claim(CLAIM_KEY) as? String
+    }
+}
