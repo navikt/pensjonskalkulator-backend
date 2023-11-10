@@ -28,20 +28,68 @@ class LeewayExpirationCheckerTest {
 
     @Test
     fun `isExpired returns false when not expired`() {
+        //       0            10           20
+        // ------|------------|------------|-------> seconds
+        //     issue         now         expire
+
         val checker = LeewayExpirationChecker(timeProvider, "0")
-        assertFalse(checker.isExpired(pointInTime.minusSeconds(10), 20L)) // expires in 10s
+
+        assertFalse(
+            checker.isExpired(
+                issuedTime = pointInTime.minusSeconds(10),
+                expiresInSeconds = 20L // 20s after issued, i.e. 10s from now (point in time)
+            )
+        )
     }
 
     @Test
-    fun `isExpired returns false when within leeway period`() {
-        val checker = LeewayExpirationChecker(timeProvider, "5")
-        assertFalse(checker.isExpired(pointInTime.minusSeconds(10), 9L)) // expired 1s ago
-    }
+    fun `isExpired returns true when expired`() {
+        //       0            6        8        10
+        // ------|------------|--------|--------|-------> seconds
+        //     issue        leeway   expire    now
 
-    @Test
-    fun `isExpired returns true when outside of leeway period`() {
         val checker = LeewayExpirationChecker(timeProvider, "2")
-        assertTrue(checker.isExpired(pointInTime.minusSeconds(10), 5L)) // expired 5s ago
+
+        assertTrue(
+            checker.isExpired(
+                issuedTime = pointInTime.minusSeconds(10),
+                expiresInSeconds = 8L // 8s after issued, i.e. expired 2s ago
+            )
+        )
+    }
+
+    @Test
+    fun `isExpired returns true when not expired but after leeway start`() {
+        //       0            8        9        10
+        // ------|------------|--------|--------|-------> seconds
+        //     issue        leeway    now     expire
+        //                    |<------ 2 ------>|
+
+        val checker = LeewayExpirationChecker(timeProvider, "2")
+
+        assertTrue(
+            checker.isExpired(
+                issuedTime = pointInTime.minusSeconds(9),
+                expiresInSeconds = 10L // 10s after issued, i.e. 1s from now
+            )
+        )
+    }
+
+    @Test
+    fun `isExpired returns false when not expired and before leeway start`() {
+        //       0            8         9         10
+        // ------|------------|---------|---------|-------> seconds
+        //     issue         now      leeway    expire
+        //                              |<-- 1 -->|
+
+        val checker = LeewayExpirationChecker(timeProvider, "1")
+
+        assertFalse(
+            checker.isExpired(
+                issuedTime = pointInTime.minusSeconds(8),
+                expiresInSeconds = 10L // 10s after issued, i.e. 2s from now
+            )
+        )
     }
 
     @Test

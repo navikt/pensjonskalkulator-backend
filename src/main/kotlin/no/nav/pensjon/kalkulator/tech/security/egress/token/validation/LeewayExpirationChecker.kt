@@ -7,6 +7,8 @@ import java.util.*
 
 /**
  * Checks expiration, allowing a certain leeway period.
+ * If current time is after the start of the leeway period, the token shall be renewed,
+ * even if it is not yet expired (this is to avoid 'false' expiry due to clock skew).
  */
 @Component
 class LeewayExpirationChecker(
@@ -17,7 +19,7 @@ class LeewayExpirationChecker(
     private val leeway: Long = leewaySeconds.toLong()
 
     override fun isExpired(issuedTime: LocalDateTime, expiresInSeconds: Long): Boolean {
-        val deadline = issuedTime.plusSeconds(expiresInSeconds + leeway)
+        val deadline = issuedTime.plusSeconds(expiresInSeconds - leeway)
         return timeProvider.time().isAfter(deadline)
     }
 
