@@ -35,7 +35,7 @@ class SecurityConfiguration {
         @Value("\${token.x.issuer}") personalIssuerUri2: String,
         @Value("\${token.x.client.id}") personalAudience2: String,
         @Value("\${azure.openid.config.issuer}") impersonalIssuerUri: String,
-        @Value("\${azure.app.client.id}") impersonalAudience: String,
+        @Value("\${azure.frontend.client.id}") impersonalAudience: String,
         @Value("\${request-matcher.internal}") internalRequestMatcher: String
     ): SecurityFilterChain {
         http.addFilterAfter(AuthenticationEnricherFilter(securityContextEnricher), BasicAuthenticationFilter::class.java)
