@@ -35,10 +35,13 @@ class SecurityConfiguration {
         @Value("\${token.x.issuer}") personalIssuerUri2: String,
         @Value("\${token.x.client.id}") personalAudience2: String,
         @Value("\${azure.openid.config.issuer}") impersonalIssuerUri: String,
-        @Value("\${azure.app.client.id}") impersonalAudience: String,
+        @Value("\${pkb.frontend.entra.client.id}") impersonalAudience: String,
         @Value("\${request-matcher.internal}") internalRequestMatcher: String
     ): SecurityFilterChain {
-        http.addFilterAfter(AuthenticationEnricherFilter(securityContextEnricher), BasicAuthenticationFilter::class.java)
+        http.addFilterAfter(
+            AuthenticationEnricherFilter(securityContextEnricher),
+            BasicAuthenticationFilter::class.java
+        )
             .addFilterAfter(impersonalAccessFilter, AuthenticationEnricherFilter::class.java)
 
         val resolver = tokenAuthenticationManagerResolver(
@@ -78,11 +81,13 @@ class SecurityConfiguration {
             personalAudience: String,
             impersonalIssuerUri: String,
             impersonalAudience: String
-        ): AuthenticationManagerResolver<HttpServletRequest> {
-            val personalJwt = providerManager(personalIssuerUri, personalAudience)
-            val impersonalJwt = providerManager(impersonalIssuerUri, impersonalAudience)
-            return AuthenticationManagerResolver { if (isImpersonal(it)) impersonalJwt else personalJwt }
-        }
+        ): AuthenticationManagerResolver<HttpServletRequest> =
+            AuthenticationManagerResolver {
+                if (isImpersonal(it))
+                    providerManager(impersonalIssuerUri, impersonalAudience)
+                else
+                    providerManager(personalIssuerUri, personalAudience)
+            }
 
         private fun providerManager(issuerUri: String, audience: String) =
             ProviderManager(JwtAuthenticationProvider(jwtDecoder(issuerUri, audience)))

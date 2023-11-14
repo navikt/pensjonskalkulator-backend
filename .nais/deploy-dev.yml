@@ -104,6 +104,8 @@ spec:
       value: dev-fss:pensjonsamhandling:tp-q2
     - name: TJENESTEPENSJON_URL
       value: https://tp-api-q2.dev-fss-pub.nais.io
+    - name: PKB_FRONTEND_ENTRA_CLIENT_ID
+      value: 0683a6ca-6f72-458c-8367-2879103edbfc
     - name: SERVER_ERROR_INCLUDE_STACKTRACE
       value: always
     - name: AUDIT_LOG_OUTPUT
