@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.tjenestepensjon.api
 
 import io.swagger.v3.oas.annotations.Operation
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -15,6 +16,8 @@ class TjenestepensjonController(
     private val service: TjenestepensjonService,
     private val traceAid: TraceAid
 ) : ControllerBase(traceAid) {
+
+    private val log = KotlinLogging.logger {}
 
     @GetMapping("tpo-medlemskap")
     @Operation(

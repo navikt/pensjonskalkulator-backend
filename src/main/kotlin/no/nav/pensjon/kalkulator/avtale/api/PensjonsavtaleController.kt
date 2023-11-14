@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleService
 import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleIngressSpecDto
 import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtalerDto
@@ -21,6 +22,8 @@ class PensjonsavtaleController(
     private val service: PensjonsavtaleService,
     private val traceAid: TraceAid
 ) : ControllerBase(traceAid) {
+
+    private val log = KotlinLogging.logger {}
 
     @PostMapping("v1/pensjonsavtaler")
     @Operation(
@@ -39,7 +42,7 @@ class PensjonsavtaleController(
             ),
         ]
     )
-    fun fetchAvtalerV1(@RequestBody spec: PensjonsavtaleIngressSpecDto): PensjonsavtalerDto {
+    fun fetchAvtaler(@RequestBody spec: PensjonsavtaleIngressSpecDto): PensjonsavtalerDto {
         traceAid.begin()
         log.debug { "Request for pensjonsavtaler V1: $spec" }
 

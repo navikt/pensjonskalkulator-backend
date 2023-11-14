@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -24,6 +25,8 @@ class UttaksalderController(
     private val traceAid: TraceAid
 ) : ControllerBase(traceAid) {
 
+    private val log = KotlinLogging.logger {}
+
     @PostMapping("v1/tidligste-uttaksalder")
     @Operation(
         summary = "Første mulige uttaksalder",
@@ -42,7 +45,7 @@ class UttaksalderController(
             ),
         ]
     )
-    fun finnTidligsteUttaksalderV1(@RequestBody spec: UttaksalderIngressSpecDto?): AlderDto? {
+    fun finnTidligsteUttaksalder(@RequestBody spec: UttaksalderIngressSpecDto?): AlderDto? {
         traceAid.begin()
         log.debug { "Request for uttaksalder-søk V1: $spec" }
 

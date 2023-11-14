@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
@@ -20,6 +21,8 @@ class FeatureToggleController(
     val service: FeatureToggleService,
     private val traceAid: TraceAid
 ) : ControllerBase(traceAid) {
+
+    private val log = KotlinLogging.logger {}
 
     @GetMapping("feature/{name}")
     @Operation(

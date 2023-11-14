@@ -5,9 +5,11 @@ import no.nav.pensjon.kalkulator.tech.security.egress.SecurityContextEnricher
 import no.nav.pensjon.kalkulator.tech.security.ingress.*
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.ImpersonalAccessFilter
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManagerResolver
 import org.springframework.security.authentication.ProviderManager
@@ -25,17 +27,46 @@ import org.springframework.util.StringUtils.hasLength
 @EnableWebSecurity
 class SecurityConfiguration {
 
+    /**
+     * Supports two issuer configurations (ID-porten and TokenX) at bean instantiation time,
+     * but only one of them will be used during call processing.
+     */
+    @Bean("personal")
+    @Primary
+    fun personalProviderManager(
+        @Value("\${idporten.issuer}") idPortenIssuerUri: String,
+        @Value("\${idporten.audience}") idPortenAudience: String,
+        @Value("\${token.x.issuer}") tokenXIssuerUri: String,
+        @Value("\${token.x.client.id}") tokenXAudience: String
+    ) =
+        ProviderManager(
+            JwtAuthenticationProvider(
+                jwtDecoder(
+                    if (hasLength(idPortenIssuerUri)) idPortenIssuerUri else tokenXIssuerUri,
+                    if (hasLength(idPortenAudience)) idPortenAudience else tokenXAudience
+                )
+            )
+        )
+
+    @Bean("impersonal")
+    fun impersonalProviderManager(
+        @Value("\${azure.openid.config.issuer}") issuerUri: String,
+        @Value("\${pkb.frontend.entra.client.id}") audience: String
+    ) = ProviderManager(JwtAuthenticationProvider(jwtDecoder(issuerUri, audience)))
+
+    @Bean
+    fun tokenAuthenticationManagerResolver(
+        @Qualifier("personal") personalProviderManager: ProviderManager,
+        @Qualifier("impersonal") impersonalProviderManager: ProviderManager
+    ): AuthenticationManagerResolver<HttpServletRequest> =
+        AuthenticationManagerResolver { if (isImpersonal(it)) impersonalProviderManager else personalProviderManager }
+
     @Bean
     fun filterChain(
         http: HttpSecurity,
         securityContextEnricher: SecurityContextEnricher,
         impersonalAccessFilter: ImpersonalAccessFilter,
-        @Value("\${idporten.issuer}") personalIssuerUri1: String,
-        @Value("\${idporten.audience}") personalAudience1: String,
-        @Value("\${token.x.issuer}") personalIssuerUri2: String,
-        @Value("\${token.x.client.id}") personalAudience2: String,
-        @Value("\${azure.openid.config.issuer}") impersonalIssuerUri: String,
-        @Value("\${pkb.frontend.entra.client.id}") impersonalAudience: String,
+        authResolver: AuthenticationManagerResolver<HttpServletRequest>,
         @Value("\${request-matcher.internal}") internalRequestMatcher: String
     ): SecurityFilterChain {
         http.addFilterAfter(
@@ -43,13 +74,6 @@ class SecurityConfiguration {
             BasicAuthenticationFilter::class.java
         )
             .addFilterAfter(impersonalAccessFilter, AuthenticationEnricherFilter::class.java)
-
-        val resolver = tokenAuthenticationManagerResolver(
-            if (hasLength(personalIssuerUri1)) personalIssuerUri1 else personalIssuerUri2,
-            if (hasLength(personalAudience1)) personalAudience1 else personalAudience2,
-            impersonalIssuerUri,
-            impersonalAudience
-        )
 
         return http
             .authorizeHttpRequests {
@@ -64,7 +88,7 @@ class SecurityConfiguration {
                 ).permitAll()
                     .anyRequest().authenticated()
             }
-            .oauth2ResourceServer { it.authenticationManagerResolver(resolver) }
+            .oauth2ResourceServer { it.authenticationManagerResolver(authResolver) }
             .build()
     }
 
@@ -75,22 +99,6 @@ class SecurityConfiguration {
          */
         fun isImpersonal(request: HttpServletRequest): Boolean =
             hasLength(request.getHeader(CustomHttpHeaders.PID))
-
-        private fun tokenAuthenticationManagerResolver(
-            personalIssuerUri: String,
-            personalAudience: String,
-            impersonalIssuerUri: String,
-            impersonalAudience: String
-        ): AuthenticationManagerResolver<HttpServletRequest> =
-            AuthenticationManagerResolver {
-                if (isImpersonal(it))
-                    providerManager(impersonalIssuerUri, impersonalAudience)
-                else
-                    providerManager(personalIssuerUri, personalAudience)
-            }
-
-        private fun providerManager(issuerUri: String, audience: String) =
-            ProviderManager(JwtAuthenticationProvider(jwtDecoder(issuerUri, audience)))
 
         private fun jwtDecoder(issuerUri: String, audience: String): JwtDecoder {
             val decoder = JwtDecoders.fromIssuerLocation(issuerUri) as NimbusJwtDecoder

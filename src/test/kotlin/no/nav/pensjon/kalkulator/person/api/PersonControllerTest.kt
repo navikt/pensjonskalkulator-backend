@@ -50,7 +50,7 @@ class PersonControllerTest {
     }
 
     private companion object {
-        private const val URL = "/api/person"
+        private const val URL = "/api/v1/person"
 
         private const val RESPONSE_BODY = """{
         "fornavn": "Fornavn1",

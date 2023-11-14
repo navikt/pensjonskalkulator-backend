@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -19,6 +20,8 @@ class UfoerepensjonController(
     private val service: UfoerepensjonService,
     private val traceAid: TraceAid
 ) : ControllerBase(traceAid) {
+
+    private val log = KotlinLogging.logger {}
 
     @PostMapping("ufoerepensjon")
     @Operation(

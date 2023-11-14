@@ -10,7 +10,7 @@ import java.lang.System.currentTimeMillis
 
 abstract class ControllerBase(private val traceAid: TraceAid) {
 
-    protected val log = KotlinLogging.logger {}
+    private val log = KotlinLogging.logger {}
 
     protected fun <R> timed(function: () -> R, functionName: String): R {
         val startTimeMillis = currentTimeMillis()

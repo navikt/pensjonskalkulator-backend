@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.sak.SakService
 import no.nav.pensjon.kalkulator.sak.api.dto.SakDto
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
@@ -19,6 +20,8 @@ class SakController(
     private val service: SakService,
     private val traceAid: TraceAid
 ) : ControllerBase(traceAid) {
+
+    private val log = KotlinLogging.logger {}
 
     @GetMapping("sak-status")
     @Operation(
