@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.person
 
+import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.PersonFactory.skiltPerson
 import no.nav.pensjon.kalkulator.person.client.PersonClient
@@ -20,14 +21,18 @@ class PersonServiceTest {
     @Mock
     private lateinit var pidGetter: PidGetter
 
+    @Mock
+    private lateinit var aldersgruppeFinder: AldersgruppeFinder
+
     @Test
     fun getPerson() {
+        val skiltPerson = skiltPerson()
         `when`(pidGetter.pid()).thenReturn(pid)
-        `when`(client.fetchPerson(pid)).thenReturn(skiltPerson())
+        `when`(client.fetchPerson(pid)).thenReturn(skiltPerson)
+        `when`(aldersgruppeFinder.aldersgruppe(skiltPerson)).thenReturn("")
 
-        val person = PersonService(client, pidGetter).getPerson()
+        val person = PersonService(client, pidGetter, aldersgruppeFinder).getPerson()
 
-        assertEquals("Fornavn1", person?.fornavn)
-        assertEquals(Sivilstand.SKILT, person?.sivilstand)
+        person shouldBe skiltPerson
     }
 }
