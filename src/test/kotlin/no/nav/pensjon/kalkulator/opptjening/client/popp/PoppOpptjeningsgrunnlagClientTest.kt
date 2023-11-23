@@ -81,7 +81,7 @@ class PoppOpptjeningsgrunnlagClientTest : WebClientTest() {
 
         val exception = assertThrows(EgressException::class.java) { client.fetchOpptjeningsgrunnlag(pid) }
 
-        assertEquals("Failed calling ${baseUrl()}/popp/api/opptjeningsgrunnlag/129064*****", exception.message)
+        assertEquals("Failed calling ${baseUrl()}/popp/api/opptjeningsgrunnlag", exception.message)
         assertEquals("Feil", (exception.cause as EgressException).message)
     }
 

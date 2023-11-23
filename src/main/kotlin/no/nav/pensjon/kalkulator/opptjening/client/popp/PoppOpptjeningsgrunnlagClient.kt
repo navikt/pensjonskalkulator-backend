@@ -40,21 +40,18 @@ class PoppOpptjeningsgrunnlagClient(
 
     override fun service() = service
 
-    /**
-     * Calls PROPOPP007
-     */
     override fun fetchOpptjeningsgrunnlag(pid: Pid): Opptjeningsgrunnlag {
-        log.debug { "GET from URI: '${displayableUri(pid)}'" }
-        val uri = uri(pid)
+        val uri = "$baseUrl/$OPPTJENINGSGRUNNLAG_PATH"
+        log.debug { "GET from URI: '$uri'" }
 
         return try {
             webClient
                 .get()
                 .uri(uri)
-                .headers(::setHeaders)
+                .headers { setHeaders(it, pid) }
                 .retrieve()
                 .bodyToMono(OpptjeningsgrunnlagResponseDto::class.java)
-                .retryWhen(retryBackoffSpec(displayableUri(pid)))
+                .retryWhen(retryBackoffSpec(uri))
                 .block()
                 ?.let { OpptjeningsgrunnlagMapper.fromDto(it) }
                 .also { countCalls(MetricResult.OK) }
@@ -90,20 +87,17 @@ class PoppOpptjeningsgrunnlagClient(
 
     override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
 
-    private fun setHeaders(headers: HttpHeaders) {
+    private fun setHeaders(headers: HttpHeaders, pid: Pid) {
         headers.setBearerAuth(EgressAccess.token(service).value)
         headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_JSON_VALUE
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
+        headers[CustomHttpHeaders.PID] = pid.value
     }
 
     private fun setPingHeaders(headers: HttpHeaders) {
         headers.setBearerAuth(EgressAccess.token(service).value)
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
     }
-
-    private fun uri(pid: Pid) = "$baseUrl/$OPPTJENINGSGRUNNLAG_PATH/${pid.value}"
-
-    private fun displayableUri(pid: Pid) = "$baseUrl/$OPPTJENINGSGRUNNLAG_PATH/${pid.displayValue}"
 
     companion object {
         private const val OPPTJENINGSGRUNNLAG_PATH = "popp/api/opptjeningsgrunnlag"
