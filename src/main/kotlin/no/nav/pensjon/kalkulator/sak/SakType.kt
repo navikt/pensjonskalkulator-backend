@@ -6,7 +6,9 @@ package no.nav.pensjon.kalkulator.sak
 enum class SakType(val relevant: Boolean) {
     NONE(false),
     UNKNOWN(false),
-    AVTALEFESTET_PENSJON(false),
+    ALDERSPENSJON(false),
+    AVTALEFESTET_PENSJON_I_OFFENTLIG_SEKTOR(false),
+    AVTALEFESTET_PENSJON_I_PRIVAT_SEKTOR(false),
     BARNEPENSJON(false),
     GENERELL(false),
     GJENLEVENDEYTELSE(true),
