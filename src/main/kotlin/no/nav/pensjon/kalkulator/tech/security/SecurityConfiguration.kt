@@ -67,7 +67,7 @@ class SecurityConfiguration {
         securityContextEnricher: SecurityContextEnricher,
         impersonalAccessFilter: ImpersonalAccessFilter,
         authResolver: AuthenticationManagerResolver<HttpServletRequest>,
-        @Value("\${request-matcher.internal}") internalRequestMatcher: String
+        @Value("\${pkb.request-matcher.internal}") internalRequestMatcher: String
     ): SecurityFilterChain {
         http.addFilterAfter(
             AuthenticationEnricherFilter(securityContextEnricher),

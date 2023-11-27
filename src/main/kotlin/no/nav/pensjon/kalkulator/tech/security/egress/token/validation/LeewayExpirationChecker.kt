@@ -13,7 +13,7 @@ import java.util.*
 @Component
 class LeewayExpirationChecker(
     val timeProvider: TimeProvider,
-    @Value("\${token.expiration.leeway}") leewaySeconds: String
+    @Value("\${pkb.token.expiration.leeway}") leewaySeconds: String
 ) : ExpirationChecker {
 
     private val leeway: Long = leewaySeconds.toLong()

@@ -105,7 +105,7 @@ spec:
       value: SYSLOG
     - name: STDOUT_LOG_OUTPUT
       value: JSON
-    - name: LOGGING_LEVEL
+    - name: PKB_LOGGING_LEVEL
       value: INFO
   envFrom:
     - secret: pensjonskalkulator-backend-unleash-api-token

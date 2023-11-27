@@ -43,7 +43,7 @@ spec:
       rules:
         - application: pensjonskalkulator-frontend
         - application: pensjonskalkulator-veiledning-frontend
-        - application: wonderwalled-azure
+        - application: azure-token-generator
           namespace: aura
         - application: wonderwalled-idporten
           namespace: aura
@@ -112,7 +112,7 @@ spec:
       value: SYSLOG
     - name: STDOUT_LOG_OUTPUT
       value: JSON
-    - name: LOGGING_LEVEL
+    - name: PKB_LOGGING_LEVEL
       value: DEBUG
     - name: JAVA_TOOL_OPTIONS
       value: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
