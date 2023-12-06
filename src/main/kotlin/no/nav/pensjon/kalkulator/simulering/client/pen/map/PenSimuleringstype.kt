@@ -8,7 +8,7 @@ enum class PenSimuleringstype(val externalValue: String, val internalValue: Simu
     ALDERSPENSJON_MED_AFP_PRIVAT("ALDER_M_AFP_PRIVAT", SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT);
 
     companion object {
-        private val values = values()
+        private val values = entries.toTypedArray()
 
         fun fromInternalValue(value: SimuleringType) =
             values.singleOrNull { it.internalValue == value } ?: ALDERSPENSJON

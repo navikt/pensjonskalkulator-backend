@@ -11,7 +11,7 @@ enum class Beregningsmodell(val externalValue: String, val internalValue: Ekster
     NORSK_PENSJON("norskpensjon", EksternBeregningsmodell.NORSK_PENSJON); // prognosen er beregnet av Norsk Pensjon
 
     companion object {
-        private val values = values()
+        private val values = entries.toTypedArray()
         private val log = KotlinLogging.logger {}
 
         fun fromExternalValue(value: String?) =

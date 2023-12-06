@@ -12,7 +12,7 @@ enum class PenSakstype(val externalValue: String, val internalValue: Sakstype) {
     UFOEREPENSJON("UFOREP", Sakstype.UFOEREPENSJON);
 
     companion object {
-        private val values = PenSakstype.values()
+        private val values = entries.toTypedArray()
         private val log = KotlinLogging.logger {}
 
         fun fromExternalValue(value: String?) =

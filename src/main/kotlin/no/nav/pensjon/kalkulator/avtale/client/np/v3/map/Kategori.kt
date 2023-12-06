@@ -14,7 +14,7 @@ enum class Kategori(val externalValue: String, val internalValue: AvtaleKategori
     FOLKETRYGD("folketrygd", AvtaleKategori.FOLKETRYGD);
 
     companion object {
-        private val values = values()
+        private val values = entries.toTypedArray()
         private val log = KotlinLogging.logger {}
 
         fun fromExternalValue(value: String?) =

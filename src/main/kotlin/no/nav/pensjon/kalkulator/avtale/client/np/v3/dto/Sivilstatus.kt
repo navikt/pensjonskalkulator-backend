@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.avtale.client.np.v3.dto
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import org.springframework.util.StringUtils
+import org.springframework.util.StringUtils.hasLength
 
 enum class Sivilstatus(val externalValue: String, val internalValue: Sivilstand) {
     NONE("", Sivilstand.UOPPGITT),
@@ -11,7 +12,7 @@ enum class Sivilstatus(val externalValue: String, val internalValue: Sivilstand)
     UGIFT("ugift", Sivilstand.UGIFT);
 
     companion object {
-        private val values = Sivilstatus.values()
+        private val values = entries.toTypedArray()
         private val defaultValue = GIFT // Norsk Pensjon default
         private val log = KotlinLogging.logger {}
 
@@ -22,7 +23,7 @@ enum class Sivilstatus(val externalValue: String, val internalValue: Sivilstand)
             values.singleOrNull { it.internalValue == value } ?: defaultValue
 
         private fun default(externalValue: String?) =
-            if (StringUtils.hasLength(externalValue))
+            if (hasLength(externalValue))
                 UNKNOWN.also { log.warn { "Unknown NP sivilstatus '$externalValue'" } }
             else
                 NONE

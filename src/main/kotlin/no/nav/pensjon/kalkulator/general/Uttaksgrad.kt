@@ -10,7 +10,7 @@ enum class Uttaksgrad(val prosentsats: Int) {
     HUNDRE_PROSENT(100);
 
     companion object {
-        private val values = values()
+        private val values = entries.toTypedArray()
 
         fun from(prosentsats: Int) =
             values.singleOrNull { it.prosentsats == prosentsats }
