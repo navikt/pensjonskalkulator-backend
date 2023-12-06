@@ -51,7 +51,7 @@ class PensjonsavtaleController(
         val mockFnr = tempPidGetter?.pid()?.value
 
         return try {
-            if ("10836397849" == mockFnr) mockMangeAvtaler() else
+            if ("10836397849" == mockFnr) mockAvtaler() else
 
             toDto(timed(service::fetchAvtaler, fromDto(spec), "pensjonsavtaler V1"))
                 .also { log.debug { "Pensjonsavtaler respons V1: $it" } }
@@ -70,100 +70,26 @@ class PensjonsavtaleController(
         /**
          * Temporary function for testing many pensjonsavtaler
          */
-        private fun mockMangeAvtaler(): PensjonsavtalerDto =
+        private fun mockAvtaler(): PensjonsavtalerDto =
              ObjectMapperConfiguration().objectMapper().readValue(
                 """{
-  "avtaler": [
-    {
-      "produktbetegnelse": "Innskuddpensjon (2 perioder - gradert)",
-      "kategori": "UNKNOWN",
-      "startAar": 70,
-      "sluttAar": 75,
-      "utbetalingsperioder": [
-        {
-          "startAlder": { "aar": 70, "maaneder": 0 },
-          "sluttAlder": { "aar": 72, "maaneder": 11 },
-          "aarligUtbetaling": 100000,
-          "grad": 100
-        },
-        {
-          "startAlder": { "aar": 73, "maaneder": 0 },
-          "sluttAlder": { "aar": 74, "maaneder": 11 },
-          "aarligUtbetaling": 50000,
-          "grad": 100
-        }
-      ]
-    },
-    {
-      "produktbetegnelse": "Nordea Liv",
-      "kategori": "PRIVAT_TJENESTEPENSJON",
-      "startAar": 75,
-      "sluttAar": 75,
-      "utbetalingsperioder": [
-        {
-          "startAlder": { "aar": 75, "maaneder": 0 },
-          "sluttAlder": { "aar": 75, "maaneder": 11 },
-          "aarligUtbetaling": 12345,
-          "grad": 100
-        }
-      ]
-    },
-    {
-      "produktbetegnelse": "Gjensidige (Gjensidige avtale)",
-      "kategori": "PRIVAT_TJENESTEPENSJON",
-      "startAar": 77,
-      "sluttAar": 87,
-      "utbetalingsperioder": [
-        {
-          "startAlder": { "aar": 77, "maaneder": 2 },
-          "sluttAlder": { "aar": 87, "maaneder": 1 },
-          "aarligUtbetaling": 12000,
-          "grad": 100
-        }
-      ]
-    },
-    {
-      "produktbetegnelse": "Oslo Pensjonsforsikring (livsvarig eksempel)",
-      "kategori": "OFFENTLIG_TJENESTEPENSJON",
-      "startAar": 62,
-      "utbetalingsperioder": [
-        {
-          "startAlder": { "aar": 62, "maaneder": 0 },
-          "aarligUtbetaling": 23456,
-          "grad": 100
-        }
-      ]
-    },
-    {
-      "produktbetegnelse": "DNB",
-      "kategori": "INDIVIDUELL_ORDNING",
-      "startAar": 67,
-      "sluttAar": 77,
-      "utbetalingsperioder": [
-        {
-          "startAlder": { "aar": 67, "maaneder": 0 },
-          "sluttAlder": { "aar": 77, "maaneder": 11 },
-          "aarligUtbetaling": 37264,
-          "grad": 100
-        }
-      ]
-    },
-    {
-      "produktbetegnelse": "IPS",
-      "kategori": "INDIVIDUELL_ORDNING",
-      "startAar": 70,
-      "sluttAar": 75,
-      "utbetalingsperioder": [
-        {
-          "startAlder": { "aar": 70, "maaneder": 6 },
-          "sluttAlder": { "aar": 75, "maaneder": 5 },
-          "aarligUtbetaling": 41802,
-          "grad": 100
-        }
-      ]
-    }
-  ],
-  "utilgjengeligeSelskap": []
+  "avtaler": [],
+	"utilgjengeligeSelskap": [{
+		"navn": "Perpetual Income & Growth Investment Trust PLC",
+		"heltUtilgjengelig": false
+	}, {
+		"navn": "Wüstenrot & Württembergische",
+		"heltUtilgjengelig": true
+	}, {
+		"navn": "UnipolSai (or UnipolSai Assicurazioni) post raggruppamento",
+		"heltUtilgjengelig": false
+	}, {
+		"navn": "Storebrand",
+		"heltUtilgjengelig": false
+	}, {
+		"navn": "Gabler",
+		"heltUtilgjengelig": true
+	}]
 }""", PensjonsavtalerDto::class.java
             )
     }
