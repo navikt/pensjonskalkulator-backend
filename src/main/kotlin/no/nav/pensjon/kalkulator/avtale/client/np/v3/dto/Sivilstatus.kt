@@ -2,7 +2,6 @@ package no.nav.pensjon.kalkulator.avtale.client.np.v3.dto
 
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import org.springframework.util.StringUtils
 import org.springframework.util.StringUtils.hasLength
 
 enum class Sivilstatus(val externalValue: String, val internalValue: Sivilstand) {
