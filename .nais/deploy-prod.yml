@@ -66,9 +66,9 @@ spec:
         - host: tp-api.prod-fss-pub.nais.io
   env:
     - name: IDPORTEN_ISSUER
-      value: https://oidc.difi.no/idporten-oidc-provider/
+      value: https://idporten.no
     - name: IDPORTEN_PING_URL
-      value: https://oidc.difi.no/idporten-oidc-provider/.well-known/openid-configuration
+      value: https://idporten.no/.well-known/openid-configuration
     - name: FSS_GATEWAY_SERVICE_ID
       value: prod-fss:pensjonselvbetjening:pensjon-selvbetjening-fss-gateway
     - name: FSS_GATEWAY_URL
