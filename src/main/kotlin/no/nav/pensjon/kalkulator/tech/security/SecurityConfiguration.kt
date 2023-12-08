@@ -67,6 +67,7 @@ class SecurityConfiguration {
         securityContextEnricher: SecurityContextEnricher,
         impersonalAccessFilter: ImpersonalAccessFilter,
         authResolver: AuthenticationManagerResolver<HttpServletRequest>,
+        authenticationEntryPoint: LoggingAuthenticationEntryPoint,
         @Value("\${pkb.request-matcher.internal}") internalRequestMatcher: String
     ): SecurityFilterChain {
         http.addFilterAfter(
@@ -88,7 +89,10 @@ class SecurityConfiguration {
                 ).permitAll()
                     .anyRequest().authenticated()
             }
-            .oauth2ResourceServer { it.authenticationManagerResolver(authResolver) }
+            .oauth2ResourceServer {
+                it.authenticationManagerResolver(authResolver)
+                    .authenticationEntryPoint(authenticationEntryPoint)
+            }
             .build()
     }
 
