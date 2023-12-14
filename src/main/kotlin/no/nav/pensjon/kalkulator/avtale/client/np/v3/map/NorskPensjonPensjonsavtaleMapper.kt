@@ -21,8 +21,8 @@ object NorskPensjonPensjonsavtaleMapper {
     const val SLUTTMAANED_FORSKYVNING = 2
 
     private const val DEFAULT_VALUE = "ukjent"
-    private val DEFAULT_HAR_EPS_PENSJON = true // Norsk Pensjon default
-    private val DEFAULT_HAR_EPS_PENSJONSGIVENDE_INNTEKT_OVER_2G = true // Norsk Pensjon default
+    private const val DEFAULT_HAR_EPS_PENSJON = true // Norsk Pensjon default
+    private const val DEFAULT_HAR_EPS_PENSJONSGIVENDE_INNTEKT_OVER_2G = true // Norsk Pensjon default
 
     fun toDto(spec: PensjonsavtaleSpec, pid: Pid) =
         NorskPensjonPensjonsavtaleSpecDto(

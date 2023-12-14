@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
 import org.springframework.boot.runApplication
 
-@SpringBootApplication(exclude = arrayOf(UserDetailsServiceAutoConfiguration::class))
+@SpringBootApplication(exclude = [UserDetailsServiceAutoConfiguration::class])
 class PensjonskalkulatorBackendApplication
 
 fun main(args: Array<String>) {
