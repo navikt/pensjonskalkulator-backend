@@ -33,7 +33,7 @@ enum class PenSivilstand(val externalValue: String, val internalValue: Sivilstan
                 Sivilstand.UOPPGITT -> UDEFINERT // ambiguous UDEFINERT/GJENLEVENDE_*
                 Sivilstand.GIFT -> GIFT // ambiguous GIFT/-_LEVER_ADSKILT
                 Sivilstand.REGISTRERT_PARTNER -> REGISTRERT_PARTNER // ambiguous REGISTRERT_PARTNER/-_LEVER_ADSKILT
-                else -> PenSivilstand.values().firstOrNull { it.internalValue == sivilstand } ?: UDEFINERT
+                else -> entries.firstOrNull { it.internalValue == sivilstand } ?: UDEFINERT
             }
     }
 }

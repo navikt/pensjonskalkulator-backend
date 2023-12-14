@@ -8,6 +8,6 @@ enum class Opptjeningstype(val code: String) {
 
     companion object {
         fun forCode(code: String): Opptjeningstype =
-            Opptjeningstype.values().firstOrNull { it.code == code } ?: OTHER
+            entries.firstOrNull { it.code == code } ?: OTHER
     }
 }

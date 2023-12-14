@@ -7,6 +7,6 @@ enum class Land(val code: String) {
 
     companion object {
         fun forCode(code: String) =
-            Land.values().firstOrNull { it.code == code } ?: OTHER
+            entries.firstOrNull { it.code == code } ?: OTHER
     }
 }

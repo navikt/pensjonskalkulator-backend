@@ -21,9 +21,9 @@ object OAuth2Scopes {
     const val OFFLINE_ACCESS = "offline_access"
 
     /**
-     * Azure AD default scope
-     * https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent#the-default-scope
+     * Entra ID default scope
+     * https://learn.microsoft.com/en-us/entra/identity-platform/scopes-oidc#the-default-scope
      * Note: Cannot be combined with other scopes
      */
-    const val AAD_DEFAULT = ".default"
+    const val ENTRA_ID_DEFAULT = ".default"
 }
