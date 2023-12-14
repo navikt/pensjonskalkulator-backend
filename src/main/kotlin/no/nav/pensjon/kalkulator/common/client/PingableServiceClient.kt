@@ -3,7 +3,6 @@ package no.nav.pensjon.kalkulator.common.client
 import no.nav.pensjon.kalkulator.tech.selftest.PingResult
 import no.nav.pensjon.kalkulator.tech.selftest.Pingable
 import no.nav.pensjon.kalkulator.tech.selftest.ServiceStatus
-import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.http.HttpHeaders
 import org.springframework.web.reactive.function.client.WebClient
@@ -13,7 +12,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 abstract class PingableServiceClient(
     private val baseUrl: String,
     private val webClient: WebClient,
-    private val traceAid: TraceAid,
     retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), Pingable {
 

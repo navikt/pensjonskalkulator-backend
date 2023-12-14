@@ -32,7 +32,7 @@ class TpTjenestepensjonClient(
     private val webClient: WebClient,
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
-) : PingableServiceClient(baseUrl, webClient, traceAid, retryAttempts),
+) : PingableServiceClient(baseUrl, webClient, retryAttempts),
     TjenestepensjonClient {
 
     private val log = KotlinLogging.logger {}

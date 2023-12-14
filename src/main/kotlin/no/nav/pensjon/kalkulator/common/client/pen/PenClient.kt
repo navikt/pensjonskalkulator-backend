@@ -22,7 +22,7 @@ abstract class PenClient(
     private val webClient: WebClient,
     private val traceAid: TraceAid,
     retryAttempts: String
-) : PingableServiceClient(baseUrl, webClient, traceAid, retryAttempts) {
+) : PingableServiceClient(baseUrl, webClient, retryAttempts) {
 
     private val log = KotlinLogging.logger {}
 
