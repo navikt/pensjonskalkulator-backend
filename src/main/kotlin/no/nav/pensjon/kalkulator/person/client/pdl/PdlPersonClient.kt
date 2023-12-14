@@ -28,11 +28,12 @@ import java.util.*
 @Component
 class PdlPersonClient(
     @Value("\${persondata.url}") private val baseUrl: String,
-    private val webClient: WebClient,
+    webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), PersonClient, Pingable {
 
+    private val webClient: WebClient = webClientBuilder.baseUrl(baseUrl).build()
     private val log = KotlinLogging.logger {}
 
     override fun service() = service
@@ -42,8 +43,7 @@ class PdlPersonClient(
     override fun fetchAdressebeskyttelse(pid: Pid): Person? = fetch(adressebeskyttelseQuery(pid))
 
     private fun fetch(query: String): Person? {
-        val uri = "$baseUrl/$PATH"
-        log.debug { "POST to URI: '$uri'" }
+        val uri = "/$RESOURCE"
 
         return try {
             webClient
@@ -61,14 +61,14 @@ class PdlPersonClient(
                 }
                 ?.let(PersonMapper::fromDto)
         } catch (e: WebClientRequestException) {
-            throw EgressException("Failed calling $uri", e)
+            throw EgressException("Failed calling $baseUrl$uri", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }
     }
 
     override fun ping(): PingResult {
-        val uri = "$baseUrl/$PATH"
+        val uri = "/$RESOURCE"
 
         return try {
             webClient
@@ -80,18 +80,18 @@ class PdlPersonClient(
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
 
-            PingResult(service, ServiceStatus.UP, uri, "Ping OK")
+            PingResult(service, ServiceStatus.UP, "$baseUrl$uri", "Ping OK")
         } catch (e: EgressException) {
             // Happens if failing to obtain access token
-            down(uri, e)
+            down(e)
         } catch (e: WebClientRequestException) {
-            down(uri, e)
+            down(e)
         } catch (e: WebClientResponseException) {
-            down(uri, e.responseBodyAsString)
+            down(e.responseBodyAsString)
         }
     }
 
-    override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
+    override fun toString(e: EgressException, uri: String) = "Failed calling $baseUrl$uri"
 
     private fun setHeaders(headers: HttpHeaders) {
         headers.contentType = MediaType.APPLICATION_JSON
@@ -102,12 +102,12 @@ class PdlPersonClient(
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
     }
 
-    private fun down(uri: String, e: Throwable) = down(uri, e.message ?: "Failed calling ${service()}")
+    private fun down(e: Throwable) = down(e.message ?: "Failed calling ${service()}")
 
-    private fun down(uri: String, message: String) = PingResult(service(), ServiceStatus.DOWN, uri, message)
+    private fun down(message: String) = PingResult(service(), ServiceStatus.DOWN, "$baseUrl$RESOURCE", message)
 
     companion object {
-        private const val PATH = "graphql"
+        private const val RESOURCE = "graphql"
         private const val THEME = "PEN"
 
         // https://behandlingskatalog.nais.adeo.no/process/team/d55cc783-7850-4606-9ff6-1fc44b646c9d/91a4e540-5e39-4c10-971f-49b48f35fe11

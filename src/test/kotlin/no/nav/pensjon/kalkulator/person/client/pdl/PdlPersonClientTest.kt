@@ -3,27 +3,29 @@ package no.nav.pensjon.kalkulator.person.client.pdl
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
+import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import okhttp3.mockwebserver.MockResponse
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.TestPropertySource
+import org.springframework.web.reactive.function.client.WebClient
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
 import java.time.LocalDate
 
-@ExtendWith(SpringExtension::class)
+@SpringBootTest
+@TestPropertySource("classpath:application-test.properties")
 class PdlPersonClientTest : WebClientTest() {
 
     private lateinit var client: PdlPersonClient
@@ -31,10 +33,13 @@ class PdlPersonClientTest : WebClientTest() {
     @Mock
     private lateinit var traceAid: TraceAid
 
+    @Autowired
+    private lateinit var webClientBuilder: WebClient.Builder
+
     @BeforeEach
     fun initialize() {
         `when`(traceAid.callId()).thenReturn("id1")
-        client = PdlPersonClient(baseUrl(), WebClientConfig().regularWebClient(), traceAid, "1")
+        client = PdlPersonClient(baseUrl(), webClientBuilder, traceAid, "1")
         arrangeSecurityContext()
     }
 

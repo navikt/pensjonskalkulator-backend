@@ -22,7 +22,6 @@ import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.SamlTokenServic
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -30,17 +29,23 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import java.nio.charset.StandardCharsets
 import java.util.*
 
 @Component
 class NorskPensjonPensjonsavtaleClient(
     @Value("\${norsk-pensjon.url}") private val baseUrl: String,
     private val tokenGetter: SamlTokenService,
-    @Qualifier("soap") private val webClient: WebClient,
+    webClientBuilder: WebClient.Builder,
     private val xmlMapper: XmlMapper,
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), PensjonsavtaleClient {
+
+    private val webClient: WebClient = webClientBuilder
+        .baseUrl(baseUrl)
+        .defaultHeaders { it.contentType = MediaType(MediaType.TEXT_XML, StandardCharsets.UTF_8) }
+        .build()
 
     private val log = KotlinLogging.logger {}
 
@@ -61,10 +66,9 @@ class NorskPensjonPensjonsavtaleClient(
     }
 
     private fun fetchAvtalerXml(spec: NorskPensjonPensjonsavtaleSpecDto): String {
-        val uri = "$baseUrl$PATH"
+        val uri = "/$RESOURCE"
         val callId = traceAid.callId()
         val body = soapEnvelope(soapBody(spec, callId))
-        log.debug { "POST to URI: '$uri' with body '$body'" }
 
         try {
             return webClient
@@ -78,7 +82,7 @@ class NorskPensjonPensjonsavtaleClient(
                 .block()
                 ?: ""
         } catch (e: WebClientRequestException) {
-            throw EgressException("Failed calling $uri", e)
+            throw EgressException("Failed calling $baseUrl$uri", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }
@@ -109,10 +113,10 @@ class NorskPensjonPensjonsavtaleClient(
         xmlMapper.readValue(
             e.message,
             EnvelopeDto::class.java
-        ).body?.fault?.let(NorskPensjonPensjonsavtaleMapper::faultToString) ?: e.message ?: "Failed to call $uri"
+        ).body?.fault?.let(NorskPensjonPensjonsavtaleMapper::faultToString) ?: e.message ?: "Failed to call $baseUrl$uri"
 
     companion object {
-        private const val PATH = "/kalkulator.pensjonsrettighetstjeneste/v3/kalkulatorPensjonTjeneste"
+        private const val RESOURCE = "kalkulator.pensjonsrettighetstjeneste/v3/kalkulatorPensjonTjeneste"
         private const val ORGANISASJONSNUMMER = "889640782" // ARBEIDS- OG VELFERDSETATEN
 
         private val service = EgressService.NORSK_PENSJON
@@ -144,7 +148,7 @@ class NorskPensjonPensjonsavtaleClient(
         }
 
         private fun xml(specs: List<NorskPensjonUttaksperiodeSpecDto>): String {
-            return specs.joinToString("", transform = ::xml)
+            return specs.joinToString(separator = "", transform = ::xml)
         }
 
         private fun xml(spec: NorskPensjonUttaksperiodeSpecDto): String {
@@ -156,6 +160,6 @@ class NorskPensjonPensjonsavtaleClient(
                 </uttaksperiode>"""
         }
 
-        private fun ingenAvtaler() = Pensjonsavtaler(emptyList(), emptyList())
+        private fun ingenAvtaler() = Pensjonsavtaler(avtaler = emptyList(), utilgjengeligeSelskap = emptyList())
     }
 }

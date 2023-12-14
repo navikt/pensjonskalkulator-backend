@@ -12,23 +12,25 @@ import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.SamlTokenServic
 import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.SamlTokenServiceTest.Companion.SAML_ASSERTION
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.TestPropertySource
+import org.springframework.web.reactive.function.client.WebClient
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
 import java.util.*
 
-@ExtendWith(SpringExtension::class)
+@SpringBootTest
+@TestPropertySource("classpath:application-test.properties")
 class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
 
     private lateinit var client: NorskPensjonPensjonsavtaleClient
@@ -39,6 +41,9 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
     @Mock
     private lateinit var traceAid: TraceAid
 
+    @Autowired
+    private lateinit var webClientBuilder: WebClient.Builder
+
     @BeforeEach
     fun initialize() {
         `when`(tokenService.assertion()).thenReturn(SAML_ASSERTION)
@@ -48,7 +53,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
         client = NorskPensjonPensjonsavtaleClient(
             baseUrl = baseUrl(),
             tokenGetter = tokenService,
-            webClient = WebClientConfig().webClientForSoapRequests(),
+            webClientBuilder = webClientBuilder,
             xmlMapper = xmlMapper(),
             traceAid = traceAid,
             retryAttempts = "1"
