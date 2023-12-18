@@ -60,7 +60,7 @@ jobs:
     needs: [ build ]
     if: |
       github.event_name == 'push' ||
-      (github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main')
+      github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -68,7 +68,6 @@ jobs:
       - name: Deploy
         uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           IMAGE: ${{ needs.build.outputs.image }}
           RESOURCE: .nais/deploy-dev.yml
@@ -86,7 +85,6 @@ jobs:
       - name: Deploy to prod-gcp
         uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
           IMAGE: ${{ needs.build.outputs.image }}
           RESOURCE: .nais/deploy-prod.yml
