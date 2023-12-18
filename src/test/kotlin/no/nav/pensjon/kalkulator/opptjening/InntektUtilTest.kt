@@ -28,7 +28,7 @@ class InntektUtilTest {
     }
 
     @Test
-    fun `sistePensjonsgivendeInntekt returns siste pensjonsgivende inntekt when pensjonsgivende inntekter are non-zero`() {
+    fun `sistePensjonsgivendeInntekt returns siste pensjonsgivende inntekt`() {
         val grunnlag = Opptjeningsgrunnlag(
             listOf(
                 pensjonsgivendeInntekt(2021, BigDecimal.ONE),
@@ -44,10 +44,10 @@ class InntektUtilTest {
     }
 
     @Test
-    fun `sistePensjonsgivendeInntekt returns siste non-zero pensjonsgivende inntekt`() {
+    fun `sistePensjonsgivendeInntekt returns siste pensjonsgivende inntekt, even if zero`() {
         val grunnlag = Opptjeningsgrunnlag(
             listOf(
-                pensjonsgivendeInntekt(2022, BigDecimal.ONE), // <--- siste non-zero
+                pensjonsgivendeInntekt(2022, BigDecimal.ONE),
                 pensjonsgivendeInntekt(2023, BigDecimal.ZERO), // <--- siste
                 pensjonsgivendeInntekt(2021, BigDecimal.TEN)
             )
@@ -55,8 +55,8 @@ class InntektUtilTest {
 
         val inntekt = InntektUtil.sistePensjonsgivendeInntekt(grunnlag)
 
-        assertEquals(BigDecimal.ONE, inntekt.beloep)
-        assertEquals(2022, inntekt.aar)
+        assertEquals(BigDecimal.ZERO, inntekt.beloep)
+        assertEquals(2023, inntekt.aar)
     }
 
     companion object {

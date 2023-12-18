@@ -6,7 +6,7 @@ object InntektUtil {
 
     fun sistePensjonsgivendeInntekt(grunnlag: Opptjeningsgrunnlag): Inntekt =
         grunnlag.inntekter
-            .filter { it.type == Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT && it.beloep != BigDecimal.ZERO }
+            .filter { it.type == Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT }
             .maxByOrNull { it.aar }
             ?: emptyInntekt()
 
