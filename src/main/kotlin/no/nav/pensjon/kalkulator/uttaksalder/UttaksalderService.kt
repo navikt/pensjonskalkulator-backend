@@ -2,8 +2,7 @@ package no.nav.pensjon.kalkulator.uttaksalder
 
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.opptjening.InntektUtil
-import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
+import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.PersonClient
@@ -17,7 +16,7 @@ import org.springframework.stereotype.Service
 @Service
 class UttaksalderService(
     private val uttaksalderClient: UttaksalderClient,
-    private val opptjeningsgrunnlagClient: OpptjeningsgrunnlagClient,
+    private val inntektService: InntektService,
     private val personClient: PersonClient,
     private val pidGetter: PidGetter
 ) {
@@ -31,7 +30,7 @@ class UttaksalderService(
             pid = pid,
             sivilstand = specDto.sivilstand ?: sivilstand,
             harEps = specDto.harEps ?: sivilstand.harEps,
-            sisteInntekt = specDto.sisteInntekt ?: sistePensjonsgivendeInntekt(pid),
+            sisteInntekt = specDto.sisteInntekt ?: inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact(),
             simuleringstype = specDto.simuleringstype ?: SimuleringType.ALDERSPENSJON,
         )
 
@@ -41,11 +40,6 @@ class UttaksalderService(
 
     private fun sivilstand(pid: Pid): Sivilstand =
         personClient.fetchPerson(pid)?.sivilstand ?: Sivilstand.UOPPGITT
-
-    private fun sistePensjonsgivendeInntekt(pid: Pid): Int =
-        opptjeningsgrunnlagClient.fetchOpptjeningsgrunnlag(pid).let {
-            InntektUtil.sistePensjonsgivendeInntekt(it).beloep.intValueExact()
-        }
 
     private companion object {
         private val teoretiskLavesteUttaksalder = Alder(62, 0)

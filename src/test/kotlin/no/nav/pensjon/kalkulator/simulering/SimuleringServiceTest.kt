@@ -1,13 +1,12 @@
 package no.nav.pensjon.kalkulator.simulering
 
-import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.PersonFactory.person
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.opptjening.Inntekt
-import no.nav.pensjon.kalkulator.opptjening.Opptjeningsgrunnlag
+import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
-import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
@@ -30,7 +29,7 @@ class SimuleringServiceTest {
     private lateinit var simuleringClient: SimuleringClient
 
     @Mock
-    private lateinit var opptjeningsgrunnlagClient: OpptjeningsgrunnlagClient
+    private lateinit var inntektService: InntektService
 
     @Mock
     private lateinit var personClient: PersonClient
@@ -40,7 +39,7 @@ class SimuleringServiceTest {
 
     @BeforeEach
     fun initialize() {
-        service = SimuleringService(simuleringClient, opptjeningsgrunnlagClient, personClient, pidGetter)
+        service = SimuleringService(simuleringClient, inntektService, personClient, pidGetter)
         `when`(pidGetter.pid()).thenReturn(pid)
     }
 
@@ -52,20 +51,20 @@ class SimuleringServiceTest {
         val response = service.simulerAlderspensjon(incomingSpec)
 
         assertEquals(123456, response.alderspensjon[0].beloep)
-        verifyNoInteractions(opptjeningsgrunnlagClient, personClient)
+        verifyNoInteractions(inntektService, personClient)
     }
 
     @Test
     fun `simulerAlderspensjon obtains registrert inntekt and sivilstand when not specified`() {
         val incomingSpec = impersonalSimuleringSpec(null, null)
-        `when`(opptjeningsgrunnlagClient.fetchOpptjeningsgrunnlag(pid)).thenReturn(opptjeningsgrunnlag)
+        `when`(inntektService.sistePensjonsgivendeInntekt()).thenReturn(inntekt) // Inntekt(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, 2023, BigDecimal.ONE)) //opptjeningsgrunnlag)
         `when`(personClient.fetchPerson(pid)).thenReturn(person())
         `when`(simuleringClient.simulerAlderspensjon(incomingSpec, personalSpec)).thenReturn(simuleringsresultat)
 
         val response = service.simulerAlderspensjon(incomingSpec)
 
         assertEquals(PENSJONSBELOEP, response.alderspensjon[0].beloep)
-        verify(opptjeningsgrunnlagClient, times(1)).fetchOpptjeningsgrunnlag(pid)
+        verify(inntektService, times(1)).sistePensjonsgivendeInntekt()
         verify(personClient, times(1)).fetchPerson(pid)
     }
 
@@ -75,7 +74,6 @@ class SimuleringServiceTest {
         private val foedselsdato = LocalDate.of(1963, 12, 31)
         private val inntekt =
             Inntekt(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, 2023, REGISTRERT_INNTEKT.toBigDecimal())
-        private val opptjeningsgrunnlag = Opptjeningsgrunnlag(listOf(inntekt))
         private val personalSpec = PersonalSimuleringSpec(pid, REGISTRERT_INNTEKT, Sivilstand.UOPPGITT)
 
         private val simuleringsresultat =

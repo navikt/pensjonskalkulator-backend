@@ -11,6 +11,7 @@ import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.math.BigDecimal
+import java.time.LocalDateTime
 
 @ExtendWith(SpringExtension::class)
 class InntektServiceTest {
@@ -25,7 +26,7 @@ class InntektServiceTest {
 
     @BeforeEach
     fun initialize() {
-        service = InntektService(client, pidGetter)
+        service = InntektService(client, pidGetter) { now }
     }
 
     @Test
@@ -35,7 +36,7 @@ class InntektServiceTest {
         val result = service.sistePensjonsgivendeInntekt()
 
         assertEquals(BigDecimal("123000"), result.beloep)
-        assertEquals(2021, result.aar)
+        assertEquals(2022, result.aar)
     }
 
     @Test
@@ -45,7 +46,7 @@ class InntektServiceTest {
         val result = service.sistePensjonsgivendeInntekt()
 
         assertEquals(BigDecimal.ZERO, result.beloep)
-        assertEquals(0, result.aar)
+        assertEquals(2022, result.aar)
     }
 
     private fun arrangePidAndResultat(opptjeningstype: Opptjeningstype) {
@@ -57,10 +58,14 @@ class InntektServiceTest {
     }
 
     private companion object {
+
+        private const val CURRENT_AAR = 2024
+        private val now = LocalDateTime.of(CURRENT_AAR, 1, 1, 12, 0, 0)
+
         private fun inntekt(opptjeningstype: Opptjeningstype) =
             Inntekt(
                 type = opptjeningstype,
-                aar = 2021,
+                aar = CURRENT_AAR - 2,
                 beloep = BigDecimal("123000")
             )
     }

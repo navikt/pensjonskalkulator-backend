@@ -4,11 +4,13 @@ import java.math.BigDecimal
 
 object InntektUtil {
 
-    fun sistePensjonsgivendeInntekt(grunnlag: Opptjeningsgrunnlag): Inntekt =
-        grunnlag.inntekter
-            .filter { it.type == Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT }
-            .maxByOrNull { it.aar }
-            ?: emptyInntekt()
+    private val opptjeningstype = Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT
 
-    private fun emptyInntekt() = Inntekt(Opptjeningstype.OTHER, 0, BigDecimal.ZERO)
+    fun pensjonsgivendeInntekt(grunnlag: Opptjeningsgrunnlag, aar: Int): Inntekt =
+        grunnlag.inntekter
+            .filter { it.type == opptjeningstype }
+            .firstOrNull { it.aar == aar }
+            ?: zeroInntekt(aar)
+
+    private fun zeroInntekt(aar: Int) = Inntekt(opptjeningstype, aar, BigDecimal.ZERO)
 }

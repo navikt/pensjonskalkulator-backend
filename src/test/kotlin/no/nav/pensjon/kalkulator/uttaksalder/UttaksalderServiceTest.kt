@@ -3,9 +3,8 @@ package no.nav.pensjon.kalkulator.uttaksalder
 import no.nav.pensjon.kalkulator.mock.PersonFactory.person
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.opptjening.Inntekt
-import no.nav.pensjon.kalkulator.opptjening.Opptjeningsgrunnlag
+import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
-import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
@@ -30,7 +29,7 @@ internal class UttaksalderServiceTest {
     private lateinit var uttaksalderClient: UttaksalderClient
 
     @Mock
-    private lateinit var opptjeningsgrunnlagClient: OpptjeningsgrunnlagClient
+    private lateinit var inntextService: InntektService
 
     @Mock
     private lateinit var personClient: PersonClient
@@ -40,7 +39,7 @@ internal class UttaksalderServiceTest {
 
     @BeforeEach
     fun initialize() {
-        service = UttaksalderService(uttaksalderClient, opptjeningsgrunnlagClient, personClient, pidGetter)
+        service = UttaksalderService(uttaksalderClient, inntextService, personClient, pidGetter)
         `when`(pidGetter.pid()).thenReturn(pid)
     }
 
@@ -54,13 +53,13 @@ internal class UttaksalderServiceTest {
             UttaksalderSpec(pid, Sivilstand.GIFT, true, 100_000, SimuleringType.ALDERSPENSJON)
         )
         verify(personClient, never()).fetchPerson(anyObject())
-        verify(opptjeningsgrunnlagClient, never()).fetchOpptjeningsgrunnlag(anyObject())
+        verify(inntextService, never()).sistePensjonsgivendeInntekt()
     }
 
     @Test
     fun `finnTidligsteUttaksalder obtains inntekt and sivilstand when not specified`() {
         val person = person()
-        `when`(opptjeningsgrunnlagClient.fetchOpptjeningsgrunnlag(anyObject())).thenReturn(opptjeningsgrunnlag)
+        `when`(inntextService.sistePensjonsgivendeInntekt()).thenReturn(inntekt)
         `when`(personClient.fetchPerson(pid)).thenReturn(person)
         val spec = UttaksalderIngressSpecDto(null, null, null, SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
 
@@ -76,7 +75,7 @@ internal class UttaksalderServiceTest {
             )
         )
         verify(personClient, times(1)).fetchPerson(pid)
-        verify(opptjeningsgrunnlagClient, times(1)).fetchOpptjeningsgrunnlag(pid)
+        verify(inntextService, times(1)).sistePensjonsgivendeInntekt()
     }
 
     @Test
@@ -131,7 +130,7 @@ internal class UttaksalderServiceTest {
     @Test
     fun `when 'har EPS' specified then service does not override it based on sivilstand`() {
         val person = person(Sivilstand.GIFT)
-        `when`(opptjeningsgrunnlagClient.fetchOpptjeningsgrunnlag(anyObject())).thenReturn(opptjeningsgrunnlag)
+        `when`(inntextService.sistePensjonsgivendeInntekt()).thenReturn(inntekt)
         `when`(personClient.fetchPerson(pid)).thenReturn(person)
 
         val spec = UttaksalderIngressSpecDto(
@@ -160,6 +159,5 @@ internal class UttaksalderServiceTest {
 
     private companion object {
         private val inntekt = Inntekt(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, 2023, BigDecimal("543210"))
-        private val opptjeningsgrunnlag = Opptjeningsgrunnlag(listOf(inntekt))
     }
 }
