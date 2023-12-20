@@ -13,8 +13,8 @@ class InntektService(
 ) {
     fun sistePensjonsgivendeInntekt(): Inntekt {
         val grunnlag = client.fetchOpptjeningsgrunnlag(pidGetter.pid())
-        val sisteRelevanteOpptjeningAar = timeProvider.time().year - ANTALL_AAR_MELLOM_INNTEKT_TJENT_OG_SKATTELIGNET
-        return InntektUtil.pensjonsgivendeInntekt(grunnlag, sisteRelevanteOpptjeningAar)
+        val minimumOpptjeningAar = timeProvider.time().year - ANTALL_AAR_MELLOM_INNTEKT_TJENT_OG_SKATTELIGNET
+        return InntektUtil.pensjonsgivendeInntekt(grunnlag, minimumOpptjeningAar)
     }
 
     private companion object{

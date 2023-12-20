@@ -8,38 +8,38 @@ import java.math.BigDecimal
 class InntektUtilTest {
 
     @Test
-    fun `pensjonsgivendeInntekt returns zero when no inntekter`() {
+    fun `pensjonsgivendeInntekt gir 0 hvis ingen inntekter`() {
         val grunnlag = Opptjeningsgrunnlag(emptyList())
 
-        val inntekt = InntektUtil.pensjonsgivendeInntekt(grunnlag, 2023)
+        val inntekt = InntektUtil.pensjonsgivendeInntekt(grunnlag, 2020)
 
         assertEquals(BigDecimal.ZERO, inntekt.beloep)
-        assertEquals(2023, inntekt.aar)
+        assertEquals(2020, inntekt.aar)
         assertEquals(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, inntekt.type)
     }
 
     @Test
-    fun `pensjonsgivendeInntekt returns zero when no pensjonsgivende inntekter`() {
+    fun `pensjonsgivendeInntekt gir 0 hvis ingen pensjonsgivende inntekter`() {
         val grunnlag = Opptjeningsgrunnlag(listOf(Inntekt(Opptjeningstype.OTHER, 2023, BigDecimal.ONE)))
 
-        val inntekt = InntektUtil.pensjonsgivendeInntekt(grunnlag, 2023)
+        val inntekt = InntektUtil.pensjonsgivendeInntekt(grunnlag, 2021)
 
         assertEquals(BigDecimal.ZERO, inntekt.beloep)
-        assertEquals(2023, inntekt.aar)
+        assertEquals(2021, inntekt.aar)
         assertEquals(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, inntekt.type)
     }
 
     @Test
-    fun `pensjonsgivendeInntekt returns pensjonsgivende inntekt for angitt aar`() {
+    fun `pensjonsgivendeInntekt gir siste nylige inntekt`() {
         val grunnlag = Opptjeningsgrunnlag(
             listOf(
                 pensjonsgivendeInntekt(2021, BigDecimal.ONE),
-                pensjonsgivendeInntekt(2023, BigDecimal.TEN), // <--- angitt år
+                pensjonsgivendeInntekt(2023, BigDecimal.TEN), // <--- siste
                 pensjonsgivendeInntekt(2022, BigDecimal("100"))
             )
         )
 
-        val inntekt = InntektUtil.pensjonsgivendeInntekt(grunnlag, 2023)
+        val inntekt = InntektUtil.pensjonsgivendeInntekt(grunnlag, 2020)
 
         assertEquals(BigDecimal.TEN, inntekt.beloep)
         assertEquals(2023, inntekt.aar)
@@ -47,24 +47,24 @@ class InntektUtilTest {
     }
 
     @Test
-    fun `pensjonsgivendeInntekt returns pensjonsgivende inntekt for angitt aar, even if zero`() {
+    fun `pensjonsgivendeInntekt gir siste nylige inntekt, selv om den er 0`() {
         val grunnlag = Opptjeningsgrunnlag(
             listOf(
-                pensjonsgivendeInntekt(2023, BigDecimal.ONE),
-                pensjonsgivendeInntekt(2022, BigDecimal.ZERO), // <--- angitt år
+                pensjonsgivendeInntekt(2023, BigDecimal.ZERO), // <--- siste = 0
+                pensjonsgivendeInntekt(2022, BigDecimal.ONE),
                 pensjonsgivendeInntekt(2021, BigDecimal.TEN)
             )
         )
 
-        val inntekt = InntektUtil.pensjonsgivendeInntekt(grunnlag, 2022)
+        val inntekt = InntektUtil.pensjonsgivendeInntekt(grunnlag, 2021)
 
         assertEquals(BigDecimal.ZERO, inntekt.beloep)
-        assertEquals(2022, inntekt.aar)
+        assertEquals(2023, inntekt.aar)
         assertEquals(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, inntekt.type)
     }
 
     @Test
-    fun `pensjonsgivendeInntekt returns zero inntekt when no inntekt exists for angitt aar`() {
+    fun `pensjonsgivendeInntekt gir 0 hvis ingen nylige inntekter`() {
         val grunnlag = Opptjeningsgrunnlag(
             listOf(
                 pensjonsgivendeInntekt(1950, BigDecimal.ONE),
@@ -72,10 +72,10 @@ class InntektUtilTest {
             )
         )
 
-        val inntekt = InntektUtil.pensjonsgivendeInntekt(grunnlag, 2022)
+        val inntekt = InntektUtil.pensjonsgivendeInntekt(grunnlag, 2020)
 
         assertEquals(BigDecimal.ZERO, inntekt.beloep)
-        assertEquals(2022, inntekt.aar)
+        assertEquals(2020, inntekt.aar)
         assertEquals(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, inntekt.type)
     }
 

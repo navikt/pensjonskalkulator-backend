@@ -60,7 +60,7 @@ jobs:
     needs: [ build ]
     if: |
       github.event_name == 'push' ||
-      github.event_name == 'workflow_dispatch'
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.prod != 'true')
     runs-on: ubuntu-latest
     permissions:
       id-token: write

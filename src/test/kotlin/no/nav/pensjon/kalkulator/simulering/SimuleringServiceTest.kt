@@ -57,7 +57,7 @@ class SimuleringServiceTest {
     @Test
     fun `simulerAlderspensjon obtains registrert inntekt and sivilstand when not specified`() {
         val incomingSpec = impersonalSimuleringSpec(null, null)
-        `when`(inntektService.sistePensjonsgivendeInntekt()).thenReturn(inntekt) // Inntekt(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, 2023, BigDecimal.ONE)) //opptjeningsgrunnlag)
+        `when`(inntektService.sistePensjonsgivendeInntekt()).thenReturn(inntekt)
         `when`(personClient.fetchPerson(pid)).thenReturn(person())
         `when`(simuleringClient.simulerAlderspensjon(incomingSpec, personalSpec)).thenReturn(simuleringsresultat)
 

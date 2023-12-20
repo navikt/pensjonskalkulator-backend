@@ -29,7 +29,7 @@ internal class UttaksalderServiceTest {
     private lateinit var uttaksalderClient: UttaksalderClient
 
     @Mock
-    private lateinit var inntextService: InntektService
+    private lateinit var inntektService: InntektService
 
     @Mock
     private lateinit var personClient: PersonClient
@@ -39,7 +39,7 @@ internal class UttaksalderServiceTest {
 
     @BeforeEach
     fun initialize() {
-        service = UttaksalderService(uttaksalderClient, inntextService, personClient, pidGetter)
+        service = UttaksalderService(uttaksalderClient, inntektService, personClient, pidGetter)
         `when`(pidGetter.pid()).thenReturn(pid)
     }
 
@@ -53,13 +53,13 @@ internal class UttaksalderServiceTest {
             UttaksalderSpec(pid, Sivilstand.GIFT, true, 100_000, SimuleringType.ALDERSPENSJON)
         )
         verify(personClient, never()).fetchPerson(anyObject())
-        verify(inntextService, never()).sistePensjonsgivendeInntekt()
+        verify(inntektService, never()).sistePensjonsgivendeInntekt()
     }
 
     @Test
     fun `finnTidligsteUttaksalder obtains inntekt and sivilstand when not specified`() {
         val person = person()
-        `when`(inntextService.sistePensjonsgivendeInntekt()).thenReturn(inntekt)
+        `when`(inntektService.sistePensjonsgivendeInntekt()).thenReturn(inntekt)
         `when`(personClient.fetchPerson(pid)).thenReturn(person)
         val spec = UttaksalderIngressSpecDto(null, null, null, SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
 
@@ -75,7 +75,7 @@ internal class UttaksalderServiceTest {
             )
         )
         verify(personClient, times(1)).fetchPerson(pid)
-        verify(inntextService, times(1)).sistePensjonsgivendeInntekt()
+        verify(inntektService, times(1)).sistePensjonsgivendeInntekt()
     }
 
     @Test
@@ -130,7 +130,7 @@ internal class UttaksalderServiceTest {
     @Test
     fun `when 'har EPS' specified then service does not override it based on sivilstand`() {
         val person = person(Sivilstand.GIFT)
-        `when`(inntextService.sistePensjonsgivendeInntekt()).thenReturn(inntekt)
+        `when`(inntektService.sistePensjonsgivendeInntekt()).thenReturn(inntekt)
         `when`(personClient.fetchPerson(pid)).thenReturn(person)
 
         val spec = UttaksalderIngressSpecDto(
