@@ -31,7 +31,7 @@ class ObjectMapperConfiguration {
             enable(SerializationFeature.INDENT_OUTPUT)
             registerModule(JavaTimeModule())
             registerModule(localDateModule())
-            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS) // for Date in call to PEN
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         }
 
@@ -40,7 +40,6 @@ class ObjectMapperConfiguration {
         XmlMapper().apply {
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         }
-
 
     private fun localDateModule() =
         SimpleModule().apply {
