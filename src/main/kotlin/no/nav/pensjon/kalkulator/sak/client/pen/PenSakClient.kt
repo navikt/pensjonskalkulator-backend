@@ -16,10 +16,11 @@ import java.util.*
 @Component
 class PenSakClient(
     @Value("\${pen.url}") baseUrl: String,
-    webClient: WebClient,
+    webClientBuilder: WebClient.Builder,
     traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
-) : PenClient(baseUrl, webClient, traceAid, retryAttempts), SakClient {
+) : PenClient(baseUrl, webClientBuilder, traceAid, retryAttempts), SakClient {
+
     override fun fetchSaker(pid: Pid): List<Sak> =
         doGet(
             object : ParameterizedTypeReference<List<SakDto>>() {},

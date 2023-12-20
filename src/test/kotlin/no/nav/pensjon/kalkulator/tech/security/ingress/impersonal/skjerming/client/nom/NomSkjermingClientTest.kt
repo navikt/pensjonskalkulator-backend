@@ -4,19 +4,24 @@ import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrang
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
-import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
-import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.TestPropertySource
+import org.springframework.web.reactive.function.client.WebClient
 
-@ExtendWith(SpringExtension::class)
+@SpringBootTest
+@TestPropertySource("classpath:application-test.properties")
 class NomSkjermingClientTest : WebClientTest() {
 
     private lateinit var client: NomSkjermingClient
+
+    @Autowired
+    private lateinit var webClientBuilder: WebClient.Builder
 
     @Mock
     private lateinit var traceAid: TraceAid
@@ -25,7 +30,7 @@ class NomSkjermingClientTest : WebClientTest() {
     fun initialize() {
         client = NomSkjermingClient(
             baseUrl = baseUrl(),
-            webClient = WebClientConfig().regularWebClient(),
+            webClientBuilder = webClientBuilder,
             traceAid = traceAid,
             retryAttempts = RETRY_ATTEMPTS
         )

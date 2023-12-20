@@ -17,10 +17,10 @@ import java.util.*
 @Component
 class PenSimuleringClient(
     @Value("\${pen.url}") baseUrl: String,
-    webClient: WebClient,
+    webClientBuilder: WebClient.Builder,
     traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") private val retryAttempts: String
-) : PenClient(baseUrl, webClient, traceAid, retryAttempts), SimuleringClient, Pingable {
+) : PenClient(baseUrl, webClientBuilder, traceAid, retryAttempts), SimuleringClient, Pingable {
 
     override fun simulerAlderspensjon(
         impersonalSpec: ImpersonalSimuleringSpec,

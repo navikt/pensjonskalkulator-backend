@@ -10,8 +10,8 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
 abstract class PingableServiceClient(
-    private val baseUrl: String,
-    private val webClient: WebClient,
+    baseUrl: String,
+    webClientBuilder: WebClient.Builder,
     retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), Pingable {
 
@@ -19,8 +19,10 @@ abstract class PingableServiceClient(
 
     abstract fun setPingHeaders(headers: HttpHeaders)
 
+    protected val webClient: WebClient = webClientBuilder.baseUrl(baseUrl).build()
+
     override fun ping(): PingResult {
-        val uri = "$baseUrl/${pingPath()}"
+        val uri = "/${pingPath()}"
 
         return try {
             val responseBody = webClient

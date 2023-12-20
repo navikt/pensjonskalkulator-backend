@@ -28,11 +28,11 @@ import java.time.LocalDate
  */
 @Component
 class TpTjenestepensjonClient(
-    @Value("\${tjenestepensjon.url}") private val baseUrl: String,
-    private val webClient: WebClient,
+    @Value("\${tjenestepensjon.url}") baseUrl: String,
+    webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
-) : PingableServiceClient(baseUrl, webClient, retryAttempts),
+) : PingableServiceClient(baseUrl, webClientBuilder, retryAttempts),
     TjenestepensjonClient {
 
     private val log = KotlinLogging.logger {}
@@ -52,7 +52,7 @@ class TpTjenestepensjonClient(
                 .headers { setHeaders(it, pid) }
                 .retrieve()
                 .bodyToMono(TpTjenestepensjonStatusDto::class.java)
-                .retryWhen(retryBackoffSpec(uri.toString()))
+                .retryWhen(retryBackoffSpec(uri))
                 .block()
                 ?.let(TpTjenestepensjonMapper::fromDto)
                 .also { countCalls(MetricResult.OK) }
@@ -65,7 +65,7 @@ class TpTjenestepensjonClient(
     }
 
     override fun tjenestepensjon(pid: Pid): Tjenestepensjon {
-        val uri = "$baseUrl/$API_PATH/"
+        val uri = "/$API_PATH/"
         log.debug { "GET from URI: '$uri'" }
 
         return try {
@@ -94,12 +94,12 @@ class TpTjenestepensjonClient(
     override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
 
     private fun uri(date: LocalDate) =
-        DefaultUriBuilderFactory(baseUrl)
+        DefaultUriBuilderFactory()
             .uriString("/$API_PATH/$API_RESOURCE")
             .queryParam("date", date.toString())
             .queryParam("ytelseType", TpYtelseType.ALDERSPENSJON.externalValue)
             .queryParam("ordningType", TpOrdningType.OFFENTLIG_TJENESTEPENSJONSORDNING.externalValue)
-            .build()
+            .build().toString()
 
     private fun setHeaders(headers: HttpHeaders, pid: Pid) {
         headers.setBearerAuth(EgressAccess.token(service).value)

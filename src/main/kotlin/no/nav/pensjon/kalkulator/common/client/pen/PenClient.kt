@@ -18,11 +18,11 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono
 
 abstract class PenClient(
-    private val baseUrl: String,
-    private val webClient: WebClient,
+    baseUrl: String,
+    webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
     retryAttempts: String
-) : PingableServiceClient(baseUrl, webClient, retryAttempts) {
+) : PingableServiceClient(baseUrl, webClientBuilder, retryAttempts) {
 
     private val log = KotlinLogging.logger {}
 
@@ -35,7 +35,7 @@ abstract class PenClient(
         path: String,
         pid: Pid
     ): T? {
-        val uri = "$baseUrl/$BASE_PATH/$path"
+        val uri = "/$BASE_PATH/$path"
         log.debug { "GET from URI: '$uri'" }
 
         return try {
@@ -60,7 +60,7 @@ abstract class PenClient(
         requestClass: Class<Request>,
         responseClass: Class<Response>
     ): Response? {
-        val uri = "$baseUrl/$BASE_PATH/$path"
+        val uri = "/$BASE_PATH/$path"
         log.debug { "POST to URI: '$uri'" }
 
         try {

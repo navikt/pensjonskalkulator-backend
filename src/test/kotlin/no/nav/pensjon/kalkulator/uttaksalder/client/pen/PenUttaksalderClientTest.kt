@@ -7,29 +7,34 @@ import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderSpec
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.TestPropertySource
+import org.springframework.web.reactive.function.client.WebClient
 
-@ExtendWith(SpringExtension::class)
+@SpringBootTest
+@TestPropertySource("classpath:application-test.properties")
 class PenUttaksalderClientTest : WebClientTest() {
 
     private lateinit var client: PenUttaksalderClient
+
+    @Autowired
+    private lateinit var webClientBuilder: WebClient.Builder
 
     @Mock
     private lateinit var traceAid: TraceAid
 
     @BeforeEach
     fun initialize() {
-        client = PenUttaksalderClient(baseUrl(), WebClientConfig().regularWebClient(), traceAid, "1")
+        client = PenUttaksalderClient(baseUrl(), webClientBuilder, traceAid, "1")
         arrangeSecurityContext()
     }
 

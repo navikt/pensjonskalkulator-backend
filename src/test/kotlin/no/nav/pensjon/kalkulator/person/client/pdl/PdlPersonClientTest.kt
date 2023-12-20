@@ -30,11 +30,11 @@ class PdlPersonClientTest : WebClientTest() {
 
     private lateinit var client: PdlPersonClient
 
-    @Mock
-    private lateinit var traceAid: TraceAid
-
     @Autowired
     private lateinit var webClientBuilder: WebClient.Builder
+
+    @Mock
+    private lateinit var traceAid: TraceAid
 
     @BeforeEach
     fun initialize() {

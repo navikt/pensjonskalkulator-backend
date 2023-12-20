@@ -7,28 +7,33 @@ import no.nav.pensjon.kalkulator.sak.SakStatus
 import no.nav.pensjon.kalkulator.sak.SakType
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.TestPropertySource
+import org.springframework.web.reactive.function.client.WebClient
 
-@ExtendWith(SpringExtension::class)
+@SpringBootTest
+@TestPropertySource("classpath:application-test.properties")
 class PenSakClientTest : WebClientTest() {
 
     private lateinit var client: PenSakClient
+
+    @Autowired
+    private lateinit var webClientBuilder: WebClient.Builder
 
     @Mock
     private lateinit var traceAid: TraceAid
 
     @BeforeEach
     fun initialize() {
-        client = PenSakClient(baseUrl(), WebClientConfig().regularWebClient(), traceAid, "1")
+        client = PenSakClient(baseUrl(), webClientBuilder, traceAid, "1")
         arrangeSecurityContext()
     }
 
@@ -50,10 +55,12 @@ class PenSakClientTest : WebClientTest() {
 
         val exception = assertThrows<EgressException> { client.fetchSaker(pid) }
 
-        assertEquals("""{
+        assertEquals(
+            """{
     "feilmelding": "Personen med fødselsnummer ${pid.value} finnes ikke i den lokale oversikten over personer. (PEN029)",
     "merknader": []
-}""", exception.message)
+}""", exception.message
+        )
         assertTrue(exception.isClientError)
     }
 
@@ -64,7 +71,7 @@ class PenSakClientTest : WebClientTest() {
 
         val exception = assertThrows<EgressException> { client.fetchSaker(pid) }
 
-        assertEquals("Failed calling ${baseUrl()}/pen/springapi/sak/sammendrag", exception.message)
+        assertEquals("Failed calling /pen/springapi/sak/sammendrag", exception.message)
         assertFalse(exception.isClientError)
     }
 

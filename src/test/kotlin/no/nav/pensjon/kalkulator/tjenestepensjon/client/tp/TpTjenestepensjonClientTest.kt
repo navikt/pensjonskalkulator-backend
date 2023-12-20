@@ -5,21 +5,26 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.TestPropertySource
+import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDate
 
-@ExtendWith(SpringExtension::class)
+@SpringBootTest
+@TestPropertySource("classpath:application-test.properties")
 class TpTjenestepensjonClientTest : WebClientTest() {
 
     private lateinit var client: TpTjenestepensjonClient
+
+    @Autowired
+    private lateinit var webClientBuilder: WebClient.Builder
 
     @Mock
     private lateinit var traceAid: TraceAid
@@ -28,7 +33,7 @@ class TpTjenestepensjonClientTest : WebClientTest() {
     fun initialize() {
         client = TpTjenestepensjonClient(
             baseUrl = baseUrl(),
-            webClient = WebClientConfig().regularWebClient(),
+            webClientBuilder = webClientBuilder,
             traceAid = traceAid,
             retryAttempts = RETRY_ATTEMPTS
         )
@@ -92,7 +97,7 @@ class TpTjenestepensjonClientTest : WebClientTest() {
         val exception = assertThrows(EgressException::class.java) { client.harTjenestepensjonsforhold(pid, dato) }
 
         assertEquals(
-            "Failed calling ${baseUrl()}/api/tjenestepensjon/haveYtelse?date=2023-02-01&ytelseType=ALDER&ordningType=TPOF",
+            "Failed calling /api/tjenestepensjon/haveYtelse?date=2023-02-01&ytelseType=ALDER&ordningType=TPOF",
             exception.message
         )
         assertEquals("Feil", (exception.cause as EgressException).message)

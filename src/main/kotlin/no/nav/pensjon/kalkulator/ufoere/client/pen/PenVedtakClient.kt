@@ -17,11 +17,12 @@ import java.util.*
 
 @Component
 class PenVedtakClient(
-    @Value("\${pen.url}") private val baseUrl: String,
-    webClient: WebClient,
+    @Value("\${pen.url}") baseUrl: String,
+    webClientBuilder: WebClient.Builder,
     traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") private val retryAttempts: String
-) : PenClient(baseUrl, webClient, traceAid, retryAttempts), VedtakClient {
+) : PenClient(baseUrl, webClientBuilder, traceAid, retryAttempts), VedtakClient {
+
     override fun bestemGjeldendeVedtak(
         pid: Pid,
         @DateTimeFormat(pattern = "yyyy-MM-dd") fom: LocalDate

@@ -8,28 +8,33 @@ import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
-import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.TestPropertySource
+import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDate
 
-@ExtendWith(SpringExtension::class)
+@SpringBootTest
+@TestPropertySource("classpath:application-test.properties")
 class PenSimuleringClientTest : WebClientTest() {
 
     private lateinit var client: PenSimuleringClient
+
+    @Autowired
+    private lateinit var webClientBuilder: WebClient.Builder
 
     @Mock
     private lateinit var traceAid: TraceAid
 
     @BeforeEach
     fun initialize() {
-        client = PenSimuleringClient(baseUrl(), WebClientConfig().regularWebClient(), traceAid, "1")
+        client = PenSimuleringClient(baseUrl(), webClientBuilder, traceAid, "1")
         arrangeSecurityContext()
     }
 

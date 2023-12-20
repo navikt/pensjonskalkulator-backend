@@ -18,7 +18,6 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
-
 /**
  * Configuration of object mapper used for serialization and deserialization of data in JSON and XML format.
  */
@@ -33,6 +32,7 @@ class ObjectMapperConfiguration {
             registerModule(JavaTimeModule())
             registerModule(localDateModule())
             disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         }
 
     @Bean

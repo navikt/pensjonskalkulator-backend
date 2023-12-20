@@ -6,22 +6,27 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import no.nav.pensjon.kalkulator.ufoere.Sakstype
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.TestPropertySource
+import org.springframework.web.reactive.function.client.WebClient
 
-@ExtendWith(SpringExtension::class)
+@SpringBootTest
+@TestPropertySource("classpath:application-test.properties")
 class PenVedtakClientTest : WebClientTest() {
 
     private lateinit var client: PenVedtakClient
+
+    @Autowired
+    private lateinit var webClientBuilder: WebClient.Builder
 
     @Mock
     private lateinit var traceAid: TraceAid
@@ -29,7 +34,7 @@ class PenVedtakClientTest : WebClientTest() {
     @BeforeEach
     fun initialize() {
         `when`(traceAid.callId()).thenReturn("id1")
-        client = PenVedtakClient(baseUrl(), WebClientConfig().regularWebClient(), traceAid, "1")
+        client = PenVedtakClient(baseUrl(), webClientBuilder, traceAid, "1")
         arrangeSecurityContext()
     }
 
@@ -77,7 +82,7 @@ class PenVedtakClientTest : WebClientTest() {
         }
 
         assertEquals(
-            "Failed calling ${baseUrl()}/pen/springapi/vedtak/bestemgjeldende?fom=2023-04-05",
+            "Failed calling /pen/springapi/vedtak/bestemgjeldende?fom=2023-04-05",
             exception.message
         )
         assertEquals("Feil", (exception.cause as EgressException).message)

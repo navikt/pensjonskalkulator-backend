@@ -14,10 +14,11 @@ import org.springframework.web.reactive.function.client.WebClient
 @Component
 class PenUttaksalderClient(
     @Value("\${pen.url}") baseUrl: String,
-    webClient: WebClient,
+    webClientBuilder: WebClient.Builder,
     traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") private val retryAttempts: String
-) : PenClient(baseUrl, webClient, traceAid, retryAttempts), UttaksalderClient {
+) : PenClient(baseUrl, webClientBuilder, traceAid, retryAttempts), UttaksalderClient {
+
     override fun finnTidligsteUttaksalder(spec: UttaksalderSpec) =
         doPost(
             PATH,

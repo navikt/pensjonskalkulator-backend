@@ -23,11 +23,11 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
  */
 @Component
 class NomSkjermingClient(
-    @Value("\${skjermede-personer.url}") private val baseUrl: String,
-    private val webClient: WebClient,
+    @Value("\${skjermede-personer.url}") baseUrl: String,
+    webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
-) : PingableServiceClient(baseUrl, webClient, retryAttempts),
+) : PingableServiceClient(baseUrl, webClientBuilder, retryAttempts),
     SkjermingClient {
 
     private val log = KotlinLogging.logger {}
@@ -37,7 +37,7 @@ class NomSkjermingClient(
     override fun service(): EgressService = service
 
     override fun personErTilgjengelig(pid: Pid): Boolean {
-        val uri = "$baseUrl/${path(pid.value)}"
+        val uri = "/${path(pid.value)}"
         log.debug { "GET from URI: '$uri'" }
 
         try {
