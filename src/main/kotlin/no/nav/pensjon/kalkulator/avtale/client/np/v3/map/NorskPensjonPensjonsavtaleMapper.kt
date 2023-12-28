@@ -77,9 +77,8 @@ object NorskPensjonPensjonsavtaleMapper {
                 startAar = it.startAlder ?: 0,
                 sluttAar = sluttAar(it.sluttAlder, it.utbetalingsperioder),
                 opplysningsdato = it.opplysningsdato ?: DEFAULT_VALUE,
-                manglendeGraderingAarsak = it.aarsakManglendeGradering?.internalValue
-                    ?: ManglendeEksternGraderingAarsak.NONE,
-                manglendeBeregningAarsak = it.aarsakIkkeBeregnet?.internalValue ?: ManglendeEksternBeregningAarsak.NONE,
+                manglendeGraderingAarsak = AarsakManglendeGradering.fromExternalValue(it.aarsakManglendeGradering).internalValue,
+                manglendeBeregningAarsak = AarsakIkkeBeregnet.fromExternalValue(it.aarsakIkkeBeregnet).internalValue,
                 utbetalingsperioder = it.utbetalingsperioder?.map(::utbetalingsperiode) ?: emptyList()
             )
         }

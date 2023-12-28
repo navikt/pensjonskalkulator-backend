@@ -49,8 +49,8 @@ class NorskPensjonPensjonsavtaleMapperTest {
                 beregningsmodell = "bransjeavtale"
                 startAlder = 70
                 sluttAlder = 80
-                aarsakManglendeGradering = AarsakManglendeGradering.IKKE_STOTTET
-                aarsakIkkeBeregnet = AarsakIkkeBeregnet.UKJENT_PRODUKTTYPE
+                aarsakManglendeGradering = "IKKE_STOTTET"
+                aarsakIkkeBeregnet = "UKJENT_PRODUKTTYPE"
                 opplysningsdato = "2023-01-01"
                 utbetalingsperioder = listOf(
                     utbetalingsperiodeMedSluttalder(),

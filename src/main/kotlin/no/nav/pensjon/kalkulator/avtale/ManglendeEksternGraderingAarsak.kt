@@ -5,6 +5,7 @@ package no.nav.pensjon.kalkulator.avtale
  */
 enum class ManglendeEksternGraderingAarsak {
     NONE,
+    UNKNOWN,
     IKKE_STOETTET,
     IKKE_TILLATT
 }

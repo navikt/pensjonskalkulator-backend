@@ -103,6 +103,25 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
     }
 
     @Test
+    fun `fetchAvtaler handles utilstrekkelig data`() {
+        arrange(okResponse(UTILSTREKKELIG_DATA_RESPONSE_BODY))
+        val aarsak = client.fetchAvtaler(spec(), pid).avtaler[0].manglendeBeregningAarsak
+        assertEquals(ManglendeEksternBeregningAarsak.UTILSTREKKELIG_DATA, aarsak)
+    }
+
+    @Test
+    fun `fetchAvtaler handles ukjente aarsaker`() {
+        arrange(okResponse(UKJENTE_AARSAKER_RESPONSE_BODY))
+
+        val avtale = client.fetchAvtaler(spec(), pid).avtaler[0]
+
+        with(avtale) {
+            assertEquals(ManglendeEksternBeregningAarsak.UNKNOWN, manglendeBeregningAarsak)
+            assertEquals(ManglendeEksternGraderingAarsak.UNKNOWN, manglendeGraderingAarsak)
+        }
+    }
+
+    @Test
     fun `fetchAvtaler retries in case of server error`() {
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody(ERROR_RESPONSE_BODY))
         arrange(okResponse(INGEN_AVTALER_RESPONSE_BODY))
@@ -306,6 +325,55 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
     </soap11:Body>
 </soap11:Envelope>
 """
+
+        @Language("xml")
+        private const val UTILSTREKKELIG_DATA_RESPONSE_BODY =
+            """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Header/>
+    <soap:Body wsu:Id="id-cc25c7d6-15cb-4b45-a11b-164e92644ff4" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+        <ns2:pensjonsrettigheter xmlns:ns2="http://norskpensjon.no/api/pensjonskalkulator/v3/typer">
+            <pensjonsRettigheter>
+                <avtalenummer>3823484919</avtalenummer>
+                <arbeidsgiver>981964047</arbeidsgiver>
+                <selskapsnavn>Nordnet Livsforsikring AS</selskapsnavn>
+                <produktbetegnelse>Egen pensjonskonto (EPK)</produktbetegnelse>
+                <kategori>privatTjenestepensjon</kategori>
+                <underkategori>innskuddspensjon</underkategori>
+                <merknad>Norsk Pensjon mottar ikke nok data fra selskapet til &#229; beregne prognose for denne avtalen.</merknad>
+                <innskuddssaldo>576259</innskuddssaldo>
+                <naavaerendeAvtaltAarligInnskudd>0</naavaerendeAvtaltAarligInnskudd>
+                <avkastningsgaranti>false</avkastningsgaranti>
+                <beregningsmodell>norskpensjon</beregningsmodell>
+                <startAlder>70</startAlder>
+                <sluttAlder>80</sluttAlder>
+                <utbetalingsperioder>
+                    <startAlder>70</startAlder>
+                    <startMaaned>1</startMaaned>
+                    <sluttAlder>80</sluttAlder>
+                    <sluttMaaned>1</sluttMaaned>
+                    <aarligUtbetalingForventet>0</aarligUtbetalingForventet>
+                    <grad>100</grad>
+                </utbetalingsperioder>
+                <opplysningsdato>2023-12-24</opplysningsdato>
+                <aarsakIkkeBeregnet>UTILSTREKKELIG_DATA</aarsakIkkeBeregnet>
+            </pensjonsRettigheter>
+        </ns2:pensjonsrettigheter>
+    </soap:Body>
+</soap:Envelope>"""
+
+        @Language("xml")
+        private const val UKJENTE_AARSAKER_RESPONSE_BODY =
+            """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Header/>
+    <soap:Body wsu:Id="id-cc25c7d6-15cb-4b45-a11b-164e92644ff4" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+        <ns2:pensjonsrettigheter xmlns:ns2="http://norskpensjon.no/api/pensjonskalkulator/v3/typer">
+            <pensjonsRettigheter>
+                <aarsakIkkeBeregnet>ukjent 1</aarsakIkkeBeregnet>
+                <aarsakManglendeGradering>ukjent 2</aarsakManglendeGradering>
+            </pensjonsRettigheter>
+        </ns2:pensjonsrettigheter>
+    </soap:Body>
+</soap:Envelope>"""
 
         private fun okResponse(avtale: String) = jsonResponse(HttpStatus.OK).setBody(avtale)
 

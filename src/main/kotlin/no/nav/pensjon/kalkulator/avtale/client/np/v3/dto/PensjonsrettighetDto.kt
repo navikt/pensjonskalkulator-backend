@@ -18,8 +18,8 @@ class PensjonsrettighetDto {
     var beregningsmodell: String? = null
     var startAlder: Int? = null
     var sluttAlder: Int? = null
-    var aarsakManglendeGradering: AarsakManglendeGradering? = null
-    var aarsakIkkeBeregnet: AarsakIkkeBeregnet? = null
+    var aarsakManglendeGradering: String? = null
+    var aarsakIkkeBeregnet: String? = null
     var opplysningsdato: String? = null
 
     @JacksonXmlElementWrapper(useWrapping = false)

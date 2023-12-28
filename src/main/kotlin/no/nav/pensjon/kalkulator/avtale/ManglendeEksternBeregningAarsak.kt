@@ -5,5 +5,7 @@ package no.nav.pensjon.kalkulator.avtale
  */
 enum class ManglendeEksternBeregningAarsak {
     NONE,
-    UKJENT_PRODUKTTYPE
+    UNKNOWN,
+    UKJENT_PRODUKTTYPE,
+    UTILSTREKKELIG_DATA
 }
