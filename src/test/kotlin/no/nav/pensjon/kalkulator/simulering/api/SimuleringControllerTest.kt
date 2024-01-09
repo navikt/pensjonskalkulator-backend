@@ -1,7 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering.api
 
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.*
@@ -95,7 +94,7 @@ class SimuleringControllerTest {
 
     private companion object {
 
-        private const val URL = "/api/v1/alderspensjon/simulering"
+        private const val URL = "/api/v2/alderspensjon/simulering"
         private const val PENSJONSBELOEP = 123456
 
         @Language("json")
@@ -112,9 +111,8 @@ class SimuleringControllerTest {
         private fun impersonalSpec(simuleringType: SimuleringType) =
             ImpersonalSimuleringSpec(
                 simuleringType = simuleringType,
-                uttaksgrad = Uttaksgrad.HUNDRE_PROSENT,
-                foersteUttaksalder = Alder(67, 1),
-                foedselsdato = LocalDate.of(1963, 12, 31),
+                foersteUttakAlder = Alder(67, 1),
+                foedselDato = LocalDate.of(1963, 12, 31),
                 epsHarInntektOver2G = false,
                 forventetInntekt = 100_000,
                 sivilstand = Sivilstand.UGIFT

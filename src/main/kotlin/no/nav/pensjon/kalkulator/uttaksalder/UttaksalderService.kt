@@ -9,7 +9,6 @@ import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.tech.metric.Metrics
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
-import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
 import no.nav.pensjon.kalkulator.uttaksalder.client.UttaksalderClient
 import org.springframework.stereotype.Service
 
@@ -22,16 +21,17 @@ class UttaksalderService(
 ) {
     private val log = KotlinLogging.logger {}
 
-    fun finnTidligsteUttaksalder(specDto: UttaksalderIngressSpecDto): Alder? {
+    fun finnTidligsteUttaksalder(spec: ImpersonalUttaksalderSpec): Alder? {
         val pid = pidGetter.pid()
-        val sivilstand = specDto.sivilstand ?: sivilstand(pid)
+        val sivilstand = spec.sivilstand ?: sivilstand(pid)
 
         val uttaksalderSpec = UttaksalderSpec(
             pid = pid,
-            sivilstand = specDto.sivilstand ?: sivilstand,
-            harEps = specDto.harEps ?: sivilstand.harEps,
-            sisteInntekt = specDto.sisteInntekt ?: inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact(),
-            simuleringstype = specDto.simuleringstype ?: SimuleringType.ALDERSPENSJON,
+            sivilstand = spec.sivilstand ?: sivilstand,
+            harEps = spec.harEps ?: sivilstand.harEps,
+            sisteInntekt = spec.sisteInntekt ?: inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact(),
+            simuleringType = spec.simuleringType ?: SimuleringType.ALDERSPENSJON,
+            gradertUttak = spec.gradertUttak,
         )
 
         log.debug { "Finner første mulige uttaksalder med parametre $uttaksalderSpec" }

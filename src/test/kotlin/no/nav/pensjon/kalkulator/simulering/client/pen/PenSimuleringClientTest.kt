@@ -1,7 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen
 
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
@@ -66,9 +65,8 @@ class PenSimuleringClientTest : WebClientTest() {
         private fun impersonalSpec() =
             ImpersonalSimuleringSpec(
                 simuleringType = SimuleringType.ALDERSPENSJON,
-                uttaksgrad = Uttaksgrad.AATTI_PROSENT,
-                foersteUttaksalder = Alder(67, 1),
-                foedselsdato = LocalDate.of(1963, 1, 1),
+                foersteUttakAlder = Alder(67, 1),
+                foedselDato = LocalDate.of(1963, 1, 1),
                 epsHarInntektOver2G = true,
                 forventetInntekt = null,
                 sivilstand = null

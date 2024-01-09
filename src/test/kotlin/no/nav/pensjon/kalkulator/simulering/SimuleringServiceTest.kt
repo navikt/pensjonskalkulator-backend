@@ -1,7 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering
 
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.PersonFactory.person
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.opptjening.Inntekt
@@ -85,7 +84,6 @@ class SimuleringServiceTest {
         private fun impersonalSimuleringSpec(forventetInntekt: Int?, sivilstand: Sivilstand?) =
             ImpersonalSimuleringSpec(
                 SimuleringType.ALDERSPENSJON,
-                Uttaksgrad.HUNDRE_PROSENT,
                 Alder(67, 1),
                 foedselsdato,
                 false,

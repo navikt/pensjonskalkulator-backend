@@ -6,7 +6,7 @@ import no.nav.pensjon.kalkulator.simulering.PersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.*
-import no.nav.pensjon.kalkulator.simulering.client.pen.map.SimuleringMapper
+import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenSimuleringMapper
 import no.nav.pensjon.kalkulator.tech.selftest.Pingable
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.springframework.beans.factory.annotation.Value
@@ -28,10 +28,10 @@ class PenSimuleringClient(
     ) =
         doPost(
             PATH,
-            SimuleringMapper.toDto(impersonalSpec, personalSpec),
-            SimuleringRequestDto::class.java,
+            PenSimuleringMapper.toDto(impersonalSpec, personalSpec),
+            SimuleringEgressSpecDto::class.java,
             SimuleringResponseDto::class.java
-        )?.let(SimuleringMapper::fromDto)
+        )?.let(PenSimuleringMapper::fromDto)
             ?: emptyResult()
 
     private companion object {

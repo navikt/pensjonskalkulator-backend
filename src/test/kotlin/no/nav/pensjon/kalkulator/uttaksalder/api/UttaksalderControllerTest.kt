@@ -8,8 +8,8 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
-import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -50,7 +50,7 @@ internal class UttaksalderControllerTest {
     @Test
     fun `finnTidligsteUttaksalder version 1`() {
         val spec =
-            UttaksalderIngressSpecDto(Sivilstand.UGIFT, true, 100_000, SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
+            ImpersonalUttaksalderSpec(Sivilstand.UGIFT, true, 100_000, SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,)
         `when`(uttaksalderService.finnTidligsteUttaksalder(spec)).thenReturn(uttaksalder)
 
         mvc.perform(

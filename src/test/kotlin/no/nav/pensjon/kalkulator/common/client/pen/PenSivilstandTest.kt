@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 class PenSivilstandTest {
 
     @Test
-    fun `from maps from sivilstand to PEN's equivalent sivilstand`() {
+    fun `fromInternalValue maps from sivilstand to PEN's equivalent sivilstand`() {
         assertEquals(PenSivilstand.GIFT, PenSivilstand.fromInternalValue(Sivilstand.GIFT))
         assertEquals(PenSivilstand.UGIFT, PenSivilstand.fromInternalValue(Sivilstand.UGIFT))
         assertEquals(PenSivilstand.REGISTRERT_PARTNER, PenSivilstand.fromInternalValue(Sivilstand.REGISTRERT_PARTNER))
