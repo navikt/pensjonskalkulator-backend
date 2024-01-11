@@ -4,6 +4,9 @@ import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import java.time.LocalDate
 
+/**
+ * Incoming (ingress) data transfer object (DTO) containing specification for finding 'første mulige uttaksalder'.
+ */
 data class UttaksalderIngressSpecDto(
     val sivilstand: Sivilstand?,
     val harEps: Boolean?,
@@ -13,9 +16,9 @@ data class UttaksalderIngressSpecDto(
 )
 
 data class UttaksalderGradertUttakIngressDto(
-    val uttaksgrad: Int,
-    val inntektUnderGradertUttak: Int?,
-    val heltUttakAlder: AlderIngressDto,
+    val grad: Int,
+    val aarligInntektVsaPensjon: Int?,
+    val heltUttakAlder: AlderIngressDto, // affects gradert uttaksalder
     val foedselsdato: LocalDate
 )
 

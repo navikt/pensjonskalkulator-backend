@@ -49,14 +49,14 @@ object SimuleringMapper {
     private fun gradertUttak(dto: SimuleringGradertUttakIngressDto, foedselDato: LocalDate) =
         GradertUttak(
             grad = Uttaksgrad.from(dto.grad),
-            uttakFomAlder = alder(dto.uttakFomAlder),
+            uttakFomAlder = alder(dto.uttaksalder),
             aarligInntekt = dto.aarligInntektVsaPensjon ?: 0,
             foedselDato = foedselDato
         )
 
     private fun heltUttak(dto: SimuleringHeltUttakIngressDto, foedselDato: LocalDate) =
         HeltUttak(
-            uttakFomAlder = alder(dto.uttakFomAlder),
+            uttakFomAlder = alder(dto.uttaksalder),
             aarligInntekt = dto.aarligInntektVsaPensjon,
             inntektTomAlder = alder(dto.inntektTomAlder),
             foedselDato = foedselDato

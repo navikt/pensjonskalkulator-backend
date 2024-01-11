@@ -59,11 +59,11 @@ class SimuleringMapperTest {
                 sivilstand = Sivilstand.REGISTRERT_PARTNER,
                 gradertUttak = SimuleringGradertUttakIngressDto(
                     grad = 40,
-                    uttakFomAlder = AlderIngressDto(68, 2),
+                    uttaksalder = AlderIngressDto(68, 2),
                     aarligInntektVsaPensjon = 234_000
                 ),
                 heltUttak = SimuleringHeltUttakIngressDto(
-                    uttakFomAlder = AlderIngressDto(70, 4),
+                    uttaksalder = AlderIngressDto(70, 4),
                     aarligInntektVsaPensjon = 1_000,
                     inntektTomAlder = AlderIngressDto(75, 0),
                 )

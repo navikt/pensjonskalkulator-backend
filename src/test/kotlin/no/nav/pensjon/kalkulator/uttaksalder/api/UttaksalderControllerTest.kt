@@ -49,8 +49,12 @@ internal class UttaksalderControllerTest {
 
     @Test
     fun `finnTidligsteUttaksalder version 1`() {
-        val spec =
-            ImpersonalUttaksalderSpec(Sivilstand.UGIFT, true, 100_000, SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,)
+        val spec = ImpersonalUttaksalderSpec(
+            simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
+            sivilstand = Sivilstand.UGIFT,
+            harEps = true,
+            aarligInntektFoerUttak = 100_000
+        )
         `when`(uttaksalderService.finnTidligsteUttaksalder(spec)).thenReturn(uttaksalder)
 
         mvc.perform(

@@ -6,7 +6,6 @@ import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.PersonClient
-import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.tech.metric.Metrics
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.uttaksalder.client.UttaksalderClient
@@ -21,22 +20,22 @@ class UttaksalderService(
 ) {
     private val log = KotlinLogging.logger {}
 
-    fun finnTidligsteUttaksalder(spec: ImpersonalUttaksalderSpec): Alder? {
+    fun finnTidligsteUttaksalder(impersonalSpec: ImpersonalUttaksalderSpec): Alder? {
         val pid = pidGetter.pid()
-        val sivilstand = spec.sivilstand ?: sivilstand(pid)
+        val sivilstand = impersonalSpec.sivilstand ?: sivilstand(pid)
 
-        val uttaksalderSpec = UttaksalderSpec(
+        val personalSpec = PersonalUttaksalderSpec(
             pid = pid,
-            sivilstand = spec.sivilstand ?: sivilstand,
-            harEps = spec.harEps ?: sivilstand.harEps,
-            sisteInntekt = spec.sisteInntekt ?: inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact(),
-            simuleringType = spec.simuleringType ?: SimuleringType.ALDERSPENSJON,
-            gradertUttak = spec.gradertUttak,
+            sivilstand = sivilstand,
+            harEps = impersonalSpec.harEps ?: sivilstand.harEps,
+            aarligInntektFoerUttak = impersonalSpec.aarligInntektFoerUttak ?: sisteInntekt()
         )
 
-        log.debug { "Finner første mulige uttaksalder med parametre $uttaksalderSpec" }
-        return uttaksalderClient.finnTidligsteUttaksalder(uttaksalderSpec).also(::updateMetric)
+        log.debug { "Finner første mulige uttaksalder med parametre $impersonalSpec og $personalSpec" }
+        return uttaksalderClient.finnTidligsteUttaksalder(impersonalSpec, personalSpec).also(::updateMetric)
     }
+
+    private fun sisteInntekt() = inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact()
 
     private fun sivilstand(pid: Pid): Sivilstand =
         personClient.fetchPerson(pid)?.sivilstand ?: Sivilstand.UOPPGITT

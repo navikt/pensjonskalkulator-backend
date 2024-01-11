@@ -33,8 +33,8 @@ class UttaksalderMapperTest {
                 sisteInntekt = 123,
                 simuleringstype = SimuleringType.ALDERSPENSJON,
                 gradertUttak = UttaksalderGradertUttakIngressDto(
-                    uttaksgrad = 50,
-                    inntektUnderGradertUttak = 456,
+                    grad = 50,
+                    aarligInntektVsaPensjon = 456,
                     heltUttakAlder = AlderIngressDto(70, 2),
                     foedselsdato = LocalDate.of(1964, 5, 6)
                 )
@@ -44,7 +44,7 @@ class UttaksalderMapperTest {
         with(spec) {
             assertEquals(Sivilstand.GJENLEVENDE_PARTNER, sivilstand)
             assertTrue(harEps!!)
-            assertEquals(123, sisteInntekt)
+            assertEquals(123, aarligInntektFoerUttak)
             assertEquals(SimuleringType.ALDERSPENSJON, simuleringType)
 
             with(gradertUttak!!) {

@@ -123,7 +123,7 @@ class SimuleringControllerTest {
             "forventetInntekt": 100000,
             "sivilstand": "UGIFT",
             "heltUttak": {
-               "uttakFomAlder": { "aar": 67, "maaneder": 1 },
+               "uttaksalder": { "aar": 67, "maaneder": 1 },
                "aarligInntektVsaPensjon": 50000,
                "inntektTomAlder": { "aar": 75, "maaneder": 0 }
             }
@@ -138,11 +138,11 @@ class SimuleringControllerTest {
             "sivilstand": "SAMBOER",
             "gradertUttak": {
                "grad": 40,
-               "uttakFomAlder": { "aar": 62, "maaneder": 9 },
+               "uttaksalder": { "aar": 62, "maaneder": 9 },
                "aarligInntektVsaPensjon": 75000
             },
             "heltUttak": {
-               "uttakFomAlder": { "aar": 67, "maaneder": 1 },
+               "uttaksalder": { "aar": 67, "maaneder": 1 },
                "aarligInntektVsaPensjon": 50000,
                "inntektTomAlder": { "aar": 75, "maaneder": 0 }
             }

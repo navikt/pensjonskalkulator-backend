@@ -16,12 +16,12 @@ data class SimuleringIngressSpecDto(
 
 class SimuleringGradertUttakIngressDto(
     val grad: Int,
-    val uttakFomAlder: AlderIngressDto,
+    val uttaksalder: AlderIngressDto,
     val aarligInntektVsaPensjon: Int?
 )
 
 class SimuleringHeltUttakIngressDto(
-    val uttakFomAlder: AlderIngressDto,
+    val uttaksalder: AlderIngressDto,
     val aarligInntektVsaPensjon: Int,
     val inntektTomAlder: AlderIngressDto
 )
