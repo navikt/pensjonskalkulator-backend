@@ -1,6 +1,9 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen
 
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.GradertUttak
+import no.nav.pensjon.kalkulator.general.HeltUttak
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
@@ -17,6 +20,8 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.TestPropertySource
 import org.springframework.web.reactive.function.client.WebClient
+import java.io.ByteArrayOutputStream
+import java.nio.charset.StandardCharsets
 import java.time.LocalDate
 
 @SpringBootTest
@@ -49,7 +54,44 @@ class PenSimuleringClientTest : WebClientTest() {
         }
     }
 
+    @Test
+    fun `simulerAlderspensjon sends request body with gradert uttak when specified`() {
+        arrange(okResponse())
+
+        val response = client.simulerAlderspensjon(impersonalGradertUttakSpec(), personalSpec())
+
+        assertGradertUttakRequestBody()
+        with(response.alderspensjon[0]) {
+            assertEquals(65, alder)
+            assertEquals(98000, beloep)
+        }
+    }
+
+    private fun assertGradertUttakRequestBody() {
+        ByteArrayOutputStream().use {
+            val request = takeRequest()
+            request.body.copyTo(it)
+            assertEquals(EXPECTED_GRADERT_UTTAK_REQUEST_BODY, it.toString(StandardCharsets.UTF_8))
+        }
+    }
+
     private companion object {
+
+        // forsteUttaksdato: 1963/1 + 64/2 + 0/1 = 2027/4 => 2027-04-01 00:00:00 UTC+2 => epoch 1806530400000
+        // heltUttakDato:    1963/1 + 67/1 + 0/1 = 2030/3 => 2030-03-01 00:00:00 UTC+2 => epoch 1898550000000
+        @Language("json")
+        private const val EXPECTED_GRADERT_UTTAK_REQUEST_BODY = """{
+  "simuleringstype" : "ALDER",
+  "pid" : "12906498357",
+  "sivilstand" : "ENKE",
+  "harEps" : true,
+  "sisteInntekt" : 123000,
+  "uttaksar" : 1,
+  "forsteUttaksdato" : 1806530400000,
+  "uttaksgrad" : "P_50",
+  "inntektUnderGradertUttak" : 12000,
+  "heltUttakDato" : 1898550000000
+}"""
 
         @Language("json")
         private const val PENSJON = """{
@@ -65,12 +107,39 @@ class PenSimuleringClientTest : WebClientTest() {
         private fun impersonalSpec() =
             ImpersonalSimuleringSpec(
                 simuleringType = SimuleringType.ALDERSPENSJON,
-                foersteUttakAlder = Alder(67, 1),
-                foedselDato = LocalDate.of(1963, 1, 1),
+                sivilstand = null,
                 epsHarInntektOver2G = true,
-                forventetInntekt = null,
-                sivilstand = null
+                forventetAarligInntektFoerUttak = null,
+                heltUttak = HeltUttak(
+                    uttakFomAlder = Alder(67, 1),
+                    aarligInntekt = 0,
+                    inntektTomAlder = Alder(99, 11),
+                    foedselDato = LocalDate.of(1963, 1, 1)
+                )
             )
+
+        private fun impersonalGradertUttakSpec(): ImpersonalSimuleringSpec {
+            val foedselDato = LocalDate.of(1963, 1, 1)
+
+            return ImpersonalSimuleringSpec(
+                simuleringType = SimuleringType.ALDERSPENSJON,
+                sivilstand = null,
+                epsHarInntektOver2G = true,
+                forventetAarligInntektFoerUttak = null,
+                gradertUttak = GradertUttak(
+                    grad = Uttaksgrad.FEMTI_PROSENT,
+                    uttakFomAlder = Alder(64, 2),
+                    aarligInntekt = 12_000,
+                    foedselDato = foedselDato
+                ),
+                heltUttak = HeltUttak(
+                    uttakFomAlder = Alder(67, 1),
+                    aarligInntekt = 0,
+                    inntektTomAlder = Alder(99, 11),
+                    foedselDato = foedselDato
+                )
+            )
+        }
 
         private fun personalSpec() =
             PersonalSimuleringSpec(

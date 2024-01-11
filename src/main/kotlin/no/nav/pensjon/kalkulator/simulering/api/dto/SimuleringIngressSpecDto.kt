@@ -6,19 +6,24 @@ import java.time.LocalDate
 
 data class SimuleringIngressSpecDto(
     val simuleringstype: SimuleringType,
-    val foersteUttaksalder: AlderIngressDto,
     val foedselsdato: LocalDate,
     val epsHarInntektOver2G: Boolean,
     val forventetInntekt: Int?,
     val sivilstand: Sivilstand?,
-    val gradertUttak: SimuleringGradertUttakIngressDto? = null // default is helt uttak (100 %)
+    val gradertUttak: SimuleringGradertUttakIngressDto? = null, // default is helt uttak (100 %)
+    val heltUttak: SimuleringHeltUttakIngressDto
 )
 
 class SimuleringGradertUttakIngressDto(
-    val uttaksgrad: Int,
-    val inntektUnderGradertUttak: Int?,
-    val heltUttakAlder: AlderIngressDto
-    // foedselsdato is in parent class
+    val grad: Int,
+    val uttakFomAlder: AlderIngressDto,
+    val aarligInntektVsaPensjon: Int?
+)
+
+class SimuleringHeltUttakIngressDto(
+    val uttakFomAlder: AlderIngressDto,
+    val aarligInntektVsaPensjon: Int,
+    val inntektTomAlder: AlderIngressDto
 )
 
 data class AlderIngressDto(val aar: Int, val maaneder: Int) {

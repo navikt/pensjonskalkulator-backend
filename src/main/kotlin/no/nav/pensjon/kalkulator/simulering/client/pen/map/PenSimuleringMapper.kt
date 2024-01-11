@@ -20,15 +20,15 @@ object PenSimuleringMapper {
         personalSpec: PersonalSimuleringSpec
     ) =
         SimuleringEgressSpecDto(
+            simuleringstype = PenSimuleringType.fromInternalValue(impersonalSpec.simuleringType).externalValue,
             pid = personalSpec.pid.value,
             sivilstand = PenSivilstand.fromInternalValue(personalSpec.sivilstand).externalValue,
             harEps = impersonalSpec.epsHarInntektOver2G,
-            uttaksar = 1,
             sisteInntekt = personalSpec.forventetInntekt,
+            uttaksar = 1,
             forsteUttaksdato = toDate(impersonalSpec.foersteUttakDato),
-            simuleringstype = PenSimuleringType.fromInternalValue(impersonalSpec.simuleringType).externalValue,
             uttaksgrad = impersonalSpec.gradertUttak?.let { PenUttaksgrad.fromInternalValue(it.grad).externalValue },
-            heltUttakDato = impersonalSpec.gradertUttak?.let { toDate(it.heltUttakDato) },
-            inntektUnderGradertUttak = impersonalSpec.gradertUttak?.inntektUnderGradertUttak
+            inntektUnderGradertUttak = impersonalSpec.gradertUttak?.aarligInntekt,
+            heltUttakDato = toDate(impersonalSpec.heltUttak.uttakFomDato)
         )
 }

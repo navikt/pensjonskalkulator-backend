@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.simulering
 
-import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.GradertUttak
+import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import java.time.LocalDate
 
@@ -11,12 +11,14 @@ import java.time.LocalDate
  */
 data class ImpersonalSimuleringSpec(
     val simuleringType: SimuleringType,
-    val foersteUttakAlder: Alder,
-    val foedselDato: LocalDate,
-    val epsHarInntektOver2G: Boolean,
-    val forventetInntekt: Int? = null,
     val sivilstand: Sivilstand? = null,
-    val gradertUttak: GradertUttak? = null
+    val epsHarInntektOver2G: Boolean,
+    val forventetAarligInntektFoerUttak: Int? = null,
+    val gradertUttak: GradertUttak? = null,
+    val heltUttak: HeltUttak
 ) {
-    val foersteUttakDato: LocalDate = PensjonUtil.uttakDato(foedselDato, foersteUttakAlder)
+    val foersteUttakDato: LocalDate = PensjonUtil.uttakDato(
+        foedselDato = heltUttak.foedselDato,
+        uttakAlder = gradertUttak?.uttakFomAlder ?: heltUttak.uttakFomAlder
+    )
 }

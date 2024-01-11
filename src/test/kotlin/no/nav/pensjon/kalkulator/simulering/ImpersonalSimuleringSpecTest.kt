@@ -1,6 +1,9 @@
 package no.nav.pensjon.kalkulator.simulering
 
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.GradertUttak
+import no.nav.pensjon.kalkulator.general.HeltUttak
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -14,15 +17,19 @@ class ImpersonalSimuleringSpecTest {
      * - dag = 1
      */
     @Test
-    fun `foersteUttaksdato uten maaned-overflow`() {
+    fun `foersteUttakDato uten maaned-overflow`() {
         val spec = ImpersonalSimuleringSpec(
             simuleringType = SimuleringType.ALDERSPENSJON,
-            foersteUttakAlder = Alder(67, 0),
-            foedselDato = LocalDate.of(1963, 1, 1),
-            epsHarInntektOver2G = false
+            epsHarInntektOver2G = false,
+            heltUttak = HeltUttak(
+                uttakFomAlder = Alder(67, 0),
+                aarligInntekt = 0,
+                inntektTomAlder = Alder(99, 11),
+                foedselDato = LocalDate.of(1963, 1, 1)
+            )
         )
 
-        assertEquals(LocalDate.of(2030, 2, 1),  spec.foersteUttakDato)
+        assertEquals(LocalDate.of(2030, 2, 1), spec.foersteUttakDato)
     }
 
     /**
@@ -32,14 +39,44 @@ class ImpersonalSimuleringSpecTest {
      * - dag = 1
      */
     @Test
-    fun `foersteUttaksdato med maaned-overflow`() {
+    fun `foersteUttakDato med maaned-overflow`() {
         val spec = ImpersonalSimuleringSpec(
             simuleringType = SimuleringType.ALDERSPENSJON,
-            foersteUttakAlder = Alder(62, 11),
-            foedselDato = LocalDate.of(1963, 12, 31),
-            epsHarInntektOver2G = false
+            epsHarInntektOver2G = false,
+            heltUttak = HeltUttak(
+                uttakFomAlder = Alder(62, 11),
+                aarligInntekt = 0,
+                inntektTomAlder = Alder(99, 11),
+                foedselDato = LocalDate.of(1963, 12, 31)
+            )
         )
 
-        assertEquals(LocalDate.of(2026, 12, 1),  spec.foersteUttakDato)
+        // Expected: 1963/12 + 62/11 + 0/1 = 2026/12
+        assertEquals(LocalDate.of(2026, 12, 1), spec.foersteUttakDato)
+    }
+
+    @Test
+    fun `foersteUttakDato is obtained from gradert uttak if specified`() {
+        val foedselDato = LocalDate.of(1963, 1, 1)
+
+        val spec = ImpersonalSimuleringSpec(
+            simuleringType = SimuleringType.ALDERSPENSJON,
+            epsHarInntektOver2G = false,
+            gradertUttak = GradertUttak(
+                grad = Uttaksgrad.FOERTI_PROSENT,
+                uttakFomAlder = Alder(63, 9),
+                aarligInntekt = 0,
+                foedselDato = foedselDato
+            ),
+            heltUttak = HeltUttak(
+                uttakFomAlder = Alder(67, 0),
+                aarligInntekt = 0,
+                inntektTomAlder = Alder(99, 11),
+                foedselDato = foedselDato
+            )
+        )
+
+        // Expected: 1963/1 + 63/9 + 0/1 = 2026/11
+        assertEquals(LocalDate.of(2026, 11, 1), spec.foersteUttakDato)
     }
 }

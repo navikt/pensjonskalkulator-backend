@@ -27,8 +27,8 @@ class PenUttaksalderMapperTest {
             simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
             gradertUttak = GradertUttak(
                 grad = Uttaksgrad.SEKSTI_PROSENT,
-                heltUttakAlder = Alder(67, 0),
-                inntektUnderGradertUttak = 10_000,
+                uttakFomAlder = Alder(67, 0),
+                aarligInntekt = 10_000,
                 foedselDato = LocalDate.of(1965, 2, 1)
             )
         )

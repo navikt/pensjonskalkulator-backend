@@ -49,11 +49,11 @@ class UttaksalderMapperTest {
 
             with(gradertUttak!!) {
                 assertEquals(Uttaksgrad.FEMTI_PROSENT, grad)
-                assertEquals(456, inntektUnderGradertUttak)
-                assertEquals(LocalDate.of(2034, 8, 1), heltUttakDato)
+                assertEquals(456, aarligInntekt)
+                assertEquals(LocalDate.of(2034, 8, 1), uttakFomDato)
                 assertEquals(LocalDate.of(1964, 5, 6), foedselDato)
 
-                with(heltUttakAlder) {
+                with(uttakFomAlder) {
                     assertEquals(70, aar)
                     assertEquals(2, maaneder)
                 }

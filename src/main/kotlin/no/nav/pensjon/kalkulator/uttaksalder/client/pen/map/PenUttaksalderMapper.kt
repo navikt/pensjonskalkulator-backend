@@ -26,8 +26,8 @@ object PenUttaksalderMapper {
             sisteInntekt = spec.sisteInntekt,
             simuleringType = PenSimuleringType.fromInternalValue(spec.simuleringType).externalValue,
             uttaksgrad = spec.gradertUttak?.let { PenUttaksgrad.fromInternalValue(it.grad).externalValue },
-            inntektUnderGradertUttak = spec.gradertUttak?.inntektUnderGradertUttak,
-            heltUttakDato = spec.gradertUttak?.let { toDate(it.heltUttakDato) }
+            inntektUnderGradertUttak = spec.gradertUttak?.aarligInntekt,
+            heltUttakDato = spec.gradertUttak?.let { toDate(it.uttakFomDato) }
         )
 
     private fun oneBasedMaaned(zeroBasedMaaned: Int) =

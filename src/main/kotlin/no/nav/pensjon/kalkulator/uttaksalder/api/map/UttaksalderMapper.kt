@@ -25,8 +25,8 @@ object UttaksalderMapper {
     private fun gradertUttak(dto: UttaksalderGradertUttakIngressDto) =
         GradertUttak(
             grad = Uttaksgrad.from(dto.uttaksgrad),
-            inntektUnderGradertUttak = dto.inntektUnderGradertUttak ?: 0,
-            heltUttakAlder = alder(dto.heltUttakAlder),
+            aarligInntekt = dto.inntektUnderGradertUttak ?: 0,
+            uttakFomAlder = alder(dto.heltUttakAlder),
             foedselDato = dto.foedselsdato
         )
 
