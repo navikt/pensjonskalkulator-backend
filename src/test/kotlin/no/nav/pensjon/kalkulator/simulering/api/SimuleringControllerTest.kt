@@ -1,9 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering.api
 
-import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.general.GradertUttak
-import no.nav.pensjon.kalkulator.general.HeltUttak
-import no.nav.pensjon.kalkulator.general.Uttaksgrad
+import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.*
@@ -156,8 +153,7 @@ class SimuleringControllerTest {
                 sivilstand = Sivilstand.UGIFT,
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(67, 1),
-                    aarligInntekt = 50_000,
-                    inntektTomAlder = Alder(75, 0),
+                    inntekt = Inntekt(50_000, Alder(75, 0)),
                     foedselDato = LocalDate.of(1963, 12, 31)
                 )
             )
@@ -178,8 +174,7 @@ class SimuleringControllerTest {
                 ),
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(67, 1),
-                    aarligInntekt = 50_000,
-                    inntektTomAlder = Alder(75, 0),
+                    inntekt = Inntekt(50_000, Alder(75, 0)),
                     foedselDato = foedselDato
                 )
             )

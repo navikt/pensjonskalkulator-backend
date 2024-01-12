@@ -90,8 +90,7 @@ class SimuleringServiceTest {
                 forventetAarligInntektFoerUttak = forventetInntekt,
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(67, 1),
-                    aarligInntekt = 0,
-                    inntektTomAlder = Alder(99, 11),
+                    inntekt = null,
                     foedselDato = foedselDato
                 )
             )

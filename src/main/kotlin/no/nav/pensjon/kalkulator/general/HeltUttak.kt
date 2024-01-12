@@ -9,9 +9,14 @@ import java.time.LocalDate
  */
 data class HeltUttak(
     val uttakFomAlder: Alder,
-    val aarligInntekt: Int,
-    val inntektTomAlder: Alder,
+    val inntekt: Inntekt?,
     val foedselDato: LocalDate
 ) {
     val uttakFomDato: LocalDate = PensjonUtil.uttakDato(foedselDato, uttakFomAlder)
 }
+
+data class Inntekt(
+    val aarligBeloep: Int,
+    val tomAlder: Alder, // tom = 'til og med'
+    // 'fra og med'-alder = uttakFomAlder in parent class
+)

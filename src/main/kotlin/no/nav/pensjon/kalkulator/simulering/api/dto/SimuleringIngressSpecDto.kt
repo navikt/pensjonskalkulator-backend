@@ -4,6 +4,9 @@ import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import java.time.LocalDate
 
+/**
+ * Incoming (ingress) data transfer object (DTO) containing specification for 'simulering av alderspensjon'.
+ */
 data class SimuleringIngressSpecDto(
     val simuleringstype: SimuleringType,
     val foedselsdato: LocalDate,
@@ -14,17 +17,23 @@ data class SimuleringIngressSpecDto(
     val heltUttak: SimuleringHeltUttakIngressDto
 )
 
-class SimuleringGradertUttakIngressDto(
+data class SimuleringGradertUttakIngressDto(
     val grad: Int,
     val uttaksalder: AlderIngressDto,
     val aarligInntektVsaPensjon: Int?
 )
 
-class SimuleringHeltUttakIngressDto(
+data class SimuleringHeltUttakIngressDto(
     val uttaksalder: AlderIngressDto,
     val aarligInntektVsaPensjon: Int,
-    val inntektTomAlder: AlderIngressDto
-)
+    val inntektTomAlder: AlderIngressDto?
+) {
+    init {
+        require(if (aarligInntektVsaPensjon != 0) inntektTomAlder != null else true) {
+            "inntektTomAlder is mandatory for non-zero aarligInntektVsaPensjon"
+        }
+    }
+}
 
 data class AlderIngressDto(val aar: Int, val maaneder: Int) {
     init {

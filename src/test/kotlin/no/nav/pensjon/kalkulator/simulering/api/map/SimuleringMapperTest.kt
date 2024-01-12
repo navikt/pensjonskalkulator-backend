@@ -94,11 +94,13 @@ class SimuleringMapperTest {
                     assertEquals(4, maaneder)
                 }
 
-                assertEquals(1_000, aarligInntekt)
+                with(inntekt!!) {
+                    assertEquals(1_000, aarligBeloep)
 
-                with(inntektTomAlder) {
-                    assertEquals(75, aar)
-                    assertEquals(0, maaneder)
+                    with(tomAlder) {
+                        assertEquals(75, aar)
+                        assertEquals(0, maaneder)
+                    }
                 }
 
                 assertEquals(LocalDate.of(1969, 3, 2), foedselDato)

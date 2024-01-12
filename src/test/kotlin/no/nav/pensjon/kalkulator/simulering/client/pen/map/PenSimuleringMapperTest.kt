@@ -52,8 +52,7 @@ class PenSimuleringMapperTest {
                 ),
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(68, 11),
-                    aarligInntekt = 0,
-                    inntektTomAlder = Alder(99, 11),
+                    inntekt = null,
                     foedselDato = foedselDato
                 )
             )

@@ -1,14 +1,15 @@
 package no.nav.pensjon.kalkulator.simulering.api.map
 
-import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.general.GradertUttak
-import no.nav.pensjon.kalkulator.general.HeltUttak
-import no.nav.pensjon.kalkulator.general.Uttaksgrad
+import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import java.time.LocalDate
 
+/**
+ * Maps between data transfer objects (DTOs) and domain objects related ti simulering.
+ * The DTOs are specified by the API offered to clients.
+ */
 object SimuleringMapper {
 
     fun resultatDto(resultat: Simuleringsresultat) =
@@ -25,15 +26,15 @@ object SimuleringMapper {
             epsHarInntektOver2G = spec.epsHarInntektOver2G,
             forventetAarligInntektFoerUttak = spec.forventetInntekt,
             sivilstand = spec.sivilstand,
-            // gradertUttak not supported in V1
+            gradertUttak = null, // not supported in V1
             heltUttak = HeltUttak(
                 uttakFomAlder = alder(spec.foersteUttaksalder),
-                aarligInntekt = 0, // not supported in V1
-                inntektTomAlder = Alder(99, 11), // not supported in V1
+                inntekt = null, // not supported in V1
                 foedselDato = spec.foedselsdato
             )
         )
 
+    // V2
     fun fromIngressSpecDto(spec: SimuleringIngressSpecDto) =
         ImpersonalSimuleringSpec(
             simuleringType = spec.simuleringstype,
@@ -57,8 +58,7 @@ object SimuleringMapper {
     private fun heltUttak(dto: SimuleringHeltUttakIngressDto, foedselDato: LocalDate) =
         HeltUttak(
             uttakFomAlder = alder(dto.uttaksalder),
-            aarligInntekt = dto.aarligInntektVsaPensjon,
-            inntektTomAlder = alder(dto.inntektTomAlder),
+            inntekt = dto.inntektTomAlder?.let { Inntekt(dto.aarligInntektVsaPensjon, alder(it)) },
             foedselDato = foedselDato
         )
 }

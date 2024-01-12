@@ -1,9 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering
 
-import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.general.GradertUttak
-import no.nav.pensjon.kalkulator.general.HeltUttak
-import no.nav.pensjon.kalkulator.general.Uttaksgrad
+import no.nav.pensjon.kalkulator.general.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -23,8 +20,7 @@ class ImpersonalSimuleringSpecTest {
             epsHarInntektOver2G = false,
             heltUttak = HeltUttak(
                 uttakFomAlder = Alder(67, 0),
-                aarligInntekt = 0,
-                inntektTomAlder = Alder(99, 11),
+                inntekt = null,
                 foedselDato = LocalDate.of(1963, 1, 1)
             )
         )
@@ -45,8 +41,7 @@ class ImpersonalSimuleringSpecTest {
             epsHarInntektOver2G = false,
             heltUttak = HeltUttak(
                 uttakFomAlder = Alder(62, 11),
-                aarligInntekt = 0,
-                inntektTomAlder = Alder(99, 11),
+                inntekt = null,
                 foedselDato = LocalDate.of(1963, 12, 31)
             )
         )
@@ -70,8 +65,7 @@ class ImpersonalSimuleringSpecTest {
             ),
             heltUttak = HeltUttak(
                 uttakFomAlder = Alder(67, 0),
-                aarligInntekt = 0,
-                inntektTomAlder = Alder(99, 11),
+                inntekt = Inntekt(10_000, Alder(74, 8)),
                 foedselDato = foedselDato
             )
         )

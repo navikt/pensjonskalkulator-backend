@@ -112,8 +112,7 @@ class PenSimuleringClientTest : WebClientTest() {
                 forventetAarligInntektFoerUttak = null,
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(67, 1),
-                    aarligInntekt = 0,
-                    inntektTomAlder = Alder(99, 11),
+                    inntekt = null,
                     foedselDato = LocalDate.of(1963, 1, 1)
                 )
             )
@@ -134,8 +133,7 @@ class PenSimuleringClientTest : WebClientTest() {
                 ),
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(67, 1),
-                    aarligInntekt = 0,
-                    inntektTomAlder = Alder(99, 11),
+                    inntekt = null,
                     foedselDato = foedselDato
                 )
             )
