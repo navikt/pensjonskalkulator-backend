@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.simulering
 
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.general.Uttaksgrad
+import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.mock.PersonFactory.person
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.opptjening.Inntekt
@@ -71,7 +71,7 @@ class SimuleringServiceTest {
     private companion object {
         private const val REGISTRERT_INNTEKT = 543210
         private const val PENSJONSBELOEP = 123456
-        private val foedselsdato = LocalDate.of(1963, 12, 31)
+        private val foedselDato = LocalDate.of(1963, 12, 31)
         private val inntekt =
             Inntekt(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, 2023, REGISTRERT_INNTEKT.toBigDecimal())
         private val personalSpec = PersonalSimuleringSpec(pid, REGISTRERT_INNTEKT, Sivilstand.UOPPGITT)
@@ -84,13 +84,15 @@ class SimuleringServiceTest {
 
         private fun impersonalSimuleringSpec(forventetInntekt: Int?, sivilstand: Sivilstand?) =
             ImpersonalSimuleringSpec(
-                SimuleringType.ALDERSPENSJON,
-                Uttaksgrad.HUNDRE_PROSENT,
-                Alder(67, 1),
-                foedselsdato,
-                false,
-                forventetInntekt,
-                sivilstand
+                simuleringType = SimuleringType.ALDERSPENSJON,
+                sivilstand = sivilstand,
+                epsHarInntektOver2G = false,
+                forventetAarligInntektFoerUttak = forventetInntekt,
+                heltUttak = HeltUttak(
+                    uttakFomAlder = Alder(67, 1),
+                    inntekt = null,
+                    foedselDato = foedselDato
+                )
             )
     }
 }

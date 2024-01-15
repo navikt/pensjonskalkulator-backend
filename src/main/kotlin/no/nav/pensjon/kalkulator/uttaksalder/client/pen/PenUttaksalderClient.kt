@@ -2,7 +2,8 @@ package no.nav.pensjon.kalkulator.uttaksalder.client.pen
 
 import no.nav.pensjon.kalkulator.common.client.pen.PenClient
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
-import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderSpec
+import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
+import no.nav.pensjon.kalkulator.uttaksalder.PersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.client.UttaksalderClient
 import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderDto
 import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderEgressSpecDto
@@ -19,10 +20,13 @@ class PenUttaksalderClient(
     @Value("\${web-client.retry-attempts}") private val retryAttempts: String
 ) : PenClient(baseUrl, webClientBuilder, traceAid, retryAttempts), UttaksalderClient {
 
-    override fun finnTidligsteUttaksalder(spec: UttaksalderSpec) =
+    override fun finnTidligsteUttaksalder(
+        impersonalSpec: ImpersonalUttaksalderSpec,
+        personalSpec: PersonalUttaksalderSpec
+    ) =
         doPost(
             PATH,
-            PenUttaksalderMapper.toDto(spec),
+            PenUttaksalderMapper.toDto(impersonalSpec, personalSpec),
             UttaksalderEgressSpecDto::class.java,
             UttaksalderDto::class.java,
         )?.let(PenUttaksalderMapper::fromDto)

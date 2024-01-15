@@ -1,20 +1,56 @@
 package no.nav.pensjon.kalkulator.uttaksalder.client.pen.map
 
+import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.GradertUttak
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
+import no.nav.pensjon.kalkulator.mock.DateFactory
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
-import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderSpec
+import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
+import no.nav.pensjon.kalkulator.uttaksalder.PersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderDto
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
+import java.time.LocalDate
+import java.util.Calendar
 
 class PenUttaksalderMapperTest {
 
     @Test
-    fun `toDto maps sivilstand to PEN's value`() {
-        val spec = UttaksalderSpec(pid, Sivilstand.UGIFT, false, 1, SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
-        assertEquals("UGIF", PenUttaksalderMapper.toDto(spec).sivilstand)
+    fun `toDto maps domain object to PEN-specific data transfer object`() {
+        val impersonalSpec = ImpersonalUttaksalderSpec(
+            simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
+            sivilstand = Sivilstand.UGIFT,
+            harEps = false,
+            aarligInntektFoerUttak = 1,
+            gradertUttak = GradertUttak(
+                grad = Uttaksgrad.SEKSTI_PROSENT,
+                uttakFomAlder = Alder(67, 0),
+                aarligInntekt = 10_000,
+                foedselDato = LocalDate.of(1965, 2, 1)
+            )
+        )
+        val personalSpec = PersonalUttaksalderSpec(
+            pid = pid,
+            sivilstand = Sivilstand.UGIFT,
+            harEps = false,
+            aarligInntektFoerUttak = 1
+        )
+
+        val dto = PenUttaksalderMapper.toDto(impersonalSpec, personalSpec)
+
+        with(dto) {
+            assertEquals("12906498357", pid)
+            assertEquals("UGIF", sivilstand)
+            assertFalse(harEps)
+            assertEquals(1, sisteInntekt)
+            assertEquals("ALDER_M_AFP_PRIVAT", simuleringType)
+            assertEquals("P_60", uttaksgrad)
+            assertEquals(10_000, inntektUnderGradertUttak)
+            assertEquals(DateFactory.date(2032, Calendar.MARCH), heltUttakDato)
+        }
     }
 
     @Test

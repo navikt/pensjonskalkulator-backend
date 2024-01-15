@@ -1,7 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering.api
 
-import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.general.Uttaksgrad
+import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.*
@@ -49,14 +48,29 @@ class SimuleringControllerTest {
     private lateinit var auditor: Auditor
 
     @Test
-    fun `simulerer alderspensjon`() {
-        val spec = impersonalSpec(SimuleringType.ALDERSPENSJON)
+    fun `simulerer hel alderspensjon`() {
+        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON)
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
         mvc.perform(
             post(URL)
                 .with(csrf())
-                .content(requestBody(SimuleringType.ALDERSPENSJON))
+                .content(heltUttakRequestBody(SimuleringType.ALDERSPENSJON))
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk())
+            .andExpect(content().json(responseBody(SimuleringType.ALDERSPENSJON)))
+    }
+
+    @Test
+    fun `simulerer alderspensjon med gradert uttak`() {
+        val spec = impersonalGradertUttakSpec()
+        `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
+
+        mvc.perform(
+            post(URL)
+                .with(csrf())
+                .content(gradertUttakRequestBody())
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk())
@@ -65,13 +79,13 @@ class SimuleringControllerTest {
 
     @Test
     fun `simulerer alderspensjon med AFP privat`() {
-        val spec = impersonalSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
+        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
         mvc.perform(
             post(URL)
                 .with(csrf())
-                .content(requestBody(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT))
+                .content(heltUttakRequestBody(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT))
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk())
@@ -80,13 +94,13 @@ class SimuleringControllerTest {
 
     @Test
     fun `simulering responds 'vilkaar ikke oppfylt' when Conflict`() {
-        val spec = impersonalSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
-        `when`(simuleringService.simulerAlderspensjon(spec)).thenThrow(EgressException("", statusCode = HttpStatus.CONFLICT))
+        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
+        `when`(simuleringService.simulerAlderspensjon(spec)).thenThrow(conflict())
 
         mvc.perform(
             post(URL)
                 .with(csrf())
-                .content(requestBody(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT))
+                .content(heltUttakRequestBody(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT))
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk())
@@ -95,30 +109,76 @@ class SimuleringControllerTest {
 
     private companion object {
 
-        private const val URL = "/api/v1/alderspensjon/simulering"
+        private const val URL = "/api/v2/alderspensjon/simulering"
         private const val PENSJONSBELOEP = 123456
 
         @Language("json")
-        private fun requestBody(simuleringType: SimuleringType) = """{
+        private fun heltUttakRequestBody(simuleringType: SimuleringType) = """{
             "simuleringstype": "$simuleringType",
-            "forventetInntekt": 100000,
-            "uttaksgrad": 100,
-            "foersteUttaksalder": { "aar": 67, "maaneder": 1 },
             "foedselsdato": "1963-12-31",
+            "epsHarInntektOver2G": false,
+            "forventetInntekt": 100000,
             "sivilstand": "UGIFT",
-            "epsHarInntektOver2G": false
+            "heltUttak": {
+               "uttaksalder": { "aar": 67, "maaneder": 1 },
+               "aarligInntektVsaPensjon": 50000,
+               "inntektTomAlder": { "aar": 75, "maaneder": 0 }
+            }
         }""".trimIndent()
 
-        private fun impersonalSpec(simuleringType: SimuleringType) =
+        @Language("json")
+        private fun gradertUttakRequestBody() = """{
+            "simuleringstype": "ALDERSPENSJON",
+            "foedselsdato": "1963-12-31",
+            "epsHarInntektOver2G": true,
+            "forventetInntekt": 100000,
+            "sivilstand": "SAMBOER",
+            "gradertUttak": {
+               "grad": 40,
+               "uttaksalder": { "aar": 62, "maaneder": 9 },
+               "aarligInntektVsaPensjon": 75000
+            },
+            "heltUttak": {
+               "uttaksalder": { "aar": 67, "maaneder": 1 },
+               "aarligInntektVsaPensjon": 50000,
+               "inntektTomAlder": { "aar": 75, "maaneder": 0 }
+            }
+        }""".trimIndent()
+
+        private fun impersonalHeltUttakSpec(simuleringType: SimuleringType) =
             ImpersonalSimuleringSpec(
                 simuleringType = simuleringType,
-                uttaksgrad = Uttaksgrad.HUNDRE_PROSENT,
-                foersteUttaksalder = Alder(67, 1),
-                foedselsdato = LocalDate.of(1963, 12, 31),
                 epsHarInntektOver2G = false,
-                forventetInntekt = 100_000,
-                sivilstand = Sivilstand.UGIFT
+                forventetAarligInntektFoerUttak = 100_000,
+                sivilstand = Sivilstand.UGIFT,
+                heltUttak = HeltUttak(
+                    uttakFomAlder = Alder(67, 1),
+                    inntekt = Inntekt(50_000, Alder(75, 0)),
+                    foedselDato = LocalDate.of(1963, 12, 31)
+                )
             )
+
+        private fun impersonalGradertUttakSpec(): ImpersonalSimuleringSpec {
+            val foedselDato = LocalDate.of(1963, 12, 31)
+
+            return ImpersonalSimuleringSpec(
+                simuleringType = SimuleringType.ALDERSPENSJON,
+                epsHarInntektOver2G = true,
+                forventetAarligInntektFoerUttak = 100_000,
+                sivilstand = Sivilstand.SAMBOER,
+                gradertUttak = GradertUttak(
+                    grad = Uttaksgrad.FOERTI_PROSENT,
+                    uttakFomAlder = Alder(62, 9),
+                    aarligInntekt = 75_000,
+                    foedselDato = foedselDato
+                ),
+                heltUttak = HeltUttak(
+                    uttakFomAlder = Alder(67, 1),
+                    inntekt = Inntekt(50_000, Alder(75, 0)),
+                    foedselDato = foedselDato
+                )
+            )
+        }
 
         @Language("json")
         private fun responseBody(simuleringstype: SimuleringType) = """{
@@ -155,5 +215,7 @@ class SimuleringControllerTest {
                     afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 22056)),
                 )
             }
+
+        private fun conflict() = EgressException(message = "", statusCode = HttpStatus.CONFLICT)
     }
 }

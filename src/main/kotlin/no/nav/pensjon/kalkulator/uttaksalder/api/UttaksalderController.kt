@@ -12,7 +12,8 @@ import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.AlderDto
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
-import no.nav.pensjon.kalkulator.uttaksalder.api.dto.map.UttaksalderMapper.toDto
+import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderMapper.fromIngressSpecDto
+import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderMapper.toDto
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -45,7 +46,7 @@ class UttaksalderController(
             ),
         ]
     )
-    fun finnTidligsteUttaksalder(@RequestBody spec: UttaksalderIngressSpecDto?): AlderDto? {
+    fun finnTidligsteUttaksalder(@RequestBody spec: UttaksalderIngressSpecDto): AlderDto? {
         traceAid.begin()
         log.debug { "Request for uttaksalder-søk V1: $spec" }
 
@@ -53,7 +54,7 @@ class UttaksalderController(
             toDto(
                 timed(
                     service::finnTidligsteUttaksalder,
-                    spec ?: UttaksalderIngressSpecDto.empty(),
+                    fromIngressSpecDto(spec),
                     "finnTidligsteUttaksalder"
                 )
             )

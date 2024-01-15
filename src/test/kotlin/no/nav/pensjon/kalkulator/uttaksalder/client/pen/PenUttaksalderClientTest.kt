@@ -7,7 +7,8 @@ import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderSpec
+import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
+import no.nav.pensjon.kalkulator.uttaksalder.PersonalUttaksalderSpec
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -48,7 +49,7 @@ class PenUttaksalderClientTest : WebClientTest() {
     fun `finnTidligsteUttaksalder returns aar and maaneder`() {
         arrange(okResponse())
 
-        val response = client.finnTidligsteUttaksalder(spec)
+        val response = client.finnTidligsteUttaksalder(impersonalSpec, personalSpec)
 
         assertEquals(62, response?.aar)
         assertEquals(0, response?.maaneder) // PEN-måned minus 1
@@ -58,7 +59,7 @@ class PenUttaksalderClientTest : WebClientTest() {
     fun `finnTidligsteUttaksalder throws EgressException when response is non-Conflict 4xx`() {
         arrange(other4xxResponse())
 
-        val exception = assertThrows<EgressException> { client.finnTidligsteUttaksalder(spec) }
+        val exception = assertThrows<EgressException> { client.finnTidligsteUttaksalder(impersonalSpec, personalSpec) }
 
         assertEquals(
             """{
@@ -74,7 +75,7 @@ class PenUttaksalderClientTest : WebClientTest() {
     fun `finnTidligsteUttaksalder throws EgressException when response is 409 Conflict`() {
         arrange(conflictResponse())
 
-        val exception = assertThrows<EgressException> { client.finnTidligsteUttaksalder(spec) }
+        val exception = assertThrows<EgressException> { client.finnTidligsteUttaksalder(impersonalSpec, personalSpec) }
 
         assertEquals(
             """{
@@ -100,13 +101,20 @@ class PenUttaksalderClientTest : WebClientTest() {
     "merknader": []
 }"""
 
-        private val spec =
-            UttaksalderSpec(
+        private val impersonalSpec =
+            ImpersonalUttaksalderSpec(
+                simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
+                sivilstand = Sivilstand.UGIFT,
+                harEps = true,
+                aarligInntektFoerUttak = 80,
+            )
+
+        private val personalSpec =
+            PersonalUttaksalderSpec(
                 pid = pid,
                 sivilstand = Sivilstand.UGIFT,
                 harEps = true,
-                sisteInntekt = 80,
-                SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT
+                aarligInntektFoerUttak = 80
             )
 
         private fun okResponse() = jsonResponse(HttpStatus.OK).setBody(PEN_ALDER)

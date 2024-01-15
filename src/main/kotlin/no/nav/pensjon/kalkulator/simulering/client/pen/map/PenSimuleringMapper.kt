@@ -1,12 +1,13 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen.map
 
 import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
+import no.nav.pensjon.kalkulator.common.client.pen.PenUttaksgrad
 import no.nav.pensjon.kalkulator.simulering.*
-import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringRequestDto
+import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringEgressSpecDto
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringResponseDto
 import no.nav.pensjon.kalkulator.tech.time.DateUtil.toDate
 
-object SimuleringMapper {
+object PenSimuleringMapper {
 
     fun fromDto(dto: SimuleringResponseDto): Simuleringsresultat =
         Simuleringsresultat(
@@ -18,13 +19,16 @@ object SimuleringMapper {
         impersonalSpec: ImpersonalSimuleringSpec,
         personalSpec: PersonalSimuleringSpec
     ) =
-        SimuleringRequestDto(
+        SimuleringEgressSpecDto(
+            simuleringstype = PenSimuleringType.fromInternalValue(impersonalSpec.simuleringType).externalValue,
             pid = personalSpec.pid.value,
             sivilstand = PenSivilstand.fromInternalValue(personalSpec.sivilstand).externalValue,
             harEps = impersonalSpec.epsHarInntektOver2G,
-            uttaksar = 1,
             sisteInntekt = personalSpec.forventetInntekt,
-            forsteUttaksdato = toDate(impersonalSpec.foersteUttaksdato),
-            simuleringstype = PenSimuleringstype.fromInternalValue(impersonalSpec.simuleringType).externalValue
+            uttaksar = 1,
+            forsteUttaksdato = toDate(impersonalSpec.foersteUttakDato),
+            uttaksgrad = impersonalSpec.gradertUttak?.let { PenUttaksgrad.fromInternalValue(it.grad).externalValue },
+            inntektUnderGradertUttak = impersonalSpec.gradertUttak?.aarligInntekt,
+            heltUttakDato = toDate(impersonalSpec.heltUttak.uttakFomDato)
         )
 }
