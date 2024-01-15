@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.uttaksalder.client.pen.map
 
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.general.GradertUttak
+import no.nav.pensjon.kalkulator.general.UttaksalderGradertUttak
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.DateFactory
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
@@ -10,11 +10,11 @@ import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.PersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderDto
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import java.time.LocalDate
-import java.util.Calendar
+import java.util.*
 
 class PenUttaksalderMapperTest {
 
@@ -25,7 +25,7 @@ class PenUttaksalderMapperTest {
             sivilstand = Sivilstand.UGIFT,
             harEps = false,
             aarligInntektFoerUttak = 1,
-            gradertUttak = GradertUttak(
+            gradertUttak = UttaksalderGradertUttak(
                 grad = Uttaksgrad.SEKSTI_PROSENT,
                 uttakFomAlder = Alder(67, 0),
                 aarligInntekt = 10_000,

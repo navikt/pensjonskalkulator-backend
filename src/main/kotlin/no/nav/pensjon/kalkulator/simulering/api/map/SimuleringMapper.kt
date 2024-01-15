@@ -4,7 +4,6 @@ import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
-import java.time.LocalDate
 
 /**
  * Maps between data transfer objects (DTOs) and domain objects related ti simulering.
@@ -29,8 +28,7 @@ object SimuleringMapper {
             gradertUttak = null, // not supported in V1
             heltUttak = HeltUttak(
                 uttakFomAlder = alder(spec.foersteUttaksalder),
-                inntekt = null, // not supported in V1
-                foedselDato = spec.foedselsdato
+                inntekt = null // not supported in V1
             )
         )
 
@@ -41,24 +39,22 @@ object SimuleringMapper {
             epsHarInntektOver2G = spec.epsHarInntektOver2G,
             forventetAarligInntektFoerUttak = spec.forventetInntekt,
             sivilstand = spec.sivilstand,
-            gradertUttak = spec.gradertUttak?.let { gradertUttak(it, spec.foedselsdato) },
-            heltUttak = heltUttak(spec.heltUttak, spec.foedselsdato)
+            gradertUttak = spec.gradertUttak?.let { gradertUttak(it) },
+            heltUttak = heltUttak(spec.heltUttak)
         )
 
     private fun alder(dto: AlderIngressDto) = Alder(dto.aar, dto.maaneder)
 
-    private fun gradertUttak(dto: SimuleringGradertUttakIngressDto, foedselDato: LocalDate) =
+    private fun gradertUttak(dto: SimuleringGradertUttakIngressDto) =
         GradertUttak(
             grad = Uttaksgrad.from(dto.grad),
             uttakFomAlder = alder(dto.uttaksalder),
-            aarligInntekt = dto.aarligInntektVsaPensjon ?: 0,
-            foedselDato = foedselDato
+            aarligInntekt = dto.aarligInntektVsaPensjon ?: 0
         )
 
-    private fun heltUttak(dto: SimuleringHeltUttakIngressDto, foedselDato: LocalDate) =
+    private fun heltUttak(dto: SimuleringHeltUttakIngressDto) =
         HeltUttak(
             uttakFomAlder = alder(dto.uttaksalder),
-            inntekt = dto.inntektTomAlder?.let { Inntekt(dto.aarligInntektVsaPensjon, alder(it)) },
-            foedselDato = foedselDato
+            inntekt = dto.inntektTomAlder?.let { Inntekt(dto.aarligInntektVsaPensjon, alder(it)) }
         )
 }

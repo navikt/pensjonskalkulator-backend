@@ -10,6 +10,12 @@ import java.time.LocalDate
 data class GradertUttak(
     val grad: Uttaksgrad,
     val uttakFomAlder: Alder,
+    val aarligInntekt: Int
+)
+
+data class UttaksalderGradertUttak(
+    val grad: Uttaksgrad,
+    val uttakFomAlder: Alder,
     val aarligInntekt: Int,
     val foedselDato: LocalDate
 ) {

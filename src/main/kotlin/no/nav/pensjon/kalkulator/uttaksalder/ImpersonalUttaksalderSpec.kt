@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.uttaksalder
 
-import no.nav.pensjon.kalkulator.general.GradertUttak
+import no.nav.pensjon.kalkulator.general.UttaksalderGradertUttak
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 
@@ -13,5 +13,5 @@ data class ImpersonalUttaksalderSpec(
     val sivilstand: Sivilstand? = null,
     val harEps: Boolean? = null, // EPS = ektefelle/partner/samboer
     val aarligInntektFoerUttak: Int? = null,
-    val gradertUttak: GradertUttak? = null
+    val gradertUttak: UttaksalderGradertUttak? = null
 )

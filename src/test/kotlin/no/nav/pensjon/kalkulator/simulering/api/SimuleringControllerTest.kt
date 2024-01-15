@@ -23,7 +23,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.time.LocalDate
 
 @WebMvcTest(SimuleringController::class)
 @Import(MockSecurityConfiguration::class)
@@ -153,15 +152,12 @@ class SimuleringControllerTest {
                 sivilstand = Sivilstand.UGIFT,
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(67, 1),
-                    inntekt = Inntekt(50_000, Alder(75, 0)),
-                    foedselDato = LocalDate.of(1963, 12, 31)
+                    inntekt = Inntekt(50_000, Alder(75, 0))
                 )
             )
 
-        private fun impersonalGradertUttakSpec(): ImpersonalSimuleringSpec {
-            val foedselDato = LocalDate.of(1963, 12, 31)
-
-            return ImpersonalSimuleringSpec(
+        private fun impersonalGradertUttakSpec() =
+            ImpersonalSimuleringSpec(
                 simuleringType = SimuleringType.ALDERSPENSJON,
                 epsHarInntektOver2G = true,
                 forventetAarligInntektFoerUttak = 100_000,
@@ -169,16 +165,13 @@ class SimuleringControllerTest {
                 gradertUttak = GradertUttak(
                     grad = Uttaksgrad.FOERTI_PROSENT,
                     uttakFomAlder = Alder(62, 9),
-                    aarligInntekt = 75_000,
-                    foedselDato = foedselDato
+                    aarligInntekt = 75_000
                 ),
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(67, 1),
-                    inntekt = Inntekt(50_000, Alder(75, 0)),
-                    foedselDato = foedselDato
+                    inntekt = Inntekt(50_000, Alder(75, 0))
                 )
             )
-        }
 
         @Language("json")
         private fun responseBody(simuleringstype: SimuleringType) = """{

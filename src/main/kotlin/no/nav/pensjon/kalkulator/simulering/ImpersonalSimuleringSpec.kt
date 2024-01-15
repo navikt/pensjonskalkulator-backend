@@ -3,7 +3,6 @@ package no.nav.pensjon.kalkulator.simulering
 import no.nav.pensjon.kalkulator.general.GradertUttak
 import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import java.time.LocalDate
 
 /**
  * Specifies impersonal parameters for simulering.
@@ -16,9 +15,4 @@ data class ImpersonalSimuleringSpec(
     val forventetAarligInntektFoerUttak: Int? = null,
     val gradertUttak: GradertUttak? = null,
     val heltUttak: HeltUttak
-) {
-    val foersteUttakDato: LocalDate = PensjonUtil.uttakDato(
-        foedselDato = heltUttak.foedselDato,
-        uttakAlder = gradertUttak?.uttakFomAlder ?: heltUttak.uttakFomAlder
-    )
-}
+)

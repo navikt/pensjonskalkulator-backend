@@ -26,7 +26,7 @@ data class SimuleringGradertUttakIngressDto(
 data class SimuleringHeltUttakIngressDto(
     val uttaksalder: AlderIngressDto,
     val aarligInntektVsaPensjon: Int,
-    val inntektTomAlder: AlderIngressDto?
+    val inntektTomAlder: AlderIngressDto? = null
 ) {
     init {
         require(if (aarligInntektVsaPensjon != 0) inntektTomAlder != null else true) {

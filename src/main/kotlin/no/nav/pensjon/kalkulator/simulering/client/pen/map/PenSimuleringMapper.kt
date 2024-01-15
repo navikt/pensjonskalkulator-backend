@@ -2,10 +2,11 @@ package no.nav.pensjon.kalkulator.simulering.client.pen.map
 
 import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
 import no.nav.pensjon.kalkulator.common.client.pen.PenUttaksgrad
+import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.GradertUttak
+import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.simulering.*
-import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringEgressSpecDto
-import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringResponseDto
-import no.nav.pensjon.kalkulator.tech.time.DateUtil.toDate
+import no.nav.pensjon.kalkulator.simulering.client.pen.dto.*
 
 object PenSimuleringMapper {
 
@@ -26,9 +27,23 @@ object PenSimuleringMapper {
             harEps = impersonalSpec.epsHarInntektOver2G,
             sisteInntekt = personalSpec.forventetInntekt,
             uttaksar = 1,
-            forsteUttaksdato = toDate(impersonalSpec.foersteUttakDato),
-            uttaksgrad = impersonalSpec.gradertUttak?.let { PenUttaksgrad.fromInternalValue(it.grad).externalValue },
-            inntektUnderGradertUttak = impersonalSpec.gradertUttak?.aarligInntekt,
-            heltUttakDato = toDate(impersonalSpec.heltUttak.uttakFomDato)
+            gradertUttak = impersonalSpec.gradertUttak?.let(::toGradertUttakDto),
+            heltUttak = toHeltUttakDto(impersonalSpec.heltUttak)
         )
+
+    private fun toGradertUttakDto(uttak: GradertUttak) =
+        GradertUttakSpecDto(
+            PenUttaksgrad.fromInternalValue(uttak.grad).externalValue,
+            toAlderDto(uttak.uttakFomAlder),
+            uttak.aarligInntekt
+        )
+
+    private fun toHeltUttakDto(uttak: HeltUttak) =
+        HeltUttakSpecDto(
+            toAlderDto(uttak.uttakFomAlder),
+            uttak.inntekt?.aarligBeloep ?: 0,
+            uttak.inntekt?.let { toAlderDto(it.tomAlder) } ?: toAlderDto(uttak.uttakFomAlder)
+        )
+
+    private fun toAlderDto(alder: Alder) = AlderSpecDto(alder.aar, alder.maaneder)
 }

@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering.api.map
 
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.*
@@ -78,8 +79,7 @@ class SimuleringMapperTest {
 
             with(gradertUttak!!) {
                 assertEquals(Uttaksgrad.FOERTI_PROSENT, grad)
-                assertEquals(LocalDate.of(1969, 3, 2), foedselDato)
-                assertEquals(LocalDate.of(2037, 6, 1), uttakFomDato) // 1969/3 + 68/2 + 0/1 = 2037/6
+                assertEquals(Alder(68, 2), uttakFomAlder)
                 assertEquals(234_000, aarligInntekt)
 
                 with(uttakFomAlder) {
@@ -103,8 +103,7 @@ class SimuleringMapperTest {
                     }
                 }
 
-                assertEquals(LocalDate.of(1969, 3, 2), foedselDato)
-                assertEquals(LocalDate.of(2039, 8, 1), uttakFomDato) // 1969/3 + 70/4 + 0/1 = 2039/8
+                assertEquals(Alder(70, 4), uttakFomAlder)
             }
         }
     }

@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.uttaksalder.api.map
 
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.general.GradertUttak
+import no.nav.pensjon.kalkulator.general.UttaksalderGradertUttak
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
@@ -24,7 +24,7 @@ object UttaksalderMapper {
         )
 
     private fun gradertUttak(dto: UttaksalderGradertUttakIngressDto) =
-        GradertUttak(
+        UttaksalderGradertUttak(
             grad = Uttaksgrad.from(dto.grad),
             aarligInntekt = dto.aarligInntektVsaPensjon ?: 0,
             uttakFomAlder = alder(dto.heltUttakAlder),
