@@ -11,6 +11,6 @@ data class HeltUttak(
 
 data class Inntekt(
     val aarligBeloep: Int,
-    val tomAlder: Alder, // tom = 'til og med'
+    val tomAlder: Alder // tom = 'til og med'
     // 'fra og med'-alder = uttakFomAlder in parent class
 )

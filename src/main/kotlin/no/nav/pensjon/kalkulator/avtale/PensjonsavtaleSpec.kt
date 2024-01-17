@@ -7,7 +7,7 @@ import no.nav.pensjon.kalkulator.person.Sivilstand
 data class PensjonsavtaleSpec(
     val aarligInntektFoerUttak: Int,
     val uttaksperioder: List<UttaksperiodeSpec>,
-    val antallInntektsaarEtterUttak: Int,
+    val antallInntektsaarEtterUttak: Int? = null, // deprecated - supports V1 only
     val harEpsPensjon: Boolean? = null,
     val harEpsPensjonsgivendeInntektOver2G: Boolean? = null,
     val antallAarIUtlandetEtter16: Int = 0,
@@ -17,5 +17,10 @@ data class PensjonsavtaleSpec(
 data class UttaksperiodeSpec(
     val startAlder: Alder,
     val grad: Uttaksgrad,
-    val aarligInntekt: Int
+    val aarligInntekt: InntektSpec,
+)
+
+data class InntektSpec(
+    val aarligBeloep: Int,
+    val tomAlder: Alder? = null
 )

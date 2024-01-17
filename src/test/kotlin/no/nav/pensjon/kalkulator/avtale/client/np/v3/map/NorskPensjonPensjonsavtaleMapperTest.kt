@@ -16,8 +16,14 @@ class NorskPensjonPensjonsavtaleMapperTest {
 
     @Test
     fun `toDto maps domain object to data transfer object`() {
-        val domainObject = PensjonsavtaleSpec(1, emptyList(), 2)
-        val expectedDto = NorskPensjonPensjonsavtaleSpecDto(pid, 1, emptyList(), 2)
+        val domainObject = PensjonsavtaleSpec(aarligInntektFoerUttak = 1, uttaksperioder = emptyList())
+        val expectedDto = NorskPensjonPensjonsavtaleSpecDto(
+            pid = pid,
+            aarligInntektFoerUttak = 1,
+            uttaksperioder = emptyList(),
+            antallInntektsaarEtterUttak = 0 // since no uttaksperioder
+        )
+
         NorskPensjonPensjonsavtaleMapper.toDto(domainObject, pid) shouldBe expectedDto
     }
 

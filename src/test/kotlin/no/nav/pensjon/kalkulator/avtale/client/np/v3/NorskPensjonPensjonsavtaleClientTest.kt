@@ -182,7 +182,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
                     <grad>100</grad>
                     <aarligInntekt>200000</aarligInntekt>
                 </uttaksperiode>
-                <antallInntektsaarEtterUttak>1</antallInntektsaarEtterUttak>
+                <antallInntektsaarEtterUttak>14</antallInntektsaarEtterUttak>
                 <harAfp>false</harAfp>
                 <antallAarIUtlandetEtter16>0</antallAarIUtlandetEtter16>
                 <sivilstatus>gift</sivilstatus>
@@ -381,83 +381,82 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
             PensjonsavtaleSpec(
                 aarligInntektFoerUttak = 123000,
                 uttaksperioder = listOf(uttaksperiodeSpec(1), uttaksperiodeSpec(2)),
-                antallInntektsaarEtterUttak = 1
             )
 
         private fun uttaksperiodeSpec(value: Int) =
             UttaksperiodeSpec(
-                Alder(value + 62, value),
-                if (value < 2) Uttaksgrad.AATTI_PROSENT else Uttaksgrad.HUNDRE_PROSENT,
-                value * 100000
+                startAlder = Alder(aar = value + 62, maaneder = value),
+                grad = if (value < 2) Uttaksgrad.AATTI_PROSENT else Uttaksgrad.HUNDRE_PROSENT,
+                aarligInntekt = InntektSpec(aarligBeloep = value * 100000, tomAlder = null)
             )
 
         private fun avtaleUtenUtbetalingsperioder() =
             Pensjonsavtale(
-                "",
-                "ukjent",
-                "Selskap2",
-                "Produkt2",
-                AvtaleKategori.FOLKETRYGD,
-                AvtaleUnderkategori.NONE,
-                0,
-                0,
-                0,
-                0,
-                0,
-                false,
-                EksternBeregningsmodell.NONE,
-                0,
-                null,
-                "ukjent",
-                ManglendeEksternGraderingAarsak.NONE,
-                ManglendeEksternBeregningAarsak.NONE,
-                emptyList()
+                avtalenummer = "",
+                arbeidsgiver = "ukjent",
+                selskapsnavn = "Selskap2",
+                produktbetegnelse = "Produkt2",
+                kategori = AvtaleKategori.FOLKETRYGD,
+                underkategori = AvtaleUnderkategori.NONE,
+                innskuddssaldo = 0,
+                naavaerendeAvtaltAarligInnskudd = 0,
+                pensjonsbeholdningForventet = 0,
+                pensjonsbeholdningNedreGrense = 0,
+                pensjonsbeholdningOvreGrense = 0,
+                avkastningsgaranti = false,
+                beregningsmodell = EksternBeregningsmodell.NONE,
+                startAar = 0,
+                sluttAar = null,
+                opplysningsdato = "ukjent",
+                manglendeGraderingAarsak = ManglendeEksternGraderingAarsak.NONE,
+                manglendeBeregningAarsak = ManglendeEksternBeregningAarsak.NONE,
+                utbetalingsperioder = emptyList()
             )
 
         private fun avtaleMedEnUtbetalingsperiode() =
             Pensjonsavtale(
-                "Avtale1",
-                "Firma1",
-                "Selskap1",
-                "Produkt1",
-                AvtaleKategori.INDIVIDUELL_ORDNING,
-                AvtaleUnderkategori.FORENINGSKOLLEKTIV,
-                1000,
-                100,
-                0,
-                0,
-                0,
-                false,
-                EksternBeregningsmodell.BRANSJEAVTALE,
-                70,
-                80,
-                "2023-01-01",
-                ManglendeEksternGraderingAarsak.NONE,
-                ManglendeEksternBeregningAarsak.NONE,
-                listOf(utbetalingsperiodeMedSluttalder())
+                avtalenummer = "Avtale1",
+                arbeidsgiver = "Firma1",
+                selskapsnavn = "Selskap1",
+                produktbetegnelse = "Produkt1",
+                kategori = AvtaleKategori.INDIVIDUELL_ORDNING,
+                underkategori = AvtaleUnderkategori.FORENINGSKOLLEKTIV,
+                innskuddssaldo = 1000,
+                naavaerendeAvtaltAarligInnskudd = 100,
+                pensjonsbeholdningForventet = 0,
+                pensjonsbeholdningNedreGrense = 0,
+                pensjonsbeholdningOvreGrense = 0,
+                avkastningsgaranti = false,
+                beregningsmodell = EksternBeregningsmodell.BRANSJEAVTALE,
+                startAar = 70,
+                sluttAar = 80,
+                opplysningsdato = "2023-01-01",
+                manglendeGraderingAarsak = ManglendeEksternGraderingAarsak.NONE,
+                manglendeBeregningAarsak = ManglendeEksternBeregningAarsak.NONE,
+                utbetalingsperioder = listOf(utbetalingsperiodeMedSluttalder())
             )
 
         private fun avtaleMedToUtbetalingsperioder() =
             Pensjonsavtale(
-                "Avtale1",
-                "Firma1",
-                "Selskap1",
-                "Produkt1",
-                AvtaleKategori.INDIVIDUELL_ORDNING,
-                AvtaleUnderkategori.FORENINGSKOLLEKTIV,
-                1000,
-                100,
-                1000000,
-                900000,
-                1100000,
-                false,
-                EksternBeregningsmodell.BRANSJEAVTALE,
-                70,
-                80,
-                "2023-01-01",
-                ManglendeEksternGraderingAarsak.IKKE_STOETTET,
-                ManglendeEksternBeregningAarsak.UKJENT_PRODUKTTYPE,
-                listOf(
+                avtalenummer = "Avtale1",
+                arbeidsgiver = "Firma1",
+                selskapsnavn = "Selskap1",
+                produktbetegnelse = "Produkt1",
+                kategori = AvtaleKategori.INDIVIDUELL_ORDNING,
+                underkategori = AvtaleUnderkategori.FORENINGSKOLLEKTIV,
+                innskuddssaldo = 1000,
+                naavaerendeAvtaltAarligInnskudd = 100,
+                pensjonsbeholdningForventet = 1000000,
+                pensjonsbeholdningNedreGrense = 900000,
+                pensjonsbeholdningOvreGrense = 1100000,
+                avkastningsgaranti = false,
+                beregningsmodell = EksternBeregningsmodell.BRANSJEAVTALE,
+                startAar = 70,
+                sluttAar = 80,
+                opplysningsdato = "2023-01-01",
+                manglendeGraderingAarsak = ManglendeEksternGraderingAarsak.IKKE_STOETTET,
+                manglendeBeregningAarsak = ManglendeEksternBeregningAarsak.UKJENT_PRODUKTTYPE,
+                utbetalingsperioder = listOf(
                     utbetalingsperiodeMedSluttalder(),
                     utbetalingsperiodeUtenSluttalder()
                 )
@@ -465,18 +464,18 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
 
         private fun utbetalingsperiodeMedSluttalder() =
             Utbetalingsperiode(
-                Alder(71, 0),
-                Alder(81, 1),
-                10000,
-                Uttaksgrad.HUNDRE_PROSENT
+                startAlder = Alder(aar = 71, maaneder = 0),
+                sluttAlder = Alder(aar = 81, maaneder = 1),
+                aarligUtbetaling = 10000,
+                grad = Uttaksgrad.HUNDRE_PROSENT
             )
 
         private fun utbetalingsperiodeUtenSluttalder() =
             Utbetalingsperiode(
-                Alder(72, 1),
-                null,
-                20000,
-                Uttaksgrad.AATTI_PROSENT
+                startAlder = Alder(aar = 72, maaneder = 1),
+                sluttAlder = null,
+                aarligUtbetaling = 20000,
+                grad = Uttaksgrad.AATTI_PROSENT
             )
 
         private fun assertRequestBody() {

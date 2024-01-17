@@ -77,7 +77,6 @@ class PensjonsavtaleServiceTest {
 
     companion object {
         private const val AARLIG_INNTEKT_FOER_UTTAK = 456000
-        private const val ANTALL_INNTEKTSAAR_ETTER_UTTAK = 2
 
         private val pensjonsavtaler = pensjonsavtalerV3()
 
@@ -85,7 +84,6 @@ class PensjonsavtaleServiceTest {
             PensjonsavtaleSpec(
                 aarligInntektFoerUttak = AARLIG_INNTEKT_FOER_UTTAK,
                 uttaksperioder = listOf(uttaksperiodeSpec1(), uttaksperiodeSpec2()),
-                antallInntektsaarEtterUttak = ANTALL_INNTEKTSAAR_ETTER_UTTAK,
                 harEpsPensjon = true,
                 harEpsPensjonsgivendeInntektOver2G = true,
                 antallAarIUtlandetEtter16 = 0,
@@ -96,14 +94,14 @@ class PensjonsavtaleServiceTest {
             UttaksperiodeSpec(
                 startAlder = Alder(67, 1),
                 grad = Uttaksgrad.AATTI_PROSENT,
-                aarligInntekt = 123000
+                aarligInntekt = InntektSpec(123000, null)
             )
 
         private fun uttaksperiodeSpec2() =
             UttaksperiodeSpec(
                 startAlder = Alder(70, 1),
                 grad = Uttaksgrad.HUNDRE_PROSENT,
-                aarligInntekt = 45000
+                aarligInntekt = InntektSpec(45000, null)
             )
 
         private fun enAvtaleUtenStart() = Pensjonsavtaler(listOf(avtaleUtenStart()), emptyList())
