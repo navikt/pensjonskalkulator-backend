@@ -120,8 +120,9 @@ class SimuleringControllerTest {
             "sivilstand": "UGIFT",
             "heltUttak": {
                "uttaksalder": { "aar": 67, "maaneder": 1 },
-               "aarligInntektVsaPensjon": 50000,
-               "inntektTomAlder": { "aar": 75, "maaneder": 0 }
+               "aarligInntektVsaPensjon": {
+                  "beloep": 50000,
+                  "sluttalder": { "aar": 75, "maaneder": 0 } }
             }
         }""".trimIndent()
 
@@ -135,12 +136,13 @@ class SimuleringControllerTest {
             "gradertUttak": {
                "grad": 40,
                "uttaksalder": { "aar": 62, "maaneder": 9 },
-               "aarligInntektVsaPensjon": 75000
+               "aarligInntekt": 75000
             },
             "heltUttak": {
                "uttaksalder": { "aar": 67, "maaneder": 1 },
-               "aarligInntektVsaPensjon": 50000,
-               "inntektTomAlder": { "aar": 75, "maaneder": 0 }
+               "aarligInntektVsaPensjon": {
+                   "beloep": 50000,
+                   "sluttalder": { "aar": 75, "maaneder": 0 } }
             }
         }""".trimIndent()
 

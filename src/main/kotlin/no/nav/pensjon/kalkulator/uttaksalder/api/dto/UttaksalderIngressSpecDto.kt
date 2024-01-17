@@ -27,23 +27,23 @@ data class UttaksalderIngressSpecDtoV2(
 data class UttaksalderGradertUttakIngressDto(
     val grad: Int,
     val aarligInntektVsaPensjon: Int?,
-    val heltUttakAlder: AlderIngressDto, // affects gradert uttaksalder
+    val heltUttakAlder: UttaksalderAlderDto, // affects gradert uttaksalder
     val foedselsdato: LocalDate
 )
 
 data class UttaksalderGradertUttakIngressDtoV2(
     val grad: Int,
-    val aarligInntektVsaPensjon: Int?
+    val aarligInntekt: Int?
 )
 
 data class UttaksalderHeltUttakIngressDtoV2(
-    val uttaksalder: AlderIngressDto,
+    val uttaksalder: UttaksalderAlderDto,
     val aarligInntektVsaPensjon: UttaksalderInntektDtoV2
 )
 
 data class UttaksalderInntektDtoV2(
     val beloep: Int,
-    val sluttalder: AlderIngressDto? = null
+    val sluttalder: UttaksalderAlderDto? = null
 ) {
     init {
         require(if (beloep != 0) sluttalder != null else true) {
@@ -52,7 +52,7 @@ data class UttaksalderInntektDtoV2(
     }
 }
 
-data class AlderIngressDto(val aar: Int, val maaneder: Int) {
+data class UttaksalderAlderDto(val aar: Int, val maaneder: Int) {
     init {
         require(aar in 0..200) { "0 <= aar <= 200" }
         require(maaneder in 0..11) { "0 <= maaneder <= 11" }

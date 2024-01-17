@@ -46,14 +46,14 @@ object UttaksalderMapper {
     private fun gradertUttakV2(dto: UttaksalderGradertUttakIngressDtoV2) =
         UttaksalderGradertUttak(
             grad = Uttaksgrad.from(dto.grad),
-            aarligInntekt = dto.aarligInntektVsaPensjon ?: 0,
+            aarligInntekt = dto.aarligInntekt ?: 0,
             foedselDato = LocalDate.MIN // not in V2
         )
 
     private fun inntektV2(dto: UttaksalderInntektDtoV2): Inntekt? =
         dto.sluttalder?.let { Inntekt(dto.beloep, alder(it)) }
 
-    private fun alder(dto: AlderIngressDto) = Alder(dto.aar, dto.maaneder)
+    private fun alder(dto: UttaksalderAlderDto) = Alder(dto.aar, dto.maaneder)
 
     private fun alderDto(alder: Alder) = AlderDto(alder.aar, alder.maaneder)
 }

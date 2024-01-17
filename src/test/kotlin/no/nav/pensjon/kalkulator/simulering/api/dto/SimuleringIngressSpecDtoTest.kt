@@ -7,45 +7,48 @@ import org.junit.jupiter.api.Test
 class SimuleringIngressSpecDtoTest {
 
     @Test
-    fun `SimuleringHeltUttakIngressDto requires defined 'til-og-med-alder' if non-zero inntekt`() {
+    fun `SimuleringHeltUttakIngressDtoV2 requires defined 'til-og-med-alder' if non-zero inntekt`() {
         val exception = assertThrows(IllegalArgumentException::class.java) {
-            SimuleringHeltUttakIngressDto(AlderIngressDto(70, 0), 1_000, null)
+            SimuleringHeltUttakIngressDtoV2(
+                uttaksalder = SimuleringAlderDto(aar = 70, maaneder = 0),
+                aarligInntektVsaPensjon = SimuleringInntektDtoV2(beloep = 1_000, sluttalder = null)
+            )
         }
 
-        assertEquals("inntektTomAlder is mandatory for non-zero aarligInntektVsaPensjon", exception.message)
+        assertEquals("sluttalder is mandatory for non-zero beloep", exception.message)
     }
 
     @Test
-    fun `AlderIngressDto requires non-zero 'aar' value`() {
+    fun `SimuleringAlderDto requires non-zero 'aar' value`() {
         val exception = assertThrows(IllegalArgumentException::class.java) {
-            AlderIngressDto(-1, 11)
-        }
-
-        assertEquals("0 <= aar <= 200", exception.message)
-    }
-
-    @Test
-    fun `AlderIngressDto requires 'aar' of 200 or less`() {
-        val exception = assertThrows(IllegalArgumentException::class.java) {
-            AlderIngressDto(201, 0)
+            SimuleringAlderDto(aar = -1, maaneder = 11)
         }
 
         assertEquals("0 <= aar <= 200", exception.message)
     }
 
     @Test
-    fun `AlderIngressDto requires non-zero 'maaneder' value`() {
+    fun `SimuleringAlderDto requires 'aar' of 200 or less`() {
         val exception = assertThrows(IllegalArgumentException::class.java) {
-            AlderIngressDto(100, -1)
+            SimuleringAlderDto(aar = 201, maaneder = 0)
+        }
+
+        assertEquals("0 <= aar <= 200", exception.message)
+    }
+
+    @Test
+    fun `SimuleringAlderDto requires non-zero 'maaneder' value`() {
+        val exception = assertThrows(IllegalArgumentException::class.java) {
+            SimuleringAlderDto(aar = 100, maaneder = -1)
         }
 
         assertEquals("0 <= maaneder <= 11", exception.message)
     }
 
     @Test
-    fun `AlderIngressDto requires 'maaneder' of 11 or less`() {
+    fun `SimuleringAlderDto requires 'maaneder' of 11 or less`() {
         val exception = assertThrows(IllegalArgumentException::class.java) {
-            AlderIngressDto(0, 12)
+            SimuleringAlderDto(aar = 0, maaneder = 12)
         }
 
         assertEquals("0 <= maaneder <= 11", exception.message)

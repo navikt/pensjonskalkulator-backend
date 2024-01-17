@@ -6,10 +6,12 @@ import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 
 /**
- * Maps between data transfer objects (DTOs) and domain objects related ti simulering.
+ * Maps between data transfer objects (DTOs) and domain objects related to simulering.
  * The DTOs are specified by the API offered to clients.
  */
 object SimuleringMapper {
+
+    private val defaultInntektTomAlder = Alder(99, 11)
 
     fun resultatDto(resultat: Simuleringsresultat) =
         SimuleringsresultatDto(
@@ -32,8 +34,7 @@ object SimuleringMapper {
             )
         )
 
-    // V2
-    fun fromIngressSpecDto(spec: SimuleringIngressSpecDto) =
+    fun fromIngressSpecDtoV2(spec: SimuleringIngressSpecDtoV2) =
         ImpersonalSimuleringSpec(
             simuleringType = spec.simuleringstype,
             epsHarInntektOver2G = spec.epsHarInntektOver2G,
@@ -43,18 +44,24 @@ object SimuleringMapper {
             heltUttak = heltUttak(spec.heltUttak)
         )
 
-    private fun alder(dto: AlderIngressDto) = Alder(dto.aar, dto.maaneder)
+    private fun alder(dto: SimuleringAlderDto) = Alder(dto.aar, dto.maaneder)
 
-    private fun gradertUttak(dto: SimuleringGradertUttakIngressDto) =
+    private fun gradertUttak(dto: SimuleringGradertUttakIngressDtoV2) =
         GradertUttak(
             grad = Uttaksgrad.from(dto.grad),
             uttakFomAlder = alder(dto.uttaksalder),
-            aarligInntekt = dto.aarligInntektVsaPensjon ?: 0
+            aarligInntekt = dto.aarligInntekt ?: 0
         )
 
-    private fun heltUttak(dto: SimuleringHeltUttakIngressDto) =
+    private fun heltUttak(dto: SimuleringHeltUttakIngressDtoV2) =
         HeltUttak(
             uttakFomAlder = alder(dto.uttaksalder),
-            inntekt = dto.inntektTomAlder?.let { Inntekt(dto.aarligInntektVsaPensjon, alder(it)) }
+            inntekt = inntekt(dto.aarligInntektVsaPensjon)
+        )
+
+    private fun inntekt(dto: SimuleringInntektDtoV2) =
+        Inntekt(
+            aarligBeloep = dto.beloep,
+            tomAlder = dto.sluttalder?.let(::alder) ?: defaultInntektTomAlder
         )
 }

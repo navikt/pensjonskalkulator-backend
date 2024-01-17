@@ -8,10 +8,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.simulering.SimuleringService
-import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringIngressSpecDto
+import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringIngressSpecDtoV2
 import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringSpecDto
 import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringsresultatDto
-import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.fromIngressSpecDto
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.fromIngressSpecDtoV2
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.fromSpecDto
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.resultatDto
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
@@ -82,12 +82,12 @@ class SimuleringController(
             ),
         ]
     )
-    fun simulerAlderspensjon(@RequestBody spec: SimuleringIngressSpecDto): SimuleringsresultatDto {
+    fun simulerAlderspensjonV2(@RequestBody spec: SimuleringIngressSpecDtoV2): SimuleringsresultatDto {
         traceAid.begin()
         log.debug { "Request for simulering: $spec" }
 
         return try {
-            resultatDto(timed(service::simulerAlderspensjon, fromIngressSpecDto(spec), "alderspensjon/simulering"))
+            resultatDto(timed(service::simulerAlderspensjon, fromIngressSpecDtoV2(spec), "alderspensjon/simulering"))
                 .also { log.debug { "Simulering respons: $it" } }
         } catch (e: EgressException) {
             if (e.isConflict) vilkaarIkkeOppfylt() else handleError(e, "V2")!!

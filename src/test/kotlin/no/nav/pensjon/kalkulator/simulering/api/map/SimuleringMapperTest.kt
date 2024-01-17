@@ -4,10 +4,7 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.*
-import no.nav.pensjon.kalkulator.simulering.api.dto.AlderIngressDto
-import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringGradertUttakIngressDto
-import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringHeltUttakIngressDto
-import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringIngressSpecDto
+import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -51,22 +48,24 @@ class SimuleringMapperTest {
 
     @Test
     fun `fromIngressSpecDto maps data transfer object to domain object`() {
-        val spec: ImpersonalSimuleringSpec = SimuleringMapper.fromIngressSpecDto(
-            SimuleringIngressSpecDto(
+        val spec: ImpersonalSimuleringSpec = SimuleringMapper.fromIngressSpecDtoV2(
+            SimuleringIngressSpecDtoV2(
                 simuleringstype = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
                 foedselsdato = LocalDate.of(1969, 3, 2),
                 epsHarInntektOver2G = true,
                 forventetInntekt = 123_000,
                 sivilstand = Sivilstand.REGISTRERT_PARTNER,
-                gradertUttak = SimuleringGradertUttakIngressDto(
+                gradertUttak = SimuleringGradertUttakIngressDtoV2(
                     grad = 40,
-                    uttaksalder = AlderIngressDto(68, 2),
-                    aarligInntektVsaPensjon = 234_000
+                    uttaksalder = SimuleringAlderDto(aar = 68, maaneder = 2),
+                    aarligInntekt = 234_000
                 ),
-                heltUttak = SimuleringHeltUttakIngressDto(
-                    uttaksalder = AlderIngressDto(70, 4),
-                    aarligInntektVsaPensjon = 1_000,
-                    inntektTomAlder = AlderIngressDto(75, 0),
+                heltUttak = SimuleringHeltUttakIngressDtoV2(
+                    uttaksalder = SimuleringAlderDto(70, 4),
+                    aarligInntektVsaPensjon = SimuleringInntektDtoV2(
+                        beloep = 1_000,
+                        sluttalder = SimuleringAlderDto(aar = 75, maaneder = 0)
+                    ),
                 )
             )
         )
@@ -79,8 +78,12 @@ class SimuleringMapperTest {
 
             with(gradertUttak!!) {
                 assertEquals(Uttaksgrad.FOERTI_PROSENT, grad)
-                assertEquals(Alder(68, 2), uttakFomAlder)
                 assertEquals(234_000, aarligInntekt)
+
+                with(uttakFomAlder) {
+                    assertEquals(68, aar)
+                    assertEquals(2, maaneder)
+                }
 
                 with(uttakFomAlder) {
                     assertEquals(68, aar)

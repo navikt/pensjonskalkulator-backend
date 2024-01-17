@@ -33,7 +33,7 @@ class UttaksalderMapperTest {
                 gradertUttak = UttaksalderGradertUttakIngressDto(
                     grad = 50,
                     aarligInntektVsaPensjon = 456,
-                    heltUttakAlder = AlderIngressDto(70, 2),
+                    heltUttakAlder = UttaksalderAlderDto(70, 2),
                     foedselsdato = LocalDate.of(1964, 5, 6)
                 )
             )
@@ -62,13 +62,13 @@ class UttaksalderMapperTest {
             simuleringstype = SimuleringType.ALDERSPENSJON,
             gradertUttak = UttaksalderGradertUttakIngressDtoV2(
                 grad = 50,
-                aarligInntektVsaPensjon = 456
+                aarligInntekt = 456
             ),
             heltUttak = UttaksalderHeltUttakIngressDtoV2(
-                uttaksalder = AlderIngressDto(70, 2),
+                uttaksalder = UttaksalderAlderDto(70, 2),
                 aarligInntektVsaPensjon = UttaksalderInntektDtoV2(
                     beloep = 456,
-                    sluttalder = AlderIngressDto(72, 5)
+                    sluttalder = UttaksalderAlderDto(72, 5)
                 )
             )
         )
