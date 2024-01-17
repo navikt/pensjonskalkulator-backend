@@ -12,7 +12,16 @@ data class UttaksalderIngressSpecDto(
     val harEps: Boolean?,
     val sisteInntekt: Int?,
     val simuleringstype: SimuleringType?,
-    val gradertUttak: UttaksalderGradertUttakIngressDto? = null // default is 'helt uttak' (100 %)
+    val gradertUttak: UttaksalderGradertUttakIngressDto? = null, // default is 'helt uttak' (100 %)
+)
+
+data class UttaksalderIngressSpecDtoV2(
+    val simuleringstype: SimuleringType?,
+    val sivilstand: Sivilstand?,
+    val harEps: Boolean?,
+    val aarligInntekt: Int?, // før første uttak
+    val gradertUttak: UttaksalderGradertUttakIngressDtoV2? = null,
+    val heltUttak: UttaksalderHeltUttakIngressDtoV2
 )
 
 data class UttaksalderGradertUttakIngressDto(
@@ -21,6 +30,27 @@ data class UttaksalderGradertUttakIngressDto(
     val heltUttakAlder: AlderIngressDto, // affects gradert uttaksalder
     val foedselsdato: LocalDate
 )
+
+data class UttaksalderGradertUttakIngressDtoV2(
+    val grad: Int,
+    val aarligInntektVsaPensjon: Int?
+)
+
+data class UttaksalderHeltUttakIngressDtoV2(
+    val uttaksalder: AlderIngressDto,
+    val aarligInntektVsaPensjon: UttaksalderInntektDtoV2
+)
+
+data class UttaksalderInntektDtoV2(
+    val beloep: Int,
+    val sluttalder: AlderIngressDto? = null
+) {
+    init {
+        require(if (beloep != 0) sluttalder != null else true) {
+            "sluttalder is mandatory for non-zero beloep"
+        }
+    }
+}
 
 data class AlderIngressDto(val aar: Int, val maaneder: Int) {
     init {

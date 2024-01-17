@@ -1,5 +1,7 @@
 package no.nav.pensjon.kalkulator.uttaksalder.client.pen
 
+import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
@@ -107,6 +109,7 @@ class PenUttaksalderClientTest : WebClientTest() {
                 sivilstand = Sivilstand.UGIFT,
                 harEps = true,
                 aarligInntektFoerUttak = 80,
+                heltUttak = HeltUttak(Alder(67, 0), null)
             )
 
         private val personalSpec =
