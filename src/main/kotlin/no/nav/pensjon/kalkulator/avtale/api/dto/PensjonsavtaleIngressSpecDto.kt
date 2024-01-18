@@ -33,7 +33,7 @@ data class IngressPensjonsavtaleSpecV2(
 )
 
 data class IngressPensjonsavtaleUttaksperiodeV2(
-    val startAlder: Alder, // månedsverdi 0..11 (antall helt fylte måneder)
+    val startAlder: IngressPensjonsavtaleAlderV2, // månedsverdi 0..11 (antall helt fylte måneder)
     val grad: Int,
     val aarligInntektVsaPensjon: IngressPensjonsavtaleInntektV2?
 )

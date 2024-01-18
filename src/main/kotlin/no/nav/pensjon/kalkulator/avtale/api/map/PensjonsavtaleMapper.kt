@@ -48,7 +48,7 @@ object PensjonsavtaleMapper {
 
     private fun uttaksperiodeSpec(dto: IngressPensjonsavtaleUttaksperiodeV2) =
         UttaksperiodeSpec(
-            startAlder = dto.startAlder,
+            startAlder = alder(dto.startAlder),
             grad = Uttaksgrad.from(dto.grad),
             aarligInntekt = dto.aarligInntektVsaPensjon?.let(::inntektSpec)
         )

@@ -52,7 +52,7 @@ object NorskPensjonPensjonsavtaleMapper {
         val heltUttakPeriode = perioder.firstOrNull { it.grad == Uttaksgrad.HUNDRE_PROSENT } ?: return 0
 
         return heltUttakPeriode.aarligInntekt?.tomAlder
-            ?.let { it.aar - heltUttakPeriode.startAlder.aar }
+            ?.let { (it.aar - heltUttakPeriode.startAlder.aar).coerceAtMost(ANTALL_AAR_REPRESENTING_LIVSVARIG) }
             ?: ANTALL_AAR_REPRESENTING_LIVSVARIG
     }
 

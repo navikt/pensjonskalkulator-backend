@@ -1,10 +1,15 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.v3.map
 
 import io.kotest.matchers.shouldBe
+import no.nav.pensjon.kalkulator.avtale.InntektSpec
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
+import no.nav.pensjon.kalkulator.avtale.UttaksperiodeSpec
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.*
+import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtalerV3
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class NorskPensjonPensjonsavtaleMapperTest {
@@ -25,6 +30,37 @@ class NorskPensjonPensjonsavtaleMapperTest {
         )
 
         NorskPensjonPensjonsavtaleMapper.toDto(domainObject, pid) shouldBe expectedDto
+    }
+
+    @Test
+    fun `toDto limits antallInntektsaarEtterUttak to 'livsvarig value' 14`() {
+        val antallInntektsaarEtterUttak = 20 // more than max. value of 14
+        val startAlderAar = 62
+        val domainObject = PensjonsavtaleSpec(
+            aarligInntektFoerUttak = 20_000,
+            uttaksperioder = listOf(
+                UttaksperiodeSpec(
+                    startAlder = Alder(startAlderAar, 0),
+                    grad = Uttaksgrad.FEMTI_PROSENT,
+                    aarligInntekt = InntektSpec(
+                        aarligBeloep = 10_000,
+                        tomAlder = Alder(aar = 66, maaneder = 11)
+                    )
+                ),
+                UttaksperiodeSpec(
+                    startAlder = Alder(67, 0),
+                    grad = Uttaksgrad.HUNDRE_PROSENT,
+                    aarligInntekt = InntektSpec(
+                        aarligBeloep = 5_000,
+                        tomAlder = Alder(aar = startAlderAar + antallInntektsaarEtterUttak, maaneder = 0)
+                    )
+                ),
+            )
+        )
+
+        val dto = NorskPensjonPensjonsavtaleMapper.toDto(domainObject, pid)
+
+        assertEquals(14, dto.antallInntektsaarEtterUttak) // max. is 14 (which represents 'livsvarig')
     }
 
     private companion object {
