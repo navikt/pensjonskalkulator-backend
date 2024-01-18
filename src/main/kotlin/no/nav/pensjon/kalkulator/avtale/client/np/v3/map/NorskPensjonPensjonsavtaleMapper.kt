@@ -51,7 +51,7 @@ object NorskPensjonPensjonsavtaleMapper {
     private fun antallInntektAarUnderHeltUttak(perioder: List<UttaksperiodeSpec>): Int {
         val heltUttakPeriode = perioder.firstOrNull { it.grad == Uttaksgrad.HUNDRE_PROSENT } ?: return 0
 
-        return heltUttakPeriode.aarligInntekt.tomAlder
+        return heltUttakPeriode.aarligInntekt?.tomAlder
             ?.let { it.aar - heltUttakPeriode.startAlder.aar }
             ?: ANTALL_AAR_REPRESENTING_LIVSVARIG
     }
@@ -60,7 +60,7 @@ object NorskPensjonPensjonsavtaleMapper {
         NorskPensjonUttaksperiodeSpecDto(
             startAlder = NorskPensjonAlderDto(spec.startAlder.aar, spec.startAlder.maaneder + STARTMAANED_FORSKYVNING),
             grad = spec.grad,
-            aarligInntekt = spec.aarligInntekt.aarligBeloep
+            aarligInntekt = spec.aarligInntekt?.aarligBeloep ?: 0
         )
 
     fun faultToString(fault: FaultDto) =
