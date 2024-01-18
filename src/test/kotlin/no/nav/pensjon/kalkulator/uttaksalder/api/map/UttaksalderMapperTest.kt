@@ -87,7 +87,7 @@ class UttaksalderMapperTest {
                 assertEquals(LocalDate.MIN, foedselDato)
             }
 
-            with(heltUttak) {
+            with(heltUttak!!) {
                 with(uttakFomAlder!!) {
                     assertEquals(70, aar)
                     assertEquals(2, maaneder)

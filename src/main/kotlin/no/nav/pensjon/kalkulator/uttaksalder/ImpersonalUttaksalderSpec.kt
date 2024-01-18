@@ -15,5 +15,5 @@ data class ImpersonalUttaksalderSpec(
     val harEps: Boolean? = null, // EPS = ektefelle/partner/samboer
     val aarligInntektFoerUttak: Int? = null,
     val gradertUttak: UttaksalderGradertUttak? = null,
-    val heltUttak: HeltUttak
+    val heltUttak: HeltUttak?
 )

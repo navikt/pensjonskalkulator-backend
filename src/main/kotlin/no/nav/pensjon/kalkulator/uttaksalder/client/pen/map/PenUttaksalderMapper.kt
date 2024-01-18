@@ -36,7 +36,7 @@ object PenUttaksalderMapper {
             uttaksgrad = impersonalSpec.gradertUttak?.let { PenUttaksgrad.fromInternalValue(it.grad).externalValue }, // deprecated - replaced by gradertUttak.grad
             heltUttakDato = heltUttakDato(impersonalSpec), // deprecated - replaced by heltUttak.uttakFomAlder
             gradertUttak = impersonalSpec.gradertUttak?.let(::gradertUttakSpecDto),
-            heltUttak = impersonalSpec.heltUttak.inntekt?.let { heltUttakSpecDto(impersonalSpec.heltUttak) }
+            heltUttak = impersonalSpec.heltUttak?.inntekt?.let { heltUttakSpecDto(impersonalSpec.heltUttak) }
         )
 
     private fun gradertUttakSpecDto(uttak: UttaksalderGradertUttak) =
@@ -51,7 +51,7 @@ object PenUttaksalderMapper {
             toDate(
                 uttakDato(
                     foedselDato = it.foedselDato,
-                    uttakAlder = spec.heltUttak.uttakFomAlder!! // mandatory in context of gradert uttak
+                    uttakAlder = spec.heltUttak!!.uttakFomAlder!! // mandatory in context of gradert uttak
                 )
             )
         }

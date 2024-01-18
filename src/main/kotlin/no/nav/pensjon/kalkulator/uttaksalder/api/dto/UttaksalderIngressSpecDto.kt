@@ -9,7 +9,7 @@ data class IngressUttaksalderSpecForHeltUttakV1(
     val sivilstand: Sivilstand?,
     val harEps: Boolean?,
     val aarligInntekt: Int?, // før helt uttak
-    val aarligInntektVsaPensjon: IngressUttaksalderInntektV1
+    val aarligInntektVsaPensjon: IngressUttaksalderInntektV1?
 )
 
 data class IngressUttaksalderSpecForGradertUttakV1(

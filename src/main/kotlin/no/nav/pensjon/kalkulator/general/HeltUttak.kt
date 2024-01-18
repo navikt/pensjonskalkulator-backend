@@ -6,8 +6,14 @@ package no.nav.pensjon.kalkulator.general
  */
 data class HeltUttak(
     val uttakFomAlder: Alder?, // fom = 'fra og med'; optional since not known in context of 'finn første mulige uttaksalder ved helt uttak'
-    val inntekt: Inntekt?
-)
+    val inntekt: Inntekt? // optional since bruker may not have 'inntekt under helt uttak'
+) {
+    init {
+        // Values may be null in different contexts, but not at the same time
+        // (in that case the entire object should be null instead)
+        require(uttakFomAlder != null || inntekt != null) { "uttakFomAlder and inntekt cannot both be null" }
+    }
+}
 
 data class Inntekt(
     val aarligBeloep: Int,

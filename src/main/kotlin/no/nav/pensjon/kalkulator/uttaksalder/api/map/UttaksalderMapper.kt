@@ -19,7 +19,7 @@ object UttaksalderMapper {
             aarligInntektFoerUttak = spec.aarligInntekt,
             simuleringType = spec.simuleringstype ?: SimuleringType.ALDERSPENSJON,
             gradertUttak = null,
-            heltUttak = heltUttakV1(spec.aarligInntektVsaPensjon)
+            heltUttak = spec.aarligInntektVsaPensjon?.let(::heltUttakV1)
         )
 
     fun fromIngressSpecForGradertUttakV1(spec: IngressUttaksalderSpecForGradertUttakV1) =
