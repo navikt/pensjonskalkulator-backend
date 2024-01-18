@@ -122,7 +122,7 @@ class SimuleringControllerTest {
                "uttaksalder": { "aar": 67, "maaneder": 1 },
                "aarligInntektVsaPensjon": {
                   "beloep": 50000,
-                  "sluttalder": { "aar": 75, "maaneder": 0 } }
+                  "sluttAlder": { "aar": 75, "maaneder": 0 } }
             }
         }""".trimIndent()
 
@@ -142,7 +142,7 @@ class SimuleringControllerTest {
                "uttaksalder": { "aar": 67, "maaneder": 1 },
                "aarligInntektVsaPensjon": {
                    "beloep": 50000,
-                   "sluttalder": { "aar": 75, "maaneder": 0 } }
+                   "sluttAlder": { "aar": 75, "maaneder": 0 } }
             }
         }""".trimIndent()
 

@@ -27,23 +27,23 @@ object PenSimuleringMapper {
             harEps = impersonalSpec.epsHarInntektOver2G,
             sisteInntekt = personalSpec.forventetInntekt,
             uttaksar = 1,
-            gradertUttak = impersonalSpec.gradertUttak?.let(::toGradertUttakDto),
-            heltUttak = toHeltUttakDto(impersonalSpec.heltUttak)
+            gradertUttak = impersonalSpec.gradertUttak?.let(::gradertUttakSpecDto),
+            heltUttak = heltUttakSpecDto(impersonalSpec.heltUttak)
         )
 
-    private fun toGradertUttakDto(uttak: GradertUttak) =
+    private fun gradertUttakSpecDto(uttak: GradertUttak) =
         GradertUttakSpecDto(
-            PenUttaksgrad.fromInternalValue(uttak.grad).externalValue,
-            toAlderDto(uttak.uttakFomAlder),
-            uttak.aarligInntekt
+            grad = PenUttaksgrad.fromInternalValue(uttak.grad).externalValue,
+            uttakFomAlder = alderSpecDto(uttak.uttakFomAlder),
+            aarligInntekt = uttak.aarligInntekt
         )
 
-    private fun toHeltUttakDto(uttak: HeltUttak) =
+    private fun heltUttakSpecDto(uttak: HeltUttak) =
         HeltUttakSpecDto(
-            toAlderDto(uttak.uttakFomAlder),
-            uttak.inntekt?.aarligBeloep ?: 0,
-            uttak.inntekt?.let { toAlderDto(it.tomAlder) } ?: toAlderDto(uttak.uttakFomAlder)
+            uttakFomAlder = alderSpecDto(uttak.uttakFomAlder!!), // mandatory in context of simulering
+            aarligInntekt = uttak.inntekt?.aarligBeloep ?: 0,
+            inntektTomAlder = uttak.inntekt?.let { alderSpecDto(it.tomAlder) } ?: alderSpecDto(uttak.uttakFomAlder)
         )
 
-    private fun toAlderDto(alder: Alder) = AlderSpecDto(alder.aar, alder.maaneder)
+    private fun alderSpecDto(alder: Alder) = AlderSpecDto(alder.aar, alder.maaneder)
 }

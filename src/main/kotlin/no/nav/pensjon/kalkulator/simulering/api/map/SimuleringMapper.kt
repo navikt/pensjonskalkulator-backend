@@ -62,6 +62,6 @@ object SimuleringMapper {
     private fun inntekt(dto: SimuleringInntektDtoV2) =
         Inntekt(
             aarligBeloep = dto.beloep,
-            tomAlder = dto.sluttalder?.let(::alder) ?: defaultInntektTomAlder
+            tomAlder = dto.sluttAlder?.let(::alder) ?: defaultInntektTomAlder
         )
 }

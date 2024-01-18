@@ -64,7 +64,7 @@ class SimuleringMapperTest {
                     uttaksalder = SimuleringAlderDto(70, 4),
                     aarligInntektVsaPensjon = SimuleringInntektDtoV2(
                         beloep = 1_000,
-                        sluttalder = SimuleringAlderDto(aar = 75, maaneder = 0)
+                        sluttAlder = SimuleringAlderDto(aar = 75, maaneder = 0)
                     ),
                 )
             )
@@ -92,7 +92,7 @@ class SimuleringMapperTest {
             }
 
             with(heltUttak) {
-                with(uttakFomAlder) {
+                with(uttakFomAlder!!) {
                     assertEquals(70, aar)
                     assertEquals(4, maaneder)
                 }

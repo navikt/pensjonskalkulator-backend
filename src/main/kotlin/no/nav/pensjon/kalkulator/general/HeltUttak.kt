@@ -5,7 +5,7 @@ package no.nav.pensjon.kalkulator.general
  * Dette er en livsvarig ytelse (dermed ingen sluttdato for uttak).
  */
 data class HeltUttak(
-    val uttakFomAlder: Alder,
+    val uttakFomAlder: Alder?, // fom = 'fra og med'; optional since not known in context of 'finn første mulige uttaksalder ved helt uttak'
     val inntekt: Inntekt?
 )
 

@@ -56,7 +56,7 @@ object PensjonsavtaleMapper {
     private fun inntektSpec(dto: AvtaleInntektDtoV2) =
         InntektSpec(
             aarligBeloep = dto.beloep,
-            tomAlder = dto.sluttalder?.let(::alder) ?: alderRepresentingLivsvarig
+            tomAlder = dto.sluttAlder?.let(::alder) ?: alderRepresentingLivsvarig
         )
 
     private fun alder(dto: AvtaleAlderDtoV2) = Alder(dto.aar, dto.maaneder)

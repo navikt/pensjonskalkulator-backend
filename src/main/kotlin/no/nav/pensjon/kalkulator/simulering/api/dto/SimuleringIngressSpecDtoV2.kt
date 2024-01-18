@@ -30,11 +30,11 @@ data class SimuleringHeltUttakIngressDtoV2(
 
 data class SimuleringInntektDtoV2(
     val beloep: Int,
-    val sluttalder: SimuleringAlderDto? = null
+    val sluttAlder: SimuleringAlderDto? = null
 ) {
     init {
-        require(if (beloep != 0) sluttalder != null else true) {
-            "sluttalder is mandatory for non-zero beloep"
+        require(if (beloep != 0) sluttAlder != null else true) {
+            "sluttAlder is mandatory for non-zero beloep"
         }
     }
 }

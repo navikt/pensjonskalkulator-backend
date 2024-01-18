@@ -11,11 +11,11 @@ class SimuleringIngressSpecDtoTest {
         val exception = assertThrows(IllegalArgumentException::class.java) {
             SimuleringHeltUttakIngressDtoV2(
                 uttaksalder = SimuleringAlderDto(aar = 70, maaneder = 0),
-                aarligInntektVsaPensjon = SimuleringInntektDtoV2(beloep = 1_000, sluttalder = null)
+                aarligInntektVsaPensjon = SimuleringInntektDtoV2(beloep = 1_000, sluttAlder = null)
             )
         }
 
-        assertEquals("sluttalder is mandatory for non-zero beloep", exception.message)
+        assertEquals("sluttAlder is mandatory for non-zero beloep", exception.message)
     }
 
     @Test

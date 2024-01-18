@@ -40,7 +40,7 @@ data class UttaksperiodeIngressSpecDtoV2(
 
 data class AvtaleInntektDtoV2(
     val beloep: Int,
-    val sluttalder: AvtaleAlderDtoV2? = null
+    val sluttAlder: AvtaleAlderDtoV2? = null
 )
 
 data class AvtaleAlderDtoV2(val aar: Int, val maaneder: Int)

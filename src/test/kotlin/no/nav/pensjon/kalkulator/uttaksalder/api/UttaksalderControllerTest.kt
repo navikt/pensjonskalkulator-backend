@@ -139,7 +139,7 @@ internal class UttaksalderControllerTest {
                 },
                 "aarligInntektVsaPensjon": {
                   "beloep": 1000,
-                  "sluttalder": {
+                  "sluttAlder": {
                     "aar": 70,
                     "maaneder": 11
                   }

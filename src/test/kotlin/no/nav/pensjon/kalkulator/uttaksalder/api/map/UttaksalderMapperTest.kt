@@ -68,7 +68,7 @@ class UttaksalderMapperTest {
                 uttaksalder = UttaksalderAlderDto(70, 2),
                 aarligInntektVsaPensjon = UttaksalderInntektDtoV2(
                     beloep = 456,
-                    sluttalder = UttaksalderAlderDto(72, 5)
+                    sluttAlder = UttaksalderAlderDto(72, 5)
                 )
             )
         )
@@ -88,7 +88,7 @@ class UttaksalderMapperTest {
             }
 
             with(heltUttak) {
-                with(uttakFomAlder) {
+                with(uttakFomAlder!!) {
                     assertEquals(70, aar)
                     assertEquals(2, maaneder)
                 }
