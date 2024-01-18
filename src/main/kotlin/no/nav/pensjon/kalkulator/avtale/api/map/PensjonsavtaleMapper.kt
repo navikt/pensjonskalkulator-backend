@@ -21,9 +21,9 @@ object PensjonsavtaleMapper {
             sivilstand = dto.sivilstand
         )
 
-    fun fromDtoV2(dto: PensjonsavtaleIngressSpecDtoV2) =
+    fun fromDtoV2(dto: IngressPensjonsavtaleSpecV2) =
         PensjonsavtaleSpec(
-            aarligInntektFoerUttak = dto.aarligInntektFoerUttak,
+            aarligInntektFoerUttak = dto.aarligInntektFoerUttakBeloep,
             uttaksperioder = dto.uttaksperioder.map(this::uttaksperiodeSpec),
             harEpsPensjon = dto.harEpsPensjon,
             harEpsPensjonsgivendeInntektOver2G = dto.harEpsPensjonsgivendeInntektOver2G,
@@ -46,20 +46,20 @@ object PensjonsavtaleMapper {
             // tomAlder not used in V1 (antallInntektsaarEtterUttak is used instead)
         )
 
-    private fun uttaksperiodeSpec(dto: UttaksperiodeIngressSpecDtoV2) =
+    private fun uttaksperiodeSpec(dto: IngressPensjonsavtaleUttaksperiodeV2) =
         UttaksperiodeSpec(
             startAlder = dto.startAlder,
             grad = Uttaksgrad.from(dto.grad),
             aarligInntekt = inntektSpec(dto.aarligInntektVsaPensjon)
         )
 
-    private fun inntektSpec(dto: AvtaleInntektDtoV2) =
+    private fun inntektSpec(dto: IngressPensjonsavtaleInntektV2) =
         InntektSpec(
             aarligBeloep = dto.beloep,
             tomAlder = dto.sluttAlder?.let(::alder) ?: alderRepresentingLivsvarig
         )
 
-    private fun alder(dto: AvtaleAlderDtoV2) = Alder(dto.aar, dto.maaneder)
+    private fun alder(dto: IngressPensjonsavtaleAlderV2) = Alder(dto.aar, dto.maaneder)
 
     private fun avtaleDto(source: Pensjonsavtale) =
         PensjonsavtaleDto(

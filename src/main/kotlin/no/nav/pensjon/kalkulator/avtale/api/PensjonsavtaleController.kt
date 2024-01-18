@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleService
 import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleIngressSpecDto
-import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleIngressSpecDtoV2
+import no.nav.pensjon.kalkulator.avtale.api.dto.IngressPensjonsavtaleSpecV2
 import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtalerDto
 import no.nav.pensjon.kalkulator.avtale.api.map.PensjonsavtaleMapper.fromDto
 import no.nav.pensjon.kalkulator.avtale.api.map.PensjonsavtaleMapper.fromDtoV2
@@ -81,7 +81,7 @@ class PensjonsavtaleController(
             ),
         ]
     )
-    fun fetchAvtalerV2(@RequestBody spec: PensjonsavtaleIngressSpecDtoV2): PensjonsavtalerDto {
+    fun fetchAvtalerV2(@RequestBody spec: IngressPensjonsavtaleSpecV2): PensjonsavtalerDto {
         traceAid.begin()
         val version = "V2"
         log.debug { "Request for pensjonsavtaler $version: $spec" }

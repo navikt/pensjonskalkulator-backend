@@ -8,7 +8,7 @@ import java.time.LocalDate
 data class SimuleringSpecDto(
     val simuleringstype: SimuleringType,
     val uttaksgrad: Int,
-    val foersteUttaksalder: SimuleringAlderDto,
+    val foersteUttaksalder: IngressSimuleringAlderV2,
     val foedselsdato: LocalDate,
     val epsHarInntektOver2G: Boolean,
     val forventetInntekt: Int?,

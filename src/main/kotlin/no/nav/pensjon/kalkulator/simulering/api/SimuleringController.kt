@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.simulering.SimuleringService
-import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringIngressSpecDtoV2
+import no.nav.pensjon.kalkulator.simulering.api.dto.IngressSimuleringSpecV2
 import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringSpecDto
 import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringsresultatDto
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.fromIngressSpecDtoV2
@@ -82,7 +82,7 @@ class SimuleringController(
             ),
         ]
     )
-    fun simulerAlderspensjonV2(@RequestBody spec: SimuleringIngressSpecDtoV2): SimuleringsresultatDto {
+    fun simulerAlderspensjonV2(@RequestBody spec: IngressSimuleringSpecV2): SimuleringsresultatDto {
         traceAid.begin()
         log.debug { "Request for simulering: $spec" }
 

@@ -22,9 +22,9 @@ data class UttaksperiodeIngressSpecDto(
     val aarligInntekt: Int
 )
 
-data class PensjonsavtaleIngressSpecDtoV2(
-    val aarligInntektFoerUttak: Int,
-    val uttaksperioder: List<UttaksperiodeIngressSpecDtoV2>,
+data class IngressPensjonsavtaleSpecV2(
+    val aarligInntektFoerUttakBeloep: Int,
+    val uttaksperioder: List<IngressPensjonsavtaleUttaksperiodeV2>,
     val harAfp: Boolean? = false,
     val harEpsPensjon: Boolean? = null,
     val harEpsPensjonsgivendeInntektOver2G: Boolean? = null,
@@ -32,15 +32,15 @@ data class PensjonsavtaleIngressSpecDtoV2(
     val sivilstand: Sivilstand? = null
 )
 
-data class UttaksperiodeIngressSpecDtoV2(
+data class IngressPensjonsavtaleUttaksperiodeV2(
     val startAlder: Alder, // månedsverdi 0..11 (antall helt fylte måneder)
     val grad: Int,
-    val aarligInntektVsaPensjon: AvtaleInntektDtoV2
+    val aarligInntektVsaPensjon: IngressPensjonsavtaleInntektV2
 )
 
-data class AvtaleInntektDtoV2(
+data class IngressPensjonsavtaleInntektV2(
     val beloep: Int,
-    val sluttAlder: AvtaleAlderDtoV2? = null
+    val sluttAlder: IngressPensjonsavtaleAlderV2? = null
 )
 
-data class AvtaleAlderDtoV2(val aar: Int, val maaneder: Int)
+data class IngressPensjonsavtaleAlderV2(val aar: Int, val maaneder: Int)

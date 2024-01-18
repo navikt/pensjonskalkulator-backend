@@ -7,30 +7,30 @@ import java.time.LocalDate
 /**
  * Incoming (ingress) data transfer object (DTO) containing specification for 'simulering av alderspensjon'.
  */
-data class SimuleringIngressSpecDtoV2(
+data class IngressSimuleringSpecV2(
     val simuleringstype: SimuleringType,
     val foedselsdato: LocalDate,
     val epsHarInntektOver2G: Boolean,
-    val forventetInntekt: Int?,
+    val aarligInntektFoerUttakBeloep: Int?,
     val sivilstand: Sivilstand?,
-    val gradertUttak: SimuleringGradertUttakIngressDtoV2? = null, // default is helt uttak (100 %)
-    val heltUttak: SimuleringHeltUttakIngressDtoV2
+    val gradertUttak: IngressSimuleringGradertUttakV2? = null, // default is helt uttak (100 %)
+    val heltUttak: IngressSimuleringHeltUttakV2
 )
 
-data class SimuleringGradertUttakIngressDtoV2(
+data class IngressSimuleringGradertUttakV2(
     val grad: Int,
-    val uttaksalder: SimuleringAlderDto,
-    val aarligInntekt: Int?
+    val uttaksalder: IngressSimuleringAlderV2,
+    val aarligInntektVsaPensjonBeloep: Int?
 )
 
-data class SimuleringHeltUttakIngressDtoV2(
-    val uttaksalder: SimuleringAlderDto,
-    val aarligInntektVsaPensjon: SimuleringInntektDtoV2
+data class IngressSimuleringHeltUttakV2(
+    val uttaksalder: IngressSimuleringAlderV2,
+    val aarligInntektVsaPensjon: IngressSimuleringInntektV2
 )
 
-data class SimuleringInntektDtoV2(
+data class IngressSimuleringInntektV2(
     val beloep: Int,
-    val sluttAlder: SimuleringAlderDto? = null
+    val sluttAlder: IngressSimuleringAlderV2? = null
 ) {
     init {
         require(if (beloep != 0) sluttAlder != null else true) {
@@ -39,7 +39,7 @@ data class SimuleringInntektDtoV2(
     }
 }
 
-data class SimuleringAlderDto(val aar: Int, val maaneder: Int) {
+data class IngressSimuleringAlderV2(val aar: Int, val maaneder: Int) {
     init {
         require(aar in 0..200) { "0 <= aar <= 200" }
         require(maaneder in 0..11) { "0 <= maaneder <= 11" }

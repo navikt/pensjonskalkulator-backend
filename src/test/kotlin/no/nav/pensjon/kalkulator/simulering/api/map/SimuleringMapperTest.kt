@@ -49,22 +49,22 @@ class SimuleringMapperTest {
     @Test
     fun `fromIngressSpecDto maps data transfer object to domain object`() {
         val spec: ImpersonalSimuleringSpec = SimuleringMapper.fromIngressSpecDtoV2(
-            SimuleringIngressSpecDtoV2(
+            IngressSimuleringSpecV2(
                 simuleringstype = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
                 foedselsdato = LocalDate.of(1969, 3, 2),
                 epsHarInntektOver2G = true,
-                forventetInntekt = 123_000,
+                aarligInntektFoerUttakBeloep = 123_000,
                 sivilstand = Sivilstand.REGISTRERT_PARTNER,
-                gradertUttak = SimuleringGradertUttakIngressDtoV2(
+                gradertUttak = IngressSimuleringGradertUttakV2(
                     grad = 40,
-                    uttaksalder = SimuleringAlderDto(aar = 68, maaneder = 2),
-                    aarligInntekt = 234_000
+                    uttaksalder = IngressSimuleringAlderV2(aar = 68, maaneder = 2),
+                    aarligInntektVsaPensjonBeloep = 234_000
                 ),
-                heltUttak = SimuleringHeltUttakIngressDtoV2(
-                    uttaksalder = SimuleringAlderDto(70, 4),
-                    aarligInntektVsaPensjon = SimuleringInntektDtoV2(
+                heltUttak = IngressSimuleringHeltUttakV2(
+                    uttaksalder = IngressSimuleringAlderV2(70, 4),
+                    aarligInntektVsaPensjon = IngressSimuleringInntektV2(
                         beloep = 1_000,
-                        sluttAlder = SimuleringAlderDto(aar = 75, maaneder = 0)
+                        sluttAlder = IngressSimuleringAlderV2(aar = 75, maaneder = 0)
                     ),
                 )
             )

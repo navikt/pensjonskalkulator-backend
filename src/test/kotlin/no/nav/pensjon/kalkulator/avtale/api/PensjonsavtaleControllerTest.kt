@@ -106,7 +106,7 @@ class PensjonsavtaleControllerTest {
 
         @Language("json")
         private val REQUEST_BODY_V2 = """{
-	"aarligInntektFoerUttak": 456000,
+	"aarligInntektFoerUttakBeloep": 456000,
 	"uttaksperioder": [{
         "startAlder": {
 	  	    "aar": 67,

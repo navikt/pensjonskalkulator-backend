@@ -116,7 +116,7 @@ class SimuleringControllerTest {
             "simuleringstype": "$simuleringType",
             "foedselsdato": "1963-12-31",
             "epsHarInntektOver2G": false,
-            "forventetInntekt": 100000,
+            "aarligInntektFoerUttakBeloep": 100000,
             "sivilstand": "UGIFT",
             "heltUttak": {
                "uttaksalder": { "aar": 67, "maaneder": 1 },
@@ -131,12 +131,12 @@ class SimuleringControllerTest {
             "simuleringstype": "ALDERSPENSJON",
             "foedselsdato": "1963-12-31",
             "epsHarInntektOver2G": true,
-            "forventetInntekt": 100000,
+            "aarligInntektFoerUttakBeloep": 100000,
             "sivilstand": "SAMBOER",
             "gradertUttak": {
                "grad": 40,
                "uttaksalder": { "aar": 62, "maaneder": 9 },
-               "aarligInntekt": 75000
+               "aarligInntektVsaPensjonBeloep": 75000
             },
             "heltUttak": {
                "uttaksalder": { "aar": 67, "maaneder": 1 },

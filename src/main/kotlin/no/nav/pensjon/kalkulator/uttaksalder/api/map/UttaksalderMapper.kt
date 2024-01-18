@@ -16,7 +16,7 @@ object UttaksalderMapper {
         ImpersonalUttaksalderSpec(
             sivilstand = spec.sivilstand,
             harEps = spec.harEps,
-            aarligInntektFoerUttak = spec.aarligInntekt,
+            aarligInntektFoerUttak = spec.aarligInntektFoerUttakBeloep,
             simuleringType = spec.simuleringstype ?: SimuleringType.ALDERSPENSJON,
             gradertUttak = null,
             heltUttak = spec.aarligInntektVsaPensjon?.let(::heltUttakV1)
@@ -26,12 +26,12 @@ object UttaksalderMapper {
         ImpersonalUttaksalderSpec(
             sivilstand = spec.sivilstand,
             harEps = spec.harEps,
-            aarligInntektFoerUttak = spec.aarligInntekt,
+            aarligInntektFoerUttak = spec.aarligInntektFoerUttakBeloep,
             simuleringType = spec.simuleringstype ?: SimuleringType.ALDERSPENSJON,
             gradertUttak = gradertUttakV1(spec.gradertUttak),
             heltUttak = HeltUttak(
                 uttakFomAlder = alder(spec.heltUttak.uttaksalder),
-                inntekt = Inntekt(aarligBeloep = spec.aarligInntekt ?: 0, tomAlder = defaultTomAlder)
+                inntekt = Inntekt(aarligBeloep = spec.aarligInntektFoerUttakBeloep ?: 0, tomAlder = defaultTomAlder)
             )
         )
 
@@ -47,7 +47,7 @@ object UttaksalderMapper {
     private fun gradertUttakV1(dto: IngressUttaksalderGradertUttakV1) =
         UttaksalderGradertUttak(
             grad = Uttaksgrad.from(dto.grad),
-            aarligInntekt = dto.aarligInntekt ?: 0,
+            aarligInntekt = dto.aarligInntektVsaPensjonBeloep ?: 0,
             foedselDato = LocalDate.MIN // deprecated; irrelevant here
         )
 
@@ -95,6 +95,8 @@ object UttaksalderMapper {
         dto.sluttAlder?.let { Inntekt(dto.beloep, alder(it)) }
 
     private fun alder(dto: UttaksalderAlderDto) = Alder(dto.aar, dto.maaneder)
+
+    private fun alder(dto: IngressUttaksalderAlderV1) = Alder(dto.aar, dto.maaneder)
 
     private fun alderDto(alder: Alder) = AlderDto(alder.aar, alder.maaneder)
 }
