@@ -47,8 +47,8 @@ class SimuleringMapperTest {
     }
 
     @Test
-    fun `fromIngressSpecDto maps data transfer object to domain object`() {
-        val spec: ImpersonalSimuleringSpec = SimuleringMapper.fromIngressSpecDtoV2(
+    fun `fromIngressSimuleringSpecV2 maps data transfer object to domain object`() {
+        val spec: ImpersonalSimuleringSpec = SimuleringMapper.fromIngressSimuleringSpecV2(
             IngressSimuleringSpecV2(
                 simuleringstype = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
                 foedselsdato = LocalDate.of(1969, 3, 2),

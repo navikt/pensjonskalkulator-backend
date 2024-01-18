@@ -11,8 +11,6 @@ import no.nav.pensjon.kalkulator.simulering.api.dto.*
  */
 object SimuleringMapper {
 
-    private val defaultInntektTomAlder = Alder(99, 11)
-
     fun resultatDto(resultat: Simuleringsresultat) =
         SimuleringsresultatDto(
             alderspensjon = resultat.alderspensjon.map { PensjonsberegningDto(it.alder, it.beloep) },
@@ -34,7 +32,7 @@ object SimuleringMapper {
             )
         )
 
-    fun fromIngressSpecDtoV2(spec: IngressSimuleringSpecV2) =
+    fun fromIngressSimuleringSpecV2(spec: IngressSimuleringSpecV2) =
         ImpersonalSimuleringSpec(
             simuleringType = spec.simuleringstype,
             epsHarInntektOver2G = spec.epsHarInntektOver2G,
@@ -56,12 +54,12 @@ object SimuleringMapper {
     private fun heltUttak(dto: IngressSimuleringHeltUttakV2) =
         HeltUttak(
             uttakFomAlder = alder(dto.uttaksalder),
-            inntekt = inntekt(dto.aarligInntektVsaPensjon)
+            inntekt = dto.aarligInntektVsaPensjon?.let(::inntekt)
         )
 
     private fun inntekt(dto: IngressSimuleringInntektV2) =
         Inntekt(
             aarligBeloep = dto.beloep,
-            tomAlder = dto.sluttAlder?.let(::alder) ?: defaultInntektTomAlder
+            tomAlder = dto.sluttAlder.let(::alder)
         )
 }

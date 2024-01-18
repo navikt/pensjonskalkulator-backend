@@ -7,18 +7,6 @@ import org.junit.jupiter.api.Test
 class IngressSimuleringSpecV2Test {
 
     @Test
-    fun `IngressSimuleringHeltUttakV2 requires defined 'til-og-med-alder' if non-zero inntekt`() {
-        val exception = assertThrows(IllegalArgumentException::class.java) {
-            IngressSimuleringHeltUttakV2(
-                uttaksalder = IngressSimuleringAlderV2(aar = 70, maaneder = 0),
-                aarligInntektVsaPensjon = IngressSimuleringInntektV2(beloep = 1_000, sluttAlder = null)
-            )
-        }
-
-        assertEquals("sluttAlder is mandatory for non-zero beloep", exception.message)
-    }
-
-    @Test
     fun `IngressSimuleringAlderV2 requires non-zero 'aar' value`() {
         val exception = assertThrows(IllegalArgumentException::class.java) {
             IngressSimuleringAlderV2(aar = -1, maaneder = 11)

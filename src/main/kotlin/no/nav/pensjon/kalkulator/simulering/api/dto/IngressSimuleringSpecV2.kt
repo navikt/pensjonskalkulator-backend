@@ -25,19 +25,13 @@ data class IngressSimuleringGradertUttakV2(
 
 data class IngressSimuleringHeltUttakV2(
     val uttaksalder: IngressSimuleringAlderV2,
-    val aarligInntektVsaPensjon: IngressSimuleringInntektV2
+    val aarligInntektVsaPensjon: IngressSimuleringInntektV2?
 )
 
 data class IngressSimuleringInntektV2(
     val beloep: Int,
-    val sluttAlder: IngressSimuleringAlderV2? = null
-) {
-    init {
-        require(if (beloep != 0) sluttAlder != null else true) {
-            "sluttAlder is mandatory for non-zero beloep"
-        }
-    }
-}
+    val sluttAlder: IngressSimuleringAlderV2
+)
 
 data class IngressSimuleringAlderV2(val aar: Int, val maaneder: Int) {
     init {
