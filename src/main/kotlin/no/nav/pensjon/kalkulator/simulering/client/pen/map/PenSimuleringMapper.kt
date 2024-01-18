@@ -2,10 +2,11 @@ package no.nav.pensjon.kalkulator.simulering.client.pen.map
 
 import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
 import no.nav.pensjon.kalkulator.common.client.pen.PenUttaksgrad
+import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.GradertUttak
+import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.simulering.*
-import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringEgressSpecDto
-import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringResponseDto
-import no.nav.pensjon.kalkulator.tech.time.DateUtil.toDate
+import no.nav.pensjon.kalkulator.simulering.client.pen.dto.*
 
 object PenSimuleringMapper {
 
@@ -26,9 +27,23 @@ object PenSimuleringMapper {
             harEps = impersonalSpec.epsHarInntektOver2G,
             sisteInntekt = personalSpec.forventetInntekt,
             uttaksar = 1,
-            forsteUttaksdato = toDate(impersonalSpec.foersteUttakDato),
-            uttaksgrad = impersonalSpec.gradertUttak?.let { PenUttaksgrad.fromInternalValue(it.grad).externalValue },
-            inntektUnderGradertUttak = impersonalSpec.gradertUttak?.aarligInntekt,
-            heltUttakDato = toDate(impersonalSpec.heltUttak.uttakFomDato)
+            gradertUttak = impersonalSpec.gradertUttak?.let(::gradertUttakSpecDto),
+            heltUttak = heltUttakSpecDto(impersonalSpec.heltUttak)
         )
+
+    private fun gradertUttakSpecDto(uttak: GradertUttak) =
+        GradertUttakSpecDto(
+            grad = PenUttaksgrad.fromInternalValue(uttak.grad).externalValue,
+            uttakFomAlder = alderSpecDto(uttak.uttakFomAlder),
+            aarligInntekt = uttak.aarligInntekt
+        )
+
+    private fun heltUttakSpecDto(uttak: HeltUttak) =
+        HeltUttakSpecDto(
+            uttakFomAlder = alderSpecDto(uttak.uttakFomAlder!!), // mandatory in context of simulering
+            aarligInntekt = uttak.inntekt?.aarligBeloep ?: 0,
+            inntektTomAlder = uttak.inntekt?.let { alderSpecDto(it.tomAlder) } ?: alderSpecDto(uttak.uttakFomAlder)
+        )
+
+    private fun alderSpecDto(alder: Alder) = AlderSpecDto(alder.aar, alder.maaneder)
 }

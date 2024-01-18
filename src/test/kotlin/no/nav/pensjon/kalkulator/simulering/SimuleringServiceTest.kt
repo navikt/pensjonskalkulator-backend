@@ -18,7 +18,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import java.time.LocalDate
 
 @ExtendWith(SpringExtension::class)
 class SimuleringServiceTest {
@@ -71,7 +70,6 @@ class SimuleringServiceTest {
     private companion object {
         private const val REGISTRERT_INNTEKT = 543210
         private const val PENSJONSBELOEP = 123456
-        private val foedselDato = LocalDate.of(1963, 12, 31)
         private val inntekt =
             Inntekt(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, 2023, REGISTRERT_INNTEKT.toBigDecimal())
         private val personalSpec = PersonalSimuleringSpec(pid, REGISTRERT_INNTEKT, Sivilstand.UOPPGITT)
@@ -90,8 +88,7 @@ class SimuleringServiceTest {
                 forventetAarligInntektFoerUttak = forventetInntekt,
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(67, 1),
-                    inntekt = null,
-                    foedselDato = foedselDato
+                    inntekt = null
                 )
             )
     }

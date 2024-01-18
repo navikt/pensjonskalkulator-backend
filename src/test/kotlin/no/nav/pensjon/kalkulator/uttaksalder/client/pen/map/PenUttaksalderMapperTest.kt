@@ -1,20 +1,16 @@
 package no.nav.pensjon.kalkulator.uttaksalder.client.pen.map
 
-import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.general.GradertUttak
-import no.nav.pensjon.kalkulator.general.Uttaksgrad
-import no.nav.pensjon.kalkulator.mock.DateFactory
+import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.PersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderDto
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import java.time.LocalDate
-import java.util.Calendar
 
 class PenUttaksalderMapperTest {
 
@@ -25,12 +21,12 @@ class PenUttaksalderMapperTest {
             sivilstand = Sivilstand.UGIFT,
             harEps = false,
             aarligInntektFoerUttak = 1,
-            gradertUttak = GradertUttak(
+            gradertUttak = UttaksalderGradertUttak(
                 grad = Uttaksgrad.SEKSTI_PROSENT,
-                uttakFomAlder = Alder(67, 0),
                 aarligInntekt = 10_000,
                 foedselDato = LocalDate.of(1965, 2, 1)
-            )
+            ),
+            heltUttak = HeltUttak(Alder(67, 0), Inntekt(5_000, Alder(70, 11)))
         )
         val personalSpec = PersonalUttaksalderSpec(
             pid = pid,
@@ -47,9 +43,27 @@ class PenUttaksalderMapperTest {
             assertFalse(harEps)
             assertEquals(1, sisteInntekt)
             assertEquals("ALDER_M_AFP_PRIVAT", simuleringType)
-            assertEquals("P_60", uttaksgrad)
-            assertEquals(10_000, inntektUnderGradertUttak)
-            assertEquals(DateFactory.date(2032, Calendar.MARCH), heltUttakDato)
+
+            with(dto.gradertUttak!!) {
+                assertEquals("P_60", grad)
+                assertEquals(10_000, aarligInntekt)
+            }
+
+            with(dto.heltUttak!!) {
+                with(uttakFomAlder!!) {
+                    assertEquals(67, aar)
+                    assertEquals(0, maaneder)
+                }
+
+                with(inntekt!!) {
+                    assertEquals(5_000, aarligBelop)
+
+                    with(tomAlder) {
+                        assertEquals(70, aar)
+                        assertEquals(11, maaneder)
+                    }
+                }
+            }
         }
     }
 

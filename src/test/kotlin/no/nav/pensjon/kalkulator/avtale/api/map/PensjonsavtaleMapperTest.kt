@@ -32,8 +32,8 @@ class PensjonsavtaleMapperTest {
         private fun pensjonsavtaleSpec() =
             PensjonsavtaleSpec(
                 aarligInntektFoerUttak = 1,
+                antallInntektsaarEtterUttak = 2,
                 uttaksperioder = emptyList(),
-                antallInntektsaarEtterUttak = 2
             )
 
         private fun pensjonsavtalerDto() =

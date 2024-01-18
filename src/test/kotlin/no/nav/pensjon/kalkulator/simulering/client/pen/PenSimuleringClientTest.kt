@@ -22,7 +22,6 @@ import org.springframework.test.context.TestPropertySource
 import org.springframework.web.reactive.function.client.WebClient
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
-import java.time.LocalDate
 
 @SpringBootTest
 @TestPropertySource("classpath:application-test.properties")
@@ -77,8 +76,6 @@ class PenSimuleringClientTest : WebClientTest() {
 
     private companion object {
 
-        // forsteUttaksdato: 1963/1 + 64/2 + 0/1 = 2027/4 => 2027-04-01 00:00:00 UTC+2 => epoch 1806530400000
-        // heltUttakDato:    1963/1 + 67/1 + 0/1 = 2030/3 => 2030-03-01 00:00:00 UTC+2 => epoch 1898550000000
         @Language("json")
         private const val EXPECTED_GRADERT_UTTAK_REQUEST_BODY = """{
   "simuleringstype" : "ALDER",
@@ -87,10 +84,25 @@ class PenSimuleringClientTest : WebClientTest() {
   "harEps" : true,
   "sisteInntekt" : 123000,
   "uttaksar" : 1,
-  "forsteUttaksdato" : 1806530400000,
-  "uttaksgrad" : "P_50",
-  "inntektUnderGradertUttak" : 12000,
-  "heltUttakDato" : 1898550000000
+  "gradertUttak" : {
+    "grad" : "P_50",
+    "uttakFomAlder" : {
+      "aar" : 64,
+      "maaneder" : 2
+    },
+    "aarligInntekt" : 12000
+  },
+  "heltUttak" : {
+    "uttakFomAlder" : {
+      "aar" : 67,
+      "maaneder" : 1
+    },
+    "aarligInntekt" : 0,
+    "inntektTomAlder" : {
+      "aar" : 67,
+      "maaneder" : 1
+    }
+  }
 }"""
 
         @Language("json")
@@ -112,15 +124,12 @@ class PenSimuleringClientTest : WebClientTest() {
                 forventetAarligInntektFoerUttak = null,
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(67, 1),
-                    inntekt = null,
-                    foedselDato = LocalDate.of(1963, 1, 1)
+                    inntekt = null
                 )
             )
 
-        private fun impersonalGradertUttakSpec(): ImpersonalSimuleringSpec {
-            val foedselDato = LocalDate.of(1963, 1, 1)
-
-            return ImpersonalSimuleringSpec(
+        private fun impersonalGradertUttakSpec() =
+            ImpersonalSimuleringSpec(
                 simuleringType = SimuleringType.ALDERSPENSJON,
                 sivilstand = null,
                 epsHarInntektOver2G = true,
@@ -128,16 +137,13 @@ class PenSimuleringClientTest : WebClientTest() {
                 gradertUttak = GradertUttak(
                     grad = Uttaksgrad.FEMTI_PROSENT,
                     uttakFomAlder = Alder(64, 2),
-                    aarligInntekt = 12_000,
-                    foedselDato = foedselDato
+                    aarligInntekt = 12_000
                 ),
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(67, 1),
-                    inntekt = null,
-                    foedselDato = foedselDato
+                    inntekt = null
                 )
             )
-        }
 
         private fun personalSpec() =
             PersonalSimuleringSpec(

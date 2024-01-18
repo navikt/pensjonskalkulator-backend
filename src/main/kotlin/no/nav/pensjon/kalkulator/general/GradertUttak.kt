@@ -1,6 +1,5 @@
 package no.nav.pensjon.kalkulator.general
 
-import no.nav.pensjon.kalkulator.simulering.PensjonUtil
 import java.time.LocalDate
 
 /**
@@ -10,8 +9,11 @@ import java.time.LocalDate
 data class GradertUttak(
     val grad: Uttaksgrad,
     val uttakFomAlder: Alder,
+    val aarligInntekt: Int
+)
+
+data class UttaksalderGradertUttak(
+    val grad: Uttaksgrad,
     val aarligInntekt: Int,
-    val foedselDato: LocalDate
-) {
-    val uttakFomDato: LocalDate = PensjonUtil.uttakDato(foedselDato, uttakFomAlder)
-}
+    val foedselDato: LocalDate // deprecated
+)

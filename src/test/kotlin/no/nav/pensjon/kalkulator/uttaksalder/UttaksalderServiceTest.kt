@@ -1,5 +1,7 @@
 package no.nav.pensjon.kalkulator.uttaksalder
 
+import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.mock.PersonFactory.person
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.opptjening.Inntekt
@@ -48,7 +50,8 @@ internal class UttaksalderServiceTest {
             simuleringType = SimuleringType.ALDERSPENSJON,
             sivilstand = Sivilstand.GIFT,
             harEps = true,
-            aarligInntektFoerUttak = 100_000
+            aarligInntektFoerUttak = 100_000,
+            heltUttak = HeltUttak(Alder(67, 0), null)
         )
 
         service.finnTidligsteUttaksalder(impersonalSpec)
@@ -73,7 +76,8 @@ internal class UttaksalderServiceTest {
             simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
             sivilstand = null, // sivilstand not specified
             harEps = null,
-            aarligInntektFoerUttak = null // inntekt not specified
+            aarligInntektFoerUttak = null, // inntekt not specified
+            heltUttak = HeltUttak(Alder(67, 0), null)
         )
 
         service.finnTidligsteUttaksalder(impersonalSpec)
@@ -97,7 +101,8 @@ internal class UttaksalderServiceTest {
             simuleringType = SimuleringType.ALDERSPENSJON,
             sivilstand = null, // sivilstand not specified
             harEps = null, // 'har EPS' not specified
-            aarligInntektFoerUttak = 1
+            aarligInntektFoerUttak = 1,
+            heltUttak = HeltUttak(Alder(67, 0), null)
         )
 
         service.finnTidligsteUttaksalder(impersonalSpec)
@@ -119,7 +124,8 @@ internal class UttaksalderServiceTest {
             simuleringType = SimuleringType.ALDERSPENSJON,
             sivilstand = Sivilstand.REGISTRERT_PARTNER, // sivilstand specified
             harEps = null, // 'har EPS' not specified
-            aarligInntektFoerUttak = 1
+            aarligInntektFoerUttak = 1,
+            heltUttak = HeltUttak(Alder(67, 0), null)
         )
 
         service.finnTidligsteUttaksalder(spec)
@@ -142,7 +148,8 @@ internal class UttaksalderServiceTest {
             simuleringType = SimuleringType.ALDERSPENSJON,
             sivilstand = null,
             harEps = false, // 'har EPS' specified
-            aarligInntektFoerUttak = null
+            aarligInntektFoerUttak = null,
+            heltUttak = HeltUttak(Alder(67, 0), null)
         )
 
         service.finnTidligsteUttaksalder(spec)

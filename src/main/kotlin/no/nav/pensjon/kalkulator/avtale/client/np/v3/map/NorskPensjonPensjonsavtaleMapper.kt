@@ -20,16 +20,24 @@ object NorskPensjonPensjonsavtaleMapper {
     // Total forskyvning: 2
     const val SLUTTMAANED_FORSKYVNING = 2
 
+    private const val ANTALL_AAR_REPRESENTING_LIVSVARIG = 14
     private const val DEFAULT_VALUE = "ukjent"
     private const val DEFAULT_HAR_EPS_PENSJON = true // Norsk Pensjon default
     private const val DEFAULT_HAR_EPS_PENSJONSGIVENDE_INNTEKT_OVER_2G = true // Norsk Pensjon default
+
+    fun fromDto(dto: EnvelopeDto) =
+        Pensjonsavtaler(
+            avtaler = pensjonsavtaler(dto) ?: emptyOrFault(dto),
+            utilgjengeligeSelskap = utilgjengeligeSelskap(dto) ?: emptyList()
+        )
 
     fun toDto(spec: PensjonsavtaleSpec, pid: Pid) =
         NorskPensjonPensjonsavtaleSpecDto(
             pid = pid,
             aarligInntektFoerUttak = spec.aarligInntektFoerUttak,
-            uttaksperioder = spec.uttaksperioder.map(::toUttaksperiodeEgressSpecDto),
-            antallInntektsaarEtterUttak = spec.antallInntektsaarEtterUttak,
+            uttaksperioder = spec.uttaksperioder.map(::uttaksperiodeSpecDto),
+            antallInntektsaarEtterUttak = spec.antallInntektsaarEtterUttak
+                ?: antallInntektAarUnderHeltUttak(spec.uttaksperioder),
             harAfp = false, // avoids Norsk Pensjon calling NAV's AFP simulation
             harEpsPensjon = spec.harEpsPensjon ?: DEFAULT_HAR_EPS_PENSJON,
             harEpsPensjonsgivendeInntektOver2G = spec.harEpsPensjonsgivendeInntektOver2G
@@ -39,17 +47,20 @@ object NorskPensjonPensjonsavtaleMapper {
             oenskesSimuleringAvFolketrygd = false
         )
 
-    private fun toUttaksperiodeEgressSpecDto(spec: UttaksperiodeSpec) =
+    // Relevant in V2 of API
+    private fun antallInntektAarUnderHeltUttak(perioder: List<UttaksperiodeSpec>): Int {
+        val heltUttakPeriode = perioder.firstOrNull { it.grad == Uttaksgrad.HUNDRE_PROSENT } ?: return 0
+
+        return heltUttakPeriode.aarligInntekt?.tomAlder
+            ?.let { (it.aar - heltUttakPeriode.startAlder.aar).coerceAtMost(ANTALL_AAR_REPRESENTING_LIVSVARIG) }
+            ?: ANTALL_AAR_REPRESENTING_LIVSVARIG
+    }
+
+    private fun uttaksperiodeSpecDto(spec: UttaksperiodeSpec) =
         NorskPensjonUttaksperiodeSpecDto(
             startAlder = NorskPensjonAlderDto(spec.startAlder.aar, spec.startAlder.maaneder + STARTMAANED_FORSKYVNING),
             grad = spec.grad,
-            aarligInntekt = spec.aarligInntekt
-        )
-
-    fun fromDto(dto: EnvelopeDto) =
-        Pensjonsavtaler(
-            avtaler = pensjonsavtaler(dto) ?: emptyOrFault(dto),
-            utilgjengeligeSelskap = utilgjengeligeSelskap(dto) ?: emptyList()
+            aarligInntekt = spec.aarligInntekt?.aarligBeloep ?: 0
         )
 
     fun faultToString(fault: FaultDto) =
