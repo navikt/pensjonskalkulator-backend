@@ -29,19 +29,25 @@ object UttaksalderMapper {
             aarligInntektFoerUttak = spec.aarligInntektFoerUttakBeloep,
             simuleringType = spec.simuleringstype ?: SimuleringType.ALDERSPENSJON,
             gradertUttak = gradertUttakV1(spec.gradertUttak),
-            heltUttak = HeltUttak(
-                uttakFomAlder = alder(spec.heltUttak.uttaksalder),
-                inntekt = Inntekt(aarligBeloep = spec.aarligInntektFoerUttakBeloep ?: 0, tomAlder = defaultTomAlder)
-            )
+            heltUttak = heltUttakInGradertContextV1(spec.heltUttak)
         )
 
     private fun heltUttakV1(spec: IngressUttaksalderInntektV1) =
         HeltUttak(
             uttakFomAlder = null, // this is the value to be found
-            inntekt = Inntekt(
-                aarligBeloep = spec.beloep,
-                tomAlder = spec.sluttAlder?.let(::alder) ?: defaultTomAlder
-            )
+            inntekt = inntektV1(spec)
+        )
+
+    private fun heltUttakInGradertContextV1(spec: IngressUttaksalderHeltUttakV1) =
+        HeltUttak(
+            uttakFomAlder = alder(spec.uttaksalder),
+            inntekt = spec.aarligInntektVsaPensjon?.let(::inntektV1)
+        )
+
+    private fun inntektV1(spec: IngressUttaksalderInntektV1) =
+        Inntekt(
+            aarligBeloep = spec.beloep,
+            tomAlder = spec.sluttAlder?.let(::alder) ?: defaultTomAlder
         )
 
     private fun gradertUttakV1(dto: IngressUttaksalderGradertUttakV1) =

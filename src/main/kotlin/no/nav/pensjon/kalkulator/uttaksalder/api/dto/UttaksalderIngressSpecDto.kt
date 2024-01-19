@@ -46,7 +46,7 @@ data class IngressUttaksalderGradertUttakV1(
  */
 data class IngressUttaksalderHeltUttakV1(
     val uttaksalder: IngressUttaksalderAlderV1, // angir implisitt sluttalder for gradert uttak
-    val aarligInntektVsaPensjon: IngressUttaksalderInntektV1
+    val aarligInntektVsaPensjon: IngressUttaksalderInntektV1?
 )
 
 data class IngressUttaksalderAlderV1(val aar: Int, val maaneder: Int) {
