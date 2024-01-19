@@ -32,9 +32,14 @@ class NorskPensjonPensjonsavtaleMapperTest {
         NorskPensjonPensjonsavtaleMapper.toDto(domainObject, pid) shouldBe expectedDto
     }
 
+    /**
+     * NB: Norsk Pensjon's documentation says that 14 represents "livsvarig".
+     * However, using 14 makes Norsk Pensjon return error "No signature in message!".
+     * As a workoround the value 13 is used instead (although this represents "13 years" instead of "livsvarig").
+     */
     @Test
-    fun `toDto limits antallInntektsaarEtterUttak to 'livsvarig value' 14`() {
-        val antallInntektsaarEtterUttak = 20 // more than max. value of 14
+    fun `toDto limits antallInntektsaarEtterUttak to 'livsvarig value' 13`() {
+        val antallInntektsaarEtterUttak = 20 // more than max. value of 13
         val startAlderAar = 62
         val domainObject = PensjonsavtaleSpec(
             aarligInntektFoerUttak = 20_000,
@@ -60,7 +65,7 @@ class NorskPensjonPensjonsavtaleMapperTest {
 
         val dto = NorskPensjonPensjonsavtaleMapper.toDto(domainObject, pid)
 
-        assertEquals(14, dto.antallInntektsaarEtterUttak) // max. is 14 (which represents 'livsvarig')
+        assertEquals(13, dto.antallInntektsaarEtterUttak) // max. is 13 (which represents 'livsvarig')
     }
 
     private companion object {

@@ -182,7 +182,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
                     <grad>100</grad>
                     <aarligInntekt>200000</aarligInntekt>
                 </uttaksperiode>
-                <antallInntektsaarEtterUttak>14</antallInntektsaarEtterUttak>
+                <antallInntektsaarEtterUttak>13</antallInntektsaarEtterUttak>
                 <harAfp>false</harAfp>
                 <antallAarIUtlandetEtter16>0</antallAarIUtlandetEtter16>
                 <sivilstatus>gift</sivilstatus>

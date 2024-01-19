@@ -12,15 +12,24 @@ import no.nav.pensjon.kalkulator.tech.time.DateUtil.MAANEDER_PER_AAR
 
 object NorskPensjonPensjonsavtaleMapper {
 
-    // Norsk Pensjon angir måned 1..12, vi angir antall måneder 0..11 => forskyvning 1
+    /**
+     * Norsk Pensjon angir måned 1..12, vi angir antall måneder 0..11 => forskyvning 1
+     */
     private const val STARTMAANED_FORSKYVNING = 1
 
-    // Norsk Pensjon regner "til", vi regner "til og med" => forskyvning 1
-    // Norsk Pensjon angir måned 1..12, vi angir antall måneder 0..11 => forskyvning 1
-    // Total forskyvning: 2
+    /**
+     *  Norsk Pensjon regner "til", vi regner "til og med" => forskyvning 1
+     *  Norsk Pensjon angir måned 1..12, vi angir antall måneder 0..11 => forskyvning 1
+     *  Total forskyvning: 2
+     */
     const val SLUTTMAANED_FORSKYVNING = 2
 
-    private const val ANTALL_AAR_REPRESENTING_LIVSVARIG = 14
+    /**
+     * NB: Norsk Pensjon's documentation says that 14 represents "livsvarig".
+     * However, using 14 makes Norsk Pensjon return error "No signature in message!".
+     * As a workoround the value 13 is used instead (although this represents "13 years" instead of "livsvarig").
+     */
+    private const val ANTALL_AAR_REPRESENTING_LIVSVARIG = 13
     private const val DEFAULT_VALUE = "ukjent"
     private const val DEFAULT_HAR_EPS_PENSJON = true // Norsk Pensjon default
     private const val DEFAULT_HAR_EPS_PENSJONSGIVENDE_INNTEKT_OVER_2G = true // Norsk Pensjon default
