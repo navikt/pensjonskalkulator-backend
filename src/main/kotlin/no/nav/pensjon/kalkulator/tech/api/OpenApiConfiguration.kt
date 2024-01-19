@@ -20,7 +20,7 @@ class OpenApiConfiguration {
                 Info()
                     .title("pensjonskalkulator API")
                     .description("Pensjonskalkulator for brukere født i 1963 eller senere")
-                    .version("v1.0.0")
+                    .version("v1.1.0")
             )
             .externalDocs(
                 ExternalDocumentation()
@@ -30,17 +30,41 @@ class OpenApiConfiguration {
     }
 
     @Bean
-    fun publicApiGroup(): GroupedOpenApi {
+    fun publicApiCurrentGroup(): GroupedOpenApi {
         return GroupedOpenApi.builder()
-            .group("api")
-            .pathsToMatch("/api/**")
+            .group("Current API")
+            .pathsToMatch(
+                "/api/v2/alderspensjon/simulering",
+                "/api/v2/pensjonsavtaler",
+                "/api/v1/person",
+                "/api/v1/tidligste-gradert-uttaksalder",
+                "/api/v1/tidligste-hel-uttaksalder",
+                "/api/feature/**",
+                "/api/inntekt",
+                "/api/sak-status",
+                "/api/tpo-medlemskap",
+                "/api/status",
+            )
+            .build()
+    }
+
+    @Bean
+    fun publicApiDeprecatedGroup(): GroupedOpenApi {
+        return GroupedOpenApi.builder()
+            .group("Deprecated API")
+            .pathsToMatch(
+                "/api/v1/alderspensjon/simulering",
+                "/api/v1/pensjonsavtaler",
+                "/api/v2/tidligste-uttaksalder",
+                "/api/grunnbeloep",
+            )
             .build()
     }
 
     @Bean
     fun internalApiGroup(): GroupedOpenApi {
         return GroupedOpenApi.builder()
-            .group("internal")
+            .group("Internal")
             .pathsToMatch("/internal/**")
             .build()
     }

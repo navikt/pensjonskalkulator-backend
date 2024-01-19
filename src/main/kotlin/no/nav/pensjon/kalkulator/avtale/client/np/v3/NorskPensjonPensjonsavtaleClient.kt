@@ -22,6 +22,7 @@ import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.SamlTokenServic
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
+import org.intellij.lang.annotations.Language
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -121,15 +122,15 @@ class NorskPensjonPensjonsavtaleClient(
 
         private val service = EgressService.NORSK_PENSJON
 
-        private fun soapBody(spec: NorskPensjonPensjonsavtaleSpecDto, callId: String): String {
-            return """<S:Body>
+        @Language("xml")
+        private fun soapBody(spec: NorskPensjonPensjonsavtaleSpecDto, callId: String): String =
+            """<S:Body>
         ${xml(spec, callId)}
     </S:Body>"""
-        }
 
         // NB: Order of XML elements is important (otherwise response may be 500)
-        private fun xml(spec: NorskPensjonPensjonsavtaleSpecDto, callId: String): String {
-            return """<typ:kalkulatorForespoersel>
+        private fun xml(spec: NorskPensjonPensjonsavtaleSpecDto, callId: String): String =
+            """<typ:kalkulatorForespoersel>
             <userSessionCorrelationID>$callId</userSessionCorrelationID>
             <organisasjonsnummer>$ORGANISASJONSNUMMER</organisasjonsnummer>
             <rettighetshaver>
@@ -145,20 +146,18 @@ class NorskPensjonPensjonsavtaleClient(
                 <oenskesSimuleringAvFolketrygd>${spec.oenskesSimuleringAvFolketrygd}</oenskesSimuleringAvFolketrygd>
             </rettighetshaver>
         </typ:kalkulatorForespoersel>"""
-        }
 
-        private fun xml(specs: List<NorskPensjonUttaksperiodeSpecDto>): String {
-            return specs.joinToString(separator = "", transform = ::xml)
-        }
+        private fun xml(specs: List<NorskPensjonUttaksperiodeSpecDto>): String =
+            specs.joinToString(separator = "", transform = ::xml)
 
-        private fun xml(spec: NorskPensjonUttaksperiodeSpecDto): String {
-            return """<uttaksperiode>
+        @Language("xml")
+        private fun xml(spec: NorskPensjonUttaksperiodeSpecDto): String =
+            """<uttaksperiode>
                     <startAlder>${spec.startAlder.aar}</startAlder>
                     <startMaaned>${spec.startAlder.maaned}</startMaaned>
                     <grad>${spec.grad.prosentsats}</grad>
                     <aarligInntekt>${spec.aarligInntekt}</aarligInntekt>
                 </uttaksperiode>"""
-        }
 
         private fun ingenAvtaler() = Pensjonsavtaler(avtaler = emptyList(), utilgjengeligeSelskap = emptyList())
     }
