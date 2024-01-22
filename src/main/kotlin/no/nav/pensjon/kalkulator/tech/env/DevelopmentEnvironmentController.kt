@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RestController
 class DevelopmentEnvironmentController {
 
     @GetMapping("azure")
-    fun azureEnvironment() = environmentVariable("AZURE_APP_CLIENT_SECRET")
+    fun azureEnvironment(): String = environmentVariable("AZURE_APP_CLIENT_SECRET")
 
     @GetMapping("unleash")
-    fun unleashEnvironment() = environmentVariable("UNLEASH_SERVER_API_TOKEN")
+    fun unleashEnvironment(): String = environmentVariable("UNLEASH_SERVER_API_TOKEN")
 
     private companion object {
         private fun environmentVariable(name: String) =

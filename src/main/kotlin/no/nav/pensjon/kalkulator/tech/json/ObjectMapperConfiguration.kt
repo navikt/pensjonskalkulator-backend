@@ -47,10 +47,10 @@ class ObjectMapperConfiguration {
         }
 
     /**
-     * Produces date 2023-02-01 both from
-     * "date": "2023-01-31T23:00:00.000Z"
+     * Produces date 2024-02-01 both from
+     * "date": "2024-01-31T23:00:00.000Z"
      * and
-     * "date": "2023-02-01"
+     * "date": "2024-02-01"
      */
     class LocalDateDeserializer : JsonDeserializer<LocalDate>() {
         override fun deserialize(parser: JsonParser, context: DeserializationContext): LocalDate =

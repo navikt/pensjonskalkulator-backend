@@ -11,7 +11,7 @@ object DateUtil {
     private val locale = Locale("nb", "NO")
     private val timeZone = TimeZone.getTimeZone(TIME_ZONE_ID)
 
-    fun toLocalDate(dateTime: ZonedDateTime) = dateTime.withZoneSameInstant(ZoneId.of(TIME_ZONE_ID)).toLocalDate()
+    fun toLocalDate(dateTime: ZonedDateTime): LocalDate = dateTime.withZoneSameInstant(ZoneId.of(TIME_ZONE_ID)).toLocalDate()
 
     fun toDate(localDate: LocalDate): Date =
         Calendar.getInstance(timeZone, locale).also {
