@@ -61,7 +61,7 @@ class PenSimuleringMapperTest {
         private fun personalSpec() =
             PersonalSimuleringSpec(
                 pid = pid,
-                forventetInntekt = 100_000,
+                aarligInntektFoerUttak = 100_000,
                 sivilstand = Sivilstand.UGIFT
             )
     }

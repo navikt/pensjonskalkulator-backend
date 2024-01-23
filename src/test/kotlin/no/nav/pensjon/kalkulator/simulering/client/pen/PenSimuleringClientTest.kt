@@ -148,7 +148,7 @@ class PenSimuleringClientTest : WebClientTest() {
         private fun personalSpec() =
             PersonalSimuleringSpec(
                 pid = pid,
-                forventetInntekt = 123000,
+                aarligInntektFoerUttak = 123000,
                 sivilstand = Sivilstand.ENKE_ELLER_ENKEMANN
             )
 

@@ -70,9 +70,14 @@ class SimuleringServiceTest {
     private companion object {
         private const val REGISTRERT_INNTEKT = 543210
         private const val PENSJONSBELOEP = 123456
-        private val inntekt =
-            Inntekt(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, 2023, REGISTRERT_INNTEKT.toBigDecimal())
-        private val personalSpec = PersonalSimuleringSpec(pid, REGISTRERT_INNTEKT, Sivilstand.UOPPGITT)
+        private val personalSpec = PersonalSimuleringSpec(pid, Sivilstand.UOPPGITT, REGISTRERT_INNTEKT)
+
+        private val inntekt = Inntekt(
+            type = Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT,
+            aar = 2023,
+            beloep = REGISTRERT_INNTEKT.toBigDecimal()
+        )
+
 
         private val simuleringsresultat =
             Simuleringsresultat(

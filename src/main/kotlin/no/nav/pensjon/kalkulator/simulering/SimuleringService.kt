@@ -22,9 +22,9 @@ class SimuleringService(
         val pid = pidGetter.pid()
 
         val personalSpec = PersonalSimuleringSpec(
-            pid,
-            impersonalSpec.forventetAarligInntektFoerUttak ?: inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact(),
-            impersonalSpec.sivilstand ?: sivilstand(pid)
+            pid = pid,
+            sivilstand = impersonalSpec.sivilstand ?: sivilstand(pid),
+            aarligInntektFoerUttak = impersonalSpec.forventetAarligInntektFoerUttak ?: inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact(),
         )
 
         log.debug { "Simulerer med parametre $impersonalSpec og $personalSpec" }

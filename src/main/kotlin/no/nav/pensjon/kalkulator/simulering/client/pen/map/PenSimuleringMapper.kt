@@ -25,7 +25,7 @@ object PenSimuleringMapper {
             pid = personalSpec.pid.value,
             sivilstand = PenSivilstand.fromInternalValue(personalSpec.sivilstand).externalValue,
             harEps = impersonalSpec.epsHarInntektOver2G,
-            sisteInntekt = personalSpec.forventetInntekt,
+            sisteInntekt = personalSpec.aarligInntektFoerUttak,
             uttaksar = 1,
             gradertUttak = impersonalSpec.gradertUttak?.let(::gradertUttakSpecDto),
             heltUttak = heltUttakSpecDto(impersonalSpec.heltUttak)
