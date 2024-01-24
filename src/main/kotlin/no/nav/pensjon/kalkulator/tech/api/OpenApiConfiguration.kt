@@ -32,7 +32,7 @@ class OpenApiConfiguration {
     @Bean
     fun publicApiCurrentGroup(): GroupedOpenApi {
         return GroupedOpenApi.builder()
-            .group("Current API")
+            .group("current")
             .pathsToMatch(
                 "/api/v2/alderspensjon/simulering",
                 "/api/v2/pensjonsavtaler",
@@ -51,7 +51,7 @@ class OpenApiConfiguration {
     @Bean
     fun publicApiDeprecatedGroup(): GroupedOpenApi {
         return GroupedOpenApi.builder()
-            .group("Deprecated API")
+            .group("deprecated")
             .pathsToMatch(
                 "/api/v1/alderspensjon/simulering",
                 "/api/v1/pensjonsavtaler",
@@ -64,7 +64,7 @@ class OpenApiConfiguration {
     @Bean
     fun internalApiGroup(): GroupedOpenApi {
         return GroupedOpenApi.builder()
-            .group("Internal")
+            .group("internal")
             .pathsToMatch("/internal/**")
             .build()
     }
