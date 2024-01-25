@@ -43,6 +43,8 @@ spec:
       rules:
         - application: pensjonskalkulator-frontend
         - application: pensjonskalkulator-veiledning-frontend
+        - application: pensjonskalkulator-frontend-sandbox
+        - application: pensjonskalkulator-veiledning-frontend-sandbox
         - application: azure-token-generator
           namespace: aura
         - application: wonderwalled-idporten
