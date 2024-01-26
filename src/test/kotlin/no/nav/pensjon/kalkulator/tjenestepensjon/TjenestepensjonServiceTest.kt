@@ -28,24 +28,26 @@ class TjenestepensjonServiceTest {
 
     @BeforeEach
     fun initialize() {
+        `when`(pidGetter.pid()).thenReturn(pid)
         service = TjenestepensjonService(client, pidGetter, featureToggleService)
     }
 
     @Test
-    fun `harTjenestepensjonsforhold uses specified inntekt and sivilstand`() {
-        arrangePidAndResultat()
+    fun `'erApoteker' gir 'true' naar ekstern tjeneste gir 'true'`() {
+        `when`(client.erApoteker(pid)).thenReturn(true)
+        assertTrue(service.erApoteker())
+    }
+
+    @Test
+    fun `'harTjenestepensjonsforhold' gir 'true' naar ekstern tjeneste gir tjenestepensjonsforhold`() {
+        `when`(client.tjenestepensjon(pid)).thenReturn(tjenestepensjon())
         val result = service.harTjenestepensjonsforhold()
         assertTrue(result)
     }
 
-    private fun arrangePidAndResultat() {
-        `when`(pidGetter.pid()).thenReturn(pid)
-        `when`(client.tjenestepensjon(pid)).thenReturn(tjenestepensjon())
-    }
-
     private companion object {
-        private fun tjenestepensjon() = Tjenestepensjon(listOf(forhold()))
+        private fun tjenestepensjon() = Tjenestepensjon(forholdList = listOf(forhold()))
 
-        private fun forhold() = Forhold("", emptyList(), null)
+        private fun forhold() = Forhold(ordning = "", ytelser = emptyList(), datoSistOpptjening = null)
     }
 }

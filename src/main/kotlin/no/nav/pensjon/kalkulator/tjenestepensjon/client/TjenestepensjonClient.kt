@@ -8,5 +8,7 @@ interface TjenestepensjonClient {
 
     fun harTjenestepensjonsforhold(pid: Pid, dato: LocalDate): Boolean
 
+    fun erApoteker(pid: Pid): Boolean
+
     fun tjenestepensjon(pid: Pid): Tjenestepensjon
 }

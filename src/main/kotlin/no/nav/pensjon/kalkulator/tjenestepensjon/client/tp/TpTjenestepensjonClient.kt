@@ -11,6 +11,7 @@ import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tjenestepensjon.Tjenestepensjon
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.TjenestepensjonClient
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpApotekerDto
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpTjenestepensjonStatusDto
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpTjenestepensjonDto
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.map.TpTjenestepensjonMapper
@@ -40,6 +41,29 @@ class TpTjenestepensjonClient(
     override fun pingPath(): String = PING_PATH
 
     override fun service(): EgressService = service
+
+    override fun erApoteker(pid: Pid): Boolean {
+        val uri = "/$API_PATH/$APOTEKER_RESOURCE"
+        log.debug { "GET from URI: '$uri'" }
+
+        return try {
+            webClient
+                .get()
+                .uri(uri)
+                .headers { setHeaders(it, pid) }
+                .retrieve()
+                .bodyToMono(TpApotekerDto::class.java)
+                .retryWhen(retryBackoffSpec(uri))
+                .block()
+                ?.let(TpTjenestepensjonMapper::fromDto)
+                .also { countCalls(MetricResult.OK) }
+                ?: false
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $uri", e)
+        } catch (e: WebClientResponseException) {
+            throw EgressException(e.responseBodyAsString, e)
+        }
+    }
 
     override fun harTjenestepensjonsforhold(pid: Pid, dato: LocalDate): Boolean {
         val uri = uri(dato)
@@ -95,7 +119,7 @@ class TpTjenestepensjonClient(
 
     private fun uri(date: LocalDate) =
         DefaultUriBuilderFactory()
-            .uriString("/$API_PATH/$API_RESOURCE")
+            .uriString("/$API_PATH/$YTELSE_RESOURCE")
             .queryParam("date", date.toString())
             .queryParam("ytelseType", TpYtelseType.ALDERSPENSJON.externalValue)
             .queryParam("ordningType", TpOrdningType.OFFENTLIG_TJENESTEPENSJONSORDNING.externalValue)
@@ -112,9 +136,10 @@ class TpTjenestepensjonClient(
     companion object {
         private const val API_PATH = "api/tjenestepensjon"
         private const val PING_PATH = "actuator/health/liveness"
+        private const val APOTEKER_RESOURCE = "medlem/afp/apotekerforeningen/ersisteforhold"
 
         // https://github.com/navikt/tp/blob/main/tp-api/src/main/kotlin/no/nav/samhandling/tp/controller/TjenestepensjonController.kt
-        private const val API_RESOURCE = "haveYtelse"
+        private const val YTELSE_RESOURCE = "haveYtelse"
 
         private val service = EgressService.TJENESTEPENSJON
     }

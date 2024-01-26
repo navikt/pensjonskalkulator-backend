@@ -13,11 +13,13 @@ class TjenestepensjonService(
     private val pidGetter: PidGetter,
     private val featureToggleService: FeatureToggleService
 ) {
-    fun harTjenestepensjonsforhold() =
+    fun harTjenestepensjonsforhold() = harForhold(tjenestepensjonClient.tjenestepensjon(pidGetter.pid()))
+
+    fun erApoteker() =
         if (featureToggleService.isEnabled("mock-norsk-pensjon") && pidGetter.pid().value == "18870199488")
             throw EgressException("Mock-feil", statusCode = HttpStatus.INTERNAL_SERVER_ERROR)
         else
-            harForhold(tjenestepensjonClient.tjenestepensjon(pidGetter.pid()))
+            tjenestepensjonClient.erApoteker(pidGetter.pid())
 
     private companion object {
         private fun harForhold(tjenestepensjon: Tjenestepensjon): Boolean =

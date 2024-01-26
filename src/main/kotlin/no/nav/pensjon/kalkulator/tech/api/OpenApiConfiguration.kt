@@ -36,6 +36,7 @@ class OpenApiConfiguration {
             .pathsToMatch(
                 "/api/v2/alderspensjon/simulering",
                 "/api/v2/pensjonsavtaler",
+                "/api/v1/ekskludert",
                 "/api/v1/person",
                 "/api/v1/tidligste-gradert-uttaksalder",
                 "/api/v1/tidligste-hel-uttaksalder",

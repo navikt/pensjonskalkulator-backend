@@ -8,7 +8,14 @@ class SakService(
     private val sakClient: SakClient,
     private val pidGetter: PidGetter
 ) {
-    fun harRelevantSak() =
+    fun harRelevantSak(): Boolean =
         sakClient.fetchSaker(pidGetter.pid())
             .any { it.type.relevant && it.status.relevant }
+
+    fun sakStatus(): RelevantSakStatus =
+        sakClient.fetchSaker(pidGetter.pid())
+            .firstOrNull { it.type.relevant && it.status.relevant }
+            ?.let { RelevantSakStatus(harSak = true, sakType = it.type) }
+            ?: RelevantSakStatus(harSak = false, sakType = SakType.NONE)
 }
+

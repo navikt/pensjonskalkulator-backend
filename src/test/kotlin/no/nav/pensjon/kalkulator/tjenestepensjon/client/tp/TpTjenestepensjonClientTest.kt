@@ -42,13 +42,25 @@ class TpTjenestepensjonClientTest : WebClientTest() {
     }
 
     @Test
-    fun `harTjenestepensjonsforhold returns true when personen har tjenestepensjonsforhold`() {
+    fun `'harTjenestepensjonsforhold' gir 'true' naar personen har tjenestepensjonsforhold`() {
         arrange(okStatusResponse(true))
         assertTrue(client.harTjenestepensjonsforhold(pid, dato))
     }
 
     @Test
-    fun `tjenestepensjonsforhold returns forhold when personen har tjenestepensjonsforhold`() {
+    fun `'erApoteker' gir 'true' naar personen er medlem av Apotekerforeningen`() {
+        arrange(okApotekerResponse(true))
+        assertTrue(client.erApoteker(pid))
+    }
+
+    @Test
+    fun `'erApoteker' gir 'false' naar personen ikke er medlem av Apotekerforeningen`() {
+        arrange(okApotekerResponse(false))
+        assertFalse(client.erApoteker(pid))
+    }
+
+    @Test
+    fun `'tjenestepensjon' gir forhold-liste naar personen har tjenestepensjonsforhold`() {
         arrange(okForholdResponse())
         val tjenestepensjonsforhold = client.tjenestepensjon(pid)
 
@@ -66,13 +78,13 @@ class TpTjenestepensjonClientTest : WebClientTest() {
     }
 
     @Test
-    fun `harTjenestepensjonsforhold returns false when personen ikke har tjenestepensjonsforhold`() {
+    fun `'harTjenestepensjonsforhold' gir 'false' naar personen ikke har tjenestepensjonsforhold`() {
         arrange(okStatusResponse(false))
         assertFalse(client.harTjenestepensjonsforhold(pid, dato))
     }
 
     @Test
-    fun `harTjenestepensjonsforhold retries in case of server error`() {
+    fun `'harTjenestepensjonsforhold' gjentar kallet ved serverfeil`() {
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
         arrange(okStatusResponse(true))
 
@@ -80,7 +92,7 @@ class TpTjenestepensjonClientTest : WebClientTest() {
     }
 
     @Test
-    fun `harTjenestepensjonsforhold does not retry in case of client error`() {
+    fun `'harTjenestepensjonsforhold' gjentar ikke kallet ved klientfeil`() {
         arrange(jsonResponse(HttpStatus.BAD_REQUEST).setBody("My bad"))
         // No 2nd response arranged, since no retry
 
@@ -90,7 +102,7 @@ class TpTjenestepensjonClientTest : WebClientTest() {
     }
 
     @Test
-    fun `harTjenestepensjonsforhold handles server error`() {
+    fun `'harTjenestepensjonsforhold' gir fornuftig feimelding ved serverfeil`() {
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil")) // for retry
 
@@ -106,6 +118,13 @@ class TpTjenestepensjonClientTest : WebClientTest() {
     companion object {
         private const val RETRY_ATTEMPTS = "1"
         private val dato = LocalDate.of(2023, 2, 1)
+
+        @Language("json")
+        private fun apotekerResponseBody(value: Boolean) =
+            """{
+    "harLopendeForholdApotekerforeningen": $value,
+    "harAndreLopendeForhold": true
+}"""
 
         @Language("json")
         private fun statusResponseBody(value: Boolean) =
@@ -159,6 +178,8 @@ class TpTjenestepensjonClientTest : WebClientTest() {
         }
     }
 }"""
+
+        private fun okApotekerResponse(value: Boolean) = jsonResponse().setBody(apotekerResponseBody(value).trimIndent())
 
         private fun okStatusResponse(value: Boolean) = jsonResponse().setBody(statusResponseBody(value).trimIndent())
 
