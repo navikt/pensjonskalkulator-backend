@@ -16,17 +16,17 @@ class Auditor(private val navIdExtractor: SecurityContextNavIdExtractor) {
 
     private val log = KotlinLogging.logger("AUDIT_LOGGER")
 
-    fun audit( onBehalfOfPid: Pid) {
-        log.info { cefEntry(navIdExtractor.id(), onBehalfOfPid).format() }
+    fun audit(onBehalfOfPid: Pid, requestUri: String) {
+        log.info { cefEntry(navIdExtractor.id(), onBehalfOfPid, requestUri).format() }
     }
 
-    private fun cefEntry(userId: String, onBehalfOfPid: Pid) =
+    private fun cefEntry(userId: String, onBehalfOfPid: Pid, requestUri: String) =
         CefEntry(
             timestamp = now(),
             level = Level.INFO,
             deviceEventClassId = DEVICE_EVENT_CLASS_ID,
             name = "Datahenting paa vegne av",
-            message = "$USER_TYPE beregner alderspensjon for annen person",
+            message = "$USER_TYPE kaller $requestUri",
             sourceUserId = userId,
             destinationUserId = onBehalfOfPid.value
         )

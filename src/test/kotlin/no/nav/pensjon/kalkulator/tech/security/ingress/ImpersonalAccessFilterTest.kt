@@ -57,12 +57,13 @@ class ImpersonalAccessFilterTest {
     @Test
     fun `when innlogget bruker har tilgang then audit info is logged and filter chain continues`() {
         `when`(request.getHeader("fnr")).thenReturn(pid.value)
+        `when`(request.requestURI).thenReturn("/foo")
         `when`(pidExtractor.pid()).thenReturn(pid)
         `when`(groupMembershipService.innloggetBrukerHarTilgang(pid)).thenReturn(true)
 
         ImpersonalAccessFilter(pidExtractor, groupMembershipService, auditor).doFilter(request, response, chain)
 
-        verify(auditor, times(1)).audit(pid)
+        verify(auditor, times(1)).audit(pid, "/foo")
         verify(chain, times(1)).doFilter(request, response)
     }
 }

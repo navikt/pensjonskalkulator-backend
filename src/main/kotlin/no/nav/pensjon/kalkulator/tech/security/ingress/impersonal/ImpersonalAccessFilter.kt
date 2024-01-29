@@ -29,7 +29,7 @@ class ImpersonalAccessFilter(
                 return
             }
 
-            auditor.audit(pid)
+            auditor.audit(pid, request.requestURI)
         }
 
         chain.doFilter(request, response)
