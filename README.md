@@ -15,7 +15,7 @@ Swagger/OpenAPI-dokumentasjon:
 
 ## Teknologi
 
-* [Java 17](https://openjdk.org/projects/jdk/17/)
+* [Java 21](https://openjdk.org/projects/jdk/21/)
 * [Kotlin](https://kotlinlang.org/)
 * [Spring Boot 3](https://spring.io/projects/spring-boot)
 * [Maven](https://maven.apache.org/)

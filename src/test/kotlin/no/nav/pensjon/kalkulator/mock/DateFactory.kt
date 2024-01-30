@@ -5,7 +5,7 @@ import java.util.*
 
 object DateFactory {
     private const val TIME_ZONE_ID = "Europe/Oslo"
-    private val locale = Locale("nb", "NO")
+    private val locale = Locale.of("nb", "NO")
     private val timeZone = TimeZone.getTimeZone(TIME_ZONE_ID)
 
     val date: LocalDate = LocalDate.of(2023, 4, 5)

@@ -8,10 +8,11 @@ import java.util.*
 object DateUtil {
     const val MAANEDER_PER_AAR = 12
     private const val TIME_ZONE_ID = "Europe/Oslo"
-    private val locale = Locale("nb", "NO")
+    private val locale = Locale.of("nb", "NO")
     private val timeZone = TimeZone.getTimeZone(TIME_ZONE_ID)
 
-    fun toLocalDate(dateTime: ZonedDateTime): LocalDate = dateTime.withZoneSameInstant(ZoneId.of(TIME_ZONE_ID)).toLocalDate()
+    fun toLocalDate(dateTime: ZonedDateTime): LocalDate =
+        dateTime.withZoneSameInstant(ZoneId.of(TIME_ZONE_ID)).toLocalDate()
 
     fun toDate(localDate: LocalDate): Date =
         Calendar.getInstance(timeZone, locale).also {
