@@ -33,12 +33,10 @@ object PenUttaksalderMapper {
             harEps = personalSpec.harEps,
             sisteInntekt = personalSpec.aarligInntektFoerUttak,
             gradertUttak = impersonalSpec.gradertUttak?.let(::gradertUttakSpecDto),
-            heltUttak = impersonalSpec.heltUttak?.inntekt
-                ?.let { heltUttakSpecDto(impersonalSpec.heltUttak) }
-                ?: defaultUttaksalderHeltUttakSpecDto()
+            heltUttak = impersonalSpec.heltUttak?.let(::heltUttakSpecDto) ?: defaultHeltUttakSpecDto()
         )
 
-    private fun defaultUttaksalderHeltUttakSpecDto() =
+    private fun defaultHeltUttakSpecDto() =
         UttaksalderHeltUttakSpecDto(
             uttakFomAlder = null,
             inntekt = UttaksalderInntektDto(

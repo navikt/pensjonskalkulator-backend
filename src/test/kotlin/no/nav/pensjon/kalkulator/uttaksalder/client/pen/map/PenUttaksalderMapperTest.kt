@@ -106,6 +106,47 @@ class PenUttaksalderMapperTest {
     }
 
     @Test
+    fun `'toDto' handles undefined inntekt`() {
+        val impersonalSpec = ImpersonalUttaksalderSpec(
+            simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
+            sivilstand = Sivilstand.UGIFT,
+            harEps = false,
+            aarligInntektFoerUttak = 1,
+            gradertUttak = UttaksalderGradertUttak(
+                grad = Uttaksgrad.AATTI_PROSENT,
+                aarligInntekt = 0,
+                foedselDato = LocalDate.MIN
+            ),
+            heltUttak = HeltUttak(
+                uttakFomAlder = Alder(aar = 65, maaneder = 4),
+                inntekt = null // undefined
+            )
+        )
+        val personalSpec = PersonalUttaksalderSpec(
+            pid = pid,
+            sivilstand = Sivilstand.UGIFT,
+            harEps = false,
+            aarligInntektFoerUttak = 1234
+        )
+        val expected = UttaksalderEgressSpecDto(
+            simuleringType = "ALDER_M_AFP_PRIVAT",
+            pid = pid.value,
+            sivilstand = "UGIF",
+            harEps = false,
+            sisteInntekt = 1234,
+            gradertUttak = UttaksalderGradertUttakSpecDto(grad = "P_80", aarligInntekt = 0),
+            heltUttak = UttaksalderHeltUttakSpecDto(
+                uttakFomAlder = UttaksalderAlderDto(aar = 65, maaneder = 4),
+                inntekt = null
+            )
+        )
+
+        val dto = PenUttaksalderMapper.toDto(impersonalSpec, personalSpec)
+
+        dto shouldBe expected
+    }
+
+    @Test
     fun `fromDto obtains maaneder by subtracting 1 from maaned`() {
         val dto = UttaksalderDto(62, 11)
 
