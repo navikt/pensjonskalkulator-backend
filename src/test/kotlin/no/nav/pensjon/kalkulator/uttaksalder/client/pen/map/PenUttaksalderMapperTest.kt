@@ -1,12 +1,13 @@
 package no.nav.pensjon.kalkulator.uttaksalder.client.pen.map
 
+import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.PersonalUttaksalderSpec
-import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.UttaksalderDto
+import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
@@ -15,7 +16,7 @@ import java.time.LocalDate
 class PenUttaksalderMapperTest {
 
     @Test
-    fun `toDto maps domain object to PEN-specific data transfer object`() {
+    fun `'toDto' maps domain object to PEN-specific data transfer object`() {
         val impersonalSpec = ImpersonalUttaksalderSpec(
             simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
             sivilstand = Sivilstand.UGIFT,
@@ -49,7 +50,7 @@ class PenUttaksalderMapperTest {
                 assertEquals(10_000, aarligInntekt)
             }
 
-            with(dto.heltUttak!!) {
+            with(dto.heltUttak) {
                 with(uttakFomAlder!!) {
                     assertEquals(67, aar)
                     assertEquals(0, maaneder)
@@ -65,6 +66,43 @@ class PenUttaksalderMapperTest {
                 }
             }
         }
+    }
+
+    @Test
+    fun `'toDto' uses default 'helt uttak' when not specified`() {
+        val impersonalSpec = ImpersonalUttaksalderSpec(
+            simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
+            sivilstand = Sivilstand.UGIFT,
+            harEps = false,
+            aarligInntektFoerUttak = 1,
+            gradertUttak = null,
+            heltUttak = null // not specified
+        )
+        val personalSpec = PersonalUttaksalderSpec(
+            pid = pid,
+            sivilstand = Sivilstand.UGIFT,
+            harEps = false,
+            aarligInntektFoerUttak = 1234
+        )
+        val expected = UttaksalderEgressSpecDto(
+            simuleringType = "ALDER_M_AFP_PRIVAT",
+            pid = pid.value,
+            sivilstand = "UGIF",
+            harEps = false,
+            sisteInntekt = 1234,
+            gradertUttak = null,
+            heltUttak = UttaksalderHeltUttakSpecDto(
+                uttakFomAlder = null,
+                inntekt = UttaksalderInntektDto(
+                    aarligBelop = 0,
+                    tomAlder = UttaksalderAlderDto(aar = 75, maaneder = 0)
+                )
+            )
+        )
+
+        val dto = PenUttaksalderMapper.toDto(impersonalSpec, personalSpec)
+
+        dto shouldBe expected
     }
 
     @Test

@@ -6,16 +6,15 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.general.Inntekt
 import no.nav.pensjon.kalkulator.general.UttaksalderGradertUttak
-import no.nav.pensjon.kalkulator.simulering.PensjonUtil.uttakDato
 import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenSimuleringType
 import no.nav.pensjon.kalkulator.tech.time.DateUtil.MAANEDER_PER_AAR
-import no.nav.pensjon.kalkulator.tech.time.DateUtil.toDate
 import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.PersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.*
-import java.util.*
 
 object PenUttaksalderMapper {
+
+    private val DEFAULT_HELT_UTTAK_INNTEKT_TOM_ALDER = UttaksalderAlderDto(aar = 75, maaneder = 0)
 
     fun fromDto(dto: UttaksalderDto) =
         Alder(
@@ -33,10 +32,19 @@ object PenUttaksalderMapper {
             sivilstand = PenSivilstand.fromInternalValue(personalSpec.sivilstand).externalValue,
             harEps = personalSpec.harEps,
             sisteInntekt = personalSpec.aarligInntektFoerUttak,
-            uttaksgrad = impersonalSpec.gradertUttak?.let { PenUttaksgrad.fromInternalValue(it.grad).externalValue }, // deprecated - replaced by gradertUttak.grad
-            heltUttakDato = heltUttakDato(impersonalSpec), // deprecated - replaced by heltUttak.uttakFomAlder
             gradertUttak = impersonalSpec.gradertUttak?.let(::gradertUttakSpecDto),
-            heltUttak = impersonalSpec.heltUttak?.inntekt?.let { heltUttakSpecDto(impersonalSpec.heltUttak) }
+            heltUttak = impersonalSpec.heltUttak?.inntekt
+                ?.let { heltUttakSpecDto(impersonalSpec.heltUttak) }
+                ?: defaultUttaksalderHeltUttakSpecDto()
+        )
+
+    private fun defaultUttaksalderHeltUttakSpecDto() =
+        UttaksalderHeltUttakSpecDto(
+            uttakFomAlder = null,
+            inntekt = UttaksalderInntektDto(
+                aarligBelop = 0,
+                tomAlder = DEFAULT_HELT_UTTAK_INNTEKT_TOM_ALDER
+            )
         )
 
     private fun gradertUttakSpecDto(uttak: UttaksalderGradertUttak) =
@@ -44,17 +52,6 @@ object PenUttaksalderMapper {
             grad = PenUttaksgrad.fromInternalValue(uttak.grad).externalValue,
             aarligInntekt = uttak.aarligInntekt
         )
-
-    // deprecated - replaced by heltUttak.uttakFomAlder
-    private fun heltUttakDato(spec: ImpersonalUttaksalderSpec): Date? =
-        spec.gradertUttak?.let {
-            toDate(
-                uttakDato(
-                    foedselDato = it.foedselDato,
-                    uttakAlder = spec.heltUttak!!.uttakFomAlder!! // mandatory in context of gradert uttak
-                )
-            )
-        }
 
     private fun heltUttakSpecDto(uttak: HeltUttak) =
         UttaksalderHeltUttakSpecDto(

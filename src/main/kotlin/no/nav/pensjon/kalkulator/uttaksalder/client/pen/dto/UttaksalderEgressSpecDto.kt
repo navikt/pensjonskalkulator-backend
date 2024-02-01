@@ -1,17 +1,13 @@
 package no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto
 
-import java.util.*
-
 data class UttaksalderEgressSpecDto(
     val pid: String,
     val sivilstand: String,
     val harEps: Boolean,
     val sisteInntekt: Int,
-    val uttaksgrad: String? = null, // deprecated - replaced by gradertUttak.grad
-    val heltUttakDato: Date? = null, // deprecated - replaced by heltUttak.uttakFomAlder
     val simuleringType: String,
     val gradertUttak: UttaksalderGradertUttakSpecDto? = null,
-    val heltUttak: UttaksalderHeltUttakSpecDto? = null
+    val heltUttak: UttaksalderHeltUttakSpecDto
 )
 
 /**
