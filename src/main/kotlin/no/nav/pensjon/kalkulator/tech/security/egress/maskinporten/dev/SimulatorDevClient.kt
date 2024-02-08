@@ -1,0 +1,89 @@
+package no.nav.pensjon.kalkulator.tech.security.egress.maskinporten.dev
+
+import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
+import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
+import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
+import no.nav.pensjon.kalkulator.tech.web.EgressException
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
+import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.BodyInserters
+import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientRequestException
+import org.springframework.web.reactive.function.client.WebClientResponseException
+
+/**
+ * Client for accessing the 'pensjonssimulator' service (see https://github.com/navikt/pensjonssimulator).
+ * This is only used for testing in the dev environment.
+ */
+@Component
+class SimulatorDevClient(
+    webClientBuilder: WebClient.Builder,
+    private val traceAid: TraceAid,
+) : ExternalServiceClient("0") {
+
+    private val log = KotlinLogging.logger {}
+
+    private val webClient =
+        webClientBuilder.baseUrl("https://pensjonskalkulator-gw.ekstern.dev.nav.no/pensjonssimulator").build()
+
+    override fun service() = service
+
+    fun status(): String {
+        val uri = "/v1/status"
+        log.debug { "GET from URI: '$uri'" }
+
+        return try {
+            webClient
+                .get()
+                .uri(uri)
+                .headers(::setHeaders)
+                .retrieve()
+                .bodyToMono(String::class.java)
+                .retryWhen(retryBackoffSpec(uri))
+                .block()
+                ?: ""
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $uri", e)
+        } catch (e: WebClientResponseException) {
+            throw EgressException(e.responseBodyAsString, e)
+        }
+    }
+
+    fun tidligstMuligUttak(): String {
+        val uri = "/v1/tidligst-mulig-uttak"
+        log.debug { "POST to URI: '$uri'" }
+
+        return try {
+            webClient
+                .post()
+                .uri(uri)
+                .headers(::setHeaders)
+                .body(BodyInserters.fromValue("{}"))
+                .retrieve()
+                .bodyToMono(String::class.java)
+                .retryWhen(retryBackoffSpec(uri))
+                .block()
+                ?: ""
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $uri", e)
+        } catch (e: WebClientResponseException) {
+            throw EgressException(e.responseBodyAsString, e)
+        }
+    }
+
+    override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
+
+    private fun setHeaders(headers: HttpHeaders) {
+        headers.setBearerAuth(EgressAccess.token(service).value)
+        headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_JSON_VALUE
+        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
+    }
+
+    companion object {
+        private val service = EgressService.PENSJONSSIMULERING
+    }
+}

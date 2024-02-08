@@ -4,6 +4,8 @@ import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.OAuth2ParameterName
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.OAuth2ParameterNames.CLIENT_SECRET
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.OAuth2ParameterNames.GRANT_TYPE
 import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenAccessParameter
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 
@@ -36,4 +38,14 @@ class OAuth2ParameterBuilder {
         map.add(CLIENT_SECRET, clientSecret)
         return map
     }
+
+    fun clientAssertionTokenRequestMap(): MultiValueMap<String, String> {
+        val map: MultiValueMap<String, String> = LinkedMultiValueMap()
+        map.add(GRANT_TYPE, accessParameter.getGrantTypeName())
+        map.add(accessParameter.getParameterName(), accessParameter.value)
+        map.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        map.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+        return map
+    }
+
 }

@@ -11,6 +11,12 @@ class DevelopmentEnvironmentController {
     @GetMapping("azure")
     fun azureEnvironment(): String = environmentVariable("AZURE_APP_CLIENT_SECRET")
 
+    @GetMapping("mp")
+    fun maskinportenEnvironment(): String = environmentVariable("MASKINPORTEN_CLIENT_ID") +
+            "|${environmentVariable("MASKINPORTEN_CLIENT_JWK")}" +
+            "|${environmentVariable("MASKINPORTEN_ISSUER")}" +
+            "|${environmentVariable("MASKINPORTEN_TOKEN_ENDPOINT")}"
+
     @GetMapping("unleash")
     fun unleashEnvironment(): String = environmentVariable("UNLEASH_SERVER_API_TOKEN")
 
