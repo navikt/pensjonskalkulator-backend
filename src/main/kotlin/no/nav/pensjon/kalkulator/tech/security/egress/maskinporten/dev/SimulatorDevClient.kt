@@ -53,7 +53,7 @@ class SimulatorDevClient(
         }
     }
 
-    fun tidligstMuligUttak(): String {
+    fun tidligstMuligUttak(): AlderV1 {
         val uri = "/v1/tidligst-mulig-uttak"
         log.debug { "POST to URI: '$uri'" }
 
@@ -61,13 +61,15 @@ class SimulatorDevClient(
             webClient
                 .post()
                 .uri(uri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
                 .headers(::setHeaders)
-                .body(BodyInserters.fromValue("{}"))
+                .bodyValue(BODY)
                 .retrieve()
-                .bodyToMono(String::class.java)
+                .bodyToMono(AlderV1::class.java)
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
-                ?: ""
+                ?: AlderV1(0, 0)
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $uri", e)
         } catch (e: WebClientResponseException) {
@@ -79,11 +81,19 @@ class SimulatorDevClient(
 
     private fun setHeaders(headers: HttpHeaders) {
         headers.setBearerAuth(EgressAccess.token(service).value)
-        headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_JSON_VALUE
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
     }
 
     companion object {
+        private const val BODY = """{
+    "foedselsnummer": "1234567890"
+}"""
+
         private val service = EgressService.PENSJONSSIMULERING
     }
 }
+
+data class AlderV1(
+    val aar: Int,
+    val maaneder: Int
+)
