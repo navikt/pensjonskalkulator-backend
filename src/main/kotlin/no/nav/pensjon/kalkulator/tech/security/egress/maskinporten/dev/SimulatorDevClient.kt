@@ -21,7 +21,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
  */
 @Component
 class SimulatorDevClient(
-    @Value("\${pensjonssimulering.url}") private val baseUrl: String,
+    @Value("\${pensjonssimulator.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
 ) : ExternalServiceClient("0") {
@@ -100,7 +100,7 @@ class SimulatorDevClient(
     ]
 }"""
 
-        private val service = EgressService.PENSJONSSIMULERING
+        private val service = EgressService.PENSJONSSIMULATOR
     }
 }
 

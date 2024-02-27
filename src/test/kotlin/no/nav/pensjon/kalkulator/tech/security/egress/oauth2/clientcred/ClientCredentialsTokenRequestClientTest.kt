@@ -1,26 +1,31 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.oauth2.clientcred
-/*
+
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.config.OAuth2ConfigurationGetter
 import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenAccessParameter
 import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenData
 import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.ExpirationChecker
 import okhttp3.mockwebserver.MockResponse
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.TestPropertySource
 import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDateTime
 
-@ExtendWith(SpringExtension::class)
+@SpringBootTest
+@TestPropertySource("classpath:application-test.properties")
 class ClientCredentialsTokenRequestClientTest : WebClientTest() {
 
-    private lateinit var client: ClientCredentialsTokenRequestClient1
+    private lateinit var client: ClientCredentialsTokenRequestClient
+
+    @Autowired
+    private lateinit var webClientBuilder: WebClient.Builder
 
     @Mock
     private lateinit var oauth2ConfigGetter: OAuth2ConfigurationGetter
@@ -32,12 +37,12 @@ class ClientCredentialsTokenRequestClientTest : WebClientTest() {
     fun initialize() {
         `when`(oauth2ConfigGetter.getTokenEndpoint()).thenReturn(baseUrl())
 
-        client = ClientCredentialsTokenRequestClient1(
-            WebClient.create(),
-            oauth2ConfigGetter,
-            expirationChecker,
-            ClientCredentials("id1", "secret1"),
-            "1"
+        client = ClientCredentialsTokenRequestClient(
+            tokenEndpoint = baseUrl(),
+            webClientBuilder = webClientBuilder,
+            expirationChecker = expirationChecker,
+            credentials = ClientCredentials("id1", "secret1"),
+            retryAttempts = "1"
         )
     }
 
@@ -85,4 +90,3 @@ class ClientCredentialsTokenRequestClientTest : WebClientTest() {
         }
     }
 }
-*/

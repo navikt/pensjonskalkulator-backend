@@ -23,11 +23,11 @@ enum class EgressService(
     PENSJONSOPPTJENING("Pensjonsopptjening", "POPP", "Pensjonsopptjeningsdata"),
     PERSONDATALOESNINGEN("Persondataløsningen", "PDL", "Persondata"),
     SKJERMEDE_PERSONER("Skjermede personer", "SP", "Skjerming"),
-    PENSJONSSIMULERING(
-        description = "Simulering",
+    PENSJONSSIMULATOR(
+        description = "Pensjonssimulator",
         shortName = "PS",
-        purpose = "Pensjonssimulering",
-        authType = AuthType.MACHINE_OUTSIDE_NAV
+        purpose = "Simulering av alderspensjon",
+        authType = AuthType.MACHINE_OUTSIDE_NAV // regarded as an external service when testing
     ),
     TJENESTEPENSJON("Tjenestepensjon", "TP", "Tjenestepensjonsforhold");
 

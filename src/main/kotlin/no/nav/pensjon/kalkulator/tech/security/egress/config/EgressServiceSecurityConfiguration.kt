@@ -17,7 +17,7 @@ class EgressServiceSecurityConfiguration {
         @Value("\${pensjon-regler.service-id}") pensjonReglerServiceId: String,
         @Value("\${pen.service-id}") pensjonsfagligKjerneServiceId: String,
         @Value("\${popp.service-id}") pensjonsopptjeningServiceId: String,
-        @Value("\${pensjonssimulering.service-id}") pensjonssimuleringServiceId: String,
+        @Value("\${pensjonssimulator.service-id}") pensjonssimulatorServiceId: String,
         @Value("\${persondata.service-id}") persondataServiceId: String,
         @Value("\${skjermede-personer.service-id}") skjermedePersonerServiceId: String,
         @Value("\${tjenestepensjon.service-id}") tjenestepensjonServiceId: String,
@@ -27,7 +27,7 @@ class EgressServiceSecurityConfiguration {
             mapOf(
                 pensjonsfagligKjerneServiceId to listOf(EgressService.PENSJONSFAGLIG_KJERNE),
                 pensjonsopptjeningServiceId to listOf(EgressService.PENSJONSOPPTJENING),
-                pensjonssimuleringServiceId to listOf(EgressService.PENSJONSSIMULERING),
+                pensjonssimulatorServiceId to listOf(EgressService.PENSJONSSIMULATOR),
                 persondataServiceId to listOf(EgressService.PERSONDATALOESNINGEN),
                 skjermedePersonerServiceId to listOf(EgressService.SKJERMEDE_PERSONER),
                 tjenestepensjonServiceId to listOf(EgressService.TJENESTEPENSJON),
