@@ -26,52 +26,51 @@ class SimulatorDevClient(
     private val traceAid: TraceAid,
 ) : ExternalServiceClient("0") {
 
-    private val log = KotlinLogging.logger {}
-
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
+    private val log = KotlinLogging.logger {}
 
     override fun service() = service
 
     fun status(): String {
-        val uri = "/v1/status"
-        log.debug { "GET from URI: '$uri'" }
+        val url = "$baseUrl/$STATUS_RESOURCE"
+        log.debug { "GET from URL: '$url'" }
 
         return try {
             webClient
                 .get()
-                .uri(uri)
+                .uri("/$STATUS_RESOURCE")
                 .headers(::setHeaders)
                 .retrieve()
                 .bodyToMono(String::class.java)
-                .retryWhen(retryBackoffSpec(uri))
+                .retryWhen(retryBackoffSpec(url))
                 .block()
                 ?: ""
         } catch (e: WebClientRequestException) {
-            throw EgressException("Failed calling $uri", e)
+            throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }
     }
 
     fun tidligstMuligUttak(): AlderV1 {
-        val uri = "/v1/tidligst-mulig-uttak"
-        log.debug { "POST to URI: '$uri'" }
+        val url = "$baseUrl/$TIDLIGST_MULIG_UTTAK_RESOURCE"
+        log.debug { "POST to URL: '$url'" }
 
         return try {
             webClient
                 .post()
-                .uri(uri)
+                .uri("/$TIDLIGST_MULIG_UTTAK_RESOURCE")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .headers(::setHeaders)
                 .bodyValue(BODY)
                 .retrieve()
                 .bodyToMono(AlderV1::class.java)
-                .retryWhen(retryBackoffSpec(uri))
+                .retryWhen(retryBackoffSpec(url))
                 .block()
                 ?: AlderV1(0, 0)
         } catch (e: WebClientRequestException) {
-            throw EgressException("Failed calling $uri", e)
+            throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }
@@ -85,6 +84,9 @@ class SimulatorDevClient(
     }
 
     companion object {
+        private const val STATUS_RESOURCE = "api/v1/status"
+        private const val TIDLIGST_MULIG_UTTAK_RESOURCE = "api/v1/tidligst-mulig-uttak"
+
         private const val BODY = """{
     "personId": "12906498357",
     "fodselsdato": "1964-10-12",
