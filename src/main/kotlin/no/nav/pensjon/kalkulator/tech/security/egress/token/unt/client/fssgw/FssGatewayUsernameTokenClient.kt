@@ -18,7 +18,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import java.util.*
 
 /**
  * Fetches UsernameToken (UNT) from FSS gateway.
@@ -26,32 +25,33 @@ import java.util.*
 //@Component <--- FssGatewayUsernameTokenClient is not used at the moment
 class FssGatewayUsernameTokenClient(
     @Value("\${proxy.url}") private val baseUrl: String,
-    private val webClient: WebClient,
+    webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), UsernameTokenClient, Pingable {
 
+    private val webClient = webClientBuilder.baseUrl(baseUrl).build()
     private val log = KotlinLogging.logger {}
 
     override fun service() = service
 
     override fun fetchUsernameToken(): UsernameTokenDto {
-        val uri = "$baseUrl$TOKEN_PATH"
-        log.debug { "GET from URI: '$uri'" }
+        val url = "$baseUrl/$TOKEN_PATH"
+        log.debug { "GET from URL: '$url'" }
 
         return try {
             webClient
                 .get()
-                .uri(uri)
+                .uri("/$TOKEN_PATH")
                 .headers(::setHeaders)
                 .retrieve()
                 .bodyToMono(String::class.java)
                 .block()
-                ?.let { UsernameTokenDto(it) }
+                ?.let(::UsernameTokenDto)
                 .also { countCalls(MetricResult.OK) }
                 ?: UsernameTokenDto("")
         } catch (e: WebClientRequestException) {
-            throw EgressException("Failed calling $uri", e)
+            throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }
@@ -92,7 +92,7 @@ class FssGatewayUsernameTokenClient(
     override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
 
     companion object {
-        private const val TOKEN_PATH = "/ws-support/unt"
+        private const val TOKEN_PATH = "ws-support/unt"
         private const val PING_PATH = "/ping" //TODO
         private val service = EgressService.FSS_GATEWAY
     }

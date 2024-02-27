@@ -28,15 +28,15 @@ class KalkulatorController(
         return grunnbeloepClient.getGrunnbeloep(spec)
     }
 
-    @GetMapping("krakend-status-test")
+    @GetMapping("simulator-status-test")
     @Operation(
-        summary = "KrakenD status-test"
+        summary = "Simulator status-test"
     )
-    fun krakendStatusTest(): String = simulatorClient.status()
+    fun simulatorStatusTest(): String = simulatorClient.status()
 
-    @GetMapping("krakend-tmu-test")
+    @GetMapping("simulator-tmu-test")
     @Operation(
-        summary = "KrakenD TMU-test"
+        summary = "Simulator TMU-test"
     )
-    fun krakendTidligstMuligUttak(): AlderV1 = simulatorClient.tidligstMuligUttak()
+    fun simulatorTidligstMuligUttakTest(): AlderV1 = simulatorClient.tidligstMuligUttak()
 }

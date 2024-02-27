@@ -2,7 +2,6 @@ package no.nav.pensjon.kalkulator.ufoere.client.pen
 
 import no.nav.pensjon.kalkulator.common.client.pen.PenClient
 import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.person.client.pdl.dto.*
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.ufoere.Vedtak
 import no.nav.pensjon.kalkulator.ufoere.client.VedtakClient
@@ -13,7 +12,6 @@ import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDate
-import java.util.*
 
 @Component
 class PenVedtakClient(

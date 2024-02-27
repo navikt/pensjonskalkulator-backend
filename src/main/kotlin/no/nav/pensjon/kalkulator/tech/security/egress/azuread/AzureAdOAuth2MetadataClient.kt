@@ -7,7 +7,7 @@ import org.springframework.web.reactive.function.client.WebClient
 
 @Component
 class AzureAdOAuth2MetadataClient(
-    webClient: WebClient,
+    webClientBuilder: WebClient.Builder,
     @Value("\${azure-app.well-known-url}") uri: String,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
-) : OAuth2ConfigurationClient(uri, webClient, retryAttempts)
+) : OAuth2ConfigurationClient(uri, webClientBuilder, retryAttempts)

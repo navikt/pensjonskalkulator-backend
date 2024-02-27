@@ -22,32 +22,34 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @Component
 class FssGatewayPingClient(
     @Value("\${proxy.url}") private val baseUrl: String,
-    private val webClient: WebClient,
+    webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), Pingable {
 
+    private val webClient = webClientBuilder.baseUrl(baseUrl).build()
+
     override fun service() = service
 
     override fun ping(): PingResult {
-        val uri = "$baseUrl/$PATH"
+        val url = "$baseUrl/$PATH"
 
         return try {
             val responseBody = webClient
                 .get()
-                .uri(uri)
+                .uri("/$PATH")
                 .headers(::setHeaders)
                 .retrieve()
                 .bodyToMono(String::class.java)
-                .retryWhen(retryBackoffSpec(uri))
+                .retryWhen(retryBackoffSpec(url))
                 .block()
                 ?: ""
 
-            PingResult(service, ServiceStatus.UP, uri, responseBody)
+            PingResult(service, ServiceStatus.UP, url, responseBody)
         } catch (e: WebClientRequestException) {
-            PingResult(service, ServiceStatus.DOWN, uri, e.message ?: "forespørsel feilet")
+            PingResult(service, ServiceStatus.DOWN, url, e.message ?: "forespørsel feilet")
         } catch (e: WebClientResponseException) {
-            PingResult(service, ServiceStatus.DOWN, uri, e.responseBodyAsString)
+            PingResult(service, ServiceStatus.DOWN, url, e.responseBodyAsString)
         }
     }
 

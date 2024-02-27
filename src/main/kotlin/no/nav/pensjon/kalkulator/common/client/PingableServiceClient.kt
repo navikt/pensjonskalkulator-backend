@@ -10,7 +10,7 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
 abstract class PingableServiceClient(
-    baseUrl: String,
+    private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), Pingable {
@@ -22,27 +22,27 @@ abstract class PingableServiceClient(
     protected val webClient: WebClient = webClientBuilder.baseUrl(baseUrl).build()
 
     override fun ping(): PingResult {
-        val uri = "/${pingPath()}"
+        val url = "$baseUrl/${pingPath()}"
 
         return try {
             val responseBody = webClient
                 .get()
-                .uri(uri)
+                .uri("/${pingPath()}")
                 .headers(::setPingHeaders)
                 .retrieve()
                 .bodyToMono(String::class.java)
-                .retryWhen(retryBackoffSpec(uri))
+                .retryWhen(retryBackoffSpec(url))
                 .block()
                 ?: ""
 
-            PingResult(service(), ServiceStatus.UP, uri, responseBody)
+            PingResult(service(), ServiceStatus.UP, url, responseBody)
         } catch (e: EgressException) {
             // Happens if failing to obtain access token
-            down(uri, e)
+            down(url, e)
         } catch (e: WebClientRequestException) {
-            down(uri, e)
+            down(url, e)
         } catch (e: WebClientResponseException) {
-            down(uri, e.responseBodyAsString)
+            down(url, e.responseBodyAsString)
         }
     }
 

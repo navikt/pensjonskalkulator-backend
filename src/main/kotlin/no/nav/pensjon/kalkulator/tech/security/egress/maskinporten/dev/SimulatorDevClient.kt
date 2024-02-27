@@ -7,28 +7,28 @@ import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
 /**
  * Client for accessing the 'pensjonssimulator' service (see https://github.com/navikt/pensjonssimulator).
- * This is only used for testing in the dev environment.
+ * This is only used for testing in the development environment.
  */
 @Component
 class SimulatorDevClient(
+    @Value("\${pensjonssimulering.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
 ) : ExternalServiceClient("0") {
 
     private val log = KotlinLogging.logger {}
 
-    private val webClient =
-        webClientBuilder.baseUrl("https://pensjonskalkulator-gw.ekstern.dev.nav.no/pensjonssimulator").build()
+    private val webClient = webClientBuilder.baseUrl(baseUrl).build()
 
     override fun service() = service
 
@@ -86,7 +86,18 @@ class SimulatorDevClient(
 
     companion object {
         private const val BODY = """{
-    "foedselsnummer": "1234567890"
+    "personId": "12906498357",
+    "fodselsdato": "1964-10-12",
+    "uttaksgrad": 100,
+    "heltUttakFraOgMedDato": null,
+    "rettTilAfpOffentligDato": null,
+    "antallAarUtenlandsEtter16Aar": 0,
+    "fremtidigInntektListe": [
+        {
+            "fraOgMedDato": "2030-01-01",
+            "arligInntekt": 500000
+        }
+    ]
 }"""
 
         private val service = EgressService.PENSJONSSIMULERING

@@ -1,7 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.token
 
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.OAuth2TokenClient
-import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.config.OAuth2ConfigurationGetter
 import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.ExpirationChecker
 import org.springframework.util.StringUtils.hasLength
 import org.springframework.web.reactive.function.client.WebClient
@@ -15,13 +14,11 @@ import java.util.*
  */
 abstract class CacheAwareTokenClient(
     webClient: WebClient,
-    oauth2ConfigGetter: OAuth2ConfigurationGetter,
     expirationChecker: ExpirationChecker,
     retryAttempts: String
 ) : OAuth2TokenClient(
     webClient,
     expirationChecker,
-    oauth2ConfigGetter,
     retryAttempts
 ) {
     private var accessTokensByUserByScope: MutableMap<String, MutableMap<String, TokenData>> = HashMap()

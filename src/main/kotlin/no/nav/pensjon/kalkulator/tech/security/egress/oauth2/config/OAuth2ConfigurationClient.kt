@@ -1,7 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.oauth2.config
 
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
-import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.selftest.PingResult
 import no.nav.pensjon.kalkulator.tech.selftest.Pingable
@@ -11,29 +10,18 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
+/**
+ * Only used for self-test (testing the connection to the authorization provider).
+ */
 open class OAuth2ConfigurationClient(
     private val uri: String,
-    private val webClient: WebClient,
+    webClientBuilder: WebClient.Builder,
     retryAttempts: String
-) : ExternalServiceClient(retryAttempts), OAuth2ConfigurationGetter, Pingable {
+) : ExternalServiceClient(retryAttempts), Pingable {
 
-    private var cachedConfig: OAuth2ConfigurationDto? = null
+    private val webClient = webClientBuilder.baseUrl(uri).build()
 
     override fun service() = service
-
-    override fun getIssuer(): String = cachedConfig().getIssuer()!!
-
-    override fun getAuthorizationEndpoint(): String = cachedConfig().getAuthorizationEndpoint()!!
-
-    override fun getTokenEndpoint(): String = cachedConfig().getTokenEndpoint()!!
-
-    override fun getEndSessionEndpoint() = cachedConfig().getEndSessionEndpoint()!!
-
-    override fun getJsonWebKeySetUri(): String = cachedConfig().getJwksUri()!!
-
-    override fun refresh() {
-        cachedConfig = null
-    }
 
     override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
 
@@ -46,7 +34,6 @@ open class OAuth2ConfigurationClient(
         return try {
             val responseBody = webClient
                 .get()
-                .uri(uri)
                 .retrieve()
                 .bodyToMono(String::class.java)
                 .retryWhen(retryBackoffSpec(uri))
@@ -61,21 +48,6 @@ open class OAuth2ConfigurationClient(
             PingResult(service, ServiceStatus.DOWN, uri, e.responseBodyAsString)
         }
     }
-
-    private fun freshConfig(): OAuth2ConfigurationDto =
-        webClient
-            .get()
-            .uri(uri)
-            .retrieve()
-            .bodyToMono(OAuth2ConfigurationDto::class.java)
-            .retryWhen(retryBackoffSpec(uri))
-            .block()!!.also { countCalls(MetricResult.OK) }
-
-    private fun cachedConfig(): OAuth2ConfigurationDto =
-        if (cachedConfig == null)
-            freshConfig().also { cachedConfig = it }
-        else
-            cachedConfig!!
 
     companion object {
         private val service = EgressService.MICROSOFT_ENTRA_ID

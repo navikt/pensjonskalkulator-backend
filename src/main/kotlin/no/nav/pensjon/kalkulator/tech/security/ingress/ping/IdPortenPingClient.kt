@@ -18,9 +18,11 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @Component
 class IdPortenPingClient(
     @Value("\${idporten.ping.url}") private val uri: String,
-    private val webClient: WebClient,
+    webClientBuilder: WebClient.Builder,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), Pingable {
+
+    private val webClient = webClientBuilder.baseUrl(uri).build()
 
     override fun service() = service
 
@@ -33,7 +35,6 @@ class IdPortenPingClient(
         return try {
             val responseBody = webClient
                 .get()
-                .uri(uri)
                 .retrieve()
                 .bodyToMono(String::class.java)
                 .retryWhen(retryBackoffSpec(uri))
