@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Operation
 import no.nav.pensjon.kalkulator.grunnbeloep.Grunnbeloep
 import no.nav.pensjon.kalkulator.grunnbeloep.client.GrunnbeloepClient
 import no.nav.pensjon.kalkulator.grunnbeloep.client.GrunnbeloepSpec
+import no.nav.pensjon.kalkulator.tech.security.egress.maskinporten.dev.AlderV1
+import no.nav.pensjon.kalkulator.tech.security.egress.maskinporten.dev.SimulatorDevClient
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -12,7 +14,8 @@ import java.time.LocalDate
 @RestController
 @RequestMapping("api")
 class KalkulatorController(
-    private val grunnbeloepClient: GrunnbeloepClient
+    private val grunnbeloepClient: GrunnbeloepClient,
+    private val simulatorClient: SimulatorDevClient
 ) {
     @GetMapping("grunnbeloep")
     @Operation(
@@ -24,4 +27,16 @@ class KalkulatorController(
         val spec = GrunnbeloepSpec(now, now)
         return grunnbeloepClient.getGrunnbeloep(spec)
     }
+
+    @GetMapping("simulator-status-test")
+    @Operation(
+        summary = "Simulator status-test"
+    )
+    fun simulatorStatusTest(): String = simulatorClient.status()
+
+    @GetMapping("simulator-tmu-test")
+    @Operation(
+        summary = "Simulator TMU-test"
+    )
+    fun simulatorTidligstMuligUttakTest(): AlderV1 = simulatorClient.tidligstMuligUttak()
 }

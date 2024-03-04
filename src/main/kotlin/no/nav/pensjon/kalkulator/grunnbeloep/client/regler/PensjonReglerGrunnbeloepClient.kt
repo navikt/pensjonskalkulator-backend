@@ -13,16 +13,15 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
-import java.util.*
 
 @Component
 class PensjonReglerGrunnbeloepClient(
     @Value("\${pensjon-regler.url}") baseUrl: String,
-    webClient: WebClient,
+    webClientBuilder: WebClient.Builder,
     @Qualifier("regler") objectMapper: ObjectMapper,
     traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
-) : PensjonReglerClient(baseUrl, webClient, objectMapper, traceAid, retryAttempts), GrunnbeloepClient {
+) : PensjonReglerClient(baseUrl, webClientBuilder, objectMapper, traceAid, retryAttempts), GrunnbeloepClient {
 
     override fun getGrunnbeloep(spec: GrunnbeloepSpec): Grunnbeloep {
         val requestSpec = GrunnbeloepMapper.toDto(spec)

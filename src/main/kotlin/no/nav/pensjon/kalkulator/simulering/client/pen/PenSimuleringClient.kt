@@ -5,14 +5,14 @@ import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.PersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
-import no.nav.pensjon.kalkulator.simulering.client.pen.dto.*
+import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringEgressSpecDto
+import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringResponseDto
 import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenSimuleringMapper
 import no.nav.pensjon.kalkulator.tech.selftest.Pingable
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
-import java.util.*
 
 @Component
 class PenSimuleringClient(

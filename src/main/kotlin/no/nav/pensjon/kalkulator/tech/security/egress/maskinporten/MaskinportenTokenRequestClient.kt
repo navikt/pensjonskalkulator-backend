@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.tech.security.egress.oauth2.clientcred
+package no.nav.pensjon.kalkulator.tech.security.egress.maskinporten
 
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.OAuth2ParameterBuilder
 import no.nav.pensjon.kalkulator.tech.security.egress.token.CacheAwareTokenClient
@@ -11,17 +11,17 @@ import org.springframework.util.MultiValueMap
 import org.springframework.web.reactive.function.client.WebClient
 
 @Component
-@Qualifier("client-credentials")
-class ClientCredentialsTokenRequestClient(
-    @Value("\${azure.openid-config.token-endpoint}") tokenEndpoint: String,
+@Qualifier("jwt-bearer")
+class MaskinportenTokenRequestClient(
     webClientBuilder: WebClient.Builder,
+    @Value("\${maskinporten.token-endpoint}") tokenEndpoint: String,
     expirationChecker: ExpirationChecker,
-    private val credentials: ClientCredentials,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
 ) : CacheAwareTokenClient(
     webClientBuilder.baseUrl(tokenEndpoint).build(),
     expirationChecker,
-    retryAttempts) {
+    retryAttempts
+) {
 
     override fun prepareTokenRequestBody(
         accessParameter: TokenAccessParameter,
@@ -29,7 +29,5 @@ class ClientCredentialsTokenRequestClient(
     ): MultiValueMap<String, String> =
         OAuth2ParameterBuilder()
             .tokenAccessParameter(accessParameter)
-            .clientId(credentials.clientId)
-            .clientSecret(credentials.clientSecret)
-            .buildClientCredentialsTokenRequestMap()
+            .clientAssertionTokenRequestMap()
 }

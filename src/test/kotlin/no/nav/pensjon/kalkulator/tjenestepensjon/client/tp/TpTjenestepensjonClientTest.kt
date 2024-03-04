@@ -109,7 +109,7 @@ class TpTjenestepensjonClientTest : WebClientTest() {
         val exception = assertThrows(EgressException::class.java) { client.harTjenestepensjonsforhold(pid, dato) }
 
         assertEquals(
-            "Failed calling /api/tjenestepensjon/haveYtelse?date=2023-02-01&ytelseType=ALDER&ordningType=TPOF",
+            "Failed calling ${baseUrl()}/api/tjenestepensjon/haveYtelse?date=2023-02-01&ytelseType=ALDER&ordningType=TPOF",
             exception.message
         )
         assertEquals("Feil", (exception.cause as EgressException).message)

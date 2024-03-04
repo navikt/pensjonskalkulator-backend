@@ -20,12 +20,13 @@ import reactor.core.publisher.Mono
 
 abstract class PensjonReglerClient(
     private val baseUrl: String,
-    private val webClient: WebClient,
+    webClientBuilder: WebClient.Builder,
     private val objectMapper: ObjectMapper,
     private val traceAid: TraceAid,
     retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), Pingable {
 
+    private val webClient = webClientBuilder.baseUrl(baseUrl).build()
     private val log = KotlinLogging.logger {}
 
     override fun service() = service
@@ -36,14 +37,14 @@ abstract class PensjonReglerClient(
         requestClass: Class<Req>,
         responseClass: Class<Res>
     ): Res {
-        val uri = "$baseUrl/$path"
-        log.debug { "POST to URI: '$uri'" }
+        val url = "$baseUrl/$path"
+        log.debug { "POST to URL: '$url'" }
 
         try {
             val responseBody = webClient
                 .post()
-                .uri(uri)
-                .headers { setHeaders(it) }
+                .uri("/$path")
+                .headers(::setHeaders)
                 .body(Mono.just(requestBody), requestClass)
                 .retrieve()
                 .bodyToMono(String::class.java)
@@ -52,31 +53,31 @@ abstract class PensjonReglerClient(
 
             return objectMapper.readValue(responseBody, responseClass)
         } catch (e: WebClientRequestException) {
-            throw EgressException("Failed calling $uri", e)
+            throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }
     }
 
     override fun ping(): PingResult {
-        val uri = "$baseUrl/$PING_PATH"
+        val url = "$baseUrl/$PING_PATH"
 
         return try {
             val responseBody = webClient
                 .get()
-                .uri(uri)
-                .headers { setPingHeaders(it) }
+                .uri("/$PING_PATH")
+                .headers(::setPingHeaders)
                 .retrieve()
                 .bodyToMono(String::class.java)
-                .retryWhen(retryBackoffSpec(uri))
+                .retryWhen(retryBackoffSpec(url))
                 .block()
                 ?: ""
 
-            return PingResult(service, ServiceStatus.UP, uri, responseBody)
+            return PingResult(service, ServiceStatus.UP, url, responseBody)
         } catch (e: WebClientRequestException) {
-            PingResult(service, ServiceStatus.DOWN, uri, e.message ?: "forespørsel feilet")
+            PingResult(service, ServiceStatus.DOWN, url, e.message ?: "forespørsel feilet")
         } catch (e: WebClientResponseException) {
-            PingResult(service, ServiceStatus.DOWN, uri, e.responseBodyAsString)
+            PingResult(service, ServiceStatus.DOWN, url, e.responseBodyAsString)
         }
     }
 

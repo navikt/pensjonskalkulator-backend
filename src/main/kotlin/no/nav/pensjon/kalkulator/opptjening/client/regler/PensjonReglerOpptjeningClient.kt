@@ -1,8 +1,8 @@
 package no.nav.pensjon.kalkulator.opptjening.client.regler
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningClient
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningshistorikk
+import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningClient
 import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningshistorikkSpec
 import no.nav.pensjon.kalkulator.opptjening.client.regler.dto.OpptjeningRequestDto
 import no.nav.pensjon.kalkulator.opptjening.client.regler.dto.OpptjeningResponseDto
@@ -13,16 +13,15 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
-import java.util.*
 
 @Component
 class PensjonReglerOpptjeningClient(
     @Value("\${pensjon-regler.url}") baseUrl: String,
-    webClient: WebClient,
+    webClientBuilder: WebClient.Builder,
     @Qualifier("regler") objectMapper: ObjectMapper,
     traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
-) : PensjonReglerClient(baseUrl, webClient, objectMapper, traceAid, retryAttempts), OpptjeningClient {
+) : PensjonReglerClient(baseUrl, webClientBuilder, objectMapper, traceAid, retryAttempts), OpptjeningClient {
 
     override fun getOpptjeningshistorikk(spec: OpptjeningshistorikkSpec): Opptjeningshistorikk {
         val requestSpec = OpptjeningMapper.toDto(spec)

@@ -25,7 +25,6 @@ import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import java.util.*
 
 /**
  * Fetches SAML tokens from Gandalf Security Token Service (STS).
@@ -33,33 +32,34 @@ import java.util.*
 @Component
 class GandalfSamlTokenClient(
     @Value("\${sts.url}") private val baseUrl: String,
-    private val webClient: WebClient,
+    webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), SamlTokenClient, Pingable {
 
+    private val webClient = webClientBuilder.baseUrl(baseUrl).build()
     private val log = KotlinLogging.logger {}
 
     override fun service() = service
 
     override fun fetchSamlToken(): SamlTokenDataDto {
-        val uri = "$baseUrl$TOKEN_EXCHANGE_PATH"
-        log.debug { "POST to URI: '$uri'" }
+        val url = "$baseUrl/$TOKEN_EXCHANGE_PATH"
+        log.debug { "POST to URI: '$url'" }
 
         return try {
             webClient
                 .post()
-                .uri(uri)
+                .uri("/$TOKEN_EXCHANGE_PATH")
                 .headers(::setHeaders)
                 .body(body(idToken()))
                 .retrieve()
                 .bodyToMono(SamlTokenDataDto::class.java)
-                .retryWhen(retryBackoffSpec(uri))
+                .retryWhen(retryBackoffSpec(url))
                 .block()
                 ?.also { countCalls(MetricResult.OK) }
                 ?: emptyDto()
         } catch (e: WebClientRequestException) {
-            throw EgressException("Failed calling $uri", e)
+            throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }
@@ -102,7 +102,7 @@ class GandalfSamlTokenClient(
 
     companion object {
         private const val TOKEN_TYPE = "urn:ietf:params:oauth:token-type:access_token"
-        private const val TOKEN_EXCHANGE_PATH = "/rest/v1/sts/token/exchange"
+        private const val TOKEN_EXCHANGE_PATH = "rest/v1/sts/token/exchange"
         private const val PING_PATH = "/ping" //TODO
         private val service = EgressService.GANDALF_STS
 

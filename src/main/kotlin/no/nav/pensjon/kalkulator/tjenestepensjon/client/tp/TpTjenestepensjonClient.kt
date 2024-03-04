@@ -29,7 +29,7 @@ import java.time.LocalDate
  */
 @Component
 class TpTjenestepensjonClient(
-    @Value("\${tjenestepensjon.url}") baseUrl: String,
+    @Value("\${tjenestepensjon.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
@@ -43,31 +43,32 @@ class TpTjenestepensjonClient(
     override fun service(): EgressService = service
 
     override fun erApoteker(pid: Pid): Boolean {
-        val uri = "/$API_PATH/$APOTEKER_RESOURCE"
-        log.debug { "GET from URI: '$uri'" }
+        val url = "$baseUrl/$APOTEKER_PATH"
+        log.debug { "GET from URL: '$url'" }
 
         return try {
             webClient
                 .get()
-                .uri(uri)
+                .uri("/$APOTEKER_PATH")
                 .headers { setHeaders(it, pid) }
                 .retrieve()
                 .bodyToMono(TpApotekerDto::class.java)
-                .retryWhen(retryBackoffSpec(uri))
+                .retryWhen(retryBackoffSpec(url))
                 .block()
                 ?.let(TpTjenestepensjonMapper::fromDto)
                 .also { countCalls(MetricResult.OK) }
                 ?: false
         } catch (e: WebClientRequestException) {
-            throw EgressException("Failed calling $uri", e)
+            throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }
     }
 
     override fun harTjenestepensjonsforhold(pid: Pid, dato: LocalDate): Boolean {
-        val uri = uri(dato)
-        log.debug { "GET from URI: '$uri'" }
+        val uri = ytelseUri(dato)
+        val url = "$baseUrl$uri"
+        log.debug { "GET from URL: '$url'" }
 
         return try {
             webClient
@@ -76,36 +77,36 @@ class TpTjenestepensjonClient(
                 .headers { setHeaders(it, pid) }
                 .retrieve()
                 .bodyToMono(TpTjenestepensjonStatusDto::class.java)
-                .retryWhen(retryBackoffSpec(uri))
+                .retryWhen(retryBackoffSpec(url))
                 .block()
                 ?.let(TpTjenestepensjonMapper::fromDto)
                 .also { countCalls(MetricResult.OK) }
                 ?: false
         } catch (e: WebClientRequestException) {
-            throw EgressException("Failed calling $uri", e)
+            throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }
     }
 
     override fun tjenestepensjon(pid: Pid): Tjenestepensjon {
-        val uri = "/$API_PATH/"
-        log.debug { "GET from URI: '$uri'" }
+        val url = "$baseUrl/$API_PATH/"
+        log.debug { "GET from URL: '$url'" }
 
         return try {
             webClient
                 .get()
-                .uri(uri)
+                .uri("/$API_PATH/")
                 .headers { setHeaders(it, pid) }
                 .retrieve()
                 .bodyToMono(TpTjenestepensjonDto::class.java)
-                .retryWhen(retryBackoffSpec(uri))
+                .retryWhen(retryBackoffSpec(url))
                 .block()
                 ?.let(TpTjenestepensjonMapper::fromDto)
                 .also { countCalls(MetricResult.OK) }
                 ?: Tjenestepensjon(emptyList())
         } catch (e: WebClientRequestException) {
-            throw EgressException("Failed calling $uri", e)
+            throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }
@@ -117,13 +118,14 @@ class TpTjenestepensjonClient(
 
     override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
 
-    private fun uri(date: LocalDate) =
+    private fun ytelseUri(date: LocalDate) =
         DefaultUriBuilderFactory()
-            .uriString("/$API_PATH/$YTELSE_RESOURCE")
+            .uriString("/$YTELSE_PATH")
             .queryParam("date", date.toString())
             .queryParam("ytelseType", TpYtelseType.ALDERSPENSJON.externalValue)
             .queryParam("ordningType", TpOrdningType.OFFENTLIG_TJENESTEPENSJONSORDNING.externalValue)
-            .build().toString()
+            .build()
+            .toString()
 
     private fun setHeaders(headers: HttpHeaders, pid: Pid) {
         headers.setBearerAuth(EgressAccess.token(service).value)
@@ -137,9 +139,11 @@ class TpTjenestepensjonClient(
         private const val API_PATH = "api/tjenestepensjon"
         private const val PING_PATH = "actuator/health/liveness"
         private const val APOTEKER_RESOURCE = "medlem/afp/apotekerforeningen/ersisteforhold"
+        private const val APOTEKER_PATH = "$API_PATH/$APOTEKER_RESOURCE"
 
         // https://github.com/navikt/tp/blob/main/tp-api/src/main/kotlin/no/nav/samhandling/tp/controller/TjenestepensjonController.kt
         private const val YTELSE_RESOURCE = "haveYtelse"
+        private const val YTELSE_PATH = "$API_PATH/$YTELSE_RESOURCE"
 
         private val service = EgressService.TJENESTEPENSJON
     }

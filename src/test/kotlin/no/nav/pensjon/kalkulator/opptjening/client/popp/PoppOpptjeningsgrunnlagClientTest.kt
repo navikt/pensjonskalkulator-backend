@@ -7,28 +7,39 @@ import no.nav.pensjon.kalkulator.opptjening.Opptjeningsgrunnlag
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.TestPropertySource
+import org.springframework.web.reactive.function.client.WebClient
 import java.math.BigDecimal
 
-@ExtendWith(SpringExtension::class)
+@SpringBootTest
+@TestPropertySource("classpath:application-test.properties")
 class PoppOpptjeningsgrunnlagClientTest : WebClientTest() {
 
     private lateinit var client: PoppOpptjeningsgrunnlagClient
+
+    @Autowired
+    private lateinit var webClientBuilder: WebClient.Builder
 
     @Mock
     private lateinit var traceAid: TraceAid
 
     @BeforeEach
     fun initialize() {
-        client = PoppOpptjeningsgrunnlagClient(baseUrl(), WebClientConfig().regularWebClient(), traceAid, RETRY_ATTEMPTS)
+        client = PoppOpptjeningsgrunnlagClient(
+            baseUrl = baseUrl(),
+            webClientBuilder = webClientBuilder,
+            traceAid = traceAid,
+            retryAttempts = RETRY_ATTEMPTS
+        )
     }
 
     @Test

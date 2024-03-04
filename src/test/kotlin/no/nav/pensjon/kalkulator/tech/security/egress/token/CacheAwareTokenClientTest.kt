@@ -4,23 +4,28 @@ import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.config.OAuth2ConfigurationGetter
 import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.ExpirationChecker
 import okhttp3.mockwebserver.MockResponse
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.TestPropertySource
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDateTime
 
-@ExtendWith(SpringExtension::class)
+@SpringBootTest
+@TestPropertySource("classpath:application-test.properties")
 class CacheAwareTokenClientTest : WebClientTest() {
 
     private lateinit var tokenGetter: TestClass
+
+    @Autowired
+    private lateinit var webClientBuilder: WebClient.Builder
 
     @Mock
     private lateinit var oauth2ConfigGetter: OAuth2ConfigurationGetter
@@ -30,7 +35,10 @@ class CacheAwareTokenClientTest : WebClientTest() {
 
     @BeforeEach
     fun initialize() {
-        tokenGetter = TestClass(WebClient.create(), oauth2ConfigGetter, expirationChecker)
+        tokenGetter = TestClass(
+            webClient = webClientBuilder.baseUrl(baseUrl()).build(),
+            expirationChecker = expirationChecker
+        )
     }
 
     @Test
@@ -77,9 +85,8 @@ class CacheAwareTokenClientTest : WebClientTest() {
 
     private class TestClass(
         webClient: WebClient,
-        oauth2ConfigGetter: OAuth2ConfigurationGetter,
         expirationChecker: ExpirationChecker
-    ) : CacheAwareTokenClient(webClient, oauth2ConfigGetter, expirationChecker, "1") {
+    ) : CacheAwareTokenClient(webClient, expirationChecker, "1") {
         private var cleanupTrigger = 1000
 
         override fun getCleanupTrigger(): Int {

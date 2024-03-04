@@ -8,25 +8,30 @@ import no.nav.pensjon.kalkulator.regler.ReglerConfiguration
 import no.nav.pensjon.kalkulator.tech.security.egress.EnrichedAuthentication
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
-import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import okhttp3.mockwebserver.MockResponse
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.TestPropertySource
+import org.springframework.web.reactive.function.client.WebClient
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
 import java.time.LocalDate
 
-@ExtendWith(SpringExtension::class)
+@SpringBootTest
+@TestPropertySource("classpath:application-test.properties")
 class PensjonReglerGrunnbeloepClientTest : WebClientTest() {
 
     private lateinit var client: PensjonReglerGrunnbeloepClient
+
+    @Autowired
+    private lateinit var webClientBuilder: WebClient.Builder
 
     @Mock
     private lateinit var traceAid: TraceAid
@@ -35,7 +40,7 @@ class PensjonReglerGrunnbeloepClientTest : WebClientTest() {
     fun initialize() {
         client = PensjonReglerGrunnbeloepClient(
             baseUrl = baseUrl(),
-            webClient = WebClientConfig().regularWebClient(),
+            webClientBuilder = webClientBuilder,
             objectMapper = ReglerConfiguration().objectMapper(),
             traceAid = traceAid,
             retryAttempts = "1"
@@ -54,7 +59,10 @@ class PensjonReglerGrunnbeloepClientTest : WebClientTest() {
         ByteArrayOutputStream().use {
             takeRequest().body.copyTo(it)
             assertEquals(
-                """{"fom":1672567200000,"tom":1672653600000}""",
+                """{
+  "fom" : 1672567200000,
+  "tom" : 1672653600000
+}""",
                 it.toString(StandardCharsets.UTF_8)
             )
         }
