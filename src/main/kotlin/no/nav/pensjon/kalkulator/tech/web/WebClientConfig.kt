@@ -1,13 +1,10 @@
 package no.nav.pensjon.kalkulator.tech.web
 
 import io.netty.channel.ChannelOption
-import io.netty.handler.logging.LogLevel
 import io.netty.handler.timeout.ReadTimeoutHandler
 import io.netty.handler.timeout.WriteTimeoutHandler
 import org.springframework.boot.web.reactive.function.client.WebClientCustomizer
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
@@ -19,7 +16,6 @@ import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import reactor.netty.Connection
 import reactor.netty.http.client.HttpClient
-import reactor.netty.transport.logging.AdvancedByteBufFormat
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 
@@ -34,32 +30,11 @@ class WebClientConfig : WebClientCustomizer {
                         .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, TIMEOUT.toInt())
                         .responseTimeout(Duration.ofMillis(TIMEOUT))
                         .doOnConnected(::addTimeoutHandlers)
-                        .wiretap(
-                            "reactor.netty.http.client.HttpClient",
-                            LogLevel.DEBUG,
-                            AdvancedByteBufFormat.TEXTUAL
-                        )
                 )
             )
             .exchangeStrategies(largeBufferStrategies())
             .filter(filterResponse())
     }
-
-    @Bean
-    @Primary
-    fun regularWebClient(): WebClient =
-        WebClient.builder()
-            .clientConnector(
-                ReactorClientHttpConnector(HttpClient.create()
-                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, TIMEOUT.toInt())
-                    .responseTimeout(Duration.ofMillis(TIMEOUT))
-                    .doOnConnected { conn ->
-                        conn.addHandlerLast(ReadTimeoutHandler(TIMEOUT, TimeUnit.MILLISECONDS))
-                        conn.addHandlerLast(WriteTimeoutHandler(TIMEOUT, TimeUnit.MILLISECONDS))
-                    })
-            )
-            .filter(filterResponse())
-            .build()
 
     companion object {
         private const val MAX_IN_MEMORY_SIZE = 10485760 // 10 MB (10 * 1024 * 1024)
