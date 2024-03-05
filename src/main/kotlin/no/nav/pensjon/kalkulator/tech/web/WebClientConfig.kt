@@ -16,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import reactor.netty.Connection
 import reactor.netty.http.client.HttpClient
+import reactor.netty.resources.ConnectionProvider
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 
@@ -26,7 +27,7 @@ class WebClientConfig : WebClientCustomizer {
         webClientBuilder
             .clientConnector(
                 ReactorClientHttpConnector(
-                    HttpClient.create()
+                    HttpClient.create(connectionProvider())
                         .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, TIMEOUT.toInt())
                         .responseTimeout(Duration.ofMillis(TIMEOUT))
                         .doOnConnected(::addTimeoutHandlers)
@@ -44,6 +45,25 @@ class WebClientConfig : WebClientCustomizer {
             connection.addHandlerLast(ReadTimeoutHandler(TIMEOUT, TimeUnit.MILLISECONDS))
             connection.addHandlerLast(WriteTimeoutHandler(TIMEOUT, TimeUnit.MILLISECONDS))
         }
+
+        /**
+         * From https://github.com/reactor/reactor-netty/issues/764:
+         * The idle timeout varies depending on provider, so it's hard to have a good default for this without
+         * making it overly aggressive i.e. setting it < 60 seconds. If too aggressive then new
+         * connections are established potentially more than needed, i.e. more SSL handshakes etc.
+         * -----
+         * Values used below are taken from example in:
+         * https://projectreactor.io/docs/netty/release/reference/index.html#connection-pool-timeout
+         */
+        private fun connectionProvider() =
+            ConnectionProvider.builder("custom")
+                .maxConnections(50)
+                .maxIdleTime(Duration.ofSeconds(20)) // too aggressive? (see Javadoc comment above)
+                .maxLifeTime(Duration.ofSeconds(60))
+                .pendingAcquireTimeout(Duration.ofSeconds(60))
+                .evictInBackground(Duration.ofSeconds(120))
+                .metrics(true)
+                .build()
 
         private fun largeBufferStrategies(): ExchangeStrategies =
             ExchangeStrategies.builder()
