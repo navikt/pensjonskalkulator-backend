@@ -10,12 +10,12 @@ data class PensjonsberegningV3(val alder: Int, val beloep: Int)
 
 data class VilkaarsproevingV3(
     val vilkaarErOppfylt: Boolean,
-    val alternativV3: AlternativV3?
+    val alternativ: AlternativV3?
 )
 
 data class AlternativV3(
     val heltUttaksalder: AlderV3,
-    val gradertUttaksalder: AlderV3,
+    val gradertUttaksalder: AlderV3?,
     val uttaksgrad: Int
 )
 

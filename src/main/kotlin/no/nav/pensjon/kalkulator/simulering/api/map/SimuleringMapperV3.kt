@@ -25,7 +25,7 @@ object SimuleringMapperV3 {
         SimuleringResultatV3(
             alderspensjon = resultat.alderspensjon.map { PensjonsberegningV3(it.alder, it.beloep) },
             afpPrivat = resultat.afpPrivat.map { PensjonsberegningV3(it.alder, it.beloep) },
-            vilkaarsproeving = VilkaarsproevingV3(vilkaarErOppfylt = true, alternativV3 = null)
+            vilkaarsproeving = VilkaarsproevingV3(vilkaarErOppfylt = true, alternativ = null)
         )
 
 

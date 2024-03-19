@@ -120,7 +120,7 @@ class SimuleringController(
             SimuleringResultatV3(
                 alderspensjon = emptyList(),
                 afpPrivat = emptyList(),
-                vilkaarsproeving = VilkaarsproevingV3(vilkaarErOppfylt = false, alternativV3 = null)
+                vilkaarsproeving = VilkaarsproevingV3(vilkaarErOppfylt = false, alternativ = null)
             )
 
         private fun vilkaarIkkeOppfylt() =
