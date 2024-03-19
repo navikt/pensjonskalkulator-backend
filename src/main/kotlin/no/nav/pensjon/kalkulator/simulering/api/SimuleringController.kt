@@ -8,16 +8,18 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.simulering.SimuleringService
-import no.nav.pensjon.kalkulator.simulering.api.dto.IngressSimuleringSpecV2
-import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringSpecDto
-import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringsresultatDto
+import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.fromIngressSimuleringSpecV2
-import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.fromSpecDto
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.resultatDto
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapperV3.fromIngressSimuleringSpecV3
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapperV3.resultatV3
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.intellij.lang.annotations.Language
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("api")
@@ -28,19 +30,20 @@ class SimuleringController(
 
     private val log = KotlinLogging.logger {}
 
-    @PostMapping("v1/alderspensjon/simulering")
+    @PostMapping("v3/alderspensjon/simulering")
     @Operation(
-        summary = "Simuler hel alderspensjon",
-        description = "Lag en prognose for framtidig alderspensjon med 100 % uttak." +
-                " Feltet 'epsHarInntektOver2G' brukes til å angi om ektefelle/partner/samboer har inntekt" +
-                " over 2 ganger grunnbeløpet eller ei.",
+        summary = "Simuler alderspensjon",
+        description = "Lag en prognose for framtidig alderspensjon." +
+                " Feltet 'epsHarInntektOver2G' brukes til å angi hvorvidt ektefelle/partner/samboer har inntekt" +
+                " over 2 ganger grunnbeløpet. Dersom simulering med de angitte parametre resulterer i avslag i" +
+                " vilkårsprøvingen, vil responsen inneholde alternative parametre som vil gi et innvilget" +
+                " simuleringsresultat"
     )
     @ApiResponses(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "Simulering utført" +
-                        " (men dersom vilkår ikke oppfylt vil responsen ikke inneholde pensjonsbeløp)."
+                description = "Simulering utført"
             ),
             ApiResponse(
                 responseCode = "503", description = "Simulering kunne ikke utføres av tekniske årsaker",
@@ -48,15 +51,21 @@ class SimuleringController(
             ),
         ]
     )
-    fun simulerAlderspensjonV1(@RequestBody spec: SimuleringSpecDto): SimuleringsresultatDto {
+    fun simulerAlderspensjonV3(@RequestBody spec: IngressSimuleringSpecV3): SimuleringResultatV3 {
         traceAid.begin()
-        log.debug { "Request for V1 simulering: $spec" }
+        log.debug { "Request for V3 simulering: $spec" }
 
         return try {
-            resultatDto(timed(service::simulerAlderspensjon, fromSpecDto(spec), "alderspensjon/simulering"))
-                .also { log.debug { "Simulering V1 respons: $it" } }
+            resultatV3(
+                timed(
+                    service::simulerAlderspensjon,
+                    fromIngressSimuleringSpecV3(spec),
+                    "alderspensjon/simulering"
+                )
+            )
+                .also { log.debug { "Simulering V3 respons: $it" } }
         } catch (e: EgressException) {
-            if (e.isConflict) vilkaarIkkeOppfylt() else handleError(e, "V1")!!
+            if (e.isConflict) vilkaarIkkeOppfyltV3() else handleError(e, "V3")!!
         } finally {
             traceAid.end()
         }
@@ -67,7 +76,7 @@ class SimuleringController(
         summary = "Simuler alderspensjon",
         description = "Lag en prognose for framtidig alderspensjon." +
                 " Feltet 'epsHarInntektOver2G' brukes til å angi om ektefelle/partner/samboer har inntekt" +
-                " over 2 ganger grunnbeløpet eller ei.",
+                " over 2 ganger grunnbeløpet eller ei."
     )
     @ApiResponses(
         value = [
@@ -87,7 +96,13 @@ class SimuleringController(
         log.debug { "Request for simulering: $spec" }
 
         return try {
-            resultatDto(timed(service::simulerAlderspensjon, fromIngressSimuleringSpecV2(spec), "alderspensjon/simulering"))
+            resultatDto(
+                timed(
+                    service::simulerAlderspensjon,
+                    fromIngressSimuleringSpecV2(spec),
+                    "alderspensjon/simulering"
+                )
+            )
                 .also { log.debug { "Simulering respons: $it" } }
         } catch (e: EgressException) {
             if (e.isConflict) vilkaarIkkeOppfylt() else handleError(e, "V2")!!
@@ -100,6 +115,13 @@ class SimuleringController(
 
     companion object {
         private const val ERROR_MESSAGE = "feil ved simulering"
+
+        private fun vilkaarIkkeOppfyltV3() =
+            SimuleringResultatV3(
+                alderspensjon = emptyList(),
+                afpPrivat = emptyList(),
+                vilkaarsproeving = VilkaarsproevingV3(vilkaarErOppfylt = false, alternativV3 = null)
+            )
 
         private fun vilkaarIkkeOppfylt() =
             SimuleringsresultatDto(
