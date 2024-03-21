@@ -6,15 +6,18 @@ object AzureAdUtil {
 
     private const val APPLICATION_URI_SCHEME = "api"
 
-    // docs.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent#the-default-scope
-    private const val AZURE_AD_DEFAULT_SCOPE = ".default"
+    /**
+     * https://learn.microsoft.com/en-us/entra/identity-platform/scopes-oidc#the-default-scope
+     * Note: Cannot be combined with other scopes
+     */
+    private const val DEFAULT_SCOPE = ".default"
 
     /**
      * Gets the default application scope in the form "api://<cluster>.<namespace>.<app-name>/.default",
      * ref. https://doc.nais.io/security/auth/azure-ad/concepts/#scopes
      */
     fun getDefaultScope(fullyQualifiedApplicationName: String): String =
-        formatAsApplicationIdUri(fullyQualifiedApplicationName) + "/" + AZURE_AD_DEFAULT_SCOPE
+        formatAsApplicationIdUri(fullyQualifiedApplicationName) + "/$DEFAULT_SCOPE"
 
     /**
      * Gets the application ID URI for a fully qualified application name of the form "<cluster>:<namespace>:<app-name>".

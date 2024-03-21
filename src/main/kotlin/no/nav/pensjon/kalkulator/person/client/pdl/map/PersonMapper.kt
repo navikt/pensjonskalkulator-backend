@@ -9,8 +9,7 @@ import java.time.LocalDate
 
 object PersonMapper {
 
-    fun fromDto(dto: PersonResponseDto): Person? =
-        dto.data?.hentPerson?.let { person(it) }
+    fun fromDto(dto: PersonResponseDto): Person? = dto.data?.hentPerson?.let(::person)
 
     private fun person(dto: PersonDto) =
         Person(
@@ -23,11 +22,9 @@ object PersonMapper {
     private fun fromDto(dto: List<AdressebeskyttelseDto>?): AdressebeskyttelseGradering =
         PdlAdressebeskyttelseGradering.fromExternalValue(dto?.firstOrNull()?.gradering).internalValue
 
-    private fun fromDto(dto: List<FoedselDto>?): LocalDate? =
-        dto?.firstOrNull()?.foedselsdato?.value
+    private fun fromDto(dto: List<FoedselDto>?): LocalDate? = dto?.firstOrNull()?.foedselsdato?.value
 
-    private fun fromDto(dto: List<NavnDto>?): String? =
-        dto?.firstOrNull()?.fornavn
+    private fun fromDto(dto: List<NavnDto>?): String? = dto?.firstOrNull()?.fornavn
 
     private fun fromDto(dto: List<SivilstandDto>?): Sivilstand =
         PdlSivilstand.fromExternalValue(dto?.firstOrNull()?.type).internalValue

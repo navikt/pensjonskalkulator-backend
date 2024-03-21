@@ -1,7 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.oauth2.clientcred
 
 import no.nav.pensjon.kalkulator.mock.WebClientTest
-import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.config.OAuth2ConfigurationGetter
 import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenAccessParameter
 import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenData
 import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.ExpirationChecker
@@ -28,15 +27,10 @@ class ClientCredentialsTokenRequestClientTest : WebClientTest() {
     private lateinit var webClientBuilder: WebClient.Builder
 
     @Mock
-    private lateinit var oauth2ConfigGetter: OAuth2ConfigurationGetter
-
-    @Mock
     private lateinit var expirationChecker: ExpirationChecker
 
     @BeforeEach
     fun initialize() {
-        `when`(oauth2ConfigGetter.getTokenEndpoint()).thenReturn(baseUrl())
-
         client = ClientCredentialsTokenRequestClient(
             tokenEndpoint = baseUrl(),
             webClientBuilder = webClientBuilder,

@@ -17,6 +17,7 @@ class PersonMapperTest {
             fodselsdatoer = listOf(foedselsdato),
             sivilstander = listOf("UGIFT")
         )
+
         val person = PersonMapper.fromDto(dto)!!
 
         assertEquals("For-Navn", person.fornavn)
@@ -78,7 +79,7 @@ class PersonMapperTest {
     }
 
     private companion object {
-        val foedselsdato = LocalDate.of(1963, 12, 31)
+        val foedselsdato: LocalDate = LocalDate.of(1963, 12, 31)
 
         private fun responseDto(
             fornavnliste: List<String> = emptyList(),
@@ -90,13 +91,28 @@ class PersonMapperTest {
                 data = PersonEnvelopeDto(
                     PersonDto(
                         fornavnliste.map(::NavnDto),
-                        fodselsdatoer.map { FoedselDto(DateDto(it)) },
+                        fodselsdatoer.map(::foedsel),
                         sivilstander.map(::SivilstandDto),
                         adressebeskyttelser.map(::AdressebeskyttelseDto)
                     )
                 ),
-                extensions = null,
-                errors = null
+                extensions = extensions(),
+                errors = errors()
+            )
+
+        private fun foedsel(dato: LocalDate) = FoedselDto(DateDto(dato))
+
+        private fun extensions() =
+            ExtensionsDto(
+                listOf(
+                    WarningDto("query", "id", "code", "message", "details")
+                )
+            )
+
+        private fun errors() =
+            listOf(
+                ErrorDto(message = "feil1"),
+                ErrorDto(message = "feil2")
             )
     }
 }

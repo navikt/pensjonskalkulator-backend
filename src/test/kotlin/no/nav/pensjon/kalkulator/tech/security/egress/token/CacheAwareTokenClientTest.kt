@@ -1,7 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.token
 
 import no.nav.pensjon.kalkulator.mock.WebClientTest
-import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.config.OAuth2ConfigurationGetter
 import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.ExpirationChecker
 import okhttp3.mockwebserver.MockResponse
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -28,9 +27,6 @@ class CacheAwareTokenClientTest : WebClientTest() {
     private lateinit var webClientBuilder: WebClient.Builder
 
     @Mock
-    private lateinit var oauth2ConfigGetter: OAuth2ConfigurationGetter
-
-    @Mock
     private lateinit var expirationChecker: ExpirationChecker
 
     @BeforeEach
@@ -44,7 +40,6 @@ class CacheAwareTokenClientTest : WebClientTest() {
     @Test
     fun `getTokenData caches token data()`() {
         arrange(tokenResponse(1))
-        `when`(oauth2ConfigGetter.getTokenEndpoint()).thenReturn(baseUrl())
         `when`(expirationChecker.time()).thenReturn(LocalDateTime.MIN)
 
         val tokenData = tokenGetter.getTokenData(TOKEN_ACCESS_PARAM, AUDIENCE, PID1)
@@ -59,7 +54,6 @@ class CacheAwareTokenClientTest : WebClientTest() {
     fun `clearTokenData removes token data from cache`() {
         arrange(tokenResponse(1))
         arrange(tokenResponse(2)) // 2 responses needed since cache is cleared
-        `when`(oauth2ConfigGetter.getTokenEndpoint()).thenReturn(baseUrl())
         `when`(expirationChecker.time()).thenReturn(LocalDateTime.MIN)
         val tokenData1 = tokenGetter.getTokenData(TOKEN_ACCESS_PARAM, AUDIENCE, PID1)
         assertEquals("${ACCESS_TOKEN}1", tokenData1.accessToken)
@@ -89,16 +83,12 @@ class CacheAwareTokenClientTest : WebClientTest() {
     ) : CacheAwareTokenClient(webClient, expirationChecker, "1") {
         private var cleanupTrigger = 1000
 
-        override fun getCleanupTrigger(): Int {
-            return cleanupTrigger
-        }
+        override fun getCleanupTrigger(): Int = cleanupTrigger
 
         override fun prepareTokenRequestBody(
             accessParameter: TokenAccessParameter,
             audience: String
-        ): MultiValueMap<String, String> {
-            return LinkedMultiValueMap()
-        }
+        ): MultiValueMap<String, String> = LinkedMultiValueMap()
     }
 
     companion object {

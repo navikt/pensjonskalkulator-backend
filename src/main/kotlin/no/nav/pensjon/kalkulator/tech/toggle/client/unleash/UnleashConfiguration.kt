@@ -2,7 +2,6 @@ package no.nav.pensjon.kalkulator.tech.toggle.client.unleash
 
 import io.getunleash.DefaultUnleash
 import io.getunleash.util.UnleashConfig
-import no.nav.pensjon.kalkulator.tech.env.NaisEnvironment
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -29,14 +28,15 @@ class UnleashConfiguration(
     fun defaultUnleash(config: UnleashConfig) = DefaultUnleash(config)
 
     private fun environment() =
-        if (clusterName == NaisEnvironment.PRODUCTION_CLUSTER_NAME)
+        if (clusterName == PRODUCTION_CLUSTER_NAME)
             PRODUCTION_ENVIRONMENT_NAME
         else
             DEFAULT_ENVIRONMENT_NAME
 
     private fun instanceId() = System.getProperty("instance.id") ?: DEFAULT_INSTANCE_ID
 
-    private companion object {
+    companion object {
+        const val PRODUCTION_CLUSTER_NAME = "prod-gcp"
         private const val PRODUCTION_ENVIRONMENT_NAME = "p"
         private const val DEFAULT_ENVIRONMENT_NAME = "q2"
         private const val DEFAULT_INSTANCE_ID = "local"

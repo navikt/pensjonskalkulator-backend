@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.tech.security.egress.maskinporten.dev
 
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
@@ -52,7 +53,7 @@ class SimulatorDevClient(
         }
     }
 
-    fun tidligstMuligUttak(): AlderV1 {
+    fun tidligstMuligUttak(): Alder {
         val url = "$baseUrl/$TIDLIGST_MULIG_UTTAK_RESOURCE"
         log.debug { "POST to URL: '$url'" }
 
@@ -65,10 +66,10 @@ class SimulatorDevClient(
                 .headers(::setHeaders)
                 .bodyValue(BODY)
                 .retrieve()
-                .bodyToMono(AlderV1::class.java)
+                .bodyToMono(Alder::class.java)
                 .retryWhen(retryBackoffSpec(url))
                 .block()
-                ?: AlderV1(0, 0)
+                ?: Alder(0, 0)
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
@@ -105,8 +106,3 @@ class SimulatorDevClient(
         private val service = EgressService.PENSJONSSIMULATOR
     }
 }
-
-data class AlderV1(
-    val aar: Int,
-    val maaneder: Int
-)

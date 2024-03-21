@@ -18,20 +18,6 @@ object SimuleringMapper {
             vilkaarErOppfylt = true
         )
 
-    // V1
-    fun fromSpecDto(spec: SimuleringSpecDto) =
-        ImpersonalSimuleringSpec(
-            simuleringType = spec.simuleringstype,
-            epsHarInntektOver2G = spec.epsHarInntektOver2G,
-            forventetAarligInntektFoerUttak = spec.forventetInntekt,
-            sivilstand = spec.sivilstand,
-            gradertUttak = null, // not supported in V1
-            heltUttak = HeltUttak(
-                uttakFomAlder = alder(spec.foersteUttaksalder),
-                inntekt = null // not supported in V1
-            )
-        )
-
     fun fromIngressSimuleringSpecV2(spec: IngressSimuleringSpecV2) =
         ImpersonalSimuleringSpec(
             simuleringType = spec.simuleringstype,
