@@ -17,13 +17,14 @@ class SimuleringMapperTest {
         val dto = SimuleringMapper.resultatDto(
             Simuleringsresultat(
                 alderspensjon = listOf(
-                    SimulertAlderspensjon(67, 1001),
-                    SimulertAlderspensjon(68, 1002)
+                    SimulertAlderspensjon(alder = 67, beloep = 1001),
+                    SimulertAlderspensjon(alder = 68, beloep = 1002)
                 ),
                 afpPrivat = listOf(
-                    SimulertAfpPrivat(62, 2001),
-                    SimulertAfpPrivat(63, 2002)
-                )
+                    SimulertAfpPrivat(alder = 62, beloep = 2001),
+                    SimulertAfpPrivat(alder = 63, beloep = 2002)
+                ),
+                vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null)
             )
         )
 
@@ -79,34 +80,20 @@ class SimuleringMapperTest {
             with(gradertUttak!!) {
                 assertEquals(Uttaksgrad.FOERTI_PROSENT, grad)
                 assertEquals(234_000, aarligInntekt)
-
-                with(uttakFomAlder) {
-                    assertEquals(68, aar)
-                    assertEquals(2, maaneder)
-                }
-
                 with(uttakFomAlder) {
                     assertEquals(68, aar)
                     assertEquals(2, maaneder)
                 }
             }
-
             with(heltUttak) {
-                with(uttakFomAlder!!) {
-                    assertEquals(70, aar)
-                    assertEquals(4, maaneder)
-                }
-
+                assertEquals(Alder(70, 4), uttakFomAlder)
                 with(inntekt!!) {
                     assertEquals(1_000, aarligBeloep)
-
                     with(tomAlder) {
                         assertEquals(75, aar)
                         assertEquals(0, maaneder)
                     }
                 }
-
-                assertEquals(Alder(70, 4), uttakFomAlder)
             }
         }
     }

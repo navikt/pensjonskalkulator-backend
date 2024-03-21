@@ -1,8 +1,10 @@
 package no.nav.pensjon.kalkulator.simulering.api.map
 
 import no.nav.pensjon.kalkulator.general.*
+import no.nav.pensjon.kalkulator.simulering.Alternativ
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
+import no.nav.pensjon.kalkulator.simulering.Vilkaarsproeving
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 
 /**
@@ -11,25 +13,22 @@ import no.nav.pensjon.kalkulator.simulering.api.dto.*
  */
 object SimuleringMapperV3 {
 
-    fun fromIngressSimuleringSpecV3(spec: IngressSimuleringSpecV3) =
+    fun fromIngressSimuleringSpecV3(dto: IngressSimuleringSpecV3) =
         ImpersonalSimuleringSpec(
-            simuleringType = spec.simuleringstype,
-            epsHarInntektOver2G = spec.epsHarInntektOver2G,
-            forventetAarligInntektFoerUttak = spec.aarligInntektFoerUttakBeloep,
-            sivilstand = spec.sivilstand,
-            gradertUttak = spec.gradertUttak?.let(::gradertUttak),
-            heltUttak = heltUttak(spec.heltUttak)
+            simuleringType = dto.simuleringstype,
+            epsHarInntektOver2G = dto.epsHarInntektOver2G,
+            forventetAarligInntektFoerUttak = dto.aarligInntektFoerUttakBeloep,
+            sivilstand = dto.sivilstand,
+            gradertUttak = dto.gradertUttak?.let(::gradertUttak),
+            heltUttak = heltUttak(dto.heltUttak)
         )
 
-    fun resultatV3(resultat: Simuleringsresultat) =
+    fun resultatV3(source: Simuleringsresultat) =
         SimuleringResultatV3(
-            alderspensjon = resultat.alderspensjon.map { PensjonsberegningV3(it.alder, it.beloep) },
-            afpPrivat = resultat.afpPrivat.map { PensjonsberegningV3(it.alder, it.beloep) },
-            vilkaarsproeving = VilkaarsproevingV3(vilkaarErOppfylt = true, alternativ = null)
+            alderspensjon = source.alderspensjon.map { PensjonsberegningV3(it.alder, it.beloep) },
+            afpPrivat = source.afpPrivat.map { PensjonsberegningV3(it.alder, it.beloep) },
+            vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving)
         )
-
-
-    private fun alder(dto: IngressSimuleringAlderV3) = Alder(dto.aar, dto.maaneder)
 
     private fun gradertUttak(dto: IngressSimuleringGradertUttakV3) =
         GradertUttak(
@@ -49,4 +48,26 @@ object SimuleringMapperV3 {
             aarligBeloep = dto.beloep,
             tomAlder = dto.sluttAlder.let(::alder)
         )
+
+    private fun alder(dto: IngressSimuleringAlderV3) = Alder(dto.aar, dto.maaneder)
+
+    private fun vilkaarsproeving(source: Vilkaarsproeving) =
+        VilkaarsproevingV3(
+            vilkaarErOppfylt = source.innvilget,
+            alternativ = source.alternativ?.let(::alternativ)
+        )
+
+    private fun alternativ(source: Alternativ) =
+        AlternativV3(
+            gradertUttaksalder = source.gradertUttakAlder?.let(::alder),
+            uttaksgrad = prosentsats(source.uttakGrad),
+            heltUttaksalder = alder(source.heltUttakAlder)
+        )
+
+    private fun prosentsats(grad: Uttaksgrad?): Int? =
+        grad?.let {
+            if (it == Uttaksgrad.HUNDRE_PROSENT) null else it.prosentsats
+        }
+
+    private fun alder(source: Alder) = AlderV3(source.aar, source.maaneder)
 }

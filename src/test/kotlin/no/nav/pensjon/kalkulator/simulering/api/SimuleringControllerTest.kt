@@ -202,12 +202,14 @@ class SimuleringControllerTest {
             when (simuleringType) {
                 SimuleringType.ALDERSPENSJON -> Simuleringsresultat(
                     alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
-                    afpPrivat = emptyList()
+                    afpPrivat = emptyList(),
+                    vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null)
                 )
 
                 SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT -> Simuleringsresultat(
                     alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
                     afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 22056)),
+                    vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null)
                 )
             }
 

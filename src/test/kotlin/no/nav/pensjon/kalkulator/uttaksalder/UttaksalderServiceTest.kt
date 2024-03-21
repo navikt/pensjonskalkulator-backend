@@ -9,10 +9,7 @@ import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.PersonClient
-import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
-import no.nav.pensjon.kalkulator.simulering.SimuleringService
-import no.nav.pensjon.kalkulator.simulering.SimuleringType
-import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
+import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.uttaksalder.client.UttaksalderClient
@@ -75,8 +72,9 @@ internal class UttaksalderServiceTest {
         )
         `when`(simuleringService.simulerAlderspensjon(simuleringSpec)).thenReturn(
             Simuleringsresultat(
-                emptyList(),
-                emptyList()
+                alderspensjon = emptyList(),
+                afpPrivat = emptyList(),
+                vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null)
             )
         )
 
@@ -110,8 +108,9 @@ internal class UttaksalderServiceTest {
         )
         `when`(simuleringService.simulerAlderspensjon(simuleringSpec)).thenReturn(
             Simuleringsresultat(
-                emptyList(),
-                emptyList()
+                alderspensjon = emptyList(),
+                afpPrivat = emptyList(),
+                vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null)
             )
         )
 

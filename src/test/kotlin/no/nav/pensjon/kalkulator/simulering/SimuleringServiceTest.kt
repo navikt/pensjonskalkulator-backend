@@ -78,11 +78,11 @@ class SimuleringServiceTest {
             beloep = REGISTRERT_INNTEKT.toBigDecimal()
         )
 
-
         private val simuleringsresultat =
             Simuleringsresultat(
                 alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
-                afpPrivat = emptyList()
+                afpPrivat = emptyList(),
+                vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null)
             )
 
         private fun impersonalSimuleringSpec(forventetInntekt: Int?, sivilstand: Sivilstand?) =

@@ -4,9 +4,10 @@ import no.nav.pensjon.kalkulator.common.client.pen.PenClient
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.PersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
+import no.nav.pensjon.kalkulator.simulering.Vilkaarsproeving
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringEgressSpecDto
-import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringResponseDto
+import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenSimuleringResultDto
 import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenSimuleringMapper
 import no.nav.pensjon.kalkulator.tech.selftest.Pingable
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
@@ -30,13 +31,18 @@ class PenSimuleringClient(
             PATH,
             PenSimuleringMapper.toDto(impersonalSpec, personalSpec),
             SimuleringEgressSpecDto::class.java,
-            SimuleringResponseDto::class.java
+            PenSimuleringResultDto::class.java
         )?.let(PenSimuleringMapper::fromDto)
             ?: emptyResult()
 
     private companion object {
         private const val PATH = "simulering/alderspensjon"
 
-        private fun emptyResult() = Simuleringsresultat(emptyList(), emptyList())
+        private fun emptyResult() =
+            Simuleringsresultat(
+                alderspensjon = emptyList(),
+                afpPrivat = emptyList(),
+                vilkaarsproeving = Vilkaarsproeving(innvilget = false)
+            )
     }
 }
