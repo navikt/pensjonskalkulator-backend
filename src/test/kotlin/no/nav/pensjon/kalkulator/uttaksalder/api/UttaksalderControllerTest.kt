@@ -1,8 +1,6 @@
 package no.nav.pensjon.kalkulator.uttaksalder.api
 
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.general.HeltUttak
-import no.nav.pensjon.kalkulator.general.Inntekt
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
@@ -13,7 +11,6 @@ import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
@@ -50,78 +47,31 @@ internal class UttaksalderControllerTest {
     private lateinit var auditor: Auditor
 
     @Test
-    fun `finnTidligsteUttaksalder version 1`() {
+    fun `finnTidligsteHelUttaksalderV1 returns response`() {
         val spec = ImpersonalUttaksalderSpec(
             simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
             sivilstand = Sivilstand.UGIFT,
             harEps = true,
             aarligInntektFoerUttak = 100_000,
-            heltUttak = HeltUttak(Alder(0, 0), null)
+            heltUttak = null
         )
         `when`(uttaksalderService.finnTidligsteUttaksalder(spec)).thenReturn(uttaksalder)
 
         mvc.perform(
-            post("/api/v1/tidligste-uttaksalder")
+            post("/api/v1/tidligste-hel-uttaksalder")
                 .with(csrf())
-                .content(requestBody())
+                .content(requestBodyV1())
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk)
             .andExpect(content().json(responseBodyV1()))
     }
 
-    @Test
-    fun `finnTidligsteUttaksalder version 2`() {
-        val spec = ImpersonalUttaksalderSpec(
-            simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
-            sivilstand = Sivilstand.UGIFT,
-            harEps = true,
-            aarligInntektFoerUttak = 100_000,
-            heltUttak = HeltUttak(
-                Alder(67, 0),
-                Inntekt(1000, Alder(70, 11))
-            )
-        )
-        `when`(uttaksalderService.finnTidligsteUttaksalder(spec)).thenReturn(uttaksalder)
-
-        mvc.perform(
-            post("/api/v2/tidligste-uttaksalder")
-                .with(csrf())
-                .content(requestBodyV2())
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(status().isOk)
-            .andExpect(content().json(responseBodyV2()))
-    }
-
-    @Language("json")
-    private fun requestBody(
-        sivilstand: Sivilstand = Sivilstand.UGIFT,
-        harEps: Boolean = true,
-        sisteInntekt: Int = 100_000,
-        simuleringType: SimuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT
-    ): String = """
-            {
-              "sivilstand": "$sivilstand",
-              "harEps": $harEps,
-              "sisteInntekt": $sisteInntekt,
-              "simuleringstype": "${simuleringType.name}"
-            }
-        """.trimIndent()
-
-    @Language("json")
-    private fun responseBodyV1(aar: Int = uttaksalder.aar, maaned: Int = uttaksalder.maaneder): String = """
-            {
-                "aar": $aar,
-                "maaneder": $maaned
-            }
-        """.trimIndent()
-
     private companion object {
-        private val uttaksalder = Alder(67, 10)
+        private val uttaksalder = Alder(aar = 67, maaneder = 10)
 
         @Language("json")
-        private fun requestBodyV2(
+        private fun requestBodyV1(
             sivilstand: Sivilstand = Sivilstand.UGIFT,
             harEps: Boolean = true,
             sisteInntekt: Int = 100_000,
@@ -131,25 +81,12 @@ internal class UttaksalderControllerTest {
               "simuleringstype": "${simuleringType.name}",
               "sivilstand": "$sivilstand",
               "harEps": $harEps,
-              "aarligInntekt": $sisteInntekt,
-              "heltUttak": {
-                "uttaksalder": {
-                  "aar": 67,
-                  "maaneder": 0
-                },
-                "aarligInntektVsaPensjon": {
-                  "beloep": 1000,
-                  "sluttAlder": {
-                    "aar": 70,
-                    "maaneder": 11
-                  }
-                }
-              }
+              "aarligInntektFoerUttakBeloep": $sisteInntekt
             }
         """.trimIndent()
 
         @Language("json")
-        private fun responseBodyV2(aar: Int = uttaksalder.aar, maaned: Int = uttaksalder.maaneder): String = """
+        private fun responseBodyV1(aar: Int = uttaksalder.aar, maaned: Int = uttaksalder.maaneder): String = """
             {
                 "aar": $aar,
                 "maaneder": $maaned

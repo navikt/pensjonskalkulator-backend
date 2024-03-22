@@ -4,10 +4,10 @@ import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
+import no.nav.pensjon.kalkulator.testutil.Assertions.assertAlder
 import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.*
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
@@ -15,7 +15,7 @@ class UttaksalderMapperTest {
 
     @Test
     fun `toDto maps domain object to data transfer object`() {
-        val dto = UttaksalderMapper.toDto(Alder(2024, 5))
+        val dto = UttaksalderMapper.toDto(Alder(aar = 2024, maaneder = 5))
 
         with(dto!!) {
             assertEquals(2024, aar)
@@ -24,32 +24,32 @@ class UttaksalderMapperTest {
     }
 
     @Test
-    fun `fromIngressSpecDto maps data transfer object to domain object`() {
-        val spec = UttaksalderMapper.fromIngressSpecDto(
-            UttaksalderIngressSpecDto(
+    fun `fromIngressSpecForHeltUttakV1 maps data transfer object to domain object`() {
+        val domainObject: ImpersonalUttaksalderSpec = UttaksalderMapper.fromIngressSpecForHeltUttakV1(
+            IngressUttaksalderSpecForHeltUttakV1(
+                simuleringstype = SimuleringType.ALDERSPENSJON,
                 sivilstand = Sivilstand.GJENLEVENDE_PARTNER,
                 harEps = true,
-                sisteInntekt = 123,
-                simuleringstype = SimuleringType.ALDERSPENSJON,
-                gradertUttak = UttaksalderGradertUttakIngressDto(
-                    grad = 50,
-                    aarligInntektVsaPensjon = 456,
-                    heltUttakAlder = UttaksalderAlderDto(70, 2),
-                    foedselsdato = LocalDate.of(1964, 5, 6)
+                aarligInntektFoerUttakBeloep = 123,
+                aarligInntektVsaPensjon = IngressUttaksalderInntektV1(
+                    beloep = 456,
+                    sluttAlder = IngressUttaksalderAlderV1(aar = 70, maaneder = 2)
                 )
             )
         )
 
-        with(spec) {
+        with(domainObject) {
+            assertEquals(SimuleringType.ALDERSPENSJON, simuleringType)
             assertEquals(Sivilstand.GJENLEVENDE_PARTNER, sivilstand)
             assertTrue(harEps!!)
             assertEquals(123, aarligInntektFoerUttak)
-            assertEquals(SimuleringType.ALDERSPENSJON, simuleringType)
-
-            with(gradertUttak!!) {
-                assertEquals(Uttaksgrad.FEMTI_PROSENT, grad)
-                assertEquals(456, aarligInntekt)
-                assertEquals(LocalDate.of(1964, 5, 6), foedselDato)
+            assertNull(gradertUttak)
+            with(heltUttak!!) {
+                assertNull(uttakFomAlder) // this is the value to be found
+                with(inntekt!!) {
+                    assertAlder(expectedAar = 70, expectedMaaneder = 2, actualAlder = tomAlder)
+                    assertEquals(456, aarligBeloep)
+                }
             }
         }
     }
@@ -96,57 +96,5 @@ class UttaksalderMapperTest {
         )
 
         actual shouldBe expected
-    }
-
-    @Test
-    fun `fromIngressSpecDtoV2 maps data transfer object to domain object`() {
-        val dto = UttaksalderIngressSpecDtoV2(
-            sivilstand = Sivilstand.GJENLEVENDE_PARTNER,
-            harEps = true,
-            aarligInntekt = 123,
-            simuleringstype = SimuleringType.ALDERSPENSJON,
-            gradertUttak = UttaksalderGradertUttakIngressDtoV2(
-                grad = 50,
-                aarligInntekt = 456
-            ),
-            heltUttak = UttaksalderHeltUttakIngressDtoV2(
-                uttaksalder = UttaksalderAlderDto(aar = 70, maaneder = 2),
-                aarligInntektVsaPensjon = UttaksalderInntektDtoV2(
-                    beloep = 456,
-                    sluttAlder = UttaksalderAlderDto(aar = 72, maaneder = 5)
-                )
-            )
-        )
-
-        val spec = UttaksalderMapper.fromIngressSpecDtoV2(dto)
-
-        with(spec) {
-            assertEquals(Sivilstand.GJENLEVENDE_PARTNER, sivilstand)
-            assertTrue(harEps!!)
-            assertEquals(123, aarligInntektFoerUttak)
-            assertEquals(SimuleringType.ALDERSPENSJON, simuleringType)
-
-            with(gradertUttak!!) {
-                assertEquals(Uttaksgrad.FEMTI_PROSENT, grad)
-                assertEquals(456, aarligInntekt)
-                assertEquals(LocalDate.MIN, foedselDato)
-            }
-
-            with(heltUttak!!) {
-                with(uttakFomAlder!!) {
-                    assertEquals(70, aar)
-                    assertEquals(2, maaneder)
-                }
-
-                with(inntekt!!) {
-                    assertEquals(456, aarligBeloep)
-
-                    with(tomAlder) {
-                        assertEquals(72, aar)
-                        assertEquals(5, maaneder)
-                    }
-                }
-            }
-        }
     }
 }

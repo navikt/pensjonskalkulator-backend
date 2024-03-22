@@ -6,39 +6,32 @@ import no.nav.pensjon.kalkulator.general.GradertUttak
 import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.general.UttaksalderGradertUttak
 import no.nav.pensjon.kalkulator.opptjening.InntektService
-import no.nav.pensjon.kalkulator.person.Pid
+import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.SimuleringService
 import no.nav.pensjon.kalkulator.tech.metric.Metrics
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
-import no.nav.pensjon.kalkulator.tech.web.EgressException
-import no.nav.pensjon.kalkulator.uttaksalder.client.UttaksalderClient
 import org.springframework.stereotype.Service
 
 @Service
 class UttaksalderService(
-    private val uttaksalderClient: UttaksalderClient,
     private val simuleringService: SimuleringService,
     private val inntektService: InntektService,
-    private val personClient: PersonClient,
+    private val personService: PersonService,
     private val pidGetter: PidGetter
 ) {
     private val log = KotlinLogging.logger {}
 
     /**
-     * Algoritme for å finne tidligste uttaksalder:
-     * (1) Prøv simulering med teoretisk laveste uttaksalder (pr. 1.1.2024 er det 62 år)
-     * (2) (a) Hvis (1) er OK, så er tidligste uttaksalder 62 år
-     *     (b) Hvis (1) feiler, finn tidligste uttaksalder gjennom PENs 'prøve seg fram'-tjeneste
-     *         (som gjør gjentatte simuleringsforsøk inntil tidligste uttaksalder er funnet)
-     *  Denne algoritmen gjør at man ofte finner tidligste uttaksalder med én simulering (da mange har
-     *  nok opptjening ved 62 år), mens PENs 'prøve seg fram'-tjeneste alltid bruker 6 simuleringer.
+     * Tidligst mulig uttak (TMU) er kun mulig å finne ved helt uttak, da det i dette tilfellet bare er én
+     * uttaksdato å beregne.
+     * (Ved gradert uttak er det to uttaksdatoer som gjensidig påvirker hverandre.)
      */
     fun finnTidligsteUttaksalder(impersonalSpec: ImpersonalUttaksalderSpec): Alder? {
+        validate(impersonalSpec)
         val pid = pidGetter.pid()
-        val sivilstand = impersonalSpec.sivilstand ?: sivilstand(pid)
+        val sivilstand = impersonalSpec.sivilstand ?: sivilstand()
         val harEps = impersonalSpec.harEps ?: sivilstand.harEps
 
         val personalSpec = PersonalUttaksalderSpec(
@@ -48,16 +41,21 @@ class UttaksalderService(
             aarligInntektFoerUttak = impersonalSpec.aarligInntektFoerUttak ?: sisteInntekt()
         )
 
-        return try {
-            simuleringService.simulerAlderspensjon(specMedLavesteUttaksalder(impersonalSpec, personalSpec, harEps))
-            teoretiskLavesteUttaksalder
-        } catch (e: EgressException) {
-            // Vil havne her hvis bruker har for lav opptjening for uttak ved teoretisk laveste alder
-            useTrialAndError(impersonalSpec, personalSpec)
+        val result = simuleringService.simulerAlderspensjon(forLavesteUttaksalder(impersonalSpec, personalSpec, harEps))
+        val tmuAlder = result.vilkaarsproeving.alternativ?.heltUttakAlder ?: teoretiskLavesteUttaksalder
+        return tmuAlder.also(::updateMetric)
+    }
+
+    private fun validate(impersonalSpec: ImpersonalUttaksalderSpec) {
+        if (impersonalSpec.gradertUttak != null) {
+            "kan ikke finne TMU for gradert uttak".let {
+                log.warn { it }
+                throw IllegalArgumentException(it)
+            }
         }
     }
 
-    private fun specMedLavesteUttaksalder(
+    private fun forLavesteUttaksalder(
         impersonalSpec: ImpersonalUttaksalderSpec,
         personalSpec: PersonalUttaksalderSpec,
         harEps: Boolean
@@ -71,18 +69,11 @@ class UttaksalderService(
             heltUttak = simuleringHeltUttak(impersonalSpec)
         )
 
-    private fun useTrialAndError(
-        impersonalSpec: ImpersonalUttaksalderSpec,
-        personalSpec: PersonalUttaksalderSpec
-    ): Alder? {
-        log.debug { "Finner første mulige uttaksalder med parametre $impersonalSpec og $personalSpec" }
-        return uttaksalderClient.finnTidligsteUttaksalder(impersonalSpec, personalSpec).also(::updateMetric)
-    }
 
     private fun sisteInntekt() = inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact()
 
-    private fun sivilstand(pid: Pid): Sivilstand =
-        personClient.fetchPerson(pid)?.sivilstand ?: Sivilstand.UOPPGITT
+    private fun sivilstand(): Sivilstand =
+        personService.getPerson()?.sivilstand ?: Sivilstand.UOPPGITT
 
     private companion object {
         private val teoretiskLavesteUttaksalder = Alder(aar = 62, maaneder = 0)
