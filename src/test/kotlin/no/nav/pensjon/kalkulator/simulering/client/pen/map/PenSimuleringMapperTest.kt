@@ -6,10 +6,10 @@ import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.PersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
-import no.nav.pensjon.kalkulator.simulering.client.pen.dto.AlderSpecDto
-import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringEgressSpecDto
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
+import no.nav.pensjon.kalkulator.simulering.client.pen.dto.*
+import no.nav.pensjon.kalkulator.testutil.Assertions.assertAlder
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class PenSimuleringMapperTest {
@@ -34,6 +34,37 @@ class PenSimuleringMapperTest {
                 assertEquals(AlderSpecDto(68, 11), uttakFomAlder)
                 assertEquals(6_000, aarligInntekt)
                 assertEquals(AlderSpecDto(70, 3), inntektTomAlder)
+            }
+        }
+    }
+
+    @Test
+    fun `fromDto maps PEN-specific data transfer object to domain object`() {
+        val resultat: Simuleringsresultat = PenSimuleringMapper.fromDto(
+            PenSimuleringResultDto(
+                alderspensjon = emptyList(),
+                afpPrivat = emptyList(),
+                vilkaarsproeving = PenVilkaarsproevingDto(
+                    vilkaarErOppfylt = false,
+                    alternativ = PenAlternativDto(
+                        gradertUttaksalder = null,
+                        uttaksgrad = null,
+                        heltUttaksalder = PenAlderDto(aar = 65, maaneder = 4)
+                    )
+                )
+            )
+        )
+
+        with(resultat) {
+            assertTrue(alderspensjon.isEmpty())
+            assertTrue(afpPrivat.isEmpty())
+            with(vilkaarsproeving) {
+                assertFalse(innvilget)
+                with(alternativ!!) {
+                    assertNull(gradertUttakAlder)
+                    assertNull(uttakGrad)
+                    assertAlder(65, 4, heltUttakAlder)
+                }
             }
         }
     }

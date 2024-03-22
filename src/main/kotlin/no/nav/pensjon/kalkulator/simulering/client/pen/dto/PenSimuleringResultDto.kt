@@ -13,12 +13,12 @@ data class PenPensjonDto(
 
 data class PenVilkaarsproevingDto(
     val vilkaarErOppfylt: Boolean,
-    val alternativ: PenAlternativDto
+    val alternativ: PenAlternativDto?
 )
 
 data class PenAlternativDto(
-    val gradertUttaksalder: PenAlderDto,
-    val uttaksgrad: Int,
+    val gradertUttaksalder: PenAlderDto?,
+    val uttaksgrad: Int?,
     val heltUttaksalder: PenAlderDto
 )
 

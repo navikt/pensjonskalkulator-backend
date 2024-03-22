@@ -40,13 +40,13 @@ object PenSimuleringMapper {
     private fun vilkaarsproeving(dto: PenVilkaarsproevingDto) =
         Vilkaarsproeving(
             innvilget = dto.vilkaarErOppfylt,
-            alternativ = dto.alternativ.let(::alternativ)
+            alternativ = dto.alternativ?.let(::alternativ)
         )
 
     private fun alternativ(dto: PenAlternativDto) =
         Alternativ(
-            gradertUttakAlder = alder(dto.gradertUttaksalder),
-            uttakGrad = Uttaksgrad.from(dto.uttaksgrad),
+            gradertUttakAlder = dto.gradertUttaksalder?.let(::alder),
+            uttakGrad = dto.uttaksgrad?.let(Uttaksgrad::from),
             heltUttakAlder = alder(dto.heltUttaksalder)
         )
 
