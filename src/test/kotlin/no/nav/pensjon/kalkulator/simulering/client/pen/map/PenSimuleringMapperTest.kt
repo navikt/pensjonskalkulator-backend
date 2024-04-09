@@ -44,6 +44,7 @@ class PenSimuleringMapperTest {
             PenSimuleringResultDto(
                 alderspensjon = emptyList(),
                 afpPrivat = emptyList(),
+                afpOffentliglivsvarig = emptyList(),
                 vilkaarsproeving = PenVilkaarsproevingDto(
                     vilkaarErOppfylt = false,
                     alternativ = PenAlternativDto(

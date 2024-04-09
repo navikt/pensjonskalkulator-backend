@@ -185,6 +185,7 @@ class SimuleringControllerTest {
             ],
             "afpPrivat": ${
             when (simuleringstype) {
+                SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG -> "[]"
                 SimuleringType.ALDERSPENSJON -> "[]"
                 SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT -> """
               [
@@ -203,12 +204,21 @@ class SimuleringControllerTest {
                 SimuleringType.ALDERSPENSJON -> Simuleringsresultat(
                     alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
                     afpPrivat = emptyList(),
+                    afpOffentlig = emptyList(),
                     vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null)
                 )
 
                 SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT -> Simuleringsresultat(
                     alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
                     afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 22056)),
+                    afpOffentlig = emptyList(),
+                    vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null)
+                )
+
+                SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG -> Simuleringsresultat(
+                    alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
+                    afpPrivat = emptyList(),
+                    afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 22056, afpLeverandoer = "Statens pensjonskasse")),
                     vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null)
                 )
             }

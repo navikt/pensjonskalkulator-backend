@@ -180,6 +180,7 @@ class PenSimuleringClientTest : WebClientTest() {
         }
     ],
     "afpPrivat": [],
+    "afpOffentliglivsvarig": [],
     "vilkaarsproeving": {
         "vilkaarErOppfylt": false,
         "alternativ": {

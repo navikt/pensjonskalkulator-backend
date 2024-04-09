@@ -189,7 +189,7 @@ internal class UttaksalderServiceTest {
                     )
                 )
             )
-        ).thenReturn(Simuleringsresultat(emptyList(), emptyList(), Vilkaarsproeving(true, null)))
+        ).thenReturn(Simuleringsresultat(emptyList(), emptyList(), emptyList(), Vilkaarsproeving(true, null)))
     }
 
     private companion object {

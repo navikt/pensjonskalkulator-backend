@@ -13,6 +13,8 @@ import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.fromIngress
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapper.resultatDto
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapperV3.fromIngressSimuleringSpecV3
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapperV3.resultatV3
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapperV4.fromIngressSimuleringSpecV4
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapperV4.resultatV4
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.intellij.lang.annotations.Language
@@ -29,6 +31,48 @@ class SimuleringController(
 ) : ControllerBase(traceAid) {
 
     private val log = KotlinLogging.logger {}
+
+    @PostMapping("v4/alderspensjon/simulering")
+    @Operation(
+        summary = "Simuler alderspensjon",
+        description = "Lag en prognose for framtidig alderspensjon med støtte til Afp Offentlig." +
+                " Feltet 'epsHarInntektOver2G' brukes til å angi hvorvidt ektefelle/partner/samboer har inntekt" +
+                " over 2 ganger grunnbeløpet. Dersom simulering med de angitte parametre resulterer i avslag i" +
+                " vilkårsprøvingen, vil responsen inneholde alternative parametre som vil gi et innvilget" +
+                " simuleringsresultat"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Simulering utført"
+            ),
+            ApiResponse(
+                responseCode = "503", description = "Simulering kunne ikke utføres av tekniske årsaker",
+                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
+            ),
+        ]
+    )
+    fun simulerAlderspensjonV4(@RequestBody spec: IngressSimuleringSpecV4): SimuleringResultatV4 {
+        traceAid.begin()
+        log.debug { "Request for V4 simulering: $spec" }
+
+        return try {
+            resultatV4(
+                timed(
+                    service::simulerAlderspensjon,
+                    fromIngressSimuleringSpecV4(spec),
+                    "alderspensjon/simulering"
+                )
+            )
+                .also { log.debug { "Simulering V4 respons: $it" } }
+        } catch (e: EgressException) {
+            if (e.isConflict) vilkaarIkkeOppfyltV4() else handleError(e, "V4")!!
+        } finally {
+            traceAid.end()
+        }
+    }
+
 
     @PostMapping("v3/alderspensjon/simulering")
     @Operation(
@@ -115,6 +159,14 @@ class SimuleringController(
 
     companion object {
         private const val ERROR_MESSAGE = "feil ved simulering"
+
+        private fun vilkaarIkkeOppfyltV4() =
+            SimuleringResultatV4(
+                alderspensjon = emptyList(),
+                afpPrivat = emptyList(),
+                afpOffentlig = emptyList(),
+                vilkaarsproeving = VilkaarsproevingV4(vilkaarErOppfylt = false, alternativ = null)
+            )
 
         private fun vilkaarIkkeOppfyltV3() =
             SimuleringResultatV3(

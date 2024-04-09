@@ -82,6 +82,7 @@ class SimuleringServiceTest {
             Simuleringsresultat(
                 alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
                 afpPrivat = emptyList(),
+                afpOffentlig = emptyList(),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null)
             )
 
