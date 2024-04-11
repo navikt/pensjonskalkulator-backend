@@ -97,7 +97,7 @@ class SimuleringControllerTest {
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
         mvc.perform(
-            post(URLv4)
+            post(URL_V4)
                 .with(csrf())
                 .content(heltUttakRequestBody(SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -124,7 +124,7 @@ class SimuleringControllerTest {
     private companion object {
 
         private const val URL = "/api/v2/alderspensjon/simulering"
-        private const val URLv4 = "/api/v4/alderspensjon/simulering"
+        private const val URL_V4 = "/api/v4/alderspensjon/simulering"
         private const val PENSJONSBELOEP = 123456
 
         @Language("json")
