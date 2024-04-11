@@ -42,6 +42,7 @@ class PenSimuleringClient(
             Simuleringsresultat(
                 alderspensjon = emptyList(),
                 afpPrivat = emptyList(),
+                afpOffentlig = emptyList(),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = false)
             )
     }

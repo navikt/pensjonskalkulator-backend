@@ -24,6 +24,7 @@ class SimuleringMapperV3Test {
                     SimulertAfpPrivat(alder = 62, beloep = 2001),
                     SimulertAfpPrivat(alder = 63, beloep = 2002)
                 ),
+                afpOffentlig = emptyList(),
                 vilkaarsproeving = Vilkaarsproeving(
                     innvilget = false,
                     alternativ = Alternativ(

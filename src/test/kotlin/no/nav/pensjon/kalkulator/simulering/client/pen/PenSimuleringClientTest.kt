@@ -49,7 +49,7 @@ class PenSimuleringClientTest : WebClientTest() {
     fun `simulerAlderspensjon der responsen har alternativ NAU-beregning`() {
         arrange(alternativPensjonResponse())
 
-        val response: Simuleringsresultat = client.simulerAlderspensjon(impersonalSpec(), personalSpec())
+        val response: Simuleringsresultat = client.simulerAlderspensjon(impersonalSpec(), personalSpec(Sivilstand.ENKE_ELLER_ENKEMANN))
 
         with(response.alderspensjon) {
             assertEquals(15, size)
@@ -70,8 +70,25 @@ class PenSimuleringClientTest : WebClientTest() {
     @Test
     fun `simulerAlderspensjon sends request body with gradert uttak when specified`() {
         arrange(alternativPensjonResponse())
-        client.simulerAlderspensjon(impersonalGradertUttakSpec(), personalSpec())
+        client.simulerAlderspensjon(impersonalGradertUttakSpec(), personalSpec(Sivilstand.ENKE_ELLER_ENKEMANN))
         assertGradertUttakRequestBody()
+    }
+
+    @Test
+    fun `simulerAlderspensjon med Afp offentlig sends request body with correct simuleringType`() {
+        arrange(pensjonMedAfpOffentligResponse())
+        val response: Simuleringsresultat = client.simulerAlderspensjon(impersonalGradertUttakSpec(), personalSpec(Sivilstand.UGIFT))
+
+        assertEquals(0, response.afpPrivat.size)
+        with(response.afpOffentlig) {
+            assertEquals(2, size)
+            assertEquals(62, this[0].alder)
+            assertEquals("Tilfeldig pensjonskasse", this[0].afpLeverandoer)
+            assertEquals(55000, this[0].beloep)
+            assertEquals(63, this[1].alder)
+            assertEquals(65000, this[1].beloep)
+            assertEquals("Tilfeldig pensjonskasse", this[1].afpLeverandoer)
+        }
     }
 
     private fun assertGradertUttakRequestBody() {
@@ -107,6 +124,28 @@ class PenSimuleringClientTest : WebClientTest() {
     "aarligInntekt" : 0,
     "inntektTomAlder" : {
       "aar" : 67,
+      "maaneder" : 1
+    }
+  }
+}"""
+
+        @Language("json")
+        private const val SIMULER_AFP_REQUEST_BODY = """{
+  "simuleringstype" : "ALDER_MED_AFP_OFFENTLIG_LIVSVARIG",
+  "pid" : "12906498357",
+  "sivilstand" : "UGIF",
+  "harEps" : false,
+  "sisteInntekt" : 123000,
+  "uttaksar" : 1,
+  "gradertUttak" : null,
+  "heltUttak" : {
+    "uttakFomAlder" : {
+      "aar" : 62,
+      "maaneder" : 0
+    },
+    "aarligInntekt" : 0,
+    "inntektTomAlder" : {
+      "aar" : 62,
       "maaneder" : 1
     }
   }
@@ -180,6 +219,7 @@ class PenSimuleringClientTest : WebClientTest() {
         }
     ],
     "afpPrivat": [],
+    "afpOffentliglivsvarig": [],
     "vilkaarsproeving": {
         "vilkaarErOppfylt": false,
         "alternativ": {
@@ -193,6 +233,85 @@ class PenSimuleringClientTest : WebClientTest() {
                 "maaneder": 6
             }
         }
+    }
+}"""
+
+        @Language("json")
+        private const val PENSJON_MED_AFP_OFFENTLIG = """{
+    "alderspensjon": [
+        {
+            "alder": 62,
+            "beloep": 222612
+        },
+        {
+            "alder": 63,
+            "beloep": 222612
+        },
+        {
+            "alder": 64,
+            "beloep": 222612
+        },
+        {
+            "alder": 65,
+            "beloep": 222612
+        },
+        {
+            "alder": 66,
+            "beloep": 222612
+        },
+        {
+            "alder": 67,
+            "beloep": 222612
+        },
+        {
+            "alder": 68,
+            "beloep": 222612
+        },
+        {
+            "alder": 69,
+            "beloep": 222612
+        },
+        {
+            "alder": 70,
+            "beloep": 222612
+        },
+        {
+            "alder": 71,
+            "beloep": 222612
+        },
+        {
+            "alder": 72,
+            "beloep": 222612
+        },
+        {
+            "alder": 73,
+            "beloep": 222612
+        },
+        {
+            "alder": 74,
+            "beloep": 222612
+        },
+        {
+            "alder": 75,
+            "beloep": 222612
+        }
+    ],
+    "afpPrivat": [],
+    "afpOffentliglivsvarig": [
+      {
+            "alder": 62,
+            "beloep": 55000,
+            "tpOrdning": "Tilfeldig pensjonskasse"
+        },
+        {
+            "alder": 63,
+            "beloep": 65000,
+            "tpOrdning": "Tilfeldig pensjonskasse"
+        }
+    ],
+    "vilkaarsproeving": {
+        "vilkaarErOppfylt": true,
+        "alternativ": null
     }
 }"""
 
@@ -225,14 +344,28 @@ class PenSimuleringClientTest : WebClientTest() {
                 )
             )
 
-        private fun personalSpec() =
+        private fun impersonalAPMedAfpOffentligSpec() =
+            ImpersonalSimuleringSpec(
+                simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG,
+                sivilstand = Sivilstand.UGIFT,
+                epsHarInntektOver2G = false,
+                forventetAarligInntektFoerUttak = 123000,
+                heltUttak = HeltUttak(
+                    uttakFomAlder = Alder(aar = 62, maaneder = 0),
+                    inntekt = null
+                )
+            )
+
+        private fun personalSpec(sivilstand: Sivilstand) =
             PersonalSimuleringSpec(
                 pid = pid,
                 aarligInntektFoerUttak = 123000,
-                sivilstand = Sivilstand.ENKE_ELLER_ENKEMANN
+                sivilstand = sivilstand
             )
 
         private fun alternativPensjonResponse() = jsonResponse(HttpStatus.OK).setBody(ALTERNATIV_PENSJON)
+
+        private fun pensjonMedAfpOffentligResponse() = jsonResponse(HttpStatus.OK).setBody(PENSJON_MED_AFP_OFFENTLIG)
 
         private fun assertPensjon(expectedAlderAar: Int, expectedBeloep: Int, actualPensjon: SimulertAlderspensjon) {
             with(actualPensjon) {

@@ -92,6 +92,21 @@ class SimuleringControllerTest {
     }
 
     @Test
+    fun `simulerer alderspensjon med AFP offentlig`() {
+        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG)
+        `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
+
+        mvc.perform(
+            post(URL_V4)
+                .with(csrf())
+                .content(heltUttakRequestBody(SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG))
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk())
+            .andExpect(content().json(responseBody(SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG)))
+    }
+
+    @Test
     fun `simulering responds 'vilkaar ikke oppfylt' when Conflict`() {
         val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
         `when`(simuleringService.simulerAlderspensjon(spec)).thenThrow(conflict())
@@ -109,6 +124,7 @@ class SimuleringControllerTest {
     private companion object {
 
         private const val URL = "/api/v2/alderspensjon/simulering"
+        private const val URL_V4 = "/api/v4/alderspensjon/simulering"
         private const val PENSJONSBELOEP = 123456
 
         @Language("json")
@@ -185,6 +201,7 @@ class SimuleringControllerTest {
             ],
             "afpPrivat": ${
             when (simuleringstype) {
+                SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG -> "[]"
                 SimuleringType.ALDERSPENSJON -> "[]"
                 SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT -> """
               [
@@ -198,17 +215,65 @@ class SimuleringControllerTest {
         }
         }""".trimIndent()
 
+        @Language("json")
+        private fun responseBodyV4(simuleringstype: SimuleringType) = """{
+            "alderspensjon": [
+              {
+                "beloep": $PENSJONSBELOEP,
+                "alder": 67
+              }
+            ],
+            "afpPrivat": ${
+            when (simuleringstype) {
+                SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG -> "[]"
+                SimuleringType.ALDERSPENSJON -> "[]"
+                SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT -> """
+              [
+                {
+                  "beloep": 22056,
+                  "alder": 67
+                }
+              ]
+              """
+            }
+        },
+        "afpOffentlig": ${
+            when (simuleringstype) {
+                SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT -> "[]"
+                SimuleringType.ALDERSPENSJON -> "[]"
+                SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG -> """
+              [
+                {
+                  "beloep": 23056,
+                  "alder": 67,
+                  "afpLeverandoer": "Statens pensjonskasse"
+                }
+              ]
+              """
+            }
+        }
+        }""".trimIndent()
+
         private fun simuleringsresultat(simuleringType: SimuleringType) =
             when (simuleringType) {
                 SimuleringType.ALDERSPENSJON -> Simuleringsresultat(
                     alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
                     afpPrivat = emptyList(),
+                    afpOffentlig = emptyList(),
                     vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null)
                 )
 
                 SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT -> Simuleringsresultat(
                     alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
                     afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 22056)),
+                    afpOffentlig = emptyList(),
+                    vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null)
+                )
+
+                SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG -> Simuleringsresultat(
+                    alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
+                    afpPrivat = emptyList(),
+                    afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 22056, afpLeverandoer = "Statens pensjonskasse")),
                     vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null)
                 )
             }

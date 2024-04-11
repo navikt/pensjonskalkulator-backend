@@ -15,6 +15,7 @@ object PenSimuleringMapper {
         Simuleringsresultat(
             alderspensjon = dto.alderspensjon.map(::alderspensjon),
             afpPrivat = dto.afpPrivat.map(::afpPrivat),
+            afpOffentlig = dto.afpOffentliglivsvarig.map (::afpOffentlig),
             vilkaarsproeving = dto.vilkaarsproeving?.let(::vilkaarsproeving) ?: Vilkaarsproeving(innvilget = true)
         )
 
@@ -36,6 +37,8 @@ object PenSimuleringMapper {
     private fun alderspensjon(dto: PenPensjonDto) = SimulertAlderspensjon(dto.alder, dto.beloep)
 
     private fun afpPrivat(dto: PenPensjonDto) = SimulertAfpPrivat(dto.alder, dto.beloep)
+
+    private fun afpOffentlig(dto: PenPensjonAfpOffentligDto) = SimulertAfpOffentlig(dto.alder, dto.beloep, dto.tpOrdning)
 
     private fun vilkaarsproeving(dto: PenVilkaarsproevingDto) =
         Vilkaarsproeving(

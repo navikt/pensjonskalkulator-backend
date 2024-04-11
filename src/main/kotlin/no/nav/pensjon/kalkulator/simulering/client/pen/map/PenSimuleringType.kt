@@ -10,7 +10,8 @@ import no.nav.pensjon.kalkulator.simulering.SimuleringType
 enum class PenSimuleringType(val externalValue: String, val internalValue: SimuleringType) {
 
     ALDERSPENSJON("ALDER", SimuleringType.ALDERSPENSJON),
-    ALDERSPENSJON_MED_AFP_PRIVAT("ALDER_M_AFP_PRIVAT", SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT);
+    ALDERSPENSJON_MED_AFP_PRIVAT("ALDER_M_AFP_PRIVAT", SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT),
+    ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG("ALDER_MED_AFP_OFFENTLIG_LIVSVARIG", SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG);
 
     companion object {
         private val values = entries.toTypedArray()
