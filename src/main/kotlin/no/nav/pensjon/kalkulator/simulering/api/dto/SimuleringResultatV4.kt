@@ -3,13 +3,15 @@ package no.nav.pensjon.kalkulator.simulering.api.dto
 data class SimuleringResultatV4(
     val alderspensjon: List<PensjonsberegningV4> = emptyList(),
     val afpPrivat: List<PensjonsberegningV4> = emptyList(),
-    val afpOffentlig: List<PensjonsberegningAfpOffentligV4> = emptyList(),
+    val afpOffentlig: AfpOffentligV4? = null,
     val vilkaarsproeving: VilkaarsproevingV4
 )
 
 data class PensjonsberegningV4(val alder: Int, val beloep: Int)
 
-data class PensjonsberegningAfpOffentligV4(val alder: Int, val beloep: Int, val afpLeverandoer: String)
+data class AfpOffentligV4(val afpLeverandoer: String, val afpOffentligListe: List<PensjonsberegningAfpOffentligV4>)
+
+data class PensjonsberegningAfpOffentligV4(val alder: Int, val beloep: Int)
 
 data class VilkaarsproevingV4(
     val vilkaarErOppfylt: Boolean,
