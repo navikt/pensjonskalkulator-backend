@@ -34,7 +34,8 @@ class OpenApiConfiguration {
         return GroupedOpenApi.builder()
             .group("current")
             .pathsToMatch(
-                "/api/v3/alderspensjon/simulering",
+                "/api/v4/alderspensjon/simulering",
+                "/api/v3/alderspensjon/simulering", // to be moved to 'deprecated'
                 "/api/v2/alderspensjon/simulering", // to be moved to 'deprecated'
                 "/api/v2/pensjonsavtaler",
                 "/api/v1/ekskludert",
