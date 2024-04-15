@@ -1,11 +1,11 @@
 package no.nav.pensjon.kalkulator
 
 import io.swagger.v3.oas.annotations.Operation
-import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.grunnbeloep.Grunnbeloep
 import no.nav.pensjon.kalkulator.grunnbeloep.client.GrunnbeloepClient
 import no.nav.pensjon.kalkulator.grunnbeloep.client.GrunnbeloepSpec
 import no.nav.pensjon.kalkulator.tech.security.egress.maskinporten.dev.SimulatorDevClient
+import no.nav.pensjon.kalkulator.tech.security.egress.maskinporten.dev.TmuResult
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -38,5 +38,11 @@ class KalkulatorController(
     @Operation(
         summary = "Simulator TMU-test"
     )
-    fun simulatorTidligstMuligUttakTest(): Alder = simulatorClient.tidligstMuligUttak()
+    fun simulatorTidligstMuligUttakTest(): TmuResult? = simulatorClient.tidligstMuligUttak()
+
+    @GetMapping("simulator-sfb-test")
+    @Operation(
+        summary = "Simulator simuler-folketrygdbeholdning-test"
+    )
+    fun simulatorFolketrygdbeholdningTest(): String? = simulatorClient.folketrygdbeholdning()
 }

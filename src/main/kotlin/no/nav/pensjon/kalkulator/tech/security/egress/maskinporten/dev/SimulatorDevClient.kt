@@ -2,7 +2,6 @@ package no.nav.pensjon.kalkulator.tech.security.egress.maskinporten.dev
 
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
-import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
@@ -53,7 +52,7 @@ class SimulatorDevClient(
         }
     }
 
-    fun tidligstMuligUttak(): Alder {
+    fun tidligstMuligUttak(): TmuResult? {
         val url = "$baseUrl/$TIDLIGST_MULIG_UTTAK_RESOURCE"
         log.debug { "POST to URL: '$url'" }
 
@@ -64,12 +63,34 @@ class SimulatorDevClient(
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .headers(::setHeaders)
-                .bodyValue(BODY)
+                .bodyValue(TMU_BODY)
                 .retrieve()
-                .bodyToMono(Alder::class.java)
+                .bodyToMono(TmuResult::class.java)
                 .retryWhen(retryBackoffSpec(url))
                 .block()
-                ?: Alder(0, 0)
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $url", e)
+        } catch (e: WebClientResponseException) {
+            throw EgressException(e.responseBodyAsString, e)
+        }
+    }
+
+    fun folketrygdbeholdning(): String? {
+        val url = "$baseUrl/$SIMULER_FOLKETRYGDBEHOLDNING_RESOURCE"
+        log.debug { "POST to URL: '$url'" }
+
+        return try {
+            webClient
+                .post()
+                .uri("/$SIMULER_FOLKETRYGDBEHOLDNING_RESOURCE")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .headers(::setHeaders)
+                .bodyValue(FOLKETRYGDBEHOLDNING_BODY)
+                .retrieve()
+                .bodyToMono(String::class.java)
+                .retryWhen(retryBackoffSpec(url))
+                .block()
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
@@ -87,14 +108,29 @@ class SimulatorDevClient(
     companion object {
         private const val STATUS_RESOURCE = "api/v1/status"
         private const val TIDLIGST_MULIG_UTTAK_RESOURCE = "api/v1/tidligst-mulig-uttak"
+        private const val SIMULER_FOLKETRYGDBEHOLDNING_RESOURCE = "api/v1/simuler-folketrygdbeholdning"
 
-        private const val BODY = """{
+        private const val TMU_BODY = """{
     "personId": "12906498357",
     "fodselsdato": "1964-10-12",
     "uttaksgrad": 100,
-    "heltUttakFraOgMedDato": null,
+    "heltUttakFraOgMedDato": "2030-11-01",
     "rettTilAfpOffentligDato": null,
     "antallAarUtenlandsEtter16Aar": 0,
+    "fremtidigInntektListe": [
+        {
+            "fraOgMedDato": "2030-01-01",
+            "arligInntekt": 500000
+        }
+    ]
+}"""
+
+        private const val FOLKETRYGDBEHOLDNING_BODY = """{
+    "personId": "12906498357",
+    "uttaksdato": "1964-10-12",
+    "arIUtlandetEtter16": 0,
+    "epsPensjon": false,
+    "eps2G": false,
     "fremtidigInntektListe": [
         {
             "fraOgMedDato": "2030-01-01",
@@ -106,3 +142,7 @@ class SimulatorDevClient(
         private val service = EgressService.PENSJONSSIMULATOR
     }
 }
+
+
+data class TmuResult(val tidligstMuligeUttakstidspunktListe: List<Tmu>, val feil: String?)
+data class Tmu(val uttaksgrad: Int, val tidligstMuligeUttaksdato: String)

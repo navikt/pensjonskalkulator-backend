@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.tech.web
 
 import io.netty.channel.ChannelOption
+import io.netty.handler.logging.LogLevel
 import io.netty.handler.timeout.ReadTimeoutHandler
 import io.netty.handler.timeout.WriteTimeoutHandler
 import org.springframework.boot.web.reactive.function.client.WebClientCustomizer
@@ -17,6 +18,7 @@ import reactor.core.publisher.Mono
 import reactor.netty.Connection
 import reactor.netty.http.client.HttpClient
 import reactor.netty.resources.ConnectionProvider
+import reactor.netty.transport.logging.AdvancedByteBufFormat
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 
@@ -31,6 +33,11 @@ class WebClientConfig : WebClientCustomizer {
                         .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, TIMEOUT.toInt())
                         .responseTimeout(Duration.ofMillis(TIMEOUT))
                         .doOnConnected(::addTimeoutHandlers)
+                        .wiretap(
+                            "reactor.netty.http.client.HttpClient",
+                            LogLevel.DEBUG,
+                            AdvancedByteBufFormat.TEXTUAL
+                        )
                 )
             )
             .exchangeStrategies(largeBufferStrategies())
