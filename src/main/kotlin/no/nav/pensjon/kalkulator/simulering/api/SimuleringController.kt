@@ -164,7 +164,7 @@ class SimuleringController(
             SimuleringResultatV4(
                 alderspensjon = emptyList(),
                 afpPrivat = emptyList(),
-                afpOffentlig = emptyList(),
+                afpOffentlig = null,
                 vilkaarsproeving = VilkaarsproevingV4(vilkaarErOppfylt = false, alternativ = null)
             )
 
