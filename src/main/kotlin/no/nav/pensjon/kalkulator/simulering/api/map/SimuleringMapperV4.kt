@@ -1,10 +1,7 @@
 package no.nav.pensjon.kalkulator.simulering.api.map
 
 import no.nav.pensjon.kalkulator.general.*
-import no.nav.pensjon.kalkulator.simulering.Alternativ
-import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
-import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
-import no.nav.pensjon.kalkulator.simulering.Vilkaarsproeving
+import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 
 /**
@@ -27,8 +24,14 @@ object SimuleringMapperV4 {
         SimuleringResultatV4(
             alderspensjon = source.alderspensjon.map { PensjonsberegningV4(it.alder, it.beloep) },
             afpPrivat = source.afpPrivat.map { PensjonsberegningV4(it.alder, it.beloep) },
-            afpOffentlig = source.afpOffentlig.map { PensjonsberegningAfpOffentligV4(it.alder, it.beloep, it.afpLeverandoer) },
+            afpOffentlig = mapAfpOffentlig(source.afpOffentlig),
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving)
+        )
+
+    private fun mapAfpOffentlig(afpOffentlig: List<SimulertAfpOffentlig>) = if (afpOffentlig.isEmpty()) null
+        else AfpOffentligV4(
+            afpLeverandoer = afpOffentlig.first().afpLeverandoer,
+            afpOffentligListe = afpOffentlig.map { PensjonsberegningAfpOffentligV4(it.alder, it.beloep) }
         )
 
     private fun gradertUttak(dto: IngressSimuleringGradertUttakV4) =

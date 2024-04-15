@@ -103,7 +103,7 @@ class SimuleringControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk())
-            .andExpect(content().json(responseBody(SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG)))
+            .andExpect(content().json(responseBodyV4(SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG)))
     }
 
     @Test
@@ -239,16 +239,17 @@ class SimuleringControllerTest {
         },
         "afpOffentlig": ${
             when (simuleringstype) {
-                SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT -> "[]"
-                SimuleringType.ALDERSPENSJON -> "[]"
-                SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG -> """
-              [
-                {
-                  "beloep": 23056,
-                  "alder": 67,
-                  "afpLeverandoer": "Statens pensjonskasse"
-                }
-              ]
+                SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT -> null
+                SimuleringType.ALDERSPENSJON -> null
+                SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG -> """{
+              "afpLeverandoer": "Statens pensjonskasse",
+              "afpOffentligListe": [
+                  {
+                    "beloep": 22056,
+                    "alder": 67
+                  }
+                ]
+              }
               """
             }
         }
