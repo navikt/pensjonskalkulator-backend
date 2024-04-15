@@ -28,13 +28,11 @@ object SimuleringMapperV4 {
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving)
         )
 
-    private fun mapAfpOffentlig(afpOffentlig: List<SimulertAfpOffentlig>): AfpOffentligV4? {
-        return if (afpOffentlig.isEmpty()) null
+    private fun mapAfpOffentlig(afpOffentlig: List<SimulertAfpOffentlig>) = if (afpOffentlig.isEmpty()) null
         else AfpOffentligV4(
             afpLeverandoer = afpOffentlig.first().afpLeverandoer,
             afpOffentligListe = afpOffentlig.map { PensjonsberegningAfpOffentligV4(it.alder, it.beloep) }
         )
-    }
 
     private fun gradertUttak(dto: IngressSimuleringGradertUttakV4) =
         GradertUttak(
