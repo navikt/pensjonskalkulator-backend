@@ -30,7 +30,6 @@ spec:
       enabled: true
       claims: # only for testing impersonal access control
         groups:
-          - id: "dec3ee50-b683-4644-9507-520e8f054ac2" # GRP Alle brukere
           - id: "8bb9b8d1-f46a-4ade-8ee8-5895eccdf8cf" # 0000-GA-PENSJON_SAKSBEHANDLER
           - id: "a3f91493-1ab8-4b64-a544-0a77cbba9240" # 0000-GA-Pensjon_VEILEDER
           - id: "dbe4ad45-320b-4e9a-aaa1-73cca4ee124d" # 0000-GA-Egne_ansatte
@@ -116,7 +115,7 @@ spec:
     - name: TJENESTEPENSJON_URL
       value: https://tp-api-q2.dev-fss-pub.nais.io
     - name: PKB_FRONTEND_ENTRA_CLIENT_ID
-      value: 0683a6ca-6f72-458c-8367-2879103edbfc
+      value: 0683a6ca-6f72-458c-8367-2879103edbfc,66a20121-b743-48e5-8cdc-1037ce68d9a5,6d1669ef-61c4-4d14-98a7-0c983f4eb14a
     - name: SERVER_ERROR_INCLUDE_STACKTRACE
       value: always
     - name: AUDIT_LOG_OUTPUT
