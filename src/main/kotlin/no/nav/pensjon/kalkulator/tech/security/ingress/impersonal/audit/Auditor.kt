@@ -12,22 +12,22 @@ import java.time.ZonedDateTime
  * The info is formatted according to ArcSight CEF (Common Event Format).
  */
 @Component
-class Auditor(private val navIdExtractor: SecurityContextNavIdExtractor) {
+class Auditor(private val ansattIdExtractor: SecurityContextNavIdExtractor) {
 
     private val log = KotlinLogging.logger("AUDIT_LOGGER")
 
     fun audit(onBehalfOfPid: Pid, requestUri: String) {
-        log.info { cefEntry(navIdExtractor.id(), onBehalfOfPid, requestUri).format() }
+        log.info { cefEntry(ansattIdExtractor.id(), onBehalfOfPid, requestUri).format() }
     }
 
-    private fun cefEntry(userId: String, onBehalfOfPid: Pid, requestUri: String) =
+    private fun cefEntry(ansattId: String, onBehalfOfPid: Pid, requestUri: String) =
         CefEntry(
             timestamp = now(),
             level = Level.INFO,
             deviceEventClassId = DEVICE_EVENT_CLASS_ID,
             name = "Datahenting paa vegne av",
             message = "$USER_TYPE kaller $requestUri",
-            sourceUserId = userId,
+            sourceUserId = ansattId,
             destinationUserId = onBehalfOfPid.value
         )
 
