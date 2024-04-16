@@ -29,7 +29,7 @@ class GroupMembershipServiceTest {
     @BeforeEach
     fun initialize() {
         groupMembershipService = GroupMembershipService(
-            "saksbehandler-gruppa",
+            "veileder-gruppa",
             "egne-ansatte-gruppa",
             "fortrolig-adresse-gruppa",
             "strengt-fortrolig-adresse-gruppa",
@@ -50,8 +50,8 @@ class GroupMembershipServiceTest {
     }
 
     @Test
-    fun `alminnelig saksbehandler har tilgang til ubeskyttet person`() {
-        `when`(groupService.groups()).thenReturn(listOf("saksbehandler-gruppa"))
+    fun `alminnelig veileder har tilgang til ubeskyttet person`() {
+        `when`(groupService.groups()).thenReturn(listOf("veileder-gruppa"))
         arrangeBeskyttelse(personErSkjermet = false, AdressebeskyttelseGradering.UGRADERT)
 
         val harTilgang = groupMembershipService.innloggetBrukerHarTilgang(pid)
@@ -60,8 +60,8 @@ class GroupMembershipServiceTest {
     }
 
     @Test
-    fun `alminnelig saksbehandler har ikke tilgang til beskyttet person`() {
-        `when`(groupService.groups()).thenReturn(listOf("saksbehandler-gruppa"))
+    fun `alminnelig veileder har ikke tilgang til beskyttet person`() {
+        `when`(groupService.groups()).thenReturn(listOf("veileder-gruppa"))
         arrangeBeskyttelse(personErSkjermet = true, AdressebeskyttelseGradering.UGRADERT)
 
         val harTilgang = groupMembershipService.innloggetBrukerHarTilgang(pid)
@@ -70,8 +70,8 @@ class GroupMembershipServiceTest {
     }
 
     @Test
-    fun `saksbehandler med fortrolig tilgang har ikke tilgang til personer med strengt fortrolig adresse`() {
-        `when`(groupService.groups()).thenReturn(listOf("saksbehandler-gruppa", "fortrolig-adresse-gruppa"))
+    fun `veileder med fortrolig tilgang har ikke tilgang til personer med strengt fortrolig adresse`() {
+        `when`(groupService.groups()).thenReturn(listOf("veileder-gruppa", "fortrolig-adresse-gruppa"))
         arrangeBeskyttelse(personErSkjermet = false, AdressebeskyttelseGradering.STRENGT_FORTROLIG)
 
         val harTilgang = groupMembershipService.innloggetBrukerHarTilgang(pid)
@@ -80,8 +80,8 @@ class GroupMembershipServiceTest {
     }
 
     @Test
-    fun `saksbehandler med strengt fortrolig tilgang har ikke tilgang til skjermet person`() {
-        `when`(groupService.groups()).thenReturn(listOf("saksbehandler-gruppa", "strengt-fortrolig-adresse-gruppa"))
+    fun `veileder med strengt fortrolig tilgang har ikke tilgang til skjermet person`() {
+        `when`(groupService.groups()).thenReturn(listOf("veileder-gruppa", "strengt-fortrolig-adresse-gruppa"))
         arrangeBeskyttelse(personErSkjermet = true, AdressebeskyttelseGradering.UGRADERT)
 
         val harTilgang = groupMembershipService.innloggetBrukerHarTilgang(pid)
@@ -90,10 +90,10 @@ class GroupMembershipServiceTest {
     }
 
     @Test
-    fun `saksbehandler med full tilgang har tilgang til skjermede personer med strengt fortrolig adresse`() {
+    fun `veileder med full tilgang har tilgang til skjermede personer med strengt fortrolig adresse`() {
         `when`(groupService.groups()).thenReturn(
             listOf(
-                "saksbehandler-gruppa",
+                "veileder-gruppa",
                 "egne-ansatte-gruppa",
                 "fortrolig-adresse-gruppa",
                 "strengt-fortrolig-adresse-gruppa"
@@ -107,13 +107,13 @@ class GroupMembershipServiceTest {
     }
 
     @Test
-    fun `saksbehandler med kun tilleggstilganger har ikke tilgang til applikasjonen`() {
+    fun `veileder med kun tilleggstilganger har ikke tilgang til applikasjonen`() {
         `when`(groupService.groups()).thenReturn(
             listOf(
                 "egne-ansatte-gruppa",
                 "fortrolig-adresse-gruppa",
                 "strengt-fortrolig-adresse-gruppa"
-                // mangler grunntilgang (saksbehandler-gruppa)
+                // mangler grunntilgang (veileder-gruppa)
             )
         )
         arrangeBeskyttelse(personErSkjermet = false, AdressebeskyttelseGradering.UGRADERT)

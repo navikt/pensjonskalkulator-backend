@@ -16,10 +16,10 @@ import org.springframework.stereotype.Service
  */
 @Service
 class GroupMembershipService(
-    @Value("\${group-id.saksbehandler}") private val saksbehandlerGroupId: String,
-    @Value("\${group-id.egne-ansatte}") private val egneAnsatteGroupId: String,
-    @Value("\${group-id.fortrolig-adresse}") private val fortroligAdresseGroupId: String,
-    @Value("\${group-id.strengt-fortrolig-adresse}") private val strengtFortroligAdresseGroupId: String,
+    @Value("\${pkb.group-id.veileder}") private val veilederGroupId: String,
+    @Value("\${pkb.group-id.egne-ansatte}") private val egneAnsatteGroupId: String,
+    @Value("\${pkb.group-id.fortrolig-adresse}") private val fortroligAdresseGroupId: String,
+    @Value("\${pkb.group-id.strengt-fortrolig-adresse}") private val strengtFortroligAdresseGroupId: String,
     private val groupService: GroupService,
     private val skjermingService: SkjermingService,
     private val adresseService: FortroligAdresseService
@@ -32,7 +32,7 @@ class GroupMembershipService(
                 adressebeskyttetPersonSjekkOk(groups, pid)
     }
 
-    private fun basisTilgangSjekkOk(groups: List<String>): Boolean = groups.contains(saksbehandlerGroupId)
+    private fun basisTilgangSjekkOk(groups: List<String>): Boolean = groups.contains(veilederGroupId)
 
     private fun egenAnsattTilgangSjekkOk(groups: List<String>, pid: Pid): Boolean =
         groups.contains(egneAnsatteGroupId) || skjermingService.personErTilgjengelig(pid)
