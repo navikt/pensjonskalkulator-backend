@@ -8,15 +8,17 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult.failu
 import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult.success
 import org.springframework.security.oauth2.jwt.Jwt
 
-class AudienceValidator(val audience: String) : OAuth2TokenValidator<Jwt> {
+class AudienceValidator(val frontEndAudience: String, val backendAudience: String) : OAuth2TokenValidator<Jwt> {
 
     private val log = KotlinLogging.logger {}
 
-    override fun validate(jwt: Jwt): OAuth2TokenValidatorResult =
-        if (jwt.audience.contains(audience))
+    override fun validate(jwt: Jwt): OAuth2TokenValidatorResult = validate(jwt.audience)
+
+    fun validate(audiences: List<String>): OAuth2TokenValidatorResult =
+        if (audiences.contains(frontEndAudience) || audiences.contains(backendAudience))
             success()
         else
-            "Invalid audience: ${jwt.audience.joinToString()}".let {
+            "Invalid audience claim: ${audiences.joinToString()}".let {
                 log.warn { it }
                 failure(OAuth2Error(it))
             }

@@ -2,7 +2,9 @@ package no.nav.pensjon.kalkulator.tech.security
 
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.pensjon.kalkulator.tech.security.egress.SecurityContextEnricher
-import no.nav.pensjon.kalkulator.tech.security.ingress.*
+import no.nav.pensjon.kalkulator.tech.security.ingress.AudienceValidator
+import no.nav.pensjon.kalkulator.tech.security.ingress.AuthenticationEnricherFilter
+import no.nav.pensjon.kalkulator.tech.security.ingress.LoggingAuthenticationEntryPoint
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.ImpersonalAccessFilter
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import org.springframework.beans.factory.annotation.Qualifier
@@ -16,8 +18,10 @@ import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
-import org.springframework.security.oauth2.core.OAuth2TokenValidator
-import org.springframework.security.oauth2.jwt.*
+import org.springframework.security.oauth2.jwt.JwtDecoder
+import org.springframework.security.oauth2.jwt.JwtDecoders
+import org.springframework.security.oauth2.jwt.JwtValidators
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
@@ -30,6 +34,11 @@ class SecurityConfiguration {
     /**
      * Supports two issuer configurations (ID-porten and TokenX) at bean instantiation time,
      * but only one of them will be used during call processing.
+     * -----
+     * Tokens issued for frontend are accepted as well as tokens issued for backend.
+     * This is in order to support both these scenarios:
+     * - Frontend forwards Wonderwall token to backend without exchanging it
+     * - Frontend exchanges Wonderwall token into TokenX or Entra ID OBO token, and uses the latter when calling backend
      */
     @Bean("personal")
     @Primary
@@ -42,8 +51,9 @@ class SecurityConfiguration {
         ProviderManager(
             JwtAuthenticationProvider(
                 jwtDecoder(
-                    if (hasLength(idPortenIssuerUri)) idPortenIssuerUri else tokenXIssuerUri,
-                    if (hasLength(idPortenAudience)) idPortenAudience else tokenXAudience
+                    issuerUri = if (hasLength(idPortenIssuerUri)) idPortenIssuerUri else tokenXIssuerUri,
+                    frontendAudience = idPortenAudience,
+                    backendAudience = tokenXAudience
                 )
             )
         )
@@ -51,8 +61,9 @@ class SecurityConfiguration {
     @Bean("impersonal")
     fun impersonalProviderManager(
         @Value("\${azure.openid.config.issuer}") issuerUri: String,
-        @Value("\${pkb.frontend.entra.client.id}") audience: String
-    ) = ProviderManager(JwtAuthenticationProvider(jwtDecoder(issuerUri, audience)))
+        @Value("\${pkb.frontend.entra.client.id}") frontendAudience: String,
+        @Value("\${azure-app.client-id}") backendAudience: String
+    ) = ProviderManager(JwtAuthenticationProvider(jwtDecoder(issuerUri, frontendAudience, backendAudience)))
 
     @Bean
     fun tokenAuthenticationManagerResolver(
@@ -104,10 +115,13 @@ class SecurityConfiguration {
         fun isImpersonal(request: HttpServletRequest): Boolean =
             hasLength(request.getHeader(CustomHttpHeaders.PID))
 
-        private fun jwtDecoder(issuerUri: String, audience: String): JwtDecoder {
+        private fun jwtDecoder(issuerUri: String, frontendAudience: String, backendAudience: String): JwtDecoder {
             val decoder = JwtDecoders.fromIssuerLocation(issuerUri) as NimbusJwtDecoder
-            val issuerValidator: OAuth2TokenValidator<Jwt> = JwtValidators.createDefaultWithIssuer(issuerUri)
-            decoder.setJwtValidator(DelegatingOAuth2TokenValidator(issuerValidator, AudienceValidator(audience)))
+
+            decoder.setJwtValidator(DelegatingOAuth2TokenValidator(
+                JwtValidators.createDefaultWithIssuer(issuerUri),
+                AudienceValidator(frontendAudience, backendAudience)))
+
             return decoder
         }
     }

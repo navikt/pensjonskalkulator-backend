@@ -15,7 +15,7 @@ class PidExtractor : PidGetter {
 
     private fun missingPid(): Pid {
         "No PID found".let {
-            log.warn(it)
+            log.warn { it }
             throw RuntimeException(it)
         }
     }
