@@ -52,7 +52,7 @@ class SecurityConfiguration {
             JwtAuthenticationProvider(
                 jwtDecoder(
                     issuerUri = if (hasLength(idPortenIssuerUri)) idPortenIssuerUri else tokenXIssuerUri,
-                    frontendAudience = idPortenAudience,
+                    frontendAudiences = listOf(idPortenAudience),
                     backendAudience = tokenXAudience
                 )
             )
@@ -61,9 +61,9 @@ class SecurityConfiguration {
     @Bean("impersonal")
     fun impersonalProviderManager(
         @Value("\${azure.openid.config.issuer}") issuerUri: String,
-        @Value("\${pkb.frontend.entra.client.id}") frontendAudience: String,
+        @Value("\${pkb.frontend.entra.client.id}") frontendAudiences: String,
         @Value("\${azure-app.client-id}") backendAudience: String
-    ) = ProviderManager(JwtAuthenticationProvider(jwtDecoder(issuerUri, frontendAudience, backendAudience)))
+    ) = ProviderManager(JwtAuthenticationProvider(jwtDecoder(issuerUri, frontendAudiences.split(","), backendAudience)))
 
     @Bean
     fun tokenAuthenticationManagerResolver(
@@ -115,12 +115,12 @@ class SecurityConfiguration {
         fun isImpersonal(request: HttpServletRequest): Boolean =
             hasLength(request.getHeader(CustomHttpHeaders.PID))
 
-        private fun jwtDecoder(issuerUri: String, frontendAudience: String, backendAudience: String): JwtDecoder {
+        private fun jwtDecoder(issuerUri: String, frontendAudiences: List<String>, backendAudience: String): JwtDecoder {
             val decoder = JwtDecoders.fromIssuerLocation(issuerUri) as NimbusJwtDecoder
 
             decoder.setJwtValidator(DelegatingOAuth2TokenValidator(
                 JwtValidators.createDefaultWithIssuer(issuerUri),
-                AudienceValidator(frontendAudience, backendAudience)))
+                AudienceValidator(frontendAudiences, backendAudience)))
 
             return decoder
         }
