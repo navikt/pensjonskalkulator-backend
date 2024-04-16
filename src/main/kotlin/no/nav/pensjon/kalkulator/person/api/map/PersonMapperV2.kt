@@ -1,18 +1,18 @@
 package no.nav.pensjon.kalkulator.person.api.map
 
 import no.nav.pensjon.kalkulator.person.Person
-import no.nav.pensjon.kalkulator.person.api.dto.ApiPersonDto
 import no.nav.pensjon.kalkulator.person.api.dto.ApiSivilstand
+import no.nav.pensjon.kalkulator.person.api.dto.PersonV2
 import java.time.LocalDate
 
-object PersonMapper {
+object PersonMapperV2 {
 
-    fun toDto(person: Person?): ApiPersonDto =
+    fun dtoV2(person: Person?): PersonV2 =
         person?.let {
-            ApiPersonDto(
+            PersonV2(
                 it.navn,
                 it.foedselsdato,
                 ApiSivilstand.fromInternalValue(it.sivilstand)
             )
-        } ?: ApiPersonDto("", LocalDate.MIN, ApiSivilstand.UOPPGITT)
+        } ?: PersonV2("", LocalDate.MIN, ApiSivilstand.UOPPGITT)
 }

@@ -19,7 +19,12 @@ class SecurityContextEnricher(
         val pid = headerPid ?: securityContextPidExtractor.pid()
 
         with(SecurityContextHolder.getContext()) {
-            authentication = authentication?.let { EnrichedAuthentication(it, tokenSuppliers, pid) }
+            authentication = authentication?.let { EnrichedAuthentication(
+                initialAuth = it,
+                egressTokenSuppliersByService = tokenSuppliers,
+                pid = pid,
+                isOnBehalf = headerPid != null
+            ) }
         }
     }
 }

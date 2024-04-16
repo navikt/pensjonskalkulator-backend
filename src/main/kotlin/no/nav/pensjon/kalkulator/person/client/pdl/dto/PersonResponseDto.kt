@@ -19,7 +19,11 @@ data class PersonDto(
     val adressebeskyttelse: List<AdressebeskyttelseDto>?
 )
 
-data class NavnDto(val fornavn: String)
+data class NavnDto(
+    val fornavn: String? = null,
+    val mellomnavn: String? = null,
+    val etternavn: String? = null
+)
 
 data class FoedselDto(val foedselsdato: DateDto)
 

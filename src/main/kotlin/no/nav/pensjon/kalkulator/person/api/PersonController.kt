@@ -9,7 +9,9 @@ import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.api.dto.ApiPersonDto
+import no.nav.pensjon.kalkulator.person.api.dto.PersonV2
 import no.nav.pensjon.kalkulator.person.api.map.PersonMapper.toDto
+import no.nav.pensjon.kalkulator.person.api.map.PersonMapperV2.dtoV2
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
@@ -51,6 +53,38 @@ class PersonController(
                 .also { log.debug { "Personinformasjon respons: $it" } }
         } catch (e: EgressException) {
             handleError(e, "V1")!!
+        } finally {
+            traceAid.end()
+        }
+    }
+
+    @GetMapping("v2/person")
+    @Operation(
+        summary = "Hent personinformasjon",
+        description = "Henter personinformasjon om den innloggede brukeren"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Henting av personinformasjon utført. I resultatet er verdi av 'maaneder' 0..11."
+            ),
+            ApiResponse(
+                responseCode = "503",
+                description = "Henting av personinformasjon kunne ikke utføres av tekniske årsaker",
+                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
+            ),
+        ]
+    )
+    fun personV2(@RequestBody spec: UttaksalderIngressSpecDto?): PersonV2 {
+        traceAid.begin()
+        log.debug { "Request for personinformasjon V2: $spec" }
+
+        return try {
+            dtoV2(timed(service::getPerson, "person"))
+                .also { log.debug { "Personinformasjon respons: $it" } }
+        } catch (e: EgressException) {
+            handleError(e, "V2")!!
         } finally {
             traceAid.end()
         }

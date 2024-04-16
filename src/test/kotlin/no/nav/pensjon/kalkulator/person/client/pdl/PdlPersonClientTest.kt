@@ -39,7 +39,7 @@ class PdlPersonClientTest : WebClientTest() {
     @BeforeEach
     fun initialize() {
         `when`(traceAid.callId()).thenReturn("id1")
-        client = PdlPersonClient(baseUrl(), webClientBuilder, traceAid, "1")
+        client = PdlPersonClient(baseUrl(), webClientBuilder, traceAid, retryAttempts = "1")
         arrangeSecurityContext()
     }
 
@@ -47,7 +47,7 @@ class PdlPersonClientTest : WebClientTest() {
     fun `fetchPerson uses supplied PID in request to PDL`() {
         arrange(okPersonaliaResponse())
 
-        client.fetchPerson(pid)
+        client.fetchPerson(pid, fetchFulltNavn = false)
 
         ByteArrayOutputStream().use {
             val request = takeRequest()
@@ -70,9 +70,9 @@ class PdlPersonClientTest : WebClientTest() {
     fun `fetchPerson returns person when OK response`() {
         arrange(okPersonaliaResponse())
 
-        val response: Person = client.fetchPerson(pid)!!
+        val response: Person = client.fetchPerson(pid, fetchFulltNavn = false)!!
 
-        assertEquals("Ola-Kari", response.fornavn)
+        assertEquals("Ola-Kari", response.navn)
         assertEquals(LocalDate.of(1963, 12, 31), response.foedselsdato)
         assertTrue(response.harFoedselsdato)
         assertEquals(Sivilstand.UGIFT, response.sivilstand)
@@ -82,9 +82,9 @@ class PdlPersonClientTest : WebClientTest() {
     fun `fetchPerson returns partial person when receiving partial graphql-response`() {
         arrange(partialPersonaliaResponse())
 
-        val response: Person = client.fetchPerson(pid)!!
+        val response: Person = client.fetchPerson(pid, fetchFulltNavn = false)!!
 
-        assertEquals("Ola-Kari", response.fornavn)
+        assertEquals("Ola-Kari", response.navn)
         assertEquals(LocalDate.MIN, response.foedselsdato)
         assertFalse(response.harFoedselsdato)
         assertEquals(Sivilstand.UOPPGITT, response.sivilstand)
@@ -95,9 +95,9 @@ class PdlPersonClientTest : WebClientTest() {
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
         arrange(okPersonaliaResponse())
 
-        val response: Person = client.fetchPerson(pid)!!
+        val response: Person = client.fetchPerson(pid, fetchFulltNavn = false)!!
 
-        assertEquals("Ola-Kari", response.fornavn)
+        assertEquals("Ola-Kari", response.navn)
         assertEquals(Sivilstand.UGIFT, response.sivilstand)
     }
 
@@ -106,7 +106,7 @@ class PdlPersonClientTest : WebClientTest() {
         arrange(jsonResponse(HttpStatus.BAD_REQUEST).setBody("My bad"))
         // No 2nd response arranged, since no retry
 
-        val exception = assertThrows(EgressException::class.java) { client.fetchPerson(pid) }
+        val exception = assertThrows(EgressException::class.java) { client.fetchPerson(pid, fetchFulltNavn = false) }
 
         assertEquals("My bad", exception.message)
     }
@@ -116,7 +116,7 @@ class PdlPersonClientTest : WebClientTest() {
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil")) // for retry
 
-        val exception = assertThrows(EgressException::class.java) { client.fetchPerson(pid) }
+        val exception = assertThrows(EgressException::class.java) { client.fetchPerson(pid, fetchFulltNavn = false) }
 
         assertEquals("Failed calling ${baseUrl()}/graphql", exception.message)
         assertEquals("Feil", (exception.cause as EgressException).message)
@@ -126,7 +126,7 @@ class PdlPersonClientTest : WebClientTest() {
     fun `fetchPerson handles extended response`() {
         arrange(extendedResponse())
         // extension data is only logged, so just check that no exception occurs:
-        assertDoesNotThrow { client.fetchPerson(pid) }
+        assertDoesNotThrow { client.fetchPerson(pid, fetchFulltNavn = false) }
     }
 
     @Test

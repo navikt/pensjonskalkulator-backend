@@ -9,10 +9,14 @@ import org.springframework.stereotype.Service
 class PersonService(
     private val client: PersonClient,
     private val pidGetter: PidGetter,
-    private val aldersgruppeFinder: AldersgruppeFinder
+    private val aldersgruppeFinder: AldersgruppeFinder,
+    private val navnRequirement: NavnRequirement
 ) {
 
-    fun getPerson() = client.fetchPerson(pidGetter.pid()).also(::updateMetrics)
+    fun getPerson() = client.fetchPerson(
+        pid = pidGetter.pid(),
+        fetchFulltNavn = navnRequirement.needFulltNavn()
+    ).also(::updateMetrics)
 
     private fun updateMetrics(person: Person?) {
         person?.let { Metrics.countEvent(ALDERSGRUPPE_METRIC_NAME, aldersgruppeFinder.aldersgruppe(it)) }

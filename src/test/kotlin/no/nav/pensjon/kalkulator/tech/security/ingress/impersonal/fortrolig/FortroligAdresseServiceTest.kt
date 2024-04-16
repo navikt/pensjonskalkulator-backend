@@ -23,7 +23,7 @@ class FortroligAdresseServiceTest {
     fun `adressebeskyttelseGradering returns person's adressebeskyttelsesgradering`() {
         `when`(personClient.fetchAdressebeskyttelse(pid)).thenReturn(
             Person(
-                fornavn = "F",
+                navn = "F",
                 foedselsdato = LocalDate.MIN,
                 sivilstand = Sivilstand.UOPPGITT,
                 adressebeskyttelse = AdressebeskyttelseGradering.STRENGT_FORTROLIG

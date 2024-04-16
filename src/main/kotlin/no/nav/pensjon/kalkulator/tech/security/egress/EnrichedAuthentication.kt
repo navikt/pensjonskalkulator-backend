@@ -16,7 +16,8 @@ import org.springframework.security.core.GrantedAuthority
 class EnrichedAuthentication(
     private val initialAuth: Authentication,
     private val egressTokenSuppliersByService: EgressTokenSuppliersByService,
-    val pid: Pid?
+    val pid: Pid?,
+    val isOnBehalf: Boolean = false
 ) : Authentication {
 
     fun getEgressAccessToken(service: EgressService): RawJwt {

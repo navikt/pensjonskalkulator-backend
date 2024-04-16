@@ -5,7 +5,6 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.PersonFactory.skiltPerson
 import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
@@ -24,14 +23,18 @@ class PersonServiceTest {
     @Mock
     private lateinit var aldersgruppeFinder: AldersgruppeFinder
 
+    @Mock
+    private lateinit var navnRequirement: NavnRequirement
+
     @Test
     fun getPerson() {
         val skiltPerson = skiltPerson()
         `when`(pidGetter.pid()).thenReturn(pid)
-        `when`(client.fetchPerson(pid)).thenReturn(skiltPerson)
+        `when`(client.fetchPerson(pid, fetchFulltNavn = false)).thenReturn(skiltPerson)
         `when`(aldersgruppeFinder.aldersgruppe(skiltPerson)).thenReturn("")
+        `when`(navnRequirement.needFulltNavn()).thenReturn(false)
 
-        val person = PersonService(client, pidGetter, aldersgruppeFinder).getPerson()
+        val person = PersonService(client, pidGetter, aldersgruppeFinder, navnRequirement).getPerson()
 
         person shouldBe skiltPerson
     }

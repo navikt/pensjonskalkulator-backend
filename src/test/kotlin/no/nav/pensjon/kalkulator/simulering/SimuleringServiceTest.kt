@@ -57,14 +57,14 @@ class SimuleringServiceTest {
     fun `simulerAlderspensjon obtains registrert inntekt and sivilstand when not specified`() {
         val incomingSpec = impersonalSimuleringSpec(null, null)
         `when`(inntektService.sistePensjonsgivendeInntekt()).thenReturn(inntekt)
-        `when`(personClient.fetchPerson(pid)).thenReturn(person())
+        `when`(personClient.fetchPerson(pid, fetchFulltNavn = false)).thenReturn(person())
         `when`(simuleringClient.simulerAlderspensjon(incomingSpec, personalSpec)).thenReturn(simuleringsresultat)
 
         val response = service.simulerAlderspensjon(incomingSpec)
 
         assertEquals(PENSJONSBELOEP, response.alderspensjon[0].beloep)
         verify(inntektService, times(1)).sistePensjonsgivendeInntekt()
-        verify(personClient, times(1)).fetchPerson(pid)
+        verify(personClient, times(1)).fetchPerson(pid, fetchFulltNavn = false)
     }
 
     private companion object {

@@ -20,7 +20,7 @@ class PersonMapperTest {
 
         val person = PersonMapper.fromDto(dto)!!
 
-        assertEquals("For-Navn", person.fornavn)
+        assertEquals("For-Navn", person.navn)
         assertEquals(foedselsdato, person.foedselsdato)
         assertTrue(person.harFoedselsdato)
         assertEquals(Sivilstand.UGIFT, person.sivilstand)
@@ -29,7 +29,7 @@ class PersonMapperTest {
     @Test
     fun `fromDto picks first fornavn`() {
         val dto = responseDto(fornavnliste = listOf("Kari", "Ola"))
-        assertEquals("Kari", PersonMapper.fromDto(dto)?.fornavn)
+        assertEquals("Kari", PersonMapper.fromDto(dto)?.navn)
     }
 
     @Test
@@ -57,7 +57,7 @@ class PersonMapperTest {
 
     @Test
     fun `fromDto maps missing fornavn to empty string`() {
-        assertEquals("", PersonMapper.fromDto(responseDto(fornavnliste = emptyList()))?.fornavn)
+        assertEquals("", PersonMapper.fromDto(responseDto(fornavnliste = emptyList()))?.navn)
     }
 
     @Test

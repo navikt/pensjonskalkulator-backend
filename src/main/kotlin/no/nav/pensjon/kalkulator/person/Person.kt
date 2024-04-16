@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.person
 import java.time.LocalDate
 
 data class Person(
-    val fornavn: String,
+    val navn: String,
     val foedselsdato: LocalDate,
     val sivilstand: Sivilstand = Sivilstand.UOPPGITT,
     val adressebeskyttelse: AdressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT

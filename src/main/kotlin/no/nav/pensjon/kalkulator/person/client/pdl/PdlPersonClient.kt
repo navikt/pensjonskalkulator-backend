@@ -38,7 +38,7 @@ class PdlPersonClient(
 
     override fun service() = service
 
-    override fun fetchPerson(pid: Pid): Person? = fetch(personaliaQuery(pid))
+    override fun fetchPerson(pid: Pid, fetchFulltNavn: Boolean): Person? = fetch(personaliaQuery(pid, fetchFulltNavn))
 
     override fun fetchAdressebeskyttelse(pid: Pid): Person? = fetch(adressebeskyttelseQuery(pid))
 
@@ -114,12 +114,15 @@ class PdlPersonClient(
         private const val BEHANDLINGSNUMMER = "B353"
         private val service = EgressService.PERSONDATALOESNINGEN
 
-        private fun personaliaQuery(pid: Pid) = """{
-	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { fornavn }, foedsel { foedselsdato }, sivilstand(historikk: false) { type } } }",
+        private fun personaliaQuery(pid: Pid, fetchFulltNavn: Boolean) = """{
+	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { ${navnQuery(fetchFulltNavn)} }, foedsel { foedselsdato }, sivilstand(historikk: false) { type } } }",
 	"variables": {
 		"ident": "${pid.value}"
 	}
 }"""
+
+        private fun navnQuery(fetchFulltNavn: Boolean): String =
+            if (fetchFulltNavn) "fornavn, mellomnavn, etternavn" else "fornavn"
 
         private fun adressebeskyttelseQuery(pid: Pid) = """{
 	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { adressebeskyttelse { gradering } } }",

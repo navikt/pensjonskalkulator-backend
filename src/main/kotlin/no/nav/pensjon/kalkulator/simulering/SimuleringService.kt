@@ -24,12 +24,14 @@ class SimuleringService(
         val personalSpec = PersonalSimuleringSpec(
             pid = pid,
             sivilstand = impersonalSpec.sivilstand ?: sivilstand(pid),
-            aarligInntektFoerUttak = impersonalSpec.forventetAarligInntektFoerUttak ?: inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact(),
+            aarligInntektFoerUttak = impersonalSpec.forventetAarligInntektFoerUttak
+                ?: inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact()
         )
 
         log.debug { "Simulerer med parametre $impersonalSpec og $personalSpec" }
         return simuleringClient.simulerAlderspensjon(impersonalSpec, personalSpec)
     }
 
-    private fun sivilstand(pid: Pid) = personClient.fetchPerson(pid)?.sivilstand ?: Sivilstand.UOPPGITT
+    private fun sivilstand(pid: Pid) =
+        personClient.fetchPerson(pid = pid, fetchFulltNavn = false)?.sivilstand ?: Sivilstand.UOPPGITT
 }
