@@ -29,17 +29,17 @@ class PersonController(
     @GetMapping("v1/person")
     @Operation(
         summary = "Hent personinformasjon",
-        description = "Henter personinformasjon om den innloggede brukeren"
+        description = "Henter personinformasjon for person-ID-en angitt i tilgangstokenet eller i HTTP-header."
     )
     @ApiResponses(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "Henting av personinformasjon utført. I resultatet er verdi av 'maaneder' 0..11."
+                description = "Henting av personinformasjon utført."
             ),
             ApiResponse(
                 responseCode = "503",
-                description = "Henting av personinformasjon kunne ikke utføres av tekniske årsaker",
+                description = "Henting av personinformasjon kunne ikke utføres av tekniske årsaker.",
                 content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
             ),
         ]
@@ -61,17 +61,17 @@ class PersonController(
     @GetMapping("v2/person")
     @Operation(
         summary = "Hent personinformasjon",
-        description = "Henter personinformasjon om den innloggede brukeren"
+        description = "Henter personinformasjon om den innloggede brukeren."
     )
     @ApiResponses(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "Henting av personinformasjon utført. I resultatet er verdi av 'maaneder' 0..11."
+                description = "Henting av personinformasjon utført."
             ),
             ApiResponse(
                 responseCode = "503",
-                description = "Henting av personinformasjon kunne ikke utføres av tekniske årsaker",
+                description = "Henting av personinformasjon kunne ikke utføres av tekniske årsaker.",
                 content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
             ),
         ]

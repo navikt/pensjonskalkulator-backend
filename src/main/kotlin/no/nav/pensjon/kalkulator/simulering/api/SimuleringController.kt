@@ -33,7 +33,7 @@ class SimuleringController(
     @PostMapping("v4/alderspensjon/simulering")
     @Operation(
         summary = "Simuler alderspensjon",
-        description = "Lag en prognose for framtidig alderspensjon med støtte til Afp Offentlig." +
+        description = "Lag en prognose for framtidig alderspensjon med støtte for AFP i offentlig sektor." +
                 " Feltet 'epsHarInntektOver2G' brukes til å angi hvorvidt ektefelle/partner/samboer har inntekt" +
                 " over 2 ganger grunnbeløpet. Dersom simulering med de angitte parametre resulterer i avslag i" +
                 " vilkårsprøvingen, vil responsen inneholde alternative parametre som vil gi et innvilget" +
