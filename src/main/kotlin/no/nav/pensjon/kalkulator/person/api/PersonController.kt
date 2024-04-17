@@ -76,9 +76,9 @@ class PersonController(
             ),
         ]
     )
-    fun personV2(@RequestBody spec: UttaksalderIngressSpecDto?): PersonV2 {
+    fun personV2(): PersonV2 {
         traceAid.begin()
-        log.debug { "Request for personinformasjon V2: $spec" }
+        log.debug { "Request for personinformasjon V2" }
 
         return try {
             dtoV2(timed(service::getPerson, "person"))

@@ -52,13 +52,13 @@ class SimuleringControllerTest {
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
         mvc.perform(
-            post(URL)
+            post(URL_V4)
                 .with(csrf())
                 .content(heltUttakRequestBody(SimuleringType.ALDERSPENSJON))
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk())
-            .andExpect(content().json(responseBody(SimuleringType.ALDERSPENSJON)))
+            .andExpect(content().json(responseBodyV4(SimuleringType.ALDERSPENSJON)))
     }
 
     @Test
@@ -67,13 +67,13 @@ class SimuleringControllerTest {
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
         mvc.perform(
-            post(URL)
+            post(URL_V4)
                 .with(csrf())
                 .content(gradertUttakRequestBody())
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk())
-            .andExpect(content().json(responseBody(SimuleringType.ALDERSPENSJON)))
+            .andExpect(content().json(responseBodyV4(SimuleringType.ALDERSPENSJON)))
     }
 
     @Test
@@ -82,13 +82,13 @@ class SimuleringControllerTest {
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
         mvc.perform(
-            post(URL)
+            post(URL_V4)
                 .with(csrf())
                 .content(heltUttakRequestBody(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT))
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk())
-            .andExpect(content().json(responseBody(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)))
+            .andExpect(content().json(responseBodyV4(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)))
     }
 
     @Test
@@ -112,7 +112,7 @@ class SimuleringControllerTest {
         `when`(simuleringService.simulerAlderspensjon(spec)).thenThrow(conflict())
 
         mvc.perform(
-            post(URL)
+            post(URL_V4)
                 .with(csrf())
                 .content(heltUttakRequestBody(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -123,7 +123,6 @@ class SimuleringControllerTest {
 
     private companion object {
 
-        private const val URL = "/api/v2/alderspensjon/simulering"
         private const val URL_V4 = "/api/v4/alderspensjon/simulering"
         private const val PENSJONSBELOEP = 123456
 
@@ -190,30 +189,6 @@ class SimuleringControllerTest {
                     inntekt = Inntekt(50_000, Alder(75, 0))
                 )
             )
-
-        @Language("json")
-        private fun responseBody(simuleringstype: SimuleringType) = """{
-            "alderspensjon": [
-              {
-                "beloep": $PENSJONSBELOEP,
-                "alder": 67
-              }
-            ],
-            "afpPrivat": ${
-            when (simuleringstype) {
-                SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG -> "[]"
-                SimuleringType.ALDERSPENSJON -> "[]"
-                SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT -> """
-              [
-                {
-                  "beloep": 22056,
-                  "alder": 67
-                }
-              ]
-              """
-            }
-        }
-        }""".trimIndent()
 
         @Language("json")
         private fun responseBodyV4(simuleringstype: SimuleringType) = """{
