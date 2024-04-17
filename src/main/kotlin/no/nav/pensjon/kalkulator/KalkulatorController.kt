@@ -40,6 +40,12 @@ class KalkulatorController(
     )
     fun simulatorTidligstMuligUttakTest(): TmuResult? = simulatorClient.tidligstMuligUttak()
 
+    @GetMapping("simulator-ap-test")
+    @Operation(
+        summary = "Simulator simuler-alderspensjon-test"
+    )
+    fun simulatorAlderspensjonTest(): String? = simulatorClient.alderspensjon()
+
     @GetMapping("simulator-sfb-test")
     @Operation(
         summary = "Simulator simuler-folketrygdbeholdning-test"

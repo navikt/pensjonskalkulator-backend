@@ -75,6 +75,29 @@ class SimulatorDevClient(
         }
     }
 
+    fun alderspensjon(): String? {
+        val url = "$baseUrl/$SIMULER_ALDERSPENSJON_RESOURCE"
+        log.debug { "POST to URL: '$url'" }
+
+        return try {
+            webClient
+                .post()
+                .uri("/$SIMULER_ALDERSPENSJON_RESOURCE")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .headers(::setHeaders)
+                .bodyValue(ALDERSPENSJON_BODY)
+                .retrieve()
+                .bodyToMono(String::class.java)
+                .retryWhen(retryBackoffSpec(url))
+                .block()
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $url", e)
+        } catch (e: WebClientResponseException) {
+            throw EgressException(e.responseBodyAsString, e)
+        }
+    }
+
     fun folketrygdbeholdning(): String? {
         val url = "$baseUrl/$SIMULER_FOLKETRYGDBEHOLDNING_RESOURCE"
         log.debug { "POST to URL: '$url'" }
@@ -108,6 +131,7 @@ class SimulatorDevClient(
     companion object {
         private const val STATUS_RESOURCE = "api/v1/status"
         private const val TIDLIGST_MULIG_UTTAK_RESOURCE = "api/v1/tidligst-mulig-uttak"
+        private const val SIMULER_ALDERSPENSJON_RESOURCE = "api/v4/simuler-alderspensjon"
         private const val SIMULER_FOLKETRYGDBEHOLDNING_RESOURCE = "api/v1/simuler-folketrygdbeholdning"
 
         private const val TMU_BODY = """{
@@ -123,6 +147,25 @@ class SimulatorDevClient(
             "arligInntekt": 500000
         }
     ]
+}"""
+
+        private const val ALDERSPENSJON_BODY = """{
+    "personId": "12906498357",
+    "gradertUttak": {
+        "fraOgMedDato": "2031-01-01",
+        "uttaksgrad": 50
+    },
+    "heltUttakFraOgMedDato": "2034-10-12",
+    "epsPensjon": false,
+    "eps2G": false,
+    "arIUtlandetEtter16": 0,
+    "fremtidigInntektListe": [
+        {
+            "arligInntekt": 500000,
+            "fraOgMedDato": "2030-01-01"
+        }
+    ],
+    "rettTilAfpOffentligDato": "2032-01-01"
 }"""
 
         private const val FOLKETRYGDBEHOLDNING_BODY = """{
