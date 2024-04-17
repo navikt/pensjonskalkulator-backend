@@ -40,7 +40,8 @@ class OpenApiConfiguration {
                 "/api/v2/pensjonsavtaler",
                 "/api/v1/ekskludert",
                 "/api/v2/person",
-                "/api/v1/person",
+                "/api/v1/person", // to be moved to 'deprecated'
+                "/api/v1/ansatt-id",
                 "/api/v1/tidligste-gradert-uttaksalder", // to be moved to 'deprecated'
                 "/api/v1/tidligste-hel-uttaksalder",
                 "/api/feature/**",
