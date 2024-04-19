@@ -103,7 +103,7 @@ class SimuleringControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk())
-            .andExpect(content().json(responseBodyV4(SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG)))
+            .andExpect(content().json(responseBodyV4MedAFPOffentlig()))
     }
 
     @Test
@@ -211,12 +211,18 @@ class SimuleringControllerTest {
               ]
               """
             }
-        },
-        "afpOffentlig": ${
-            when (simuleringstype) {
-                SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT -> null
-                SimuleringType.ALDERSPENSJON -> null
-                SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG -> """{
+        }}""".trimIndent()
+
+        @Language("json")
+        private fun responseBodyV4MedAFPOffentlig() = """{
+            "alderspensjon": [
+              {
+                "beloep": $PENSJONSBELOEP,
+                "alder": 67
+              }
+            ],
+            "afpPrivat": [],
+            "afpOffentlig": {
               "afpLeverandoer": "Statens pensjonskasse",
               "afpOffentligListe": [
                   {
@@ -225,10 +231,8 @@ class SimuleringControllerTest {
                   }
                 ]
               }
-              """
-            }
-        }
-        }""".trimIndent()
+              }
+              """.trimIndent()
 
         private fun simuleringsresultat(simuleringType: SimuleringType) =
             when (simuleringType) {
