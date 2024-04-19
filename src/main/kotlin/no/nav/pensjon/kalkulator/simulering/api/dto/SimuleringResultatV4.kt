@@ -1,5 +1,8 @@
 package no.nav.pensjon.kalkulator.simulering.api.dto
 
+import com.fasterxml.jackson.annotation.JsonInclude
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class SimuleringResultatV4(
     val alderspensjon: List<PensjonsberegningV4> = emptyList(),
     val afpPrivat: List<PensjonsberegningV4> = emptyList(),
