@@ -182,6 +182,6 @@ class SimuleringController(
             )
 
         @Language("json")
-        const val VILKAAR_IKKE_OPPFYLT_EXAMPLE = """{"alderspensjon":[],"afpPrivat":[],"afpOffentlig":null,"vilkaarsproeving":{"vilkaarErOppfylt":false,"alternativ":null}}"""
+        const val VILKAAR_IKKE_OPPFYLT_EXAMPLE = """{"alderspensjon":[],"afpPrivat":[],"vilkaarsproeving":{"vilkaarErOppfylt":false,"alternativ":null}}"""
     }
 }
