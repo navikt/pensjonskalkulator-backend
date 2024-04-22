@@ -8,8 +8,8 @@ class SecurityContextNavIdExtractor {
 
     fun id(): String = idFromSecurityContext() ?: ""
 
-    private companion object {
-        private const val CLAIM_KEY = "NAVident"
+    companion object {
+        const val CLAIM_KEY = "NAVident"
 
         private fun idFromSecurityContext(): String? = SecurityContextClaimExtractor.claim(CLAIM_KEY) as? String
     }

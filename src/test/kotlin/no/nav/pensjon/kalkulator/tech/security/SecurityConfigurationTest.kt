@@ -16,20 +16,20 @@ class SecurityConfigurationTest {
     private lateinit var request: HttpServletRequest
 
     @Test
-    fun `when no 'fnr' header then isImpersonal returns false`() {
+    fun `when no 'fnr' header then hasPidHeader returns false`() {
         `when`(request.getHeader("fnr")).thenReturn(null)
-        assertFalse(SecurityConfiguration.isImpersonal(request))
+        assertFalse(SecurityConfiguration.hasPidHeader(request))
     }
 
     @Test
-    fun `when empty 'fnr' header then isImpersonal returns false`() {
+    fun `when empty 'fnr' header then hasPidHeader returns false`() {
         `when`(request.getHeader("fnr")).thenReturn("")
-        assertFalse(SecurityConfiguration.isImpersonal(request))
+        assertFalse(SecurityConfiguration.hasPidHeader(request))
     }
 
     @Test
-    fun `when non-empty 'fnr' header then isImpersonal returns true`() {
+    fun `when non-empty 'fnr' header then hasPidHeader returns true`() {
         `when`(request.getHeader("fnr")).thenReturn(pid.value)
-        assertTrue(SecurityConfiguration.isImpersonal(request))
+        assertTrue(SecurityConfiguration.hasPidHeader(request))
     }
 }

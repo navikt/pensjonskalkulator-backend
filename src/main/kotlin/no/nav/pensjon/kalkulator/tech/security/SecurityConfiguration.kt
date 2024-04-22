@@ -6,6 +6,8 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.AudienceValidator
 import no.nav.pensjon.kalkulator.tech.security.ingress.AuthenticationEnricherFilter
 import no.nav.pensjon.kalkulator.tech.security.ingress.LoggingAuthenticationEntryPoint
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.ImpersonalAccessFilter
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.SecurityContextNavIdExtractor
+import no.nav.pensjon.kalkulator.tech.security.ingress.jwt.RequestClaimExtractor
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -29,7 +31,7 @@ import org.springframework.util.StringUtils.hasLength
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfiguration {
+class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtractor) {
 
     /**
      * Supports two issuer configurations (ID-porten and TokenX) at bean instantiation time,
@@ -107,20 +109,35 @@ class SecurityConfiguration {
             .build()
     }
 
+    /**
+     * "Impersonal" means that the logged-in user acts on behalf of another person
+     */
+    private fun isImpersonal(request: HttpServletRequest): Boolean =
+        request.requestURI == ANSATT_ID_URI && hasAnsattIdClaim(request) || hasPidHeader(request)
+
+    private fun hasAnsattIdClaim(request: HttpServletRequest): Boolean =
+        hasLength(requestClaimExtractor.extractAuthorizationClaim(request, SecurityContextNavIdExtractor.CLAIM_KEY))
+
     companion object {
 
-        /**
-         * "Impersonal" means that the logged-in user acts on behalf of another person
-         */
-        fun isImpersonal(request: HttpServletRequest): Boolean =
+        private const val ANSATT_ID_URI = "/api/v1/ansatt-id"
+
+        fun hasPidHeader(request: HttpServletRequest): Boolean =
             hasLength(request.getHeader(CustomHttpHeaders.PID))
 
-        private fun jwtDecoder(issuerUri: String, frontendAudiences: List<String>, backendAudience: String): JwtDecoder {
+        private fun jwtDecoder(
+            issuerUri: String,
+            frontendAudiences: List<String>,
+            backendAudience: String
+        ): JwtDecoder {
             val decoder = JwtDecoders.fromIssuerLocation(issuerUri) as NimbusJwtDecoder
 
-            decoder.setJwtValidator(DelegatingOAuth2TokenValidator(
-                JwtValidators.createDefaultWithIssuer(issuerUri),
-                AudienceValidator(frontendAudiences, backendAudience)))
+            decoder.setJwtValidator(
+                DelegatingOAuth2TokenValidator(
+                    JwtValidators.createDefaultWithIssuer(issuerUri),
+                    AudienceValidator(frontendAudiences, backendAudience)
+                )
+            )
 
             return decoder
         }
