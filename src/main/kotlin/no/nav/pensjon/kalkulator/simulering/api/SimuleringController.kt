@@ -15,6 +15,8 @@ import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapperV3.fromIngre
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapperV3.resultatV3
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapperV4.fromIngressSimuleringSpecV4
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapperV4.resultatV4
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapperV5.fromIngressSimuleringSpecV5
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapperV5.resultatV5
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.intellij.lang.annotations.Language
@@ -66,6 +68,47 @@ class SimuleringController(
                 .also { log.debug { "Simulering respons: $it" } }
         } catch (e: EgressException) {
             if (e.isConflict) vilkaarIkkeOppfylt() else handleError(e, "V2")!!
+        } finally {
+            traceAid.end()
+        }
+    }
+
+    @PostMapping("v5/alderspensjon/simulering")
+    @Operation(
+        summary = "Simuler alderspensjon",
+        description = "Lag en prognose for framtidig alderspensjon med støtte for AFP i offentlig sektor." +
+                " Feltet 'epsHarInntektOver2G' brukes til å angi hvorvidt ektefelle/partner/samboer har inntekt" +
+                " over 2 ganger grunnbeløpet. Dersom simulering med de angitte parametre resulterer i avslag i" +
+                " vilkårsprøvingen, vil responsen inneholde alternative parametre som vil gi et innvilget" +
+                " simuleringsresultat"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Simulering utført"
+            ),
+            ApiResponse(
+                responseCode = "503", description = "Simulering kunne ikke utføres av tekniske årsaker",
+                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
+            ),
+        ]
+    )
+    fun simulerAlderspensjonV5(@RequestBody spec: IngressSimuleringSpecV5): SimuleringResultatV5 {
+        traceAid.begin()
+        log.debug { "Request for V5 simulering: $spec" }
+
+        return try {
+            resultatV5(
+                timed(
+                    service::simulerAlderspensjon,
+                    fromIngressSimuleringSpecV5(spec),
+                    "alderspensjon/simulering"
+                )
+            )
+                .also { log.debug { "Simulering V5 respons: $it" } }
+        } catch (e: EgressException) {
+            if (e.isConflict) vilkaarIkkeOppfyltV5() else handleError(e, "V5")!!
         } finally {
             traceAid.end()
         }
@@ -166,6 +209,14 @@ class SimuleringController(
                 vilkaarErOppfylt = false
             )
 
+        private fun vilkaarIkkeOppfyltV5() =
+            SimuleringResultatV5(
+                alderspensjon = emptyList(),
+                afpPrivat = null,
+                afpOffentlig = null,
+                vilkaarsproeving = VilkaarsproevingV5(vilkaarErOppfylt = false, alternativ = null)
+            )
+
         private fun vilkaarIkkeOppfyltV4() =
             SimuleringResultatV4(
                 alderspensjon = emptyList(),
@@ -183,5 +234,8 @@ class SimuleringController(
 
         @Language("json")
         const val VILKAAR_IKKE_OPPFYLT_EXAMPLE = """{"alderspensjon":[],"afpPrivat":[],"vilkaarsproeving":{"vilkaarErOppfylt":false,"alternativ":null}}"""
+
+        @Language("json")
+        const val VILKAAR_IKKE_OPPFYLT_EXAMPLE_V5 = """{"alderspensjon":[],"vilkaarsproeving":{"vilkaarErOppfylt":false}}"""
     }
 }
