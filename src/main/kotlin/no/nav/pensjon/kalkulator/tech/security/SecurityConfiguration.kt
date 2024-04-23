@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManagerResolver
+import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -34,8 +35,7 @@ import org.springframework.util.StringUtils.hasLength
 class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtractor) {
 
     /**
-     * Supports two issuer configurations (ID-porten and TokenX) at bean instantiation time,
-     * but only one of them will be used during call processing.
+     * Supports two issuer configurations (ID-porten and TokenX).
      * -----
      * Tokens issued for frontend are accepted as well as tokens issued for backend.
      * This is in order to support both these scenarios:
@@ -45,34 +45,56 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
     @Bean("personal")
     @Primary
     fun personalProviderManager(
-        @Value("\${idporten.issuer}") idPortenIssuerUri: String,
-        @Value("\${idporten.audience}") idPortenAudience: String,
-        @Value("\${token.x.issuer}") tokenXIssuerUri: String,
-        @Value("\${token.x.client.id}") tokenXAudience: String
+        @Qualifier("id-porten-provider") idPortenProvider: AuthenticationProvider,
+        @Qualifier("token-x-provider") tokenXProvider: AuthenticationProvider
     ) =
-        ProviderManager(
-            JwtAuthenticationProvider(
-                jwtDecoder(
-                    issuerUri = if (hasLength(idPortenIssuerUri)) idPortenIssuerUri else tokenXIssuerUri,
-                    frontendAudiences = listOf(idPortenAudience),
-                    backendAudience = tokenXAudience
-                )
-            )
-        )
+        ProviderManager(idPortenProvider, tokenXProvider)
 
     @Bean("impersonal")
     fun impersonalProviderManager(
         @Value("\${azure.openid.config.issuer}") issuerUri: String,
         @Value("\${pkb.frontend.entra.client.id}") frontendAudiences: String,
         @Value("\${azure-app.client-id}") backendAudience: String
-    ) = ProviderManager(JwtAuthenticationProvider(jwtDecoder(issuerUri, frontendAudiences.split(","), backendAudience)))
+    ) =
+        ProviderManager(
+            JwtAuthenticationProvider(jwtDecoder(issuerUri, frontendAudiences.split(","), backendAudience))
+        )
+
+    @Bean("id-porten-provider")
+    @Primary
+    fun idPortenProvider(
+        @Value("\${idporten.issuer}") issuer: String,
+        @Value("\${idporten.audience}") audience: String
+    ) =
+        JwtAuthenticationProvider(
+            jwtDecoder(
+                issuerUri = issuer,
+                frontendAudiences = listOf(audience),
+                backendAudience = ""
+            )
+        )
+
+    @Bean("token-x-provider")
+    fun tokenXProvider(
+        @Value("\${token-x.issuer}") issuer: String,
+        @Value("\${token-x.client.id}") audience: String
+    ) =
+        JwtAuthenticationProvider(
+            jwtDecoder(
+                issuerUri = issuer,
+                frontendAudiences = emptyList(),
+                backendAudience = audience
+            )
+        )
 
     @Bean
     fun tokenAuthenticationManagerResolver(
         @Qualifier("personal") personalProviderManager: ProviderManager,
         @Qualifier("impersonal") impersonalProviderManager: ProviderManager
     ): AuthenticationManagerResolver<HttpServletRequest> =
-        AuthenticationManagerResolver { if (isImpersonal(it)) impersonalProviderManager else personalProviderManager }
+        AuthenticationManagerResolver {
+            if (isImpersonal(it)) impersonalProviderManager else personalProviderManager
+        }
 
     @Bean
     fun filterChain(
