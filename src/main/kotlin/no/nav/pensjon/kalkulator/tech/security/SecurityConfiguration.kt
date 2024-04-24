@@ -52,13 +52,17 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
 
     @Bean("impersonal")
     fun impersonalProviderManager(
-        @Value("\${azure.openid.config.issuer}") issuerUri: String,
-        @Value("\${pkb.frontend.entra.client.id}") frontendAudiences: String,
-        @Value("\${azure-app.client-id}") backendAudience: String
+        @Qualifier("entra-id-provider") provider: AuthenticationProvider
     ) =
-        ProviderManager(
-            JwtAuthenticationProvider(jwtDecoder(issuerUri, frontendAudiences.split(","), backendAudience))
-        )
+        ProviderManager(provider)
+
+    @Bean("universal")
+    fun universalProviderManager(
+        @Qualifier("id-porten-provider") idPortenProvider: AuthenticationProvider,
+        @Qualifier("token-x-provider") tokenXProvider: AuthenticationProvider,
+        @Qualifier("entra-id-provider") entraIdProvider: AuthenticationProvider
+    ) =
+        ProviderManager(idPortenProvider, tokenXProvider, entraIdProvider)
 
     @Bean("id-porten-provider")
     @Primary
@@ -87,13 +91,34 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
             )
         )
 
+    @Bean("entra-id-provider")
+    fun entraIdProvider(
+        @Value("\${azure.openid.config.issuer}") issuer: String,
+        @Value("\${pkb.frontend.entra.client.id}") frontendAudiences: String,
+        @Value("\${azure-app.client-id}") backendAudience: String
+    ) =
+        JwtAuthenticationProvider(
+            jwtDecoder(
+                issuerUri = issuer,
+                frontendAudiences = frontendAudiences.split(","),
+                backendAudience
+            )
+        )
+
     @Bean
     fun tokenAuthenticationManagerResolver(
         @Qualifier("personal") personalProviderManager: ProviderManager,
-        @Qualifier("impersonal") impersonalProviderManager: ProviderManager
+        @Qualifier("impersonal") impersonalProviderManager: ProviderManager,
+        @Qualifier("universal") universalProviderManager: ProviderManager
     ): AuthenticationManagerResolver<HttpServletRequest> =
         AuthenticationManagerResolver {
-            if (isImpersonal(it)) impersonalProviderManager else personalProviderManager
+            if (isUniversal(it))
+                universalProviderManager
+            else
+                if (isImpersonal(it))
+                    impersonalProviderManager
+                else
+                    personalProviderManager
         }
 
     @Bean
@@ -132,10 +157,17 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
     }
 
     /**
-     * "Impersonal" means that the logged-in user acts on behalf of another person
+     * "Impersonal" means that the logged-in user acts on behalf of another person.
      */
     private fun isImpersonal(request: HttpServletRequest): Boolean =
         request.requestURI == ANSATT_ID_URI && hasAnsattIdClaim(request) || hasPidHeader(request)
+
+    /**
+     * "Universal" means that it cannot be determined whether the request is made in a personal or impersonal
+     * context. This implies that any one of the relevant token issuers must be accepted.
+     */
+    private fun isUniversal(request: HttpServletRequest): Boolean =
+        request.requestURI.startsWith(FEATURE_URI)
 
     private fun hasAnsattIdClaim(request: HttpServletRequest): Boolean =
         hasLength(requestClaimExtractor.extractAuthorizationClaim(request, SecurityContextNavIdExtractor.CLAIM_KEY))
@@ -143,6 +175,7 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
     companion object {
 
         private const val ANSATT_ID_URI = "/api/v1/ansatt-id"
+        private const val FEATURE_URI = "/api/feature/"
 
         fun hasPidHeader(request: HttpServletRequest): Boolean =
             hasLength(request.getHeader(CustomHttpHeaders.PID))
