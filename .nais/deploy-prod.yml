@@ -99,6 +99,16 @@ spec:
       value: prod-fss:pensjonsamhandling:tp
     - name: TJENESTEPENSJON_URL
       value: https://tp-api.prod-fss-pub.nais.io
+    - name: PKB_FRONTEND_ENTRA_CLIENT_ID
+      value: irrelevant-when-obo-token-used
+    - name: PKB_GROUP_ID_VEILEDER
+      value: 959ead5b-99b5-466b-a0ff-5fdbc687517b
+    - name: PKB_GROUP_ID_EGNE_ANSATTE
+      value: e750ceb5-b70b-4d94-b4fa-9d22467b786b
+    - name: PKB_GROUP_ID_FORTROLIG_ADRESSE
+      value: 9ec6487d-f37a-4aad-a027-cd221c1ac32b
+    - name: PKB_GROUP_ID_STRENGT_FORTROLIG_ADRESSE
+      value: ad7b87a6-9180-467c-affc-20a566b0fec0
     - name: SERVER_ERROR_INCLUDE_STACKTRACE
       value: never
     - name: AUDIT_LOG_OUTPUT
