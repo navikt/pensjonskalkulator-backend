@@ -1,12 +1,12 @@
 package no.nav.pensjon.kalkulator.ufoere.api
 
-import no.nav.pensjon.kalkulator.avtale.*
 import no.nav.pensjon.kalkulator.mock.DateFactory
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import no.nav.pensjon.kalkulator.ufoere.Ufoeregrad
 import no.nav.pensjon.kalkulator.ufoere.UfoerepensjonService
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
@@ -56,6 +56,19 @@ class UfoerepensjonControllerTest {
         )
             .andExpect(status().isOk)
             .andExpect(content().json(RESPONSE_BODY))
+    }
+
+    @Test
+    fun hentUfoeregrad() {
+        `when`(ufoeretrygdService.hentUfoeregrad()).thenReturn(Ufoeregrad(50))
+
+        mvc.perform(
+            MockMvcRequestBuilders.get("$URL/ufoeregrad")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().json("""{"ufoeregrad": 50}"""))
     }
 
     private companion object {
