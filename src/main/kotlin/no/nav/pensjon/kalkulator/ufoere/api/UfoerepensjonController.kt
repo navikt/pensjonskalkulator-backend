@@ -56,7 +56,7 @@ class UfoerepensjonController(
         }
     }
 
-    @GetMapping("ufoerepensjon/ufoeregrad")
+    @GetMapping("v1/ufoeregrad")
     @Operation(
         summary = "Hente gjeldende uføregrad",
         description = "Hente gjeldende uføregrad fra løpende vedtak om uføretrygd om det finnes"
