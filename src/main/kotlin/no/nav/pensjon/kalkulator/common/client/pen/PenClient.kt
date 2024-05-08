@@ -33,9 +33,10 @@ abstract class PenClient(
     protected fun <T> doGet(
         elementTypeRef: ParameterizedTypeReference<T>,
         path: String,
-        pid: Pid
+        pid: Pid,
+        deprecatedBasePath: Boolean = true
     ): T? {
-        val uri = "/$BASE_PATH/$path"
+        val uri = if (deprecatedBasePath) "/$DEPRECATED_BASE_PATH/$path" else "/$BASE_PATH/$path"
         log.debug { "GET from URI: '$uri'" }
 
         return try {
@@ -58,9 +59,10 @@ abstract class PenClient(
         path: String,
         requestBody: Request,
         requestClass: Class<Request>,
-        responseClass: Class<Response>
+        responseClass: Class<Response>,
+        deprecatedBasePath: Boolean = true
     ): Response? {
-        val uri = "/$BASE_PATH/$path"
+        val uri = if (deprecatedBasePath) "/$DEPRECATED_BASE_PATH/$path" else "/$BASE_PATH/$path"
         log.debug { "POST to URI: '$uri'" }
 
         try {
@@ -96,8 +98,9 @@ abstract class PenClient(
     }
 
     companion object {
-        private const val BASE_PATH = "pen/springapi"
-        private const val PING_PATH = "$BASE_PATH/ping"
+        private const val DEPRECATED_BASE_PATH = "pen/springapi"
+        private const val BASE_PATH = "pen/api"
+        private const val PING_PATH = "$DEPRECATED_BASE_PATH/ping"
         private val service = EgressService.PENSJONSFAGLIG_KJERNE
     }
 }

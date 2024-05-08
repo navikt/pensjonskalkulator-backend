@@ -45,6 +45,7 @@ class OpenApiConfiguration {
                 "/api/v1/ansatt-id",
                 "/api/v1/tidligste-gradert-uttaksalder", // to be moved to 'deprecated'
                 "/api/v1/tidligste-hel-uttaksalder",
+                "/api/v1/ufoeregrad",
                 "/api/feature/**",
                 "/api/inntekt",
                 "/api/sak-status",

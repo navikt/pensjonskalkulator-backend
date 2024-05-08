@@ -1,12 +1,12 @@
 package no.nav.pensjon.kalkulator.ufoere.api
 
-import no.nav.pensjon.kalkulator.avtale.*
 import no.nav.pensjon.kalkulator.mock.DateFactory
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import no.nav.pensjon.kalkulator.ufoere.Ufoeregrad
 import no.nav.pensjon.kalkulator.ufoere.UfoerepensjonService
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
@@ -49,7 +49,7 @@ class UfoerepensjonControllerTest {
         `when`(ufoeretrygdService.harLoependeUfoerepensjon(DateFactory.date)).thenReturn(true)
 
         mvc.perform(
-            MockMvcRequestBuilders.post(URL)
+            MockMvcRequestBuilders.post(URL_UFOEREPENSJON)
                 .with(csrf())
                 .content(requestBody())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -58,8 +58,22 @@ class UfoerepensjonControllerTest {
             .andExpect(content().json(RESPONSE_BODY))
     }
 
+    @Test
+    fun hentUfoeregrad() {
+        `when`(ufoeretrygdService.hentUfoeregrad()).thenReturn(Ufoeregrad(50))
+
+        mvc.perform(
+            MockMvcRequestBuilders.get(URL_HENT_UFOEREGRAD)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().json("""{"ufoeregrad": 50}"""))
+    }
+
     private companion object {
-        private const val URL = "/api/ufoerepensjon"
+        private const val URL_UFOEREPENSJON = "/api/ufoerepensjon"
+        private const val URL_HENT_UFOEREGRAD = "/api/v1/ufoeregrad"
 
         @Language("json")
         private fun requestBody() = """

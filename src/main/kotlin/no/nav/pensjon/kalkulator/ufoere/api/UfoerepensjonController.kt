@@ -9,7 +9,9 @@ import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
+import no.nav.pensjon.kalkulator.ufoere.Ufoeregrad
 import no.nav.pensjon.kalkulator.ufoere.UfoerepensjonService
+import no.nav.pensjon.kalkulator.ufoere.api.dto.UfoeregradDto
 import no.nav.pensjon.kalkulator.ufoere.api.dto.UfoerepensjonDto
 import no.nav.pensjon.kalkulator.ufoere.api.dto.UfoerepensjonSpecDto
 import org.springframework.web.bind.annotation.*
@@ -54,11 +56,43 @@ class UfoerepensjonController(
         }
     }
 
+    @GetMapping("v1/ufoeregrad")
+    @Operation(
+        summary = "Hente gjeldende uføregrad",
+        description = "Hente gjeldende uføregrad fra løpende vedtak om uføretrygd om det finnes"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Henting av uføregrad utført"
+            ),
+            ApiResponse(
+                responseCode = "503", description = "henting av uføregrad kunne ikke utføres av tekniske årsaker",
+                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
+            ),
+        ]
+    )
+    fun hentUfoeregrad() : UfoeregradDto{
+        traceAid.begin()
+        log.debug { "Request for gjeldende uføregrad" }
+
+        return try {
+            toDto(timed(service::hentUfoeregrad,  "hentUfoeregrad"))
+                .also { log.debug { "Uføretrygd-hent uføregrad respons: $it" } }
+        } catch (e: EgressException) {
+            handleError(e)!!
+        } finally {
+            traceAid.end()
+        }
+    }
+
     override fun errorMessage() = ERROR_MESSAGE
 
     private companion object {
         private const val ERROR_MESSAGE = "feil ved bestemmelse av uføretrygd-status"
 
         private fun toDto(harUfoerepensjon: Boolean) = UfoerepensjonDto(harUfoerepensjon)
+        private fun toDto(hentUfoeregrad: Ufoeregrad) = UfoeregradDto(hentUfoeregrad.uforegrad)
     }
 }

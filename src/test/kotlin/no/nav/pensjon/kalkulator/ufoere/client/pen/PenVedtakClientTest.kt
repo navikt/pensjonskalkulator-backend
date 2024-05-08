@@ -51,6 +51,17 @@ class PenVedtakClientTest : WebClientTest() {
     }
 
     @Test
+    fun `bestemGjeldendeVedtak uses correct PEN api-path`() {
+        arrange(okResponse())
+
+        client.bestemGjeldendeVedtak(pid, date)
+
+        val request = takeRequest()
+        assertTrue(request.path?.contains("/pen/springapi") == true)
+        assertTrue(request.path?.contains("/pen/api") == false)
+    }
+
+    @Test
     fun `bestemGjeldendeVedtak retries in case of server error`() {
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
         arrange(okResponse())
