@@ -101,8 +101,8 @@ spec:
       value: https://tp-api.prod-fss-pub.nais.io
     - name: PKB_FRONTEND_ENTRA_CLIENT_ID
       value: irrelevant-when-obo-token-used
-    - name: PKB_GROUP_ID_VEILEDER
-      value: 959ead5b-99b5-466b-a0ff-5fdbc687517b
+    - name: PKB_GROUP_ID_SAKSBEHANDLER
+      value: 0af3955f-df85-4eb0-b5b2-45bf2c8aeb9e
     - name: PKB_GROUP_ID_EGNE_ANSATTE
       value: e750ceb5-b70b-4d94-b4fa-9d22467b786b
     - name: PKB_GROUP_ID_FORTROLIG_ADRESSE
