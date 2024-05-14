@@ -42,6 +42,7 @@ spec:
     inbound:
       rules:
         - application: pensjonskalkulator-frontend
+        - application: pensjonskalkulator-veiledning-frontend
     outbound:
       rules:
         - application: pdl-api
