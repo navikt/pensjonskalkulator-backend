@@ -130,6 +130,13 @@ class PdlPersonClientTest : WebClientTest() {
     }
 
     @Test
+    fun `fetchPerson handles person ikke funnet`() {
+        arrange(personIkkeFunnetResponse())
+        // extension data is only logged, so just check that no exception occurs:
+        assertDoesNotThrow { client.fetchPerson(pid, fetchFulltNavn = false) }
+    }
+
+    @Test
     fun `fetchAdressebeskyttelse returns adressebeskyttelsesgradering when OK response`() {
         arrange(okAdressebeskyttelseResponse())
 
@@ -179,30 +186,7 @@ class PdlPersonClientTest : WebClientTest() {
             }"""
 
         @Language("JSON")
-        private const val ADRESSEBESKYTTELSE_JSON = """{
-              "data": {
-                "hentPerson": {
-                  "adressebeskyttelse": [
-                    {
-                      "gradering": "STRENGT_FORTROLIG"
-                    }
-                  ]
-                }
-              }
-            }"""
-
-        private fun okPersonaliaResponse(): MockResponse =
-            jsonResponse(HttpStatus.OK).setBody(PERSONALIA_JSON.trimIndent())
-
-        private fun okAdressebeskyttelseResponse(): MockResponse =
-            jsonResponse(HttpStatus.OK).setBody(ADRESSEBESKYTTELSE_JSON.trimIndent())
-
-        private fun partialPersonaliaResponse(): MockResponse =
-            jsonResponse(HttpStatus.OK).setBody(PARTIAL_PERSONALIA_JSON.trimIndent())
-
-        private fun extendedResponse(): MockResponse {
-            @Language("JSON")
-            val body = """{
+        private const val EXTENSION_JSON = """{
               "data": {
                 "hentPerson": {
                   "navn": [
@@ -235,9 +219,59 @@ class PdlPersonClientTest : WebClientTest() {
               		}
               	]
               }
-            }""".trimIndent()
+            }"""
 
-            return jsonResponse(HttpStatus.OK).setBody(body)
+        @Language("JSON")
+        private const val ADRESSEBESKYTTELSE_JSON = """{
+              "data": {
+                "hentPerson": {
+                  "adressebeskyttelse": [
+                    {
+                      "gradering": "STRENGT_FORTROLIG"
+                    }
+                  ]
+                }
+              }
+            }"""
+
+        @Language("JSON")
+        private const val PERSON_IKKE_FUNNET_JSON = """{
+    "errors": [
+        {
+            "message": "Fant ikke person",
+            "locations": [
+                {
+                    "line": 1,
+                    "column": 22
+                }
+            ],
+            "path": [
+                "hentPerson"
+            ],
+            "extensions": {
+                "code": "not_found",
+                "classification": "ExecutionAborted"
+            }
         }
+    ],
+    "data": {
+        "hentPerson": null
+    }
+}"""
+
+        private fun okPersonaliaResponse(): MockResponse =
+            jsonResponse(HttpStatus.OK).setBody(PERSONALIA_JSON.trimIndent())
+
+        private fun okAdressebeskyttelseResponse(): MockResponse =
+            jsonResponse(HttpStatus.OK).setBody(ADRESSEBESKYTTELSE_JSON.trimIndent())
+
+        private fun partialPersonaliaResponse(): MockResponse =
+            jsonResponse(HttpStatus.OK).setBody(PARTIAL_PERSONALIA_JSON.trimIndent())
+
+        private fun extendedResponse(): MockResponse =
+            jsonResponse(HttpStatus.OK).setBody(EXTENSION_JSON.trimIndent())
+
+        private fun personIkkeFunnetResponse(): MockResponse =
+            jsonResponse(HttpStatus.OK).setBody(PERSON_IKKE_FUNNET_JSON.trimIndent())
     }
 }

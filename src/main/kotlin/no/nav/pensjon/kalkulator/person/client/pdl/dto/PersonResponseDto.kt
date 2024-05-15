@@ -10,7 +10,7 @@ data class PersonResponseDto(
     val errors: List<ErrorDto>?
 )
 
-data class PersonEnvelopeDto(val hentPerson: PersonDto)
+data class PersonEnvelopeDto(val hentPerson: PersonDto?) // null if person not found
 
 data class PersonDto(
     val navn: List<NavnDto>?,

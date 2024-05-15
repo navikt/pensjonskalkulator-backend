@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.person
 
+import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.tech.metric.Metrics
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
@@ -14,9 +15,13 @@ class PersonService(
 ) {
 
     fun getPerson() = client.fetchPerson(
-        pid = pidGetter.pid(),
+        pid = pidGetter.pid().also(::validate),
         fetchFulltNavn = navnRequirement.needFulltNavn()
-    ).also(::updateMetrics)
+    ).also(::updateMetrics) ?: throw NotFoundException("person")
+
+    private fun validate(pid: Pid) {
+        if (!pid.isValid) throw NotFoundException("person")
+    }
 
     private fun updateMetrics(person: Person?) {
         person?.let { Metrics.countEvent(ALDERSGRUPPE_METRIC_NAME, aldersgruppeFinder.aldersgruppe(it)) }

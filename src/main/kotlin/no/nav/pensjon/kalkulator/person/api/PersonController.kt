@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
+import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.api.dto.ApiPersonDto
 import no.nav.pensjon.kalkulator.person.api.dto.PersonV2
@@ -15,7 +16,9 @@ import no.nav.pensjon.kalkulator.person.api.map.PersonMapperV2.dtoV2
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderIngressSpecDto
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("api")
@@ -70,6 +73,10 @@ class PersonController(
                 description = "Henting av personinformasjon utført."
             ),
             ApiResponse(
+                responseCode = "404",
+                description = "Personen ble ikke funnet."
+            ),
+            ApiResponse(
                 responseCode = "503",
                 description = "Henting av personinformasjon kunne ikke utføres av tekniske årsaker.",
                 content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
@@ -83,6 +90,8 @@ class PersonController(
         return try {
             dtoV2(timed(service::getPerson, "person"))
                 .also { log.debug { "Personinformasjon respons: $it" } }
+        } catch (e: NotFoundException) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, e.message)
         } catch (e: EgressException) {
             handleError(e, "V2")!!
         } finally {
