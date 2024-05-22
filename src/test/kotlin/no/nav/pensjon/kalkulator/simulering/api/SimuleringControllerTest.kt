@@ -418,15 +418,13 @@ class SimuleringControllerTest {
                 "alder": 67
               }
             ],
-            "afpPrivat": {
-              "afpPrivatListe":
+            "afpPrivat": 
               [
                 {
                   "beloep": 22056,
                   "alder": 67
                 }
               ]
-              }
             }
         }""".trimIndent()
 
@@ -480,14 +478,12 @@ class SimuleringControllerTest {
                 "alder": 67
               }
             ],
-            "afpOffentlig": {
-              "afpOffentligListe": [
+            "afpOffentlig": [
                   {
                     "beloep": 22056,
                     "alder": 67
                   }
                 ]
-              }
               }
               """.trimIndent()
 

@@ -23,8 +23,8 @@ object SimuleringMapperV6 {
     fun resultatV6(source: Simuleringsresultat) =
         SimuleringResultatV6(
             alderspensjon = source.alderspensjon.map { PensjonsberegningV6(it.alder, it.beloep) },
-            afpPrivat = if (source.afpPrivat.isEmpty()) null else AfpPrivatV6(source.afpPrivat.map { PensjonsberegningV6(it.alder, it.beloep) }),
-            afpOffentlig = if (source.afpOffentlig.isEmpty()) null else AfpOffentligV6(source.afpOffentlig.map { PensjonsberegningAfpOffentligV6(it.alder, it.beloep) }),
+            afpPrivat = source.afpPrivat.map { PensjonsberegningV6(it.alder, it.beloep) },
+            afpOffentlig = source.afpOffentlig.map { PensjonsberegningAfpOffentligV6(it.alder, it.beloep) },
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving)
         )
 
