@@ -62,6 +62,9 @@ spec:
         - application: tp
           namespace: pensjonsamhandling
           cluster: prod-fss
+        - application: etterlatte-samordning-vedtak
+          namespace: etterlatte
+          cluster: prod-gcp
       external:
         - host: idporten.no
         - host: pdl-api.prod-fss-pub.nais.io

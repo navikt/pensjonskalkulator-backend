@@ -43,7 +43,7 @@ class OmstillingsstoenadControllerTest {
     private lateinit var auditor: Auditor
 
     @Test
-    fun mottarOmstillingsstoenad() {
+    fun `bruker mottar omstillingsstoenad`() {
         `when`(service.mottarOmstillingsstoenad()).thenReturn(true)
 
         val response = mvc.perform(

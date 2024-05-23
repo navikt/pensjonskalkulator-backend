@@ -70,6 +70,9 @@ spec:
         - application: tp-q2
           namespace: pensjonsamhandling
           cluster: dev-fss
+        - application: etterlatte-samordning-vedtak
+          namespace: etterlatte
+          cluster: dev-gcp
       external:
         - host: pdl-api.dev-fss-pub.nais.io
         - host: pensjon-pen-q2.dev-fss-pub.nais.io

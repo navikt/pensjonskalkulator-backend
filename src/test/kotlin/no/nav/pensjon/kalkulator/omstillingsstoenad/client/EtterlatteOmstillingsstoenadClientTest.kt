@@ -42,13 +42,13 @@ class EtterlatteOmstillingsstoenadClientTest : WebClientTest() {
     }
 
     @Test
-    fun `Bruker mottar omstillingsstoenad`() {
+    fun `bruker mottar omstillingsstoenad`() {
         arrange(okStatusResponse(true))
         assertTrue(client.mottarOmstillingsstoenad(pid, dato))
     }
 
     @Test
-    fun `Bruker mottar ikke omstillingsstoenad`() {
+    fun `bruker mottar ikke omstillingsstoenad`() {
         arrange(okStatusResponse(false))
         assertFalse(client.mottarOmstillingsstoenad(pid, dato))
     }
