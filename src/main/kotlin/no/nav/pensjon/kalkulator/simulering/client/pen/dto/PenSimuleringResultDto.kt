@@ -15,7 +15,7 @@ data class PenPensjonDto(
 data class PenPensjonAfpOffentligDto(
     val alder: Int,
     val beloep: Int,
-    val tpOrdning: String,
+    val tpOrdning: String, //TODO fjerne når frontend vil gå over til "simulerAlderspensjonV6"
 )
 
 data class PenVilkaarsproevingDto(
