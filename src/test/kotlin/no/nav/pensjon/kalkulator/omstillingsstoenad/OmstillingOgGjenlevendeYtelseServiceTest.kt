@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.omstillingsstoenad
 
+import kotlinx.coroutines.test.runTest
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.omstillingsstoenad.client.OmstillingsstoenadClient
 import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.TimeProvider
@@ -14,7 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDateTime
 
 @ExtendWith(SpringExtension::class)
-class OmstillingsstoenadServiceTest {
+class OmstillingOgGjenlevendeYtelseServiceTest {
 
     private lateinit var service: OmstillingsstoenadService
 
@@ -35,7 +36,7 @@ class OmstillingsstoenadServiceTest {
     }
 
     @Test
-    fun mottarOmstillingsstoenad() {
+    fun mottarOmstillingsstoenad() = runTest {
         `when`(client.mottarOmstillingsstoenad(pid, paaDato)).thenReturn(true)
         val resultat = service.mottarOmstillingsstoenad()
         assertTrue(resultat)

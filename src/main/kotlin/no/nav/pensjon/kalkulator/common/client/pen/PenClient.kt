@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.common.client.pen
 
+import kotlinx.coroutines.reactor.awaitSingle
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.PingableServiceClient
 import no.nav.pensjon.kalkulator.person.Pid
@@ -48,6 +49,31 @@ abstract class PenClient(
                 .bodyToMono(elementTypeRef)
                 .retryWhen(retryBackoffSpec(uri))
                 .block().also { countCalls(MetricResult.OK) }
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $uri", e)
+        } catch (e: WebClientResponseException) {
+            throw EgressException(e.responseBodyAsString, e)
+        }
+    }
+
+    protected suspend fun <T> doGetAsync(
+        elementTypeRef: ParameterizedTypeReference<T>,
+        path: String,
+        pid: Pid,
+        deprecatedBasePath: Boolean = true
+    ): T? {
+        val uri = if (deprecatedBasePath) "/$DEPRECATED_BASE_PATH/$path" else "/$BASE_PATH/$path"
+        log.debug { "GET from URI: '$uri'" }
+
+        return try {
+            webClient
+                .get()
+                .uri(uri)
+                .headers { setHeaders(it, pid) }
+                .retrieve()
+                .bodyToMono(elementTypeRef)
+                .retryWhen(retryBackoffSpec(uri))
+                .awaitSingle().also { countCalls(MetricResult.OK) }
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $uri", e)
         } catch (e: WebClientResponseException) {

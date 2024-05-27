@@ -12,7 +12,7 @@ class OmstillingsstoenadService(
     private val timeProvider: TimeProvider
 ) {
 
-    fun mottarOmstillingsstoenad(): Boolean {
+    suspend fun mottarOmstillingsstoenad(): Boolean {
         return client.mottarOmstillingsstoenad(pidGetter.pid(), timeProvider.time().toLocalDate())
     }
 }

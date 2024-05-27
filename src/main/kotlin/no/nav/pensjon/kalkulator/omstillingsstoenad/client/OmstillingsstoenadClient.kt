@@ -4,5 +4,5 @@ import no.nav.pensjon.kalkulator.person.Pid
 import java.time.LocalDate
 
 interface OmstillingsstoenadClient {
-    fun mottarOmstillingsstoenad(pid: Pid, paaDato: LocalDate): Boolean
+    suspend fun mottarOmstillingsstoenad(pid: Pid, paaDato: LocalDate): Boolean
 }

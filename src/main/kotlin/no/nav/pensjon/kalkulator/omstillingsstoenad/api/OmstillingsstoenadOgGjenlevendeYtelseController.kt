@@ -5,10 +5,11 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
-import no.nav.pensjon.kalkulator.omstillingsstoenad.OmstillingsstoenadService
-import no.nav.pensjon.kalkulator.omstillingsstoenad.api.dto.BrukerMottarOmstillingsstoenad
+import no.nav.pensjon.kalkulator.omstillingsstoenad.OmstillingOgGjenlevendeYtelseService
+import no.nav.pensjon.kalkulator.omstillingsstoenad.api.dto.BrukerHarLoependeOmstillingsstoenadEllerGjenlevendeYtelse
 import no.nav.pensjon.kalkulator.omstillingsstoenad.api.map.OmstillingsstoenadMapper.toDto
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -18,16 +19,16 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("api")
-class OmstillingsstoenadController(
-    private val service: OmstillingsstoenadService,
+class OmstillingsstoenadOgGjenlevendeYtelseController(
+    private val service: OmstillingOgGjenlevendeYtelseService,
     private val traceAid: TraceAid,
 ) : ControllerBase(traceAid) {
 
     private val log = KotlinLogging.logger {}
 
-    @GetMapping("/v1/mottar-omstillingsstoenad")
+    @GetMapping("/v1/loepende-omstillingsstoenad-eller-gjenlevendeytelse")
     @Operation(
-        summary = "Mottar omstillingsstønad",
+        summary = "Mottar omstillingsstønad eller gjenlevende ytelse",
         description = "Hvorvidt den innloggede brukeren mottar omstillingsstønad"
     )
     @ApiResponses(
@@ -42,12 +43,12 @@ class OmstillingsstoenadController(
             ),
         ]
     )
-    fun mottarOmstillingsstoenad(): BrukerMottarOmstillingsstoenad {
+    suspend fun mottarOmstillingsstoenadEllerGjenlevendeYtelse() : BrukerHarLoependeOmstillingsstoenadEllerGjenlevendeYtelse = runBlocking {
         traceAid.begin()
-        log.debug { "Request for omstillingsstønad" }
-        return try {
-            toDto(timed(service::mottarOmstillingsstoenad, "mottarOmstillingsstoenad"))
-                .also { log.debug { "Omstillingsstønad respons: $it" } }
+        log.debug { "Request for mottarOmstillingsstoenadEllerGjenlevendeYtelse" }
+        return@runBlocking try {
+            toDto(timed(service::harLoependeSaker, "mottarOmstillingsstoenadEllerGjenlevendeYtelse"))
+                .also { log.debug { "mottarOmstillingsstoenadEllerGjenlevendeYtelse respons: $it" } }
         } catch (e: EgressException) {
             handleError(e, "V1")!!
         } finally {
@@ -58,7 +59,7 @@ class OmstillingsstoenadController(
     override fun errorMessage() = ERROR_MESSAGE
 
     private companion object {
-        private const val ERROR_MESSAGE = "feil ved henting av omstillingsstønad"
+        private const val ERROR_MESSAGE = "feil ved henting av omstillingsstønad og gjenlevende ytelse"
     }
 
 }

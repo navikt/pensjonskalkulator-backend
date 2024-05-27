@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.omstillingsstoenad.client
 
+import kotlinx.coroutines.test.runTest
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
@@ -42,19 +43,19 @@ class EtterlatteOmstillingsstoenadClientTest : WebClientTest() {
     }
 
     @Test
-    fun `bruker mottar omstillingsstoenad`() {
+    fun `bruker mottar omstillingsstoenad`() = runTest {
         arrange(okStatusResponse(true))
         assertTrue(client.mottarOmstillingsstoenad(pid, dato))
     }
 
     @Test
-    fun `bruker mottar ikke omstillingsstoenad`() {
+    fun `bruker mottar ikke omstillingsstoenad`() = runTest {
         arrange(okStatusResponse(false))
         assertFalse(client.mottarOmstillingsstoenad(pid, dato))
     }
 
     @Test
-    fun `omstillinsstoenadClient gjentar request ved serverfeil`() {
+    fun `omstillinsstoenadClient gjentar request ved serverfeil`() = runTest {
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
         arrange(okStatusResponse(true))
         assertTrue(client.mottarOmstillingsstoenad(pid, dato))

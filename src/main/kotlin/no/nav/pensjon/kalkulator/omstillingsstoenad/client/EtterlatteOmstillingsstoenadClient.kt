@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.omstillingsstoenad.client
 
+import kotlinx.coroutines.reactor.awaitSingle
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.omstillingsstoenad.client.dto.MottarOmstillingsstoenadDto
@@ -31,7 +32,7 @@ class EtterlatteOmstillingsstoenadClient(
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
     private val log = KotlinLogging.logger {}
 
-    override fun mottarOmstillingsstoenad(pid: Pid, paaDato: LocalDate): Boolean {
+    override suspend fun mottarOmstillingsstoenad(pid: Pid, paaDato: LocalDate): Boolean {
         val uri = uri(paaDato)
         log.debug { "GET from URL: '$uri'" }
 
@@ -43,7 +44,7 @@ class EtterlatteOmstillingsstoenadClient(
                 .retrieve()
                 .bodyToMono(MottarOmstillingsstoenadDto::class.java)
                 .retryWhen(retryBackoffSpec(uri))
-                .block()
+                .awaitSingle()
                 ?.omstillingsstoenad
                 .also { countCalls(MetricResult.OK) }
                 ?: false

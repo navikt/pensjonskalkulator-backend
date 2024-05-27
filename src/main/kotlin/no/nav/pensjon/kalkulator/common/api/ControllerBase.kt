@@ -7,6 +7,7 @@ import org.intellij.lang.annotations.Language
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
 import java.lang.System.currentTimeMillis
+import kotlin.reflect.KSuspendFunction0
 
 abstract class ControllerBase(private val traceAid: TraceAid) {
 
@@ -25,6 +26,14 @@ abstract class ControllerBase(private val traceAid: TraceAid) {
         log.info { "$functionName took ${currentTimeMillis() - startTimeMillis} ms to process" }
         return result
     }
+
+    protected suspend fun <R> timed(function: KSuspendFunction0<R>, functionName: String): R {
+        val startTimeMillis = currentTimeMillis()
+        val result = function()
+        log.info { "$functionName took ${currentTimeMillis() - startTimeMillis} ms to process" }
+        return result
+    }
+
 
     protected fun <T> handleError(e: EgressException, version: String = "V0") =
         if (e.isClientError) // "client" is here the backend server itself (calling other services)
