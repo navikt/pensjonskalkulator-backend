@@ -43,10 +43,10 @@ class OmstillingsstoenadOgGjenlevendeYtelseController(
             ),
         ]
     )
-    suspend fun mottarOmstillingsstoenadEllerGjenlevendeYtelse() : BrukerHarLoependeOmstillingsstoenadEllerGjenlevendeYtelse = runBlocking {
+    suspend fun mottarOmstillingsstoenadEllerGjenlevendeYtelse() : BrukerHarLoependeOmstillingsstoenadEllerGjenlevendeYtelse {
         traceAid.begin()
         log.debug { "Request for mottarOmstillingsstoenadEllerGjenlevendeYtelse" }
-        return@runBlocking try {
+        return try {
             toDto(timed(service::harLoependeSaker, "mottarOmstillingsstoenadEllerGjenlevendeYtelse"))
                 .also { log.debug { "mottarOmstillingsstoenadEllerGjenlevendeYtelse respons: $it" } }
         } catch (e: EgressException) {
