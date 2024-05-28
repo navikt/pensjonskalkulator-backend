@@ -70,6 +70,9 @@ spec:
         - application: tp-q2
           namespace: pensjonsamhandling
           cluster: dev-fss
+        - application: etterlatte-samordning-vedtak
+          namespace: etterlatte
+          cluster: dev-gcp
       external:
         - host: pdl-api.dev-fss-pub.nais.io
         - host: pensjon-pen-q2.dev-fss-pub.nais.io
@@ -115,6 +118,10 @@ spec:
       value: dev-fss:pensjonsamhandling:tp-q2
     - name: TJENESTEPENSJON_URL
       value: https://tp-api-q2.dev-fss-pub.nais.io
+    - name: OMSTILLINGSSTOENAD_SERVICE_ID
+      value: dev-gcp:etterlatte:etterlatte-samordning-vedtak
+    - name: OMSTILLINGSSTOENAD_SERVICE_URL
+      value: https://etterlatte-samordning-vedtak.intern.dev.nav.no
     - name: PKB_FRONTEND_ENTRA_CLIENT_ID
       value: 0683a6ca-6f72-458c-8367-2879103edbfc,66a20121-b743-48e5-8cdc-1037ce68d9a5,6d1669ef-61c4-4d14-98a7-0c983f4eb14a
     - name: SERVER_ERROR_INCLUDE_STACKTRACE

@@ -27,6 +27,14 @@ class PenSakClient(
         )?.let(SakMapper::fromDto)
             ?: emptyList()
 
+    override suspend fun fetchSakerAsync(pid: Pid): List<Sak> =
+        doGetAsync(
+            object : ParameterizedTypeReference<List<SakDto>>() {},
+            PATH,
+            pid
+        )?.let(SakMapper::fromDto)
+            ?: emptyList()
+
     private companion object {
         private const val PATH = "sak/sammendrag"
     }

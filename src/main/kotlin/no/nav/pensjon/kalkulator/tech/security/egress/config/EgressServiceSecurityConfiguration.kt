@@ -21,7 +21,8 @@ class EgressServiceSecurityConfiguration {
         @Value("\${persondata.service-id}") persondataServiceId: String,
         @Value("\${skjermede-personer.service-id}") skjermedePersonerServiceId: String,
         @Value("\${tjenestepensjon.service-id}") tjenestepensjonServiceId: String,
-        @Value("\${proxy.service-id}") proxyServiceId: String
+        @Value("\${proxy.service-id}") proxyServiceId: String,
+        @Value("\${omstillingsstoenad-service-id}") omstillingsstoenadServiceId: String,
     ): EgressServiceListsByAudience {
         return EgressServiceListsByAudience(
             mapOf(
@@ -31,7 +32,8 @@ class EgressServiceSecurityConfiguration {
                 persondataServiceId to listOf(EgressService.PERSONDATALOESNINGEN),
                 skjermedePersonerServiceId to listOf(EgressService.SKJERMEDE_PERSONER),
                 tjenestepensjonServiceId to listOf(EgressService.TJENESTEPENSJON),
-                proxyServiceId to EgressService.servicesAccessibleViaProxy
+                proxyServiceId to EgressService.servicesAccessibleViaProxy,
+                omstillingsstoenadServiceId to listOf(EgressService.OMSTILLINGSSTOENAD),
             )
         )
     }

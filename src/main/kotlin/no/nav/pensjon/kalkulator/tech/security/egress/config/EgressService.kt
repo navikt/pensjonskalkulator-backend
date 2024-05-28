@@ -29,7 +29,8 @@ enum class EgressService(
         purpose = "Simulering av alderspensjon",
         authType = AuthType.MACHINE_OUTSIDE_NAV // regarded as an external service when testing
     ),
-    TJENESTEPENSJON("Tjenestepensjon", "TP", "Tjenestepensjonsforhold");
+    TJENESTEPENSJON("Tjenestepensjon", "TP", "Tjenestepensjonsforhold"),
+    OMSTILLINGSSTOENAD("Omstillingsstoenad", "OS", "Finne om bruker mottar omstillingsstoenad");
 
     companion object {
         val servicesAccessibleViaProxy = entries.filter { it.gatewayUsage == GatewayUsage.INTERNAL }
