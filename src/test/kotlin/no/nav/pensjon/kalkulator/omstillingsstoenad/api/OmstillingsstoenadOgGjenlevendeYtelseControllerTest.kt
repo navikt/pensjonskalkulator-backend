@@ -53,27 +53,31 @@ class OmstillingsstoenadOgGjenlevendeYtelseControllerTest {
     fun `bruker mottar enten omstillingsstoenad eller gjenlevende ytelse`() = runTest {
         `when`(service.harLoependeSaker()).thenReturn(true)
 
-        mvc.get(URL).asyncDispatch()
+        val res = mvc.get(URL).asyncDispatch()
             .andExpect { status().isOk() }
-            .andExpect { content().json(RESPONSE_BODY_MOTTAR) }
+            .andReturn()
+
+        assertEquals(RESPONSE_BODY_MOTTAR, res.response.contentAsString)
     }
 
     @Test
     fun `bruker mottar verken omstillingsstoenad eller gjenlevende ytelsee`() = runTest {
-        `when`(service.harLoependeSaker()).thenReturn(true)
+        `when`(service.harLoependeSaker()).thenReturn(false)
 
-        mvc.get(URL).asyncDispatch()
+        val res = mvc.get(URL).asyncDispatch()
             .andExpect { status().isOk() }
-            .andExpect { content().json(RESPONSE_BODY_MOTTAR_IKKE) }
+            .andReturn()
+
+        assertEquals(RESPONSE_BODY_MOTTAR_IKKE, res.response.contentAsString)
     }
 
     private companion object {
         private const val URL = "/api/v1/loepende-omstillingsstoenad-eller-gjenlevendeytelse"
 
         @Language("json")
-        private const val RESPONSE_BODY_MOTTAR = """{"brukerMottarOmstillingsstoenad":true}"""
+        private const val RESPONSE_BODY_MOTTAR = """{"harLoependeSak":true}"""
 
         @Language("json")
-        private const val RESPONSE_BODY_MOTTAR_IKKE = """{"brukerMottarOmstillingsstoenad":false}"""
+        private const val RESPONSE_BODY_MOTTAR_IKKE = """{"harLoependeSak":false}"""
     }
 }
