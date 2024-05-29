@@ -48,7 +48,38 @@ class EkskluderingController(
             version1(timed(service::erEkskludert, "erEkskludertV1"))
                 .also { log.debug { "Eksludering-status respons: $it" } }
         } catch (e: EgressException) {
-            handleError(e)!!
+            handleError(e, "V1")!!
+        } finally {
+            traceAid.end()
+        }
+    }
+
+    @GetMapping("v2/ekskludert")
+    @Operation(
+        summary = "Om personen er ekskludert fra å bruke kalkulatoren",
+        description = "Eksludering kan skyldes medlemskap i Apotekerforeningen"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Sjekking av ekskludering utført"
+            ),
+            ApiResponse(
+                responseCode = "503", description = "Sjekking av ekskludering kunne ikke utføres av tekniske årsaker",
+                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
+            ),
+        ]
+    )
+    fun erEkskludertV2(): EkskluderingStatusV1 {
+        traceAid.begin()
+        log.debug { "Request for ekskludering-status" }
+
+        return try {
+            version1(timed(service::erEkskludertV2, "erEkskludertV2"))
+                .also { log.debug { "Eksludering-status respons: $it" } }
+        } catch (e: EgressException) {
+            handleError(e, "V2")!!
         } finally {
             traceAid.end()
         }

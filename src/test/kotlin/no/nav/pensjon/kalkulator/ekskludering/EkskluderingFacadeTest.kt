@@ -5,7 +5,6 @@ import no.nav.pensjon.kalkulator.sak.RelevantSakStatus
 import no.nav.pensjon.kalkulator.sak.SakService
 import no.nav.pensjon.kalkulator.sak.SakType
 import no.nav.pensjon.kalkulator.tjenestepensjon.TjenestepensjonService
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -61,4 +60,26 @@ class EkskluderingFacadeTest {
 
         erEkskludert shouldBe expected
     }
+
+
+    @Test
+    fun `'erEkskludertV2' gir normalt 'false'`() {
+        val expected = EkskluderingStatus(false, EkskluderingAarsak.NONE)
+        `when`(tjenestepensjonService.erApoteker()).thenReturn(false)
+
+        val erEkskludert = ekskluderingService.erEkskludertV2()
+
+        erEkskludert shouldBe expected
+    }
+
+    @Test
+    fun `'erEkskludertV2' gir 'true' for apoteker`() {
+        val expected = EkskluderingStatus(true, EkskluderingAarsak.ER_APOTEKER)
+        `when`(tjenestepensjonService.erApoteker()).thenReturn(true)
+
+        val erEkskludert = ekskluderingService.erEkskludertV2()
+
+        erEkskludert shouldBe expected
+    }
+
 }
