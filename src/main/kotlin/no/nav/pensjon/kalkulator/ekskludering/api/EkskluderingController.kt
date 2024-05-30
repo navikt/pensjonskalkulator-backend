@@ -9,7 +9,9 @@ import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.ekskludering.EkskluderingFacade
 import no.nav.pensjon.kalkulator.ekskludering.api.dto.EkskluderingStatusV1
+import no.nav.pensjon.kalkulator.ekskludering.api.dto.EkskluderingStatusV2
 import no.nav.pensjon.kalkulator.ekskludering.api.map.EkskluderingMapper.version1
+import no.nav.pensjon.kalkulator.ekskludering.api.map.EkskluderingMapper.version2
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.web.bind.annotation.*
@@ -71,12 +73,12 @@ class EkskluderingController(
             ),
         ]
     )
-    fun erEkskludertV2(): EkskluderingStatusV1 {
+    fun erEkskludertV2(): EkskluderingStatusV2 {
         traceAid.begin()
         log.debug { "Request for ekskludering-status" }
 
         return try {
-            version1(timed(service::erEkskludertV2, "erEkskludertV2"))
+            version2(timed(service::erEkskludertV2, "erEkskludertV2"))
                 .also { log.debug { "Eksludering-status respons: $it" } }
         } catch (e: EgressException) {
             handleError(e, "V2")!!
