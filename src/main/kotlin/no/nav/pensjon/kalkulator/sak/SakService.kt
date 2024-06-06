@@ -14,7 +14,7 @@ class SakService(
 
     suspend fun harSakType(sakType: SakType) : Boolean =
         sakClient.fetchSakerAsync(pidGetter.pid())
-            .any { it.type == sakType }
+            .any { it.type == sakType && it.status.relevant }
 
     fun sakStatus(): RelevantSakStatus =
         sakClient.fetchSaker(pidGetter.pid())
