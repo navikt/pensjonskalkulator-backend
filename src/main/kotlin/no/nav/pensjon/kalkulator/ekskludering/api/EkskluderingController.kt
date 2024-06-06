@@ -9,7 +9,9 @@ import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.ekskludering.EkskluderingFacade
 import no.nav.pensjon.kalkulator.ekskludering.api.dto.EkskluderingStatusV1
+import no.nav.pensjon.kalkulator.ekskludering.api.dto.EkskluderingStatusV2
 import no.nav.pensjon.kalkulator.ekskludering.api.map.EkskluderingMapper.version1
+import no.nav.pensjon.kalkulator.ekskludering.api.map.EkskluderingMapper.version2
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.web.bind.annotation.*
@@ -48,7 +50,38 @@ class EkskluderingController(
             version1(timed(service::erEkskludert, "erEkskludertV1"))
                 .also { log.debug { "Eksludering-status respons: $it" } }
         } catch (e: EgressException) {
-            handleError(e)!!
+            handleError(e, "V1")!!
+        } finally {
+            traceAid.end()
+        }
+    }
+
+    @GetMapping("v2/ekskludert")
+    @Operation(
+        summary = "Om personen er ekskludert fra å bruke kalkulatoren",
+        description = "Eksludering kan skyldes medlemskap i Apotekerforeningen"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Sjekking av ekskludering utført"
+            ),
+            ApiResponse(
+                responseCode = "503", description = "Sjekking av ekskludering kunne ikke utføres av tekniske årsaker",
+                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
+            ),
+        ]
+    )
+    fun erEkskludertV2(): EkskluderingStatusV2 {
+        traceAid.begin()
+        log.debug { "Request for ekskludering-status" }
+
+        return try {
+            version2(timed(service::erEkskludertV2, "erEkskludertV2"))
+                .also { log.debug { "Eksludering-status respons: $it" } }
+        } catch (e: EgressException) {
+            handleError(e, "V2")!!
         } finally {
             traceAid.end()
         }

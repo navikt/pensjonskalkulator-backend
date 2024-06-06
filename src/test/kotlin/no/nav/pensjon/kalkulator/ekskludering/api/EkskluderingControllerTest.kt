@@ -1,6 +1,5 @@
 package no.nav.pensjon.kalkulator.ekskludering.api
 
-import no.nav.pensjon.kalkulator.avtale.*
 import no.nav.pensjon.kalkulator.ekskludering.EkskluderingAarsak
 import no.nav.pensjon.kalkulator.ekskludering.EkskluderingFacade
 import no.nav.pensjon.kalkulator.ekskludering.EkskluderingStatus
@@ -46,7 +45,7 @@ class EkskluderingControllerTest {
     private lateinit var auditor: Auditor
 
     @Test
-    fun `'erEkskludert' returnerer normalt status 'OK' og JSON-respons`() {
+    fun `'erEkskludertV1' returnerer normalt status 'OK' og JSON-respons`() {
         val ekskluderingStatus = EkskluderingStatus(ekskludert = true, aarsak = EkskluderingAarsak.ER_APOTEKER)
         `when`(service.erEkskludert()).thenReturn(ekskluderingStatus)
 
@@ -56,17 +55,71 @@ class EkskluderingControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY))
+            .andExpect(content().json(RESPONSE_BODY_APOTEKER))
+    }
+
+    @Test
+    fun `'erEkskludertV1' returnerer ekskludert for brukere med loepende ufoeretrygd`() {
+        val ekskluderingStatus = EkskluderingStatus(ekskludert = true, aarsak = EkskluderingAarsak.HAR_LOEPENDE_UFOERETRYGD)
+        `when`(service.erEkskludert()).thenReturn(ekskluderingStatus)
+
+        mvc.perform(
+            get(URL)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk())
+            .andExpect(content().json(RESPONSE_BODY_HAR_LOEPENDE_UFOERETRYGD))
+    }
+
+    @Test
+    fun `'erEkskludertV2' returnerer ekskludert for medlemmer av apotekerforeningen`() {
+        val ekskluderingStatus = EkskluderingStatus(ekskludert = true, aarsak = EkskluderingAarsak.ER_APOTEKER)
+        `when`(service.erEkskludertV2()).thenReturn(ekskluderingStatus)
+
+        mvc.perform(
+            get(URL_V2)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk())
+            .andExpect(content().json(RESPONSE_BODY_APOTEKER))
+    }
+
+    @Test
+    fun `'erEkskludertV2' returnerer ikke ekskludert`() {
+        val ekskluderingStatus = EkskluderingStatus(ekskludert = false, aarsak = EkskluderingAarsak.NONE)
+        `when`(service.erEkskludertV2()).thenReturn(ekskluderingStatus)
+
+        mvc.perform(
+            get(URL_V2)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk())
+            .andExpect(content().json(RESPONSE_BODY_IKKE_EKSKLUDERT))
     }
 
     private companion object {
 
         private const val URL = "/api/v1/ekskludert"
+        private const val URL_V2 = "/api/v2/ekskludert"
 
         @Language("json")
-        private const val RESPONSE_BODY = """{
+        private const val RESPONSE_BODY_APOTEKER = """{
 	"ekskludert": true,
 	"aarsak": "ER_APOTEKER"
+}"""
+        @Language("json")
+        private const val RESPONSE_BODY_HAR_LOEPENDE_UFOERETRYGD = """{
+	"ekskludert": true,
+	"aarsak": "HAR_LOEPENDE_UFOERETRYGD"
+}"""
+
+        @Language("json")
+        private const val RESPONSE_BODY_IKKE_EKSKLUDERT = """{
+	"ekskludert": false,
+	"aarsak": "NONE"
 }"""
     }
 }
