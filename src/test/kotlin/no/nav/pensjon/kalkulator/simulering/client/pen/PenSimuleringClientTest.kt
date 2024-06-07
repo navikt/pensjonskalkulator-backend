@@ -105,7 +105,8 @@ class PenSimuleringClientTest : WebClientTest() {
   "simuleringstype" : "ALDER",
   "pid" : "12906498357",
   "sivilstand" : "ENKE",
-  "harEps" : true,
+  "epsHarPensjon" : false,
+  "epsHarInntektOver2G" : true,
   "sisteInntekt" : 123000,
   "uttaksar" : 1,
   "gradertUttak" : {

@@ -27,7 +27,8 @@ object PenSimuleringMapper {
             simuleringstype = PenSimuleringType.fromInternalValue(impersonalSpec.simuleringType).externalValue,
             pid = personalSpec.pid.value,
             sivilstand = PenSivilstand.fromInternalValue(personalSpec.sivilstand).externalValue,
-            harEps = impersonalSpec.epsHarInntektOver2G,
+            epsHarInntektOver2G = impersonalSpec.epsHarInntektOver2G,
+            epsHarPensjon = false, // NB: Ikke-støttet verdi
             sisteInntekt = personalSpec.aarligInntektFoerUttak,
             uttaksar = 1,
             gradertUttak = impersonalSpec.gradertUttak?.let(::gradertUttakSpecDto),
