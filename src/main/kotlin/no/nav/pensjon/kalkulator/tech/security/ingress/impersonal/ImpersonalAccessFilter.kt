@@ -6,7 +6,7 @@ import jakarta.servlet.ServletResponse
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
-import no.nav.pensjon.kalkulator.tech.security.SecurityConfiguration.Companion.hasPidHeader
+import no.nav.pensjon.kalkulator.tech.security.SecurityConfiguration.Companion.hasPid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
@@ -24,7 +24,7 @@ class ImpersonalAccessFilter(
     private val log = KotlinLogging.logger {}
 
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
-        if (hasPidHeader(request as HttpServletRequest)) {
+        if (hasPid(request as HttpServletRequest)) {
             val pid = pidGetter.pid()
 
             if (!groupMembershipService.innloggetBrukerHarTilgang(pid)) {

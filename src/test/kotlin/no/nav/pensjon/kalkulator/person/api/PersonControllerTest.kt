@@ -7,16 +7,18 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
+import org.springframework.http.MediaType
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @WebMvcTest(PersonController::class)
 @Import(MockSecurityConfiguration::class)
@@ -41,20 +43,48 @@ class PersonControllerTest {
     private lateinit var auditor: Auditor
 
     @Test
-    fun person() {
+    fun `personV3 without PID`() {
         `when`(service.getPerson()).thenReturn(skiltPerson())
 
-        mvc.perform(get(URL))
+        mvc.perform(
+            post(URL_V3)
+                .with(csrf())
+                .content("")
+        )
+            .andExpect(request().attribute("pid", null))
+            .andExpect(status().isOk())
+            .andExpect(content().json(RESPONSE_BODY))
+    }
+
+    @Test
+    fun `personV3 with PID`() {
+        `when`(service.getPerson()).thenReturn(skiltPerson())
+
+        mvc.perform(
+            post(URL_V3)
+                .with(csrf())
+                .content(requestBodyWithPid())
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(request().attribute("pid", "12906498357"))
             .andExpect(status().isOk())
             .andExpect(content().json(RESPONSE_BODY))
     }
 
     private companion object {
-        private const val URL = "/api/v1/person"
+        private const val URL_V3 = "/api/v3/person"
 
+        @Language("json")
+        private fun requestBodyWithPid() = """{
+            "pid": "12906498357"
+        }""".trimIndent()
+
+
+        @Language("json")
         private const val RESPONSE_BODY = """{
-        "fornavn": "Fornavn1",
-        "sivilstand": "SKILT"
-    }"""
+    "navn": "Fornavn1",
+    "foedselsdato": "1963-12-31",
+    "sivilstand": "SKILT"
+}"""
     }
 }

@@ -160,7 +160,7 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
      * "Impersonal" means that the logged-in user acts on behalf of another person.
      */
     private fun isImpersonal(request: HttpServletRequest): Boolean =
-        request.requestURI == ANSATT_ID_URI && hasAnsattIdClaim(request) || hasPidHeader(request)
+        request.requestURI == ANSATT_ID_URI && hasAnsattIdClaim(request) || hasPid(request)
 
     /**
      * "Universal" means that it cannot be determined whether the request is made in a personal or impersonal
@@ -177,8 +177,29 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
         private const val ANSATT_ID_URI = "/api/v1/ansatt-id"
         private const val FEATURE_URI = "/api/feature/"
 
-        fun hasPidHeader(request: HttpServletRequest): Boolean =
-            hasLength(request.getHeader(CustomHttpHeaders.PID))
+        fun hasPid(request: HttpServletRequest): Boolean =
+            uniquePid(
+                pidAttribute(request),
+                pidHeader(request)
+            )?.let { true } ?: false
+
+        private fun uniquePid(pid1: String?, pid2: String?): String? =
+            pid1?.let {
+                if (pid2 == null || pid2 == it)
+                    pid1
+                else // pid2 is different from pid1
+                    throw RuntimeException("Ambiguous PID values")
+            } ?: pid2
+
+        private fun pidHeader(request: HttpServletRequest): String? {
+            val header = request.getHeader(CustomHttpHeaders.PID)
+            return if (hasLength(header)) header else null
+        }
+
+        private fun pidAttribute(request: HttpServletRequest): String? {
+            val header = request.getAttribute("pid") as? String
+            return if (hasLength(header)) header else null
+        }
 
         private fun jwtDecoder(
             issuerUri: String,
