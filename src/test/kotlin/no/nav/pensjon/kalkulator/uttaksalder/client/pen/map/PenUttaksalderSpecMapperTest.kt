@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class PenUttaksalderMapperTest {
+class PenUttaksalderSpecMapperTest {
 
     @Test
     fun `'toDto' maps domain object to PEN-specific data transfer object`() {
@@ -27,7 +27,13 @@ class PenUttaksalderMapperTest {
                 aarligInntekt = 10_000,
                 foedselDato = LocalDate.of(1965, 2, 1)
             ),
-            heltUttak = HeltUttak(Alder(67, 0), Inntekt(5_000, Alder(70, 11)))
+            heltUttak = HeltUttak(
+                uttakFomAlder = Alder(aar = 67, maaneder = 0),
+                inntekt = Inntekt(
+                    aarligBeloep = 5_000,
+                    tomAlder = Alder(aar = 70, maaneder = 11)
+                )
+            )
         )
         val personalSpec = PersonalUttaksalderSpec(
             pid = pid,
@@ -36,7 +42,7 @@ class PenUttaksalderMapperTest {
             aarligInntektFoerUttak = 1
         )
 
-        val dto = PenUttaksalderMapper.toDto(impersonalSpec, personalSpec)
+        val dto = PenUttaksalderSpecMapper.toDto(impersonalSpec, personalSpec)
 
         with(dto) {
             assertEquals("12906498357", pid)
@@ -84,25 +90,24 @@ class PenUttaksalderMapperTest {
             harEps = false,
             aarligInntektFoerUttak = 1234
         )
-        val expected = UttaksalderEgressSpecDto(
+
+        val dto = PenUttaksalderSpecMapper.toDto(impersonalSpec, personalSpec)
+
+        dto shouldBe PenUttaksalderSpec(
             simuleringType = "ALDER_M_AFP_PRIVAT",
             pid = pid.value,
             sivilstand = "UGIF",
             harEps = false,
             sisteInntekt = 1234,
             gradertUttak = null,
-            heltUttak = UttaksalderHeltUttakSpecDto(
+            heltUttak = PenUttaksalderHeltUttakSpec(
                 uttakFomAlder = null,
-                inntekt = UttaksalderInntektDto(
+                inntekt = PenUttaksalderInntektSpec(
                     aarligBelop = 0,
-                    tomAlder = UttaksalderAlderDto(aar = 75, maaneder = 0)
+                    tomAlder = PenUttaksalderAlderSpec(aar = 75, maaneder = 0)
                 )
             )
         )
-
-        val dto = PenUttaksalderMapper.toDto(impersonalSpec, personalSpec)
-
-        dto shouldBe expected
     }
 
     @Test
@@ -128,41 +133,20 @@ class PenUttaksalderMapperTest {
             harEps = false,
             aarligInntektFoerUttak = 1234
         )
-        val expected = UttaksalderEgressSpecDto(
+
+        val dto = PenUttaksalderSpecMapper.toDto(impersonalSpec, personalSpec)
+
+        dto shouldBe PenUttaksalderSpec(
             simuleringType = "ALDER_M_AFP_PRIVAT",
             pid = pid.value,
             sivilstand = "UGIF",
             harEps = false,
             sisteInntekt = 1234,
-            gradertUttak = UttaksalderGradertUttakSpecDto(grad = "P_80", aarligInntekt = 0),
-            heltUttak = UttaksalderHeltUttakSpecDto(
-                uttakFomAlder = UttaksalderAlderDto(aar = 65, maaneder = 4),
+            gradertUttak = PenUttaksalderGradertUttakSpec(grad = "P_80", aarligInntekt = 0),
+            heltUttak = PenUttaksalderHeltUttakSpec(
+                uttakFomAlder = PenUttaksalderAlderSpec(aar = 65, maaneder = 4),
                 inntekt = null
             )
         )
-
-        val dto = PenUttaksalderMapper.toDto(impersonalSpec, personalSpec)
-
-        dto shouldBe expected
-    }
-
-    @Test
-    fun `fromDto obtains maaneder by subtracting 1 from maaned`() {
-        val dto = UttaksalderDto(62, 11)
-
-        val uttaksalder = PenUttaksalderMapper.fromDto(dto)
-
-        assertEquals(62, uttaksalder.aar)
-        assertEquals(10, uttaksalder.maaneder)
-    }
-
-    @Test
-    fun `fromDto returns previous aar if maaned is zero`() {
-        val dto = UttaksalderDto(64, 0)
-
-        val uttaksalder = PenUttaksalderMapper.fromDto(dto)
-
-        assertEquals(63, uttaksalder.aar)
-        assertEquals(11, uttaksalder.maaneder)
     }
 }

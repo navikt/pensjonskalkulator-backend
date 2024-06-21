@@ -1,20 +1,20 @@
 package no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto
 
-data class UttaksalderEgressSpecDto(
+data class PenUttaksalderSpec(
     val pid: String,
     val sivilstand: String,
     val harEps: Boolean,
     val sisteInntekt: Int,
     val simuleringType: String,
-    val gradertUttak: UttaksalderGradertUttakSpecDto? = null,
-    val heltUttak: UttaksalderHeltUttakSpecDto
+    val gradertUttak: PenUttaksalderGradertUttakSpec? = null,
+    val heltUttak: PenUttaksalderHeltUttakSpec
 )
 
 /**
  * Notable difference compared to GradertUttakSpecDto (for simulering):
  * - uttakFomAlder is missing (because uttakFomAlder is the 'første mulige uttaksalder' to be found)
  */
-data class UttaksalderGradertUttakSpecDto(
+data class PenUttaksalderGradertUttakSpec(
     val grad: String,
     val aarligInntekt: Int?
 )
@@ -24,14 +24,17 @@ data class UttaksalderGradertUttakSpecDto(
  * - uttakFomAlder is optional (because uttakFomAlder is only required if 'gradert uttak',
  *     if 'helt uttak' then uttakFomAlder is the 'første mulige uttaksalder' to be found)
  */
-data class UttaksalderHeltUttakSpecDto(
-    val uttakFomAlder: UttaksalderAlderDto?,
-    val inntekt: UttaksalderInntektDto?
+data class PenUttaksalderHeltUttakSpec(
+    val uttakFomAlder: PenUttaksalderAlderSpec?,
+    val inntekt: PenUttaksalderInntektSpec?
 )
 
-data class UttaksalderInntektDto(
+data class PenUttaksalderInntektSpec(
     val aarligBelop: Int,
-    val tomAlder: UttaksalderAlderDto
+    val tomAlder: PenUttaksalderAlderSpec
 )
 
-data class UttaksalderAlderDto(val aar: Int, val maaneder: Int)
+data class PenUttaksalderAlderSpec(
+    val aar: Int,
+    val maaneder: Int
+)

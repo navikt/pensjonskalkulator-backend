@@ -54,7 +54,7 @@ class PenUttaksalderClientTest : WebClientTest() {
         val response = client.finnTidligsteUttaksalder(impersonalSpec, personalSpec)
 
         assertEquals(62, response?.aar)
-        assertEquals(0, response?.maaneder) // PEN-måned minus 1
+        assertEquals(1, response?.maaneder)
     }
 
     @Test
@@ -93,8 +93,11 @@ class PenUttaksalderClientTest : WebClientTest() {
 
         @Language("json")
         private const val PEN_ALDER = """{
-    "aar": 62,
-    "maaned": 1
+    "alder": {
+        "aar": 62,
+        "maaneder": 1
+    },
+    "dato": "2037-02-01"
 }"""
 
         @Language("json")
