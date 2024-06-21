@@ -9,12 +9,11 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
-import org.mockito.Mockito.*
+import org.mockito.Mockito.`when`
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @ExtendWith(SpringExtension::class)
@@ -84,7 +83,6 @@ class PensjonsavtaleServiceTest {
             PensjonsavtaleSpec(
                 aarligInntektFoerUttak = AARLIG_INNTEKT_FOER_UTTAK,
                 uttaksperioder = listOf(uttaksperiodeSpec1(), uttaksperiodeSpec2()),
-                antallInntektsaarEtterUttak = 2,
                 harEpsPensjon = true,
                 harEpsPensjonsgivendeInntektOver2G = true,
                 antallAarIUtlandetEtter16 = 0,

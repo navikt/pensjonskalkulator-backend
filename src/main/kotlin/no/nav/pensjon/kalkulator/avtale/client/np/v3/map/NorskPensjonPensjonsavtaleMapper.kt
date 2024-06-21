@@ -45,8 +45,7 @@ object NorskPensjonPensjonsavtaleMapper {
             pid = pid,
             aarligInntektFoerUttak = spec.aarligInntektFoerUttak,
             uttaksperioder = spec.uttaksperioder.map(::uttaksperiodeSpecDto),
-            antallInntektsaarEtterUttak = spec.antallInntektsaarEtterUttak
-                ?: antallInntektAarUnderHeltUttak(spec.uttaksperioder),
+            antallInntektsaarEtterUttak = antallInntektAarUnderHeltUttak(spec.uttaksperioder),
             harAfp = false, // avoids Norsk Pensjon calling NAV's AFP simulation
             harEpsPensjon = spec.harEpsPensjon ?: DEFAULT_HAR_EPS_PENSJON,
             harEpsPensjonsgivendeInntektOver2G = spec.harEpsPensjonsgivendeInntektOver2G
@@ -56,7 +55,6 @@ object NorskPensjonPensjonsavtaleMapper {
             oenskesSimuleringAvFolketrygd = false
         )
 
-    // Relevant in V2 of API
     private fun antallInntektAarUnderHeltUttak(perioder: List<UttaksperiodeSpec>): Int {
         val heltUttakPeriode = perioder.firstOrNull { it.grad == Uttaksgrad.HUNDRE_PROSENT } ?: return 0
 
@@ -128,9 +126,9 @@ object NorskPensjonPensjonsavtaleMapper {
         val maaneder = norskPensjonSluttMaaned - SLUTTMAANED_FORSKYVNING
 
         return if (maaneder < 0)
-            Alder(norskPensjonSluttAlder - 1, maaneder + MAANEDER_PER_AAR)
+            Alder(aar = norskPensjonSluttAlder - 1, maaneder = maaneder + MAANEDER_PER_AAR)
         else
-            Alder(norskPensjonSluttAlder, maaneder)
+            Alder(aar = norskPensjonSluttAlder, maaneder = maaneder)
     }
 
     private fun emptyOrFault(dto: EnvelopeDto) =

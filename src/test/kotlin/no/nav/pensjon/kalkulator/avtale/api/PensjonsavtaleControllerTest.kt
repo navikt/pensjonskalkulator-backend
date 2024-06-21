@@ -1,7 +1,6 @@
 package no.nav.pensjon.kalkulator.avtale.api
 
 import no.nav.pensjon.kalkulator.avtale.*
-import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleServiceTest.Companion.pensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleServiceTest.Companion.pensjonsavtaleSpecV2
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtaler
@@ -46,20 +45,6 @@ class PensjonsavtaleControllerTest {
     private lateinit var auditor: Auditor
 
     @Test
-    fun fetchAvtaler() {
-        `when`(avtaleService.fetchAvtaler(pensjonsavtaleSpec())).thenReturn(pensjonsavtaler())
-
-        mvc.perform(
-            post(URL)
-                .with(csrf())
-                .content(REQUEST_BODY)
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY))
-    }
-
-    @Test
     fun fetchAvtalerV2() {
         `when`(avtaleService.fetchAvtaler(pensjonsavtaleSpecV2())).thenReturn(pensjonsavtaler())
 
@@ -75,34 +60,7 @@ class PensjonsavtaleControllerTest {
 
     private companion object {
 
-        private const val URL = "/api/v1/pensjonsavtaler"
         private const val URL_V2 = "/api/v2/pensjonsavtaler"
-
-        @Language("json")
-        private val REQUEST_BODY = """{
-	"aarligInntektFoerUttak": 456000,
-	"uttaksperioder": [{
-        "startAlder": {
-	  	    "aar": 67,
-		    "maaneder": 1
-	    },
-		"grad": 80,
-		"aarligInntekt": 123000
-	}, {
-       "startAlder": {
-	  	    "aar": 70,
-		    "maaneder": 1
-	    },
-		"grad": 100,
-		"aarligInntekt": 45000
-	}],
-	"antallInntektsaarEtterUttak": 2,
-    "harAfp": false,
-    "harEpsPensjon": true,
-    "harEpsPensjonsgivendeInntektOver2G": true,
-    "antallAarIUtlandetEtter16": 0,
-    "sivilstand": "UGIFT"
-}"""
 
         @Language("json")
         private val REQUEST_BODY_V2 = """{

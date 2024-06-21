@@ -7,67 +7,31 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleService
-import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleIngressSpecDto
-import no.nav.pensjon.kalkulator.avtale.api.dto.IngressPensjonsavtaleSpecV2
-import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtalerDto
-import no.nav.pensjon.kalkulator.avtale.api.map.PensjonsavtaleMapper.fromDto
-import no.nav.pensjon.kalkulator.avtale.api.map.PensjonsavtaleMapper.fromDtoV2
-import no.nav.pensjon.kalkulator.avtale.api.map.PensjonsavtaleMapper.toDto
+import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleSpecV2
+import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleResultV2
+import no.nav.pensjon.kalkulator.avtale.api.map.PensjonsavtaleResultMapperV2.toDtoV2
+import no.nav.pensjon.kalkulator.avtale.api.map.PensjonsavtaleSpecMapperV2.fromDtoV2
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
-import no.nav.pensjon.kalkulator.tech.json.ObjectMapperConfiguration
-import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("api")
 class PensjonsavtaleController(
     private val service: PensjonsavtaleService,
-    private val traceAid: TraceAid,
-    private val tempPidGetter: PidGetter? = null
+    private val traceAid: TraceAid
 ) : ControllerBase(traceAid) {
 
     private val log = KotlinLogging.logger {}
 
-    @PostMapping("v1/pensjonsavtaler")
-    @Operation(
-        summary = "Hent pensjonsavtaler (versjon 1)",
-        description = "Henter pensjonsavtalene til den innloggede brukeren. I request må verdi av 'maaneder' være 0..11."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(
-                responseCode = "200",
-                description = "Henting av pensjonsavtaler utført. I respons er verdi av 'maaneder' 0..11."
-            ),
-            ApiResponse(
-                responseCode = "503", description = "Henting av pensjonsavtaler kunne ikke utføres av tekniske årsaker",
-                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
-            ),
-        ]
-    )
-    fun fetchAvtaler(@RequestBody spec: PensjonsavtaleIngressSpecDto): PensjonsavtalerDto {
-        traceAid.begin()
-        log.debug { "Request for pensjonsavtaler V1: $spec" }
-        val mockFnr = tempPidGetter?.pid()?.value
-
-        return try {
-            if ("10836397849" == mockFnr) mockAvtaler() else
-
-            toDto(timed(service::fetchAvtaler, fromDto(spec), "pensjonsavtaler V1"))
-                .also { log.debug { "Pensjonsavtaler respons V1: $it" } }
-        } catch (e: EgressException) {
-            handleError(e, "V1")!!
-        } finally {
-            traceAid.end()
-        }
-    }
-
     @PostMapping("v2/pensjonsavtaler")
     @Operation(
         summary = "Hent pensjonsavtaler (versjon 2)",
-        description = "Henter pensjonsavtalene til den innloggede brukeren. I request må verdi av 'maaneder' være 0..11."
+        description = "Henter pensjonsavtalene til den innloggede/angitte brukeren. I request må verdi av 'maaneder' være 0..11."
     )
     @ApiResponses(
         value = [
@@ -81,16 +45,13 @@ class PensjonsavtaleController(
             ),
         ]
     )
-    fun fetchAvtalerV2(@RequestBody spec: IngressPensjonsavtaleSpecV2): PensjonsavtalerDto {
+    fun fetchAvtalerV2(@RequestBody spec: PensjonsavtaleSpecV2): PensjonsavtaleResultV2 {
         traceAid.begin()
         val version = "V2"
         log.debug { "Request for pensjonsavtaler $version: $spec" }
-        val mockFnr = tempPidGetter?.pid()?.value
 
         return try {
-            if ("10836397849" == mockFnr) mockAvtaler() else
-
-            toDto(timed(service::fetchAvtaler, fromDtoV2(spec), "pensjonsavtaler $version"))
+            toDtoV2(timed(service::fetchAvtaler, fromDtoV2(spec), "pensjonsavtaler $version"))
                 .also { log.debug { "Pensjonsavtaler respons $version: $it" } }
         } catch (e: EgressException) {
             handleError(e, version)!!
@@ -103,31 +64,5 @@ class PensjonsavtaleController(
 
     private companion object {
         private const val ERROR_MESSAGE = "feil ved henting av pensjonsavtaler"
-
-        /**
-         * Temporary function for testing many pensjonsavtaler
-         */
-        private fun mockAvtaler(): PensjonsavtalerDto =
-             ObjectMapperConfiguration().objectMapper().readValue(
-                """{
-  "avtaler": [],
-	"utilgjengeligeSelskap": [{
-		"navn": "Perpetual Income & Growth Investment Trust PLC",
-		"heltUtilgjengelig": false
-	}, {
-		"navn": "Wüstenrot & Württembergische",
-		"heltUtilgjengelig": true
-	}, {
-		"navn": "UnipolSai (or UnipolSai Assicurazioni) post raggruppamento",
-		"heltUtilgjengelig": false
-	}, {
-		"navn": "Storebrand",
-		"heltUtilgjengelig": false
-	}, {
-		"navn": "Gabler",
-		"heltUtilgjengelig": true
-	}]
-}""", PensjonsavtalerDto::class.java
-            )
     }
 }
