@@ -12,7 +12,7 @@ spec:
     min: 2
     max: 2
   ingresses:
-    - https://pensjonskalkulator-backend.ansatt.dev.nav.no
+    - https://pensjonskalkulator-backend.intern.dev.nav.no
   liveness:
     path: /internal/health/liveness
     initialDelay: 30
