@@ -136,3 +136,4 @@ spec:
       value: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
   envFrom:
     - secret: pensjonskalkulator-backend-unleash-api-token
+    - secret: pkb-pid-encryption
