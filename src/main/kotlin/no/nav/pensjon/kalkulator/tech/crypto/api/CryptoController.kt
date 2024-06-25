@@ -10,9 +10,7 @@ import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.tech.crypto.PidEncryptionService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("api")
@@ -54,9 +52,39 @@ class CryptoController(
         }
     }
 
+    @PostMapping("v1/encrypt")
+    @Operation(
+        summary = "Krypter tekst",
+        description = "Krypterer angitt tekst (typisk brukstilfelle er for fødselsnumre)"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Kryptering utført"
+            ),
+            ApiResponse(
+                responseCode = "503", description = "Kryptering kunne ikke utføres av tekniske årsaker",
+                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
+            ),
+        ]
+    )
+    fun encrypt(@RequestBody text: String): String {
+        traceAid.begin()
+        log.debug { "Request for encryption: $text" }
+
+        return try {
+            timed(service::encrypt, text, "encrypt")
+        } catch (e: EgressException) {
+            handleError(e, "V1")!!
+        } finally {
+            traceAid.end()
+        }
+    }
+
     override fun errorMessage() = ERROR_MESSAGE
 
     private companion object {
-        private const val ERROR_MESSAGE = "feil ved henting av nøkkel"
+        private const val ERROR_MESSAGE = "krypto-feil"
     }
 }
