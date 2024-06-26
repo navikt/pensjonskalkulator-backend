@@ -1,6 +1,5 @@
 package no.nav.pensjon.kalkulator.tjenestepensjon.api
 
-import no.nav.pensjon.kalkulator.avtale.*
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
@@ -56,13 +55,32 @@ class TjenestepensjonControllerTest {
             .andExpect(content().json(RESPONSE_BODY))
     }
 
+    @Test
+    fun hentMedlemskapITjenestepensjonsordninger() {
+        `when`(tjenestepensjonService.hentMedlemskapITjenestepensjonsordninger()).thenReturn(listOf("Maritim pensjonskasse", "Statens pensjonskasse", "Kommunal Landspensjonskasse"))
+
+        mvc.perform(
+            get(URL_V1)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk())
+            .andExpect(content().json(RESPONSE_BODY_V1))
+    }
+
     private companion object {
 
         private const val URL = "/api/tpo-medlemskap"
+        private const val URL_V1 = "/api/v1/tpo-medlemskap"
 
         @Language("json")
         private const val RESPONSE_BODY = """{
 	"harTjenestepensjonsforhold": true
 }"""
+
+        @Language("json")
+        private const val RESPONSE_BODY_V1 = """{
+        "tpLeverandoerListe": ["Maritim pensjonskasse", "Statens pensjonskasse", "Kommunal Landspensjonskasse"]
+    }"""
     }
 }

@@ -13,6 +13,8 @@ class TjenestepensjonService(
 ) {
     fun harTjenestepensjonsforhold() = harForhold(tjenestepensjonClient.tjenestepensjon(pidGetter.pid()))
 
+    fun hentMedlemskapITjenestepensjonsordninger() = forholdsListe(tjenestepensjonClient.tjenestepensjon(pidGetter.pid()))
+
     fun erApoteker(): Boolean =
         if (featureToggleService.isEnabled("mock-norsk-pensjon") && pidGetter.pid().value == "18870199488")
             true
@@ -22,5 +24,8 @@ class TjenestepensjonService(
     private companion object {
         private fun harForhold(tjenestepensjon: Tjenestepensjon): Boolean =
             tjenestepensjon.forholdList.isNotEmpty()
+
+        private fun forholdsListe (tjenestepensjon: Tjenestepensjon): List<String> =
+            tjenestepensjon.forholdList.map { it.ordning }
     }
 }
