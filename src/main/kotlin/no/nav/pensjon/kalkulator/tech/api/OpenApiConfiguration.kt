@@ -53,6 +53,7 @@ class OpenApiConfiguration {
                 "/api/inntekt",
                 "/api/sak-status",
                 "/api/tpo-medlemskap",
+                "/api/v1/tpo-medlemskap",
                 "/api/status",
             )
             .build()
