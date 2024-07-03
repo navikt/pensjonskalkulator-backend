@@ -20,7 +20,8 @@ object SimuleringMapperV3 {
             forventetAarligInntektFoerUttak = dto.aarligInntektFoerUttakBeloep,
             sivilstand = dto.sivilstand,
             gradertUttak = dto.gradertUttak?.let(::gradertUttak),
-            heltUttak = heltUttak(dto.heltUttak)
+            heltUttak = heltUttak(dto.heltUttak),
+            utenlandsperiodeListe = emptyList()
         )
 
     fun resultatV3(source: Simuleringsresultat) =

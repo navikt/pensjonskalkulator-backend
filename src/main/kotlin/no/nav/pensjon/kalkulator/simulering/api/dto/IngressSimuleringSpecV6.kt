@@ -14,7 +14,8 @@ data class IngressSimuleringSpecV6(
     val aarligInntektFoerUttakBeloep: Int?,
     val sivilstand: Sivilstand?,
     val gradertUttak: IngressSimuleringGradertUttakV6? = null, // default is helt uttak (100 %)
-    val heltUttak: IngressSimuleringHeltUttakV6
+    val heltUttak: IngressSimuleringHeltUttakV6,
+    val utenlandsperiodeListe: List<UtenlandsperiodeSpecV6>? = null
 )
 
 data class IngressSimuleringGradertUttakV6(
@@ -31,6 +32,13 @@ data class IngressSimuleringHeltUttakV6(
 data class IngressSimuleringInntektV6(
     val beloep: Int,
     val sluttAlder: IngressSimuleringAlderV6
+)
+
+data class UtenlandsperiodeSpecV6 (
+    val fom: LocalDate,
+    val tom: LocalDate?,
+    val land: String,
+    val arbeidetUtenlands: Boolean
 )
 
 data class IngressSimuleringAlderV6(val aar: Int, val maaneder: Int) {

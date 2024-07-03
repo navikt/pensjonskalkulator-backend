@@ -4,6 +4,7 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
+import no.nav.pensjon.kalkulator.simulering.UtenlandsperiodeSpec
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
@@ -23,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.LocalDate
 
 @WebMvcTest(UttaksalderController::class)
 @Import(MockSecurityConfiguration::class)
@@ -53,7 +55,15 @@ internal class UttaksalderControllerTest {
             sivilstand = Sivilstand.UGIFT,
             harEps = true,
             aarligInntektFoerUttak = 100_000,
-            heltUttak = null
+            heltUttak = null,
+            utenlandsperiodeListe = listOf(
+                UtenlandsperiodeSpec(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = "AUS",
+                    arbeidetUtenlands = true
+                )
+            )
         )
         `when`(uttaksalderService.finnTidligsteUttaksalder(spec)).thenReturn(uttaksalder)
 
@@ -81,7 +91,13 @@ internal class UttaksalderControllerTest {
               "simuleringstype": "${simuleringType.name}",
               "sivilstand": "$sivilstand",
               "harEps": $harEps,
-              "aarligInntektFoerUttakBeloep": $sisteInntekt
+              "aarligInntektFoerUttakBeloep": $sisteInntekt,
+              "utenlandsperiodeListe": [{
+                "fom": "1990-01-02",
+                "tom": "1999-11-30",
+                "land": "AUS",
+                "arbeidetUtenlands": true
+              }]
             }
         """.trimIndent()
 

@@ -1,5 +1,7 @@
 package no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto
 
+import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenUtenlandsperiodeSpec
+
 data class PenUttaksalderSpec(
     val pid: String,
     val sivilstand: String,
@@ -7,7 +9,8 @@ data class PenUttaksalderSpec(
     val sisteInntekt: Int,
     val simuleringType: String,
     val gradertUttak: PenUttaksalderGradertUttakSpec? = null,
-    val heltUttak: PenUttaksalderHeltUttakSpec
+    val heltUttak: PenUttaksalderHeltUttakSpec,
+    val utenlandsperiodeListe: List<PenUtenlandsperiodeSpec>
 )
 
 /**

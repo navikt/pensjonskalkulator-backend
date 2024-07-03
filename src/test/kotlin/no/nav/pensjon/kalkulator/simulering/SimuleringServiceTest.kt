@@ -18,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import java.time.LocalDate
 
 @ExtendWith(SpringExtension::class)
 class SimuleringServiceTest {
@@ -95,6 +96,14 @@ class SimuleringServiceTest {
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(67, 1),
                     inntekt = null
+                ),
+                utenlandsperiodeListe = listOf(
+                    UtenlandsperiodeSpec(
+                        fom = LocalDate.of(1990, 1, 2),
+                        tom = LocalDate.of(1999, 11, 30),
+                        land = "AUS",
+                        arbeidetUtenlands = true
+                    )
                 )
             )
     }

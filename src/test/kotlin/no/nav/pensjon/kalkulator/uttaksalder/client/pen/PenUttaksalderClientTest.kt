@@ -7,6 +7,7 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
+import no.nav.pensjon.kalkulator.simulering.UtenlandsperiodeSpec
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
@@ -22,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.TestPropertySource
 import org.springframework.web.reactive.function.client.WebClient
+import java.time.LocalDate
 
 @SpringBootTest
 @TestPropertySource("classpath:application-test.properties")
@@ -112,7 +114,17 @@ class PenUttaksalderClientTest : WebClientTest() {
                 sivilstand = Sivilstand.UGIFT,
                 harEps = true,
                 aarligInntektFoerUttak = 80,
-                heltUttak = HeltUttak(Alder(67, 0), null)
+                heltUttak = HeltUttak(
+                    uttakFomAlder = Alder(aar = 67, maaneder = 0),
+                    inntekt = null),
+                utenlandsperiodeListe = listOf(
+                    UtenlandsperiodeSpec(
+                        fom = LocalDate.of(1990, 1, 2),
+                        tom = LocalDate.of(1999, 11, 30),
+                        land = "AUS",
+                        arbeidetUtenlands = true
+                    )
+                )
             )
 
         private val personalSpec =
