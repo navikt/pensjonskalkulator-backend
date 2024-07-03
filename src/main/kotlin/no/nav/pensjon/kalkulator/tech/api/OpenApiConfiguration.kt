@@ -43,6 +43,7 @@ class OpenApiConfiguration {
                 "/api/v1/loepende-omstillingsstoenad-eller-gjenlevendeytelse",
                 "/api/v1/ekskludert",
                 "/api/v2/ekskludert",
+                "/api/v1/land-liste",
                 "/api/v2/person",
                 "/api/v1/person", // to be moved to 'deprecated'
                 "/api/v1/ansatt-id",
