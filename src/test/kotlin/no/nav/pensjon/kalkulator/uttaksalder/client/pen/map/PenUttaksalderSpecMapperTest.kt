@@ -5,6 +5,8 @@ import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
+import no.nav.pensjon.kalkulator.simulering.UtenlandsperiodeSpec
+import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenUtenlandsperiodeSpec
 import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.PersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.client.pen.dto.*
@@ -32,6 +34,14 @@ class PenUttaksalderSpecMapperTest {
                 inntekt = Inntekt(
                     aarligBeloep = 5_000,
                     tomAlder = Alder(aar = 70, maaneder = 11)
+                )
+            ),
+            utenlandsperiodeListe = listOf(
+                UtenlandsperiodeSpec(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = "AUS",
+                    arbeidetUtenlands = true
                 )
             )
         )
@@ -82,8 +92,17 @@ class PenUttaksalderSpecMapperTest {
             harEps = false,
             aarligInntektFoerUttak = 1,
             gradertUttak = null,
-            heltUttak = null // not specified
+            heltUttak = null, // not specified
+            utenlandsperiodeListe = listOf(
+                UtenlandsperiodeSpec(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = "AUS",
+                    arbeidetUtenlands = true
+                )
+            )
         )
+
         val personalSpec = PersonalUttaksalderSpec(
             pid = pid,
             sivilstand = Sivilstand.UGIFT,
@@ -106,6 +125,14 @@ class PenUttaksalderSpecMapperTest {
                     aarligBelop = 0,
                     tomAlder = PenUttaksalderAlderSpec(aar = 75, maaneder = 0)
                 )
+            ),
+            utenlandsperiodeListe = listOf(
+                PenUtenlandsperiodeSpec(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = "AUS",
+                    arbeidetUtenlands = true
+                )
             )
         )
     }
@@ -125,6 +152,14 @@ class PenUttaksalderSpecMapperTest {
             heltUttak = HeltUttak(
                 uttakFomAlder = Alder(aar = 65, maaneder = 4),
                 inntekt = null // undefined
+            ),
+            utenlandsperiodeListe = listOf(
+                UtenlandsperiodeSpec(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = "AUS",
+                    arbeidetUtenlands = true
+                )
             )
         )
         val personalSpec = PersonalUttaksalderSpec(
@@ -146,6 +181,14 @@ class PenUttaksalderSpecMapperTest {
             heltUttak = PenUttaksalderHeltUttakSpec(
                 uttakFomAlder = PenUttaksalderAlderSpec(aar = 65, maaneder = 4),
                 inntekt = null
+            ),
+            utenlandsperiodeListe = listOf(
+                PenUtenlandsperiodeSpec(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = "AUS",
+                    arbeidetUtenlands = true
+                )
             )
         )
     }

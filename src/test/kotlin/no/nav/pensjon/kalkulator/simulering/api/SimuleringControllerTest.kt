@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.LocalDate
 
 @WebMvcTest(SimuleringController::class)
 @Import(MockSecurityConfiguration::class)
@@ -47,8 +48,8 @@ class SimuleringControllerTest {
     private lateinit var auditor: Auditor
 
     @Test
-    fun `simulerer hel alderspensjon`() {
-        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON)
+    fun `simulerer hel alderspensjon V4`() {
+        val spec = impersonalHeltUttakSpecV1to5(SimuleringType.ALDERSPENSJON)
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
         mvc.perform(
@@ -64,7 +65,7 @@ class SimuleringControllerTest {
 
     @Test
     fun `simulerer hel alderspensjon V5`() {
-        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON)
+        val spec = impersonalHeltUttakSpecV1to5(SimuleringType.ALDERSPENSJON)
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
         mvc.perform(
@@ -79,7 +80,7 @@ class SimuleringControllerTest {
 
     @Test
     fun `simulerer hel alderspensjon V6`() {
-        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON)
+        val spec = impersonalHeltUttakSpecV6(SimuleringType.ALDERSPENSJON)
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
         mvc.perform(
@@ -93,7 +94,7 @@ class SimuleringControllerTest {
     }
 
     @Test
-    fun `simulerer alderspensjon med gradert uttak`() {
+    fun `simulerer alderspensjon med gradert uttak V4`() {
         val spec = impersonalGradertUttakSpec()
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
@@ -139,8 +140,8 @@ class SimuleringControllerTest {
 
 
     @Test
-    fun `simulerer alderspensjon med AFP privat`() {
-        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
+    fun `simulerer alderspensjon med AFP privat V4`() {
+        val spec = impersonalHeltUttakSpecV1to5(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
         mvc.perform(
@@ -155,7 +156,7 @@ class SimuleringControllerTest {
 
     @Test
     fun `simulerer alderspensjon med AFP privat V5`() {
-        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
+        val spec = impersonalHeltUttakSpecV1to5(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
         mvc.perform(
@@ -171,7 +172,7 @@ class SimuleringControllerTest {
 
     @Test
     fun `simulerer alderspensjon med AFP privat V6`() {
-        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
+        val spec = impersonalHeltUttakSpecV6(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
         mvc.perform(
@@ -185,8 +186,8 @@ class SimuleringControllerTest {
     }
 
     @Test
-    fun `simulerer alderspensjon med AFP offentlig`() {
-        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG)
+    fun `simulerer alderspensjon med AFP offentlig V4`() {
+        val spec = impersonalHeltUttakSpecV1to5(SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG)
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
         mvc.perform(
@@ -201,7 +202,7 @@ class SimuleringControllerTest {
 
     @Test
     fun `simulerer alderspensjon med AFP offentlig V5`() {
-        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG)
+        val spec = impersonalHeltUttakSpecV1to5(SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG)
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
         mvc.perform(
@@ -216,7 +217,7 @@ class SimuleringControllerTest {
 
     @Test
     fun `simulerer alderspensjon med AFP offentlig V6`() {
-        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG)
+        val spec = impersonalHeltUttakSpecV6(SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG)
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
 
         mvc.perform(
@@ -231,8 +232,8 @@ class SimuleringControllerTest {
 
 
     @Test
-    fun `simulering responds 'vilkaar ikke oppfylt' when Conflict`() {
-        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
+    fun `simulering responds 'vilkaar ikke oppfylt' when Conflict V4`() {
+        val spec = impersonalHeltUttakSpecV1to5(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
         `when`(simuleringService.simulerAlderspensjon(spec)).thenThrow(conflict())
 
         mvc.perform(
@@ -247,7 +248,7 @@ class SimuleringControllerTest {
 
     @Test
     fun `simulering responds 'vilkaar ikke oppfylt' when Conflict V5`() {
-        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
+        val spec = impersonalHeltUttakSpecV1to5(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
         `when`(simuleringService.simulerAlderspensjon(spec)).thenThrow(conflict())
 
         mvc.perform(
@@ -262,7 +263,7 @@ class SimuleringControllerTest {
 
     @Test
     fun `simulering responds 'vilkaar ikke oppfylt' when Conflict V6`() {
-        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
+        val spec = impersonalHeltUttakSpecV6(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
         `when`(simuleringService.simulerAlderspensjon(spec)).thenThrow(conflict())
 
         mvc.perform(
@@ -295,7 +296,13 @@ class SimuleringControllerTest {
                "aarligInntektVsaPensjon": {
                   "beloep": 50000,
                   "sluttAlder": { "aar": 75, "maaneder": 0 } }
-            }
+            },
+            "utenlandsperiodeListe": [{
+              "fom": "1990-01-02",
+              "tom": "1999-11-30",
+              "land": "AUS",
+              "arbeidetUtenlands": true
+            }]
         }""".trimIndent()
 
         @Language("json")
@@ -318,7 +325,7 @@ class SimuleringControllerTest {
             }
         }""".trimIndent()
 
-        private fun impersonalHeltUttakSpec(simuleringType: SimuleringType) =
+        private fun impersonalHeltUttakSpecV6(simuleringType: SimuleringType) =
             ImpersonalSimuleringSpec(
                 simuleringType = simuleringType,
                 epsHarInntektOver2G = false,
@@ -327,7 +334,28 @@ class SimuleringControllerTest {
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(67, 1),
                     inntekt = Inntekt(50_000, Alder(75, 0))
+                ),
+                utenlandsperiodeListe = listOf(
+                    UtenlandsperiodeSpec(
+                        fom = LocalDate.of(1990, 1, 2),
+                        tom = LocalDate.of(1999, 11, 30),
+                        land = "AUS",
+                        arbeidetUtenlands = true
+                    )
                 )
+            )
+
+        private fun impersonalHeltUttakSpecV1to5(simuleringType: SimuleringType) =
+            ImpersonalSimuleringSpec(
+                simuleringType = simuleringType,
+                epsHarInntektOver2G = false,
+                forventetAarligInntektFoerUttak = 100_000,
+                sivilstand = Sivilstand.UGIFT,
+                heltUttak = HeltUttak(
+                    uttakFomAlder = Alder(67, 1),
+                    inntekt = Inntekt(50_000, Alder(75, 0))
+                ),
+                utenlandsperiodeListe = emptyList()
             )
 
         private fun impersonalGradertUttakSpec() =
@@ -344,7 +372,8 @@ class SimuleringControllerTest {
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(67, 1),
                     inntekt = Inntekt(50_000, Alder(75, 0))
-                )
+                ),
+                utenlandsperiodeListe = emptyList()
             )
 
         @Language("json")

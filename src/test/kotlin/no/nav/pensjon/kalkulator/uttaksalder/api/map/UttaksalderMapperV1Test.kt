@@ -4,18 +4,18 @@ import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
-import no.nav.pensjon.kalkulator.testutil.Assertions.assertAlder
+import no.nav.pensjon.kalkulator.simulering.UtenlandsperiodeSpec
 import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.*
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class UttaksalderMapperTest {
+class UttaksalderMapperV1Test {
 
     @Test
     fun `toDto maps domain object to data transfer object`() {
-        val dto = UttaksalderMapper.toDto(Alder(aar = 2024, maaneder = 5))
+        val dto = UttaksalderMapperV1.toDto(Alder(aar = 2024, maaneder = 5))
 
         with(dto!!) {
             assertEquals(2024, aar)
@@ -25,7 +25,7 @@ class UttaksalderMapperTest {
 
     @Test
     fun `fromIngressSpecForHeltUttakV1 maps data transfer object to domain object`() {
-        val domainObject: ImpersonalUttaksalderSpec = UttaksalderMapper.fromIngressSpecForHeltUttakV1(
+        val domainObject: ImpersonalUttaksalderSpec = UttaksalderMapperV1.fromIngressSpecForHeltUttakV1(
             IngressUttaksalderSpecForHeltUttakV1(
                 simuleringstype = SimuleringType.ALDERSPENSJON,
                 sivilstand = Sivilstand.GJENLEVENDE_PARTNER,
@@ -34,24 +34,42 @@ class UttaksalderMapperTest {
                 aarligInntektVsaPensjon = IngressUttaksalderInntektV1(
                     beloep = 456,
                     sluttAlder = IngressUttaksalderAlderV1(aar = 70, maaneder = 2)
+                ),
+                utenlandsperiodeListe = listOf(
+                    UttaksalderUtenlandsperiodeSpecV1(
+                        fom = LocalDate.of(1990, 1, 2),
+                        tom = LocalDate.of(1999, 11, 30),
+                        land = "AUS",
+                        arbeidetUtenlands = true
+                    )
                 )
             )
         )
 
-        with(domainObject) {
-            assertEquals(SimuleringType.ALDERSPENSJON, simuleringType)
-            assertEquals(Sivilstand.GJENLEVENDE_PARTNER, sivilstand)
-            assertTrue(harEps!!)
-            assertEquals(123, aarligInntektFoerUttak)
-            assertNull(gradertUttak)
-            with(heltUttak!!) {
-                assertNull(uttakFomAlder) // this is the value to be found
-                with(inntekt!!) {
-                    assertAlder(expectedAar = 70, expectedMaaneder = 2, actualAlder = tomAlder)
-                    assertEquals(456, aarligBeloep)
-                }
-            }
-        }
+        val expected = ImpersonalUttaksalderSpec(
+            simuleringType = SimuleringType.ALDERSPENSJON,
+            sivilstand = Sivilstand.GJENLEVENDE_PARTNER,
+            harEps = true,
+            aarligInntektFoerUttak = 123,
+            gradertUttak = null,
+            heltUttak = HeltUttak(
+                uttakFomAlder = null,
+                inntekt = Inntekt(
+                    aarligBeloep = 456,
+                    tomAlder = Alder(aar = 70, maaneder = 2)
+                )
+            ),
+            utenlandsperiodeListe = listOf(
+                UtenlandsperiodeSpec(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = "AUS",
+                    arbeidetUtenlands = true
+                )
+            )
+        )
+
+        domainObject shouldBe expected
     }
 
     @Test
@@ -71,10 +89,18 @@ class UttaksalderMapperTest {
                     beloep = 25_000,
                     sluttAlder = IngressUttaksalderAlderV1(aar = 70, maaneder = 11)
                 )
+            ),
+            utenlandsperiodeListe = listOf(
+                UttaksalderUtenlandsperiodeSpecV1(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = "AUS",
+                    arbeidetUtenlands = true
+                )
             )
         )
 
-        val actual = UttaksalderMapper.fromIngressSpecForGradertUttakV1(dto)
+        val actual = UttaksalderMapperV1.fromIngressSpecForGradertUttakV1(dto)
 
         val expected = ImpersonalUttaksalderSpec(
             sivilstand = Sivilstand.GJENLEVENDE_PARTNER,
@@ -91,6 +117,14 @@ class UttaksalderMapperTest {
                 inntekt = Inntekt(
                     aarligBeloep = 25_000,
                     tomAlder = Alder(aar = 70, maaneder = 11)
+                )
+            ),
+            utenlandsperiodeListe = listOf(
+                UtenlandsperiodeSpec(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = "AUS",
+                    arbeidetUtenlands = true
                 )
             )
         )

@@ -19,6 +19,7 @@ import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.math.BigDecimal
+import java.time.LocalDate
 
 @ExtendWith(SpringExtension::class)
 internal class UttaksalderServiceTest {
@@ -50,7 +51,15 @@ internal class UttaksalderServiceTest {
             sivilstand = Sivilstand.GIFT,
             harEps = true,
             aarligInntektFoerUttak = 100_000,
-            heltUttak = HeltUttak(Alder(67, 0), null)
+            heltUttak = HeltUttak(Alder(67, 0), null),
+            utenlandsperiodeListe = listOf(
+                UtenlandsperiodeSpec(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = "AUS",
+                    arbeidetUtenlands = true
+                )
+            )
         )
         arrangeSimulering(impersonalSpec, true)
 
@@ -70,7 +79,15 @@ internal class UttaksalderServiceTest {
             sivilstand = null, // sivilstand not specified
             harEps = null,
             aarligInntektFoerUttak = null, // inntekt not specified
-            heltUttak = HeltUttak(Alder(67, 0), null)
+            heltUttak = HeltUttak(Alder(67, 0), null),
+            utenlandsperiodeListe = listOf(
+                UtenlandsperiodeSpec(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = "AUS",
+                    arbeidetUtenlands = true
+                )
+            )
         )
         arrangeSimulering(impersonalSpec, false, person)
 
@@ -89,7 +106,15 @@ internal class UttaksalderServiceTest {
             sivilstand = null, // sivilstand not specified
             harEps = null, // 'har EPS' not specified
             aarligInntektFoerUttak = 1,
-            heltUttak = HeltUttak(Alder(67, 0), null)
+            heltUttak = HeltUttak(Alder(67, 0), null),
+            utenlandsperiodeListe = listOf(
+                UtenlandsperiodeSpec(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = "AUS",
+                    arbeidetUtenlands = true
+                )
+            )
         )
         arrangeSimulering(impersonalSpec, true, person)
 
@@ -104,6 +129,14 @@ internal class UttaksalderServiceTest {
             heltUttak = HeltUttak(
                 uttakFomAlder = Alder(aar = 62, maaneder = 0),
                 inntekt = null
+            ),
+            utenlandsperiodeListe = listOf(
+                UtenlandsperiodeSpec(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = "AUS",
+                    arbeidetUtenlands = true
+                )
             )
         )
         verify(simuleringService, times(1)).simulerAlderspensjon(simuleringSpec)
@@ -118,7 +151,15 @@ internal class UttaksalderServiceTest {
             sivilstand = Sivilstand.REGISTRERT_PARTNER, // sivilstand specified
             harEps = null, // 'har EPS' not specified
             aarligInntektFoerUttak = 1,
-            heltUttak = HeltUttak(Alder(67, 0), null)
+            heltUttak = HeltUttak(Alder(67, 0), null),
+            utenlandsperiodeListe = listOf(
+                UtenlandsperiodeSpec(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = "AUS",
+                    arbeidetUtenlands = true
+                )
+            )
         )
         arrangeSimulering(impersonalSpec, true)
 
@@ -133,6 +174,14 @@ internal class UttaksalderServiceTest {
             heltUttak = HeltUttak(
                 uttakFomAlder = Alder(aar = 62, maaneder = 0),
                 inntekt = null
+            ),
+            utenlandsperiodeListe = listOf(
+                UtenlandsperiodeSpec(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = "AUS",
+                    arbeidetUtenlands = true
+                )
             )
         )
         verify(simuleringService, times(1)).simulerAlderspensjon(simuleringSpec)
@@ -148,7 +197,15 @@ internal class UttaksalderServiceTest {
             sivilstand = null,
             harEps = false, // 'har EPS' specified
             aarligInntektFoerUttak = null,
-            heltUttak = HeltUttak(Alder(67, 0), null)
+            heltUttak = HeltUttak(Alder(67, 0), null),
+            utenlandsperiodeListe = listOf(
+                UtenlandsperiodeSpec(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = "AUS",
+                    arbeidetUtenlands = true
+                )
+            )
         )
         arrangeSimulering(impersonalSpec, false, person)
 
@@ -163,6 +220,14 @@ internal class UttaksalderServiceTest {
             heltUttak = HeltUttak(
                 uttakFomAlder = Alder(aar = 62, maaneder = 0),
                 inntekt = null
+            ),
+            utenlandsperiodeListe = listOf(
+                UtenlandsperiodeSpec(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = "AUS",
+                    arbeidetUtenlands = true
+                )
             )
         )
         verify(simuleringService, times(1)).simulerAlderspensjon(simuleringSpec)
@@ -186,6 +251,14 @@ internal class UttaksalderServiceTest {
                     heltUttak = HeltUttak(
                         uttakFomAlder = Alder(aar = 62, maaneder = 0),
                         inntekt = null
+                    ),
+                    utenlandsperiodeListe = listOf(
+                        UtenlandsperiodeSpec(
+                            fom = LocalDate.of(1990, 1, 2),
+                            tom = LocalDate.of(1999, 11, 30),
+                            land = "AUS",
+                            arbeidetUtenlands = true
+                        )
                     )
                 )
             )
