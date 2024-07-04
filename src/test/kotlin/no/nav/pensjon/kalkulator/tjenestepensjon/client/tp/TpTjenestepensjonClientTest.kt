@@ -78,6 +78,14 @@ class TpTjenestepensjonClientTest : WebClientTest() {
     }
 
     @Test
+    fun `'tjenestepensjon' gir forhold-liste naar personen har hatt tjenestepensjonsforhold`() {
+        arrange(okTjenestepensjonsforholdResponse())
+        val tjenestepensjonsforhold = client.tjenestepensjonsforhold(pid)
+
+       assertEquals(listOf("Utviklers pensjonskasse", "Pensjonskasse for folk flest"), tjenestepensjonsforhold.tpOrdninger)
+    }
+
+    @Test
     fun `'harTjenestepensjonsforhold' gir 'false' naar personen ikke har tjenestepensjonsforhold`() {
         arrange(okStatusResponse(false))
         assertFalse(client.harTjenestepensjonsforhold(pid, dato))
@@ -179,10 +187,88 @@ class TpTjenestepensjonClientTest : WebClientTest() {
     }
 }"""
 
+        private const val tjenestepensjonsForholdResponsBody = """
+            {
+  "fnr": "***********",
+  "forhold": [
+    {
+      "samtykkeSimulering": false,
+      "kilde": "PP01",
+      "tpNr": "3010",
+      "ordning": {
+        "navn": "Utviklers pensjonskasse",
+        "tpNr": "4",
+        "orgNr": "5",
+        "tssId": "6"
+      },
+      "harSimulering": false,
+      "harUtlandsPensjon": false,
+      "datoSamtykkeGitt": null,
+      "ytelser": [
+        {
+          "datoInnmeldtYtelseFom": "2020-01-01",
+          "ytelseType": "ALDER",
+          "datoYtelseIverksattFom": "2020-01-01",
+          "datoYtelseIverksattTom": "2020-12-31",
+          "changeStamp": {
+            "createdBy": "Dummy User",
+            "createdDate": "2022-09-20T13:30:00",
+            "updatedBy": "Dummy User",
+            "updatedDate": "2022-09-20T13:30:00"
+          }
+        }
+      ],
+      "changeStampDate": {
+        "createdBy": "Dummy User",
+        "createdDate": "2022-09-20T13:30:00",
+        "updatedBy": "Dummy User",
+        "updatedDate": "2022-09-20T13:30:00"
+      }
+    },
+    {
+      "samtykkeSimulering": false,
+      "kilde": "PP01",
+      "tpNr": "3010",
+      "ordning": {
+        "navn": "Pensjonskasse for folk flest",
+        "tpNr": "1",
+        "orgNr": "2",
+        "tssId": "3"
+      },
+      "harSimulering": false,
+      "harUtlandsPensjon": false,
+      "datoSamtykkeGitt": null,
+      "ytelser": [
+        {
+          "datoInnmeldtYtelseFom": "2020-01-01",
+          "ytelseType": "ALDER",
+          "datoYtelseIverksattFom": "2020-01-01",
+          "datoYtelseIverksattTom": "2020-12-31",
+          "changeStamp": {
+            "createdBy": "Dummy User",
+            "createdDate": "2022-09-20T13:30:00",
+            "updatedBy": "Dummy User",
+            "updatedDate": "2022-09-20T13:30:00"
+          }
+        }
+      ],
+      "changeStampDate": {
+        "createdBy": "Dummy User",
+        "createdDate": "2022-09-20T13:30:00",
+        "updatedBy": "Dummy User",
+        "updatedDate": "2022-09-20T13:30:00"
+      }
+    }
+  ]
+}
+        """
+
         private fun okApotekerResponse(value: Boolean) = jsonResponse().setBody(apotekerResponseBody(value).trimIndent())
 
         private fun okStatusResponse(value: Boolean) = jsonResponse().setBody(statusResponseBody(value).trimIndent())
 
         private fun okForholdResponse() = jsonResponse().setBody(forholdResponseBody().trimIndent())
+
+        private fun okTjenestepensjonsforholdResponse() = jsonResponse().setBody(tjenestepensjonsForholdResponsBody.trimIndent())
     }
 }

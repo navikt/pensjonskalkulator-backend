@@ -1,8 +1,6 @@
 package no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.map
 
-import no.nav.pensjon.kalkulator.tjenestepensjon.Forhold
-import no.nav.pensjon.kalkulator.tjenestepensjon.Tjenestepensjon
-import no.nav.pensjon.kalkulator.tjenestepensjon.Ytelse
+import no.nav.pensjon.kalkulator.tjenestepensjon.*
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.*
 
 object TpTjenestepensjonMapper {
@@ -13,6 +11,9 @@ object TpTjenestepensjonMapper {
 
     fun fromDto(dto: TpTjenestepensjonDto): Tjenestepensjon =
         Tjenestepensjon(dto.forhold?.map(::forhold).orEmpty())
+
+    fun fromDto(dto: FinnTjenestepensjonsforholdResponsDto): Tjenestepensjonsforhold =
+        Tjenestepensjonsforhold(dto.forhold.orEmpty().map { it.ordning.navn })
 
     private fun forhold(dto: TpForholdDto): Forhold =
         Forhold(
