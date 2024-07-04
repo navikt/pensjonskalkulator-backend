@@ -12,8 +12,7 @@ class LandService {
                 erAvtaleland = it.erAvtaleland,
                 bokmaalNavn = it.bokmaalNavn,
                 nynorskNavn = it.bokmaalNavn,
-                engelskNavn = it.bokmaalNavn
+                engelskNavn = it.engelskNavn
             )
         }
 }
-
