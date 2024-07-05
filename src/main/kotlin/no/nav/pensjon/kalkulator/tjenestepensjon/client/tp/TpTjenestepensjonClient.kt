@@ -9,7 +9,9 @@ import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
+import no.nav.pensjon.kalkulator.tjenestepensjon.Tjenestepensjonsforhold
 import no.nav.pensjon.kalkulator.tjenestepensjon.Tjenestepensjon
+import no.nav.pensjon.kalkulator.tjenestepensjon.FinnTjenestepensjonsforholdResponsDto
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.TjenestepensjonClient
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpApotekerDto
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpTjenestepensjonStatusDto
@@ -112,6 +114,29 @@ class TpTjenestepensjonClient(
         }
     }
 
+    override fun tjenestepensjonsforhold(pid: Pid): Tjenestepensjonsforhold {
+        val url = "$baseUrl/$API_TP_FORHOLD/"
+        log.debug { "GET from URL: '$url'" }
+
+        return try {
+            webClient
+                .get()
+                .uri("/$API_TP_FORHOLD/")
+                .headers { setHeaders(it, pid) }
+                .retrieve()
+                .bodyToMono(FinnTjenestepensjonsforholdResponsDto::class.java)
+                .retryWhen(retryBackoffSpec(url))
+                .block()
+                ?.let(TpTjenestepensjonMapper::fromDto)
+                .also { countCalls(MetricResult.OK) }
+                ?: Tjenestepensjonsforhold(emptyList())
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $url", e)
+        } catch (e: WebClientResponseException) {
+            throw EgressException(e.responseBodyAsString, e)
+        }
+    }
+
     override fun setPingHeaders(headers: HttpHeaders) {
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
     }
@@ -137,6 +162,7 @@ class TpTjenestepensjonClient(
 
     companion object {
         private const val API_PATH = "api/tjenestepensjon"
+        private const val API_TP_FORHOLD = "api/tjenestepensjon/finnTjenestepensjonsforhold"
         private const val PING_PATH = "actuator/health/liveness"
         private const val APOTEKER_RESOURCE = "medlem/afp/apotekerforeningen/ersisteforhold"
         private const val APOTEKER_PATH = "$API_PATH/$APOTEKER_RESOURCE"
