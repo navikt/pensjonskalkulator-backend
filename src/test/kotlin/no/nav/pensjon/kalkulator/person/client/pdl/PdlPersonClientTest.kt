@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.person.client.pdl
 
+import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
@@ -13,6 +14,7 @@ import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
@@ -116,7 +118,7 @@ class PdlPersonClientTest : WebClientTest() {
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil")) // for retry
 
-        val exception = assertThrows(EgressException::class.java) { client.fetchPerson(pid, fetchFulltNavn = false) }
+        val exception = assertThrows<EgressException> { client.fetchPerson(pid, fetchFulltNavn = false) }
 
         assertEquals("Failed calling ${baseUrl()}/graphql", exception.message)
         assertEquals("Feil", (exception.cause as EgressException).message)
@@ -132,8 +134,8 @@ class PdlPersonClientTest : WebClientTest() {
     @Test
     fun `fetchPerson handles person ikke funnet`() {
         arrange(personIkkeFunnetResponse())
-        // extension data is only logged, so just check that no exception occurs:
-        assertDoesNotThrow { client.fetchPerson(pid, fetchFulltNavn = false) }
+        val exception = assertThrows<NotFoundException> { client.fetchPerson(pid, fetchFulltNavn = false) }
+        assertEquals("person", exception.message)
     }
 
     @Test

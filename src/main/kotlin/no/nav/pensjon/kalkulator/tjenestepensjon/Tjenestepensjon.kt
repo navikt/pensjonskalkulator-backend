@@ -16,3 +16,5 @@ data class Ytelse(
     val datoYtelseIverksattFom: LocalDate?,
     val datoYtelseIverksattTom: LocalDate?
 )
+
+data class Tjenestepensjonsforhold(val tpOrdninger: List<String>)

@@ -1,10 +1,8 @@
 # pensjonskalkulator-backend
 
-Backend-applikasjon for pensjonskalkulator for brukere født 1963 eller senere.
+Backend-applikasjon for pensjonskalkulator for personer født 1963 eller senere.
 
-Dette er brukere som berøres av [ny AFP-ordning i offentlig sektor](https://www.nav.no/afp-offentlig-livsvarig), og som omfattes av kapittel 20 i pensjonsregelverket (ikke kapittel 19).
-
-NB: Beregning av ny offentlig AFP vil ikke gjøres før leverandørene av offentlig tjenestepensjon tilbyr tjenester for dette.
+Dette er personer som potensielt berøres av [ny AFP-ordning i offentlig sektor](https://www.nav.no/afp-offentlig-livsvarig), og som omfattes av kapittel 20 i pensjonsregelverket (ikke kapittel 19).
 
 ## API
 

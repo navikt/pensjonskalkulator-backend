@@ -3,11 +3,11 @@ package no.nav.pensjon.kalkulator.tech.security.ingress
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.ImpersonalAccessFilter
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
@@ -51,6 +51,18 @@ class ImpersonalAccessFilterTest {
         ImpersonalAccessFilter(pidExtractor, groupMembershipService, auditor).doFilter(request, response, chain)
 
         verify(response, times(1)).sendError(403, "Adgang nektet pga. manglende gruppemedlemskap")
+        verify(chain, never()).doFilter(request, response)
+    }
+
+    @Test
+    fun `when person not found then doFilter reports 'not found' and breaks filter chain`() {
+        `when`(request.getHeader("fnr")).thenReturn(pid.value)
+        `when`(pidExtractor.pid()).thenReturn(pid)
+        `when`(groupMembershipService.innloggetBrukerHarTilgang(pid)).thenThrow(NotFoundException("person"))
+
+        ImpersonalAccessFilter(pidExtractor, groupMembershipService, auditor).doFilter(request, response, chain)
+
+        verify(response, times(1)).sendError(404, "Person ikke funnet")
         verify(chain, never()).doFilter(request, response)
     }
 

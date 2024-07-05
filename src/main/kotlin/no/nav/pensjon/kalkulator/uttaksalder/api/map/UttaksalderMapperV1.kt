@@ -2,11 +2,12 @@ package no.nav.pensjon.kalkulator.uttaksalder.api.map
 
 import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
+import no.nav.pensjon.kalkulator.simulering.UtenlandsperiodeSpec
 import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.*
 import java.time.LocalDate
 
-object UttaksalderMapper {
+object UttaksalderMapperV1 {
 
     private val defaultTomAlder = Alder(99, 11)
 
@@ -19,7 +20,8 @@ object UttaksalderMapper {
             aarligInntektFoerUttak = spec.aarligInntektFoerUttakBeloep,
             simuleringType = spec.simuleringstype ?: SimuleringType.ALDERSPENSJON,
             gradertUttak = null,
-            heltUttak = spec.aarligInntektVsaPensjon?.let(::heltUttakV1)
+            heltUttak = spec.aarligInntektVsaPensjon?.let(::heltUttakV1),
+            utenlandsperiodeListe = spec.utenlandsperiodeListe.orEmpty().map(::utenlandsperiodeSpecV1)
         )
 
     fun fromIngressSpecForGradertUttakV1(spec: IngressUttaksalderSpecForGradertUttakV1) =
@@ -29,7 +31,8 @@ object UttaksalderMapper {
             aarligInntektFoerUttak = spec.aarligInntektFoerUttakBeloep,
             simuleringType = spec.simuleringstype ?: SimuleringType.ALDERSPENSJON,
             gradertUttak = gradertUttakV1(spec.gradertUttak),
-            heltUttak = heltUttakInGradertContextV1(spec.heltUttak)
+            heltUttak = heltUttakInGradertContextV1(spec.heltUttak),
+            utenlandsperiodeListe = spec.utenlandsperiodeListe.orEmpty().map(::utenlandsperiodeSpecV1)
         )
 
     private fun heltUttakV1(spec: IngressUttaksalderInntektV1) =
@@ -55,6 +58,14 @@ object UttaksalderMapper {
             grad = Uttaksgrad.from(dto.grad),
             aarligInntekt = dto.aarligInntektVsaPensjonBeloep ?: 0,
             foedselDato = LocalDate.MIN // deprecated; irrelevant here
+        )
+
+    private fun utenlandsperiodeSpecV1(dto: UttaksalderUtenlandsperiodeSpecV1) =
+        UtenlandsperiodeSpec(
+            fom = dto.fom,
+            tom = dto.tom,
+            land = dto.land,
+            arbeidetUtenlands = dto.arbeidetUtenlands
         )
 
     private fun alder(dto: IngressUttaksalderAlderV1) = Alder(dto.aar, dto.maaneder)

@@ -13,9 +13,9 @@ import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.AlderDto
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.IngressUttaksalderSpecForGradertUttakV1
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.IngressUttaksalderSpecForHeltUttakV1
-import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderMapper.fromIngressSpecForGradertUttakV1
-import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderMapper.fromIngressSpecForHeltUttakV1
-import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderMapper.toDto
+import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderMapperV1.fromIngressSpecForGradertUttakV1
+import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderMapperV1.fromIngressSpecForHeltUttakV1
+import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderMapperV1.toDto
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

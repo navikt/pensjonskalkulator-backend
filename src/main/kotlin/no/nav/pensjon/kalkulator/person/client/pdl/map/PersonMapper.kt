@@ -1,5 +1,7 @@
 package no.nav.pensjon.kalkulator.person.client.pdl.map
 
+import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import no.nav.pensjon.kalkulator.person.NavnFormatter.formatNavn
 import no.nav.pensjon.kalkulator.person.Person
@@ -8,8 +10,11 @@ import no.nav.pensjon.kalkulator.person.client.pdl.dto.*
 import java.time.LocalDate
 
 object PersonMapper {
+    private val log = KotlinLogging.logger {}
 
-    fun fromDto(dto: PersonResponseDto): Person? = dto.data?.hentPerson?.let(::person)
+    fun fromDto(dto: PersonResponseDto): Person =
+        dto.data?.hentPerson?.let(::person)
+            ?: throw NotFoundException("person").also { logError(dto) }
 
     private fun person(dto: PersonDto) =
         Person(
@@ -29,4 +34,10 @@ object PersonMapper {
 
     private fun fromDto(dto: List<SivilstandDto>): Sivilstand =
         PdlSivilstand.fromExternalValue(dto.firstOrNull()?.type).internalValue
+
+    private fun logError(dto: PersonResponseDto) {
+        dto.errors?.firstOrNull()?.message?.let {
+            log.info { "PDL error message: $it" }
+        }
+    }
 }

@@ -3,14 +3,12 @@ package no.nav.pensjon.kalkulator.simulering.client.pen.map
 import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
-import no.nav.pensjon.kalkulator.simulering.PersonalSimuleringSpec
-import no.nav.pensjon.kalkulator.simulering.SimuleringType
-import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
+import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.*
 import no.nav.pensjon.kalkulator.testutil.Assertions.assertAlder
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class PenSimuleringMapperTest {
 
@@ -87,6 +85,14 @@ class PenSimuleringMapperTest {
                     inntekt = Inntekt(
                         aarligBeloep = 6_000,
                         tomAlder = Alder(70, 3)
+                    )
+                ),
+                utenlandsperiodeListe = listOf(
+                    UtenlandsperiodeSpec(
+                        fom = LocalDate.of(1990, 1, 2),
+                        tom = LocalDate.of(1999, 11, 30),
+                        land = "AUS",
+                        arbeidetUtenlands = true
                     )
                 )
             )

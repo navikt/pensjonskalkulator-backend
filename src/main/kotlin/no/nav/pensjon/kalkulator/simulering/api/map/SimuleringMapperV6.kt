@@ -17,7 +17,8 @@ object SimuleringMapperV6 {
             forventetAarligInntektFoerUttak = dto.aarligInntektFoerUttakBeloep,
             sivilstand = dto.sivilstand,
             gradertUttak = dto.gradertUttak?.let(::gradertUttak),
-            heltUttak = heltUttak(dto.heltUttak)
+            heltUttak = heltUttak(dto.heltUttak),
+            utenlandsperiodeListe = dto.utenlandsperiodeListe.orEmpty().map(::utenlandsperiodeSpec)
         )
 
     fun resultatV6(source: Simuleringsresultat) =
@@ -39,6 +40,14 @@ object SimuleringMapperV6 {
         HeltUttak(
             uttakFomAlder = alder(dto.uttaksalder),
             inntekt = dto.aarligInntektVsaPensjon?.let(::inntekt)
+        )
+
+    private fun utenlandsperiodeSpec(dto: UtenlandsperiodeSpecV6) =
+        UtenlandsperiodeSpec(
+            fom = dto.fom,
+            tom = dto.tom,
+            land = dto.land,
+            arbeidetUtenlands = dto.arbeidetUtenlands
         )
 
     private fun inntekt(dto: IngressSimuleringInntektV6) =

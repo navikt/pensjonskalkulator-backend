@@ -66,14 +66,14 @@ class UttaksalderService(
             epsHarInntektOver2G = harEps, // antagelse: de fleste ektefeller/partnere/samboere har inntekt over 2G
             forventetAarligInntektFoerUttak = personalSpec.aarligInntektFoerUttak,
             gradertUttak = impersonalSpec.gradertUttak?.let(::simuleringGradertUttak),
-            heltUttak = simuleringHeltUttak(impersonalSpec)
+            heltUttak = simuleringHeltUttak(impersonalSpec),
+            utenlandsperiodeListe = impersonalSpec.utenlandsperiodeListe
         )
 
 
     private fun sisteInntekt() = inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact()
 
-    private fun sivilstand(): Sivilstand =
-        personService.getPerson()?.sivilstand ?: Sivilstand.UOPPGITT
+    private fun sivilstand(): Sivilstand = personService.getPerson().sivilstand
 
     private companion object {
         private val teoretiskLavesteUttaksalder = Alder(aar = 62, maaneder = 0)

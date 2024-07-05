@@ -6,6 +6,7 @@ import jakarta.servlet.ServletResponse
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
@@ -28,8 +29,13 @@ class ImpersonalAccessFilter(
         if (hasPid(request as HttpServletRequest)) {
             val pid = pidGetter.pid()
 
-            if (!groupMembershipService.innloggetBrukerHarTilgang(pid)) {
-                forbidden(response as HttpServletResponse)
+            try {
+                if (!groupMembershipService.innloggetBrukerHarTilgang(pid)) {
+                    forbidden(response as HttpServletResponse)
+                    return
+                }
+            } catch (e: NotFoundException) {
+                notFound(response as HttpServletResponse)
                 return
             }
 
@@ -46,6 +52,13 @@ class ImpersonalAccessFilter(
         "Adgang nektet pga. manglende gruppemedlemskap".let {
             log.warn { it }
             response.sendError(HttpStatus.FORBIDDEN.value(), it)
+        }
+    }
+
+    private fun notFound(response: HttpServletResponse) {
+        "Person ikke funnet".let {
+            log.info { it }
+            response.sendError(HttpStatus.NOT_FOUND.value(), it)
         }
     }
 }

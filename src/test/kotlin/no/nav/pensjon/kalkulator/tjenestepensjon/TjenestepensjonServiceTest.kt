@@ -45,9 +45,25 @@ class TjenestepensjonServiceTest {
         assertTrue(result)
     }
 
+    @Test
+    fun `gir liste over alle medlemskap i tp-ordninger`() {
+        `when`(client.tjenestepensjonsforhold(pid)).thenReturn(tjenestepensjonMedMedlemskap())
+        val result = service.hentMedlemskapITjenestepensjonsordninger()
+        assertEquals(listOf("Maritim pensjonskasse", "Statens pensjonskasse", "Kommunal Landspensjonskasse"), result)
+    }
+
+
     private companion object {
         private fun tjenestepensjon() = Tjenestepensjon(forholdList = listOf(forhold()))
+        private fun tjenestepensjonMedMedlemskap() = Tjenestepensjonsforhold(
+            tpOrdninger = listOf(
+                "Maritim pensjonskasse",
+                "Statens pensjonskasse",
+                "Kommunal Landspensjonskasse"
+            )
+        )
 
-        private fun forhold() = Forhold(ordning = "", ytelser = emptyList(), datoSistOpptjening = null)
+        private fun forhold(tpOrdning: String = "") =
+            Forhold(ordning = tpOrdning, ytelser = emptyList(), datoSistOpptjening = null)
     }
 }

@@ -23,6 +23,7 @@ import org.springframework.test.context.TestPropertySource
 import org.springframework.web.reactive.function.client.WebClient
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
+import java.time.LocalDate
 
 @SpringBootTest
 @TestPropertySource("classpath:application-test.properties")
@@ -127,29 +128,13 @@ class PenSimuleringClientTest : WebClientTest() {
       "aar" : 67,
       "maaneder" : 1
     }
-  }
-}"""
-
-        @Language("json")
-        private const val SIMULER_AFP_REQUEST_BODY = """{
-  "simuleringstype" : "ALDER_MED_AFP_OFFENTLIG_LIVSVARIG",
-  "pid" : "12906498357",
-  "sivilstand" : "UGIF",
-  "harEps" : false,
-  "sisteInntekt" : 123000,
-  "uttaksar" : 1,
-  "gradertUttak" : null,
-  "heltUttak" : {
-    "uttakFomAlder" : {
-      "aar" : 62,
-      "maaneder" : 0
-    },
-    "aarligInntekt" : 0,
-    "inntektTomAlder" : {
-      "aar" : 62,
-      "maaneder" : 1
-    }
-  }
+  },
+  "utenlandsperiodeListe" : [ {
+    "fom" : "1990-01-02",
+    "tom" : "1999-11-30",
+    "land" : "AUS",
+    "arbeidetUtenlands" : true
+  } ]
 }"""
 
         /**
@@ -325,6 +310,14 @@ class PenSimuleringClientTest : WebClientTest() {
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(aar = 67, maaneder = 1),
                     inntekt = null
+                ),
+                utenlandsperiodeListe = listOf(
+                    UtenlandsperiodeSpec(
+                        fom = LocalDate.of(1990, 1, 2),
+                        tom = LocalDate.of(1999, 11, 30),
+                        land = "AUS",
+                        arbeidetUtenlands = true
+                    )
                 )
             )
 
@@ -342,18 +335,14 @@ class PenSimuleringClientTest : WebClientTest() {
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(aar = 67, maaneder = 1),
                     inntekt = null
-                )
-            )
-
-        private fun impersonalAPMedAfpOffentligSpec() =
-            ImpersonalSimuleringSpec(
-                simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG,
-                sivilstand = Sivilstand.UGIFT,
-                epsHarInntektOver2G = false,
-                forventetAarligInntektFoerUttak = 123000,
-                heltUttak = HeltUttak(
-                    uttakFomAlder = Alder(aar = 62, maaneder = 0),
-                    inntekt = null
+                ),
+                utenlandsperiodeListe = listOf(
+                    UtenlandsperiodeSpec(
+                        fom = LocalDate.of(1990, 1, 2),
+                        tom = LocalDate.of(1999, 11, 30),
+                        land = "AUS",
+                        arbeidetUtenlands = true
+                    )
                 )
             )
 
