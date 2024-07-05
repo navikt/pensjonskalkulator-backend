@@ -160,46 +160,26 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
      * "Impersonal" means that the logged-in user acts on behalf of another person.
      */
     private fun isImpersonal(request: HttpServletRequest): Boolean =
-        request.requestURI == ANSATT_ID_URI && hasAnsattIdClaim(request) || hasPid(request)
+        request.requestURI == ANSATT_ID_URI && hasAnsattIdClaim(request) || hasPidHeader(request)
 
     /**
      * "Universal" means that it cannot be determined whether the request is made in a personal or impersonal
      * context. This implies that any one of the relevant token issuers must be accepted.
      */
     private fun isUniversal(request: HttpServletRequest): Boolean =
-        request.requestURI.startsWith(FEATURE_URI)
+        request.requestURI == ENCRYPTION_URI ||
+                request.requestURI.startsWith(FEATURE_URI)
 
     private fun hasAnsattIdClaim(request: HttpServletRequest): Boolean =
         hasLength(requestClaimExtractor.extractAuthorizationClaim(request, SecurityContextNavIdExtractor.CLAIM_KEY))
 
     companion object {
-
         private const val ANSATT_ID_URI = "/api/v1/ansatt-id"
         private const val FEATURE_URI = "/api/feature/"
+        private const val ENCRYPTION_URI = "/api/v1/encrypt"
 
-        fun hasPid(request: HttpServletRequest): Boolean =
-            uniquePid(
-                pidAttribute(request),
-                pidHeader(request)
-            )?.let { true } ?: false
-
-        private fun uniquePid(pid1: String?, pid2: String?): String? =
-            pid1?.let {
-                if (pid2 == null || pid2 == it)
-                    pid1
-                else // pid2 is different from pid1
-                    throw RuntimeException("Ambiguous PID values")
-            } ?: pid2
-
-        private fun pidHeader(request: HttpServletRequest): String? {
-            val header = request.getHeader(CustomHttpHeaders.PID)
-            return if (hasLength(header)) header else null
-        }
-
-        private fun pidAttribute(request: HttpServletRequest): String? {
-            val header = request.getAttribute("pid") as? String
-            return if (hasLength(header)) header else null
-        }
+        fun hasPidHeader(request: HttpServletRequest): Boolean =
+            hasLength(request.getHeader(CustomHttpHeaders.PID))
 
         private fun jwtDecoder(
             issuerUri: String,
