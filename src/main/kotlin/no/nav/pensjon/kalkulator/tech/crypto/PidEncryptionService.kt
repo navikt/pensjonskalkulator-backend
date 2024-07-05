@@ -11,6 +11,9 @@ import javax.crypto.Cipher
 import javax.crypto.IllegalBlockSizeException
 import javax.crypto.NoSuchPaddingException
 
+/**
+ * Based on https://github.com/navikt/pid-encryption/
+ */
 @Service
 class PidEncryptionService(
     @Value("\${pid.encryption.key.new}") newKey: String,

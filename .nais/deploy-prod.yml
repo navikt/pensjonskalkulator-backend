@@ -133,3 +133,4 @@ spec:
       value: INFO
   envFrom:
     - secret: pensjonskalkulator-backend-unleash-api-token
+    - secret: pkb-pid-encryption
