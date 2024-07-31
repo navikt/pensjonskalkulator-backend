@@ -27,7 +27,6 @@ import org.springframework.test.context.TestPropertySource
 import org.springframework.web.reactive.function.client.WebClient
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
-import java.util.*
 
 @SpringBootTest
 @TestPropertySource("classpath:application-test.properties")
@@ -66,7 +65,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
 
         val avtaler = client.fetchAvtaler(spec(), pid).avtaler
 
-        assertRequestBody()
+        assertRequestBody(EXPECTED_REQUEST_BODY)
         assertEquals(1, avtaler.size)
         avtaler[0] shouldBe avtaleMedToUtbetalingsperioder()
     }
@@ -204,7 +203,7 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
 </soap:Envelope>"""
 
         @Language("xml")
-        private const val EN_AVTALE_RESPONSE_BODY =
+        const val EN_AVTALE_RESPONSE_BODY =
             """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Header/>
     <soap:Body wsu:Id="x" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
@@ -375,9 +374,9 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
     </soap:Body>
 </soap:Envelope>"""
 
-        private fun okResponse(avtale: String) = jsonResponse(HttpStatus.OK).setBody(avtale)
+        fun okResponse(avtale: String) = jsonResponse(HttpStatus.OK).setBody(avtale)
 
-        private fun spec() =
+        fun spec() =
             PensjonsavtaleSpec(
                 aarligInntektFoerUttak = 123000,
                 uttaksperioder = listOf(uttaksperiodeSpec(1), uttaksperiodeSpec(2)),
@@ -478,11 +477,11 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
                 grad = Uttaksgrad.AATTI_PROSENT
             )
 
-        private fun assertRequestBody() {
+        fun assertRequestBody(body: String) {
             ByteArrayOutputStream().use {
                 val request = takeRequest()
                 request.body.copyTo(it)
-                assertEquals(EXPECTED_REQUEST_BODY, it.toString(StandardCharsets.UTF_8))
+                assertEquals(body, it.toString(StandardCharsets.UTF_8))
             }
         }
     }

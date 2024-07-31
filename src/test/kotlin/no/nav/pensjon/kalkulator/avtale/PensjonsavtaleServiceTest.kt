@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.*
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @ExtendWith(SpringExtension::class)
@@ -25,6 +25,9 @@ class PensjonsavtaleServiceTest {
     private lateinit var avtaleClient: PensjonsavtaleClient
 
     @Mock
+    private lateinit var mockAvtaleClient: PensjonsavtaleClient
+
+    @Mock
     private lateinit var featureToggleService: FeatureToggleService
 
     @Mock
@@ -32,7 +35,7 @@ class PensjonsavtaleServiceTest {
 
     @BeforeEach
     fun initialize() {
-        avtaleService = PensjonsavtaleService(avtaleClient, pidGetter, featureToggleService)
+        avtaleService = PensjonsavtaleService(avtaleClient, mockAvtaleClient, pidGetter, featureToggleService)
         `when`(pidGetter.pid()).thenReturn(pid)
     }
 
@@ -64,6 +67,30 @@ class PensjonsavtaleServiceTest {
         `when`(avtaleClient.fetchAvtaler(pensjonsavtaleSpec(), pid)).thenReturn(enAvtaleUtenStart())
         val result = avtaleService.fetchAvtaler(pensjonsavtaleSpec())
         result shouldBe Pensjonsavtaler(emptyList(), emptyList())
+    }
+
+    @Test
+    fun `fetchAvtaler uses mocked avtaler, when toggle is set`() {
+        val spec = pensjonsavtaleSpec()
+        `when`(featureToggleService.isEnabled("mock-norsk-pensjon")).thenReturn(true)
+        `when`(mockAvtaleClient.fetchAvtaler(spec, pid)).thenReturn(pensjonsavtalerV3())
+
+        avtaleService.fetchAvtaler(spec)
+
+        verify(mockAvtaleClient, atLeastOnce()).fetchAvtaler(spec, pid)
+        verify(avtaleClient, never()).fetchAvtaler(spec, pid)
+    }
+
+    @Test
+    fun `fetchAvtaler uses norsk pensjon, when toggle is not set`() {
+        val spec = pensjonsavtaleSpec()
+        `when`(featureToggleService.isEnabled("mock-norsk-pensjon")).thenReturn(false)
+        `when`(avtaleClient.fetchAvtaler(spec, pid)).thenReturn(pensjonsavtalerV3())
+
+        avtaleService.fetchAvtaler(spec)
+
+        verify(avtaleClient, atLeastOnce()).fetchAvtaler(spec, pid)
+        verify(mockAvtaleClient, never()).fetchAvtaler(spec, pid)
     }
 
     private fun arrangeClient() {
