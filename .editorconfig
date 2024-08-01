@@ -1,0 +1,4 @@
+root = true
+
+[{*.gradle.kts,*.kt,*.kts,*.main.kts,*.space.kts}]
+max_line_length = 1500
