@@ -33,7 +33,10 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import java.nio.charset.StandardCharsets
 import java.util.*
 
-@Component
+/**
+ * Denne klienten skal hente pensjonsavtaler fra Norsk pensjon i prod og dev
+ */
+@Component("norskPensjon")
 class NorskPensjonPensjonsavtaleClient(
     @Value("\${norsk-pensjon.url}") private val baseUrl: String,
     private val tokenGetter: SamlTokenService,
@@ -43,7 +46,7 @@ class NorskPensjonPensjonsavtaleClient(
     @Value("\${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), PensjonsavtaleClient {
 
-    private val webClient: WebClient = webClientBuilder
+    val webClient: WebClient = webClientBuilder
         .baseUrl(baseUrl)
         .defaultHeaders { it.contentType = MediaType(MediaType.TEXT_XML, StandardCharsets.UTF_8) }
         .build()
@@ -66,7 +69,7 @@ class NorskPensjonPensjonsavtaleClient(
         }
     }
 
-    private fun fetchAvtalerXml(spec: NorskPensjonPensjonsavtaleSpecDto): String {
+    protected fun fetchAvtalerXml(spec: NorskPensjonPensjonsavtaleSpecDto): String {
         val uri = "/$RESOURCE"
         val callId = traceAid.callId()
         val body = soapEnvelope(soapBody(spec, callId))
@@ -89,14 +92,14 @@ class NorskPensjonPensjonsavtaleClient(
         }
     }
 
-    private fun soapEnvelope(body: String) =
+    protected fun soapEnvelope(body: String) =
         """<?xml version="1.0" ?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:typ="http://norskpensjon.no/api/pensjonskalkulator/v3/typer">
     ${soapHeader()}
     $body
 </S:Envelope>"""
 
-    private fun soapHeader() =
+    protected fun soapHeader() =
         """<S:Header>
         ${tokenGetter.assertion()}
     </S:Header>"""
@@ -123,7 +126,7 @@ class NorskPensjonPensjonsavtaleClient(
         private val service = EgressService.NORSK_PENSJON
 
         @Language("xml")
-        private fun soapBody(spec: NorskPensjonPensjonsavtaleSpecDto, callId: String): String =
+        fun soapBody(spec: NorskPensjonPensjonsavtaleSpecDto, callId: String): String =
             """<S:Body>
         ${xml(spec, callId)}
     </S:Body>"""
