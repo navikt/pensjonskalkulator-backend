@@ -11,6 +11,12 @@ spec:
   replicas:
     min: 2
     max: 2
+  resources:
+    limits:
+      memory: 1024Mi
+    requests:
+      cpu: 100m
+      memory: 512Mi
   ingresses:
     - https://pensjonskalkulator-backend.intern.dev.nav.no
   liveness:

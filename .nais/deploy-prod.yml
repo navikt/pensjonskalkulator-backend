@@ -12,6 +12,12 @@ spec:
     min: 2
     max: 4
     cpuThresholdPercentage: 70
+  resources:
+    limits:
+      memory: 2048Mi
+    requests:
+      cpu: 500m
+      memory: 1024Mi
   ingresses:
     - https://pensjonskalkulator-backend.intern.nav.no
   liveness:
@@ -26,13 +32,6 @@ spec:
   prometheus:
     enabled: true
     path: /internal/prometheus
-  resources:
-    limits:
-      cpu: "2"
-      memory: "2048Mi"
-    requests:
-      cpu: "1"
-      memory: "1024Mi"
   azure:
     application:
       enabled: true
