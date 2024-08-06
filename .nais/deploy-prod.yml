@@ -61,7 +61,7 @@ spec:
         - application: tp
           namespace: pensjonsamhandling
           cluster: prod-fss
-        - application: etterlatte-samordning-vedtak
+        - application: etterlatte-api
           namespace: etterlatte
           cluster: prod-gcp
       external:
@@ -109,9 +109,9 @@ spec:
     - name: TJENESTEPENSJON_URL
       value: https://tp-api.prod-fss-pub.nais.io
     - name: OMSTILLINGSSTOENAD_SERVICE_ID
-      value: prod-gcp:etterlatte:etterlatte-samordning-vedtak
+      value: prod-gcp:etterlatte:etterlatte-api
     - name: OMSTILLINGSSTOENAD_SERVICE_URL
-      value: https://etterlatte-samordning-vedtak.intern.nav.no
+      value: http://etterlatte-api.etterlatte
     - name: PKB_FRONTEND_ENTRA_CLIENT_ID
       value: irrelevant-when-obo-token-used
     - name: PKB_GROUP_ID_SAKSBEHANDLER
