@@ -84,11 +84,9 @@ class PenSimuleringClientTest : WebClientTest() {
         with(response.afpOffentlig) {
             assertEquals(2, size)
             assertEquals(62, this[0].alder)
-            assertEquals("Tilfeldig pensjonskasse", this[0].afpLeverandoer)
             assertEquals(55000, this[0].beloep)
             assertEquals(63, this[1].alder)
             assertEquals(65000, this[1].beloep)
-            assertEquals("Tilfeldig pensjonskasse", this[1].afpLeverandoer)
         }
     }
 
@@ -286,13 +284,11 @@ class PenSimuleringClientTest : WebClientTest() {
     "afpOffentliglivsvarig": [
       {
             "alder": 62,
-            "beloep": 55000,
-            "tpOrdning": "Tilfeldig pensjonskasse"
+            "beloep": 55000
         },
         {
             "alder": 63,
-            "beloep": 65000,
-            "tpOrdning": "Tilfeldig pensjonskasse"
+            "beloep": 65000
         }
     ],
     "vilkaarsproeving": {
