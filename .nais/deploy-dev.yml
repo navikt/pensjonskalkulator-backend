@@ -71,6 +71,7 @@ spec:
         - application: pensjon-selvbetjening-fss-gateway
           namespace: pensjonselvbetjening
           cluster: dev-fss
+        - application: pensjonssimulator
         - application: skjermede-personer-pip
           namespace: nom
         - application: tp-q2
