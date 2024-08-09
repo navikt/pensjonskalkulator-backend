@@ -40,7 +40,7 @@ object PenSimuleringMapper {
 
     private fun afpPrivat(dto: PenPensjonDto) = SimulertAfpPrivat(dto.alder, dto.beloep)
 
-    private fun afpOffentlig(dto: PenPensjonAfpOffentligDto) = SimulertAfpOffentlig(dto.alder, dto.beloep, dto.tpOrdning)
+    private fun afpOffentlig(dto: PenPensjonAfpOffentligDto) = SimulertAfpOffentlig(dto.alder, dto.beloep)
 
     private fun vilkaarsproeving(dto: PenVilkaarsproevingDto) =
         Vilkaarsproeving(
