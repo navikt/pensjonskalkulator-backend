@@ -27,7 +27,7 @@ class LandController(
     @GetMapping("v1/land-liste")
     @Operation(
         summary = "Hent land-liste",
-        description = "Henter liste over land med navn og status som avtaleland."
+        description = "Henter liste over land med navn og status som avtaleland. Denne tjenesten er åpen - krever ikke autentisering."
     )
     @ApiResponses(
         value = [

@@ -143,6 +143,7 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
                     internalRequestMatcher,
                     "/error",
                     "/api/status",
+                    "/api/v1/land-liste",
                     "/api/feature/**",
                     "/swagger-ui/**",
                     "/v3/api-docs/**"
