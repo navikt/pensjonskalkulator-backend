@@ -248,7 +248,6 @@ enum class Land(val erAvtaleland: Boolean, val bokmaalNavn: String, val engelskN
     UGA(false, "Uganda", "Uganda"),
     UKR(false, "Ukraina", "Ukraine"),
     HUN(true, "Ungarn", "Hungary"),
-    XUK(false, "uoppgitt/ukjent", "unspecified/unknown"),
     URY(false, "Uruguay", "Uruguay"),
     UMI(false, "USAs ytre småøyer", "United States Minor Outlying Islands"),
     UZB(false, "Usbekistan", "Uzbekistan"),
