@@ -1,9 +1,9 @@
 package no.nav.pensjon.kalkulator.uttaksalder.api.map
 
 import no.nav.pensjon.kalkulator.general.*
+import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.simulering.UtenlandsperiodeSpec
-import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.*
 import java.time.LocalDate
@@ -65,7 +65,7 @@ object UttaksalderMapperV1 {
         UtenlandsperiodeSpec(
             fom = dto.fom,
             tom = dto.tom,
-            land = dto.land ?: dto.landkode ?: throw BadRequestException("land eller landkode mangler i utenlandsperiode"),
+            land = Land.valueOf(dto.landkode),
             arbeidetUtenlands = dto.arbeidetUtenlands
         )
 

@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.simulering
 
 import no.nav.pensjon.kalkulator.general.GradertUttak
 import no.nav.pensjon.kalkulator.general.HeltUttak
+import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import java.time.LocalDate
 
@@ -22,6 +23,6 @@ data class ImpersonalSimuleringSpec(
 data class UtenlandsperiodeSpec (
     val fom: LocalDate,
     val tom: LocalDate?,
-    val land: String,
+    val land: Land,
     val arbeidetUtenlands: Boolean
 )

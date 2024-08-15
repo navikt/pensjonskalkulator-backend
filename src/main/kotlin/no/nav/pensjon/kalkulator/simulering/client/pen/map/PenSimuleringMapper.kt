@@ -75,7 +75,7 @@ object PenSimuleringMapper {
         PenUtenlandsperiodeSpec(
             fom = dto.fom,
             tom = dto.tom,
-            land = dto.land,
+            land = dto.land.name,
             arbeidetUtenlands = dto.arbeidetUtenlands
         )
 

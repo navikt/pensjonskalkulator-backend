@@ -37,8 +37,7 @@ data class IngressSimuleringInntektV6(
 data class UtenlandsperiodeSpecV6 (
     val fom: LocalDate,
     val tom: LocalDate?,
-    val land: String? = null, // deprecated
-    val landkode: String? = null,
+    val landkode: String,
     val arbeidetUtenlands: Boolean
 )
 

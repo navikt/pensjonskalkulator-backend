@@ -4,6 +4,7 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.GradertUttak
 import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
+import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
@@ -311,7 +312,7 @@ class PenSimuleringClientTest : WebClientTest() {
                     UtenlandsperiodeSpec(
                         fom = LocalDate.of(1990, 1, 2),
                         tom = LocalDate.of(1999, 11, 30),
-                        land = "AUS",
+                        land = Land.AUS,
                         arbeidetUtenlands = true
                     )
                 )
@@ -336,7 +337,7 @@ class PenSimuleringClientTest : WebClientTest() {
                     UtenlandsperiodeSpec(
                         fom = LocalDate.of(1990, 1, 2),
                         tom = LocalDate.of(1999, 11, 30),
-                        land = "AUS",
+                        land = Land.AUS,
                         arbeidetUtenlands = true
                     )
                 )

@@ -1,12 +1,14 @@
 package no.nav.pensjon.kalkulator.land
 
 /**
+ * Enumerasjon av land basert på ISO 3166-1 alpha-3.
  * Kilder:
  * - pen.T_K_LAND_3_TEGN, pen.T_K_AVTALELAND
  * - https://no.wikipedia.org/wiki/ISO_3166-1
  * - https://en.wikipedia.org/wiki/ISO_3166-1
  * - https://no.wikipedia.org/wiki/De_nederlandske_Antiller
  * Sortert alfabetisk etter bokmålsnavn.
+ * NB: "XUK" (ukjent/uoppgitt) er utelatt.
  */
 enum class Land(val erAvtaleland: Boolean, val bokmaalNavn: String, val engelskNavn: String) {
     AFG(false, "Afghanistan", "Afghanistan"),

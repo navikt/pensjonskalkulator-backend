@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.uttaksalder.client.pen.map
 
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.general.*
+import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
@@ -40,7 +41,7 @@ class PenUttaksalderSpecMapperTest {
                 UtenlandsperiodeSpec(
                     fom = LocalDate.of(1990, 1, 2),
                     tom = LocalDate.of(1999, 11, 30),
-                    land = "AUS",
+                    land = Land.AUS,
                     arbeidetUtenlands = true
                 )
             )
@@ -97,7 +98,7 @@ class PenUttaksalderSpecMapperTest {
                 UtenlandsperiodeSpec(
                     fom = LocalDate.of(1990, 1, 2),
                     tom = LocalDate.of(1999, 11, 30),
-                    land = "AUS",
+                    land = Land.AUS,
                     arbeidetUtenlands = true
                 )
             )
@@ -157,7 +158,7 @@ class PenUttaksalderSpecMapperTest {
                 UtenlandsperiodeSpec(
                     fom = LocalDate.of(1990, 1, 2),
                     tom = LocalDate.of(1999, 11, 30),
-                    land = "AUS",
+                    land = Land.AUS,
                     arbeidetUtenlands = true
                 )
             )

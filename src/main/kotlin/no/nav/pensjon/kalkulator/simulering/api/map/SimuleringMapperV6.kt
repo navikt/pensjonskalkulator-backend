@@ -1,13 +1,13 @@
 package no.nav.pensjon.kalkulator.simulering.api.map
 
 import no.nav.pensjon.kalkulator.general.*
+import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
-import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 
 /**
  * Maps between data transfer objects (DTOs) and domain objects related to simulering.
- * The DTOs are specified by version 5 of the API offered to clients.
+ * The DTOs are specified by version 6 of the API offered to clients.
  */
 object SimuleringMapperV6 {
 
@@ -47,7 +47,7 @@ object SimuleringMapperV6 {
         UtenlandsperiodeSpec(
             fom = dto.fom,
             tom = dto.tom,
-            land = dto.land ?: dto.landkode ?: throw BadRequestException("land eller landkode mangler i utenlandsperiode"),
+            land = Land.valueOf(dto.landkode),
             arbeidetUtenlands = dto.arbeidetUtenlands
         )
 

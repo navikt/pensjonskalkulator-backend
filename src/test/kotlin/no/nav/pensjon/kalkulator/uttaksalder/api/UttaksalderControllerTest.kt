@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.uttaksalder.api
 
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
@@ -60,7 +61,7 @@ internal class UttaksalderControllerTest {
                 UtenlandsperiodeSpec(
                     fom = LocalDate.of(1990, 1, 2),
                     tom = LocalDate.of(1999, 11, 30),
-                    land = "AUS",
+                    land = Land.AUS,
                     arbeidetUtenlands = true
                 )
             )
@@ -95,7 +96,7 @@ internal class UttaksalderControllerTest {
               "utenlandsperiodeListe": [{
                 "fom": "1990-01-02",
                 "tom": "1999-11-30",
-                "land": "AUS",
+                "landkode": "AUS",
                 "arbeidetUtenlands": true
               }]
             }
