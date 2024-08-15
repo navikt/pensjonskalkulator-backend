@@ -61,6 +61,7 @@ data class IngressUttaksalderAlderV1(val aar: Int, val maaneder: Int) {
 data class UttaksalderUtenlandsperiodeSpecV1(
     val fom: LocalDate,
     val tom: LocalDate?,
-    val land: String,
+    val land: String? = null, // deprecated
+    val landkode: String? = null,
     val arbeidetUtenlands: Boolean
 )

@@ -12,6 +12,7 @@ import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapperV6.fromIngressSimuleringSpecV6
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapperV6.resultatV6
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.intellij.lang.annotations.Language
 import org.springframework.web.bind.annotation.PostMapping
@@ -62,6 +63,8 @@ class SimuleringController(
                 )
             )
                 .also { log.debug { "Simulering V6 respons: $it" } }
+        } catch (e: BadRequestException) {
+            badRequest(e)!!
         } catch (e: EgressException) {
             if (e.isConflict) vilkaarIkkeOppfyltV6() else handleError(e, "V6")!!
         } finally {

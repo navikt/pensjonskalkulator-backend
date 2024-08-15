@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.AlderDto
@@ -66,6 +67,8 @@ class UttaksalderController(
                 .also { log.debug { "Hel uttaksalder-søk respons $version: $it" } }
         } catch (e: EgressException) {
             handleError(e, version)
+        } catch (e: BadRequestException) {
+            badRequest(e)!!
         } finally {
             traceAid.end()
         }
@@ -105,6 +108,8 @@ class UttaksalderController(
                 .also { log.debug { "Gradert uttaksalder-søk respons $version: $it" } }
         } catch (e: IllegalArgumentException) {
             handle(e)
+        } catch (e: BadRequestException) {
+            badRequest(e)!!
         } catch (e: EgressException) {
             handleError(e, version)
         } finally {

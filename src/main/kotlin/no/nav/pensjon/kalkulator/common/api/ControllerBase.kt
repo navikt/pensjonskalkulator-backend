@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.common.api
 
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.intellij.lang.annotations.Language
 import org.springframework.http.HttpStatus
@@ -34,6 +35,13 @@ abstract class ControllerBase(private val traceAid: TraceAid) {
         return result
     }
 
+    protected fun <T> badRequest(e: BadRequestException): T? {
+        throw ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "Call ID: ${traceAid.callId()} | Error: ${errorMessage()} | Details: ${extractMessageRecursively(e)}",
+            e
+        )
+    }
 
     protected fun <T> handleError(e: EgressException, version: String = "V0") =
         if (e.isClientError) // "client" is here the backend server itself (calling other services)
