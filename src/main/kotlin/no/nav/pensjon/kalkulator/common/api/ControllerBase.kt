@@ -75,7 +75,7 @@ abstract class ControllerBase(private val traceAid: TraceAid) {
     }
 
     private fun logError(e: EgressException, category: String, version: String) {
-        log.error { "$category ${errorMessage()} $version: ${extractMessageRecursively(e)}" }
+        log.error(e) { "$category ${errorMessage()} $version: ${extractMessageRecursively(e)}" }
     }
 
     private fun extractMessageRecursively(ex: Throwable): String {
