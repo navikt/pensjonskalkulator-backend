@@ -28,7 +28,10 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler
 import org.springframework.util.StringUtils.hasLength
+
 
 @Configuration
 @EnableWebSecurity
@@ -136,7 +139,10 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
         )
             .addFilterAfter(impersonalAccessFilter, AuthenticationEnricherFilter::class.java)
 
-        return http.csrf { it.disable() }
+        return http.csrf {
+            it.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            it.csrfTokenRequestHandler(CsrfTokenRequestAttributeHandler())
+        }
             .authorizeHttpRequests {
                 it.requestMatchers(
                     HttpMethod.GET,
