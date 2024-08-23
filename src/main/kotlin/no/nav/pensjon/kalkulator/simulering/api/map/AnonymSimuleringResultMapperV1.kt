@@ -6,7 +6,7 @@ import no.nav.pensjon.kalkulator.simulering.api.dto.*
 
 /**
  * Maps between data transfer objects (DTOs) and domain objects related to simulering.
- * The DTOs are specified by version 6 of the API offered to clients.
+ * The DTOs are specified by version 1 of the API offered to clients.
  */
 object AnonymSimuleringResultMapperV1 {
 

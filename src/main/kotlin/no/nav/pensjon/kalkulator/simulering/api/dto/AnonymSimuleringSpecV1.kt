@@ -72,7 +72,7 @@ enum class AnonymSimuleringTypeV1(val externalValue: String, val internalValue: 
 
         private fun default(externalValue: String?) =
             if (hasLength(externalValue))
-                ALDERSPENSJON.also { log.warn { "Unknown AnonymSivilstandV1: '$externalValue'" } }
+                ALDERSPENSJON.also { log.warn { "Unknown AnonymSimuleringTypeV1: '$externalValue'" } }
             else
                 ALDERSPENSJON
     }
