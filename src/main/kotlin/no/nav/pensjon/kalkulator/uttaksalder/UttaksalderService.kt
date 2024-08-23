@@ -8,8 +8,10 @@ import no.nav.pensjon.kalkulator.general.UttaksalderGradertUttak
 import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.simulering.Eps
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.SimuleringService
+import no.nav.pensjon.kalkulator.simulering.Utenlandsopphold
 import no.nav.pensjon.kalkulator.tech.metric.Metrics
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import org.springframework.stereotype.Service
@@ -63,11 +65,17 @@ class UttaksalderService(
         ImpersonalSimuleringSpec(
             simuleringType = impersonalSpec.simuleringType,
             sivilstand = personalSpec.sivilstand,
-            epsHarInntektOver2G = harEps, // antagelse: de fleste ektefeller/partnere/samboere har inntekt over 2G
+            eps = Eps(
+                harInntektOver2G = harEps, // antagelse: de fleste ektefeller/partnere/samboere har inntekt over 2G
+                harPensjon = false
+            ),
             forventetAarligInntektFoerUttak = personalSpec.aarligInntektFoerUttak,
             gradertUttak = impersonalSpec.gradertUttak?.let(::simuleringGradertUttak),
             heltUttak = simuleringHeltUttak(impersonalSpec),
-            utenlandsperiodeListe = impersonalSpec.utenlandsperiodeListe
+            utenlandsopphold = Utenlandsopphold(
+                periodeListe = impersonalSpec.utenlandsperiodeListe,
+                antallAar = null
+            )
         )
 
 

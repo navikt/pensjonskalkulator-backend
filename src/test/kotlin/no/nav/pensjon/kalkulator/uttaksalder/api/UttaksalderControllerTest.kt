@@ -5,7 +5,7 @@ import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
-import no.nav.pensjon.kalkulator.simulering.UtenlandsperiodeSpec
+import no.nav.pensjon.kalkulator.simulering.Opphold
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
@@ -58,11 +58,11 @@ internal class UttaksalderControllerTest {
             aarligInntektFoerUttak = 100_000,
             heltUttak = null,
             utenlandsperiodeListe = listOf(
-                UtenlandsperiodeSpec(
+                Opphold(
                     fom = LocalDate.of(1990, 1, 2),
                     tom = LocalDate.of(1999, 11, 30),
                     land = Land.AUS,
-                    arbeidetUtenlands = true
+                    arbeidet = true
                 )
             )
         )

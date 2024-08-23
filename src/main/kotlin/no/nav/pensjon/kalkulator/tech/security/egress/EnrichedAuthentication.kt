@@ -14,30 +14,29 @@ import org.springframework.security.core.GrantedAuthority
  * It also keeps the person ID (if available).
  */
 class EnrichedAuthentication(
-    private val initialAuth: Authentication,
+    private val initialAuth: Authentication?,
     private val egressTokenSuppliersByService: EgressTokenSuppliersByService,
     val pid: Pid?,
     val isOnBehalf: Boolean = false
 ) : Authentication {
 
-    fun getEgressAccessToken(service: EgressService): RawJwt {
-        return egressTokenSuppliersByService.value[service]?.get() ?: RawJwt("")
-    }
+    fun getEgressAccessToken(service: EgressService): RawJwt =
+        egressTokenSuppliersByService.value[service]?.get() ?: RawJwt("")
 
-    override fun getName(): String = initialAuth.name
+    override fun getName(): String = initialAuth?.name ?: ""
 
-    override fun getAuthorities(): MutableCollection<out GrantedAuthority> = initialAuth.authorities
+    override fun getAuthorities(): MutableCollection<out GrantedAuthority> = initialAuth?.authorities ?: mutableSetOf()
 
-    override fun getCredentials(): Any = initialAuth.credentials
+    override fun getCredentials(): Any = initialAuth?.credentials ?: ""
 
-    override fun getDetails(): Any = initialAuth.details
+    override fun getDetails(): Any = initialAuth?.details ?: ""
 
-    override fun getPrincipal(): Any = initialAuth.principal
+    override fun getPrincipal(): Any = initialAuth?.principal ?: ""
 
-    override fun isAuthenticated(): Boolean = initialAuth.isAuthenticated
+    override fun isAuthenticated(): Boolean = initialAuth?.isAuthenticated ?: false
 
     override fun setAuthenticated(isAuthenticated: Boolean) {
-        initialAuth.isAuthenticated = isAuthenticated
+        initialAuth?.let { it.isAuthenticated = isAuthenticated }
     }
 }
 

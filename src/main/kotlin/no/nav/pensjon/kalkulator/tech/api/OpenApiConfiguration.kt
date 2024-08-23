@@ -35,6 +35,7 @@ class OpenApiConfiguration {
             .group("current")
             .pathsToMatch(
                 "/api/v6/alderspensjon/simulering",
+                "/api/v1/alderspensjon/anonym-simulering",
                 "/api/v2/pensjonsavtaler",
                 "/api/v1/loepende-omstillingsstoenad-eller-gjenlevendeytelse",
                 "/api/v1/ekskludert",

@@ -75,7 +75,7 @@ class PenSimuleringMapperTest {
         private fun impersonalSpec() =
             ImpersonalSimuleringSpec(
                 simuleringType = SimuleringType.ALDERSPENSJON,
-                epsHarInntektOver2G = true,
+                eps = Eps(harInntektOver2G = true, harPensjon = false),
                 gradertUttak = GradertUttak(
                     grad = Uttaksgrad.AATTI_PROSENT,
                     uttakFomAlder = Alder(67, 1),
@@ -88,12 +88,14 @@ class PenSimuleringMapperTest {
                         tomAlder = Alder(70, 3)
                     )
                 ),
-                utenlandsperiodeListe = listOf(
-                    UtenlandsperiodeSpec(
-                        fom = LocalDate.of(1990, 1, 2),
-                        tom = LocalDate.of(1999, 11, 30),
-                        land = Land.AUS,
-                        arbeidetUtenlands = true
+                utenlandsopphold = Utenlandsopphold(
+                    periodeListe = listOf(
+                        Opphold(
+                            fom = LocalDate.of(1990, 1, 2),
+                            tom = LocalDate.of(1999, 11, 30),
+                            land = Land.AUS,
+                            arbeidet = true
+                        )
                     )
                 )
             )

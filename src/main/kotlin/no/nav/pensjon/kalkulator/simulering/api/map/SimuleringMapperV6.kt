@@ -14,12 +14,18 @@ object SimuleringMapperV6 {
     fun fromIngressSimuleringSpecV6(dto: IngressSimuleringSpecV6) =
         ImpersonalSimuleringSpec(
             simuleringType = dto.simuleringstype,
-            epsHarInntektOver2G = dto.epsHarInntektOver2G,
+            eps = eps(dto),
             forventetAarligInntektFoerUttak = dto.aarligInntektFoerUttakBeloep,
             sivilstand = dto.sivilstand,
             gradertUttak = dto.gradertUttak?.let(::gradertUttak),
             heltUttak = heltUttak(dto.heltUttak),
-            utenlandsperiodeListe = dto.utenlandsperiodeListe.orEmpty().map(::utenlandsperiodeSpec)
+            utenlandsopphold = utenlandsopphold(dto)
+        )
+
+    private fun eps(dto: IngressSimuleringSpecV6) =
+        Eps(
+            harInntektOver2G = dto.epsHarInntektOver2G,
+            harPensjon = false
         )
 
     fun resultatV6(source: Simuleringsresultat) =
@@ -43,12 +49,18 @@ object SimuleringMapperV6 {
             inntekt = dto.aarligInntektVsaPensjon?.let(::inntekt)
         )
 
-    private fun utenlandsperiodeSpec(dto: UtenlandsperiodeSpecV6) =
-        UtenlandsperiodeSpec(
+    private fun utenlandsopphold(dto: IngressSimuleringSpecV6) =
+        Utenlandsopphold(
+            periodeListe = dto.utenlandsperiodeListe.orEmpty().map(::opphold),
+            antallAar = 0 // not relevant when utenlandsperiodeListe used
+        )
+
+    private fun opphold(dto: UtenlandsperiodeSpecV6) =
+        Opphold(
             fom = dto.fom,
             tom = dto.tom,
             land = Land.valueOf(dto.landkode),
-            arbeidetUtenlands = dto.arbeidetUtenlands
+            arbeidet = dto.arbeidetUtenlands
         )
 
     private fun inntekt(dto: IngressSimuleringInntektV6) =

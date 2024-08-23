@@ -136,18 +136,23 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
         )
             .addFilterAfter(impersonalAccessFilter, AuthenticationEnricherFilter::class.java)
 
-        return http
+        return http.csrf { it.disable() }
             .authorizeHttpRequests {
                 it.requestMatchers(
                     HttpMethod.GET,
                     internalRequestMatcher,
-                    "/error",
                     "/api/status",
                     "/api/v1/land-liste",
                     "/api/feature/**",
                     "/swagger-ui/**",
-                    "/v3/api-docs/**"
+                    "/v3/api-docs/**",
+                    "/error"
                 ).permitAll()
+                    .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/v1/alderspensjon/anonym-simulering",
+                        "/error"
+                    ).permitAll()
                     .anyRequest().authenticated()
             }
             .oauth2ResourceServer {

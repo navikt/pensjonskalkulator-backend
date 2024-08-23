@@ -6,8 +6,10 @@ import no.nav.pensjon.kalkulator.simulering.PersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
 import no.nav.pensjon.kalkulator.simulering.Vilkaarsproeving
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
+import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenAnonymSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringEgressSpecDto
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenSimuleringResultDto
+import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenAnonymSimuleringSpecMapper
 import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenSimuleringMapper
 import no.nav.pensjon.kalkulator.tech.selftest.Pingable
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
@@ -31,6 +33,15 @@ class PenSimuleringClient(
             PATH,
             PenSimuleringMapper.toDto(impersonalSpec, personalSpec),
             SimuleringEgressSpecDto::class.java,
+            PenSimuleringResultDto::class.java
+        )?.let(PenSimuleringMapper::fromDto)
+            ?: emptyResult()
+
+    override fun simulerAnonymAlderspensjon(spec: ImpersonalSimuleringSpec) =
+        doPost(
+            PATH,
+            PenAnonymSimuleringSpecMapper.toDto(spec),
+            PenAnonymSimuleringSpec::class.java,
             PenSimuleringResultDto::class.java
         )?.let(PenSimuleringMapper::fromDto)
             ?: emptyResult()

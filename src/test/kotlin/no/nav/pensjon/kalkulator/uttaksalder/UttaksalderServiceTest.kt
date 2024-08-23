@@ -54,11 +54,11 @@ internal class UttaksalderServiceTest {
             aarligInntektFoerUttak = 100_000,
             heltUttak = HeltUttak(Alder(67, 0), null),
             utenlandsperiodeListe = listOf(
-                UtenlandsperiodeSpec(
+                Opphold(
                     fom = LocalDate.of(1990, 1, 2),
                     tom = LocalDate.of(1999, 11, 30),
                     land = Land.AUS,
-                    arbeidetUtenlands = true
+                    arbeidet = true
                 )
             )
         )
@@ -82,11 +82,11 @@ internal class UttaksalderServiceTest {
             aarligInntektFoerUttak = null, // inntekt not specified
             heltUttak = HeltUttak(Alder(67, 0), null),
             utenlandsperiodeListe = listOf(
-                UtenlandsperiodeSpec(
+                Opphold(
                     fom = LocalDate.of(1990, 1, 2),
                     tom = LocalDate.of(1999, 11, 30),
                     land = Land.AUS,
-                    arbeidetUtenlands = true
+                    arbeidet = true
                 )
             )
         )
@@ -109,11 +109,11 @@ internal class UttaksalderServiceTest {
             aarligInntektFoerUttak = 1,
             heltUttak = HeltUttak(Alder(67, 0), null),
             utenlandsperiodeListe = listOf(
-                UtenlandsperiodeSpec(
+                Opphold(
                     fom = LocalDate.of(1990, 1, 2),
                     tom = LocalDate.of(1999, 11, 30),
                     land = Land.AUS,
-                    arbeidetUtenlands = true
+                    arbeidet = true
                 )
             )
         )
@@ -124,20 +124,23 @@ internal class UttaksalderServiceTest {
         val simuleringSpec = ImpersonalSimuleringSpec(
             simuleringType = impersonalSpec.simuleringType,
             sivilstand = Sivilstand.SAMBOER,
-            epsHarInntektOver2G = true, // since samboer
+            eps = Eps(harInntektOver2G = true, harPensjon = false), // since samboer
             forventetAarligInntektFoerUttak = 1,
             gradertUttak = null,
             heltUttak = HeltUttak(
                 uttakFomAlder = Alder(aar = 62, maaneder = 0),
                 inntekt = null
             ),
-            utenlandsperiodeListe = listOf(
-                UtenlandsperiodeSpec(
-                    fom = LocalDate.of(1990, 1, 2),
-                    tom = LocalDate.of(1999, 11, 30),
-                    land = Land.AUS,
-                    arbeidetUtenlands = true
-                )
+            utenlandsopphold = Utenlandsopphold(
+                periodeListe = listOf(
+                    Opphold(
+                        fom = LocalDate.of(1990, 1, 2),
+                        tom = LocalDate.of(1999, 11, 30),
+                        land = Land.AUS,
+                        arbeidet = true
+                    )
+                ),
+                antallAar = null
             )
         )
         verify(simuleringService, times(1)).simulerAlderspensjon(simuleringSpec)
@@ -154,11 +157,11 @@ internal class UttaksalderServiceTest {
             aarligInntektFoerUttak = 1,
             heltUttak = HeltUttak(Alder(67, 0), null),
             utenlandsperiodeListe = listOf(
-                UtenlandsperiodeSpec(
+                Opphold(
                     fom = LocalDate.of(1990, 1, 2),
                     tom = LocalDate.of(1999, 11, 30),
                     land = Land.AUS,
-                    arbeidetUtenlands = true
+                    arbeidet = true
                 )
             )
         )
@@ -169,20 +172,26 @@ internal class UttaksalderServiceTest {
         val simuleringSpec = ImpersonalSimuleringSpec(
             simuleringType = impersonalSpec.simuleringType,
             sivilstand = Sivilstand.REGISTRERT_PARTNER,
-            epsHarInntektOver2G = true, // since specified sivilstand is 'registrert partner'
+            eps = Eps(
+                harInntektOver2G = true, // since specified sivilstand is 'registrert partner'
+                harPensjon = false
+            ),
             forventetAarligInntektFoerUttak = 1,
             gradertUttak = null,
             heltUttak = HeltUttak(
                 uttakFomAlder = Alder(aar = 62, maaneder = 0),
                 inntekt = null
             ),
-            utenlandsperiodeListe = listOf(
-                UtenlandsperiodeSpec(
-                    fom = LocalDate.of(1990, 1, 2),
-                    tom = LocalDate.of(1999, 11, 30),
-                    land = Land.AUS,
-                    arbeidetUtenlands = true
-                )
+            utenlandsopphold = Utenlandsopphold(
+                periodeListe = listOf(
+                    Opphold(
+                        fom = LocalDate.of(1990, 1, 2),
+                        tom = LocalDate.of(1999, 11, 30),
+                        land = Land.AUS,
+                        arbeidet = true
+                    )
+                ),
+                antallAar = null
             )
         )
         verify(simuleringService, times(1)).simulerAlderspensjon(simuleringSpec)
@@ -200,11 +209,11 @@ internal class UttaksalderServiceTest {
             aarligInntektFoerUttak = null,
             heltUttak = HeltUttak(Alder(67, 0), null),
             utenlandsperiodeListe = listOf(
-                UtenlandsperiodeSpec(
+                Opphold(
                     fom = LocalDate.of(1990, 1, 2),
                     tom = LocalDate.of(1999, 11, 30),
                     land = Land.AUS,
-                    arbeidetUtenlands = true
+                    arbeidet = true
                 )
             )
         )
@@ -215,20 +224,23 @@ internal class UttaksalderServiceTest {
         val simuleringSpec = ImpersonalSimuleringSpec(
             simuleringType = impersonalSpec.simuleringType,
             sivilstand = Sivilstand.GIFT,
-            epsHarInntektOver2G = false, // not overridden (despite sivilstand 'gift')
+            eps = Eps(harInntektOver2G = false, harPensjon = false), // not overridden (despite sivilstand 'gift')
             forventetAarligInntektFoerUttak = 543210,
             gradertUttak = null,
             heltUttak = HeltUttak(
                 uttakFomAlder = Alder(aar = 62, maaneder = 0),
                 inntekt = null
             ),
-            utenlandsperiodeListe = listOf(
-                UtenlandsperiodeSpec(
-                    fom = LocalDate.of(1990, 1, 2),
-                    tom = LocalDate.of(1999, 11, 30),
-                    land = Land.AUS,
-                    arbeidetUtenlands = true
-                )
+            utenlandsopphold = Utenlandsopphold(
+                periodeListe = listOf(
+                    Opphold(
+                        fom = LocalDate.of(1990, 1, 2),
+                        tom = LocalDate.of(1999, 11, 30),
+                        land = Land.AUS,
+                        arbeidet = true
+                    )
+                ),
+                antallAar = null
             )
         )
         verify(simuleringService, times(1)).simulerAlderspensjon(simuleringSpec)
@@ -245,7 +257,7 @@ internal class UttaksalderServiceTest {
                 ImpersonalSimuleringSpec(
                     simuleringType = spec.simuleringType,
                     sivilstand = person?.sivilstand ?: spec.sivilstand,
-                    epsHarInntektOver2G = epsHarInntektOver2G,
+                    eps = Eps(harInntektOver2G = epsHarInntektOver2G, harPensjon = false),
                     forventetAarligInntektFoerUttak = spec.aarligInntektFoerUttak
                         ?: (angittInntekt ?: inntekt).beloep.intValueExact(),
                     gradertUttak = null,
@@ -253,13 +265,16 @@ internal class UttaksalderServiceTest {
                         uttakFomAlder = Alder(aar = 62, maaneder = 0),
                         inntekt = null
                     ),
-                    utenlandsperiodeListe = listOf(
-                        UtenlandsperiodeSpec(
-                            fom = LocalDate.of(1990, 1, 2),
-                            tom = LocalDate.of(1999, 11, 30),
-                            land = Land.AUS,
-                            arbeidetUtenlands = true
-                        )
+                    utenlandsopphold = Utenlandsopphold(
+                        periodeListe = listOf(
+                            Opphold(
+                                fom = LocalDate.of(1990, 1, 2),
+                                tom = LocalDate.of(1999, 11, 30),
+                                land = Land.AUS,
+                                arbeidet = true
+                            )
+                        ),
+                        antallAar = null
                     )
                 )
             )

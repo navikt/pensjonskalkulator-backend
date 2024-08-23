@@ -6,7 +6,7 @@ import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
-import no.nav.pensjon.kalkulator.simulering.UtenlandsperiodeSpec
+import no.nav.pensjon.kalkulator.simulering.Opphold
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenUtenlandsperiodeSpec
 import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.PersonalUttaksalderSpec
@@ -38,11 +38,11 @@ class PenUttaksalderSpecMapperTest {
                 )
             ),
             utenlandsperiodeListe = listOf(
-                UtenlandsperiodeSpec(
+                Opphold(
                     fom = LocalDate.of(1990, 1, 2),
                     tom = LocalDate.of(1999, 11, 30),
                     land = Land.AUS,
-                    arbeidetUtenlands = true
+                    arbeidet = true
                 )
             )
         )
@@ -95,11 +95,11 @@ class PenUttaksalderSpecMapperTest {
             gradertUttak = null,
             heltUttak = null, // not specified
             utenlandsperiodeListe = listOf(
-                UtenlandsperiodeSpec(
+                Opphold(
                     fom = LocalDate.of(1990, 1, 2),
                     tom = LocalDate.of(1999, 11, 30),
                     land = Land.AUS,
-                    arbeidetUtenlands = true
+                    arbeidet = true
                 )
             )
         )
@@ -155,11 +155,11 @@ class PenUttaksalderSpecMapperTest {
                 inntekt = null // undefined
             ),
             utenlandsperiodeListe = listOf(
-                UtenlandsperiodeSpec(
+                Opphold(
                     fom = LocalDate.of(1990, 1, 2),
                     tom = LocalDate.of(1999, 11, 30),
                     land = Land.AUS,
-                    arbeidetUtenlands = true
+                    arbeidet = true
                 )
             )
         )

@@ -8,7 +8,7 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
-import no.nav.pensjon.kalkulator.simulering.UtenlandsperiodeSpec
+import no.nav.pensjon.kalkulator.simulering.Opphold
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
@@ -119,11 +119,11 @@ class PenUttaksalderClientTest : WebClientTest() {
                     uttakFomAlder = Alder(aar = 67, maaneder = 0),
                     inntekt = null),
                 utenlandsperiodeListe = listOf(
-                    UtenlandsperiodeSpec(
+                    Opphold(
                         fom = LocalDate.of(1990, 1, 2),
                         tom = LocalDate.of(1999, 11, 30),
                         land = Land.AUS,
-                        arbeidetUtenlands = true
+                        arbeidet = true
                     )
                 )
             )

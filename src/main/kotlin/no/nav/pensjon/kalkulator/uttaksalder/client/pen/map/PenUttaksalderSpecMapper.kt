@@ -6,7 +6,7 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.general.Inntekt
 import no.nav.pensjon.kalkulator.general.UttaksalderGradertUttak
-import no.nav.pensjon.kalkulator.simulering.UtenlandsperiodeSpec
+import no.nav.pensjon.kalkulator.simulering.Opphold
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenUtenlandsperiodeSpec
 import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenSimuleringType
 import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
@@ -65,11 +65,11 @@ object PenUttaksalderSpecMapper {
             tomAlder = alderSpec(inntekt.tomAlder)
         )
 
-    private fun utenlandsperiodeSpec(dto: UtenlandsperiodeSpec) =
+    private fun utenlandsperiodeSpec(dto: Opphold) =
         PenUtenlandsperiodeSpec(
             fom = dto.fom,
             tom = dto.tom,
             land = dto.land.name,
-            arbeidetUtenlands = dto.arbeidetUtenlands
+            arbeidetUtenlands = dto.arbeidet
         )
 }

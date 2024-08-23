@@ -13,16 +13,31 @@ import java.time.LocalDate
 data class ImpersonalSimuleringSpec(
     val simuleringType: SimuleringType,
     val sivilstand: Sivilstand? = null,
-    val epsHarInntektOver2G: Boolean,
+    val eps: Eps,
     val forventetAarligInntektFoerUttak: Int? = null,
     val gradertUttak: GradertUttak? = null,
     val heltUttak: HeltUttak,
-    val utenlandsperiodeListe: List<UtenlandsperiodeSpec>
+    val utenlandsopphold: Utenlandsopphold,
+
+    // For 'anonym simulering' only:
+    val foedselAar: Int? = null,
+    val inntektOver1GAntallAar: Int? = 0
 )
 
-data class UtenlandsperiodeSpec (
+// Ektefelle/partner/samboer
+data class Eps (
+    val harInntektOver2G: Boolean,
+    val harPensjon: Boolean
+)
+
+data class Utenlandsopphold (
+    val periodeListe: List<Opphold>,
+    val antallAar: Int? = 0
+)
+
+data class Opphold (
     val fom: LocalDate,
     val tom: LocalDate?,
     val land: Land,
-    val arbeidetUtenlands: Boolean
+    val arbeidet: Boolean
 )

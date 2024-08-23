@@ -4,7 +4,7 @@ import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.general.UttaksalderGradertUttak
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
-import no.nav.pensjon.kalkulator.simulering.UtenlandsperiodeSpec
+import no.nav.pensjon.kalkulator.simulering.Opphold
 
 /**
  * Specifies impersonal parameters for finding første mulige uttaksalder.
@@ -17,5 +17,5 @@ data class ImpersonalUttaksalderSpec(
     val aarligInntektFoerUttak: Int? = null,
     val gradertUttak: UttaksalderGradertUttak? = null,
     val heltUttak: HeltUttak?,
-    val utenlandsperiodeListe: List<UtenlandsperiodeSpec>
+    val utenlandsperiodeListe: List<Opphold>
 )

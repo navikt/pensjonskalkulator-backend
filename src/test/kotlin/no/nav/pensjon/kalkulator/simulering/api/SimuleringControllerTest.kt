@@ -37,6 +37,9 @@ class SimuleringControllerTest {
     private lateinit var simuleringService: SimuleringService
 
     @MockBean
+    private lateinit var anonymSimuleringService: AnonymSimuleringService
+
+    @MockBean
     private lateinit var traceAid: TraceAid
 
     @MockBean
@@ -173,19 +176,21 @@ class SimuleringControllerTest {
         private fun impersonalHeltUttakSpec(simuleringType: SimuleringType) =
             ImpersonalSimuleringSpec(
                 simuleringType = simuleringType,
-                epsHarInntektOver2G = false,
+                eps = Eps(harInntektOver2G = false, harPensjon = false),
                 forventetAarligInntektFoerUttak = 100_000,
                 sivilstand = Sivilstand.UGIFT,
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(67, 1),
                     inntekt = Inntekt(50_000, Alder(75, 0))
                 ),
-                utenlandsperiodeListe = listOf(
-                    UtenlandsperiodeSpec(
-                        fom = LocalDate.of(1990, 1, 2),
-                        tom = LocalDate.of(1999, 11, 30),
-                        land = Land.AUS,
-                        arbeidetUtenlands = true
+                utenlandsopphold = Utenlandsopphold(
+                    periodeListe = listOf(
+                        Opphold(
+                            fom = LocalDate.of(1990, 1, 2),
+                            tom = LocalDate.of(1999, 11, 30),
+                            land = Land.AUS,
+                            arbeidet = true
+                        )
                     )
                 )
             )
@@ -193,7 +198,7 @@ class SimuleringControllerTest {
         private fun impersonalGradertUttakSpec() =
             ImpersonalSimuleringSpec(
                 simuleringType = SimuleringType.ALDERSPENSJON,
-                epsHarInntektOver2G = true,
+                eps = Eps(harInntektOver2G = true, harPensjon = false),
                 forventetAarligInntektFoerUttak = 100_000,
                 sivilstand = Sivilstand.SAMBOER,
                 gradertUttak = GradertUttak(
@@ -205,7 +210,7 @@ class SimuleringControllerTest {
                     uttakFomAlder = Alder(67, 1),
                     inntekt = Inntekt(50_000, Alder(75, 0))
                 ),
-                utenlandsperiodeListe = emptyList()
+                utenlandsopphold = Utenlandsopphold(periodeListe = emptyList())
             )
 
         @Language("json")

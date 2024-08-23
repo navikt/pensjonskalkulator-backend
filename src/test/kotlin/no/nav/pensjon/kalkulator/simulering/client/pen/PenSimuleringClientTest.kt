@@ -51,7 +51,8 @@ class PenSimuleringClientTest : WebClientTest() {
     fun `simulerAlderspensjon der responsen har alternativ NAU-beregning`() {
         arrange(alternativPensjonResponse())
 
-        val response: Simuleringsresultat = client.simulerAlderspensjon(impersonalSpec(), personalSpec(Sivilstand.ENKE_ELLER_ENKEMANN))
+        val response: Simuleringsresultat =
+            client.simulerAlderspensjon(impersonalSpec(), personalSpec(Sivilstand.ENKE_ELLER_ENKEMANN))
 
         with(response.alderspensjon) {
             assertEquals(15, size)
@@ -79,7 +80,8 @@ class PenSimuleringClientTest : WebClientTest() {
     @Test
     fun `simulerAlderspensjon med Afp offentlig sends request body with correct simuleringType`() {
         arrange(pensjonMedAfpOffentligResponse())
-        val response: Simuleringsresultat = client.simulerAlderspensjon(impersonalGradertUttakSpec(), personalSpec(Sivilstand.UGIFT))
+        val response: Simuleringsresultat =
+            client.simulerAlderspensjon(impersonalGradertUttakSpec(), personalSpec(Sivilstand.UGIFT))
 
         assertEquals(0, response.afpPrivat.size)
         with(response.afpOffentlig) {
@@ -302,18 +304,20 @@ class PenSimuleringClientTest : WebClientTest() {
             ImpersonalSimuleringSpec(
                 simuleringType = SimuleringType.ALDERSPENSJON,
                 sivilstand = null,
-                epsHarInntektOver2G = true,
+                eps = Eps(harInntektOver2G = true, harPensjon = false),
                 forventetAarligInntektFoerUttak = null,
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(aar = 67, maaneder = 1),
                     inntekt = null
                 ),
-                utenlandsperiodeListe = listOf(
-                    UtenlandsperiodeSpec(
-                        fom = LocalDate.of(1990, 1, 2),
-                        tom = LocalDate.of(1999, 11, 30),
-                        land = Land.AUS,
-                        arbeidetUtenlands = true
+                utenlandsopphold = Utenlandsopphold(
+                    periodeListe = listOf(
+                        Opphold(
+                            fom = LocalDate.of(1990, 1, 2),
+                            tom = LocalDate.of(1999, 11, 30),
+                            land = Land.AUS,
+                            arbeidet = true
+                        )
                     )
                 )
             )
@@ -322,7 +326,7 @@ class PenSimuleringClientTest : WebClientTest() {
             ImpersonalSimuleringSpec(
                 simuleringType = SimuleringType.ALDERSPENSJON,
                 sivilstand = null,
-                epsHarInntektOver2G = true,
+                eps = Eps(harInntektOver2G = true, harPensjon = false),
                 forventetAarligInntektFoerUttak = null,
                 gradertUttak = GradertUttak(
                     grad = Uttaksgrad.FEMTI_PROSENT,
@@ -333,12 +337,14 @@ class PenSimuleringClientTest : WebClientTest() {
                     uttakFomAlder = Alder(aar = 67, maaneder = 1),
                     inntekt = null
                 ),
-                utenlandsperiodeListe = listOf(
-                    UtenlandsperiodeSpec(
-                        fom = LocalDate.of(1990, 1, 2),
-                        tom = LocalDate.of(1999, 11, 30),
-                        land = Land.AUS,
-                        arbeidetUtenlands = true
+                utenlandsopphold = Utenlandsopphold(
+                    periodeListe = listOf(
+                        Opphold(
+                            fom = LocalDate.of(1990, 1, 2),
+                            tom = LocalDate.of(1999, 11, 30),
+                            land = Land.AUS,
+                            arbeidet = true
+                        )
                     )
                 )
             )

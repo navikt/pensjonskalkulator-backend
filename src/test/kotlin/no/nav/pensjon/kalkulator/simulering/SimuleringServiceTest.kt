@@ -92,18 +92,20 @@ class SimuleringServiceTest {
             ImpersonalSimuleringSpec(
                 simuleringType = SimuleringType.ALDERSPENSJON,
                 sivilstand = sivilstand,
-                epsHarInntektOver2G = false,
+                eps = Eps(harInntektOver2G = false, harPensjon = false),
                 forventetAarligInntektFoerUttak = forventetInntekt,
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(67, 1),
                     inntekt = null
                 ),
-                utenlandsperiodeListe = listOf(
-                    UtenlandsperiodeSpec(
-                        fom = LocalDate.of(1990, 1, 2),
-                        tom = LocalDate.of(1999, 11, 30),
-                        land = Land.AUS,
-                        arbeidetUtenlands = true
+                utenlandsopphold = Utenlandsopphold(
+                    periodeListe = listOf(
+                        Opphold(
+                            fom = LocalDate.of(1990, 1, 2),
+                            tom = LocalDate.of(1999, 11, 30),
+                            land = Land.AUS,
+                            arbeidet = true
+                        )
                     )
                 )
             )

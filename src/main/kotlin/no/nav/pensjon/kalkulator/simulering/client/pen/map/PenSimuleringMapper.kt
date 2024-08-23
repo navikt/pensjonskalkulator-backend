@@ -27,13 +27,13 @@ object PenSimuleringMapper {
             simuleringstype = PenSimuleringType.fromInternalValue(impersonalSpec.simuleringType).externalValue,
             pid = personalSpec.pid.value,
             sivilstand = PenSivilstand.fromInternalValue(personalSpec.sivilstand).externalValue,
-            epsHarInntektOver2G = impersonalSpec.epsHarInntektOver2G,
+            epsHarInntektOver2G = impersonalSpec.eps.harInntektOver2G,
             epsHarPensjon = false, // NB: Ikke-støttet verdi
             sisteInntekt = personalSpec.aarligInntektFoerUttak,
             uttaksar = 1,
             gradertUttak = impersonalSpec.gradertUttak?.let(::gradertUttakSpecDto),
             heltUttak = heltUttakSpecDto(impersonalSpec.heltUttak),
-            utenlandsperiodeListe = impersonalSpec.utenlandsperiodeListe.map(::utenlandsperiodeSpec)
+            utenlandsperiodeListe = impersonalSpec.utenlandsopphold.periodeListe.map(::utenlandsperiodeSpec)
         )
 
     private fun alderspensjon(dto: PenPensjonDto) = SimulertAlderspensjon(dto.alder, dto.beloep)
@@ -71,12 +71,12 @@ object PenSimuleringMapper {
             inntektTomAlder = uttak.inntekt?.let { alderSpecDto(it.tomAlder) } ?: alderSpecDto(uttak.uttakFomAlder)
         )
 
-    private fun utenlandsperiodeSpec(dto: UtenlandsperiodeSpec) =
+    private fun utenlandsperiodeSpec(dto: Opphold) =
         PenUtenlandsperiodeSpec(
             fom = dto.fom,
             tom = dto.tom,
             land = dto.land.name,
-            arbeidetUtenlands = dto.arbeidetUtenlands
+            arbeidetUtenlands = dto.arbeidet
         )
 
     private fun alderSpecDto(alder: Alder) = AlderSpecDto(alder.aar, alder.maaneder)
