@@ -45,7 +45,8 @@ enum class Land(val erAvtaleland: Boolean, val bokmaalNavn: String, val engelskN
     BGR(true, "Bulgaria", "Bulgaria"),
     BFA(false, "Burkina Faso", "Burkina Faso"),
     BDI(false, "Burundi", "Burundi"),
-    CAN(true, "Canada", "Canada"),
+    CAN(true, "Canada (utenom Quebec)", "Canada (except Quebec)"),
+    QEB(true, "Canada (Quebec)", "Canada (Quebec)"), // provinsen Quebec har egen trygdeavtale med Norge
     CYM(false, "Caymanøyene", "Cayman Islands"),
     CHL(true, "Chile", "Chile"),
     CXR(false, "Christmasøya", "Christmas Island"),
@@ -190,7 +191,6 @@ enum class Land(val erAvtaleland: Boolean, val bokmaalNavn: String, val engelskN
     PRT(true, "Portugal", "Portugal"),
     PRI(false, "Puerto Rico", "Puerto Rico"),
     QAT(false, "Qatar", "Qatar"),
-    QEB(true, "Quebec", "Quebec"), // NB: Ikke et land, men provins i Canada; Quebec har trygdeavtale med Norge
     REU(true, "Réunion", "Réunion"),
     ROU(true, "Romania", "Romania"),
     RUS(false, "Russland", "Russia"),
