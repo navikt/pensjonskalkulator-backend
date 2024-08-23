@@ -6,12 +6,12 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.2</version>
+        <version>3.3.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>no.nav.pensjon</groupId>
     <artifactId>pensjonskalkulator-backend</artifactId>
-    <version>1.3.0</version>
+    <version>1.4.0</version>
     <name>pensjonskalkulator-backend</name>
     <description>Backend for pensjonskalkulator for brukere født 1963 eller senere</description>
     <packaging>jar</packaging>
@@ -22,7 +22,7 @@
         <maven.compiler.target>21</maven.compiler.target>
         <kotlin.code.style>official</kotlin.code.style>
         <kotlin.compiler.jvmTarget>21</kotlin.compiler.jvmTarget>
-        <kotlin.version>2.0.10</kotlin.version>
+        <kotlin.version>2.0.20</kotlin.version>
         <logback.version>1.5.6</logback.version>
         <okhttp3.version>4.12.0</okhttp3.version>
     </properties>
@@ -208,7 +208,7 @@
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
-            <version>3.3.1</version>
+            <version>3.4.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.guava</groupId>
