@@ -6,9 +6,11 @@ import no.nav.pensjon.kalkulator.simulering.PersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
 import no.nav.pensjon.kalkulator.simulering.Vilkaarsproeving
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
+import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenAnonymSimuleringResult
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenAnonymSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringEgressSpecDto
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenSimuleringResultDto
+import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenAnonymSimuleringResultMapper
 import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenAnonymSimuleringSpecMapper
 import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenSimuleringMapper
 import no.nav.pensjon.kalkulator.tech.selftest.Pingable
@@ -42,9 +44,9 @@ class PenSimuleringClient(
             path = ANONYM_PATH,
             requestBody = PenAnonymSimuleringSpecMapper.toDto(spec),
             requestClass = PenAnonymSimuleringSpec::class.java,
-            responseClass = PenSimuleringResultDto::class.java,
+            responseClass = PenAnonymSimuleringResult::class.java,
             deprecatedBasePath = true
-        )?.let(PenSimuleringMapper::fromDto)
+        )?.let(PenAnonymSimuleringResultMapper::fromDto)
             ?: emptyResult()
 
     private companion object {

@@ -7,8 +7,8 @@ import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenAnonymAlderSpec
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenAnonymSimuleringSpec
+import no.nav.pensjon.kalkulator.tech.time.DateUtil.toEpoch
 import java.time.LocalDate
-
 
 object PenAnonymSimuleringSpecMapper {
 
@@ -39,10 +39,10 @@ object PenAnonymSimuleringSpecMapper {
             utenlandsopphold = spec.utenlandsopphold.antallAar ?: 0,
             antArInntektOverG = spec.inntektOver1GAntallAar ?: 0,
             forventetInntekt = spec.forventetAarligInntektFoerUttak ?: 0,
-            forsteUttakDato = gradertUttakFom ?: heltUttakFom,
+            forsteUttakDato = toEpoch(gradertUttakFom ?: heltUttakFom),
             utg = uttaksgrad.let { PenUttaksgrad.fromInternalValue(it).externalValue },
             inntektUnderGradertUttak = spec.gradertUttak?.aarligInntekt,
-            heltUttakDato = heltUttakFom,
+            heltUttakDato = toEpoch(heltUttakFom),
             inntektEtterHeltUttak = spec.heltUttak.inntekt.aarligBeloep,
             antallArInntektEtterHeltUttak = inntektTom.year - heltUttakFom.year
         )

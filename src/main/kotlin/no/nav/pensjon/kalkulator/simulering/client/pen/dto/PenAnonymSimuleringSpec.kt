@@ -1,7 +1,5 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen.dto
 
-import java.time.LocalDate
-
 // Corresponds to SimuleringEtter2011 in PEN
 data class PenAnonymSimuleringSpec (
     val simuleringType: String, // SimuleringTypeCode in PEN
@@ -12,10 +10,10 @@ data class PenAnonymSimuleringSpec (
     val utenlandsopphold: Int,
     val antArInntektOverG: Int,
     val forventetInntekt: Int,
-    val forsteUttakDato: LocalDate,
+    val forsteUttakDato: Long, // epoch
     val utg: String, // UttaksgradCode in PEN
     val inntektUnderGradertUttak: Int? = null,
-    val heltUttakDato: LocalDate? = null,
+    val heltUttakDato: Long? = null, // epoch
     val inntektEtterHeltUttak: Int,
     val antallArInntektEtterHeltUttak: Int
 )
