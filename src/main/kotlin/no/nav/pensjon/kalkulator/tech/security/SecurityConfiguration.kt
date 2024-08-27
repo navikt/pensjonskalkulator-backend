@@ -32,7 +32,6 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler
 import org.springframework.util.StringUtils.hasLength
 
-
 @Configuration
 @EnableWebSecurity
 class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtractor) {
@@ -147,6 +146,7 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
                 it.requestMatchers(
                     HttpMethod.GET,
                     internalRequestMatcher,
+                    "/api/csrf",
                     "/api/status",
                     "/api/v1/land-liste",
                     "/api/feature/**",
