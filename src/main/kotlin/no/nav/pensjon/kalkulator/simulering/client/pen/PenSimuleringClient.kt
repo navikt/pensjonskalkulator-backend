@@ -39,15 +39,17 @@ class PenSimuleringClient(
 
     override fun simulerAnonymAlderspensjon(spec: ImpersonalSimuleringSpec) =
         doPost(
-            PATH,
-            PenAnonymSimuleringSpecMapper.toDto(spec),
-            PenAnonymSimuleringSpec::class.java,
-            PenSimuleringResultDto::class.java
+            path = ANONYM_PATH,
+            requestBody = PenAnonymSimuleringSpecMapper.toDto(spec),
+            requestClass = PenAnonymSimuleringSpec::class.java,
+            responseClass = PenSimuleringResultDto::class.java,
+            deprecatedBasePath = true
         )?.let(PenSimuleringMapper::fromDto)
             ?: emptyResult()
 
     private companion object {
         private const val PATH = "simulering/alderspensjon"
+        private const val ANONYM_PATH = "simulering/fleksibelap"
 
         private fun emptyResult() =
             Simuleringsresultat(
