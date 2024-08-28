@@ -4,19 +4,17 @@ import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.avtale.InntektSpec
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.UttaksperiodeSpec
-import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleAlderSpecV2
-import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleInntektSpecV2
-import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleSpecV2
-import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleUttaksperiodeSpecV2
+import no.nav.pensjon.kalkulator.avtale.api.dto.*
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class PensjonsavtaleSpecMapperV2Test {
 
     @Test
-    fun `fromDtoV2 maps version 2 of data transfer object to domain object (pensjonsavtale specification)`() {
+    fun `'fromDtoV2' maps version 2 of data transfer object to domain object (pensjonsavtale specification)`() {
         PensjonsavtaleSpecMapperV2.fromDtoV2(
             PensjonsavtaleSpecV2(
                 aarligInntektFoerUttakBeloep = 234000,
@@ -34,7 +32,8 @@ class PensjonsavtaleSpecMapperV2Test {
                 harEpsPensjon = true,
                 harEpsPensjonsgivendeInntektOver2G = true,
                 antallAarIUtlandetEtter16 = 5,
-                sivilstand = Sivilstand.SEPARERT_PARTNER
+                utenlandsperioder = null,
+                sivilstand = PensjonsavtaleSivilstandSpecV2.SEPARERT_PARTNER
             )
         ) shouldBe
                 PensjonsavtaleSpec(
@@ -53,6 +52,35 @@ class PensjonsavtaleSpecMapperV2Test {
                     harEpsPensjonsgivendeInntektOver2G = true,
                     antallAarIUtlandetEtter16 = 5,
                     sivilstand = Sivilstand.SEPARERT_PARTNER
+                )
+    }
+
+    @Test
+    fun `'fromDtoV2' maps utenlandsperioder to aar`() {
+        PensjonsavtaleSpecMapperV2.fromDtoV2(
+            PensjonsavtaleSpecV2(
+                aarligInntektFoerUttakBeloep = -1,
+                uttaksperioder = emptyList(),
+                antallAarIUtlandetEtter16 = null,
+                utenlandsperioder = listOf(
+                    PensjonsavtaleOppholdSpecV2(
+                        fom = LocalDate.of(2020, 1, 1),
+                        tom = LocalDate.of(2023, 12, 31) // => 4 år
+                    ),
+                    PensjonsavtaleOppholdSpecV2(
+                        fom = LocalDate.of(2024, 6, 1),
+                        tom = LocalDate.of(2025, 11, 30) // => 1 år
+                    )
+                )
+            )
+        ) shouldBe
+                PensjonsavtaleSpec(
+                    aarligInntektFoerUttak = -1,
+                    uttaksperioder = emptyList(),
+                    harEpsPensjon = null,
+                    harEpsPensjonsgivendeInntektOver2G = null,
+                    antallAarIUtlandetEtter16 = 5,
+                    sivilstand = null
                 )
     }
 }
