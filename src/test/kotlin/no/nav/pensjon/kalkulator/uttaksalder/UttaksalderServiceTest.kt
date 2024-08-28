@@ -278,7 +278,15 @@ internal class UttaksalderServiceTest {
                     )
                 )
             )
-        ).thenReturn(Simuleringsresultat(emptyList(), emptyList(), emptyList(), Vilkaarsproeving(true, null)))
+        ).thenReturn(
+            SimuleringResult(
+                alderspensjon = emptyList(),
+                afpPrivat = emptyList(),
+                afpOffentlig = emptyList(),
+                vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
+                harForLiteTrygdetid = false
+            )
+        )
     }
 
     private companion object {

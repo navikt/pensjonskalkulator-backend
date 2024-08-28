@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class AnonymSimuleringService(private val simuleringClient: SimuleringClient) {
-    fun simulerAlderspensjon(spec: ImpersonalSimuleringSpec): Simuleringsresultat {
+    fun simulerAlderspensjon(spec: ImpersonalSimuleringSpec): SimuleringResult {
         return simuleringClient.simulerAnonymAlderspensjon(spec)
     }
 }

@@ -47,7 +47,7 @@ class SimuleringServiceTest {
     @Test
     fun `simulerAlderspensjon uses specified inntekt and sivilstand`() {
         val incomingSpec = impersonalSimuleringSpec(REGISTRERT_INNTEKT, Sivilstand.UOPPGITT)
-        `when`(simuleringClient.simulerAlderspensjon(incomingSpec, personalSpec)).thenReturn(simuleringsresultat)
+        `when`(simuleringClient.simulerAlderspensjon(incomingSpec, personalSpec)).thenReturn(simuleringResult)
 
         val response = service.simulerAlderspensjon(incomingSpec)
 
@@ -60,7 +60,7 @@ class SimuleringServiceTest {
         val incomingSpec = impersonalSimuleringSpec(null, null)
         `when`(inntektService.sistePensjonsgivendeInntekt()).thenReturn(inntekt)
         `when`(personClient.fetchPerson(pid, fetchFulltNavn = false)).thenReturn(person())
-        `when`(simuleringClient.simulerAlderspensjon(incomingSpec, personalSpec)).thenReturn(simuleringsresultat)
+        `when`(simuleringClient.simulerAlderspensjon(incomingSpec, personalSpec)).thenReturn(simuleringResult)
 
         val response = service.simulerAlderspensjon(incomingSpec)
 
@@ -80,12 +80,13 @@ class SimuleringServiceTest {
             beloep = REGISTRERT_INNTEKT.toBigDecimal()
         )
 
-        private val simuleringsresultat =
-            Simuleringsresultat(
+        private val simuleringResult =
+            SimuleringResult(
                 alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
                 afpPrivat = emptyList(),
                 afpOffentlig = emptyList(),
-                vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null)
+                vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
+                harForLiteTrygdetid = false
             )
 
         private fun impersonalSimuleringSpec(forventetInntekt: Int?, sivilstand: Sivilstand?) =

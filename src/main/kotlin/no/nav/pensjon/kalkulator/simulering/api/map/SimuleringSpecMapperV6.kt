@@ -9,7 +9,7 @@ import no.nav.pensjon.kalkulator.simulering.api.dto.*
  * Maps between data transfer objects (DTOs) and domain objects related to simulering.
  * The DTOs are specified by version 6 of the API offered to clients.
  */
-object SimuleringMapperV6 {
+object SimuleringSpecMapperV6 {
 
     fun fromIngressSimuleringSpecV6(dto: IngressSimuleringSpecV6) =
         ImpersonalSimuleringSpec(
@@ -26,14 +26,6 @@ object SimuleringMapperV6 {
         Eps(
             harInntektOver2G = dto.epsHarInntektOver2G,
             harPensjon = false
-        )
-
-    fun resultatV6(source: Simuleringsresultat) =
-        SimuleringResultatV6(
-            alderspensjon = source.alderspensjon.map { PensjonsberegningV6(it.alder, it.beloep) },
-            afpPrivat = source.afpPrivat.map { PensjonsberegningV6(it.alder, it.beloep) },
-            afpOffentlig = source.afpOffentlig.map { PensjonsberegningAfpOffentligV6(it.alder, it.beloep) },
-            vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving)
         )
 
     private fun gradertUttak(dto: IngressSimuleringGradertUttakV6) =
@@ -70,24 +62,4 @@ object SimuleringMapperV6 {
         )
 
     private fun alder(dto: IngressSimuleringAlderV6) = Alder(dto.aar, dto.maaneder)
-
-    private fun vilkaarsproeving(source: Vilkaarsproeving) =
-        VilkaarsproevingV6(
-            vilkaarErOppfylt = source.innvilget,
-            alternativ = source.alternativ?.let(::alternativ)
-        )
-
-    private fun alternativ(source: Alternativ) =
-        AlternativV6(
-            gradertUttaksalder = source.gradertUttakAlder?.let(::alder),
-            uttaksgrad = prosentsats(source.uttakGrad),
-            heltUttaksalder = alder(source.heltUttakAlder)
-        )
-
-    private fun prosentsats(grad: Uttaksgrad?): Int? =
-        grad?.let {
-            if (it == Uttaksgrad.HUNDRE_PROSENT) null else it.prosentsats
-        }
-
-    private fun alder(source: Alder) = AlderV6(source.aar, source.maaneder)
 }

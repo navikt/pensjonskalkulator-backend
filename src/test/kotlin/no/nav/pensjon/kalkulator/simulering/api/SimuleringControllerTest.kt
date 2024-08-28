@@ -260,25 +260,28 @@ class SimuleringControllerTest {
 
         private fun simuleringsresultat(simuleringType: SimuleringType) =
             when (simuleringType) {
-                SimuleringType.ALDERSPENSJON -> Simuleringsresultat(
+                SimuleringType.ALDERSPENSJON -> SimuleringResult(
                     alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
                     afpPrivat = emptyList(),
                     afpOffentlig = emptyList(),
-                    vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null)
+                    vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
+                    harForLiteTrygdetid = false
                 )
 
-                SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT -> Simuleringsresultat(
+                SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT -> SimuleringResult(
                     alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
                     afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 22056)),
                     afpOffentlig = emptyList(),
-                    vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null)
+                    vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
+                    harForLiteTrygdetid = false
                 )
 
-                SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG -> Simuleringsresultat(
+                SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG -> SimuleringResult(
                     alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
                     afpPrivat = emptyList(),
                     afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 22056)),
-                    vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null)
+                    vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
+                    harForLiteTrygdetid = false
                 )
             }
 

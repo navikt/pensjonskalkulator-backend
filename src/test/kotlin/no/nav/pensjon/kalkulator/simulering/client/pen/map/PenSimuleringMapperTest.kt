@@ -40,7 +40,7 @@ class PenSimuleringMapperTest {
 
     @Test
     fun `fromDto maps PEN-specific data transfer object to domain object`() {
-        val resultat: Simuleringsresultat = PenSimuleringMapper.fromDto(
+        val resultat: SimuleringResult = PenSimuleringMapper.fromDto(
             PenSimuleringResultDto(
                 alderspensjon = emptyList(),
                 afpPrivat = emptyList(),

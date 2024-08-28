@@ -51,7 +51,7 @@ class PenSimuleringClientTest : WebClientTest() {
     fun `simulerAlderspensjon der responsen har alternativ NAU-beregning`() {
         arrange(alternativPensjonResponse())
 
-        val response: Simuleringsresultat =
+        val response: SimuleringResult =
             client.simulerAlderspensjon(impersonalSpec(), personalSpec(Sivilstand.ENKE_ELLER_ENKEMANN))
 
         with(response.alderspensjon) {
@@ -80,7 +80,7 @@ class PenSimuleringClientTest : WebClientTest() {
     @Test
     fun `simulerAlderspensjon med Afp offentlig sends request body with correct simuleringType`() {
         arrange(pensjonMedAfpOffentligResponse())
-        val response: Simuleringsresultat =
+        val response: SimuleringResult =
             client.simulerAlderspensjon(impersonalGradertUttakSpec(), personalSpec(Sivilstand.UGIFT))
 
         assertEquals(0, response.afpPrivat.size)

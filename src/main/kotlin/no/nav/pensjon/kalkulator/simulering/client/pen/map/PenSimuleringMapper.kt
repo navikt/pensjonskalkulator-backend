@@ -12,11 +12,12 @@ import no.nav.pensjon.kalkulator.simulering.client.pen.dto.*
 object PenSimuleringMapper {
 
     fun fromDto(dto: PenSimuleringResultDto) =
-        Simuleringsresultat(
+        SimuleringResult(
             alderspensjon = dto.alderspensjon.map(::alderspensjon),
             afpPrivat = dto.afpPrivat.map(::afpPrivat),
             afpOffentlig = dto.afpOffentliglivsvarig.map (::afpOffentlig),
-            vilkaarsproeving = dto.vilkaarsproeving?.let(::vilkaarsproeving) ?: Vilkaarsproeving(innvilget = true)
+            vilkaarsproeving = dto.vilkaarsproeving?.let(::vilkaarsproeving) ?: Vilkaarsproeving(innvilget = true),
+            harForLiteTrygdetid = false //TODO
         )
 
     fun toDto(

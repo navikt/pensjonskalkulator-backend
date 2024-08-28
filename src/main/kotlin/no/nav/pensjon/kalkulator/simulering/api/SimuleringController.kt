@@ -12,8 +12,8 @@ import no.nav.pensjon.kalkulator.simulering.SimuleringService
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import no.nav.pensjon.kalkulator.simulering.api.map.AnonymSimuleringResultMapperV1.resultatV1
 import no.nav.pensjon.kalkulator.simulering.api.map.AnonymSimuleringSpecMapperV1
-import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapperV6.fromIngressSimuleringSpecV6
-import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringMapperV6.resultatV6
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringResultMapperV6.resultatV6
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringSpecMapperV6.fromIngressSimuleringSpecV6
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -137,7 +137,8 @@ class SimuleringController(
                 alderspensjon = emptyList(),
                 afpPrivat = null,
                 afpOffentlig = null,
-                vilkaarsproeving = VilkaarsproevingV6(vilkaarErOppfylt = false, alternativ = null)
+                vilkaarsproeving = VilkaarsproevingV6(vilkaarErOppfylt = false, alternativ = null),
+                harForLiteTrygdetid = false
             )
 
         @Language("json")

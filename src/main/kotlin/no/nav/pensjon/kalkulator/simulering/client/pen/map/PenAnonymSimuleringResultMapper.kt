@@ -9,11 +9,12 @@ import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenAnonymSimulertAfpP
 object PenAnonymSimuleringResultMapper {
 
     fun fromDto(dto: PenAnonymSimuleringResult) =
-        Simuleringsresultat(
+        SimuleringResult(
             alderspensjon = dto.alderspensjonPerioder.map(::alderspensjon),
             afpPrivat = dto.afpPrivatPerioder.map(::afpPrivat),
             afpOffentlig = dto.afpOffentligPerioder.map(::afpOffentlig),
-            vilkaarsproeving = Vilkaarsproeving(innvilget = dto.alderspensjonPerioder.isNotEmpty(), alternativ = null)
+            vilkaarsproeving = Vilkaarsproeving(innvilget = dto.alderspensjonPerioder.isNotEmpty(), alternativ = null),
+            harForLiteTrygdetid = false //TODO
         )
 
     private fun alderspensjon(dto: PenAnonymPensjonsperiode) =

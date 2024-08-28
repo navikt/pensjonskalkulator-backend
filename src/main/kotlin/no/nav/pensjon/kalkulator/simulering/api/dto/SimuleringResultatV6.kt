@@ -7,7 +7,8 @@ data class SimuleringResultatV6(
     val alderspensjon: List<PensjonsberegningV6> = emptyList(),
     val afpPrivat: List<PensjonsberegningV6>? = emptyList(),
     val afpOffentlig: List<PensjonsberegningAfpOffentligV6>? = emptyList(),
-    val vilkaarsproeving: VilkaarsproevingV6
+    val vilkaarsproeving: VilkaarsproevingV6,
+    val harForLiteTrygdetid: Boolean
 )
 
 data class PensjonsberegningV6(val alder: Int, val beloep: Int)

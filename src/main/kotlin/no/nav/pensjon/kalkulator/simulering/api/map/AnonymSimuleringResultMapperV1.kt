@@ -10,7 +10,7 @@ import no.nav.pensjon.kalkulator.simulering.api.dto.*
  */
 object AnonymSimuleringResultMapperV1 {
 
-    fun resultatV1(source: Simuleringsresultat) =
+    fun resultatV1(source: SimuleringResult) =
         AnonymSimuleringResultV1(
             alderspensjon = source.alderspensjon.map { AnonymPensjonsberegningV1(it.alder, it.beloep) },
             afpPrivat = source.afpPrivat.map { AnonymPensjonsberegningV1(it.alder, it.beloep) },

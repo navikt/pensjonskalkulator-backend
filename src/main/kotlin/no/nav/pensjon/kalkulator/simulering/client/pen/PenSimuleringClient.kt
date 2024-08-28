@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.simulering.client.pen
 import no.nav.pensjon.kalkulator.common.client.pen.PenClient
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.PersonalSimuleringSpec
-import no.nav.pensjon.kalkulator.simulering.Simuleringsresultat
+import no.nav.pensjon.kalkulator.simulering.SimuleringResult
 import no.nav.pensjon.kalkulator.simulering.Vilkaarsproeving
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenAnonymSimuleringResult
@@ -54,11 +54,12 @@ class PenSimuleringClient(
         private const val ANONYM_PATH = "simulering/fleksibelap"
 
         private fun emptyResult() =
-            Simuleringsresultat(
+            SimuleringResult(
                 alderspensjon = emptyList(),
                 afpPrivat = emptyList(),
                 afpOffentlig = emptyList(),
-                vilkaarsproeving = Vilkaarsproeving(innvilget = false)
+                vilkaarsproeving = Vilkaarsproeving(innvilget = false),
+                harForLiteTrygdetid = false
             )
     }
 }
