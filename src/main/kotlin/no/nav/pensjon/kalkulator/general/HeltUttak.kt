@@ -13,6 +13,15 @@ data class HeltUttak(
         // (in that case the entire object should be null instead)
         require(uttakFomAlder != null || inntekt != null) { "uttakFomAlder and inntekt cannot both be null" }
     }
+
+    companion object {
+        /**
+         * Sluttalder for inntekt som brukes når denne ikke er angitt av bruker (tilsvarer "livsvarig").
+         * NB: Verdien er ikke basert på noen lov eller regel.
+         * Tom = til og med.
+         */
+        val defaultHeltUttakInntektTomAlder = Alder(aar = 79, maaneder = 11) // til og med
+    }
 }
 
 data class Inntekt(

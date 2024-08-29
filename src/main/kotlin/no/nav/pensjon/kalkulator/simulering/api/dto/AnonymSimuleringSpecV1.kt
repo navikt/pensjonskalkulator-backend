@@ -49,7 +49,7 @@ data class AnonymSimuleringHeltUttakV1(
 
 data class AnonymSimuleringInntektV1(
     val beloep: Int,
-    val sluttAlder: AnonymSimuleringAlderV1
+    val sluttAlder: AnonymSimuleringAlderV1?
 )
 
 data class AnonymSimuleringAlderV1(val aar: Int, val maaneder: Int) {

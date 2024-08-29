@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.uttaksalder.api.map
 
 import no.nav.pensjon.kalkulator.general.*
+import no.nav.pensjon.kalkulator.general.HeltUttak.Companion.defaultHeltUttakInntektTomAlder
 import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.simulering.Opphold
@@ -9,8 +10,6 @@ import no.nav.pensjon.kalkulator.uttaksalder.api.dto.*
 import java.time.LocalDate
 
 object UttaksalderMapperV1 {
-
-    private val defaultTomAlder = Alder(99, 11)
 
     fun toDto(uttaksalder: Alder?): AlderDto? = uttaksalder?.let(::alderDto)
 
@@ -51,7 +50,7 @@ object UttaksalderMapperV1 {
     private fun inntektV1(spec: IngressUttaksalderInntektV1) =
         Inntekt(
             aarligBeloep = spec.beloep,
-            tomAlder = spec.sluttAlder?.let(::alder) ?: defaultTomAlder
+            tomAlder = spec.sluttAlder?.let(::alder) ?: defaultHeltUttakInntektTomAlder
         )
 
     private fun gradertUttakV1(dto: IngressUttaksalderGradertUttakV1) =
