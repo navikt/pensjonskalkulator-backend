@@ -9,33 +9,33 @@ import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.pdl.dto.*
 import java.time.LocalDate
 
-object PersonMapper {
+object PdlPersonMapper {
     private val log = KotlinLogging.logger {}
 
-    fun fromDto(dto: PersonResponseDto): Person =
+    fun fromDto(dto: PdlPersonResult): Person =
         dto.data?.hentPerson?.let(::person)
             ?: throw NotFoundException("person").also { logError(dto) }
 
-    private fun person(dto: PersonDto) =
+    private fun person(dto: PdlPerson) =
         Person(
             navn = dto.navn.orEmpty().let(::fromDto) ?: "",
-            foedselsdato = dto.foedsel.orEmpty().let(::fromDto) ?: LocalDate.MIN,
+            foedselsdato = dto.foedselsdato.orEmpty().let(::fromDto) ?: LocalDate.MIN,
             sivilstand = dto.sivilstand.orEmpty().let(::fromDto),
             adressebeskyttelse = dto.adressebeskyttelse.orEmpty().let(::fromDto)
         )
 
-    private fun fromDto(dto: List<AdressebeskyttelseDto>): AdressebeskyttelseGradering =
+    private fun fromDto(dto: List<PdlAdressebeskyttelse>): AdressebeskyttelseGradering =
         PdlAdressebeskyttelseGradering.fromExternalValue(dto.firstOrNull()?.gradering).internalValue
 
-    private fun fromDto(dto: List<FoedselDto>): LocalDate? = dto.firstOrNull()?.foedselsdato?.value
+    private fun fromDto(dto: List<PdlFoedselsdato>): LocalDate? = dto.firstOrNull()?.foedselsdato?.value
 
-    private fun fromDto(dto: List<NavnDto>): String? =
+    private fun fromDto(dto: List<PdlNavn>): String? =
         dto.firstOrNull()?.let { formatNavn(it.fornavn, it.mellomnavn, it.etternavn) }
 
-    private fun fromDto(dto: List<SivilstandDto>): Sivilstand =
-        PdlSivilstand.fromExternalValue(dto.firstOrNull()?.type).internalValue
+    private fun fromDto(dto: List<PdlSivilstand>): Sivilstand =
+        PdlSivilstandType.fromExternalValue(dto.firstOrNull()?.type).internalValue
 
-    private fun logError(dto: PersonResponseDto) {
+    private fun logError(dto: PdlPersonResult) {
         dto.errors?.firstOrNull()?.message?.let {
             log.info { "PDL error message: $it" }
         }

@@ -7,7 +7,7 @@ import org.springframework.util.StringUtils.hasLength
 /**
  * For externalValue definitions see: https://pdldocs-navno.msappproxy.net/ekstern/index.html#_sivilstand
  */
-enum class PdlSivilstand(val externalValue: String, val internalValue: Sivilstand) {
+enum class PdlSivilstandType(val externalValue: String, val internalValue: Sivilstand) {
 
     UNKNOWN("?", Sivilstand.UNKNOWN),
     UOPPGITT("UOPPGITT", Sivilstand.UOPPGITT),

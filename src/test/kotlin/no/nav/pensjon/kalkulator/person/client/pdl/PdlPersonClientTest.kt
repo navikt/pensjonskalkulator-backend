@@ -58,7 +58,7 @@ class PdlPersonClientTest : WebClientTest() {
             assertEquals("PEN", request.getHeader("tema"))
             assertEquals(
                 """{
-	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { fornavn }, foedsel { foedselsdato }, sivilstand(historikk: false) { type } } }",
+	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { fornavn }, foedselsdato { foedselsdato }, sivilstand(historikk: false) { type } } }",
 	"variables": {
 		"ident": "12906498357"
 	}
@@ -159,7 +159,7 @@ class PdlPersonClientTest : WebClientTest() {
                       "fornavn": "Ola-Kari"
                     }
                   ],
-                  "foedsel": [
+                  "foedselsdato": [
                     {
                       "foedselsdato": "1963-12-31"
                     }

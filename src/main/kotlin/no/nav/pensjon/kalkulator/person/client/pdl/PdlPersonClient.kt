@@ -6,7 +6,7 @@ import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.person.client.pdl.dto.*
-import no.nav.pensjon.kalkulator.person.client.pdl.map.PersonMapper
+import no.nav.pensjon.kalkulator.person.client.pdl.map.PdlPersonMapper
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
@@ -52,14 +52,14 @@ class PdlPersonClient(
                 .headers(::setHeaders)
                 .bodyValue(query)
                 .retrieve()
-                .bodyToMono(PersonResponseDto::class.java)
+                .bodyToMono(PdlPersonResult::class.java)
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
                 ?.also {
                     warnings(it)?.let { log.warn { it } }
                     countCalls(MetricResult.OK)
                 }
-                ?.let(PersonMapper::fromDto)
+                ?.let(PdlPersonMapper::fromDto)
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $baseUrl$uri", e)
         } catch (e: WebClientResponseException) {
@@ -115,7 +115,7 @@ class PdlPersonClient(
         private val service = EgressService.PERSONDATALOESNINGEN
 
         private fun personaliaQuery(pid: Pid, fetchFulltNavn: Boolean) = """{
-	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { ${navnQuery(fetchFulltNavn)} }, foedsel { foedselsdato }, sivilstand(historikk: false) { type } } }",
+	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { ${navnQuery(fetchFulltNavn)} }, foedselsdato { foedselsdato }, sivilstand(historikk: false) { type } } }",
 	"variables": {
 		"ident": "${pid.value}"
 	}
@@ -131,7 +131,7 @@ class PdlPersonClient(
 	}
 }"""
 
-        private fun warnings(response: PersonResponseDto): String? =
+        private fun warnings(response: PdlPersonResult): String? =
             response.extensions?.warnings?.joinToString {
                 (it.message ?: "-") + " (${warningDetails(it.details)})"
             }

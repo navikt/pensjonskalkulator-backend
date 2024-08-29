@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 
-class PersonMapperTest {
+class PdlPersonMapperTest {
 
     @Test
     fun `fromDto maps response DTO to domain object`() {
@@ -19,7 +19,7 @@ class PersonMapperTest {
             sivilstandListe = listOf("UGIFT")
         )
 
-        val person = PersonMapper.fromDto(dto)
+        val person = PdlPersonMapper.fromDto(dto)
 
         assertEquals("For-Navn", person.navn)
         assertEquals(foedselsdato, person.foedselsdato)
@@ -30,31 +30,31 @@ class PersonMapperTest {
     @Test
     fun `fromDto picks first fornavn`() {
         val dto = responseDto(fornavnListe = listOf("Kari", "Ola"))
-        assertEquals("Kari", PersonMapper.fromDto(dto).navn)
+        assertEquals("Kari", PdlPersonMapper.fromDto(dto).navn)
     }
 
     @Test
     fun `fromDto picks first foedselsdato`() {
         val dto = responseDto(foedselsdatoListe = listOf(foedselsdato, LocalDate.of(1962, 1, 1)))
-        assertEquals(foedselsdato, PersonMapper.fromDto(dto).foedselsdato)
+        assertEquals(foedselsdato, PdlPersonMapper.fromDto(dto).foedselsdato)
     }
 
     @Test
     fun `fromDto picks first sivilstand`() {
         val dto = responseDto(sivilstandListe = listOf("UGIFT", "SKILT"))
-        assertEquals(Sivilstand.UGIFT, PersonMapper.fromDto(dto).sivilstand)
+        assertEquals(Sivilstand.UGIFT, PdlPersonMapper.fromDto(dto).sivilstand)
     }
 
     @Test
     fun `fromDto picks first adressebeskyttelsegradering`() {
         val dto = responseDto(adressebeskyttelseListe = listOf("FORTROLIG", "STRENGT_FORTROLIG"))
-        assertEquals(AdressebeskyttelseGradering.FORTROLIG, PersonMapper.fromDto(dto).adressebeskyttelse)
+        assertEquals(AdressebeskyttelseGradering.FORTROLIG, PdlPersonMapper.fromDto(dto).adressebeskyttelse)
     }
 
     @Test
     fun `fromDto maps DTO with null data to null`() {
         val exception = assertThrows<NotFoundException> {
-            PersonMapper.fromDto(PersonResponseDto(data = null, extensions = null, errors = null))
+            PdlPersonMapper.fromDto(PdlPersonResult(data = null, extensions = null, errors = null))
         }
 
         assertEquals("person", exception.message)
@@ -62,25 +62,25 @@ class PersonMapperTest {
 
     @Test
     fun `fromDto maps missing fornavn to empty string`() {
-        assertEquals("", PersonMapper.fromDto(responseDto(fornavnListe = emptyList())).navn)
+        assertEquals("", PdlPersonMapper.fromDto(responseDto(fornavnListe = emptyList())).navn)
     }
 
     @Test
     fun `fromDto maps missing foedselsdato to minimum date`() {
-        val person = PersonMapper.fromDto(responseDto(foedselsdatoListe = emptyList()))
+        val person = PdlPersonMapper.fromDto(responseDto(foedselsdatoListe = emptyList()))
         assertEquals(LocalDate.MIN, person.foedselsdato)
         assertFalse(person.harFoedselsdato)
     }
 
     @Test
     fun `fromDto maps missing sivilstand to sivilstand null`() {
-        assertEquals(Sivilstand.UOPPGITT, PersonMapper.fromDto(responseDto(sivilstandListe = emptyList())).sivilstand)
+        assertEquals(Sivilstand.UOPPGITT, PdlPersonMapper.fromDto(responseDto(sivilstandListe = emptyList())).sivilstand)
     }
 
     @Test
     fun `fromDto maps unknown sivilstand to sivilstand 'uoppgitt'`() {
         val dto = responseDto(sivilstandListe = listOf("not known"))
-        assertEquals(Sivilstand.UNKNOWN, PersonMapper.fromDto(dto).sivilstand)
+        assertEquals(Sivilstand.UNKNOWN, PdlPersonMapper.fromDto(dto).sivilstand)
     }
 
     private companion object {
@@ -92,25 +92,25 @@ class PersonMapperTest {
             sivilstandListe: List<String> = emptyList(),
             adressebeskyttelseListe: List<String> = emptyList()
         ) =
-            PersonResponseDto(
-                data = PersonEnvelopeDto(
-                    PersonDto(
-                        navn = fornavnListe.map(::NavnDto),
-                        foedsel = foedselsdatoListe.map(::foedsel),
-                        sivilstand = sivilstandListe.map(::SivilstandDto),
-                        adressebeskyttelse = adressebeskyttelseListe.map(::AdressebeskyttelseDto)
+            PdlPersonResult(
+                data = PdlPersonEnvelope(
+                    PdlPerson(
+                        navn = fornavnListe.map(::PdlNavn),
+                        foedselsdato = foedselsdatoListe.map(::foedsel),
+                        sivilstand = sivilstandListe.map(::PdlSivilstand),
+                        adressebeskyttelse = adressebeskyttelseListe.map(::PdlAdressebeskyttelse)
                     )
                 ),
                 extensions = extensions(),
                 errors = errors()
             )
 
-        private fun foedsel(dato: LocalDate) = FoedselDto(DateDto(dato))
+        private fun foedsel(dato: LocalDate) = PdlFoedselsdato(PdlDate(dato))
 
         private fun extensions() =
-            ExtensionsDto(
+            PdlExtensions(
                 warnings = listOf(
-                    WarningDto(
+                    PdlWarning(
                         query = "query",
                         id = "id",
                         code = "code",
@@ -122,8 +122,8 @@ class PersonMapperTest {
 
         private fun errors() =
             listOf(
-                ErrorDto(message = "feil1"),
-                ErrorDto(message = "feil2")
+                PdlError(message = "feil1"),
+                PdlError(message = "feil2")
             )
     }
 }
