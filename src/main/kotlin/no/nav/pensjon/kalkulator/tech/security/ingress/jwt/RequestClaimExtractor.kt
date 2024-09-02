@@ -18,6 +18,9 @@ class RequestClaimExtractor {
         private const val JWT_PAYLOAD_PART_INDEX = 1
         private const val JWT_PART_DELIMITER = "."
 
+        @OptIn(ExperimentalEncodingApi::class)
+        private val base64 = Base64.UrlSafe.withPadding(Base64.PaddingOption.ABSENT_OPTIONAL)
+
         private fun extractClaim(jwt: String, claimName: String): String? {
             val parts = jwt.split(JWT_PART_DELIMITER)
 
@@ -32,6 +35,6 @@ class RequestClaimExtractor {
 
         @OptIn(ExperimentalEncodingApi::class)
         private fun toJson(value: String): MutableMap<String, Any>? =
-            JSONObjectUtils.parse(String(Base64.decode(value)))
+            JSONObjectUtils.parse(String(base64.decode(value)))
     }
 }
