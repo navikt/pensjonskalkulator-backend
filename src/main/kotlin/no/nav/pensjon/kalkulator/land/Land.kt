@@ -64,8 +64,8 @@ enum class Land(
     CUW(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Curaçao", engelskNavn = "Curaçao"),
     DNK(erAvtaleland = true, kravOmArbeid = false, bokmaalNavn = "Danmark", engelskNavn = "Denmark"),
     ARE(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "De forente arabiske emirater", engelskNavn = "United Arab Emirates"),
-    ANT(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "De nederlandske Antiller", engelskNavn = "Netherlands Antilles"), // oppløst 10. oktober 2010
     ATF(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "De franske sørterritorier", engelskNavn = "French Southern Territories"),
+    ANT(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "De nederlandske Antiller", engelskNavn = "Netherlands Antilles"), // oppløst 10. oktober 2010
     DOM(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Den dominikanske republikk", engelskNavn = "Dominican Republic"),
     CAF(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Den sentralafrikanske republikk", engelskNavn = "Central African Republic"),
     IOT(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Det britiske territoriet i Indiahavet", engelskNavn = "British Indian Ocean Territory"),
@@ -132,8 +132,8 @@ enum class Land(
     KIR(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Kiribati", engelskNavn = "Kiribati"),
     CCK(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Kokosøyene (Keelingøyene)", engelskNavn = " Cocos (Keeling) Islands"),
     COM(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Komorene", engelskNavn = "Comoros"),
-    COD(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Kongo-Kinshasa", engelskNavn = "Congo-Kinshasa"),
     COG(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Kongo-Brazzaville", engelskNavn = "Congo-Brazzaville"),
+    COD(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Kongo-Kinshasa", engelskNavn = "Congo-Kinshasa"),
     XXK(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Kosovo", engelskNavn = "Kosovo"),
     HRV(erAvtaleland = true, kravOmArbeid = true, bokmaalNavn = "Kroatia", engelskNavn = "Croatia"),
     KWT(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Kuwait", engelskNavn = "Kuwait"),
@@ -206,7 +206,7 @@ enum class Land(
     SHN(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "St. Helena, Ascension og Tristan da Cunha", engelskNavn = "Saint Helena, Ascension and Tristan da Cunha"),
     KNA(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Saint Kitts og Nevis", engelskNavn = "Saint Kitts and Nevis"),
     LCA(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Saint Lucia", engelskNavn = "Saint Lucia"),
-    MAF(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Saint-Martin", engelskNavn = "Saint Martin"),
+    MAF(erAvtaleland = true, kravOmArbeid = null, bokmaalNavn = "Saint-Martin", engelskNavn = "Saint Martin"),
     SPM(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Saint-Pierre og Miquelon", engelskNavn = "Saint Pierre and Miquelon"),
     VCT(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Saint Vincent og Grenadinene", engelskNavn = "Saint Vincent and the Grenadines"),
     SLB(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Salomonøyene", engelskNavn = "Solomon Islands"),
@@ -253,11 +253,11 @@ enum class Land(
     TUV(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Tuvalu", engelskNavn = "Tuvalu"),
     TUR(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Tyrkia", engelskNavn = "Turkey"),
     DEU(erAvtaleland = true, kravOmArbeid = true, bokmaalNavn = "Tyskland", engelskNavn = "Germany"),
-    USA(erAvtaleland = true, kravOmArbeid = true, bokmaalNavn = "USA", engelskNavn = "USA"),
     UGA(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Uganda", engelskNavn = "Uganda"),
     UKR(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Ukraina", engelskNavn = "Ukraine"),
     HUN(erAvtaleland = true, kravOmArbeid = true, bokmaalNavn = "Ungarn", engelskNavn = "Hungary"),
     URY(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Uruguay", engelskNavn = "Uruguay"),
+    USA(erAvtaleland = true, kravOmArbeid = true, bokmaalNavn = "USA", engelskNavn = "USA"),
     UMI(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "USAs ytre småøyer", engelskNavn = "United States Minor Outlying Islands"),
     UZB(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Usbekistan", engelskNavn = "Uzbekistan"),
     VUT(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Vanuatu", engelskNavn = "Vanuatu"),
@@ -270,5 +270,5 @@ enum class Land(
     ZWE(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Zimbabwe", engelskNavn = "Zimbabwe"),
     TLS(erAvtaleland = false, kravOmArbeid = null, bokmaalNavn = "Øst-Timor", engelskNavn = "East Timor"),
     AUT(erAvtaleland = true, kravOmArbeid = true, bokmaalNavn = "Østerrike", engelskNavn = "Austria"),
-    ALA(erAvtaleland = true, kravOmArbeid = false, bokmaalNavn = "Åland", engelskNavn = "Åland") // NB: Not avtaleland in PEN (Aug 2024)
+    ALA(erAvtaleland = true, kravOmArbeid = false, bokmaalNavn = "Åland", engelskNavn = "Åland") // NB: ikke avtaleland i PEN (pr. september 2024)
 }
