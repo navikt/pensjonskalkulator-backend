@@ -1,9 +1,11 @@
 package no.nav.pensjon.kalkulator.land
 
+import com.fasterxml.jackson.annotation.JsonInclude
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class LandInfo(
     val landkode: String,
-    val erAvtaleland: Boolean,
-    val kravOmArbeid: Boolean? = null, // only relevant if erAvtaleland = true
+    val kravOmArbeid: Boolean? = null, // kun relevant for land med trygdeavtale
     val bokmaalNavn: String,
     val nynorskNavn: String,
     val engelskNavn: String

@@ -11,7 +11,6 @@ class LandService {
             .map {
                 LandInfo(
                     landkode = it.name,
-                    erAvtaleland = it.erAvtaleland,
                     kravOmArbeid = it.kravOmArbeid,
                     bokmaalNavn = it.bokmaalNavn,
                     nynorskNavn = it.bokmaalNavn,
