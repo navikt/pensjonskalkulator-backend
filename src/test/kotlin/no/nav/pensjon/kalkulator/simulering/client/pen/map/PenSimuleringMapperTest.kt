@@ -52,13 +52,15 @@ class PenSimuleringMapperTest {
                         uttaksgrad = null,
                         heltUttaksalder = PenAlderDto(aar = 65, maaneder = 4)
                     )
-                )
+                ),
+                harNokTrygdetidForGarantipensjon = false
             )
         )
 
         with(resultat) {
             assertTrue(alderspensjon.isEmpty())
             assertTrue(afpPrivat.isEmpty())
+            assertTrue(harForLiteTrygdetid)
             with(vilkaarsproeving) {
                 assertFalse(innvilget)
                 with(alternativ!!) {

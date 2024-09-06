@@ -17,7 +17,7 @@ object PenSimuleringMapper {
             afpPrivat = dto.afpPrivat.map(::afpPrivat),
             afpOffentlig = dto.afpOffentliglivsvarig.map (::afpOffentlig),
             vilkaarsproeving = dto.vilkaarsproeving?.let(::vilkaarsproeving) ?: Vilkaarsproeving(innvilget = true),
-            harForLiteTrygdetid = false //TODO
+            harForLiteTrygdetid = dto.harNokTrygdetidForGarantipensjon == false
         )
 
     fun toDto(

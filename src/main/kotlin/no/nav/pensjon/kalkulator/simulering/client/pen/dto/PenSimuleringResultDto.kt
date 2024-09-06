@@ -4,7 +4,8 @@ data class PenSimuleringResultDto(
     val alderspensjon: List<PenPensjonDto>,
     val afpPrivat: List<PenPensjonDto>,
     val afpOffentliglivsvarig: List<PenPensjonAfpOffentligDto>,
-    val vilkaarsproeving: PenVilkaarsproevingDto?
+    val vilkaarsproeving: PenVilkaarsproevingDto?,
+    val harNokTrygdetidForGarantipensjon: Boolean?
 )
 
 data class PenPensjonDto(
