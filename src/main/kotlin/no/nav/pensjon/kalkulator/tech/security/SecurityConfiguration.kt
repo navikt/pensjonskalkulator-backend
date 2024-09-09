@@ -139,8 +139,9 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
             .addFilterAfter(impersonalAccessFilter, AuthenticationEnricherFilter::class.java)
 
         return http.csrf {
-            it.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-            it.csrfTokenRequestHandler(CsrfTokenRequestAttributeHandler())
+            //it.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            //it.csrfTokenRequestHandler(CsrfTokenRequestAttributeHandler())
+            it.disable() // TODO temporarily
         }
             .authorizeHttpRequests {
                 it.requestMatchers(
