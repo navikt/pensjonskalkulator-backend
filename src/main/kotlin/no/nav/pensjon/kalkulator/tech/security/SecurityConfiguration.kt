@@ -156,7 +156,6 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
                 ).permitAll()
                     .requestMatchers(
                         HttpMethod.POST,
-                        "/api/v1/alderspensjon/anonym-simulering",
                         "/error"
                     ).permitAll()
                     .anyRequest().authenticated()
@@ -172,7 +171,9 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
      * "Impersonal" means that the logged-in user acts on behalf of another person.
      */
     private fun isImpersonal(request: HttpServletRequest): Boolean =
-        request.requestURI == ANSATT_ID_URI && hasAnsattIdClaim(request) || hasPidHeader(request)
+        request.requestURI == ANONYM_SIMULERING_URI
+                || request.requestURI == ANSATT_ID_URI && hasAnsattIdClaim(request)
+                || hasPidHeader(request)
 
     /**
      * "Universal" means that it cannot be determined whether the request is made in a personal or impersonal
@@ -186,6 +187,7 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
         hasLength(requestClaimExtractor.extractAuthorizationClaim(request, SecurityContextNavIdExtractor.CLAIM_KEY))
 
     companion object {
+        private const val ANONYM_SIMULERING_URI = "/api/v1/alderspensjon/anonym-simulering"
         private const val ANSATT_ID_URI = "/api/v1/ansatt-id"
         private const val FEATURE_URI = "/api/feature/"
         private const val ENCRYPTION_URI = "/api/v1/encrypt"
