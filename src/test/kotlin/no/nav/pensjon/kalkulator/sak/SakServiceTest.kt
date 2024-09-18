@@ -2,8 +2,8 @@ package no.nav.pensjon.kalkulator.sak
 
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.sak.client.SakClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
