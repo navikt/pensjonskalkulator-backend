@@ -34,10 +34,10 @@ class VedtakController(private val traceAid: TraceAid) : ControllerBase(traceAid
     )
     fun hentLoependeVedtak(): LoependeVedtakDto {
         return LoependeVedtakDto(
-            alderspensjon = LoependeSakDto(60),
-            ufoeretrygd = LoependeSakDto(40),
-            afpPrivat = LoependeSakDto(),
-            afpOffentlig = null
+            alderspensjon = LoependeSakDto(loepende = true, grad = 60),
+            ufoeretrygd = LoependeSakDto(loepende = true, 40),
+            afpPrivat = LoependeSakDto(loepende = true),
+            afpOffentlig = LoependeSakDto()
         )
     }
 
