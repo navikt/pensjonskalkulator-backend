@@ -6,9 +6,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
-import no.nav.pensjon.kalkulator.common.api.ControllerBase.Companion.SERVICE_UNAVAILABLE_EXAMPLE
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
-import org.intellij.lang.annotations.Language
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController

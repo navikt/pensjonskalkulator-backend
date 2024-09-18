@@ -7,4 +7,4 @@ data class LoependeVedtakDto(
     val afpOffentlig: LoependeSakDto?,
 )
 
-data class LoependeSakDto(val uttaksgrad: Int = 100)
+data class LoependeSakDto(val grad: Int = 100)
