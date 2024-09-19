@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.person
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
+import java.time.LocalDate
 
 class PidTest {
 
@@ -54,5 +55,15 @@ class PidTest {
     @Test
     fun `equals is false when value is null`() {
         assertFalse(Pid("04925398980").equals(null))
+    }
+
+    @Test
+    fun `dato gir datodel som LocalDate`() {
+        assertEquals(LocalDate.of(1953, 12, 4), Pid("04925398980").dato())
+    }
+
+    @Test
+    fun `dato gir 1900-01-01 hvis ugyldig PID`() {
+        assertEquals(LocalDate.of(1900, 1, 1), Pid("0492539898").dato())
     }
 }
