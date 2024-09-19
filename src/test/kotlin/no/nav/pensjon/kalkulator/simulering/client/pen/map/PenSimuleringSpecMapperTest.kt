@@ -11,11 +11,11 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class PenSimuleringMapperTest {
+class PenSimuleringSpecMapperTest {
 
     @Test
     fun `toDto maps domain object to PEN-specific data transfer object`() {
-        val dto: SimuleringEgressSpecDto = PenSimuleringMapper.toDto(impersonalSpec(), personalSpec())
+        val dto: SimuleringEgressSpecDto = PenSimuleringSpecMapper.toDto(impersonalSpec(), personalSpec())
 
         with(dto) {
             assertEquals("ALDER", simuleringstype)
@@ -34,40 +34,6 @@ class PenSimuleringMapperTest {
                 assertEquals(AlderSpecDto(68, 11), uttakFomAlder)
                 assertEquals(6_000, aarligInntekt)
                 assertEquals(AlderSpecDto(70, 3), inntektTomAlder)
-            }
-        }
-    }
-
-    @Test
-    fun `fromDto maps PEN-specific data transfer object to domain object`() {
-        val resultat: SimuleringResult = PenSimuleringMapper.fromDto(
-            PenSimuleringResultDto(
-                alderspensjon = emptyList(),
-                afpPrivat = emptyList(),
-                afpOffentliglivsvarig = emptyList(),
-                vilkaarsproeving = PenVilkaarsproevingDto(
-                    vilkaarErOppfylt = false,
-                    alternativ = PenAlternativDto(
-                        gradertUttaksalder = null,
-                        uttaksgrad = null,
-                        heltUttaksalder = PenAlderDto(aar = 65, maaneder = 4)
-                    )
-                ),
-                harNokTrygdetidForGarantipensjon = false
-            )
-        )
-
-        with(resultat) {
-            assertTrue(alderspensjon.isEmpty())
-            assertTrue(afpPrivat.isEmpty())
-            assertTrue(harForLiteTrygdetid)
-            with(vilkaarsproeving) {
-                assertFalse(innvilget)
-                with(alternativ!!) {
-                    assertNull(gradertUttakAlder)
-                    assertNull(uttakGrad)
-                    assertAlder(65, 4, heltUttakAlder)
-                }
             }
         }
     }

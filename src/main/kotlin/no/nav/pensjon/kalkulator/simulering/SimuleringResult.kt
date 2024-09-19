@@ -5,5 +5,11 @@ data class SimuleringResult(
     val afpPrivat: List<SimulertAfpPrivat>,
     val afpOffentlig: List<SimulertAfpOffentlig>,
     val vilkaarsproeving: Vilkaarsproeving,
-    val harForLiteTrygdetid: Boolean
+    val harForLiteTrygdetid: Boolean,
+    val opptjeningGrunnlagListe: List<SimulertOpptjeningGrunnlag>
+)
+
+data class SimulertOpptjeningGrunnlag(
+    val aar: Int,
+    val pensjonsgivendeInntektBeloep: Int
 )

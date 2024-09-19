@@ -12,7 +12,8 @@ import no.nav.pensjon.kalkulator.simulering.client.pen.dto.SimuleringEgressSpecD
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenSimuleringResultDto
 import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenAnonymSimuleringResultMapper
 import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenAnonymSimuleringSpecMapper
-import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenSimuleringMapper
+import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenSimuleringResultMapper
+import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenSimuleringSpecMapper
 import no.nav.pensjon.kalkulator.tech.selftest.Pingable
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.springframework.beans.factory.annotation.Value
@@ -33,10 +34,10 @@ class PenSimuleringClient(
     ) =
         doPost(
             PATH,
-            PenSimuleringMapper.toDto(impersonalSpec, personalSpec),
+            PenSimuleringSpecMapper.toDto(impersonalSpec, personalSpec),
             SimuleringEgressSpecDto::class.java,
             PenSimuleringResultDto::class.java
-        )?.let(PenSimuleringMapper::fromDto)
+        )?.let(PenSimuleringResultMapper::fromDto)
             ?: emptyResult()
 
     override fun simulerAnonymAlderspensjon(spec: ImpersonalSimuleringSpec) =
@@ -59,7 +60,8 @@ class PenSimuleringClient(
                 afpPrivat = emptyList(),
                 afpOffentlig = emptyList(),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = false),
-                harForLiteTrygdetid = false
+                harForLiteTrygdetid = false,
+                opptjeningGrunnlagListe = emptyList()
             )
     }
 }

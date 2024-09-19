@@ -284,7 +284,8 @@ internal class UttaksalderServiceTest {
                 afpPrivat = emptyList(),
                 afpOffentlig = emptyList(),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
-                harForLiteTrygdetid = false
+                harForLiteTrygdetid = false,
+                opptjeningGrunnlagListe = emptyList()
             )
         )
     }

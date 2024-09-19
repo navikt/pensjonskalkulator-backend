@@ -82,11 +82,21 @@ class SimuleringServiceTest {
 
         private val simuleringResult =
             SimuleringResult(
-                alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
+                alderspensjon = listOf(
+                    SimulertAlderspensjon(
+                        alder = 67,
+                        beloep = PENSJONSBELOEP,
+                        inntektspensjonBeloep = 0,
+                        garantipensjonBeloep = 0,
+                        delingstall = 0.0,
+                        pensjonBeholdningFoerUttak = 0
+                    )
+                ),
                 afpPrivat = emptyList(),
                 afpOffentlig = emptyList(),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
-                harForLiteTrygdetid = false
+                harForLiteTrygdetid = false,
+                opptjeningGrunnlagListe = emptyList()
             )
 
         private fun impersonalSimuleringSpec(forventetInntekt: Int?, sivilstand: Sivilstand?) =

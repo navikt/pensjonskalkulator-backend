@@ -14,13 +14,18 @@ object PenAnonymSimuleringResultMapper {
             afpPrivat = dto.afpPrivatPerioder.map(::afpPrivat),
             afpOffentlig = dto.afpOffentligPerioder.map(::afpOffentlig),
             vilkaarsproeving = Vilkaarsproeving(innvilget = dto.alderspensjonPerioder.isNotEmpty(), alternativ = null),
-            harForLiteTrygdetid = false //TODO
+            harForLiteTrygdetid = false, //TODO
+            opptjeningGrunnlagListe = emptyList() // not required in anonym context
         )
 
     private fun alderspensjon(dto: PenAnonymPensjonsperiode) =
         SimulertAlderspensjon(
             alder = dto.alder ?: 0,
-            beloep = dto.belop ?: 0
+            beloep = dto.belop ?: 0,
+            inntektspensjonBeloep = 0, // not required in anonym context
+            garantipensjonBeloep = 0, // ditto
+            delingstall = 0.0, // ditto
+            pensjonBeholdningFoerUttak = 0 // ditto
         )
 
     private fun afpPrivat(dto: PenAnonymSimulertAfpPrivatPeriode) =
