@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import java.time.LocalDate
 
+/**
+ * Alle fødselsnumre og D-numre brukt her er syntetiske/fiktive.
+ */
 class PidTest {
 
     @Test
@@ -60,6 +63,16 @@ class PidTest {
     @Test
     fun `dato gir datodel som LocalDate`() {
         assertEquals(LocalDate.of(1953, 12, 4), Pid("04925398980").dato())
+    }
+
+    @Test
+    fun `dato gir datodel som LocalDate for D-nummer`() {
+        assertEquals(LocalDate.of(1985, 1, 1), Pid("41018512345").dato())
+    }
+
+    @Test
+    fun `dato gir datodel som LocalDate for Dolly-nummer`() {
+        assertEquals(LocalDate.of(1966, 1, 1), Pid("01416637578").dato())
     }
 
     @Test
