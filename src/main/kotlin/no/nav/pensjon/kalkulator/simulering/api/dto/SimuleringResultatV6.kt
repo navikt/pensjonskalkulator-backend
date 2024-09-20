@@ -15,11 +15,13 @@ data class PensjonsberegningV6(val alder: Int, val beloep: Int)
 
 data class PensjonsberegningAfpOffentligV6(val alder: Int, val beloep: Int)
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class VilkaarsproevingV6(
     val vilkaarErOppfylt: Boolean,
     val alternativ: AlternativV6?
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class AlternativV6(
     val gradertUttaksalder: AlderV6?,
     val uttaksgrad: Int?, // null implies 100 %
