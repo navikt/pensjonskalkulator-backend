@@ -15,6 +15,7 @@ object PenAnonymSimuleringResultMapper {
             afpOffentlig = dto.afpOffentligPerioder.map(::afpOffentlig),
             vilkaarsproeving = Vilkaarsproeving(innvilget = dto.alderspensjonPerioder.isNotEmpty(), alternativ = null),
             harForLiteTrygdetid = false, //TODO
+            trygdetid = 0, // not required in anonym context
             opptjeningGrunnlagListe = emptyList() // not required in anonym context
         )
 

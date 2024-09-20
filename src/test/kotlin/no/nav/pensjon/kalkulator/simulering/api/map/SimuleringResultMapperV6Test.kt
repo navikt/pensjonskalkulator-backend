@@ -1,14 +1,8 @@
 package no.nav.pensjon.kalkulator.simulering.api.map
 
 import io.kotest.matchers.shouldBe
-import no.nav.pensjon.kalkulator.simulering.SimuleringResult
-import no.nav.pensjon.kalkulator.simulering.SimulertAlderspensjon
-import no.nav.pensjon.kalkulator.simulering.SimulertOpptjeningGrunnlag
-import no.nav.pensjon.kalkulator.simulering.Vilkaarsproeving
-import no.nav.pensjon.kalkulator.simulering.api.dto.AlderspensjonsberegningV6
-import no.nav.pensjon.kalkulator.simulering.api.dto.SimuleringResultatV6
-import no.nav.pensjon.kalkulator.simulering.api.dto.SimulertOpptjeningGrunnlagV6
-import no.nav.pensjon.kalkulator.simulering.api.dto.VilkaarsproevingV6
+import no.nav.pensjon.kalkulator.simulering.*
+import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import org.junit.jupiter.api.Test
 
 class SimuleringResultMapperV6Test {
@@ -27,10 +21,11 @@ class SimuleringResultMapperV6Test {
                         pensjonBeholdningFoerUttak = 5
                     )
                 ),
-                afpPrivat = emptyList(),
-                afpOffentlig = emptyList(),
+                afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 12000)),
+                afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000)),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
-                harForLiteTrygdetid = false,
+                harForLiteTrygdetid = true,
+                trygdetid = 10,
                 opptjeningGrunnlagListe = listOf(
                     SimulertOpptjeningGrunnlag(aar = 2001, pensjonsgivendeInntektBeloep = 501000),
                     SimulertOpptjeningGrunnlag(aar = 2002, pensjonsgivendeInntektBeloep = 502000)
@@ -47,10 +42,11 @@ class SimuleringResultMapperV6Test {
                     pensjonBeholdningFoerUttakBeloep = 5
                 )
             ),
-            afpPrivat = emptyList(),
-            afpOffentlig = emptyList(),
+            afpPrivat = listOf(PensjonsberegningV6(alder = 67, beloep = 12000)),
+            afpOffentlig = listOf(PensjonsberegningAfpOffentligV6(alder = 67, beloep = 12000)),
             vilkaarsproeving = VilkaarsproevingV6(vilkaarErOppfylt = true, alternativ = null),
-            harForLiteTrygdetid = false,
+            harForLiteTrygdetid = true,
+            trygdetid = 10,
             opptjeningGrunnlagListe = listOf(
                 SimulertOpptjeningGrunnlagV6(aar = 2001, pensjonsgivendeInntektBeloep = 501000),
                 SimulertOpptjeningGrunnlagV6(aar = 2002, pensjonsgivendeInntektBeloep = 502000)

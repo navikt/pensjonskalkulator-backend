@@ -1,10 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen.map
 
-import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
-import no.nav.pensjon.kalkulator.common.client.pen.PenUttaksgrad
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.general.GradertUttak
-import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.*
@@ -18,6 +14,7 @@ object PenSimuleringResultMapper {
             afpOffentlig = dto.afpOffentliglivsvarig.map(::afpOffentlig),
             vilkaarsproeving = dto.vilkaarsproeving?.let(::vilkaarsproeving) ?: Vilkaarsproeving(innvilget = true),
             harForLiteTrygdetid = dto.harNokTrygdetidForGarantipensjon == false,
+            trygdetid = dto.trygdetid ?: 0,
             opptjeningGrunnlagListe = dto.opptjeningGrunnlagListe.orEmpty().map(::opptjeningGrunnlag)
         )
 

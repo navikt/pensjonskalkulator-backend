@@ -1,19 +1,19 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen.map
 
+import io.kotest.matchers.shouldBe
+import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.simulering.Alternativ
 import no.nav.pensjon.kalkulator.simulering.SimuleringResult
-import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenAlderDto
-import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenAlternativDto
-import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenSimuleringResultDto
-import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenVilkaarsproevingDto
-import no.nav.pensjon.kalkulator.testutil.Assertions.assertAlder
-import org.junit.jupiter.api.Assertions.*
+import no.nav.pensjon.kalkulator.simulering.SimulertOpptjeningGrunnlag
+import no.nav.pensjon.kalkulator.simulering.Vilkaarsproeving
+import no.nav.pensjon.kalkulator.simulering.client.pen.dto.*
 import org.junit.jupiter.api.Test
 
 class PenSimuleringResultMapperTest {
 
     @Test
     fun `fromDto maps PEN-specific data transfer object to domain object`() {
-        val resultat: SimuleringResult = PenSimuleringResultMapper.fromDto(
+        PenSimuleringResultMapper.fromDto(
             PenSimuleringResultDto(
                 alderspensjon = emptyList(),
                 afpPrivat = emptyList(),
@@ -27,22 +27,28 @@ class PenSimuleringResultMapperTest {
                     )
                 ),
                 harNokTrygdetidForGarantipensjon = false,
-                opptjeningGrunnlagListe = emptyList()
+                trygdetid = 10,
+                opptjeningGrunnlagListe = listOf(
+                    PenOpptjeningGrunnlag(aar = 2001, pensjonsgivendeInntekt = 123000)
+                )
+            )
+        ) shouldBe SimuleringResult(
+            alderspensjon = emptyList(),
+            afpPrivat = emptyList(),
+            afpOffentlig = emptyList(),
+            vilkaarsproeving = Vilkaarsproeving(
+                innvilget = false,
+                alternativ = Alternativ(
+                    gradertUttakAlder = null,
+                    uttakGrad = null,
+                    heltUttakAlder = Alder(aar = 65, maaneder = 4)
+                )
+            ),
+            harForLiteTrygdetid = true,
+            trygdetid = 10,
+            opptjeningGrunnlagListe = listOf(
+                SimulertOpptjeningGrunnlag(aar = 2001, pensjonsgivendeInntektBeloep = 123000)
             )
         )
-
-        with(resultat) {
-            assertTrue(alderspensjon.isEmpty())
-            assertTrue(afpPrivat.isEmpty())
-            assertTrue(harForLiteTrygdetid)
-            with(vilkaarsproeving) {
-                assertFalse(innvilget)
-                with(alternativ!!) {
-                    assertNull(gradertUttakAlder)
-                    assertNull(uttakGrad)
-                    assertAlder(65, 4, heltUttakAlder)
-                }
-            }
-        }
     }
 }

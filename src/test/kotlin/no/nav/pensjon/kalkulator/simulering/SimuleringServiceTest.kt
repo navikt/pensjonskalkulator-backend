@@ -96,6 +96,7 @@ class SimuleringServiceTest {
                 afpOffentlig = emptyList(),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                 harForLiteTrygdetid = false,
+                trygdetid = 0,
                 opptjeningGrunnlagListe = emptyList()
             )
 

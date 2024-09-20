@@ -61,6 +61,7 @@ class PenSimuleringClient(
                 afpOffentlig = emptyList(),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = false),
                 harForLiteTrygdetid = false,
+                trygdetid = 0,
                 opptjeningGrunnlagListe = emptyList()
             )
     }

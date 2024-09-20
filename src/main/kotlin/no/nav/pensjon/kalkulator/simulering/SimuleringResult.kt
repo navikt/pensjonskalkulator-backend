@@ -6,6 +6,7 @@ data class SimuleringResult(
     val afpOffentlig: List<SimulertAfpOffentlig>,
     val vilkaarsproeving: Vilkaarsproeving,
     val harForLiteTrygdetid: Boolean,
+    val trygdetid: Int,
     val opptjeningGrunnlagListe: List<SimulertOpptjeningGrunnlag>
 )
 
