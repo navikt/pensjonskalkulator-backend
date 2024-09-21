@@ -261,27 +261,60 @@ class SimuleringControllerTest {
         private fun simuleringsresultat(simuleringType: SimuleringType) =
             when (simuleringType) {
                 SimuleringType.ALDERSPENSJON -> SimuleringResult(
-                    alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
+                    alderspensjon = listOf(
+                        SimulertAlderspensjon(
+                            alder = 67,
+                            beloep = PENSJONSBELOEP,
+                            inntektspensjonBeloep = 0,
+                            garantipensjonBeloep = 0,
+                            delingstall = 0.0,
+                            pensjonBeholdningFoerUttak = 0
+                        )
+                    ),
                     afpPrivat = emptyList(),
                     afpOffentlig = emptyList(),
                     vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
-                    harForLiteTrygdetid = false
+                    harForLiteTrygdetid = false,
+                    trygdetid = 0,
+                    opptjeningGrunnlagListe = emptyList()
                 )
 
                 SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT -> SimuleringResult(
-                    alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
+                    alderspensjon = listOf(
+                        SimulertAlderspensjon(
+                            alder = 67,
+                            beloep = PENSJONSBELOEP,
+                            inntektspensjonBeloep = 0,
+                            garantipensjonBeloep = 0,
+                            delingstall = 0.0,
+                            pensjonBeholdningFoerUttak = 0
+                        )
+                    ),
                     afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 22056)),
                     afpOffentlig = emptyList(),
                     vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
-                    harForLiteTrygdetid = false
+                    harForLiteTrygdetid = false,
+                    trygdetid = 0,
+                    opptjeningGrunnlagListe = emptyList()
                 )
 
                 SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG -> SimuleringResult(
-                    alderspensjon = listOf(SimulertAlderspensjon(alder = 67, beloep = PENSJONSBELOEP)),
+                    alderspensjon = listOf(
+                        SimulertAlderspensjon(
+                            alder = 67,
+                            beloep = PENSJONSBELOEP,
+                            inntektspensjonBeloep = 0,
+                            garantipensjonBeloep = 0,
+                            delingstall = 0.0,
+                            pensjonBeholdningFoerUttak = 0
+                        )
+                    ),
                     afpPrivat = emptyList(),
                     afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 22056)),
                     vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
-                    harForLiteTrygdetid = false
+                    harForLiteTrygdetid = false,
+                    trygdetid = 0,
+                    opptjeningGrunnlagListe = emptyList()
                 )
             }
 

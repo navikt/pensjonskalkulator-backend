@@ -2,9 +2,7 @@ package no.nav.pensjon.kalkulator.simulering.api.map
 
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
-import no.nav.pensjon.kalkulator.simulering.Alternativ
-import no.nav.pensjon.kalkulator.simulering.SimuleringResult
-import no.nav.pensjon.kalkulator.simulering.Vilkaarsproeving
+import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 
 /**
@@ -15,11 +13,35 @@ object SimuleringResultMapperV6 {
 
     fun resultatV6(source: SimuleringResult) =
         SimuleringResultatV6(
-            alderspensjon = source.alderspensjon.map { PensjonsberegningV6(it.alder, it.beloep) },
-            afpPrivat = source.afpPrivat.map { PensjonsberegningV6(it.alder, it.beloep) },
-            afpOffentlig = source.afpOffentlig.map { PensjonsberegningAfpOffentligV6(it.alder, it.beloep) },
+            alderspensjon = source.alderspensjon.map(::alderspensjon),
+            afpPrivat = source.afpPrivat.map(::privatAfp),
+            afpOffentlig = source.afpOffentlig.map(::offentligAfp),
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving),
-            harForLiteTrygdetid = source.harForLiteTrygdetid
+            harForLiteTrygdetid = source.harForLiteTrygdetid,
+            trygdetid = source.trygdetid,
+            opptjeningGrunnlagListe = source.opptjeningGrunnlagListe.map(::opptjeningGrunnlag)
+        )
+
+    private fun alderspensjon(source: SimulertAlderspensjon) =
+        AlderspensjonsberegningV6(
+            source.alder,
+            source.beloep,
+            source.inntektspensjonBeloep,
+            source.garantipensjonBeloep,
+            source.delingstall,
+            source.pensjonBeholdningFoerUttak
+        )
+
+    private fun offentligAfp(source: SimulertAfpOffentlig) =
+        PensjonsberegningAfpOffentligV6(source.alder, source.beloep)
+
+    private fun privatAfp(source: SimulertAfpPrivat) =
+        PensjonsberegningV6(source.alder, source.beloep)
+
+    private fun opptjeningGrunnlag(source: SimulertOpptjeningGrunnlag) =
+        SimulertOpptjeningGrunnlagV6(
+            source.aar,
+            source.pensjonsgivendeInntektBeloep
         )
 
     private fun vilkaarsproeving(source: Vilkaarsproeving) =
