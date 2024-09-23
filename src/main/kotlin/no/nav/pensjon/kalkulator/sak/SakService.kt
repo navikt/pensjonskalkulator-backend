@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.sak
 
+import no.nav.pensjon.kalkulator.sak.client.SakClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import org.springframework.stereotype.Service
 
@@ -12,7 +13,7 @@ class SakService(
         sakClient.fetchSaker(pidGetter.pid())
             .any { it.type.relevant && it.status.relevant }
 
-    suspend fun harSakType(sakType: SakType) : Boolean =
+    suspend fun harSakType(sakType: SakType): Boolean =
         sakClient.fetchSakerAsync(pidGetter.pid())
             .any { it.type == sakType && it.status.relevant }
 
@@ -22,4 +23,3 @@ class SakService(
             ?.let { RelevantSakStatus(harSak = true, sakType = it.type) }
             ?: RelevantSakStatus(harSak = false, sakType = SakType.NONE)
 }
-

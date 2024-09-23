@@ -7,20 +7,20 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
-import no.nav.pensjon.kalkulator.vedtak.api.dto.LoependeVedtakDetaljerDto
-import no.nav.pensjon.kalkulator.vedtak.api.dto.LoependeVedtakDto
+import no.nav.pensjon.kalkulator.vedtak.api.dto.LoependeSakV1
+import no.nav.pensjon.kalkulator.vedtak.api.dto.LoependeVedtakV1
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("api")
-class VedtakController(private val traceAid: TraceAid) : ControllerBase(traceAid) {
+class VedtakController(traceAid: TraceAid) : ControllerBase(traceAid) {
 
     @GetMapping("/v1/vedtak/loepende-vedtak")
     @Operation(
         summary = "Har løpende saker",
-        description = "Hvorvidt den innloggede brukeren har løpende uføretrygd med uttaksgrad, alderspensjon med uttaksgrad, AFP privat eller offentlig"
+        description = "Hvorvidt den innloggede brukeren har løpende uføretrygd med uttaksgrad, alderspensjon med uttaksgrad, AFP i privat eller offentlig sektor"
     )
     @ApiResponses(
         value = [
@@ -34,19 +34,17 @@ class VedtakController(private val traceAid: TraceAid) : ControllerBase(traceAid
             ),
         ]
     )
-    fun hentLoependeVedtak(): LoependeVedtakDto {
-        return LoependeVedtakDto(
-            alderspensjon = LoependeVedtakDetaljerDto(loepende = true, grad = 60),
-            ufoeretrygd = LoependeVedtakDetaljerDto(loepende = true, 40),
-            afpPrivat = LoependeVedtakDetaljerDto(loepende = true),
-            afpOffentlig = LoependeVedtakDetaljerDto()
+    fun hentLoependeVedtak() =
+        LoependeVedtakV1(
+            alderspensjon = LoependeSakV1(loepende = true, grad = 60),
+            ufoeretrygd = LoependeSakV1(loepende = true, 40),
+            afpPrivat = LoependeSakV1(loepende = true),
+            afpOffentlig = LoependeSakV1()
         )
-    }
 
     override fun errorMessage() = ERROR_MESSAGE
 
     private companion object {
         private const val ERROR_MESSAGE = "Feil ved sjekking av løpende saker"
     }
-
 }

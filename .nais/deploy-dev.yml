@@ -63,6 +63,10 @@ spec:
         - application: pensjonskalkulator-veiledning-frontend-sandbox
         - application: pensjonskalkulator-frontend-catbox
         - application: pensjonskalkulator-veiledning-frontend-catbox
+        - application: pensjonskalkulator-frontend-magicbox
+        - application: pensjonskalkulator-veiledning-frontend-magicbox
+        - application: pensjonskalkulator-frontend-dreambox
+        - application: pensjonskalkulator-veiledning-frontend-dreambox
         - application: pensjonskalkulator-uinnlogget-sandbox
         - application: azure-token-generator # only in dev
           namespace: aura
