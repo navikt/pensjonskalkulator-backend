@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import no.nav.pensjon.kalkulator.vedtak.api.dto.LoependeVedtakDetaljerDto
+import no.nav.pensjon.kalkulator.vedtak.api.dto.LoependeVedtakDto
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -34,10 +36,10 @@ class VedtakController(private val traceAid: TraceAid) : ControllerBase(traceAid
     )
     fun hentLoependeVedtak(): LoependeVedtakDto {
         return LoependeVedtakDto(
-            alderspensjon = LoependeSakDto(loepende = true, grad = 60),
-            ufoeretrygd = LoependeSakDto(loepende = true, 40),
-            afpPrivat = LoependeSakDto(loepende = true),
-            afpOffentlig = LoependeSakDto()
+            alderspensjon = LoependeVedtakDetaljerDto(loepende = true, grad = 60),
+            ufoeretrygd = LoependeVedtakDetaljerDto(loepende = true, 40),
+            afpPrivat = LoependeVedtakDetaljerDto(loepende = true),
+            afpOffentlig = LoependeVedtakDetaljerDto()
         )
     }
 
