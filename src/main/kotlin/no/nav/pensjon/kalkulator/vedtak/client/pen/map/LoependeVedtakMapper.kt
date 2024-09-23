@@ -1,21 +1,17 @@
 package no.nav.pensjon.kalkulator.vedtak.client.pen.map
 
+import no.nav.pensjon.kalkulator.vedtak.Grad
+import no.nav.pensjon.kalkulator.vedtak.LoependeVedtak
+import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenLoependeVedtakDto
+
 object LoependeVedtakMapper {
 
-    fun fromDto(dto: no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenLoependeVedtakDto): no.nav.pensjon.kalkulator.vedtak.LoependeVedtak {
-        return no.nav.pensjon.kalkulator.vedtak.LoependeVedtak(
-            alderspensjon = fromDto(dto.alderspensjon),
-            ufoeretrygd = fromDto(dto.ufoeretrygd),
-            afpPrivat = fromDto(dto.afpPrivat),
-            afpOffentlig = fromDto(dto.afpOffentlig),
+    fun fromDto(dto: PenLoependeVedtakDto): LoependeVedtak {
+        return LoependeVedtak(
+            alderspensjon = dto.alderspensjon?.let { Grad(grad = it.grad) },
+            ufoeretrygd = dto.ufoeretrygd?.let { Grad(grad = it.grad) },
+            afpPrivat = dto.afpPrivat?.let { Grad(grad = it.grad) },
+            afpOffentlig = dto.afpOffentlig?.let { Grad(grad = it.grad) },
         )
-    }
-
-    private fun fromDto(dto: no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenLopenedeVedtakMedGradDto?): no.nav.pensjon.kalkulator.vedtak.Grad? {
-        return dto?.let {
-            no.nav.pensjon.kalkulator.vedtak.Grad(
-                grad = it.grad,
-            )
-        }
     }
 }

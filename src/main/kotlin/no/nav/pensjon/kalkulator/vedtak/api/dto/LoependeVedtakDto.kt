@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.vedtak.api.dto
 
+
 data class LoependeVedtakDto(
     val alderspensjon: LoependeVedtakDetaljerDto?,
     val ufoeretrygd: LoependeVedtakDetaljerDto?,
