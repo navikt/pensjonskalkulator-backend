@@ -38,7 +38,7 @@ class PidEncryptionService(
         } catch (e: NoSuchPaddingException) {
             throw RuntimeException("Unsupported encryption padding", e)
         } catch (e: IllegalBlockSizeException) {
-            throw RuntimeException("Illegal block size for encryption (too long plaintext string?)", e)
+            throw RuntimeException("Illegal block size for decryption - ${displayableValue(value!!)}", e)
         } catch (e: NoSuchAlgorithmException) {
             throw RuntimeException("Unsupported encryption encoding", e)
         } catch (e: BadPaddingException) {
@@ -103,5 +103,14 @@ class PidEncryptionService(
 
         private fun base64(bytes: ByteArray?): String =
             Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
+
+        private fun displayableValue(value: String): String {
+            val length = value.length
+
+            return if (length > 12)
+                "${value.substring(0, 3)}...${value.substring(length - 3, length)} - length $length"
+            else
+                "length $length"
+        }
     }
 }
