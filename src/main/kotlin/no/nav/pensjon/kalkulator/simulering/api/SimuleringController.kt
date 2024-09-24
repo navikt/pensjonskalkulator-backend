@@ -12,8 +12,10 @@ import no.nav.pensjon.kalkulator.simulering.SimuleringService
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import no.nav.pensjon.kalkulator.simulering.api.map.AnonymSimuleringResultMapperV1.resultatV1
 import no.nav.pensjon.kalkulator.simulering.api.map.AnonymSimuleringSpecMapperV1
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringExtendedResultMapperV6.extendedResultV6
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringResultMapperV6.resultatV6
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringSpecMapperV6.fromIngressSimuleringSpecV6
+import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController
 class SimuleringController(
     private val service: SimuleringService,
     private val anonymService: AnonymSimuleringService,
+    private val feature: FeatureToggleService,
     private val traceAid: TraceAid
 ) : ControllerBase(traceAid) {
 
@@ -59,14 +62,25 @@ class SimuleringController(
         log.debug { "Request for V6 simulering: $spec" }
 
         return try {
-            resultatV6(
-                timed(
-                    service::simulerAlderspensjon,
-                    fromIngressSimuleringSpecV6(spec),
-                    "alderspensjon/simulering"
+            if (feature.isEnabled("utvidet-simuleringsresultat"))
+                extendedResultV6(
+                    timed(
+                        service::simulerAlderspensjon,
+                        fromIngressSimuleringSpecV6(spec),
+                        "alderspensjon/simulering"
+                    )
                 )
-            )
-                .also { log.debug { "Simulering V6 respons: $it" } }
+                    .also { log.debug { "Simulering V6 respons: $it" } }
+            else
+                resultatV6(
+                    timed(
+                        service::simulerAlderspensjon,
+                        fromIngressSimuleringSpecV6(spec),
+                        "alderspensjon/simulering"
+                    )
+                )
+                    .also { log.debug { "Simulering V6 respons: $it" } }
+
         } catch (e: BadRequestException) {
             badRequest(e)!!
         } catch (e: EgressException) {
@@ -142,6 +156,7 @@ class SimuleringController(
             )
 
         @Language("json")
-        const val VILKAAR_IKKE_OPPFYLT_EXAMPLE_V6 = """{"alderspensjon":[],"vilkaarsproeving":{"vilkaarErOppfylt":false}}"""
+        const val VILKAAR_IKKE_OPPFYLT_EXAMPLE_V6 =
+            """{"alderspensjon":[],"vilkaarsproeving":{"vilkaarErOppfylt":false}}"""
     }
 }

@@ -9,21 +9,27 @@ import no.nav.pensjon.kalkulator.simulering.api.dto.*
  * Maps between data transfer objects (DTOs) and domain objects related to simulering.
  * The DTOs are specified by version 6 of the API offered to clients.
  */
-object SimuleringResultMapperV6 {
+object SimuleringExtendedResultMapperV6 {
 
-    fun resultatV6(source: SimuleringResult) =
+    fun extendedResultV6(source: SimuleringResult) =
         SimuleringResultatV6(
             alderspensjon = source.alderspensjon.map(::alderspensjon),
             afpPrivat = source.afpPrivat.map(::privatAfp),
             afpOffentlig = source.afpOffentlig.map(::offentligAfp),
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving),
             harForLiteTrygdetid = source.harForLiteTrygdetid,
+            trygdetid = source.trygdetid,
+            opptjeningGrunnlagListe = source.opptjeningGrunnlagListe.map(::opptjeningGrunnlag)
         )
 
     private fun alderspensjon(source: SimulertAlderspensjon) =
         AlderspensjonsberegningV6(
             source.alder,
-            source.beloep
+            source.beloep,
+            source.inntektspensjonBeloep,
+            source.garantipensjonBeloep,
+            source.delingstall,
+            source.pensjonBeholdningFoerUttak
         )
 
     private fun offentligAfp(source: SimulertAfpOffentlig) =
@@ -31,6 +37,12 @@ object SimuleringResultMapperV6 {
 
     private fun privatAfp(source: SimulertAfpPrivat) =
         PensjonsberegningV6(source.alder, source.beloep)
+
+    private fun opptjeningGrunnlag(source: SimulertOpptjeningGrunnlag) =
+        SimulertOpptjeningGrunnlagV6(
+            source.aar,
+            source.pensjonsgivendeInntektBeloep
+        )
 
     private fun vilkaarsproeving(source: Vilkaarsproeving) =
         VilkaarsproevingV6(

@@ -5,11 +5,11 @@ import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import org.junit.jupiter.api.Test
 
-class SimuleringResultMapperV6Test {
+class SimuleringExtendedResultMapperV6Test {
 
     @Test
-    fun `resultatV6 maps domain to V6 DTO`() {
-        SimuleringResultMapperV6.resultatV6(
+    fun `extendedResultV6 maps domain to V6 DTO`() {
+        SimuleringExtendedResultMapperV6.extendedResultV6(
             SimuleringResult(
                 alderspensjon = listOf(
                     SimulertAlderspensjon(
@@ -36,18 +36,21 @@ class SimuleringResultMapperV6Test {
                 AlderspensjonsberegningV6(
                     alder = 67,
                     beloep = 123456,
-                    inntektspensjonBeloep = null,
-                    garantipensjonBeloep = null,
-                    delingstall = null,
-                    pensjonBeholdningFoerUttakBeloep = null
+                    inntektspensjonBeloep = 1,
+                    garantipensjonBeloep = 2,
+                    delingstall = 3.4,
+                    pensjonBeholdningFoerUttakBeloep = 5
                 )
             ),
             afpPrivat = listOf(PensjonsberegningV6(alder = 67, beloep = 12000)),
             afpOffentlig = listOf(PensjonsberegningAfpOffentligV6(alder = 67, beloep = 12000)),
             vilkaarsproeving = VilkaarsproevingV6(vilkaarErOppfylt = true, alternativ = null),
             harForLiteTrygdetid = true,
-            trygdetid = null,
-            opptjeningGrunnlagListe = null
+            trygdetid = 10,
+            opptjeningGrunnlagListe = listOf(
+                SimulertOpptjeningGrunnlagV6(aar = 2001, pensjonsgivendeInntektBeloep = 501000),
+                SimulertOpptjeningGrunnlagV6(aar = 2002, pensjonsgivendeInntektBeloep = 502000)
+            )
         )
     }
 }

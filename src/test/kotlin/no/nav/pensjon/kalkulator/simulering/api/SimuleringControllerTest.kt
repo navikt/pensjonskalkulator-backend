@@ -8,6 +8,7 @@ import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
+import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.intellij.lang.annotations.Language
@@ -40,6 +41,9 @@ class SimuleringControllerTest {
     private lateinit var anonymSimuleringService: AnonymSimuleringService
 
     @MockBean
+    private lateinit var feature: FeatureToggleService
+
+    @MockBean
     private lateinit var traceAid: TraceAid
 
     @MockBean
@@ -55,6 +59,7 @@ class SimuleringControllerTest {
     fun `simulerer hel alderspensjon V6`() {
         val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON)
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
+        enableUtvidetResult()
 
         mvc.perform(
             post(URL_V6)
@@ -70,6 +75,7 @@ class SimuleringControllerTest {
     fun `simulerer alderspensjon med gradert uttak V6`() {
         val spec = impersonalGradertUttakSpec()
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
+        enableUtvidetResult()
 
         mvc.perform(
             post(URL_V6)
@@ -85,6 +91,7 @@ class SimuleringControllerTest {
     fun `simulerer alderspensjon med AFP privat V6`() {
         val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
+        enableUtvidetResult()
 
         mvc.perform(
             post(URL_V6)
@@ -100,6 +107,7 @@ class SimuleringControllerTest {
     fun `simulerer alderspensjon med AFP offentlig V6`() {
         val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG)
         `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
+        enableUtvidetResult()
 
         mvc.perform(
             post(URL_V6)
@@ -115,6 +123,7 @@ class SimuleringControllerTest {
     fun `simulering responds 'vilkaar ikke oppfylt' when Conflict V6`() {
         val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
         `when`(simuleringService.simulerAlderspensjon(spec)).thenThrow(conflict())
+        enableUtvidetResult()
 
         mvc.perform(
             post(URL_V6)
@@ -126,6 +135,9 @@ class SimuleringControllerTest {
             .andExpect(content().json(SimuleringController.VILKAAR_IKKE_OPPFYLT_EXAMPLE_V6))
     }
 
+    private fun enableUtvidetResult() {
+        `when`(feature.isEnabled("utvidet-simuleringsresultat")).thenReturn(true)
+    }
 
     private companion object {
 
