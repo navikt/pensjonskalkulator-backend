@@ -25,7 +25,8 @@ class PenLoependeVedtakClient(
         return doGet(
             object : ParameterizedTypeReference<PenLoependeVedtakDto>() {},
             path = PATH,
-            pid
+            pid,
+            deprecatedBasePath = false
         )?.let(LoependeVedtakMapper::fromDto)
             ?: throw EgressException("Kunne ikke hente loepende vedtak for brukeren")
     }
