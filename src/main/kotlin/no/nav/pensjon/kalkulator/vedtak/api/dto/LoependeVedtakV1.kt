@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.vedtak.api.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import java.time.LocalDate
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class LoependeVedtakV1(
@@ -12,5 +13,6 @@ data class LoependeVedtakV1(
 
 data class LoependeVedtakDetaljerV1(
     val loepende: Boolean = false,
-    val grad: Int = 100
+    val grad: Int = 100,
+    val fom: LocalDate? = null,
 )

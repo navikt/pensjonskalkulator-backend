@@ -1,12 +1,15 @@
 package no.nav.pensjon.kalkulator.vedtak
 
+import java.time.LocalDate
+
 data class LoependeVedtak(
-    val alderspensjon: Grad?,
-    val ufoeretrygd: Grad?,
-    val afpPrivat: Grad?,
-    val afpOffentlig: Grad?,
+    val alderspensjon: LopenedeVedtakDetaljer?,
+    val ufoeretrygd: LopenedeVedtakDetaljer?,
+    val afpPrivat: LopenedeVedtakDetaljer?,
+    val afpOffentlig: LopenedeVedtakDetaljer?,
 )
 
-data class Grad(
+data class LopenedeVedtakDetaljer(
     val grad: Int,
+    val fom: LocalDate,
 )

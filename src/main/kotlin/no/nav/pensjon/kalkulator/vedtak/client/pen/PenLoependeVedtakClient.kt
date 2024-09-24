@@ -31,6 +31,6 @@ class PenLoependeVedtakClient(
     }
 
     private companion object {
-        private const val PATH = "vedtak/v1/loepende-vedtak"
+        private const val PATH = "vedtak/loependevedtak"
     }
 }
