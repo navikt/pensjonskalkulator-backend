@@ -9,8 +9,8 @@ data class SimuleringResultatV6(
     val afpOffentlig: List<PensjonsberegningAfpOffentligV6>? = emptyList(),
     val vilkaarsproeving: VilkaarsproevingV6,
     val harForLiteTrygdetid: Boolean? = false,
-    val trygdetid: Int? = 0,
-    val opptjeningGrunnlagListe: List<SimulertOpptjeningGrunnlagV6>? = emptyList()
+    val trygdetid: Int? = null,
+    val opptjeningGrunnlagListe: List<SimulertOpptjeningGrunnlagV6>? = null
 )
 
 data class PensjonsberegningV6(val alder: Int, val beloep: Int)
@@ -19,10 +19,10 @@ data class PensjonsberegningV6(val alder: Int, val beloep: Int)
 data class AlderspensjonsberegningV6(
     val alder: Int,
     val beloep: Int,
-    val inntektspensjonBeloep: Int? = 0,
-    val garantipensjonBeloep: Int? = 0,
-    val delingstall: Double? = 0.0,
-    val pensjonBeholdningFoerUttakBeloep: Int? = 0
+    val inntektspensjonBeloep: Int? = null,
+    val garantipensjonBeloep: Int? = null,
+    val delingstall: Double? = null,
+    val pensjonBeholdningFoerUttakBeloep: Int? = null
 )
 
 data class PensjonsberegningAfpOffentligV6(val alder: Int, val beloep: Int)
