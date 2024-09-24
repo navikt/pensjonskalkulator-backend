@@ -115,7 +115,7 @@ abstract class PenClient(
 
     override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
 
-    private fun setHeaders(headers: HttpHeaders, pid: Pid? = null) {
+    protected fun setHeaders(headers: HttpHeaders, pid: Pid? = null) {
         headers.contentType = MediaType.APPLICATION_JSON
         headers.accept = listOf(MediaType.APPLICATION_JSON)
         headers.setBearerAuth(EgressAccess.token(service).value)

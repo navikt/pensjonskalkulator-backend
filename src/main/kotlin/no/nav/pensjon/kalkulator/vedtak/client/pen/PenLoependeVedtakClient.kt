@@ -24,7 +24,7 @@ class PenLoependeVedtakClient(
         return webClient
             .get()
             .uri(PATH)
-            .header("fnr", pid.value)
+            .headers { setHeaders(it, pid) }
             .retrieve()
             .bodyToMono(PenLoependeVedtakDto::class.java)
             .block()
