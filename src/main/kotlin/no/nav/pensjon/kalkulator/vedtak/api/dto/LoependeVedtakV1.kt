@@ -11,8 +11,9 @@ data class LoependeVedtakV1(
     val afpOffentlig: LoependeVedtakDetaljerV1,
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class LoependeVedtakDetaljerV1(
     val loepende: Boolean = false,
-    val grad: Int = 100,
+    val grad: Int = 0,
     val fom: LocalDate? = null,
 )

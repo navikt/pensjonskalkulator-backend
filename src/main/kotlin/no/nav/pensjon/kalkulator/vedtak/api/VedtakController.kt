@@ -8,14 +8,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
-import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderMapperV1
-import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderMapperV1.fromIngressSpecForHeltUttakV1
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtakService
-import no.nav.pensjon.kalkulator.vedtak.api.dto.LoependeVedtakDetaljerV1
 import no.nav.pensjon.kalkulator.vedtak.api.dto.LoependeVedtakV1
-import no.nav.pensjon.kalkulator.vedtak.api.map.LoependeVedtakMapperV1
 import no.nav.pensjon.kalkulator.vedtak.api.map.LoependeVedtakMapperV1.toDto
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
