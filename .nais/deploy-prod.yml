@@ -57,6 +57,9 @@ spec:
         - application: pdl-api
           namespace: pdl
           cluster: prod-fss
+        - application: pensjon-representasjon
+          namespace: pensjon-person
+          cluster: prod-fss
         - application: pensjon-selvbetjening-fss-gateway
           namespace: pensjonselvbetjening
           cluster: prod-fss
@@ -67,12 +70,12 @@ spec:
           cluster: prod-fss
         - application: etterlatte-api
           namespace: etterlatte
-          cluster: prod-gcp
       external:
         - host: idporten.no
         - host: pdl-api.prod-fss-pub.nais.io
         - host: pensjon-pen.prod-fss-pub.nais.io
         - host: pensjon-popp.prod-fss-pub.nais.io
+        - host: pensjon-representasjon.prod-fss-pub.nais.io
         - host: pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
         - host: pensjonskalkulator-unleash-api.nav.cloud.nais.io
         - host: skjermede-personer-pip.intern.nav.no
@@ -94,6 +97,10 @@ spec:
       value: https://pensjon-pen.prod-fss-pub.nais.io
     - name: PENSJON_REGLER_URL
       value: https://pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
+    - name: PENSJON_REPRESENTASJON_SERVICE_ID
+      value: prod-fss:pensjon-person:pensjon-representasjon
+    - name: PENSJON_REPRESENTASJON_URL
+      value: https://pensjon-representasjon.prod-fss-pub.nais.io
     - name: PERSONDATA_SERVICE_ID
       value: prod-fss:pdl:pdl-api
     - name: PERSONDATA_URL

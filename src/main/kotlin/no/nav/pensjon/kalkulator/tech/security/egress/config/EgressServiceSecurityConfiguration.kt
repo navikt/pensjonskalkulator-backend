@@ -17,17 +17,19 @@ class EgressServiceSecurityConfiguration {
         @Value("\${pensjon-regler.service-id}") pensjonReglerServiceId: String,
         @Value("\${pen.service-id}") pensjonsfagligKjerneServiceId: String,
         @Value("\${popp.service-id}") pensjonsopptjeningServiceId: String,
+        @Value("\${pensjon-representasjon.service-id}") pensjonRepresentasjonServiceId: String,
         @Value("\${pensjonssimulator.service-id}") pensjonssimulatorServiceId: String,
         @Value("\${persondata.service-id}") persondataServiceId: String,
         @Value("\${skjermede-personer.service-id}") skjermedePersonerServiceId: String,
         @Value("\${tjenestepensjon.service-id}") tjenestepensjonServiceId: String,
         @Value("\${proxy.service-id}") proxyServiceId: String,
         @Value("\${omstillingsstoenad-service-id}") omstillingsstoenadServiceId: String,
-    ): EgressServiceListsByAudience {
-        return EgressServiceListsByAudience(
+    ) =
+        EgressServiceListsByAudience(
             mapOf(
                 pensjonsfagligKjerneServiceId to listOf(EgressService.PENSJONSFAGLIG_KJERNE),
                 pensjonsopptjeningServiceId to listOf(EgressService.PENSJONSOPPTJENING),
+                pensjonRepresentasjonServiceId to listOf(EgressService.PENSJON_REPRESENTASJON),
                 pensjonssimulatorServiceId to listOf(EgressService.PENSJONSSIMULATOR),
                 persondataServiceId to listOf(EgressService.PERSONDATALOESNINGEN),
                 skjermedePersonerServiceId to listOf(EgressService.SKJERMEDE_PERSONER),
@@ -36,7 +38,6 @@ class EgressServiceSecurityConfiguration {
                 omstillingsstoenadServiceId to listOf(EgressService.OMSTILLINGSSTOENAD),
             )
         )
-    }
 
     @Bean
     fun impersonalEgressTokenSuppliersByService(
