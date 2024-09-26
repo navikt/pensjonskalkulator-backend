@@ -126,6 +126,8 @@ spec:
       value: 9ec6487d-f37a-4aad-a027-cd221c1ac32b
     - name: PKB_GROUP_ID_STRENGT_FORTROLIG_ADRESSE
       value: ad7b87a6-9180-467c-affc-20a566b0fec0
+    - name: PKB_REPRESENTASJON_TOKEN_X_AUDIENCE
+      value: prod-fss:pensjon-person:pensjon-representasjon
     - name: SERVER_ERROR_INCLUDE_STACKTRACE
       value: never
     - name: AUDIT_LOG_OUTPUT

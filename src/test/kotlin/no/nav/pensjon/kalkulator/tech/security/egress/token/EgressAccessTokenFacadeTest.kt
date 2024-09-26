@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.tech.security.egress.token
 import no.nav.pensjon.kalkulator.tech.security.egress.AuthType
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.clientcred.ClientCredentialsEgressTokenService
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.jwtbearer.JwtBearerEgressTokenService
+import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.tokenexchange.TokenExchangeService
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -17,20 +18,35 @@ class EgressAccessTokenFacadeTest {
     private lateinit var facade: EgressAccessTokenFacade
 
     @Mock
-    private lateinit var accessTokenGetterForClientCredentials: ClientCredentialsEgressTokenService
+    private lateinit var clientCredentialsTokenService: ClientCredentialsEgressTokenService
 
     @Mock
-    private lateinit var jwtBearerAccessTokenGetter: JwtBearerEgressTokenService
+    private lateinit var jwtBearerTokenService: JwtBearerEgressTokenService
+
+    @Mock
+    private lateinit var tokenExchangeService: TokenExchangeService
 
     @BeforeEach
     fun initialize() {
-        facade = EgressAccessTokenFacade(accessTokenGetterForClientCredentials, jwtBearerAccessTokenGetter)
+        facade = EgressAccessTokenFacade(
+            clientCredentialsTokenService,
+            jwtBearerTokenService,
+            tokenExchangeService
+        )
     }
 
     @Test
     fun `when user type is application then getAccessToken returns access token for application`() {
-        `when`(accessTokenGetterForClientCredentials.getEgressToken("", AUDIENCE, "")).thenReturn(RawJwt(EGRESS_TOKEN))
+        `when`(
+            clientCredentialsTokenService.getEgressToken(
+                ingressToken = null,
+                audience = AUDIENCE,
+                user = ""
+            )
+        ).thenReturn(RawJwt(EGRESS_TOKEN))
+
         val token: RawJwt = facade.getAccessToken(AuthType.MACHINE_INSIDE_NAV, AUDIENCE)
+
         assertEquals(EGRESS_TOKEN, token.value)
     }
 
