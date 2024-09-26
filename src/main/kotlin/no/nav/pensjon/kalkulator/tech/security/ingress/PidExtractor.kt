@@ -11,7 +11,8 @@ class PidExtractor : PidGetter {
 
     private val log = KotlinLogging.logger {}
 
-    override fun pid(): Pid = SecurityContextHolder.getContext().authentication?.enriched()?.pid ?: missingPid()
+    override fun pid(): Pid =
+        SecurityContextHolder.getContext().authentication?.enriched()?.targetPid() ?: missingPid()
 
     private fun missingPid(): Pid {
         "No PID found".let {

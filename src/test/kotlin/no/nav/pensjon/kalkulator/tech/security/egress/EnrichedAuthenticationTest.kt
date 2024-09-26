@@ -1,6 +1,8 @@
 package no.nav.pensjon.kalkulator.tech.security.egress
 
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonTarget
+import no.nav.pensjon.kalkulator.tech.representasjon.RepresentertRolle
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import no.nav.pensjon.kalkulator.tech.security.egress.token.RawJwt
@@ -28,7 +30,12 @@ class EnrichedAuthenticationTest {
         val tokenSuppliersByService =
             EgressTokenSuppliersByService(mapOf(EgressService.PENSJON_REGLER to Supplier { RawJwt("token1") }))
 
-        enrichedAuthentication = EnrichedAuthentication(initialAuth, tokenSuppliersByService, pid)
+        enrichedAuthentication =
+            EnrichedAuthentication(
+                initialAuth,
+                egressTokenSuppliersByService = tokenSuppliersByService,
+                target = RepresentasjonTarget(pid, RepresentertRolle.SELV)
+            )
     }
 
     @Test

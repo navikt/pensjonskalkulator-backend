@@ -14,5 +14,5 @@ class NavnRequirement {
      * Fullt navn required in 'on behalf' context (veileder etc.)
      */
     fun needFulltNavn(): Boolean =
-        SecurityContextHolder.getContext().authentication?.enriched()?.isOnBehalf ?: false
+        SecurityContextHolder.getContext().authentication?.enriched()?.needFulltNavn() ?: false
 }

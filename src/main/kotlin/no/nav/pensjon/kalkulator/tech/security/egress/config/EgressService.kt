@@ -19,6 +19,12 @@ enum class EgressService(
     NORSK_PENSJON("Norsk Pensjon", "NP", "Private pensjonsavtaler", GatewayUsage.INTERNAL),
     OAUTH2_TOKEN("OAuth2 token", "OA2", "OAuth2 access token"),
     PENSJON_REGLER("Pensjon-regler", "PReg", "Pensjonsregler", GatewayUsage.INTERNAL),
+    PENSJON_REPRESENTASJON(
+        description = "Pensjon-representasjon",
+        shortName = "Rep",
+        purpose = "Representasjonsforhold (fullmakt m.m.)",
+        authType = AuthType.PERSON_SELF // personal token required
+    ),
     PENSJONSFAGLIG_KJERNE("Pensjonsfaglig kjerne", "PEN", "Simulering, pensjonsdata"),
     PENSJONSOPPTJENING("Pensjonsopptjening", "POPP", "Pensjonsopptjeningsdata"),
     PERSONDATALOESNINGEN("Persondataløsningen", "PDL", "Persondata"),

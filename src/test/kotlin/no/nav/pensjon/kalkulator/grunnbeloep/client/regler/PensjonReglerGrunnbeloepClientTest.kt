@@ -5,6 +5,8 @@ import no.nav.pensjon.kalkulator.grunnbeloep.client.GrunnbeloepSpec
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.regler.ReglerConfiguration
+import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonTarget
+import no.nav.pensjon.kalkulator.tech.representasjon.RepresentertRolle
 import no.nav.pensjon.kalkulator.tech.security.egress.EnrichedAuthentication
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
@@ -75,11 +77,12 @@ class PensjonReglerGrunnbeloepClientTest : WebClientTest() {
         private fun arrangeSecurityContext() {
             SecurityContextHolder.setContext(SecurityContextHolder.createEmptyContext())
 
-            SecurityContextHolder.getContext().authentication = EnrichedAuthentication(
-                initialAuth = TestingAuthenticationToken("TEST_USER", null),
-                egressTokenSuppliersByService = EgressTokenSuppliersByService(mapOf()),
-                pid = pid
-            )
+            SecurityContextHolder.getContext().authentication =
+                EnrichedAuthentication(
+                    initialAuth = TestingAuthenticationToken("TEST_USER", null),
+                    egressTokenSuppliersByService = EgressTokenSuppliersByService(mapOf()),
+                    target = RepresentasjonTarget(pid, RepresentertRolle.SELV)
+                )
         }
 
         private fun okResponse(): MockResponse {
