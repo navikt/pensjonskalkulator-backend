@@ -17,8 +17,8 @@ import org.springframework.web.reactive.function.client.WebClient
 @Component
 @Qualifier("token-x")
 class TokenXClient(
-    @Value("\${token.x.token_endpoint}") private val tokenEndpoint: String,
-    @Value("\${pkb.representasjon.token.x.audience}") private val tokenAudience: String,
+    @Value("\${token.x.token.endpoint}") private val tokenEndpoint: String,
+    @Value("\${pensjon-representasjon.service-id}") private val tokenAudience: String,
     webClientBuilder: WebClient.Builder,
     expirationChecker: ExpirationChecker,
     private val credentials: TokenExchangeCredentials,
