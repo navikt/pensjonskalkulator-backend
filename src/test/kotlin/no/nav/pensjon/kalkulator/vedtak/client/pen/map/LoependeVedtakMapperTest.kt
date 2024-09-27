@@ -15,7 +15,7 @@ class LoependeVedtakMapperTest {
             alderspensjon = PenLopenedeVedtakMedGradDto(1, LocalDate.of(2021, 1, 1)),
             ufoeretrygd = PenLopenedeVedtakMedGradDto(2, LocalDate.of(2021, 1, 1)),
             afpPrivat = PenLopenedeVedtakMedGradDto(3, LocalDate.of(2021, 1, 1)),
-            afp = PenLopenedeVedtakMedGradDto(4, LocalDate.of(2021, 1, 1)),
+            afpOffentlig = PenLopenedeVedtakMedGradDto(4, LocalDate.of(2021, 1, 1)),
         )
 
         val result = LoependeVedtakMapper.fromDto(dto)

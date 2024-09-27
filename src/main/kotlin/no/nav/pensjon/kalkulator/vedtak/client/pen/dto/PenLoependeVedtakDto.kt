@@ -6,7 +6,7 @@ data class PenLoependeVedtakDto(
     val alderspensjon: PenLopenedeVedtakMedGradDto?,
     val ufoeretrygd: PenLopenedeVedtakMedGradDto?,
     val afpPrivat: PenLopenedeVedtakMedGradDto?,
-    val afp: PenLopenedeVedtakMedGradDto?, //Afp i Offentlig Sektor for brukere født før 1963
+    val afpOffentlig: PenLopenedeVedtakMedGradDto?, //Afp i Offentlig Sektor for brukere født før 1963
 )
 
 data class PenLopenedeVedtakMedGradDto(
