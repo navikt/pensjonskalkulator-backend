@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.tech.security.egress
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.crypto.PidEncryptionService
+import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonService
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import no.nav.pensjon.kalkulator.tech.security.ingress.SecurityContextPidExtractor
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
@@ -26,7 +27,10 @@ class SecurityContextEnricherTest {
     private lateinit var securityContextPidExtractor: SecurityContextPidExtractor
 
     @Mock
-    private lateinit var pidEncryptionService: PidEncryptionService
+    private lateinit var pidDecrypter: PidEncryptionService
+
+    @Mock
+    private lateinit var representasjonService: RepresentasjonService
 
     @Mock
     private lateinit var authentication: Authentication
@@ -34,27 +38,22 @@ class SecurityContextEnricherTest {
     @Test
     fun `enrichAuthentication tolerates null authentication`() {
         SecurityContextHolder.setContext(SecurityContextImpl(null))
-        val enricher = SecurityContextEnricher(tokenSuppliers(), securityContextPidExtractor, pidEncryptionService)
-
-        assertDoesNotThrow { enricher.enrichAuthentication(request) }
+        assertDoesNotThrow { securityContextEnricher().enrichAuthentication(request) }
     }
 
     @Test
     fun `if PID in request header then enrichAuthentication does not get PID from security context`() {
         `when`(request.getHeader("fnr")).thenReturn(pid.value)
-        val enricher = SecurityContextEnricher(tokenSuppliers(), securityContextPidExtractor, pidEncryptionService)
-
-        enricher.enrichAuthentication(request)
-
+        securityContextEnricher().enrichAuthentication(request)
         verify(securityContextPidExtractor, never()).pid()
     }
 
     @Test
     fun `if no PID in request header then enrichAuthentication gets PID from security context`() {
+        SecurityContextHolder.setContext(SecurityContextImpl(authentication))
         `when`(request.getHeader("fnr")).thenReturn(null)
-        val enricher = SecurityContextEnricher(tokenSuppliers(), securityContextPidExtractor, pidEncryptionService)
 
-        enricher.enrichAuthentication(request)
+        securityContextEnricher().enrichAuthentication(request)
 
         verify(securityContextPidExtractor, times(1)).pid()
     }
@@ -63,26 +62,33 @@ class SecurityContextEnricherTest {
     fun `enrichAuthentication decrypts encrypted PID`() {
         SecurityContextHolder.setContext(SecurityContextImpl(authentication))
         `when`(request.getHeader("fnr")).thenReturn("encrypted.string.containing.dot")
-        `when`(pidEncryptionService.decrypt("encrypted.string.containing.dot")).thenReturn("12906498357")
-        val enricher = SecurityContextEnricher(tokenSuppliers(), securityContextPidExtractor, pidEncryptionService)
+        `when`(pidDecrypter.decrypt("encrypted.string.containing.dot")).thenReturn("12906498357")
 
-        enricher.enrichAuthentication(request)
+        securityContextEnricher().enrichAuthentication(request)
 
-        assertEquals("12906498357", SecurityContextHolder.getContext().authentication?.enriched()?.pid?.value)
+        assertEquals("12906498357", securityContextTargetPid()?.value)
     }
 
     @Test
     fun `enrichAuthentication uses plaintext PID if not encrypted`() {
         SecurityContextHolder.setContext(SecurityContextImpl(authentication))
         `when`(request.getHeader("fnr")).thenReturn("12906498357")
-        val enricher = SecurityContextEnricher(tokenSuppliers(), securityContextPidExtractor, pidEncryptionService)
 
-        enricher.enrichAuthentication(request)
+        securityContextEnricher().enrichAuthentication(request)
 
-        assertEquals("12906498357", SecurityContextHolder.getContext().authentication?.enriched()?.pid?.value)
+        assertEquals("12906498357", securityContextTargetPid()?.value)
     }
 
+    private fun securityContextEnricher() =
+        SecurityContextEnricher(
+            tokenSuppliers = EgressTokenSuppliersByService(emptyMap()),
+            securityContextPidExtractor,
+            pidDecrypter,
+            representasjonService
+        )
+
     private companion object {
-        private fun tokenSuppliers() = EgressTokenSuppliersByService(emptyMap())
+        private fun securityContextTargetPid() =
+            SecurityContextHolder.getContext().authentication?.enriched()?.targetPid()
     }
 }

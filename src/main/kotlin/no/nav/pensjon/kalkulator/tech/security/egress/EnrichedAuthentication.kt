@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.tech.security.egress
 
 import no.nav.pensjon.kalkulator.person.Pid
+import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonTarget
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import no.nav.pensjon.kalkulator.tech.security.egress.token.RawJwt
@@ -16,12 +17,15 @@ import org.springframework.security.core.GrantedAuthority
 class EnrichedAuthentication(
     private val initialAuth: Authentication?,
     private val egressTokenSuppliersByService: EgressTokenSuppliersByService,
-    val pid: Pid?,
-    val isOnBehalf: Boolean = false
+    private val target: RepresentasjonTarget
 ) : Authentication {
 
     fun getEgressAccessToken(service: EgressService): RawJwt =
         egressTokenSuppliersByService.value[service]?.get() ?: RawJwt("")
+
+    fun needFulltNavn(): Boolean = target.rolle.needFulltNavn
+
+    fun targetPid(): Pid? = target.pid
 
     override fun getName(): String = initialAuth?.name ?: ""
 

@@ -77,6 +77,9 @@ spec:
         - application: pdl-api
           namespace: pdl
           cluster: dev-fss
+        - application: pensjon-representasjon-q2
+          namespace: pensjon-person
+          cluster: dev-fss
         - application: pensjon-selvbetjening-fss-gateway
           namespace: pensjonselvbetjening
           cluster: dev-fss
@@ -93,6 +96,7 @@ spec:
         - host: pdl-api.dev-fss-pub.nais.io
         - host: pensjon-pen-q2.dev-fss-pub.nais.io
         - host: pensjon-popp-q2.dev-fss-pub.nais.io
+        - host: pensjon-representasjon-q2.dev-fss-pub.nais.io
         - host: pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
         - host: pensjon-testdata-facade.dev-fss-pub.nais.io # only in dev
         - host: pensjonskalkulator-unleash-api.nav.cloud.nais.io
@@ -119,6 +123,10 @@ spec:
       value: https://pensjon-pen-q2.dev-fss-pub.nais.io
     - name: PENSJON_REGLER_URL
       value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
+    - name: PENSJON_REPRESENTASJON_SERVICE_ID
+      value: dev-fss:pensjon-person:pensjon-representasjon-q2
+    - name: PENSJON_REPRESENTASJON_URL
+      value: https://pensjon-representasjon-q2.dev-fss-pub.nais.io
     - name: PERSONDATA_SERVICE_ID
       value: dev-fss:pdl:pdl-api
     - name: PERSONDATA_URL
