@@ -13,7 +13,7 @@ class JwtBearerEgressTokenService(
     val assertionCreator: JwtBearerAssertionCreator
 ) : EgressTokenGetter {
 
-    override fun getEgressToken(ingressToken: String, audience: String, user: String): RawJwt {
+    override fun getEgressToken(ingressToken: String?, audience: String, user: String): RawJwt {
         // audience = scope, e.g. "nav:pensjonssimulator:simulering"
         val accessParameter = TokenAccessParameter.jwtBearer(assertionCreator.assertion(audience))
 

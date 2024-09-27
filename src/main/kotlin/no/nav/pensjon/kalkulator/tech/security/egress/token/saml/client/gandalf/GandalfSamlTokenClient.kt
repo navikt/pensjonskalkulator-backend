@@ -5,7 +5,7 @@ import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
-import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.AuthorizationGrantType
+import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.AuthorizationGrantCombo
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.OAuth2ParameterNames
 import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.client.SamlTokenClient
 import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.client.gandalf.dto.SamlTokenDataDto
@@ -108,7 +108,7 @@ class GandalfSamlTokenClient(
 
         private fun body(idToken: Jwt) =
             BodyInserters
-                .fromFormData(OAuth2ParameterNames.GRANT_TYPE, AuthorizationGrantType.TOKEN_EXCHANGE.value)
+                .fromFormData(OAuth2ParameterNames.GRANT_TYPE, AuthorizationGrantCombo.TOKEN_EXCHANGE.value)
                 .with(OAuth2ParameterNames.SUBJECT_TOKEN_TYPE, TOKEN_TYPE)
                 .with(OAuth2ParameterNames.SUBJECT_TOKEN, idToken.tokenValue)
 

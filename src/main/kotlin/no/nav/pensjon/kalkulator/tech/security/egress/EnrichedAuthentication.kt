@@ -20,8 +20,8 @@ class EnrichedAuthentication(
     private val target: RepresentasjonTarget
 ) : Authentication {
 
-    fun getEgressAccessToken(service: EgressService): RawJwt =
-        egressTokenSuppliersByService.value[service]?.get() ?: RawJwt("")
+    fun getEgressAccessToken(service: EgressService, ingressToken: String?): RawJwt =
+        egressTokenSuppliersByService.value[service]?.apply(ingressToken) ?: RawJwt("")
 
     fun needFulltNavn(): Boolean = target.rolle.needFulltNavn
 

@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.util.*
-import java.util.function.Supplier
+import java.util.function.Function
 
 @Configuration
 class EgressServiceSecurityConfiguration {
@@ -40,18 +40,19 @@ class EgressServiceSecurityConfiguration {
         )
 
     @Bean
-    fun impersonalEgressTokenSuppliersByService(
+    fun egressTokenSuppliersByService(
         serviceListsByAudience: EgressServiceListsByAudience,
         egressTokenGetter: EgressAccessTokenFacade
     ): EgressTokenSuppliersByService {
-        val suppliersByService: MutableMap<EgressService, Supplier<RawJwt>> = EnumMap(EgressService::class.java)
+        val suppliersByService: MutableMap<EgressService, Function<String?, RawJwt>> =
+            EnumMap(EgressService::class.java)
 
         serviceListsByAudience.entries.forEach { (audience, services) ->
-            obtainImpersonalTokenSupplier(
-                audience = audience,
-                services = services,
+            obtainTokenSupplier(
+                audience,
+                services,
                 authType = services.first().authType,
-                egressTokenGetter = egressTokenGetter,
+                egressTokenGetter,
                 tokenSuppliersByService = suppliersByService
             )
         }
@@ -60,14 +61,18 @@ class EgressServiceSecurityConfiguration {
     }
 
     companion object {
-        private fun obtainImpersonalTokenSupplier(
+
+        private fun obtainTokenSupplier(
             audience: String,
             services: List<EgressService>,
             authType: AuthType,
             egressTokenGetter: EgressAccessTokenFacade,
-            tokenSuppliersByService: MutableMap<EgressService, Supplier<RawJwt>>
+            tokenSuppliersByService: MutableMap<EgressService, Function<String?, RawJwt>>
         ) {
-            val tokenSupplier = Supplier<RawJwt> { egressTokenGetter.getAccessToken(authType, audience) }
+            val tokenSupplier = Function<String?, RawJwt> {
+                egressTokenGetter.getAccessToken(authType, audience, ingressToken = it)
+            }
+
             services.forEach { tokenSuppliersByService[it] = tokenSupplier }
         }
     }
