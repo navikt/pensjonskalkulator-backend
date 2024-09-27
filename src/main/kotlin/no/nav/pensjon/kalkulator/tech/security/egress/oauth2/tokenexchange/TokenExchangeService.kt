@@ -6,13 +6,13 @@ import no.nav.pensjon.kalkulator.tech.security.egress.token.CacheKey
 import no.nav.pensjon.kalkulator.tech.security.egress.token.EgressTokenGetter
 import no.nav.pensjon.kalkulator.tech.security.egress.token.RawJwt
 import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenAccessParameter
-import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
+import no.nav.pensjon.kalkulator.tech.security.ingress.SecurityContextPidExtractor
 import org.springframework.stereotype.Service
 
 @Service
 class TokenExchangeService(
     val client: TokenExchangeClient,
-    private val pidGetter: PidGetter
+    private val loggedInPidProvider: SecurityContextPidExtractor
 ) : EgressTokenGetter {
 
     override fun getEgressToken(ingressToken: String?, audience: String, user: String): RawJwt {
@@ -21,7 +21,10 @@ class TokenExchangeService(
         val accessParameter = ingressToken?.let(TokenAccessParameter::tokenExchange)
             ?: throw IllegalArgumentException("Missing ingressToken")
 
-        val tokenValue = client.exchange(accessParameter, CacheKey(scope, pidGetter.pid())).accessToken
+        val tokenValue = loggedInPidProvider.pid()?.let {
+            client.exchange(accessParameter, CacheKey(scope, it)).accessToken
+        } ?: throw IllegalStateException("Missing PID of logged in user")
+
         return RawJwt(tokenValue)
     }
 }

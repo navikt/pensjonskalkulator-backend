@@ -10,6 +10,7 @@ import no.nav.pensjon.kalkulator.tech.representasjon.RepresentertRolle
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import no.nav.pensjon.kalkulator.tech.security.ingress.SecurityContextPidExtractor
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
+import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.util.StringUtils.hasLength
@@ -23,35 +24,51 @@ class SecurityContextEnricher(
 ) {
     fun enrichAuthentication(request: HttpServletRequest) {
         with(SecurityContextHolder.getContext()) {
-            authentication = authentication?.let {
-                EnrichedAuthentication(
-                    initialAuth = it,
-                    egressTokenSuppliersByService = tokenSuppliers,
-                    target = target(request)
-                )
-            } ?: anonymousAuthentication()
+            if (authentication == null) {
+                authentication = anonymousAuthentication()
+            } else {
+                authentication = enrich(authentication, request)
+                authentication = applyPotentialFullmakt(authentication, request)
+            }
         }
     }
 
-    private fun target(request: HttpServletRequest): RepresentasjonTarget =
-        onBehalfOfPid(request.cookies)?.let(::validFullmaktGiver)
-            ?: headerPid(request)?.let(::personUnderVeiledning)
-            ?: selv()
+    private fun enrich(auth: Authentication, request: HttpServletRequest) =
+        EnrichedAuthentication(
+            initialAuth = auth,
+            egressTokenSuppliersByService = tokenSuppliers,
+            target = headerPid(request)?.let(::personUnderVeiledning) ?: selv()
+        )
+
+    private fun applyPotentialFullmakt(auth: Authentication, request: HttpServletRequest): Authentication =
+        validFullmaktGiver(onBehalfOfPid(request.cookies))
+            ?.let { enrichWithFullmakt(auth, it) }
+            ?: auth
+
+    private fun enrichWithFullmakt(auth: Authentication, fullmaktGiverPid: Pid) =
+        EnrichedAuthentication(
+            initialAuth = auth,
+            egressTokenSuppliersByService = tokenSuppliers,
+            target = RepresentasjonTarget(pid = fullmaktGiverPid, rolle = RepresentertRolle.FULLMAKT_GIVER)
+        )
 
     /**
      * NB: Dette støtter ikke brukstilfellet der veileder er logget inn på vegne av en fullmektig.
      * Dette fordi pensjon-representasjon henter ut PID fra TokenX-tokenet (som ikke finnes når veileder er logget inn).
      */
-    private fun validFullmaktGiver(pid: Pid?): RepresentasjonTarget? =
+    private fun validFullmaktGiver(pid: Pid?): Pid? =
         pid?.let {
             if (representasjonService.hasValidRepresentasjonsforhold(it).isValid)
-                RepresentasjonTarget(pid = it, rolle = RepresentertRolle.FULLMAKT_GIVER)
+                it
             else
                 null
         }
 
     private fun selv() =
-        RepresentasjonTarget(pid = securityContextPidExtractor.pid(), rolle = RepresentertRolle.SELV)
+        RepresentasjonTarget(
+            pid = securityContextPidExtractor.pid(),
+            rolle = RepresentertRolle.SELV
+        )
 
     private fun anonymousAuthentication() =
         EnrichedAuthentication(

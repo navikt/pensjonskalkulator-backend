@@ -6,7 +6,8 @@ import no.nav.pensjon.kalkulator.tech.representasjon.RepresentertRolle
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import no.nav.pensjon.kalkulator.tech.security.egress.token.RawJwt
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -15,7 +16,7 @@ import org.mockito.Mockito.*
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import java.util.function.Supplier
+import java.util.function.Function
 
 @ExtendWith(SpringExtension::class)
 class EnrichedAuthenticationTest {
@@ -28,7 +29,7 @@ class EnrichedAuthenticationTest {
     @BeforeEach
     fun initialize() {
         val tokenSuppliersByService =
-            EgressTokenSuppliersByService(mapOf(EgressService.PENSJON_REGLER to Supplier { RawJwt("token1") }))
+            EgressTokenSuppliersByService(mapOf(EgressService.PENSJON_REGLER to Function { RawJwt("token1") }))
 
         enrichedAuthentication =
             EnrichedAuthentication(
@@ -40,7 +41,7 @@ class EnrichedAuthenticationTest {
 
     @Test
     fun `getEgressAccessToken returns access token for given egress service`() {
-        val token = enrichedAuthentication.getEgressAccessToken(EgressService.PENSJON_REGLER)
+        val token = enrichedAuthentication.getEgressAccessToken(EgressService.PENSJON_REGLER, "")
         assertEquals("token1", token.value)
     }
 

@@ -12,8 +12,7 @@ class EgressAccessTokenFacade(
     private val jwtBearerTokenService: JwtBearerEgressTokenService,
     private val tokenExchangeService: TokenExchangeService
 ) {
-
-    fun getAccessToken(authType: AuthType, audience: String, ingressToken: String? = null): RawJwt =
+    fun getAccessToken(authType: AuthType, audience: String, ingressToken: String?): RawJwt =
         tokenGetter(authType).getEgressToken(ingressToken, audience, "")
 
     private fun tokenGetter(authType: AuthType): EgressTokenGetter =

@@ -45,7 +45,11 @@ class EgressAccessTokenFacadeTest {
             )
         ).thenReturn(RawJwt(EGRESS_TOKEN))
 
-        val token: RawJwt = facade.getAccessToken(AuthType.MACHINE_INSIDE_NAV, AUDIENCE)
+        val token: RawJwt = facade.getAccessToken(
+            authType = AuthType.MACHINE_INSIDE_NAV,
+            audience = AUDIENCE,
+            ingressToken = null
+        )
 
         assertEquals(EGRESS_TOKEN, token.value)
     }
