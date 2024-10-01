@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.tech.security.egress
 
 import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.crypto.PidEncryptionService
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonService
@@ -24,6 +25,9 @@ class SecurityContextEnricherTest {
     private lateinit var request: HttpServletRequest
 
     @Mock
+    private lateinit var response: HttpServletResponse
+
+    @Mock
     private lateinit var securityContextPidExtractor: SecurityContextPidExtractor
 
     @Mock
@@ -38,13 +42,13 @@ class SecurityContextEnricherTest {
     @Test
     fun `enrichAuthentication tolerates null authentication`() {
         SecurityContextHolder.setContext(SecurityContextImpl(null))
-        assertDoesNotThrow { securityContextEnricher().enrichAuthentication(request) }
+        assertDoesNotThrow { securityContextEnricher().enrichAuthentication(request, response) }
     }
 
     @Test
     fun `if PID in request header then enrichAuthentication does not get PID from security context`() {
         `when`(request.getHeader("fnr")).thenReturn(pid.value)
-        securityContextEnricher().enrichAuthentication(request)
+        securityContextEnricher().enrichAuthentication(request, response)
         verify(securityContextPidExtractor, never()).pid()
     }
 
@@ -53,7 +57,7 @@ class SecurityContextEnricherTest {
         SecurityContextHolder.setContext(SecurityContextImpl(authentication))
         `when`(request.getHeader("fnr")).thenReturn(null)
 
-        securityContextEnricher().enrichAuthentication(request)
+        securityContextEnricher().enrichAuthentication(request, response)
 
         verify(securityContextPidExtractor, times(1)).pid()
     }
@@ -64,7 +68,7 @@ class SecurityContextEnricherTest {
         `when`(request.getHeader("fnr")).thenReturn("encrypted.string.containing.dot")
         `when`(pidDecrypter.decrypt("encrypted.string.containing.dot")).thenReturn("12906498357")
 
-        securityContextEnricher().enrichAuthentication(request)
+        securityContextEnricher().enrichAuthentication(request, response)
 
         assertEquals("12906498357", securityContextTargetPid()?.value)
     }
@@ -74,7 +78,7 @@ class SecurityContextEnricherTest {
         SecurityContextHolder.setContext(SecurityContextImpl(authentication))
         `when`(request.getHeader("fnr")).thenReturn("12906498357")
 
-        securityContextEnricher().enrichAuthentication(request)
+        securityContextEnricher().enrichAuthentication(request, response)
 
         assertEquals("12906498357", securityContextTargetPid()?.value)
     }
