@@ -5,6 +5,7 @@ import no.nav.pensjon.kalkulator.common.client.pen.PenPingClient
 import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.PensjonReglerGrunnbeloepClient
 import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.client.pdl.PdlPersonClient
+import no.nav.pensjon.kalkulator.tech.representasjon.client.pensjon.PensjonRepresentasjonClient
 import no.nav.pensjon.kalkulator.tech.security.egress.azuread.AzureAdOAuth2MetadataClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.client.nom.NomSkjermingClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.ping.IdPortenPingClient
@@ -21,6 +22,7 @@ class SelfTest(
     opptjeningClient: PoppOpptjeningsgrunnlagClient,
     penClient: PenPingClient,
     personClient: PdlPersonClient,
+    representasjonClient: PensjonRepresentasjonClient,
     skjermingClient: NomSkjermingClient,
     tjenestepensjonClient: TpTjenestepensjonClient
 ) {
@@ -33,6 +35,7 @@ class SelfTest(
         opptjeningClient,
         penClient,
         personClient,
+        representasjonClient,
         skjermingClient,
         tjenestepensjonClient)
 
@@ -66,7 +69,8 @@ class SelfTest(
                 .map { it.status }
                 .firstOrNull { it == ServiceStatus.DOWN } ?: ServiceStatus.UP
 
-        private fun json(resultsByService: Map<String, PingResult>) = resultsByService.values.joinToString { json(it) }
+        private fun json(resultsByService: Map<String, PingResult>) =
+            resultsByService.values.joinToString { json(it) }
 
         private fun json(result: PingResult): String {
             val errorMessageEntry =

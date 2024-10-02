@@ -37,10 +37,6 @@ class PensjonRepresentasjonClient(
 
     private val log = KotlinLogging.logger {}
 
-    override fun pingPath(): String = "$baseUrl/actuator/health/liveness"
-
-    override fun service(): EgressService = service
-
     override fun hasValidRepresentasjonsforhold(fullmaktGiverPid: Pid): Representasjon {
         val uri = uri()
         log.debug { "GET from URI: '$uri'" }
@@ -65,8 +61,12 @@ class PensjonRepresentasjonClient(
         }
     }
 
+    override fun service(): EgressService = service
+
+    override fun pingPath(): String = "$baseUrl/actuator/health/liveness"
+
     override fun setPingHeaders(headers: HttpHeaders) {
-        setHeaders(headers)
+        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
     }
 
     override fun toString(e: EgressException, uri: String) = "Failed calling $uri"

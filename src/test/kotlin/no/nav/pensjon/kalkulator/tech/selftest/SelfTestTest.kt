@@ -5,6 +5,7 @@ import no.nav.pensjon.kalkulator.common.client.pen.PenPingClient
 import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.PensjonReglerGrunnbeloepClient
 import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.client.pdl.PdlPersonClient
+import no.nav.pensjon.kalkulator.tech.representasjon.client.pensjon.PensjonRepresentasjonClient
 import no.nav.pensjon.kalkulator.tech.security.egress.azuread.AzureAdOAuth2MetadataClient
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.client.nom.NomSkjermingClient
@@ -47,6 +48,9 @@ class SelfTestTest {
     private lateinit var personClient: PdlPersonClient
 
     @Mock
+    private lateinit var representasjonClient: PensjonRepresentasjonClient
+
+    @Mock
     private lateinit var skjermingClient: NomSkjermingClient
 
     @Mock
@@ -62,6 +66,7 @@ class SelfTestTest {
             opptjeningClient,
             penClient,
             personClient,
+            representasjonClient,
             skjermingClient,
             tjenestepensjonClient
         )
@@ -157,6 +162,9 @@ $TABLE_BODY
         `when`(personClient.ping())
             .thenReturn(PingResult(EgressService.PERSONDATALOESNINGEN, status, "pdl-endpoint", "pdl-message"))
 
+        `when`(representasjonClient.ping())
+            .thenReturn(PingResult(EgressService.PENSJON_REPRESENTASJON, status, "repr-endpoint", "repr-message"))
+
         `when`(skjermingClient.ping())
             .thenReturn(PingResult(EgressService.SKJERMEDE_PERSONER, status, "nom-endpoint", "nom-message"))
 
@@ -172,6 +180,7 @@ $TABLE_BODY
         opptjeningClient: PoppOpptjeningsgrunnlagClient,
         penClient: PenPingClient,
         personClient: PdlPersonClient,
+        representasjonClient: PensjonRepresentasjonClient,
         skjermingClient: NomSkjermingClient,
         tjenestepensjonClient: TpTjenestepensjonClient
     ) :
@@ -183,6 +192,7 @@ $TABLE_BODY
             opptjeningClient,
             penClient,
             personClient,
+            representasjonClient,
             skjermingClient,
             tjenestepensjonClient
         ) {
@@ -202,6 +212,7 @@ $TABLE_BODY
                 "{\"endpoint\":\"popp-endpoint\",\"description\":\"Pensjonsopptjening\",\"result\":0}, " +
                 "{\"endpoint\":\"pen-endpoint\",\"description\":\"Pensjonsfaglig kjerne\",\"result\":0}, " +
                 "{\"endpoint\":\"pdl-endpoint\",\"description\":\"Persondataløsningen\",\"result\":0}, " +
+                "{\"endpoint\":\"repr-endpoint\",\"description\":\"Pensjon-representasjon\",\"result\":0}, " +
                 "{\"endpoint\":\"nom-endpoint\",\"description\":\"Skjermede personer\",\"result\":0}, " +
                 "{\"endpoint\":\"tp-endpoint\",\"description\":\"Tjenestepensjon\",\"result\":0}" +
                 "]"
@@ -215,6 +226,7 @@ $TABLE_BODY
                 "{\"endpoint\":\"popp-endpoint\",\"description\":\"Pensjonsopptjening\",\"errorMessage\":\"popp-message\",\"result\":1}, " +
                 "{\"endpoint\":\"pen-endpoint\",\"description\":\"Pensjonsfaglig kjerne\",\"errorMessage\":\"pen-message\",\"result\":1}, " +
                 "{\"endpoint\":\"pdl-endpoint\",\"description\":\"Persondataløsningen\",\"errorMessage\":\"pdl-message\",\"result\":1}, " +
+                "{\"endpoint\":\"repr-endpoint\",\"description\":\"Pensjon-representasjon\",\"errorMessage\":\"repr-message\",\"result\":1}, " +
                 "{\"endpoint\":\"nom-endpoint\",\"description\":\"Skjermede personer\",\"errorMessage\":\"nom-message\",\"result\":1}, " +
                 "{\"endpoint\":\"tp-endpoint\",\"description\":\"Tjenestepensjon\",\"errorMessage\":\"tp-message\",\"result\":1}" +
                 "]"
@@ -228,6 +240,7 @@ $TABLE_BODY
                 "<tr><td>Pensjonsopptjening</td><td style=\"background-color:green;text-align:center;\">UP</td><td>popp-message</td><td>popp-endpoint</td><td>Pensjonsopptjeningsdata</td></tr>" +
                 "<tr><td>Pensjonsfaglig kjerne</td><td style=\"background-color:green;text-align:center;\">UP</td><td>pen-message</td><td>pen-endpoint</td><td>Simulering, pensjonsdata</td></tr>" +
                 "<tr><td>Persondataløsningen</td><td style=\"background-color:green;text-align:center;\">UP</td><td>pdl-message</td><td>pdl-endpoint</td><td>Persondata</td></tr>" +
+                "<tr><td>Pensjon-representasjon</td><td style=\"background-color:green;text-align:center;\">UP</td><td>repr-message</td><td>repr-endpoint</td><td>Representasjonsforhold (fullmakt m.m.)</td></tr>" +
                 "<tr><td>Skjermede personer</td><td style=\"background-color:green;text-align:center;\">UP</td><td>nom-message</td><td>nom-endpoint</td><td>Skjerming</td></tr>" +
                 "<tr><td>Tjenestepensjon</td><td style=\"background-color:green;text-align:center;\">UP</td><td>tp-message</td><td>tp-endpoint</td><td>Tjenestepensjonsforhold</td></tr>" +
                 "</tbody>"
