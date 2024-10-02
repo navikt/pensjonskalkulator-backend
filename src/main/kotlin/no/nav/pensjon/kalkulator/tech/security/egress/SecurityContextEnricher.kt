@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.crypto.PidEncryptionService
+import no.nav.pensjon.kalkulator.tech.metric.Metrics
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonService
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonTarget
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentertRolle
@@ -50,7 +51,7 @@ class SecurityContextEnricher(
     ): Authentication =
         onBehalfOfPid(request.cookies)?.let {
             if (validRepresentasjonForhold(it))
-                enrichWithFullmakt(auth, it)
+                enrichWithFullmakt(auth, it).also { Metrics.countEvent(eventName = "obo", result = "ok") }
             else
                 invalidRepresentasjonForhold(response)
         } ?: auth
@@ -105,6 +106,7 @@ class SecurityContextEnricher(
 
         private fun invalidRepresentasjonForhold(response: HttpServletResponse): Nothing {
             "Intet gyldig representasjonsforhold funnet".apply {
+                Metrics.countEvent(eventName = "obo", result = "avvist")
                 response.sendError(HttpStatus.FORBIDDEN.value(), this)
                 throw AccessDeniedException(this)
             }
