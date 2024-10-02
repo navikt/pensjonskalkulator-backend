@@ -1,15 +1,18 @@
 package no.nav.pensjon.kalkulator.tech.security.egress
 
+import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.crypto.PidEncryptionService
+import no.nav.pensjon.kalkulator.tech.representasjon.Representasjon
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonService
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import no.nav.pensjon.kalkulator.tech.security.ingress.SecurityContextPidExtractor
-import org.junit.jupiter.api.Assertions.assertDoesNotThrow
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.*
@@ -81,6 +84,35 @@ class SecurityContextEnricherTest {
         securityContextEnricher().enrichAuthentication(request, response)
 
         assertEquals("12906498357", securityContextTargetPid()?.value)
+    }
+
+    @Test
+    fun `enrichAuthentication sets target PID from OBO cookie if valid representasjon`() {
+        SecurityContextHolder.setContext(SecurityContextImpl(authentication))
+        `when`(request.cookies).thenReturn(listOf(Cookie("nav-obo", "12906498357")).toTypedArray())
+        `when`(representasjonService.hasValidRepresentasjonsforhold(Pid("12906498357"))).thenReturn(
+            Representasjon(isValid = true, fullmaktGiverNavn = "F. Giver")
+        )
+
+        securityContextEnricher().enrichAuthentication(request, response)
+
+        assertEquals("12906498357", securityContextTargetPid()?.value)
+    }
+
+    @Test
+    fun `enrichAuthentication throws AccessDeniedException if invalid representasjon`() {
+        SecurityContextHolder.setContext(SecurityContextImpl(authentication))
+        `when`(request.cookies).thenReturn(listOf(Cookie("nav-obo", "12906498357")).toTypedArray())
+        `when`(representasjonService.hasValidRepresentasjonsforhold(Pid("12906498357"))).thenReturn(
+            Representasjon(isValid = false, fullmaktGiverNavn = "")
+        )
+
+        val exception = assertThrows<org.springframework.security.access.AccessDeniedException> {
+            securityContextEnricher().enrichAuthentication(request, response)
+        }
+
+        assertEquals("Intet gyldig representasjonsforhold funnet", exception.message)
+        assertNull(securityContextTargetPid()?.value)
     }
 
     private fun securityContextEnricher() =
