@@ -12,7 +12,6 @@ import no.nav.pensjon.kalkulator.tech.representasjon.RepresentertRolle
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import no.nav.pensjon.kalkulator.tech.security.ingress.SecurityContextPidExtractor
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
-import org.springframework.http.HttpStatus
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
@@ -32,7 +31,7 @@ class SecurityContextEnricher(
                 authentication = anonymousAuthentication()
             } else {
                 authentication = enrich(authentication, request)
-                authentication = applyPotentialFullmakt(authentication, request, response)
+                authentication = applyPotentialFullmakt(authentication, request)
             }
         }
     }
@@ -46,14 +45,13 @@ class SecurityContextEnricher(
 
     private fun applyPotentialFullmakt(
         auth: Authentication,
-        request: HttpServletRequest,
-        response: HttpServletResponse
+        request: HttpServletRequest
     ): Authentication =
         onBehalfOfPid(request.cookies)?.let {
             if (validRepresentasjonForhold(it))
                 enrichWithFullmakt(auth, it).also { Metrics.countEvent(eventName = "obo", result = "ok") }
             else
-                invalidRepresentasjonForhold(response)
+                invalidRepresentasjonForhold()
         } ?: auth
 
     /**
@@ -104,12 +102,9 @@ class SecurityContextEnricher(
         private fun personUnderVeiledning(pid: Pid) =
             RepresentasjonTarget(pid, rolle = RepresentertRolle.UNDER_VEILEDNING)
 
-        private fun invalidRepresentasjonForhold(response: HttpServletResponse): Nothing {
-            "Intet gyldig representasjonsforhold funnet".apply {
-                Metrics.countEvent(eventName = "obo", result = "avvist")
-                response.sendError(HttpStatus.FORBIDDEN.value(), this)
-                throw AccessDeniedException(this)
-            }
+        private fun invalidRepresentasjonForhold(): Nothing {
+            Metrics.countEvent(eventName = "obo", result = "avvist")
+            throw AccessDeniedException("Intet gyldig representasjonsforhold funnet")
         }
     }
 }
