@@ -68,10 +68,10 @@ class VedtakControllerTest {
             )
         )
 
-        val res = mvc.get(URL).andReturn()
+        val res = mvc.get(URL_V1).andReturn()
 
         assertEquals(200, res.response.status)
-        assertEquals(RESPONSE_BODY_ALLE_MULIGE_VEDTAK, res.response.contentAsString)
+        assertEquals(RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V1, res.response.contentAsString)
     }
 
     @Test
@@ -85,19 +85,73 @@ class VedtakControllerTest {
             )
         )
 
-        val res = mvc.get(URL).andReturn()
+        val res = mvc.get(URL_V1).andReturn()
 
         assertEquals(200, res.response.status)
-        assertEquals(RESPONSE_BODY_INGEN_VEDTAK, res.response.contentAsString)
+        assertEquals(RESPONSE_BODY_INGEN_VEDTAK_V1, res.response.contentAsString)
+    }
+
+    @Test
+    fun `hent loepende vedtak V2`() {
+        `when`(service.hentLoependeVedtak()).thenReturn(
+            LoependeVedtak(
+                alderspensjon = LoependeVedtakDetaljer(
+                    grad = 1,
+                    fom = LocalDate.parse("2020-12-01")
+                ),
+                ufoeretrygd = LoependeVedtakDetaljer(
+                    grad = 2,
+                    fom = LocalDate.parse("2021-12-01")
+                ),
+                afpPrivat = LoependeVedtakDetaljer(
+                    grad = 3,
+                    fom = LocalDate.parse("2022-12-01")
+                ),
+                afpOffentlig = LoependeVedtakDetaljer(
+                    grad = 4,
+                    fom = LocalDate.parse("2023-12-01")
+                ),
+            )
+        )
+
+        val res = mvc.get(URL_V2).andReturn()
+
+        assertEquals(200, res.response.status)
+        assertEquals(RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V2, res.response.contentAsString)
+    }
+
+    @Test
+    fun `hent loepende vedtak V2 ingen vedtak`() {
+        `when`(service.hentLoependeVedtak()).thenReturn(
+            LoependeVedtak(
+                alderspensjon = null,
+                ufoeretrygd = null,
+                afpPrivat = null,
+                afpOffentlig = null,
+            )
+        )
+
+        val res = mvc.get(URL_V2).andReturn()
+
+        assertEquals(200, res.response.status)
+        assertEquals(RESPONSE_BODY_INGEN_VEDTAK_V2, res.response.contentAsString)
     }
 
     private companion object {
-        private const val URL = "/api/v1/vedtak/loepende-vedtak"
+        private const val URL_V1 = "/api/v1/vedtak/loepende-vedtak"
+        private const val URL_V2 = "/api/v2/vedtak/loepende-vedtak"
 
         @Language("json")
-        private const val RESPONSE_BODY_INGEN_VEDTAK = """{"alderspensjon":{"loepende":false,"grad":0},"ufoeretrygd":{"loepende":false,"grad":0},"afpPrivat":{"loepende":false,"grad":0},"afpOffentlig":{"loepende":false,"grad":0}}"""
+        private const val RESPONSE_BODY_INGEN_VEDTAK_V1 = """{"alderspensjon":{"loepende":false,"grad":0},"ufoeretrygd":{"loepende":false,"grad":0},"afpPrivat":{"loepende":false,"grad":0},"afpOffentlig":{"loepende":false,"grad":0}}"""
 
         @Language("json")
-        private const val RESPONSE_BODY_ALLE_MULIGE_VEDTAK = """{"alderspensjon":{"loepende":true,"grad":1,"fom":"2020-12-01"},"ufoeretrygd":{"loepende":true,"grad":2,"fom":"2021-12-01"},"afpPrivat":{"loepende":true,"grad":3,"fom":"2022-12-01"},"afpOffentlig":{"loepende":true,"grad":4,"fom":"2023-12-01"}}"""
+        private const val RESPONSE_BODY_INGEN_VEDTAK_V2 = """{"ufoeretrygd":{"grad":0}}"""
+
+        @Language("json")
+        private const val RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V1 = """{"alderspensjon":{"loepende":true,"grad":1,"fom":"2020-12-01"},"ufoeretrygd":{"loepende":true,"grad":2,"fom":"2021-12-01"},"afpPrivat":{"loepende":true,"grad":3,"fom":"2022-12-01"},"afpOffentlig":{"loepende":true,"grad":4,"fom":"2023-12-01"}}"""
+
+        @Language("json")
+        private const val RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V2 = """{"alderspensjon":{"grad":1,"fom":"2020-12-01"},"ufoeretrygd":{"grad":2},"afpPrivat":{"fom":"2022-12-01"},"afpOffentlig":{"fom":"2023-12-01"}}"""
+
     }
 }
