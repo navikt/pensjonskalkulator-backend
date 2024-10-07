@@ -5,7 +5,5 @@ import java.time.LocalDateTime
 
 @Component
 class NowProvider : TimeProvider {
-    override fun time(): LocalDateTime {
-        return LocalDateTime.now()
-    }
+    override fun time(): LocalDateTime = LocalDateTime.now()
 }

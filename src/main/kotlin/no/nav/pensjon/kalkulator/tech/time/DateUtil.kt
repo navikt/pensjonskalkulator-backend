@@ -12,10 +12,11 @@ object DateUtil {
     private val timeZone = TimeZone.getTimeZone(TIME_ZONE_ID)
     private val zoneId = ZoneId.of(TIME_ZONE_ID)
 
-    fun toEpoch(date: LocalDate): Long = date.atStartOfDay(zoneId).toInstant().toEpochMilli()
+    fun toEpoch(date: LocalDate): Long =
+        date.atStartOfDay(zoneId).toInstant().toEpochMilli()
 
-    fun toLocalDate(dateTime: ZonedDateTime): LocalDate =
-        dateTime.withZoneSameInstant(ZoneId.of(TIME_ZONE_ID)).toLocalDate()
+    fun toLocalDate(time: ZonedDateTime): LocalDate =
+        time.withZoneSameInstant(ZoneId.of(TIME_ZONE_ID)).toLocalDate()
 
     fun toDate(localDate: LocalDate): Date =
         Calendar.getInstance(timeZone, locale).also {
