@@ -14,7 +14,7 @@ data class LoependeVedtakV2(
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class AlderspensjonDetaljerV2(
     val grad: Int = 0,
-    val fom: LocalDate? = null,
+    val fom: LocalDate,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -24,5 +24,5 @@ data class UfoeretrygdDetaljerV2(
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class LoependeFraV2(
-    val fom: LocalDate? = null,
+    val fom: LocalDate,
 )
