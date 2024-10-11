@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.vedtak.api.map
 
+import no.nav.pensjon.kalkulator.vedtak.LoependeAlderspensjonDetaljer
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtak
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtakDetaljer
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -13,7 +14,7 @@ class LoependeVedtakMapperV1Test {
     @Test
     fun `map to dto`() {
         val vedtak = LoependeVedtak(
-            alderspensjon = LoependeVedtakDetaljer(
+            alderspensjon = LoependeAlderspensjonDetaljer(
                 grad = 100,
                 fom = LocalDate.parse("2020-10-01")
             ),

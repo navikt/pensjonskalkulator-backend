@@ -34,7 +34,7 @@ class LoependeVedtakServiceTest {
     fun `hent loepende vedtak med eksisterende vedtak`() {
         `when`(client.hentLoependeVedtak(pid)).thenReturn(
             LoependeVedtak(
-                alderspensjon = LoependeVedtakDetaljer(
+                alderspensjon = LoependeAlderspensjonDetaljer(
                     grad = 1,
                     fom = LocalDate.parse("2020-10-01")
                 ),

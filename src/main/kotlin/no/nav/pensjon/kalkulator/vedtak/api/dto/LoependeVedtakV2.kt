@@ -6,7 +6,7 @@ import java.time.LocalDate
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class LoependeVedtakV2(
     val alderspensjon: AlderspensjonDetaljerV2?,
-    val harLoependeVedtakIFremtid: Boolean = false,
+    val harFremtidigLoependeVedtak: Boolean = false,
     val ufoeretrygd: UfoeretrygdDetaljerV2,
     val afpPrivat: LoependeFraV2?,
     val afpOffentlig: LoependeFraV2?,
