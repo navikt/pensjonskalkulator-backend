@@ -6,6 +6,7 @@ import java.time.LocalDate
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class LoependeVedtakV2(
     val alderspensjon: AlderspensjonDetaljerV2?,
+    val harLoependeVedtakIFremtid: Boolean = false,
     val ufoeretrygd: UfoeretrygdDetaljerV2,
     val afpPrivat: LoependeFraV2?,
     val afpOffentlig: LoependeFraV2?,
@@ -15,6 +16,12 @@ data class LoependeVedtakV2(
 data class AlderspensjonDetaljerV2(
     val grad: Int = 0,
     val fom: LocalDate,
+    val sisteUtbetaling: UtbetalingSisteMaanedV2? = null,
+)
+
+data class UtbetalingSisteMaanedV2(
+    val beloep: Int,
+    val utbetalingsdato: LocalDate,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

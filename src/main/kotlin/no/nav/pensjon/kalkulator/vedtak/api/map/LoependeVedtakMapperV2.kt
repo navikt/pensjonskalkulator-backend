@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.vedtak.api.map
 
+import no.nav.pensjon.kalkulator.vedtak.LoependeAlderspensjonDetaljer
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtak
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtakDetaljer
 import no.nav.pensjon.kalkulator.vedtak.api.dto.*
@@ -13,10 +14,16 @@ object LoependeVedtakMapperV2 {
         afpOffentlig = toLoependeFraV2Dto(vedtak.afpOffentlig),
     )
 
-    private fun toAlderspensjonDetaljerV2Dto(alderspensjon: LoependeVedtakDetaljer?) = alderspensjon?.let {
+    private fun toAlderspensjonDetaljerV2Dto(alderspensjon: LoependeAlderspensjonDetaljer?) = alderspensjon?.let {
         AlderspensjonDetaljerV2(
             grad = alderspensjon.grad,
             fom = alderspensjon.fom,
+            sisteUtbetaling = alderspensjon.utbetalingSisteMaaned?.let {
+                UtbetalingSisteMaanedV2(
+                    beloep = it.beloep?.toInt() ?: 0, //TODO RoundingMode.HALF_EVEN
+                    utbetalingsdato = it.posteringsdato,
+                )
+            }
         )
     }
 

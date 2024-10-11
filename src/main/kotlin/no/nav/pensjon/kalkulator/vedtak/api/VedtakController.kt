@@ -10,6 +10,7 @@ import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtakService
+import no.nav.pensjon.kalkulator.vedtak.VedtakMedUtbetalingService
 import no.nav.pensjon.kalkulator.vedtak.api.dto.LoependeVedtakV1
 import no.nav.pensjon.kalkulator.vedtak.api.dto.LoependeVedtakV2
 import no.nav.pensjon.kalkulator.vedtak.api.map.LoependeVedtakMapperV1
@@ -20,7 +21,11 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("api")
-class VedtakController(val traceAid: TraceAid, val service: LoependeVedtakService) : ControllerBase(traceAid) {
+class VedtakController(
+    val traceAid: TraceAid,
+    val loependeVedtakService: LoependeVedtakService,
+    val service: VedtakMedUtbetalingService
+) : ControllerBase(traceAid) {
 
     private val log = KotlinLogging.logger {}
 
@@ -47,7 +52,7 @@ class VedtakController(val traceAid: TraceAid, val service: LoependeVedtakServic
         log.debug { "Request for hent løpende vedtak $version" }
 
         return try {
-            LoependeVedtakMapperV1.toDto(timed(service::hentLoependeVedtak, "hentLoependeVedtakV1"))
+            LoependeVedtakMapperV1.toDto(timed(loependeVedtakService::hentLoependeVedtak, "hentLoependeVedtakV1"))
                 .also { log.debug { "Hent løpende vedtak V1 respons $version" } }
         } catch (e: EgressException) {
             handleError(e, "V1")!!
@@ -73,13 +78,13 @@ class VedtakController(val traceAid: TraceAid, val service: LoependeVedtakServic
             ),
         ]
     )
-    fun hentLoependeVedtakV2(): LoependeVedtakV2 {
+    suspend fun hentLoependeVedtakV2(): LoependeVedtakV2 {
         traceAid.begin()
         val version = "V2"
         log.debug { "Request for hent løpende vedtak $version" }
 
         return try {
-            LoependeVedtakMapperV2.toDto(timed(service::hentLoependeVedtak, "hentLoependeVedtakV2"))
+            LoependeVedtakMapperV2.toDto(timed(service::hentVedtakMedUtbetaling, "hentLoependeVedtakV2"))
                 .also { log.debug { "Hent løpende vedtak V2 respons $version" } }
         } catch (e: EgressException) {
             handleError(e, "V2")!!

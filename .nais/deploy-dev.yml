@@ -104,6 +104,7 @@ spec:
         - host: skjermede-personer-pip.intern.dev.nav.no
         - host: test.idporten.no
         - host: tp-api-q2.dev-fss-pub.nais.io
+        - host: sokos-utbetaldata.dev-fss-pub.nais.io
   env:
     - name: IDPORTEN_ISSUER
       value: https://test.idporten.no
@@ -139,6 +140,10 @@ spec:
       value: dev-gcp:nom:skjermede-personer-pip
     - name: SKJERMEDE_PERSONER_URL
       value: https://skjermede-personer-pip.intern.dev.nav.no
+    - name: SOKOS_UTBETALDATA_SERVICE_ID
+      value: dev-fss:okonomi:sokos-utbetaldata
+    - name: SOKOS_UTBETALDATA_URL
+      value: https://sokos-utbetaldata.dev-fss-pub.nais.io
     - name: STS_URL
       value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: TJENESTEPENSJON_SERVICE_ID
