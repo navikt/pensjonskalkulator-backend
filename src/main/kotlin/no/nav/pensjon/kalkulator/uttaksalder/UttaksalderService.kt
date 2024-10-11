@@ -2,16 +2,11 @@ package no.nav.pensjon.kalkulator.uttaksalder
 
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.general.GradertUttak
-import no.nav.pensjon.kalkulator.general.HeltUttak
-import no.nav.pensjon.kalkulator.general.UttaksalderGradertUttak
+import no.nav.pensjon.kalkulator.general.alder.NormAlderService
 import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.simulering.Eps
-import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.SimuleringService
-import no.nav.pensjon.kalkulator.simulering.Utenlandsopphold
 import no.nav.pensjon.kalkulator.tech.metric.Metrics
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import org.springframework.stereotype.Service
@@ -21,7 +16,9 @@ class UttaksalderService(
     private val simuleringService: SimuleringService,
     private val inntektService: InntektService,
     private val personService: PersonService,
-    private val pidGetter: PidGetter
+    private val pidGetter: PidGetter,
+    private val normAlderService: NormAlderService,
+    private val lavesteUttaksalderService: LavesteUttaksalderService
 ) {
     private val log = KotlinLogging.logger {}
 
@@ -32,24 +29,31 @@ class UttaksalderService(
      */
     fun finnTidligsteUttaksalder(impersonalSpec: ImpersonalUttaksalderSpec): Alder? {
         validate(impersonalSpec)
-        val pid = pidGetter.pid()
         val sivilstand = impersonalSpec.sivilstand ?: sivilstand()
         val harEps = impersonalSpec.harEps ?: sivilstand.harEps
 
         val personalSpec = PersonalUttaksalderSpec(
-            pid = pid,
-            sivilstand = sivilstand,
-            harEps = harEps,
+            pid = pidGetter.pid(),
+            sivilstand, harEps,
             aarligInntektFoerUttak = impersonalSpec.aarligInntektFoerUttak ?: sisteInntekt()
         )
 
-        val result = simuleringService.simulerAlderspensjon(forLavesteUttaksalder(impersonalSpec, personalSpec, harEps))
-        val tmuAlder = result.vilkaarsproeving.alternativ?.heltUttakAlder ?: teoretiskLavesteUttaksalder
+        val gunstigstSimuleringSpec =
+            lavesteUttaksalderService.lavesteUttaksalderSimuleringSpec(impersonalSpec, personalSpec, harEps)
+
+        val result = simuleringService.simulerAlderspensjon(gunstigstSimuleringSpec)
+
+        // TMU er enten:
+        // - Den lavest mulige fremtidige alder for helt uttak (hvis vilkårsprøvingen av denne gir OK), eller
+        // - Den alternative alder for helt uttak som returneres av simuleringen (vilkårsprøvingen av denne har gitt OK)
+        val tmuAlder = result.vilkaarsproeving.alternativ?.heltUttakAlder
+            ?: gunstigstSimuleringSpec.heltUttak.uttakFomAlder
+
         return tmuAlder.also(::updateMetric)
     }
 
-    private fun validate(impersonalSpec: ImpersonalUttaksalderSpec) {
-        if (impersonalSpec.gradertUttak != null) {
+    private fun validate(spec: ImpersonalUttaksalderSpec) {
+        if (spec.gradertUttak != null) {
             "kan ikke finne TMU for gradert uttak".let {
                 log.warn { it }
                 throw IllegalArgumentException(it)
@@ -57,58 +61,18 @@ class UttaksalderService(
         }
     }
 
-    private fun forLavesteUttaksalder(
-        impersonalSpec: ImpersonalUttaksalderSpec,
-        personalSpec: PersonalUttaksalderSpec,
-        harEps: Boolean
-    ) =
-        ImpersonalSimuleringSpec(
-            simuleringType = impersonalSpec.simuleringType,
-            sivilstand = personalSpec.sivilstand,
-            eps = Eps(
-                harInntektOver2G = harEps, // antagelse: de fleste ektefeller/partnere/samboere har inntekt over 2G
-                harPensjon = false
-            ),
-            forventetAarligInntektFoerUttak = personalSpec.aarligInntektFoerUttak,
-            gradertUttak = impersonalSpec.gradertUttak?.let(::simuleringGradertUttak),
-            heltUttak = simuleringHeltUttak(impersonalSpec),
-            utenlandsopphold = Utenlandsopphold(
-                periodeListe = impersonalSpec.utenlandsperiodeListe,
-                antallAar = null
-            )
-        )
-
-
-    private fun sisteInntekt() = inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact()
+    private fun sisteInntekt(): Int = inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact()
 
     private fun sivilstand(): Sivilstand = personService.getPerson().sivilstand
 
-    private companion object {
-        private val teoretiskLavesteUttaksalder = Alder(aar = 62, maaneder = 0)
-        private val defaultHeltUttakFomAlderIfGradert = Alder(aar = 67, maaneder = 0)
+    private fun teoretiskLavesteUttaksalder(): Alder = normAlderService.nedreAldersgrense()
 
-        private fun simuleringGradertUttak(source: UttaksalderGradertUttak) =
-            GradertUttak(
-                grad = source.grad,
-                uttakFomAlder = teoretiskLavesteUttaksalder,
-                aarligInntekt = source.aarligInntekt
-            )
-
-        private fun simuleringHeltUttak(spec: ImpersonalUttaksalderSpec) =
-            HeltUttak(
-                uttakFomAlder = spec.gradertUttak
-                    ?.let { defaultHeltUttakFomAlderIfGradert }
-                    ?: teoretiskLavesteUttaksalder,
-                inntekt = spec.heltUttak?.inntekt
-            )
-
-        private fun updateMetric(alder: Alder?) {
-            val maaneder = alder?.let {
-                if (teoretiskLavesteUttaksalder == it) it.maaneder.toString() else "x"
-            }
-
-            val result = maaneder?.let { "${alder.aar}/$maaneder" } ?: "null"
-            Metrics.countEvent(eventName = "uttaksalder", result = result)
+    private fun updateMetric(alder: Alder?) {
+        val maaneder = alder?.let {
+            if (teoretiskLavesteUttaksalder() == it) it.maaneder.toString() else "x"
         }
+
+        val result = maaneder?.let { "${alder.aar}/$maaneder" } ?: "null"
+        Metrics.countEvent(eventName = "uttaksalder", result = result)
     }
 }

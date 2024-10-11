@@ -5,6 +5,7 @@ import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.tech.metric.Metrics
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import org.springframework.stereotype.Service
+import java.util.Collections.synchronizedMap
 
 @Service
 class PersonService(
@@ -13,11 +14,21 @@ class PersonService(
     private val aldersgruppeFinder: AldersgruppeFinder,
     private val navnRequirement: NavnRequirement
 ) {
+    private val cachedPersonerVedPid: MutableMap<Pid, Person> = synchronizedMap(mutableMapOf())
+
     fun getPerson(): Person =
+        with(pidGetter.pid()) {
+            cachedPersonerVedPid[this] ?: fetchPerson(pid = this).also {
+                limitCacheSize()
+                cachedPersonerVedPid[this] = it
+            }
+        }
+
+    private fun fetchPerson(pid: Pid): Person =
         client.fetchPerson(
-            pid = pidGetter.pid().also(::validate),
+            pid = pid.also(::validate),
             fetchFulltNavn = navnRequirement.needFulltNavn()
-        ).also(::observe) ?: throw NotFoundException("person")
+        )?.also(::observe) ?: throw NotFoundException("person")
 
     private fun validate(pid: Pid) {
         if (pid.isValid.not()) throw NotFoundException("person")
@@ -33,7 +44,14 @@ class PersonService(
         Metrics.countEvent(ALDERSGRUPPE_METRIC_NAME, aldersgruppeFinder.aldersgruppe(person))
     }
 
+    private fun limitCacheSize() {
+        if (cachedPersonerVedPid.size > MAX_PERSON_CACHE_SIZE) {
+            cachedPersonerVedPid.clear()
+        }
+    }
+
     private companion object {
+        private const val MAX_PERSON_CACHE_SIZE = 1000
         private const val ALDERSGRUPPE_METRIC_NAME = "aldersgruppe"
     }
 }

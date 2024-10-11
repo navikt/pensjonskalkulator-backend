@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.uttaksalder
 
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.HeltUttak
+import no.nav.pensjon.kalkulator.general.alder.NormAlderService
 import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.mock.PersonFactory.person
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
@@ -39,14 +40,26 @@ internal class UttaksalderServiceTest {
     @Mock
     private lateinit var pidGetter: PidGetter
 
+    @Mock
+    private lateinit var normAlderService: NormAlderService
+
+    @Mock
+    private lateinit var lavesteUttaksalderService: LavesteUttaksalderService
+
     @BeforeEach
     fun initialize() {
-        service = UttaksalderService(simuleringService, inntektService, personService, pidGetter)
+        service = UttaksalderService(
+            simuleringService, inntektService, personService, pidGetter, normAlderService, lavesteUttaksalderService
+        )
+
         `when`(pidGetter.pid()).thenReturn(pid)
+        `when`(normAlderService.nedreAldersgrense()).thenReturn(Alder(aar = 62, maaneder = 0))
     }
 
     @Test
-    fun `finnTidligsteUttaksalder uses properties from impersonal spec`() {
+    fun `finnTidligsteUttaksalder uses inntekt from impersonal spec`() {
+        `when`(personService.getPerson()).thenReturn(person())
+
         val impersonalSpec = ImpersonalUttaksalderSpec(
             simuleringType = SimuleringType.ALDERSPENSJON,
             sivilstand = Sivilstand.GIFT,
@@ -62,11 +75,17 @@ internal class UttaksalderServiceTest {
                 )
             )
         )
-        arrangeSimulering(impersonalSpec, true)
+        val personalSpec = PersonalUttaksalderSpec(
+            pid = pid,
+            sivilstand = Sivilstand.GIFT,
+            harEps = true,
+            aarligInntektFoerUttak = 100_000
+        )
+        val simuleringSpec = arrangeSimulering(impersonalSpec, epsHarInntektOver2G = true)
+        arrangeLavesteUttaksalder(impersonalSpec, personalSpec, simuleringSpec, harEps = true)
 
         service.finnTidligsteUttaksalder(impersonalSpec)
 
-        verify(personService, never()).getPerson()
         verify(inntektService, never()).sistePensjonsgivendeInntekt()
     }
 
@@ -90,7 +109,14 @@ internal class UttaksalderServiceTest {
                 )
             )
         )
-        arrangeSimulering(impersonalSpec, false, person)
+        val personalSpec = PersonalUttaksalderSpec(
+            pid = pid,
+            sivilstand = person.sivilstand, //  Sivilstand.SAMBOER,
+            harEps = false,
+            aarligInntektFoerUttak = inntekt.beloep.intValueExact()
+        )
+        val simuleringSpec = arrangeSimulering(impersonalSpec, epsHarInntektOver2G = false, person)
+        arrangeLavesteUttaksalder(impersonalSpec, personalSpec, simuleringSpec, harEps = false)
 
         service.finnTidligsteUttaksalder(impersonalSpec)
 
@@ -117,33 +143,33 @@ internal class UttaksalderServiceTest {
                 )
             )
         )
-        arrangeSimulering(impersonalSpec, true, person)
+        val personalSpec = PersonalUttaksalderSpec(
+            pid = pid,
+            sivilstand = Sivilstand.SAMBOER,
+            harEps = true,
+            aarligInntektFoerUttak = 1
+        )
+        val simuleringSpec = arrangeSimulering(impersonalSpec, epsHarInntektOver2G = true, person)
+        arrangeLavesteUttaksalder(impersonalSpec, personalSpec, simuleringSpec, harEps = true)
 
         service.finnTidligsteUttaksalder(impersonalSpec)
 
-        val simuleringSpec = ImpersonalSimuleringSpec(
-            simuleringType = impersonalSpec.simuleringType,
-            sivilstand = Sivilstand.SAMBOER,
-            eps = Eps(harInntektOver2G = true, harPensjon = false), // since samboer
-            forventetAarligInntektFoerUttak = 1,
-            gradertUttak = null,
-            heltUttak = HeltUttak(
-                uttakFomAlder = Alder(aar = 62, maaneder = 0),
-                inntekt = null
-            ),
-            utenlandsopphold = Utenlandsopphold(
-                periodeListe = listOf(
-                    Opphold(
-                        fom = LocalDate.of(1990, 1, 2),
-                        tom = LocalDate.of(1999, 11, 30),
-                        land = Land.AUS,
-                        arbeidet = true
-                    )
-                ),
-                antallAar = null
-            )
-        )
         verify(simuleringService, times(1)).simulerAlderspensjon(simuleringSpec)
+    }
+
+    private fun arrangeLavesteUttaksalder(
+        impersonalSpec: ImpersonalUttaksalderSpec,
+        personalSpec: PersonalUttaksalderSpec,
+        simuleringSpec: ImpersonalSimuleringSpec,
+        harEps: Boolean
+    ) {
+        `when`(
+            lavesteUttaksalderService.lavesteUttaksalderSimuleringSpec(
+                impersonalSpec,
+                personalSpec, // = personalSpec(),
+                harEps // = true
+            )
+        ).thenReturn(simuleringSpec)
     }
 
     @Test
@@ -165,35 +191,17 @@ internal class UttaksalderServiceTest {
                 )
             )
         )
-        arrangeSimulering(impersonalSpec, true)
+        val personalSpec = PersonalUttaksalderSpec(
+            pid = pid,
+            sivilstand = Sivilstand.REGISTRERT_PARTNER,
+            harEps = true,
+            aarligInntektFoerUttak = 1
+        )
+        val simuleringSpec = arrangeSimulering(impersonalSpec, epsHarInntektOver2G = true) //, person)
+        arrangeLavesteUttaksalder(impersonalSpec, personalSpec, simuleringSpec, harEps = true)
 
         service.finnTidligsteUttaksalder(impersonalSpec)
 
-        val simuleringSpec = ImpersonalSimuleringSpec(
-            simuleringType = impersonalSpec.simuleringType,
-            sivilstand = Sivilstand.REGISTRERT_PARTNER,
-            eps = Eps(
-                harInntektOver2G = true, // since specified sivilstand is 'registrert partner'
-                harPensjon = false
-            ),
-            forventetAarligInntektFoerUttak = 1,
-            gradertUttak = null,
-            heltUttak = HeltUttak(
-                uttakFomAlder = Alder(aar = 62, maaneder = 0),
-                inntekt = null
-            ),
-            utenlandsopphold = Utenlandsopphold(
-                periodeListe = listOf(
-                    Opphold(
-                        fom = LocalDate.of(1990, 1, 2),
-                        tom = LocalDate.of(1999, 11, 30),
-                        land = Land.AUS,
-                        arbeidet = true
-                    )
-                ),
-                antallAar = null
-            )
-        )
         verify(simuleringService, times(1)).simulerAlderspensjon(simuleringSpec)
     }
 
@@ -217,67 +225,30 @@ internal class UttaksalderServiceTest {
                 )
             )
         )
-        arrangeSimulering(impersonalSpec, false, person)
+        val personalSpec = PersonalUttaksalderSpec(
+            pid = pid,
+            sivilstand = Sivilstand.GIFT,
+            harEps = false,
+            aarligInntektFoerUttak = 543210
+        )
+        val simuleringSpec = arrangeSimulering(impersonalSpec, epsHarInntektOver2G = false)
+        arrangeLavesteUttaksalder(impersonalSpec, personalSpec, simuleringSpec, harEps = false)
 
         service.finnTidligsteUttaksalder(impersonalSpec)
 
-        val simuleringSpec = ImpersonalSimuleringSpec(
-            simuleringType = impersonalSpec.simuleringType,
-            sivilstand = Sivilstand.GIFT,
-            eps = Eps(harInntektOver2G = false, harPensjon = false), // not overridden (despite sivilstand 'gift')
-            forventetAarligInntektFoerUttak = 543210,
-            gradertUttak = null,
-            heltUttak = HeltUttak(
-                uttakFomAlder = Alder(aar = 62, maaneder = 0),
-                inntekt = null
-            ),
-            utenlandsopphold = Utenlandsopphold(
-                periodeListe = listOf(
-                    Opphold(
-                        fom = LocalDate.of(1990, 1, 2),
-                        tom = LocalDate.of(1999, 11, 30),
-                        land = Land.AUS,
-                        arbeidet = true
-                    )
-                ),
-                antallAar = null
-            )
-        )
         verify(simuleringService, times(1)).simulerAlderspensjon(simuleringSpec)
     }
 
     private fun arrangeSimulering(
-        spec: ImpersonalUttaksalderSpec,
+        uttaksalderSpec: ImpersonalUttaksalderSpec,
         epsHarInntektOver2G: Boolean,
         person: Person? = null,
         angittInntekt: Inntekt? = null
-    ) {
+    ): ImpersonalSimuleringSpec {
+        val simuleringSpec = simuleringSpec(uttaksalderSpec, epsHarInntektOver2G, person, angittInntekt)
+
         `when`(
-            simuleringService.simulerAlderspensjon(
-                ImpersonalSimuleringSpec(
-                    simuleringType = spec.simuleringType,
-                    sivilstand = person?.sivilstand ?: spec.sivilstand,
-                    eps = Eps(harInntektOver2G = epsHarInntektOver2G, harPensjon = false),
-                    forventetAarligInntektFoerUttak = spec.aarligInntektFoerUttak
-                        ?: (angittInntekt ?: inntekt).beloep.intValueExact(),
-                    gradertUttak = null,
-                    heltUttak = HeltUttak(
-                        uttakFomAlder = Alder(aar = 62, maaneder = 0),
-                        inntekt = null
-                    ),
-                    utenlandsopphold = Utenlandsopphold(
-                        periodeListe = listOf(
-                            Opphold(
-                                fom = LocalDate.of(1990, 1, 2),
-                                tom = LocalDate.of(1999, 11, 30),
-                                land = Land.AUS,
-                                arbeidet = true
-                            )
-                        ),
-                        antallAar = null
-                    )
-                )
-            )
+            simuleringService.simulerAlderspensjon(simuleringSpec)
         ).thenReturn(
             SimuleringResult(
                 alderspensjon = emptyList(),
@@ -289,7 +260,38 @@ internal class UttaksalderServiceTest {
                 opptjeningGrunnlagListe = emptyList()
             )
         )
+
+        return simuleringSpec
     }
+
+    private fun simuleringSpec(
+        spec: ImpersonalUttaksalderSpec,
+        epsHarInntektOver2G: Boolean,
+        person: Person? = null,
+        angittInntekt: Inntekt? = null
+    ) = ImpersonalSimuleringSpec(
+        simuleringType = spec.simuleringType,
+        sivilstand = person?.sivilstand ?: spec.sivilstand,
+        eps = Eps(harInntektOver2G = epsHarInntektOver2G, harPensjon = false),
+        forventetAarligInntektFoerUttak = spec.aarligInntektFoerUttak
+            ?: (angittInntekt ?: inntekt).beloep.intValueExact(),
+        gradertUttak = null,
+        heltUttak = HeltUttak(
+            uttakFomAlder = Alder(aar = 62, maaneder = 0),
+            inntekt = null
+        ),
+        utenlandsopphold = Utenlandsopphold(
+            periodeListe = listOf(
+                Opphold(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = Land.AUS,
+                    arbeidet = true
+                )
+            ),
+            antallAar = null
+        )
+    )
 
     private companion object {
         private val inntekt = Inntekt(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, 2023, BigDecimal("543210"))
