@@ -9,4 +9,4 @@ data class HentUtbetalingerRequestDto(
     val periodetype: String = "UTBETALINGSPERIODE")
 
 
-data class OekonomiUtbetalingPeriodeDto(val fom: LocalDate = LocalDate.now().minusMonths(1), val tom: LocalDate = LocalDate.now())
+data class OekonomiUtbetalingPeriodeDto(val fom: LocalDate = LocalDate.now().minusMonths(2), val tom: LocalDate = LocalDate.now())

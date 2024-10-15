@@ -9,4 +9,6 @@ data class Utbetaling(
     val beloep: BigDecimal?,
     val erUtbetalt: Boolean,
     val gjelderAlderspensjon: Boolean,
+    val fom: LocalDate,
+    val tom: LocalDate,
 )
