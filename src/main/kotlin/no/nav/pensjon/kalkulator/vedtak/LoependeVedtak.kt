@@ -5,6 +5,7 @@ import java.time.LocalDate
 
 data class LoependeVedtak(
     val alderspensjon: LoependeAlderspensjonDetaljer?,
+    val fremtidigLoependeVedtakAp: Boolean,
     val ufoeretrygd: LoependeVedtakDetaljer?,
     val afpPrivat: LoependeVedtakDetaljer?,
     val afpOffentlig: LoependeVedtakDetaljer?,

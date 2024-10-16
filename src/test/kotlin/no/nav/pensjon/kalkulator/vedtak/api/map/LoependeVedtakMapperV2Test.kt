@@ -16,6 +16,7 @@ class LoependeVedtakMapperV2Test {
                 grad = 100,
                 fom = LocalDate.parse("2020-10-01")
             ),
+            fremtidigLoependeVedtakAp = true,
             ufoeretrygd = LoependeVedtakDetaljer(
                 grad = 50,
                 fom = LocalDate.parse("2021-10-01")
@@ -45,6 +46,7 @@ class LoependeVedtakMapperV2Test {
     fun `map ingen vedtak to dto`() {
         val vedtak = LoependeVedtak(
             alderspensjon = null,
+            fremtidigLoependeVedtakAp = true,
             ufoeretrygd = null,
             afpPrivat = null,
             afpOffentlig = null

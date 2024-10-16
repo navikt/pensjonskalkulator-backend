@@ -55,6 +55,7 @@ class VedtakControllerTest {
                     grad = 1,
                     fom = LocalDate.parse("2020-12-01")
                 ),
+                fremtidigLoependeVedtakAp = true,
                 ufoeretrygd = LoependeVedtakDetaljer(
                     grad = 2,
                     fom = LocalDate.parse("2021-12-01")
@@ -81,6 +82,7 @@ class VedtakControllerTest {
         `when`(loependeVedtakService.hentLoependeVedtak()).thenReturn(
             LoependeVedtak(
                 alderspensjon = null,
+                fremtidigLoependeVedtakAp = true,
                 ufoeretrygd = null,
                 afpPrivat = null,
                 afpOffentlig = null,
@@ -101,6 +103,7 @@ class VedtakControllerTest {
                     grad = 1,
                     fom = LocalDate.parse("2020-12-01")
                 ),
+                fremtidigLoependeVedtakAp = true,
                 ufoeretrygd = LoependeVedtakDetaljer(
                     grad = 2,
                     fom = LocalDate.parse("2021-12-01")
@@ -127,6 +130,7 @@ class VedtakControllerTest {
         `when`(service.hentVedtakMedUtbetaling()).thenReturn(
             LoependeVedtak(
                 alderspensjon = null,
+                fremtidigLoependeVedtakAp = true,
                 ufoeretrygd = null,
                 afpPrivat = null,
                 afpOffentlig = null,
@@ -147,13 +151,13 @@ class VedtakControllerTest {
         private const val RESPONSE_BODY_INGEN_VEDTAK_V1 = """{"alderspensjon":{"loepende":false,"grad":0},"ufoeretrygd":{"loepende":false,"grad":0},"afpPrivat":{"loepende":false,"grad":0},"afpOffentlig":{"loepende":false,"grad":0}}"""
 
         @Language("json")
-        private const val RESPONSE_BODY_INGEN_VEDTAK_V2 = """{"harFremtidigLoependeVedtak":false,"ufoeretrygd":{"grad":0}}"""
+        private const val RESPONSE_BODY_INGEN_VEDTAK_V2 = """{"harFremtidigLoependeVedtak":true,"ufoeretrygd":{"grad":0}}"""
 
         @Language("json")
         private const val RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V1 = """{"alderspensjon":{"loepende":true,"grad":1,"fom":"2020-12-01"},"ufoeretrygd":{"loepende":true,"grad":2,"fom":"2021-12-01"},"afpPrivat":{"loepende":true,"grad":3,"fom":"2022-12-01"},"afpOffentlig":{"loepende":true,"grad":4,"fom":"2023-12-01"}}"""
 
         @Language("json")
-        private const val RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V2 = """{"alderspensjon":{"grad":1,"fom":"2020-12-01"},"harFremtidigLoependeVedtak":false,"ufoeretrygd":{"grad":2},"afpPrivat":{"fom":"2022-12-01"},"afpOffentlig":{"fom":"2023-12-01"}}"""
+        private const val RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V2 = """{"alderspensjon":{"grad":1,"fom":"2020-12-01"},"harFremtidigLoependeVedtak":true,"ufoeretrygd":{"grad":2},"afpPrivat":{"fom":"2022-12-01"},"afpOffentlig":{"fom":"2023-12-01"}}"""
 
     }
 }

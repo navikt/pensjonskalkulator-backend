@@ -8,8 +8,7 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.utbetaling.UtbetalingService
 import no.nav.pensjon.kalkulator.utbetaling.UtbetalingServiceTest.Companion.MONTH_START
 import no.nav.pensjon.kalkulator.utbetaling.UtbetalingServiceTest.Companion.dummyUtbetaling
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -52,6 +51,7 @@ class VedtakMedUtbetalingServiceTest {
                     grad = 1,
                     fom = AP_START_DATO
                 ),
+                fremtidigLoependeVedtakAp = true,
                 ufoeretrygd = LoependeVedtakDetaljer(
                     grad = 2,
                     fom = UFOERETRYGD_START_DATO
@@ -74,6 +74,7 @@ class VedtakMedUtbetalingServiceTest {
         assertNotNull(vedtak)
         assertEquals(1, vedtak.alderspensjon?.grad)
         assertEquals(AP_START_DATO, vedtak.alderspensjon?.fom)
+        assertTrue(vedtak.fremtidigLoependeVedtakAp)
         assertNotNull(vedtak.alderspensjon?.utbetalingSisteMaaned)
         assertEquals(SISTE_AP_UTBETALING_DATO, vedtak.alderspensjon?.utbetalingSisteMaaned?.posteringsdato)
         assertEquals(BigDecimal.TEN, vedtak.alderspensjon?.utbetalingSisteMaaned?.beloep)
