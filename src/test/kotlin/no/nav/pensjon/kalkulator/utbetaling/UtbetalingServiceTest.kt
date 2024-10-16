@@ -42,7 +42,7 @@ class UtbetalingServiceTest {
     fun `hentSisteMaanedsUtbetaling retunerer siste maanedsutbetaling`() = runTest {
         val utbetaling = dummyUtbetaling(
             fom = LocalDate.of(YEAR, Month.OCTOBER, MONTH_START),
-            beloep =  BigDecimal.TEN,
+            beloep = BigDecimal.TEN,
         )
 
         Mockito.`when`(utbetalingClient.hentSisteMaanedsUtbetaling(pid)).thenReturn(
@@ -110,7 +110,7 @@ class UtbetalingServiceTest {
     fun `hentSisteMaanedsUtbetaling ignorere utbetalinger med ytelsesperiode stoerre enn en maaned`() = runTest {
         val utbetaling = dummyUtbetaling(
             fom = LocalDate.of(YEAR, Month.OCTOBER, MONTH_START),
-            beloep =  BigDecimal.TEN,
+            beloep = BigDecimal.TEN,
         )
 
         Mockito.`when`(utbetalingClient.hentSisteMaanedsUtbetaling(pid)).thenReturn(
@@ -143,7 +143,7 @@ class UtbetalingServiceTest {
     fun `hentSisteMaanedsUtbetaling bruker posteringsdato for aa definere hvilken utbetaling er siste`() = runTest {
         val utbetaling = dummyUtbetaling(
             fom = LocalDate.of(YEAR, Month.OCTOBER, MONTH_START),
-            beloep =  BigDecimal.TEN,
+            beloep = BigDecimal.TEN,
             posteringsdato = LocalDate.of(YEAR, Month.OCTOBER, MONTH_END),
         )
 
@@ -187,23 +187,23 @@ class UtbetalingServiceTest {
         }
     }
 
-    private fun dummyUtbetaling(
-        fom: LocalDate,
-        tom: LocalDate? = null,
-        beloep: BigDecimal = BigDecimal.ONE,
-        posteringsdato: LocalDate? = null,
-    ) =
-        Utbetaling(
-            utbetalingsdato = null,
-            posteringsdato = posteringsdato ?: fom.plusDays(MONTH_MIDDLE.toLong()),
-            beloep = beloep,
-            erUtbetalt = false,
-            gjelderAlderspensjon = true,
-            fom = fom,
-            tom = tom ?: fom.plusMonths(1).minusDays(1)
-        )
-
     companion object {
+        fun dummyUtbetaling(
+            fom: LocalDate,
+            tom: LocalDate? = null,
+            beloep: BigDecimal = BigDecimal.ONE,
+            posteringsdato: LocalDate? = null,
+        ) =
+            Utbetaling(
+                utbetalingsdato = null,
+                posteringsdato = posteringsdato ?: fom.plusDays(MONTH_MIDDLE.toLong()),
+                beloep = beloep,
+                erUtbetalt = false,
+                gjelderAlderspensjon = true,
+                fom = fom,
+                tom = tom ?: fom.plusMonths(1).minusDays(1)
+            )
+
         const val MONTH_START = 1
         const val MONTH_MIDDLE = 15
         const val MONTH_END = 31
