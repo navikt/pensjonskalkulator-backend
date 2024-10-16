@@ -4,6 +4,7 @@ import no.nav.pensjon.kalkulator.vedtak.LoependeAlderspensjonDetaljer
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtak
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtakDetaljer
 import no.nav.pensjon.kalkulator.vedtak.api.dto.*
+import java.math.BigDecimal
 
 object LoependeVedtakMapperV2 {
 
@@ -21,7 +22,7 @@ object LoependeVedtakMapperV2 {
             fom = alderspensjon.fom,
             sisteUtbetaling = alderspensjon.utbetalingSisteMaaned?.let {
                 UtbetalingSisteMaanedV2(
-                    beloep = it.beloep?.toInt() ?: 0, //TODO RoundingMode.HALF_EVEN
+                    beloep = it.beloep ?: BigDecimal(0),
                     utbetalingsdato = it.posteringsdato,
                 )
             }

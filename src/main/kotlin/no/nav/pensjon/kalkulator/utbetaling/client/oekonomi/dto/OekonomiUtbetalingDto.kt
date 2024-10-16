@@ -15,22 +15,8 @@ data class OekonomiUtbetalingDto(
 data class Ytelse(
     val ytelsestype: String?,
     val ytelsesperiode: Periode,
-//    val ytelseNettobeloep: BigDecimal,
-//    val skattsum: BigDecimal,
-//    val trekksum: BigDecimal,
     val ytelseskomponentersum: BigDecimal,
 
-//    val skattListe: List<Skatt>? = null,
-//    val trekkListe: List<Trekk>? = null,
-//    val ytelseskomponentListe: List<Ytelseskomponent>? = null,
-)
-
-data class Ytelseskomponent(
-    val ytelseskomponenttype: String?,
-    val satsbeloep: BigDecimal?,
-    val satstype: String?,
-    val satsantall: Double?,
-    val ytelseskomponentbeloep: BigDecimal?,
 )
 
 data class Periode(

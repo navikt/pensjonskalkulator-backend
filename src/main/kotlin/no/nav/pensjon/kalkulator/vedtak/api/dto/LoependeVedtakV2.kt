@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.vedtak.api.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import java.math.BigDecimal
 import java.time.LocalDate
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -20,7 +21,7 @@ data class AlderspensjonDetaljerV2(
 )
 
 data class UtbetalingSisteMaanedV2(
-    val beloep: Int,
+    val beloep: BigDecimal,
     val utbetalingsdato: LocalDate,
 )
 
