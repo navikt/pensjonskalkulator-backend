@@ -12,9 +12,9 @@ import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.utbetaling.Utbetaling
 import no.nav.pensjon.kalkulator.utbetaling.client.UtbetalingClient
-import no.nav.pensjon.kalkulator.utbetaling.client.oekonomi.dto.HentUtbetalingerRequestDto
 import no.nav.pensjon.kalkulator.utbetaling.client.oekonomi.dto.OekonomiUtbetalingDto
-import no.nav.pensjon.kalkulator.utbetaling.client.oekonomi.map.UtbetalingMapper
+import no.nav.pensjon.kalkulator.utbetaling.client.oekonomi.map.UtbetalingMapper.fromDto
+import no.nav.pensjon.kalkulator.utbetaling.client.oekonomi.map.UtbetalingMapper.toDto
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
@@ -43,13 +43,13 @@ class OekonomiUtbetalingClient(
             webClient
                 .post()
                 .uri(uri)
-                .bodyValue(HentUtbetalingerRequestDto(pid.value))
+                .bodyValue(toDto(pid))
                 .headers { setHeaders(it, pid) }
                 .retrieve()
                 .bodyToMono(object: ParameterizedTypeReference<List<OekonomiUtbetalingDto>>() {})
                 .retryWhen(retryBackoffSpec(uri))
                 .awaitSingle()
-                ?.let { UtbetalingMapper.fromDto(it) }
+                ?.let { fromDto(it) }
                 .also { countCalls(MetricResult.OK) }
                 ?: throw EgressException("No utbetaling found")
         } catch (e: WebClientRequestException) {

@@ -5,9 +5,9 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.omstillingsstoenad.OmstillingOgGjenlevendeYtelseServiceTest.Companion.now
 import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.TimeProvider
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
+import no.nav.pensjon.kalkulator.utbetaling.SamletUtbetaling
 import no.nav.pensjon.kalkulator.utbetaling.UtbetalingService
 import no.nav.pensjon.kalkulator.utbetaling.UtbetalingServiceTest.Companion.MONTH_START
-import no.nav.pensjon.kalkulator.utbetaling.UtbetalingServiceTest.Companion.dummyUtbetaling
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -66,7 +66,7 @@ class VedtakMedUtbetalingServiceTest {
         )
 
         Mockito.`when`(utbetalingService.hentSisteMaanedsUtbetaling()).thenReturn(
-            dummyUtbetaling(SISTE_AP_UTBETALING_DATO, posteringsdato = SISTE_AP_UTBETALING_DATO, beloep = BigDecimal.TEN)
+            SamletUtbetaling(posteringsdato = SISTE_AP_UTBETALING_DATO, totalBeloep = BigDecimal.TEN)
         )
 
         val vedtak = service.hentVedtakMedUtbetaling()

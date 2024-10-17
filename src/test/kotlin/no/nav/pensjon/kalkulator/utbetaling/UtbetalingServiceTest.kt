@@ -39,34 +39,6 @@ class UtbetalingServiceTest {
     }
 
     @Test
-    fun `hentSisteMaanedsUtbetaling retunerer siste maanedsutbetaling`() = runTest {
-        val utbetaling = dummyUtbetaling(
-            fom = LocalDate.of(YEAR, Month.OCTOBER, MONTH_START),
-            beloep = BigDecimal.TEN,
-        )
-
-        Mockito.`when`(utbetalingClient.hentSisteMaanedsUtbetaling(pid)).thenReturn(
-            listOf(
-                dummyUtbetaling(
-                    LocalDate.of(YEAR, Month.AUGUST, MONTH_START),
-                ),
-                utbetaling,
-                dummyUtbetaling(
-                    LocalDate.of(YEAR, Month.SEPTEMBER, MONTH_START),
-                ),
-            )
-        )
-
-        val sisteUtbetaling = service.hentSisteMaanedsUtbetaling()
-
-        assertNotNull(sisteUtbetaling)
-        assertEquals(utbetaling.fom, sisteUtbetaling!!.fom)
-        assertEquals(utbetaling.tom, sisteUtbetaling.tom)
-        assertEquals(utbetaling.beloep, sisteUtbetaling.beloep)
-        assertEquals(utbetaling.posteringsdato, sisteUtbetaling.posteringsdato)
-    }
-
-    @Test
     fun `hentSisteMaanedsUtbetaling retunerer utbetalinger som gjelder kun alderspensjon`() = runTest {
         val utbetaling = dummyUtbetaling(
             fom = LocalDate.of(YEAR, Month.SEPTEMBER, MONTH_START),
@@ -100,69 +72,44 @@ class UtbetalingServiceTest {
         val sisteUtbetaling = service.hentSisteMaanedsUtbetaling()
 
         assertNotNull(sisteUtbetaling)
-        assertEquals(utbetaling.fom, sisteUtbetaling!!.fom)
-        assertEquals(utbetaling.tom, sisteUtbetaling.tom)
-        assertEquals(utbetaling.beloep, sisteUtbetaling.beloep)
+        assertEquals(utbetaling.beloep, sisteUtbetaling!!.totalBeloep)
         assertEquals(utbetaling.posteringsdato, sisteUtbetaling.posteringsdato)
     }
 
     @Test
-    fun `hentSisteMaanedsUtbetaling ignorere utbetalinger med ytelsesperiode stoerre enn en maaned`() = runTest {
+    fun `hentSisteMaanedsUtbetaling retunerer samlet utbetaling for alderspensjon`() = runTest {
         val utbetaling = dummyUtbetaling(
-            fom = LocalDate.of(YEAR, Month.OCTOBER, MONTH_START),
-            beloep = BigDecimal.TEN,
+            fom = LocalDate.of(YEAR, Month.SEPTEMBER, MONTH_START),
+            beloep = BigDecimal.ONE,
+            posteringsdato = LocalDate.of(YEAR, Month.SEPTEMBER, MONTH_MIDDLE)
+        )
+        val etterUtbetaling = dummyUtbetaling(
+            fom = LocalDate.of(YEAR, Month.SEPTEMBER, MONTH_START),
+            beloep = BigDecimal.ONE,
+            posteringsdato = LocalDate.of(YEAR, Month.SEPTEMBER, MONTH_MIDDLE)
         )
 
         Mockito.`when`(utbetalingClient.hentSisteMaanedsUtbetaling(pid)).thenReturn(
             listOf(
-                dummyUtbetaling(
-                    LocalDate.of(YEAR, Month.AUGUST, MONTH_START),
-                ),
                 utbetaling,
-                dummyUtbetaling(
-                    LocalDate.of(YEAR, Month.OCTOBER, MONTH_START),
-                    LocalDate.of(YEAR, Month.NOVEMBER, MONTH_START),
+                etterUtbetaling,
+                Utbetaling(
+                    fom = LocalDate.of(YEAR, Month.AUGUST, MONTH_START),
+                    tom = LocalDate.of(YEAR, Month.AUGUST, MONTH_END),
+                    posteringsdato = LocalDate.of(YEAR, Month.AUGUST, MONTH_MIDDLE),
+                    beloep = BigDecimal.TEN,
+                    erUtbetalt = true,
+                    gjelderAlderspensjon = false,
+                    utbetalingsdato = null
                 ),
-                dummyUtbetaling(
-                    LocalDate.of(YEAR, Month.AUGUST, MONTH_START),
-                    LocalDate.of(YEAR, Month.OCTOBER, MONTH_END),
-                ),
-            )
-        )
-
-        val sisteUtbetaling = service.hentSisteMaanedsUtbetaling()
-
-        assertNotNull(sisteUtbetaling)
-        assertEquals(utbetaling.fom, sisteUtbetaling!!.fom)
-        assertEquals(utbetaling.tom, sisteUtbetaling.tom)
-        assertEquals(utbetaling.beloep, sisteUtbetaling.beloep)
-        assertEquals(utbetaling.posteringsdato, sisteUtbetaling.posteringsdato)
-    }
-
-    @Test
-    fun `hentSisteMaanedsUtbetaling bruker posteringsdato for aa definere hvilken utbetaling er siste`() = runTest {
-        val utbetaling = dummyUtbetaling(
-            fom = LocalDate.of(YEAR, Month.OCTOBER, MONTH_START),
-            beloep = BigDecimal.TEN,
-            posteringsdato = LocalDate.of(YEAR, Month.OCTOBER, MONTH_END),
-        )
-
-        Mockito.`when`(utbetalingClient.hentSisteMaanedsUtbetaling(pid)).thenReturn(
-            listOf(
-                dummyUtbetaling(
+                Utbetaling(
                     fom = LocalDate.of(YEAR, Month.OCTOBER, MONTH_START),
                     tom = LocalDate.of(YEAR, Month.OCTOBER, MONTH_END),
-                    posteringsdato = LocalDate.of(YEAR, Month.OCTOBER, 30),
-                ),
-                utbetaling,
-                dummyUtbetaling(
-                    LocalDate.of(YEAR, Month.OCTOBER, MONTH_START),
-                    LocalDate.of(YEAR, Month.OCTOBER, MONTH_END),
-                    posteringsdato = LocalDate.of(YEAR, Month.OCTOBER, 29),
-                ),
-                dummyUtbetaling(
-                    LocalDate.of(YEAR, Month.OCTOBER, MONTH_START),
-                    LocalDate.of(YEAR, Month.OCTOBER, MONTH_END),
+                    posteringsdato = LocalDate.of(YEAR, Month.OCTOBER, MONTH_MIDDLE),
+                    beloep = BigDecimal.TEN,
+                    erUtbetalt = true,
+                    gjelderAlderspensjon = false,
+                    utbetalingsdato = null
                 ),
             )
         )
@@ -170,21 +117,39 @@ class UtbetalingServiceTest {
         val sisteUtbetaling = service.hentSisteMaanedsUtbetaling()
 
         assertNotNull(sisteUtbetaling)
-        assertEquals(utbetaling.fom, sisteUtbetaling!!.fom)
-        assertEquals(utbetaling.tom, sisteUtbetaling.tom)
-        assertEquals(utbetaling.beloep, sisteUtbetaling.beloep)
+        assertEquals(BigDecimal.TWO, sisteUtbetaling!!.totalBeloep)
         assertEquals(utbetaling.posteringsdato, sisteUtbetaling.posteringsdato)
     }
 
     @Test
-    fun `erMaanedsUtbetaling returns true for all months between first and last days of the same month`() {
-        IntRange(YEAR, 2029).forEach { year ->
-            IntRange(1, 12).forEach { month ->
-                val fom = LocalDate.of(year, month, MONTH_START)
-                val tom = LocalDate.of(year, month, MONTH_START).plusMonths(1).minusDays(1)
-                assertTrue(UtbetalingService.erMaanedsUtbetaling(dummyUtbetaling(fom, tom)))
-            }
-        }
+    fun `hentSisteMaanedsUtbetaling retunerer ingen utbetaling hvis det ikke ble utbetalt alderspensjon`() = runTest {
+
+        Mockito.`when`(utbetalingClient.hentSisteMaanedsUtbetaling(pid)).thenReturn(
+            listOf(
+                Utbetaling(
+                    fom = LocalDate.of(YEAR, Month.AUGUST, MONTH_START),
+                    tom = LocalDate.of(YEAR, Month.AUGUST, MONTH_END),
+                    posteringsdato = LocalDate.of(YEAR, Month.AUGUST, MONTH_MIDDLE),
+                    beloep = BigDecimal.ONE,
+                    erUtbetalt = true,
+                    gjelderAlderspensjon = false,
+                    utbetalingsdato = null
+                ),
+                Utbetaling(
+                    fom = LocalDate.of(YEAR, Month.OCTOBER, MONTH_START),
+                    tom = LocalDate.of(YEAR, Month.OCTOBER, MONTH_END),
+                    posteringsdato = LocalDate.of(YEAR, Month.OCTOBER, MONTH_MIDDLE),
+                    beloep = BigDecimal.ONE,
+                    erUtbetalt = true,
+                    gjelderAlderspensjon = false,
+                    utbetalingsdato = null
+                ),
+            )
+        )
+
+        val sisteUtbetaling = service.hentSisteMaanedsUtbetaling()
+
+        assertNull(sisteUtbetaling)
     }
 
     companion object {

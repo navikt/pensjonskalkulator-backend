@@ -4,9 +4,12 @@ import java.time.LocalDate
 
 data class HentUtbetalingerRequestDto(
     val ident: String,
-    val rolle: String = "UTBETALT_TIL",
-    val periode: OekonomiUtbetalingPeriodeDto = OekonomiUtbetalingPeriodeDto(),
-    val periodetype: String = "UTBETALINGSPERIODE")
+    val rolle: String,
+    val periode: OekonomiYtelsesPeriodeDto,
+    val periodetype: String,
+)
 
-
-data class OekonomiUtbetalingPeriodeDto(val fom: LocalDate = LocalDate.now().minusMonths(2), val tom: LocalDate = LocalDate.now())
+data class OekonomiYtelsesPeriodeDto(
+    val fom: LocalDate,
+    val tom: LocalDate,
+)

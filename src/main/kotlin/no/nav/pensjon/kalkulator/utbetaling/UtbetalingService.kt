@@ -12,17 +12,20 @@ class UtbetalingService(
 ) {
     private val log = KotlinLogging.logger {}
 
-    suspend fun hentSisteMaanedsUtbetaling(): Utbetaling? {
+    suspend fun hentSisteMaanedsUtbetaling(): SamletUtbetaling? {
         val utbetalinger: List<Utbetaling> = utbetalingClient.hentSisteMaanedsUtbetaling(pidGetter.pid())
         log.info { "Hentet utbetalinger: $utbetalinger" }
-        return utbetalinger
-            .filter { it.gjelderAlderspensjon }
-            .filter { erMaanedsUtbetaling(it) }
-            .maxByOrNull { it.posteringsdato }
+
+        val alderspensjonUtbetalinger = utbetalinger.filter { it.gjelderAlderspensjon && it.beloep != null }
+
+        if (alderspensjonUtbetalinger.isEmpty()) {
+            return null
+        }
+
+        return SamletUtbetaling(
+            totalBeloep = alderspensjonUtbetalinger.sumOf { it.beloep!! },
+            posteringsdato = alderspensjonUtbetalinger.maxOf { it.posteringsdato }
+        )
     }
 
-    companion object {
-        fun erMaanedsUtbetaling(utbetaling: Utbetaling) =
-            utbetaling.fom.plusMonths(1).minusDays(1) == utbetaling.tom
-    }
 }

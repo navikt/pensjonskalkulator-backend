@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.utbetaling.client.oekonomi.map
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.utbetaling.Utbetaling
 import no.nav.pensjon.kalkulator.utbetaling.UtbetalingServiceTest.Companion.MONTH_END
 import no.nav.pensjon.kalkulator.utbetaling.UtbetalingServiceTest.Companion.MONTH_MIDDLE
@@ -91,5 +92,16 @@ class UtbetalingMapperTest : FunSpec({
         result[2].gjelderAlderspensjon shouldBe true
         result[2].fom shouldBe LocalDate.of(2021, Month.MARCH, MONTH_START)
         result[2].tom shouldBe LocalDate.of(2021, Month.MAY, MONTH_END)
+    }
+
+
+    test("toDto oppretter riktig utfylt request") {
+            val result = UtbetalingMapper.toDto(pid)
+
+            result.ident shouldBe pid.value
+            result.rolle shouldBe "UTBETALT_TIL"
+            result.periode.fom shouldBe LocalDate.now().minusMonths(1).withDayOfMonth(1)
+            result.periode.tom shouldBe LocalDate.now().withDayOfMonth(1).minusDays(1)
+            result.periodetype shouldBe "YTELSESPERIODE"
     }
 })

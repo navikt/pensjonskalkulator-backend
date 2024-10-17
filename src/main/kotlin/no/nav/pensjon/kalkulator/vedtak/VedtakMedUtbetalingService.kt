@@ -24,7 +24,7 @@ class VedtakMedUtbetalingService(
 
             sisteMaanedsUtbetaling?.let {
                 loependeVedtak.alderspensjon?.utbetalingSisteMaaned = UtbetalingSisteMaaned(
-                    beloep = it.beloep,
+                    beloep = it.totalBeloep,
                     posteringsdato = it.posteringsdato //brukere vil se utbetaling tigligst mulig uavhengig av utbetalingsstatus
                 )
             }

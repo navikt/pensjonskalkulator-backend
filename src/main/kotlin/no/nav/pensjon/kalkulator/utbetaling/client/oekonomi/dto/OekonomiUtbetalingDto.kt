@@ -16,7 +16,6 @@ data class Ytelse(
     val ytelsestype: String?,
     val ytelsesperiode: Periode,
     val ytelseskomponentersum: BigDecimal,
-
 )
 
 data class Periode(

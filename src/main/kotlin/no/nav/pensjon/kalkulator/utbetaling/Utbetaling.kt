@@ -12,3 +12,8 @@ data class Utbetaling(
     val fom: LocalDate,
     val tom: LocalDate,
 )
+
+data class SamletUtbetaling(
+    val totalBeloep: BigDecimal,
+    val posteringsdato: LocalDate,
+)
