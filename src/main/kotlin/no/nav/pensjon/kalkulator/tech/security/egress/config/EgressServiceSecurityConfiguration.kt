@@ -24,6 +24,7 @@ class EgressServiceSecurityConfiguration {
         @Value("\${tjenestepensjon.service-id}") tjenestepensjonServiceId: String,
         @Value("\${proxy.service-id}") proxyServiceId: String,
         @Value("\${omstillingsstoenad-service-id}") omstillingsstoenadServiceId: String,
+        @Value("\${sokos.utbetaldata.service-id}") utbetalingDataServiceId: String,
     ) =
         EgressServiceListsByAudience(
             mapOf(
@@ -36,6 +37,7 @@ class EgressServiceSecurityConfiguration {
                 tjenestepensjonServiceId to listOf(EgressService.TJENESTEPENSJON),
                 proxyServiceId to EgressService.servicesAccessibleViaProxy,
                 omstillingsstoenadServiceId to listOf(EgressService.OMSTILLINGSSTOENAD),
+                utbetalingDataServiceId to listOf(EgressService.UTBETALING_DATA),
             )
         )
 
