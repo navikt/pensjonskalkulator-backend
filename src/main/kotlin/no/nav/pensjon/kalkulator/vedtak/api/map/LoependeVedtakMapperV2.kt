@@ -21,7 +21,7 @@ object LoependeVedtakMapperV2 {
             grad = alderspensjon.grad,
             fom = alderspensjon.fom,
             sisteUtbetaling = alderspensjon.utbetalingSisteMaaned?.let {
-                UtbetalingSisteMaanedV2(
+                UtbetalingV2(
                     beloep = it.beloep ?: BigDecimal(0),
                     utbetalingsdato = it.posteringsdato,
                 )
@@ -31,6 +31,6 @@ object LoependeVedtakMapperV2 {
 
     private fun toUfoeretrygdDetaljerV2Dto(ufoeretrygd: LoependeVedtakDetaljer?) : UfoeretrygdDetaljerV2 = UfoeretrygdDetaljerV2(grad = ufoeretrygd?.grad?: 0)
 
-    private fun toLoependeFraV2Dto(loependeVedtakDetaljer: LoependeVedtakDetaljer?) = loependeVedtakDetaljer?.fom?.let { LoependeFraV2(fom = it,) }
+    private fun toLoependeFraV2Dto(loependeVedtakDetaljer: LoependeVedtakDetaljer?) = loependeVedtakDetaljer?.fom?.let { LoependeFraV2(fom = it) }
 
 }

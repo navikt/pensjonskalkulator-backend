@@ -17,10 +17,10 @@ data class LoependeVedtakV2(
 data class AlderspensjonDetaljerV2(
     val grad: Int = 0,
     val fom: LocalDate,
-    val sisteUtbetaling: UtbetalingSisteMaanedV2? = null,
+    val sisteUtbetaling: UtbetalingV2? = null,
 )
 
-data class UtbetalingSisteMaanedV2(
+data class UtbetalingV2(
     val beloep: BigDecimal,
     val utbetalingsdato: LocalDate,
 )

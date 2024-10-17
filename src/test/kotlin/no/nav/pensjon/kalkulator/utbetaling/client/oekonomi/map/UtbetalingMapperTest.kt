@@ -17,8 +17,6 @@ import java.time.Month
 class UtbetalingMapperTest : FunSpec({
 
     test("fromDto mapper ulike ytelser til utbetalinger") {
-
-        // Arrange
         val dto = listOf(
             OekonomiUtbetalingDto(
                 utbetalingsdato = LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE),
@@ -64,34 +62,39 @@ class UtbetalingMapperTest : FunSpec({
             )
         )
 
-        // Act
         val result: List<Utbetaling> = UtbetalingMapper.fromDto(dto)
 
-        // Assert
         result.size shouldBe 3
-        result[0].utbetalingsdato shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE)
-        result[0].posteringsdato shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE)
-        result[0].beloep shouldBe BigDecimal(1000)
-        result[0].erUtbetalt shouldBe true
-        result[0].gjelderAlderspensjon shouldBe true
-        result[0].fom shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_START)
-        result[0].tom shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_END)
 
-        result[1].utbetalingsdato shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE)
-        result[1].posteringsdato shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE)
-        result[1].beloep shouldBe BigDecimal(1100)
-        result[1].erUtbetalt shouldBe true
-        result[1].gjelderAlderspensjon shouldBe false
-        result[1].fom shouldBe LocalDate.of(2021, Month.FEBRUARY, MONTH_START)
-        result[1].tom shouldBe LocalDate.of(2021, Month.FEBRUARY, 28)
+        with(result[0]) {
+            utbetalingsdato shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE)
+            posteringsdato shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE)
+            beloep shouldBe BigDecimal(1000)
+            erUtbetalt shouldBe true
+            gjelderAlderspensjon shouldBe true
+            fom shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_START)
+            tom shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_END)
+        }
 
-        result[2].utbetalingsdato shouldBe null
-        result[2].posteringsdato shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE)
-        result[2].beloep shouldBe BigDecimal(1200)
-        result[2].erUtbetalt shouldBe false
-        result[2].gjelderAlderspensjon shouldBe true
-        result[2].fom shouldBe LocalDate.of(2021, Month.MARCH, MONTH_START)
-        result[2].tom shouldBe LocalDate.of(2021, Month.MAY, MONTH_END)
+        with(result[1]) {
+            utbetalingsdato shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE)
+            posteringsdato shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE)
+            beloep shouldBe BigDecimal(1100)
+            erUtbetalt shouldBe true
+            gjelderAlderspensjon shouldBe false
+            fom shouldBe LocalDate.of(2021, Month.FEBRUARY, MONTH_START)
+            tom shouldBe LocalDate.of(2021, Month.FEBRUARY, 28)
+        }
+
+        with(result[2]) {
+            utbetalingsdato shouldBe null
+            posteringsdato shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE)
+            beloep shouldBe BigDecimal(1200)
+            erUtbetalt shouldBe false
+            gjelderAlderspensjon shouldBe true
+            fom shouldBe LocalDate.of(2021, Month.MARCH, MONTH_START)
+            tom shouldBe LocalDate.of(2021, Month.MAY, MONTH_END)
+        }
     }
 
 

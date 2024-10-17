@@ -1,5 +1,7 @@
 package no.nav.pensjon.kalkulator.utbetaling
 
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.test.runTest
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.omstillingsstoenad.OmstillingOgGjenlevendeYtelseServiceTest.Companion.now
@@ -12,6 +14,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -33,8 +36,8 @@ class UtbetalingServiceTest {
 
     @BeforeEach
     fun initialize() {
-        Mockito.`when`(pidGetter.pid()).thenReturn(pid)
-        Mockito.`when`(timeProvider.time()).thenReturn(now)
+        `when`(pidGetter.pid()).thenReturn(pid)
+        `when`(timeProvider.time()).thenReturn(now)
         service = UtbetalingService(pidGetter, utbetalingClient)
     }
 
@@ -45,7 +48,7 @@ class UtbetalingServiceTest {
             beloep = BigDecimal.TEN,
         )
 
-        Mockito.`when`(utbetalingClient.hentSisteMaanedsUtbetaling(pid)).thenReturn(
+        `when`(utbetalingClient.hentSisteMaanedsUtbetaling(pid)).thenReturn(
             listOf(
                 utbetaling,
                 Utbetaling(
@@ -71,9 +74,9 @@ class UtbetalingServiceTest {
 
         val sisteUtbetaling = service.hentSisteMaanedsUtbetaling()
 
-        assertNotNull(sisteUtbetaling)
-        assertEquals(utbetaling.beloep, sisteUtbetaling!!.totalBeloep)
-        assertEquals(utbetaling.posteringsdato, sisteUtbetaling.posteringsdato)
+        sisteUtbetaling shouldNotBe null
+        sisteUtbetaling!!.totalBeloep shouldBe utbetaling.beloep
+        sisteUtbetaling.posteringsdato shouldBe utbetaling.posteringsdato
     }
 
     @Test
@@ -89,7 +92,7 @@ class UtbetalingServiceTest {
             posteringsdato = LocalDate.of(YEAR, Month.SEPTEMBER, MONTH_MIDDLE)
         )
 
-        Mockito.`when`(utbetalingClient.hentSisteMaanedsUtbetaling(pid)).thenReturn(
+        `when`(utbetalingClient.hentSisteMaanedsUtbetaling(pid)).thenReturn(
             listOf(
                 utbetaling,
                 etterUtbetaling,
@@ -116,15 +119,15 @@ class UtbetalingServiceTest {
 
         val sisteUtbetaling = service.hentSisteMaanedsUtbetaling()
 
-        assertNotNull(sisteUtbetaling)
-        assertEquals(BigDecimal.TWO, sisteUtbetaling!!.totalBeloep)
-        assertEquals(utbetaling.posteringsdato, sisteUtbetaling.posteringsdato)
+        sisteUtbetaling shouldNotBe null
+        sisteUtbetaling!!.totalBeloep shouldBe BigDecimal.TWO
+        sisteUtbetaling.posteringsdato shouldBe utbetaling.posteringsdato
     }
 
     @Test
     fun `hentSisteMaanedsUtbetaling retunerer ingen utbetaling hvis det ikke ble utbetalt alderspensjon`() = runTest {
 
-        Mockito.`when`(utbetalingClient.hentSisteMaanedsUtbetaling(pid)).thenReturn(
+        `when`(utbetalingClient.hentSisteMaanedsUtbetaling(pid)).thenReturn(
             listOf(
                 Utbetaling(
                     fom = LocalDate.of(YEAR, Month.AUGUST, MONTH_START),
@@ -149,7 +152,7 @@ class UtbetalingServiceTest {
 
         val sisteUtbetaling = service.hentSisteMaanedsUtbetaling()
 
-        assertNull(sisteUtbetaling)
+        sisteUtbetaling shouldBe null
     }
 
     companion object {
