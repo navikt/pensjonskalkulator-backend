@@ -114,7 +114,7 @@ spec:
       value: prod-gcp:nom:skjermede-personer-pip
     - name: SKJERMEDE_PERSONER_URL
       value: https://skjermede-personer-pip.intern.nav.no
-    - name:
+    - name: SOKOS_UTBETALDATA_SERVICE_ID
       value: prod-fss:okonomi:sokos-utbetaldata
     - name: SOKOS_UTBETALDATA_URL
       value: https://sokos-utbetaldata.prod-fss-pub.nais.io
