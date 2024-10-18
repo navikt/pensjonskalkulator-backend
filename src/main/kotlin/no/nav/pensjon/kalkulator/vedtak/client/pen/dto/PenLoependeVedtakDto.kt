@@ -6,11 +6,15 @@ data class PenLoependeVedtakDto(
     val alderspensjon: PenGjeldendeVedtakMedGradDto?,
     val fremtidigLoependeVedtakAp: Boolean,
     val ufoeretrygd: PenGjeldendeVedtakMedGradDto?,
-    val afpPrivat: PenGjeldendeVedtakMedGradDto?,
-    val afpOffentlig: PenGjeldendeVedtakMedGradDto?, //Afp i Offentlig Sektor for brukere født før 1963
+    val afpPrivat: PenGjeldendeVedtakDto?,
+    val afpOffentlig: PenGjeldendeVedtakDto?, //Afp i Offentlig Sektor for brukere født før 1963
 )
 
 data class PenGjeldendeVedtakMedGradDto(
     val grad: Int,
+    val fraOgMed: LocalDate,
+)
+
+data class PenGjeldendeVedtakDto(
     val fraOgMed: LocalDate,
 )

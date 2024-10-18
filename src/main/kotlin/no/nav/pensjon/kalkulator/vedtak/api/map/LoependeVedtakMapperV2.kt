@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.vedtak.api.map
 
 import no.nav.pensjon.kalkulator.vedtak.LoependeAlderspensjonDetaljer
+import no.nav.pensjon.kalkulator.vedtak.LoependeUfoeretrygdDetaljer
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtak
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtakDetaljer
 import no.nav.pensjon.kalkulator.vedtak.api.dto.*
@@ -29,7 +30,7 @@ object LoependeVedtakMapperV2 {
         )
     }
 
-    private fun toUfoeretrygdDetaljerV2Dto(ufoeretrygd: LoependeVedtakDetaljer?) : UfoeretrygdDetaljerV2 = UfoeretrygdDetaljerV2(grad = ufoeretrygd?.grad?: 0)
+    private fun toUfoeretrygdDetaljerV2Dto(ufoeretrygd: LoependeUfoeretrygdDetaljer?) : UfoeretrygdDetaljerV2 = UfoeretrygdDetaljerV2(grad = ufoeretrygd?.grad?: 0)
 
     private fun toLoependeFraV2Dto(loependeVedtakDetaljer: LoependeVedtakDetaljer?) = loependeVedtakDetaljer?.fom?.let { LoependeFraV2(fom = it) }
 

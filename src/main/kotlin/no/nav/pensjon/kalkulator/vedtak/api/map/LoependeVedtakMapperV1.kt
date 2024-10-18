@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.vedtak.api.map
 
 import no.nav.pensjon.kalkulator.vedtak.LoependeAlderspensjonDetaljer
+import no.nav.pensjon.kalkulator.vedtak.LoependeUfoeretrygdDetaljer
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtakDetaljer
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtak
 import no.nav.pensjon.kalkulator.vedtak.api.dto.LoependeVedtakDetaljerV1
@@ -17,7 +18,7 @@ object LoependeVedtakMapperV1 {
 
     fun toDto(loependeVedtakDetaljer: LoependeVedtakDetaljer) = LoependeVedtakDetaljerV1(
         loepende = true,
-        grad = loependeVedtakDetaljer.grad,
+        grad = 100,
         fom = loependeVedtakDetaljer.fom,
     )
 
@@ -25,6 +26,12 @@ object LoependeVedtakMapperV1 {
         loepende = true,
         grad = loependeAlderspensjonDetaljer.grad,
         fom = loependeAlderspensjonDetaljer.fom,
+    )
+
+    fun toDto(loependeUfoeretrygdDetaljer: LoependeUfoeretrygdDetaljer) = LoependeVedtakDetaljerV1(
+        loepende = true,
+        grad = loependeUfoeretrygdDetaljer.grad,
+        fom = loependeUfoeretrygdDetaljer.fom,
     )
 
     private fun toDtoIkkeLoepende() = LoependeVedtakDetaljerV1()

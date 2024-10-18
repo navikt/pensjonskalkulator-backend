@@ -52,14 +52,12 @@ class VedtakMedUtbetalingServiceTest {
                     fom = AP_START_DATO
                 ),
                 fremtidigLoependeVedtakAp = true,
-                ufoeretrygd = LoependeVedtakDetaljer(
+                ufoeretrygd = LoependeUfoeretrygdDetaljer(
                     grad = 2,
                     fom = UFOERETRYGD_START_DATO
                 ), afpPrivat = LoependeVedtakDetaljer(
-                    grad = 3,
                     fom = AFP_PRIVAT_START_DATO
                 ), afpOffentlig = LoependeVedtakDetaljer(
-                    grad = 4,
                     fom = AFP_OFFENTLIG_START_DATO
                 )
             )
@@ -80,9 +78,7 @@ class VedtakMedUtbetalingServiceTest {
         assertEquals(BigDecimal.TEN, vedtak.alderspensjon?.utbetalingSisteMaaned?.beloep)
         assertEquals(2, vedtak.ufoeretrygd?.grad)
         assertEquals(UFOERETRYGD_START_DATO, vedtak.ufoeretrygd?.fom)
-        assertEquals(3, vedtak.afpPrivat?.grad)
         assertEquals(AFP_PRIVAT_START_DATO, vedtak.afpPrivat?.fom)
-        assertEquals(4, vedtak.afpOffentlig?.grad)
         assertEquals(AFP_OFFENTLIG_START_DATO, vedtak.afpOffentlig?.fom)
     }
 

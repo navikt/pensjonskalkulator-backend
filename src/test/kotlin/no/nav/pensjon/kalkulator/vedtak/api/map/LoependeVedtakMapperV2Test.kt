@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.vedtak.api.map
 
 import no.nav.pensjon.kalkulator.vedtak.LoependeAlderspensjonDetaljer
+import no.nav.pensjon.kalkulator.vedtak.LoependeUfoeretrygdDetaljer
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtak
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtakDetaljer
 import org.junit.jupiter.api.Assertions.*
@@ -17,16 +18,14 @@ class LoependeVedtakMapperV2Test {
                 fom = LocalDate.parse("2020-10-01")
             ),
             fremtidigLoependeVedtakAp = true,
-            ufoeretrygd = LoependeVedtakDetaljer(
+            ufoeretrygd = LoependeUfoeretrygdDetaljer(
                 grad = 50,
                 fom = LocalDate.parse("2021-10-01")
             ),
             afpPrivat = LoependeVedtakDetaljer(
-                grad = 75,
                 fom = LocalDate.parse("2022-10-01")
             ),
             afpOffentlig = LoependeVedtakDetaljer(
-                grad = 25,
                 fom = LocalDate.parse("2023-10-01")
             )
         )

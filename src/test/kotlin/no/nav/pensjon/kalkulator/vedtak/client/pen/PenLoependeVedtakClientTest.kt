@@ -84,7 +84,6 @@ class PenLoependeVedtakClientTest : WebClientTest() {
             assertEquals("2025-10-01", alderspensjon?.fom.toString())
             assertEquals(100, ufoeretrygd?.grad)
             assertEquals("2022-07-01", ufoeretrygd?.fom.toString())
-            assertEquals(100, afpPrivat?.grad)
             assertEquals("2022-07-01", afpPrivat?.fom.toString())
             assertEquals(null, afpOffentlig)
         }
@@ -99,7 +98,6 @@ class PenLoependeVedtakClientTest : WebClientTest() {
             assertEquals("2025-10-01", alderspensjon?.fom.toString())
             assertEquals(100, ufoeretrygd?.grad)
             assertEquals("2022-07-01", ufoeretrygd?.fom.toString())
-            assertEquals(100, afpPrivat?.grad)
             assertEquals("2022-07-01", afpPrivat?.fom.toString())
             assertEquals(null, afpOffentlig)
         }
