@@ -27,7 +27,7 @@ open class OAuth2ConfigurationClient(
 
     override fun ping(): PingResult {
         if (status == ServiceStatus.UP) {
-            // Since this is a service outside NAV, we check status only once if UP
+            // Since this is a service outside Nav, we check status only once if UP
             return PingResult(service, ServiceStatus.UP, uri, "(cached status)")
         }
 

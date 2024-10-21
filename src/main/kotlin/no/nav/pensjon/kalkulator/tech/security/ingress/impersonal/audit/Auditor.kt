@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 import java.time.ZonedDateTime
 
 /**
- * Sends info to the auditing system when a user (NAV employee)
+ * Sends info to the auditing system when a user (Nav employee)
  * performs some task on behalf of another person.
  * The info is formatted according to ArcSight CEF (Common Event Format).
  */
@@ -33,7 +33,7 @@ class Auditor(private val ansattIdExtractor: SecurityContextNavIdExtractor) {
 
     private companion object {
         private const val DEVICE_EVENT_CLASS_ID = "audit:read"
-        private const val USER_TYPE = "NAV-ansatt"
+        private const val USER_TYPE = "Nav-ansatt"
 
         private fun now() = ZonedDateTime.now().toInstant().toEpochMilli()
     }

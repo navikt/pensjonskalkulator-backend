@@ -20,4 +20,4 @@ Swagger/OpenAPI-dokumentasjon:
 
 ## Henvendelser
 
-NAV-interne henvendelser kan sendes via Slack i kanalen [#pensjonskalkulator](https://nav-it.slack.com/archives/C04M46SPSRL).
+Nav-interne henvendelser kan sendes via Slack i kanalen [#pensjonskalkulator](https://nav-it.slack.com/archives/C04M46SPSRL).
