@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.vedtak.api.dto
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonInclude
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -16,12 +17,14 @@ data class LoependeVedtakV2(
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class AlderspensjonDetaljerV2(
     val grad: Int = 0,
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     val fom: LocalDate,
     val sisteUtbetaling: UtbetalingV2? = null,
 )
 
 data class UtbetalingV2(
     val beloep: BigDecimal,
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     val utbetalingsdato: LocalDate,
 )
 
@@ -32,5 +35,6 @@ data class UfoeretrygdDetaljerV2(
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class LoependeFraV2(
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     val fom: LocalDate,
 )
