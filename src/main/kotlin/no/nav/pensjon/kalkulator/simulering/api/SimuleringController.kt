@@ -13,8 +13,11 @@ import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import no.nav.pensjon.kalkulator.simulering.api.map.AnonymSimuleringResultMapperV1.resultatV1
 import no.nav.pensjon.kalkulator.simulering.api.map.AnonymSimuleringSpecMapperV1
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringExtendedResultMapperV6.extendedResultV6
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringExtendedResultMapperV7.extendedResultV7
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringResultMapperV6.resultatV6
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringResultMapperV7.resultatV7
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringSpecMapperV6.fromIngressSimuleringSpecV6
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringSpecMapperV7.fromIngressSimuleringSpecV7
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.BadRequestException
@@ -35,6 +38,60 @@ class SimuleringController(
 ) : ControllerBase(traceAid) {
 
     private val log = KotlinLogging.logger {}
+
+    @PostMapping("v7/alderspensjon/simulering")
+    @Operation(
+        summary = "Simuler alderspensjon",
+        description = "Lag en prognose for framtidig alderspensjon med støtte for AFP i offentlig sektor." +
+                " Feltet 'epsHarInntektOver2G' brukes til å angi hvorvidt ektefelle/partner/samboer har inntekt" +
+                " over 2 ganger grunnbeløpet. Dersom simulering med de angitte parametre resulterer i avslag i" +
+                " vilkårsprøvingen, vil responsen inneholde alternative parametre som vil gi et innvilget" +
+                " simuleringsresultat"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Simulering utført"
+            ),
+            ApiResponse(
+                responseCode = "503", description = "Simulering kunne ikke utføres av tekniske årsaker",
+                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
+            ),
+        ]
+    )
+    fun simulerAlderspensjonV7(@RequestBody spec: IngressSimuleringSpecV7): SimuleringResultatV7 {
+        traceAid.begin()
+        log.debug { "Request for V7 simulering: $spec" }
+
+        return try {
+            if (feature.isEnabled("utvidet-simuleringsresultat"))
+                extendedResultV7(
+                    timed(
+                        service::simulerAlderspensjon,
+                        fromIngressSimuleringSpecV7(spec),
+                        "alderspensjon/simulering"
+                    )
+                )
+                    .also { log.debug { "Simulering V7 respons: $it" } }
+            else
+                resultatV7(
+                    timed(
+                        service::simulerAlderspensjon,
+                        fromIngressSimuleringSpecV7(spec),
+                        "alderspensjon/simulering"
+                    )
+                )
+                    .also { log.debug { "Simulering V7 respons: $it" } }
+
+        } catch (e: BadRequestException) {
+            badRequest(e)!!
+        } catch (e: EgressException) {
+            if (e.isConflict) vilkaarIkkeOppfyltV7() else handleError(e, "V7")!!
+        } finally {
+            traceAid.end()
+        }
+    }
 
     @PostMapping("v6/alderspensjon/simulering")
     @Operation(
@@ -144,6 +201,15 @@ class SimuleringController(
                 afpPrivat = null,
                 afpOffentlig = null,
                 vilkaarsproeving = AnonymVilkaarsproevingV1(vilkaarErOppfylt = false, alternativ = null)
+            )
+
+        private fun vilkaarIkkeOppfyltV7() =
+            SimuleringResultatV7(
+                alderspensjon = emptyList(),
+                afpPrivat = null,
+                afpOffentlig = null,
+                vilkaarsproeving = VilkaarsproevingV7(vilkaarErOppfylt = false, alternativ = null),
+                harForLiteTrygdetid = false
             )
 
         private fun vilkaarIkkeOppfyltV6() =
