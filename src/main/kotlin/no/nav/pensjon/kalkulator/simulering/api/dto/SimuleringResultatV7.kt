@@ -48,13 +48,8 @@ data class AlternativV7(
 
 data class AlderV7(val aar: Int, val maaneder: Int)
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class AlderspensjonsMaanedligBeregningerV7(
-    val gradertUttak: AlderspensjonsMaanedligUttakBeregningV7?,
-    val heltUttak: AlderspensjonsMaanedligUttakBeregningV7?
-)
-
-data class AlderspensjonsMaanedligUttakBeregningV7(
-    val maanedsbeloep: Int,
-    val uttaksalder: AlderV7,
-    val uttaksgrad: Int?, // null implies 100 %
+    val gradertUttakMaanedligBeloep: Int?,
+    val heltUttakMaanedligBeloep: Int?,
 )

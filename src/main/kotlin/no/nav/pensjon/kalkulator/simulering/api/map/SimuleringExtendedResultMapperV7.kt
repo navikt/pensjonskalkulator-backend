@@ -15,16 +15,8 @@ object SimuleringExtendedResultMapperV7 {
         SimuleringResultatV7(
             alderspensjon = source.alderspensjon.map(::alderspensjon),
             alderspensjonMaanedligVedEndring = AlderspensjonsMaanedligBeregningerV7(
-                gradertUttak = AlderspensjonsMaanedligUttakBeregningV7(
-                    maanedsbeloep = 27912,
-                    uttaksalder = AlderV7(65, 11),
-                    uttaksgrad = 80
-                ),
-                heltUttak = AlderspensjonsMaanedligUttakBeregningV7(
-                    maanedsbeloep = 33782,
-                    uttaksalder = AlderV7(67, 0),
-                    uttaksgrad = null
-                )
+                gradertUttakMaanedligBeloep = 27912,
+                heltUttakMaanedligBeloep = 33782,
             ),
             afpPrivat = source.afpPrivat.map(::privatAfp),
             afpOffentlig = source.afpOffentlig.map(::offentligAfp),
