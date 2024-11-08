@@ -96,6 +96,8 @@ jobs:
     name: Scan Docker image
     needs: [ build ]
     if: github.ref == 'refs/heads/main'
+    env:
+      TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db
     runs-on: ubuntu-latest
     permissions:
       actions: read
