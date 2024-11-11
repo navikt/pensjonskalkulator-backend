@@ -2,10 +2,7 @@ package no.nav.pensjon.kalkulator.simulering.client.pen.map
 
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.simulering.Alternativ
-import no.nav.pensjon.kalkulator.simulering.SimuleringResult
-import no.nav.pensjon.kalkulator.simulering.SimulertOpptjeningGrunnlag
-import no.nav.pensjon.kalkulator.simulering.Vilkaarsproeving
+import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.*
 import org.junit.jupiter.api.Test
 
@@ -16,6 +13,10 @@ class PenSimuleringResultMapperTest {
         PenSimuleringResultMapper.fromDto(
             PenSimuleringResultDto(
                 alderspensjon = emptyList(),
+                alderspensjonMaanedsbeloep = Maanedsbeloep(
+                    maanedsbeloepVedGradertUttak = null,
+                    maanedsbeloepVedHeltUttak = 0
+                ),
                 afpPrivat = emptyList(),
                 afpOffentliglivsvarig = emptyList(),
                 vilkaarsproeving = PenVilkaarsproevingDto(
@@ -34,6 +35,10 @@ class PenSimuleringResultMapperTest {
             )
         ) shouldBe SimuleringResult(
             alderspensjon = emptyList(),
+            alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(
+                gradertUttak = null,
+                heltUttak = 0
+            ),
             afpPrivat = emptyList(),
             afpOffentlig = emptyList(),
             vilkaarsproeving = Vilkaarsproeving(

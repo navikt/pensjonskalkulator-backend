@@ -1,15 +1,18 @@
 package no.nav.pensjon.kalkulator.simulering.client.pen.map
 
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.client.pen.dto.*
+import no.nav.pensjon.kalkulator.simulering.client.pen.dto.Maanedsbeloep
 
 object PenSimuleringResultMapper {
 
     fun fromDto(dto: PenSimuleringResultDto) =
         SimuleringResult(
             alderspensjon = dto.alderspensjon.map(::alderspensjon),
+            alderspensjonMaanedsbeloep = alderspensjonMaanedsbeloep(dto.alderspensjonMaanedsbeloep),
             afpPrivat = dto.afpPrivat.map(::afpPrivat),
             afpOffentlig = dto.afpOffentliglivsvarig.map(::afpOffentlig),
             vilkaarsproeving = dto.vilkaarsproeving?.let(::vilkaarsproeving) ?: Vilkaarsproeving(innvilget = true),
@@ -49,4 +52,14 @@ object PenSimuleringResultMapper {
         )
 
     private fun alder(dto: PenAlderDto) = Alder(dto.aar, dto.maaneder)
+
+    private fun alderspensjonMaanedsbeloep(dto: Maanedsbeloep): AlderspensjonMaanedsbeloep {
+        log.info { "Mapping alderspensjonMaanedsbeloep $dto" }
+        return AlderspensjonMaanedsbeloep(
+            gradertUttak = dto.maanedsbeloepVedGradertUttak,
+            heltUttak = dto.maanedsbeloepVedHeltUttak
+        )
+    }
+
+    private val log = KotlinLogging.logger {}
 }
