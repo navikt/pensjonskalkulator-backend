@@ -5,11 +5,11 @@ import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import org.junit.jupiter.api.Test
 
-class SimuleringResultMapperV6Test {
+class SimuleringResultMapperV7Test {
 
     @Test
-    fun `resultatV6 maps domain to V6 DTO`() {
-        SimuleringResultMapperV6.resultatV6(
+    fun `resultatV7 maps domain to V7 DTO`() {
+        SimuleringResultMapperV7.resultatV7(
             SimuleringResult(
                 alderspensjon = listOf(
                     SimulertAlderspensjon(
@@ -21,6 +21,7 @@ class SimuleringResultMapperV6Test {
                         pensjonBeholdningFoerUttak = 5
                     )
                 ),
+                alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
                 afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 12000)),
                 afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000)),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
@@ -31,9 +32,9 @@ class SimuleringResultMapperV6Test {
                     SimulertOpptjeningGrunnlag(aar = 2002, pensjonsgivendeInntektBeloep = 502000)
                 )
             )
-        ) shouldBe SimuleringResultatV6(
+        ) shouldBe SimuleringResultatV7(
             alderspensjon = listOf(
-                AlderspensjonsberegningV6(
+                AlderspensjonsberegningV7(
                     alder = 67,
                     beloep = 123456,
                     inntektspensjonBeloep = null,
@@ -42,9 +43,13 @@ class SimuleringResultMapperV6Test {
                     pensjonBeholdningFoerUttakBeloep = null
                 )
             ),
-            afpPrivat = listOf(PensjonsberegningV6(alder = 67, beloep = 12000)),
-            afpOffentlig = listOf(PensjonsberegningAfpOffentligV6(alder = 67, beloep = 12000)),
-            vilkaarsproeving = VilkaarsproevingV6(vilkaarErOppfylt = true, alternativ = null),
+            alderspensjonMaanedligVedEndring = AlderspensjonsMaanedligV7(
+                gradertUttakMaanedligBeloep = 6,
+                heltUttakMaanedligBeloep = 7
+            ),
+            afpPrivat = listOf(PensjonsberegningV7(alder = 67, beloep = 12000)),
+            afpOffentlig = listOf(PensjonsberegningAfpOffentligV7(alder = 67, beloep = 12000)),
+            vilkaarsproeving = VilkaarsproevingV7(vilkaarErOppfylt = true, alternativ = null),
             harForLiteTrygdetid = true,
             trygdetid = null,
             opptjeningGrunnlagListe = null

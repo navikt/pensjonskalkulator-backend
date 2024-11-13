@@ -92,6 +92,10 @@ class SimuleringServiceTest {
                         pensjonBeholdningFoerUttak = 0
                     )
                 ),
+                alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(
+                    gradertUttak = null,
+                    heltUttak = 0
+                ),
                 afpPrivat = emptyList(),
                 afpOffentlig = emptyList(),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),

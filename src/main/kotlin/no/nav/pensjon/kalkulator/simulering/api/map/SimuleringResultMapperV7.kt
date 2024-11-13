@@ -14,7 +14,7 @@ object SimuleringResultMapperV7 {
     fun resultatV7(source: SimuleringResult) =
         SimuleringResultatV7(
             alderspensjon = source.alderspensjon.map(::alderspensjon),
-            alderspensjonMaanedligVedEndring = AlderspensjonsMaanedligBeregningerV7(
+            alderspensjonMaanedligVedEndring = AlderspensjonsMaanedligV7(
                 gradertUttakMaanedligBeloep = source.alderspensjonMaanedsbeloep?.gradertUttak,
                 heltUttakMaanedligBeloep = source.alderspensjonMaanedsbeloep?.heltUttak ?: 0,
             ),
