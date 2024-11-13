@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.simulering
 
 data class SimulertAlderspensjon(
-    val alder: Int,
+    var alder: Int,
     val beloep: Int,
     val inntektspensjonBeloep: Int,
     val garantipensjonBeloep: Int,
