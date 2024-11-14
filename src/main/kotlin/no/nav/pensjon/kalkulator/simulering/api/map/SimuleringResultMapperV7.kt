@@ -14,6 +14,10 @@ object SimuleringResultMapperV7 {
     fun resultatV7(source: SimuleringResult) =
         SimuleringResultatV7(
             alderspensjon = source.alderspensjon.map(::alderspensjon),
+            alderspensjonMaanedligVedEndring = AlderspensjonsMaanedligV7(
+                gradertUttakMaanedligBeloep = source.alderspensjonMaanedsbeloep?.gradertUttak,
+                heltUttakMaanedligBeloep = source.alderspensjonMaanedsbeloep?.heltUttak ?: 0,
+            ),
             afpPrivat = source.afpPrivat.map(::privatAfp),
             afpOffentlig = source.afpOffentlig.map(::offentligAfp),
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving),

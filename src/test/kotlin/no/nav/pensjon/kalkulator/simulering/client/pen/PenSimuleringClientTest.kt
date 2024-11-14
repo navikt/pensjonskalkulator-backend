@@ -205,6 +205,10 @@ class PenSimuleringClientTest : WebClientTest() {
             "beloep": 222612
         }
     ],
+    "alderspensjonMaanedsbeloep": {
+        "maanedsbeloepVedGradertUttak": 13000,
+        "maanedsbeloepVedHeltUttak": 26000
+    },
     "afpPrivat": [],
     "afpOffentliglivsvarig": [],
     "vilkaarsproeving": {
@@ -283,6 +287,10 @@ class PenSimuleringClientTest : WebClientTest() {
             "beloep": 222612
         }
     ],
+    "alderspensjonMaanedsbeloep": {
+        "maanedsbeloepVedGradertUttak": 13000,
+        "maanedsbeloepVedHeltUttak": 26000
+    },
     "afpPrivat": [],
     "afpOffentliglivsvarig": [
       {

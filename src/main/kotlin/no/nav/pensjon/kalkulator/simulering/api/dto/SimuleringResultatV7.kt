@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class SimuleringResultatV7(
     val alderspensjon: List<AlderspensjonsberegningV7> = emptyList(),
-    val alderspensjonMaanedligVedEndring: AlderspensjonsMaanedligBeregningerV7? = null,
+    val alderspensjonMaanedligVedEndring: AlderspensjonsMaanedligV7? = null,
     val afpPrivat: List<PensjonsberegningV7>? = emptyList(),
     val afpOffentlig: List<PensjonsberegningAfpOffentligV7>? = emptyList(),
     val vilkaarsproeving: VilkaarsproevingV7,
@@ -49,7 +49,7 @@ data class AlternativV7(
 data class AlderV7(val aar: Int, val maaneder: Int)
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class AlderspensjonsMaanedligBeregningerV7(
+data class AlderspensjonsMaanedligV7(
     val gradertUttakMaanedligBeloep: Int? = null,
     val heltUttakMaanedligBeloep: Int,
 )

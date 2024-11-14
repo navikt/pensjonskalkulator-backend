@@ -14,9 +14,9 @@ object SimuleringExtendedResultMapperV7 {
     fun extendedResultV7(source: SimuleringResult) =
         SimuleringResultatV7(
             alderspensjon = source.alderspensjon.map(::alderspensjon),
-            alderspensjonMaanedligVedEndring = AlderspensjonsMaanedligBeregningerV7(
-                gradertUttakMaanedligBeloep = 27912,
-                heltUttakMaanedligBeloep = 33782,
+            alderspensjonMaanedligVedEndring = AlderspensjonsMaanedligV7(
+                gradertUttakMaanedligBeloep = source.alderspensjonMaanedsbeloep?.gradertUttak,
+                heltUttakMaanedligBeloep = source.alderspensjonMaanedsbeloep?.heltUttak ?: 0,
             ),
             afpPrivat = source.afpPrivat.map(::privatAfp),
             afpOffentlig = source.afpOffentlig.map(::offentligAfp),
