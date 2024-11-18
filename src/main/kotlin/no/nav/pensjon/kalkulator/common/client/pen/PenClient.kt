@@ -92,7 +92,7 @@ abstract class PenClient(
         log.debug { "POST to URI: '$uri'" }
 
         try {
-            return webClient
+            val result = webClient
                 .post()
                 .uri(uri)
                 .headers(::setHeaders)
@@ -101,6 +101,8 @@ abstract class PenClient(
                 .bodyToMono(responseClass)
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
+            log.debug { "Successful POST to $uri, response: $result" }
+            return result
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $service", e)
         } catch (e: WebClientResponseException) {
