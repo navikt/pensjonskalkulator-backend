@@ -10,6 +10,17 @@ data class AnonymSimuleringResultV1(
     val vilkaarsproeving: AnonymVilkaarsproevingV1
 )
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class AnonymSimuleringErrV1(
+    val error: SimuleringError? = null
+)
+
+data class SimuleringError(
+    val status: String? = null,
+    val message: String,
+
+)
+
 data class AnonymPensjonsberegningV1(val alder: Int, val beloep: Int)
 
 data class AnonymPensjonsberegningAfpOffentligV1(val alder: Int, val beloep: Int)
