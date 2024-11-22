@@ -6,8 +6,7 @@ import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tjenestepensjon.TjenestepensjonService
-import no.nav.pensjon.kalkulator.tjenestepensjon.api.dto.MedlemskapITjenestepensjonsordningDto
-import no.nav.pensjon.kalkulator.tjenestepensjon.api.dto.TjenestepensjonsforholdDto
+import no.nav.pensjon.kalkulator.tjenestepensjon.api.dto.*
 import no.nav.pensjon.kalkulator.tjenestepensjon.api.map.TjenestepensjonMapper.toDto
 import org.springframework.web.bind.annotation.*
 
@@ -51,6 +50,35 @@ class TjenestepensjonController(
         return try {
             toDto(timed(service::hentMedlemskapITjenestepensjonsordninger, "hentMedlemskapITjenestepensjonsordninger"))
                 .also { log.debug { "Medlemskap i tjenestepensjonsordninger respons: $it" } }
+        } catch (e: EgressException) {
+            handleError(e)!!
+        } finally {
+            traceAid.end()
+        }
+    }
+
+    @PostMapping("v1/simuler-oftp")
+    @Operation(
+        summary = "Simuler offentlig tjenestepensjon hos tp-leverandør bruker er medlem av",
+        description = "Simulerer offentlig tjenestepensjon hos tp-leverandør som har ansvar for brukers tjenestepensjon"
+    )
+    fun simulerOffentligTjenestepensjon(@RequestBody spec: IngressSimuleringOFTPSpecV1): OFTPSimuleringsresultatDto {
+        traceAid.begin()
+        log.debug { "Request for simuler Offentlig tjenestepensjon" }
+
+        return try {
+            OFTPSimuleringsresultatDto(
+                simuleringsresultatStatus = SimuleringsresultatStatus.OK,
+                muligeTpLeverandoerListe = listOf("Statens pensjonskasse"),
+                simulertTjenestepensjon = SimulertTjenestepensjon(
+                    tpLeverandoer = "Statens pensjonskasse",
+                    simuleringsresultat = Simuleringsresultat(
+                        betingetTjenestepensjonErInkludert = true,
+                        utbetalingsperioder = IntRange(spec.uttaksalder.aar, spec.uttaksalder.aar + 15)
+                            .map { UtbetalingPerAar(aar = it, beloep = 57000) }
+                    )
+                )
+            )
         } catch (e: EgressException) {
             handleError(e)!!
         } finally {
