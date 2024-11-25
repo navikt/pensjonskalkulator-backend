@@ -10,11 +10,14 @@ import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.person.PersonService
+import no.nav.pensjon.kalkulator.person.api.dto.PersonResultV4
 import no.nav.pensjon.kalkulator.person.api.dto.PersonSpecV3
+import no.nav.pensjon.kalkulator.person.api.dto.PersonSpecV4
 import no.nav.pensjon.kalkulator.person.api.dto.PersonV2
 import no.nav.pensjon.kalkulator.person.api.dto.PersonV3
 import no.nav.pensjon.kalkulator.person.api.map.PersonMapperV2.dtoV2
 import no.nav.pensjon.kalkulator.person.api.map.PersonMapperV3
+import no.nav.pensjon.kalkulator.person.api.map.PersonMapperV4
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.http.HttpStatus
@@ -106,6 +109,49 @@ class PersonController(
             throw ResponseStatusException(HttpStatus.NOT_FOUND, e.message)
         } catch (e: EgressException) {
             handleError(e, "V3")!!
+        } finally {
+            traceAid.end()
+        }
+    }
+
+    @PostMapping("v4/person")
+    @Operation(
+        summary = "Hent personinformasjon",
+        description = "Henter informasjon om personen hvis person-ID er angitt enten i auth-tokenet eller i body."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Henting av personinformasjon utført."
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Personen ble ikke funnet."
+            ),
+            ApiResponse(
+                responseCode = "503",
+                description = "Henting av personinformasjon kunne ikke utføres av tekniske årsaker.",
+                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
+            ),
+        ]
+    )
+    fun personV4(
+        @RequestBody(required = false) spec: PersonSpecV4?,
+        request: HttpServletRequest
+    ): PersonResultV4 {
+        traceAid.begin()
+        log.debug { "Request for personinformasjon V4" }
+
+        return try {
+            spec?.pid?.let { request.setAttribute("pid", it) }
+
+            PersonMapperV4.dtoV4(timed(service::getPerson, "person"))
+                .also { log.debug { "Personinformasjon respons: $it" } }
+        } catch (e: NotFoundException) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, e.message)
+        } catch (e: EgressException) {
+            handleError(e, "V4")!!
         } finally {
             traceAid.end()
         }

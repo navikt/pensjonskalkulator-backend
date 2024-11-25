@@ -53,7 +53,7 @@ class PersonControllerTest {
         )
             .andExpect(request().attribute("pid", null))
             .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY))
+            .andExpect(content().json(RESPONSE_BODY_V3))
     }
 
     @Test
@@ -68,23 +68,69 @@ class PersonControllerTest {
         )
             .andExpect(request().attribute("pid", "12906498357"))
             .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY))
+            .andExpect(content().json(RESPONSE_BODY_V3))
+    }
+
+    @Test
+    fun `personV4 without PID`() {
+        `when`(service.getPerson()).thenReturn(skiltPerson())
+
+        mvc.perform(
+            post(URL_V4)
+                .with(csrf())
+                .content("")
+        )
+            .andExpect(request().attribute("pid", null))
+            .andExpect(status().isOk())
+            .andExpect(content().json(RESPONSE_BODY_V3))
+    }
+
+    @Test
+    fun `personV4 with PID`() {
+        `when`(service.getPerson()).thenReturn(skiltPerson())
+
+        mvc.perform(
+            post(URL_V4)
+                .with(csrf())
+                .content(requestBodyWithPid())
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(request().attribute("pid", "12906498357"))
+            .andExpect(status().isOk())
+            .andExpect(content().json(RESPONSE_BODY_V4))
     }
 
     private companion object {
         private const val URL_V3 = "/api/v3/person"
+        private const val URL_V4 = "/api/v4/person"
 
         @Language("json")
         private fun requestBodyWithPid() = """{
             "pid": "12906498357"
         }""".trimIndent()
 
-
         @Language("json")
-        private const val RESPONSE_BODY = """{
+        private const val RESPONSE_BODY_V3 = """{
     "navn": "Fornavn1",
     "foedselsdato": "1963-12-31",
     "sivilstand": "SKILT"
+}"""
+
+        @Language("json")
+        private const val RESPONSE_BODY_V4 = """{
+    "navn": "Fornavn1",
+    "foedselsdato": "1963-12-31",
+    "sivilstand": "SKILT",
+    "pensjoneringAldre": {
+        "normertPensjoneringsalder": {
+            "aar": 67,
+            "maaneder": 0
+        },
+        "nedreAldresgrense": {
+            "aar": 62,
+            "maaneder": 0
+        }
+    }
 }"""
     }
 }
