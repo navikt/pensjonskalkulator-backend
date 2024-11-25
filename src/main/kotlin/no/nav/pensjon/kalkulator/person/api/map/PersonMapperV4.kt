@@ -34,7 +34,7 @@ object PersonMapperV4 {
     private fun pensjoneringAldre(source: PensjoneringAldre) =
         PersonPensjoneringAldreV4(
             normertPensjoneringsalder = alder(source.normalder),
-            nedreAldresgrense = alder(source.nedreAldresgrense)
+            nedreAldersgrense = alder(source.nedreAldersgrense)
         )
 
     private fun alder(source: Alder) =

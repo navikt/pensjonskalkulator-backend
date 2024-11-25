@@ -19,7 +19,7 @@ class NormertPensjoneringsalderService {
 
         private fun aldre(normalder: Alder) = PensjoneringAldre(
             normalder,
-            nedreAldresgrense = Alder(
+            nedreAldersgrense = Alder(
                 aar = normalder.aar - ANTALL_AAR_FRA_NEDRE_ALDERSGRENSE_TIL_NORMALDER,
                 maaneder = normalder.maaneder
             )
@@ -29,5 +29,5 @@ class NormertPensjoneringsalderService {
 
 data class PensjoneringAldre(
     val normalder: Alder,
-    val nedreAldresgrense: Alder
+    val nedreAldersgrense: Alder
 )

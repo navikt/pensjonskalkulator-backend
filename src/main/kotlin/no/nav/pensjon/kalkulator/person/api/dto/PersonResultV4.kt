@@ -13,7 +13,7 @@ data class PersonResultV4(
 
 data class PersonPensjoneringAldreV4(
     val normertPensjoneringsalder: PersonAlderV4,
-    val nedreAldresgrense: PersonAlderV4
+    val nedreAldersgrense: PersonAlderV4
 )
 
 data class PersonAlderV4(

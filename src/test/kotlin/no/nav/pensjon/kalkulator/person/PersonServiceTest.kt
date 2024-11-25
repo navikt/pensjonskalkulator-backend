@@ -49,13 +49,13 @@ class PersonServiceTest {
         arrangePerson(
             pensjoneringAldre = PensjoneringAldre(
                 normalder = Alder(aar = 67, maaneder = 4),
-                nedreAldresgrense = Alder(aar = 62, maaneder = 4)
+                nedreAldersgrense = Alder(aar = 62, maaneder = 4)
             )
         )
 
         service().getPerson().pensjoneringAldre shouldBe PensjoneringAldre(
             normalder = Alder(aar = 67, maaneder = 4),
-            nedreAldresgrense = Alder(aar = 62, maaneder = 4)
+            nedreAldersgrense = Alder(aar = 62, maaneder = 4)
         )
     }
 

@@ -126,7 +126,7 @@ class PersonControllerTest {
             "aar": 67,
             "maaneder": 0
         },
-        "nedreAldresgrense": {
+        "nedreAldersgrense": {
             "aar": 62,
             "maaneder": 0
         }
