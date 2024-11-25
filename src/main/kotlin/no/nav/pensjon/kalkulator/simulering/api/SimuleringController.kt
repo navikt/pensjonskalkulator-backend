@@ -111,7 +111,7 @@ class SimuleringController(
             ),
             ApiResponse(
                 responseCode = "4xx", description = "Simulering kunne ikke utføres av tekniske årsaker",
-                content = [Content(schema = Schema(implementation = AnonymSimuleringErrV1::class))]
+                content = [Content(schema = Schema(implementation = AnonymSimuleringErrorV1::class))]
             ),
         ]
     )
@@ -132,18 +132,16 @@ class SimuleringController(
         } catch (e: BadRequestException) {
             badRequest(e)!!
         } catch (e: EgressException) {
-            if (e.isConflict) (throw e) else handleError(e, "V6")
+            if (e.isConflict && e.errorObj != null) (throw e) else handleError(e, "V6")
         } finally {
             traceAid.end()
         }
     }
 
     @ExceptionHandler(EgressException::class)
-    fun handleError(e: EgressException): ResponseEntity<AnonymSimuleringErrV1> {
+    fun handleError(e: EgressException): ResponseEntity<AnonymSimuleringErrorV1> {
         val status = e.statusCode ?: HttpStatus.INTERNAL_SERVER_ERROR
-        return ResponseEntity.status(status).body(AnonymSimuleringErrV1(
-            error = e.errorObj
-        ))
+        return ResponseEntity.status(status).body(e.errorObj)
     }
 
     override fun errorMessage() = ERROR_MESSAGE

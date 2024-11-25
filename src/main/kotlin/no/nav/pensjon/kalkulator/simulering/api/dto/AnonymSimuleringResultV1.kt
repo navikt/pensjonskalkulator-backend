@@ -11,14 +11,9 @@ data class AnonymSimuleringResultV1(
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class AnonymSimuleringErrV1(
-    val error: SimuleringError? = null
-)
-
-data class SimuleringError(
-    val status: String? = null,
+data class AnonymSimuleringErrorV1(
+    val status: String,
     val message: String,
-
 )
 
 data class AnonymPensjonsberegningV1(val alder: Int, val beloep: Int)
