@@ -110,7 +110,7 @@ class SimuleringController(
                 description = "Simulering utført"
             ),
             ApiResponse(
-                responseCode = "4xx", description = "Simulering kunne ikke utføres av tekniske årsaker",
+                responseCode = "4xx", description = "Simulering kunne ikke utføres pga. feil i input-data",
                 content = [Content(schema = Schema(implementation = AnonymSimuleringErrorV1::class))]
             ),
         ]
@@ -132,7 +132,8 @@ class SimuleringController(
         } catch (e: BadRequestException) {
             badRequest(e)!!
         } catch (e: EgressException) {
-            if (e.isConflict && e.errorObj != null) (throw e) else handleError(e, "V6")
+            if (e.isConflict && e.errorObj != null) throw e
+            else ResponseEntity.badRequest().body(handleError(e, "V6"))
         } finally {
             traceAid.end()
         }
@@ -148,14 +149,6 @@ class SimuleringController(
 
     companion object {
         private const val ERROR_MESSAGE = "feil ved simulering"
-
-//        private fun vilkaarIkkeOppfyltAnonymV1() =
-//            AnonymSimuleringResultV1(
-//                alderspensjon = emptyList(),
-//                afpPrivat = null,
-//                afpOffentlig = null,
-//                vilkaarsproeving = AnonymVilkaarsproevingV1(vilkaarErOppfylt = false, alternativ = null)
-//            )
 
         private fun vilkaarIkkeOppfyltV6() =
             SimuleringResultatV6(

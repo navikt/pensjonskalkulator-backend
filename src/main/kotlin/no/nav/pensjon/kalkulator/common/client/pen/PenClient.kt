@@ -104,7 +104,7 @@ abstract class PenClient(
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $service", e)
         } catch (e: WebClientResponseException) {
-            throw EgressException(e.responseBodyAsString, e, statusCode = e.statusCode)
+            throw EgressException(e.responseBodyAsString, e)
         }
     }
 
@@ -122,6 +122,7 @@ abstract class PenClient(
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
         pid?.let { headers[CustomHttpHeaders.PID] = it.value }
     }
+
     companion object {
         private const val DEPRECATED_BASE_PATH = "pen/springapi"
         private const val BASE_PATH = "pen/api"

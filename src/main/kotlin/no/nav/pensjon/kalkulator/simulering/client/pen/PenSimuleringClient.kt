@@ -61,16 +61,7 @@ class PenSimuleringClient(
                 ?: emptyResult()
 
         }  catch (e: EgressException) { //Adding formatted errorObject to the EgressException
-            try {
-                val jsonMap: PenAnonymSimuleringError = mapper.readValue(e.message, PenAnonymSimuleringError::class.java)
-                e.errorObj = jsonMap.let(PenAnonymSimuleringErrorMapper::fromDto)
-            } catch (_: JsonProcessingException) {
-                log.debug { "Json mapping feilet. Ugjenkjennelig format på feilmelding fra PEN: ${e.message}"}
-                e.errorObj =  AnonymSimuleringErrorV1(
-                    status = "PEK500InternalServerError",
-                    message = "Det skjedde en feil i kalkuleringen"
-                )
-            }
+            addFormattedErrorObjectToException(e)
             throw e
         }
     }
@@ -81,6 +72,18 @@ class PenSimuleringClient(
         private val mapper = jacksonObjectMapper()
         private val log = KotlinLogging.logger {}
 
+        private fun addFormattedErrorObjectToException(e: EgressException) {
+            try {
+                val jsonMap: PenAnonymSimuleringError = mapper.readValue(e.message, PenAnonymSimuleringError::class.java)
+                e.errorObj = jsonMap.let(PenAnonymSimuleringErrorMapper::fromDto)
+            } catch (_: JsonProcessingException) {
+                log.debug { "Json mapping feilet. Ugjenkjennelig format på feilmelding fra PEN: ${e.message}"}
+                e.errorObj =  AnonymSimuleringErrorV1(
+                    status = "PEK500InternalServerError",
+                    message = "Det skjedde en feil i kalkuleringen"
+                )
+            }
+        }
 
         private fun emptyResult() =
             SimuleringResult(
