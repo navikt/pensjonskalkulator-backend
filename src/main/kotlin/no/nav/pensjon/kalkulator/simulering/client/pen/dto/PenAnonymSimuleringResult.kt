@@ -41,3 +41,8 @@ data class PenAnonymSimulertBeregningsinformasjon(
     val inntektspensjon: Int?,
     val garantipensjon: Int?,
 )
+
+data class PenAnonymSimuleringError(
+    val feilmelding: String,
+    val merknader: List<String> = emptyList(),
+)
