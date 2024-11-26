@@ -28,7 +28,7 @@ class PersonController(
 
     private val log = KotlinLogging.logger {}
 
-    @PostMapping("v2/person")
+    @GetMapping("v2/person")
     @Operation(
         summary = "Hent personinformasjon",
         description = "Henter informasjon om personen hvis person-ID er angitt enten i bearer-tokenet eller som fnr-header."
@@ -66,7 +66,7 @@ class PersonController(
         }
     }
 
-    @PostMapping("v4/person")
+    @GetMapping("v4/person")
     @Operation(
         summary = "Hent personinformasjon",
         description = "Henter informasjon om personen hvis person-ID er angitt enten i bearer-tokenet eller som fnr-header."

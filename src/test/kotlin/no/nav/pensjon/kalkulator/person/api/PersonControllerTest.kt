@@ -16,7 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @WebMvcTest(PersonController::class)
@@ -46,7 +46,7 @@ class PersonControllerTest {
         `when`(service.getPerson()).thenReturn(skiltPerson())
 
         mvc.perform(
-            post(URL_V2)
+            get(URL_V2)
                 .with(csrf())
                 .content("")
         )
@@ -59,7 +59,7 @@ class PersonControllerTest {
         `when`(service.getPerson()).thenReturn(skiltPerson())
 
         mvc.perform(
-            post(URL_V4)
+            get(URL_V4)
                 .with(csrf())
                 .content("")
         )
