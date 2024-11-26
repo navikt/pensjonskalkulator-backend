@@ -45,7 +45,7 @@ class OpenApiConfiguration {
                 "/api/v2/ekskludert",
                 "/api/v1/land-liste",
                 "/api/v4/person",
-                "/api/v3/person",
+                "/api/v2/person",
                 "/api/v1/ansatt-id",
                 "/api/v1/encrypt",
                 "/api/v1/tidligste-gradert-uttaksalder", // to be moved to 'deprecated'

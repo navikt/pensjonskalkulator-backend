@@ -31,7 +31,7 @@ class PersonController(
     @PostMapping("v2/person")
     @Operation(
         summary = "Hent personinformasjon",
-        description = "Henter informasjon om personen hvis person-ID er angitt enten i auth-tokenet eller i body."
+        description = "Henter informasjon om personen hvis person-ID er angitt enten i bearer-tokenet eller som fnr-header."
     )
     @ApiResponses(
         value = [
