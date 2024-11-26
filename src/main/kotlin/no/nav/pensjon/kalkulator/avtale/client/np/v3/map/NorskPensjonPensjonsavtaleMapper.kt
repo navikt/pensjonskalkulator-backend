@@ -132,7 +132,7 @@ object NorskPensjonPensjonsavtaleMapper {
     }
 
     private fun emptyOrFault(dto: EnvelopeDto) =
-        dto.body?.fault?.run { throw RuntimeException(faultToString(this)) }
+        dto.body?.fault?.run { throw PensjonsavtaleException(faultToString(this)) }
             ?: emptyList<Pensjonsavtale>()
 
     private fun nullableDetailToString(detail: FaultDetailDto?) = detail?.let(::detailToString) ?: "no detail"

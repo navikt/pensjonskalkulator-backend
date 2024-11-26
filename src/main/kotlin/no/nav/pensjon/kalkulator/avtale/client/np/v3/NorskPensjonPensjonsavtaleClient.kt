@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.avtale.client.np.v3
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleException
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.Pensjonsavtaler
 import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
@@ -31,7 +32,6 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.nio.charset.StandardCharsets
-import java.util.*
 
 /**
  * Denne klienten skal hente pensjonsavtaler fra Norsk pensjon i prod og dev
@@ -65,6 +65,9 @@ class NorskPensjonPensjonsavtaleClient(
         } catch (e: JsonProcessingException) {
             log.error(e) { "Failed to process XML: $responseXml" }
             countCalls(MetricResult.BAD_XML)
+            ingenAvtaler()
+        } catch (e: PensjonsavtaleException) {
+            log.warn(e) { "Pensjonsavtaler respons fault - ${e.message}" }
             ingenAvtaler()
         }
     }
