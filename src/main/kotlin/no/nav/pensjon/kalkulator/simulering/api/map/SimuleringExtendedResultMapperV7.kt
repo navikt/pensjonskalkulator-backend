@@ -9,11 +9,15 @@ import no.nav.pensjon.kalkulator.simulering.api.dto.*
  * Maps between data transfer objects (DTOs) and domain objects related to simulering.
  * The DTOs are specified by version 6 of the API offered to clients.
  */
-object SimuleringExtendedResultMapperV6 {
+object SimuleringExtendedResultMapperV7 {
 
-    fun extendedResultV6(source: SimuleringResult) =
-        SimuleringResultatV6(
+    fun extendedResultV7(source: SimuleringResult) =
+        SimuleringResultatV7(
             alderspensjon = source.alderspensjon.map(::alderspensjon),
+            alderspensjonMaanedligVedEndring = AlderspensjonsMaanedligV7(
+                gradertUttakMaanedligBeloep = source.alderspensjonMaanedsbeloep?.gradertUttak,
+                heltUttakMaanedligBeloep = source.alderspensjonMaanedsbeloep?.heltUttak ?: 0,
+            ),
             afpPrivat = source.afpPrivat.map(::privatAfp),
             afpOffentlig = source.afpOffentlig.map(::offentligAfp),
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving),
@@ -23,7 +27,7 @@ object SimuleringExtendedResultMapperV6 {
         )
 
     private fun alderspensjon(source: SimulertAlderspensjon) =
-        AlderspensjonsberegningV6(
+        AlderspensjonsberegningV7(
             source.alder,
             source.beloep,
             source.inntektspensjonBeloep,
@@ -33,25 +37,25 @@ object SimuleringExtendedResultMapperV6 {
         )
 
     private fun offentligAfp(source: SimulertAfpOffentlig) =
-        PensjonsberegningAfpOffentligV6(source.alder, source.beloep)
+        PensjonsberegningAfpOffentligV7(source.alder, source.beloep)
 
     private fun privatAfp(source: SimulertAfpPrivat) =
-        PensjonsberegningV6(source.alder, source.beloep)
+        PensjonsberegningV7(source.alder, source.beloep)
 
     private fun opptjeningGrunnlag(source: SimulertOpptjeningGrunnlag) =
-        SimulertOpptjeningGrunnlagV6(
+        SimulertOpptjeningGrunnlagV7(
             source.aar,
             source.pensjonsgivendeInntektBeloep
         )
 
     private fun vilkaarsproeving(source: Vilkaarsproeving) =
-        VilkaarsproevingV6(
+        VilkaarsproevingV7(
             vilkaarErOppfylt = source.innvilget,
             alternativ = source.alternativ?.let(::alternativ)
         )
 
     private fun alternativ(source: Alternativ) =
-        AlternativV6(
+        AlternativV7(
             gradertUttaksalder = source.gradertUttakAlder?.let(::alder),
             uttaksgrad = prosentsats(source.uttakGrad),
             heltUttaksalder = alder(source.heltUttakAlder)
@@ -62,5 +66,5 @@ object SimuleringExtendedResultMapperV6 {
             if (it == Uttaksgrad.HUNDRE_PROSENT) null else it.prosentsats
         }
 
-    private fun alder(source: Alder) = AlderV6(source.aar, source.maaneder)
+    private fun alder(source: Alder) = AlderV7(source.aar, source.maaneder)
 }

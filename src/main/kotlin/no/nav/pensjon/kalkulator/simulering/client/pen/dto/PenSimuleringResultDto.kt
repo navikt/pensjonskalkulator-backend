@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.simulering.client.pen.dto
 // Corresponds to SimuleringsresultatAlderspensjon1963Plus in PEN
 data class PenSimuleringResultDto(
     val alderspensjon: List<PenPensjonDto>,
+    val alderspensjonMaanedsbeloep: Maanedsbeloep,
     val afpPrivat: List<PenPensjonDto>,
     val afpOffentliglivsvarig: List<PenPensjonAfpOffentligDto>,
     val vilkaarsproeving: PenVilkaarsproevingDto?,
@@ -45,3 +46,5 @@ data class PenOpptjeningGrunnlag(
     val aar: Int,
     val pensjonsgivendeInntekt: Int
 )
+
+data class Maanedsbeloep(val maanedsbeloepVedGradertUttak: Int?, val maanedsbeloepVedHeltUttak: Int)

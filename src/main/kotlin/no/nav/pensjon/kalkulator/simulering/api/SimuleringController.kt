@@ -13,9 +13,9 @@ import no.nav.pensjon.kalkulator.simulering.SimuleringService
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import no.nav.pensjon.kalkulator.simulering.api.map.AnonymSimuleringResultMapperV1.resultatV1
 import no.nav.pensjon.kalkulator.simulering.api.map.AnonymSimuleringSpecMapperV1
-import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringExtendedResultMapperV6.extendedResultV6
-import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringResultMapperV6.resultatV6
-import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringSpecMapperV6.fromIngressSimuleringSpecV6
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringExtendedResultMapperV7.extendedResultV7
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringResultMapperV7.resultatV7
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringSpecMapperV7.fromIngressSimuleringSpecV7
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.BadRequestException
@@ -40,7 +40,7 @@ class SimuleringController(
 
     private val log = KotlinLogging.logger {}
 
-    @PostMapping("v6/alderspensjon/simulering")
+    @PostMapping("v7/alderspensjon/simulering")
     @Operation(
         summary = "Simuler alderspensjon",
         description = "Lag en prognose for framtidig alderspensjon med støtte for AFP i offentlig sektor." +
@@ -61,34 +61,34 @@ class SimuleringController(
             ),
         ]
     )
-    fun simulerAlderspensjonV6(@RequestBody spec: IngressSimuleringSpecV6): SimuleringResultatV6 {
+    fun simulerAlderspensjonV7(@RequestBody spec: IngressSimuleringSpecV7): SimuleringResultatV7 {
         traceAid.begin()
-        log.debug { "Request for V6 simulering: $spec" }
+        log.debug { "Request for V7 simulering: $spec" }
 
         return try {
             if (feature.isEnabled("utvidet-simuleringsresultat"))
-                extendedResultV6(
+                extendedResultV7(
                     timed(
                         service::simulerAlderspensjon,
-                        fromIngressSimuleringSpecV6(spec),
+                        fromIngressSimuleringSpecV7(spec),
                         "alderspensjon/simulering"
                     )
                 )
-                    .also { log.debug { "Simulering V6 respons: $it" } }
+                    .also { log.debug { "Simulering V7 respons: $it" } }
             else
-                resultatV6(
+                resultatV7(
                     timed(
                         service::simulerAlderspensjon,
-                        fromIngressSimuleringSpecV6(spec),
+                        fromIngressSimuleringSpecV7(spec),
                         "alderspensjon/simulering"
                     )
                 )
-                    .also { log.debug { "Simulering V6 respons: $it" } }
+                    .also { log.debug { "Simulering V7 respons: $it" } }
 
         } catch (e: BadRequestException) {
             badRequest(e)!!
         } catch (e: EgressException) {
-            if (e.isConflict) vilkaarIkkeOppfyltV6() else handleError(e, "V6")!!
+            if (e.isConflict) vilkaarIkkeOppfyltV7() else handleError(e, "V7")!!
         } finally {
             traceAid.end()
         }
@@ -150,17 +150,17 @@ class SimuleringController(
     companion object {
         private const val ERROR_MESSAGE = "feil ved simulering"
 
-        private fun vilkaarIkkeOppfyltV6() =
-            SimuleringResultatV6(
+        private fun vilkaarIkkeOppfyltV7() =
+            SimuleringResultatV7(
                 alderspensjon = emptyList(),
                 afpPrivat = null,
                 afpOffentlig = null,
-                vilkaarsproeving = VilkaarsproevingV6(vilkaarErOppfylt = false, alternativ = null),
+                vilkaarsproeving = VilkaarsproevingV7(vilkaarErOppfylt = false, alternativ = null),
                 harForLiteTrygdetid = false
             )
 
         @Language("json")
-        const val VILKAAR_IKKE_OPPFYLT_EXAMPLE_V6 =
+        const val VILKAAR_IKKE_OPPFYLT_EXAMPLE_V7 =
             """{"alderspensjon":[],"vilkaarsproeving":{"vilkaarErOppfylt":false}}"""
     }
 }

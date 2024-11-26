@@ -46,7 +46,7 @@ object NorskPensjonPensjonsavtaleMapper {
             aarligInntektFoerUttak = spec.aarligInntektFoerUttak,
             uttaksperioder = spec.uttaksperioder.map(::uttaksperiodeSpecDto),
             antallInntektsaarEtterUttak = antallInntektAarUnderHeltUttak(spec.uttaksperioder),
-            harAfp = false, // avoids Norsk Pensjon calling NAV's AFP simulation
+            harAfp = false, // avoids Norsk Pensjon calling Nav's AFP simulation
             harEpsPensjon = spec.harEpsPensjon ?: DEFAULT_HAR_EPS_PENSJON,
             harEpsPensjonsgivendeInntektOver2G = spec.harEpsPensjonsgivendeInntektOver2G
                 ?: DEFAULT_HAR_EPS_PENSJONSGIVENDE_INNTEKT_OVER_2G,
@@ -132,7 +132,7 @@ object NorskPensjonPensjonsavtaleMapper {
     }
 
     private fun emptyOrFault(dto: EnvelopeDto) =
-        dto.body?.fault?.run { throw RuntimeException(faultToString(this)) }
+        dto.body?.fault?.run { throw PensjonsavtaleException(faultToString(this)) }
             ?: emptyList<Pensjonsavtale>()
 
     private fun nullableDetailToString(detail: FaultDetailDto?) = detail?.let(::detailToString) ?: "no detail"
