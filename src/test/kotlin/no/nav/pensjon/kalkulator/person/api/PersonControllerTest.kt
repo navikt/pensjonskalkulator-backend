@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
-import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -43,36 +42,20 @@ class PersonControllerTest {
     private lateinit var auditor: Auditor
 
     @Test
-    fun `personV3 without PID`() {
+    fun `test 'person' endpoint version 2`() {
         `when`(service.getPerson()).thenReturn(skiltPerson())
 
         mvc.perform(
-            post(URL_V3)
+            post(URL_V2)
                 .with(csrf())
                 .content("")
         )
-            .andExpect(request().attribute("pid", null))
             .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY_V3))
+            .andExpect(content().json(RESPONSE_BODY_V2))
     }
 
     @Test
-    fun `personV3 with PID`() {
-        `when`(service.getPerson()).thenReturn(skiltPerson())
-
-        mvc.perform(
-            post(URL_V3)
-                .with(csrf())
-                .content(requestBodyWithPid())
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(request().attribute("pid", "12906498357"))
-            .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY_V3))
-    }
-
-    @Test
-    fun `personV4 without PID`() {
+    fun `test 'person' endpoint version 4`() {
         `when`(service.getPerson()).thenReturn(skiltPerson())
 
         mvc.perform(
@@ -80,37 +63,16 @@ class PersonControllerTest {
                 .with(csrf())
                 .content("")
         )
-            .andExpect(request().attribute("pid", null))
-            .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY_V3))
-    }
-
-    @Test
-    fun `personV4 with PID`() {
-        `when`(service.getPerson()).thenReturn(skiltPerson())
-
-        mvc.perform(
-            post(URL_V4)
-                .with(csrf())
-                .content(requestBodyWithPid())
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(request().attribute("pid", "12906498357"))
             .andExpect(status().isOk())
             .andExpect(content().json(RESPONSE_BODY_V4))
     }
 
     private companion object {
-        private const val URL_V3 = "/api/v3/person"
+        private const val URL_V2 = "/api/v2/person"
         private const val URL_V4 = "/api/v4/person"
 
         @Language("json")
-        private fun requestBodyWithPid() = """{
-            "pid": "12906498357"
-        }""".trimIndent()
-
-        @Language("json")
-        private const val RESPONSE_BODY_V3 = """{
+        private const val RESPONSE_BODY_V2 = """{
     "navn": "Fornavn1",
     "foedselsdato": "1963-12-31",
     "sivilstand": "SKILT"
