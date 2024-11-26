@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.simulering.api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
+import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
@@ -20,6 +21,9 @@ import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.intellij.lang.annotations.Language
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -106,45 +110,45 @@ class SimuleringController(
                 description = "Simulering utført"
             ),
             ApiResponse(
-                responseCode = "503", description = "Simulering kunne ikke utføres av tekniske årsaker",
-                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
+                responseCode = "4xx", description = "Simulering kunne ikke utføres pga. feil i input-data",
+                content = [Content(schema = Schema(implementation = AnonymSimuleringErrorV1::class))]
             ),
         ]
     )
-    fun simulerAnonymAlderspensjonV1(@RequestBody spec: AnonymSimuleringSpecV1): AnonymSimuleringResultV1 {
+    fun simulerAnonymAlderspensjonV1(@RequestBody spec: AnonymSimuleringSpecV1): ResponseEntity<AnonymSimuleringResultV1?>? {
         traceAid.begin()
         log.debug { "Request for anonym simulering V1: $spec" }
 
+
         return try {
-            resultatV1(
+            ResponseEntity.ok(resultatV1(
                 timed(
                     anonymService::simulerAlderspensjon,
                     AnonymSimuleringSpecMapperV1.fromAnonymSimuleringSpecV1(spec),
                     "alderspensjon/anonym-simulering"
                 )
-            )
-                .also { log.debug { "Anonym simulering V1 respons: $it" } }
+                    .also { log.debug { "Anonym simulering V1 respons: $it" } }
+            ))
         } catch (e: BadRequestException) {
             badRequest(e)!!
         } catch (e: EgressException) {
-            if (e.isConflict) vilkaarIkkeOppfyltAnonymV1() else handleError(e, "V6")!!
+            if (e.isConflict && e.errorObj != null) throw e
+            else ResponseEntity.badRequest().body(handleError(e, "V6"))
         } finally {
             traceAid.end()
         }
+    }
+
+    @ExceptionHandler(EgressException::class)
+    fun handleError(e: EgressException): ResponseEntity<AnonymSimuleringErrorV1> {
+        val status = e.statusCode ?: HttpStatus.INTERNAL_SERVER_ERROR
+        return ResponseEntity.status(status).body(e.errorObj)
     }
 
     override fun errorMessage() = ERROR_MESSAGE
 
     companion object {
         private const val ERROR_MESSAGE = "feil ved simulering"
-
-        private fun vilkaarIkkeOppfyltAnonymV1() =
-            AnonymSimuleringResultV1(
-                alderspensjon = emptyList(),
-                afpPrivat = null,
-                afpOffentlig = null,
-                vilkaarsproeving = AnonymVilkaarsproevingV1(vilkaarErOppfylt = false, alternativ = null)
-            )
 
         private fun vilkaarIkkeOppfyltV7() =
             SimuleringResultatV7(
