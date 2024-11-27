@@ -168,8 +168,6 @@ spec:
       value: JSON
     - name: PKB_LOGGING_LEVEL
       value: DEBUG
-    - name: JAVA_TOOL_OPTIONS # only in dev
-      value: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
   envFrom:
     - secret: pensjonskalkulator-backend-unleash-api-token
     - secret: pkb-pid-encryption
