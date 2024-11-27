@@ -6,12 +6,12 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.5</version>
+        <version>3.4.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>no.nav.pensjon</groupId>
     <artifactId>pensjonskalkulator-backend</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
     <name>pensjonskalkulator-backend</name>
     <description>Backend for pensjonskalkulator for brukere født 1963 eller senere</description>
     <packaging>jar</packaging>
@@ -141,7 +141,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.6.0</version>
+            <version>2.7.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.yaml</groupId>
@@ -152,7 +152,7 @@
         <dependency>
             <groupId>io.getunleash</groupId>
             <artifactId>unleash-client-java</artifactId>
-            <version>9.2.4</version>
+            <version>9.2.5</version>
         </dependency>
         <dependency>
             <groupId>io.github.microutils</groupId>
