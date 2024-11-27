@@ -26,7 +26,7 @@ class TjenestepensjonSimuleringController(
         summary = "Simuler offentlig tjenestepensjon hos tp-leverandør bruker er medlem av",
         description = "Simulerer offentlig tjenestepensjon hos tp-leverandør som har ansvar for brukers tjenestepensjon"
     )
-    fun simulerOffentligTjenestepensjon(@RequestBody spec: IngressSimuleringOFTPSpecV1): OFTPSimuleringsresultatDto {
+    fun simulerOffentligTjenestepensjon(@RequestBody spec: IngressSimuleringOFTPSpecV2): OFTPSimuleringsresultatDto {
         traceAid.begin()
         log.debug { "Request for simuler Offentlig tjenestepensjon" }
 
