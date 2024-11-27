@@ -13,6 +13,8 @@ class TjenestepensjonSimuleringService(
 ) {
 
     fun hentTjenestepensjonSimulering(request: IngressSimuleringOFTPSpecV1): OFTPSimuleringsresultat {
-        return tjenestepensjonSimuleringClient.hentTjenestepensjonSimulering(request)
+        val pid = pidGetter.pid()
+        val simuleringRequest = request.toSimuleringOFTPSpec(pid)
+        return tjenestepensjonSimuleringClient.hentTjenestepensjonSimulering(simuleringRequest)
     }
 }

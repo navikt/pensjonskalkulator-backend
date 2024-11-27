@@ -17,7 +17,8 @@ enum class ResultatType(val externalValue: ResultatTypeDto) {
     OK(ResultatTypeDto.SUCCESS),
     IKKE_MEDLEM(ResultatTypeDto.BRUKER_ER_IKKE_MEDLEM_HOS_TP_ORDNING),
     TP_ORDNING_STOETTES_IKKE(ResultatTypeDto.TP_ORDNING_ER_IKKE_STOTTET),
-    TOM_RESPONS(ResultatTypeDto.INGEN_UTBETALINGSPERIODER_FRA_TP_ORDNING);
+    TOM_RESPONS(ResultatTypeDto.INGEN_UTBETALINGSPERIODER_FRA_TP_ORDNING),
+    TEKNISK_FEIL(ResultatTypeDto.TEKNISK_FEIL_FRA_TP_ORDNING);
 
     companion object {
         fun fromExternalValue(externalValue: ResultatTypeDto) = entries.first { it.externalValue == externalValue }

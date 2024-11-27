@@ -21,7 +21,7 @@ class TjenestepensjonSimuleringController(
 
     private val log = KotlinLogging.logger {}
 
-    @PostMapping("v2/simuler-oftp-ekte")
+    @PostMapping("v2/simuler-oftp")
     @Operation(
         summary = "Simuler offentlig tjenestepensjon hos tp-leverandør bruker er medlem av",
         description = "Simulerer offentlig tjenestepensjon hos tp-leverandør som har ansvar for brukers tjenestepensjon"
@@ -31,7 +31,7 @@ class TjenestepensjonSimuleringController(
         log.debug { "Request for simuler Offentlig tjenestepensjon" }
 
         return try {
-            TjenestepensjonSimuleringMapper.mapToDto(timed(service::hentTjenestepensjonSimulering, spec, "simulerOffentligTjenestepensjon"))
+            TjenestepensjonSimuleringMapper.toDto(timed(service::hentTjenestepensjonSimulering, spec, "simulerOffentligTjenestepensjon"))
                 .also { log.debug { "Simuler Offentlig tjenestepensjon respons: $it" } }
         } catch (e: EgressException) {
             handleError(e)!!
