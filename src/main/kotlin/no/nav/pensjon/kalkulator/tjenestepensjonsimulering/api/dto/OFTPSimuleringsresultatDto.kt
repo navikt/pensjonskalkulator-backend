@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.tjenestepensjon.api.dto
+package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
 

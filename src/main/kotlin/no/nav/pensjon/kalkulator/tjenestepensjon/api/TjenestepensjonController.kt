@@ -57,35 +57,6 @@ class TjenestepensjonController(
         }
     }
 
-    @PostMapping("v1/simuler-oftp")
-    @Operation(
-        summary = "Simuler offentlig tjenestepensjon hos tp-leverandør bruker er medlem av",
-        description = "Simulerer offentlig tjenestepensjon hos tp-leverandør som har ansvar for brukers tjenestepensjon"
-    )
-    fun simulerOffentligTjenestepensjon(@RequestBody spec: IngressSimuleringOFTPSpecV1): OFTPSimuleringsresultatDto {
-        traceAid.begin()
-        log.debug { "Request for simuler Offentlig tjenestepensjon" }
-
-        return try {
-            OFTPSimuleringsresultatDto(
-                simuleringsresultatStatus = SimuleringsresultatStatus.OK,
-                muligeTpLeverandoerListe = listOf("Statens pensjonskasse"),
-                simulertTjenestepensjon = SimulertTjenestepensjon(
-                    tpLeverandoer = "Statens pensjonskasse",
-                    simuleringsresultat = Simuleringsresultat(
-                        betingetTjenestepensjonErInkludert = true,
-                        utbetalingsperioder = IntRange(spec.uttaksalder.aar, spec.uttaksalder.aar + 15)
-                            .map { UtbetalingPerAar(aar = it, beloep = 57000) }
-                    )
-                )
-            )
-        } catch (e: EgressException) {
-            handleError(e)!!
-        } finally {
-            traceAid.end()
-        }
-    }
-
     override fun errorMessage() = ERROR_MESSAGE
 
     private companion object {
