@@ -4,8 +4,8 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.simulering.Opphold
+import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
@@ -17,10 +17,10 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
@@ -34,19 +34,19 @@ internal class UttaksalderControllerTest {
     @Autowired
     private lateinit var mvc: MockMvc
 
-    @MockBean
+    @MockitoBean
     private lateinit var uttaksalderService: UttaksalderService
 
-    @MockBean
+    @MockitoBean
     private lateinit var traceAid: TraceAid
 
-    @MockBean
+    @MockitoBean
     private lateinit var pidExtractor: PidExtractor
 
-    @MockBean
+    @MockitoBean
     private lateinit var groupMembershipService: GroupMembershipService
 
-    @MockBean
+    @MockitoBean
     private lateinit var auditor: Auditor
 
     @Test

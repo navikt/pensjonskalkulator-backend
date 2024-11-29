@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
@@ -24,19 +24,19 @@ class AnsattControllerTest {
     @Autowired
     private lateinit var mvc: MockMvc
 
-    @MockBean
+    @MockitoBean
     private lateinit var service: AnsattService
 
-    @MockBean
+    @MockitoBean
     private lateinit var traceAid: TraceAid
 
-    @MockBean
+    @MockitoBean
     private lateinit var pidExtractor: PidExtractor
 
-    @MockBean
+    @MockitoBean
     private lateinit var groupMembershipService: GroupMembershipService
 
-    @MockBean
+    @MockitoBean
     private lateinit var auditor: Auditor
 
     @Test
