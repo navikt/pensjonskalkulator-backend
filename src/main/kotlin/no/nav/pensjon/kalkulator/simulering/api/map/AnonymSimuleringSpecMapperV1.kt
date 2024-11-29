@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.simulering.api.map
 
 import no.nav.pensjon.kalkulator.general.*
+import no.nav.pensjon.kalkulator.general.HeltUttak.Companion.defaultHeltUttakInntekt
 import no.nav.pensjon.kalkulator.general.HeltUttak.Companion.defaultHeltUttakInntektTomAlder
 import no.nav.pensjon.kalkulator.simulering.Eps
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
@@ -42,7 +43,7 @@ object AnonymSimuleringSpecMapperV1 {
     private fun heltUttak(dto: AnonymSimuleringHeltUttakV1) =
         HeltUttak(
             uttakFomAlder = alder(dto.uttakAlder),
-            inntekt = dto.aarligInntektVsaPensjon?.let(::inntekt)
+            inntekt = dto.aarligInntektVsaPensjon?.let(::inntekt) ?: defaultHeltUttakInntekt
         )
 
     private fun inntekt(dto: AnonymSimuleringInntektV1) =
