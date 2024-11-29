@@ -1,6 +1,5 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map
 
-import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.simulering.PensjonUtil.uttakDato
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.IngressSimuleringOFTPSpecV2
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.UtenlandsoppholdV2
@@ -8,7 +7,6 @@ import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.S
 import java.time.LocalDate
 
 object TjenestepensjonSimuleringSpecMapperV2 {
-    private val log = KotlinLogging.logger {}
 
     fun fromDto(spec: IngressSimuleringOFTPSpecV2) : SimuleringOFTPSpec {
         return SimuleringOFTPSpec(
@@ -24,15 +22,11 @@ object TjenestepensjonSimuleringSpecMapperV2 {
 
     fun antallAar(oppholdListe: List<UtenlandsoppholdV2>): Int {
         val antallDager = antallDager(oppholdListe)
-        val res = (antallDager / DAGER_PER_AAR).toInt()
-        log.info { "( $antallDager / $DAGER_PER_AAR ).toInt()=$res" }
-        return res
+        return (antallDager / DAGER_PER_AAR).toInt()
     }
 
     fun antallDager(oppholdListe: List<UtenlandsoppholdV2>): Long {
-        val res = oppholdListe.sumOf { (it.tom ?: LocalDate.now()).toEpochDay() + 1 - it.fom.toEpochDay() } // +1 for å inkludere siste dagen
-        log.info { "antall dager i $oppholdListe: $res" }
-        return res
+        return oppholdListe.sumOf { (it.tom ?: LocalDate.now()).toEpochDay() + 1 - it.fom.toEpochDay() } // +1 for å inkludere siste dagen
     }
 
     private const val DAGER_PER_AAR = 365
