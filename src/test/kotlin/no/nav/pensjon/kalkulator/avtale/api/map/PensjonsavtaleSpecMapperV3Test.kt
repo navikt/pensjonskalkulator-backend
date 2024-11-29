@@ -9,31 +9,28 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
 
-class PensjonsavtaleSpecMapperV2Test {
+class PensjonsavtaleSpecMapperV3Test {
 
     @Test
-    fun `'fromDtoV2' maps version 2 of data transfer object to domain object (pensjonsavtale specification)`() {
-        PensjonsavtaleSpecMapperV2.fromDtoV2(
-            PensjonsavtaleSpecV2(
+    fun `'fromDtoV3' maps version 3 of data transfer object to domain object (pensjonsavtale specification)`() {
+        PensjonsavtaleSpecMapperV3.fromDtoV3(
+            PensjonsavtaleSpecV3(
                 aarligInntektFoerUttakBeloep = 234000,
                 uttaksperioder = listOf(
-                    PensjonsavtaleUttaksperiodeSpecV2(
-                        startAlder = PensjonsavtaleAlderSpecV2(aar = 68, maaneder = 0),
+                    PensjonsavtaleUttaksperiodeSpecV3(
+                        startAlder = PensjonsavtaleAlderSpecV3(aar = 68, maaneder = 0),
                         grad = 50,
-                        aarligInntektVsaPensjon = PensjonsavtaleInntektSpecV2(
+                        aarligInntektVsaPensjon = PensjonsavtaleInntektSpecV3(
                             beloep = 123000,
-                            sluttAlder = PensjonsavtaleAlderSpecV2(aar = 75, maaneder = 10)
+                            sluttAlder = PensjonsavtaleAlderSpecV3(aar = 75, maaneder = 10)
                         )
                     )
                 ),
                 harAfp = true, // this value will be ignored in mapping
-                harEpsPensjon = true,
-                harEpsPensjonsgivendeInntektOver2G = true,
-                antallAarIUtlandetEtter16 = 5,
-                utenlandsperioder = null,
-                sivilstand = PensjonsavtaleSivilstandSpecV2.SEPARERT_PARTNER
+                epsHarPensjon = true,
+                epsHarInntektOver2G = true,
+                sivilstand = PensjonsavtaleSivilstandSpecV3.SEPARERT_PARTNER
             )
         ) shouldBe
                 PensjonsavtaleSpec(
@@ -55,22 +52,11 @@ class PensjonsavtaleSpecMapperV2Test {
     }
 
     @Test
-    fun `'fromDtoV2' maps utenlandsperioder to aar`() {
-        PensjonsavtaleSpecMapperV2.fromDtoV2(
-            PensjonsavtaleSpecV2(
+    fun `'fromDtoV3' maps utenlandsperioder to aar`() {
+        PensjonsavtaleSpecMapperV3.fromDtoV3(
+            PensjonsavtaleSpecV3(
                 aarligInntektFoerUttakBeloep = -1,
-                uttaksperioder = emptyList(),
-                antallAarIUtlandetEtter16 = null,
-                utenlandsperioder = listOf(
-                    PensjonsavtaleOppholdSpecV2(
-                        fom = LocalDate.of(2020, 1, 1),
-                        tom = LocalDate.of(2023, 12, 31) // => 4 år
-                    ),
-                    PensjonsavtaleOppholdSpecV2(
-                        fom = LocalDate.of(2024, 6, 1),
-                        tom = LocalDate.of(2025, 11, 30) // => 1 år
-                    )
-                )
+                uttaksperioder = emptyList()
             )
         ) shouldBe
                 PensjonsavtaleSpec(
