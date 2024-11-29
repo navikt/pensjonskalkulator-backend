@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.avtale.api
 
 import no.nav.pensjon.kalkulator.avtale.*
-import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleServiceTest.Companion.pensjonsavtaleSpecV2
+import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleServiceTest.Companion.avtaleSpecMedTidsbegrensetInntekt
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtaler
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
@@ -46,7 +46,7 @@ class PensjonsavtaleControllerTest {
 
     @Test
     fun fetchAvtalerV2() {
-        `when`(avtaleService.fetchAvtaler(pensjonsavtaleSpecV2())).thenReturn(pensjonsavtaler())
+        `when`(avtaleService.fetchAvtaler(avtaleSpecMedTidsbegrensetInntekt())).thenReturn(pensjonsavtaler())
 
         mvc.perform(
             post(URL_V2)
@@ -58,9 +58,24 @@ class PensjonsavtaleControllerTest {
             .andExpect(content().json(RESPONSE_BODY))
     }
 
+    @Test
+    fun fetchAvtalerV3() {
+        `when`(avtaleService.fetchAvtaler(avtaleSpecMedTidsbegrensetInntekt())).thenReturn(pensjonsavtaler())
+
+        mvc.perform(
+            post(URL_V3)
+                .with(csrf())
+                .content(REQUEST_BODY_V3)
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk())
+            .andExpect(content().json(RESPONSE_BODY))
+    }
+
     private companion object {
 
         private const val URL_V2 = "/api/v2/pensjonsavtaler"
+        private const val URL_V3 = "/api/v3/pensjonsavtaler"
 
         @Language("json")
         private val REQUEST_BODY_V2 = """{
@@ -96,6 +111,42 @@ class PensjonsavtaleControllerTest {
     "harEpsPensjon": true,
     "harEpsPensjonsgivendeInntektOver2G": true,
     "antallAarIUtlandetEtter16": 0,
+    "sivilstand": "UGIFT"
+}"""
+
+        @Language("json")
+        private val REQUEST_BODY_V3 = """{
+	"aarligInntektFoerUttakBeloep": 456000,
+	"uttaksperioder": [{
+        "startAlder": {
+	  	    "aar": 67,
+		    "maaneder": 1
+	    },
+		"grad": 80,
+		"aarligInntektVsaPensjon": {
+	  	    "beloep": 123000,
+		    "sluttAlder": {
+	  	       "aar": 67,
+		       "maaneder": 1
+	        }
+	    }
+	}, {
+       "startAlder": {
+	  	    "aar": 70,
+		    "maaneder": 1
+	    },
+		"grad": 100,
+		"aarligInntektVsaPensjon": {
+	  	    "beloep": 45000,
+		    "sluttAlder": {
+	  	       "aar": 69,
+		       "maaneder": 1
+	        }
+	    }
+	}],
+    "harAfp": false,
+    "epsHarPensjon": true,
+    "epsHarInntektOver2G": true,
     "sivilstand": "UGIFT"
 }"""
 

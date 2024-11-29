@@ -42,7 +42,7 @@ class PensjonsavtaleServiceTest {
     @Test
     fun `fetchAvtaler fetches avtaler`() {
         arrangeClient()
-        val result = avtaleService.fetchAvtaler(pensjonsavtaleSpec())
+        val result = avtaleService.fetchAvtaler(avtaleSpecMedLivsvarigInntekt())
         result shouldBe pensjonsavtaler
     }
 
@@ -57,21 +57,21 @@ class PensjonsavtaleServiceTest {
             )
         )
 
-        val result = avtaleService.fetchAvtaler(pensjonsavtaleSpec())
+        val result = avtaleService.fetchAvtaler(avtaleSpecMedLivsvarigInntekt())
 
         result shouldBe pensjonsavtalerV3(listOf(AvtaleKategori.INDIVIDUELL_ORDNING))
     }
 
     @Test
     fun `fetchAvtaler excludes avtaler without start-aar`() {
-        `when`(avtaleClient.fetchAvtaler(pensjonsavtaleSpec(), pid)).thenReturn(enAvtaleUtenStart())
-        val result = avtaleService.fetchAvtaler(pensjonsavtaleSpec())
+        `when`(avtaleClient.fetchAvtaler(avtaleSpecMedLivsvarigInntekt(), pid)).thenReturn(enAvtaleUtenStart())
+        val result = avtaleService.fetchAvtaler(avtaleSpecMedLivsvarigInntekt())
         result shouldBe Pensjonsavtaler(emptyList(), emptyList())
     }
 
     @Test
     fun `fetchAvtaler uses mocked avtaler, when toggle is set`() {
-        val spec = pensjonsavtaleSpec()
+        val spec = avtaleSpecMedLivsvarigInntekt()
         `when`(featureToggleService.isEnabled("mock-norsk-pensjon")).thenReturn(true)
         `when`(mockAvtaleClient.fetchAvtaler(spec, pid)).thenReturn(pensjonsavtalerV3())
 
@@ -83,7 +83,7 @@ class PensjonsavtaleServiceTest {
 
     @Test
     fun `fetchAvtaler uses norsk pensjon, when toggle is not set`() {
-        val spec = pensjonsavtaleSpec()
+        val spec = avtaleSpecMedLivsvarigInntekt()
         `when`(featureToggleService.isEnabled("mock-norsk-pensjon")).thenReturn(false)
         `when`(avtaleClient.fetchAvtaler(spec, pid)).thenReturn(pensjonsavtalerV3())
 
@@ -94,11 +94,12 @@ class PensjonsavtaleServiceTest {
     }
 
     private fun arrangeClient() {
-        `when`(avtaleClient.fetchAvtaler(pensjonsavtaleSpec(), pid)).thenReturn(pensjonsavtaler)
+        `when`(avtaleClient.fetchAvtaler(avtaleSpecMedLivsvarigInntekt(), pid)).thenReturn(pensjonsavtaler)
     }
 
     private fun arrangeClient(kategorier: List<AvtaleKategori>) {
-        `when`(avtaleClient.fetchAvtaler(pensjonsavtaleSpec(), pid)).thenReturn(pensjonsavtalerV3(kategorier))
+        `when`(avtaleClient.fetchAvtaler(avtaleSpecMedLivsvarigInntekt(), pid))
+            .thenReturn(pensjonsavtalerV3(kategorier))
     }
 
     companion object {
@@ -106,57 +107,47 @@ class PensjonsavtaleServiceTest {
 
         private val pensjonsavtaler = pensjonsavtalerV3()
 
-        fun pensjonsavtaleSpec() =
+        fun avtaleSpecMedLivsvarigInntekt() =
             PensjonsavtaleSpec(
                 aarligInntektFoerUttak = AARLIG_INNTEKT_FOER_UTTAK,
-                uttaksperioder = listOf(uttaksperiodeSpec1(), uttaksperiodeSpec2()),
+                uttaksperioder = listOf(
+                    uttaksperiodeSpecForGradertUttak(inntektTom = null),
+                    uttaksperiodeSpecForHeltUttak(inntektTom = null)
+                ),
                 harEpsPensjon = true,
                 harEpsPensjonsgivendeInntektOver2G = true,
-                antallAarIUtlandetEtter16 = 0,
                 sivilstand = Sivilstand.UGIFT
             )
 
-        fun pensjonsavtaleSpecV2() =
+        fun avtaleSpecMedTidsbegrensetInntekt() =
             PensjonsavtaleSpec(
                 aarligInntektFoerUttak = AARLIG_INNTEKT_FOER_UTTAK,
-                uttaksperioder = listOf(uttaksperiodeSpec1V2(), uttaksperiodeSpec2V2()),
+                uttaksperioder = listOf(
+                    uttaksperiodeSpecForGradertUttak(inntektTom = Alder(aar = 67, maaneder = 1)),
+                    uttaksperiodeSpecForHeltUttak(inntektTom = Alder(aar = 69, maaneder = 1))
+                ),
                 harEpsPensjon = true,
                 harEpsPensjonsgivendeInntektOver2G = true,
-                antallAarIUtlandetEtter16 = 0,
                 sivilstand = Sivilstand.UGIFT
             )
 
-        private fun uttaksperiodeSpec1() =
-            UttaksperiodeSpec(
-                startAlder = Alder(67, 1),
-                grad = Uttaksgrad.AATTI_PROSENT,
-                aarligInntekt = InntektSpec(123000, null)
-            )
-
-        private fun uttaksperiodeSpec2() =
-            UttaksperiodeSpec(
-                startAlder = Alder(70, 1),
-                grad = Uttaksgrad.HUNDRE_PROSENT,
-                aarligInntekt = InntektSpec(45000, null)
-            )
-
-        private fun uttaksperiodeSpec1V2() =
+        private fun uttaksperiodeSpecForGradertUttak(inntektTom: Alder?) =
             UttaksperiodeSpec(
                 startAlder = Alder(67, 1),
                 grad = Uttaksgrad.AATTI_PROSENT,
                 aarligInntekt = InntektSpec(
                     aarligBeloep = 123000,
-                    tomAlder = Alder(aar = 67, maaneder = 1)
+                    tomAlder = inntektTom
                 )
             )
 
-        private fun uttaksperiodeSpec2V2() =
+        private fun uttaksperiodeSpecForHeltUttak(inntektTom: Alder?) =
             UttaksperiodeSpec(
                 startAlder = Alder(70, 1),
                 grad = Uttaksgrad.HUNDRE_PROSENT,
                 aarligInntekt = InntektSpec(
                     aarligBeloep = 45000,
-                    tomAlder = Alder(aar = 69, maaneder = 1)
+                    tomAlder = inntektTom
                 )
             )
 
