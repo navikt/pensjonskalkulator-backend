@@ -1,7 +1,9 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.map
 
+import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.*
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.SimulerTjenestepensjonResponseDto
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.SimuleringOFTPSpecDto
 
 object TpSimuleringClientMapper {
 
@@ -24,5 +26,16 @@ object TpSimuleringClientMapper {
             )
         },
         tpOrdninger = dto.relevanteTpOrdninger,
+    )
+
+    fun toDto(spec: SimuleringOFTPSpec, pid: Pid) = SimuleringOFTPSpecDto(
+        pid = pid.value,
+        foedselsdato = spec.foedselsdato,
+        uttaksdato = spec.uttaksdato,
+        sisteInntekt = spec.sisteInntekt,
+        aarIUtlandetEtter16 = spec.aarIUtlandetEtter16,
+        brukerBaOmAfp = spec.brukerBaOmAfp,
+        epsPensjon = spec.epsPensjon,
+        eps2G = spec.eps2G,
     )
 }

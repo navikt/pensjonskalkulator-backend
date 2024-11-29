@@ -3,16 +3,17 @@ package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering
 import io.netty.handler.timeout.ReadTimeoutHandler
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
+import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.SimuleringOFTPSpec
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.TjenestepensjonSimuleringClient
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.SimulerTjenestepensjonResponseDto
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.map.TpSimuleringClientMapper
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.map.TpSimuleringClientMapper.toDto
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
@@ -39,7 +40,7 @@ class TpSimuleringClient(
                     .doOnConnected { it.addHandlerLast(ReadTimeoutHandler(ON_CONNECTED_READ_TIMEOUT)) })
         ).build()
 
-    override fun hentTjenestepensjonSimulering(request: SimuleringOFTPSpec): OFTPSimuleringsresultat {
+    override fun hentTjenestepensjonSimulering(request: SimuleringOFTPSpec, pid: Pid): OFTPSimuleringsresultat {
         val uri = "/$API_PATH"
         log.debug { "POST to URL: '$uri'" }
 
@@ -47,7 +48,7 @@ class TpSimuleringClient(
             webClient
                 .post()
                 .uri(uri)
-                .bodyValue(request)
+                .bodyValue(toDto(request, pid))
                 .headers { setHeaders(it) }
                 .retrieve()
                 .bodyToMono(SimulerTjenestepensjonResponseDto::class.java)

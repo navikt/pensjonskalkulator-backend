@@ -4,12 +4,10 @@ import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrang
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.SimuleringOFTPSpec
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Test
-
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.Mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -45,7 +43,6 @@ class TpSimuleringClientTest : WebClientTest() {
     fun `hent tjenestepensjonSimulering hvor responsen har ingen utbetalingsperioder`() {
         arrange(ingenUtbetalingsperioderResponse())
         val req = SimuleringOFTPSpec(
-            pid = pid.value,
             foedselsdato = LocalDate.of(1964, 2, 3),
             uttaksdato = LocalDate.of(2027, 2, 3),
             sisteInntekt = 0,
@@ -54,7 +51,7 @@ class TpSimuleringClientTest : WebClientTest() {
             epsPensjon = true,
             eps2G = true,
         )
-        val resp = client.hentTjenestepensjonSimulering(req)
+        val resp = client.hentTjenestepensjonSimulering(req, pid)
 
         assertNull(resp.simuleringsResultat)
         assertEquals(ResultatType.TOM_RESPONS, resp.simuleringsResultatStatus.resultatType)
@@ -66,7 +63,6 @@ class TpSimuleringClientTest : WebClientTest() {
     fun `hent tjenestepensjon simulering OK`() {
         arrange(okResponse())
         val req = SimuleringOFTPSpec(
-            pid = pid.value,
             foedselsdato = LocalDate.of(1964, 2, 3),
             uttaksdato = LocalDate.of(2027, 2, 3),
             sisteInntekt = 500000,
@@ -75,7 +71,7 @@ class TpSimuleringClientTest : WebClientTest() {
             epsPensjon = true,
             eps2G = true,
         )
-        val resp = client.hentTjenestepensjonSimulering(req)
+        val resp = client.hentTjenestepensjonSimulering(req, pid)
 
         assertNotNull(resp.simuleringsResultat)
         assertEquals(ResultatType.OK, resp.simuleringsResultatStatus.resultatType)
@@ -90,7 +86,6 @@ class TpSimuleringClientTest : WebClientTest() {
     fun `hent tjenestepensjon simulering for bruker som ikke er medlem`() {
         arrange(ikkeMedlemResponse())
         val req = SimuleringOFTPSpec(
-            pid = pid.value,
             foedselsdato = LocalDate.of(1964, 2, 3),
             uttaksdato = LocalDate.of(2027, 2, 3),
             sisteInntekt = 500000,
@@ -99,7 +94,7 @@ class TpSimuleringClientTest : WebClientTest() {
             epsPensjon = true,
             eps2G = true,
         )
-        val resp = client.hentTjenestepensjonSimulering(req)
+        val resp = client.hentTjenestepensjonSimulering(req, pid)
 
         assertNull(resp.simuleringsResultat)
         assertEquals(ResultatType.IKKE_MEDLEM, resp.simuleringsResultatStatus.resultatType)
@@ -111,7 +106,6 @@ class TpSimuleringClientTest : WebClientTest() {
     fun `hent tjenestepensjon simulering for tp-ordning som ikke stoettes`() {
         arrange(tpOrdningStoettesIkkeResponse())
         val req = SimuleringOFTPSpec(
-            pid = pid.value,
             foedselsdato = LocalDate.of(1964, 2, 3),
             uttaksdato = LocalDate.of(2027, 2, 3),
             sisteInntekt = 500000,
@@ -120,7 +114,7 @@ class TpSimuleringClientTest : WebClientTest() {
             epsPensjon = true,
             eps2G = true,
         )
-        val resp = client.hentTjenestepensjonSimulering(req)
+        val resp = client.hentTjenestepensjonSimulering(req, pid)
 
         assertNull(resp.simuleringsResultat)
         assertEquals(ResultatType.TP_ORDNING_STOETTES_IKKE, resp.simuleringsResultatStatus.resultatType)
@@ -133,7 +127,6 @@ class TpSimuleringClientTest : WebClientTest() {
     fun `hent tjenestepensjon simulering kom med teksnisk feil fra tp-ordning`() {
         arrange(tekniskFeilResponse())
         val req = SimuleringOFTPSpec(
-            pid = pid.value,
             foedselsdato = LocalDate.of(1964, 2, 3),
             uttaksdato = LocalDate.of(2027, 2, 3),
             sisteInntekt = 500000,
@@ -142,7 +135,7 @@ class TpSimuleringClientTest : WebClientTest() {
             epsPensjon = true,
             eps2G = true,
         )
-        val resp = client.hentTjenestepensjonSimulering(req)
+        val resp = client.hentTjenestepensjonSimulering(req, pid)
 
         assertNull(resp.simuleringsResultat)
         assertEquals(ResultatType.TEKNISK_FEIL, resp.simuleringsResultatStatus.resultatType)

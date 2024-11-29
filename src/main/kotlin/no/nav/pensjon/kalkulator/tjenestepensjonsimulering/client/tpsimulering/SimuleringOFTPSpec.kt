@@ -1,9 +1,8 @@
-package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client
+package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering
 
 import java.time.LocalDate
 
 data class SimuleringOFTPSpec(
-    val pid: String,
     val foedselsdato: LocalDate,
     val uttaksdato: LocalDate,
     val sisteInntekt: Int,

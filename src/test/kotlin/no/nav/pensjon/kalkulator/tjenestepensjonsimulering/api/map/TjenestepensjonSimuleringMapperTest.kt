@@ -29,7 +29,7 @@ class TjenestepensjonSimuleringMapperTest {
             tpOrdninger = listOf("tpOrdningY")
         )
 
-        val result: OFTPSimuleringsresultatDto = TjenestepensjonSimuleringMapper.toDto(source)
+        val result: OFTPSimuleringsresultatDto = TjenestepensjonSimuleringResultMapperV2.toDto(source)
 
         assertEquals(SimuleringsresultatStatus.OK, result.simuleringsresultatStatus)
         assertEquals("tpOrdningY", result.muligeTpLeverandoerListe[0])

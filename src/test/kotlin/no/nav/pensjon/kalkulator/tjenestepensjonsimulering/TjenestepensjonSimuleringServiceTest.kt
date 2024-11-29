@@ -1,11 +1,8 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering
 
-import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.IngressSimuleringOFTPSpecV2
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.SimuleringOFTPSpec
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.TjenestepensjonSimuleringClient
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.*
 import org.junit.jupiter.api.Assertions.*
@@ -39,19 +36,8 @@ class TjenestepensjonSimuleringServiceTest {
 
     @Test
     fun `hent pid, map request og hent simulering fra client`() {
-        val request = IngressSimuleringOFTPSpecV2(
+        val request = SimuleringOFTPSpec(
             foedselsdato = LocalDate.parse("1990-01-01"),
-            uttaksalder = Alder(aar = 63, maaneder = 1),
-            aarligInntektFoerUttakBeloep = 500000,
-            antallAarIUtlandetEtter16 = 6,
-            epsHarPensjon = true,
-            epsHarInntektOver2G = true,
-            brukerBaOmAfp = true
-        )
-
-        val mappedRequest = SimuleringOFTPSpec(
-            pid = pid.value,
-            foedselsdato = request.foedselsdato,
             uttaksdato = LocalDate.of(2053, 3, 1),
             sisteInntekt = 500000,
             aarIUtlandetEtter16 = 6,
@@ -60,7 +46,7 @@ class TjenestepensjonSimuleringServiceTest {
             eps2G = true
         )
 
-        `when`(tjenestepensjonSimuleringClient.hentTjenestepensjonSimulering(mappedRequest)).thenReturn(
+        `when`(tjenestepensjonSimuleringClient.hentTjenestepensjonSimulering(request, pid)).thenReturn(
             OFTPSimuleringsresultat(
                 simuleringsResultatStatus = SimuleringsResultatStatus(resultatType = ResultatType.OK),
                 simuleringsResultat = SimuleringsResultat(

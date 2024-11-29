@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.simulering.PensjonUtil.uttakDato
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.SimuleringOFTPSpec
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.SimuleringOFTPSpecDto
 import java.time.LocalDate
 
 data class IngressSimuleringOFTPSpecV1 (
@@ -15,8 +15,8 @@ data class IngressSimuleringOFTPSpecV1 (
     val epsHarInntektOver2G: Boolean,
     val brukerBaOmAfpOffentlig: Boolean,
 ) {
-    fun toSimuleringOFTPSpec(pid: Pid): SimuleringOFTPSpec {
-        return SimuleringOFTPSpec(
+    fun toSimuleringOFTPSpec(pid: Pid): SimuleringOFTPSpecDto {
+        return SimuleringOFTPSpecDto(
             pid = pid.value,
             foedselsdato = foedselsdato,
             uttaksdato = uttakDato(foedselsdato, uttaksalder),

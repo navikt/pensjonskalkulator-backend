@@ -6,7 +6,8 @@ import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.*
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map.TjenestepensjonSimuleringMapper
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map.TjenestepensjonSimuleringResultMapperV2
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map.TjenestepensjonSimuleringSpecMapperV2.fromDto
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -31,7 +32,7 @@ class TjenestepensjonSimuleringController(
         log.debug { "Request for simuler Offentlig tjenestepensjon" }
 
         return try {
-            TjenestepensjonSimuleringMapper.toDto(timed(service::hentTjenestepensjonSimulering, spec, "simulerOffentligTjenestepensjon"))
+            TjenestepensjonSimuleringResultMapperV2.toDto(timed(service::hentTjenestepensjonSimulering, fromDto(spec), "simulerOffentligTjenestepensjon"))
                 .also { log.debug { "Simuler Offentlig tjenestepensjon respons: $it" } }
         } catch (e: EgressException) {
             handleError(e)!!
