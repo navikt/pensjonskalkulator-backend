@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.map
 
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.OFTPSimuleringsresultat
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.OffentligTjenestepensjonSimuleringsresultat
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.ResultatType
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.SimuleringOffentligTjenestepensjonSpec
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.*
@@ -32,7 +32,7 @@ class TpSimuleringClientMapperTest {
             relevanteTpOrdninger = listOf("tpOrdningY")
         )
 
-        val result: OFTPSimuleringsresultat = TpSimuleringClientMapper.fromDto(dto)
+        val result: OffentligTjenestepensjonSimuleringsresultat = TpSimuleringClientMapper.fromDto(dto)
 
         assertEquals(ResultatType.OK, result.simuleringsResultatStatus.resultatType)
         assertEquals("tpOrdningY", result.tpOrdninger[0])

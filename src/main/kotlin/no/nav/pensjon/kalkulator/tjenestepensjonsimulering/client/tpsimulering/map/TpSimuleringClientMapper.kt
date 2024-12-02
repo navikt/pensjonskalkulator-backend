@@ -7,7 +7,7 @@ import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.d
 
 object TpSimuleringClientMapper {
 
-    fun fromDto(dto: SimulerTjenestepensjonResponseDto) = OFTPSimuleringsresultat(
+    fun fromDto(dto: SimulerTjenestepensjonResponseDto) = OffentligTjenestepensjonSimuleringsresultat(
         simuleringsResultatStatus = SimuleringsResultatStatus(
             resultatType = ResultatType.fromExternalValue(dto.simuleringsResultatStatus.resultatType),
             feilmelding = dto.simuleringsResultatStatus.feilmelding,

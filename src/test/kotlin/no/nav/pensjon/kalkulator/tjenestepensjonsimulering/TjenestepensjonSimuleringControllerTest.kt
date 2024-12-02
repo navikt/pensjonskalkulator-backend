@@ -7,6 +7,7 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMem
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.testutil.anyNonNull
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.TjenestepensjonSimuleringController
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.*
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
@@ -249,7 +250,7 @@ class TjenestepensjonSimuleringControllerTest {
     "brukerBaOmAfpOffentlig": false
 }"""
 
-        private val RESULTAT_OK_V2 = OFTPSimuleringsresultat(
+        private val RESULTAT_OK_V2 = OffentligTjenestepensjonSimuleringsresultat(
             simuleringsResultatStatus = SimuleringsResultatStatus(resultatType = ResultatType.OK, feilmelding = null),
             simuleringsResultat = SimuleringsResultat(
                 tpOrdning = "Statens Pensjonskasse",
@@ -288,7 +289,7 @@ class TjenestepensjonSimuleringControllerTest {
             "Statens pensjonskasse"
         ]
     }"""
-        private val RESULTAT_TEKNISK_FEIL_V2 = OFTPSimuleringsresultat(
+        private val RESULTAT_TEKNISK_FEIL_V2 = OffentligTjenestepensjonSimuleringsresultat(
             simuleringsResultatStatus = SimuleringsResultatStatus(resultatType = ResultatType.TEKNISK_FEIL, feilmelding = "Noe gikk galt"),
             tpOrdninger = listOf("Bodø kommunale pensjonskasse","Statens pensjonskasse")
         )
@@ -297,7 +298,7 @@ class TjenestepensjonSimuleringControllerTest {
         "simuleringsresultatStatus": "BRUKER_ER_IKKE_MEDLEM_AV_TP_ORDNING",
         "muligeTpLeverandoerListe": []
     }"""
-        private val RESULTAT_BRUKER_ER_IKKE_MEDLEM_V2 = OFTPSimuleringsresultat(
+        private val RESULTAT_BRUKER_ER_IKKE_MEDLEM_V2 = OffentligTjenestepensjonSimuleringsresultat(
             simuleringsResultatStatus = SimuleringsResultatStatus(resultatType = ResultatType.IKKE_MEDLEM, feilmelding = "Ikke medlem")
         )
 
@@ -305,7 +306,7 @@ class TjenestepensjonSimuleringControllerTest {
         "simuleringsresultatStatus": "TP_ORDNING_STOETTES_IKKE",
             "muligeTpLeverandoerListe": ["Pensjonstrygden uten navn"]
     }"""
-        private val RESULTAT_TP_ORDNING_STOETTES_IKKE_V2 = OFTPSimuleringsresultat(
+        private val RESULTAT_TP_ORDNING_STOETTES_IKKE_V2 = OffentligTjenestepensjonSimuleringsresultat(
             simuleringsResultatStatus = SimuleringsResultatStatus(resultatType = ResultatType.TP_ORDNING_STOETTES_IKKE, feilmelding = "TP-ordning støttes ikke"),
             tpOrdninger = listOf("Pensjonstrygden uten navn")
         )
@@ -314,7 +315,7 @@ class TjenestepensjonSimuleringControllerTest {
         "simuleringsresultatStatus": "TOM_SIMULERING_FRA_TP_ORDNING",
             "muligeTpLeverandoerListe": ["Pensjonstrygden med navn"]
     }"""
-        private val RESULTAT_TOM_RESPONS_FRA_TP_ORDNING_V2 = OFTPSimuleringsresultat(
+        private val RESULTAT_TOM_RESPONS_FRA_TP_ORDNING_V2 = OffentligTjenestepensjonSimuleringsresultat(
             simuleringsResultatStatus = SimuleringsResultatStatus(resultatType = ResultatType.TOM_RESPONS, feilmelding = "Ingen utbetalingsperioder fra TP-ordning"),
             tpOrdninger = listOf("Pensjonstrygden med navn")
         )
