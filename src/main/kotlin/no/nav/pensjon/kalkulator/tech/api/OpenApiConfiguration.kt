@@ -20,7 +20,7 @@ class OpenApiConfiguration {
                 Info()
                     .title("pensjonskalkulator API")
                     .description("Pensjonskalkulator for brukere født i 1963 eller senere")
-                    .version("v1.5.0")
+                    .version("v1.5.1")
             )
             .externalDocs(
                 ExternalDocumentation()
@@ -37,6 +37,7 @@ class OpenApiConfiguration {
                 "/api/v7/alderspensjon/simulering",
                 "/api/v6/alderspensjon/simulering",
                 "/api/v1/alderspensjon/anonym-simulering",
+                "/api/v3/pensjonsavtaler",
                 "/api/v2/pensjonsavtaler",
                 "/api/v1/loepende-omstillingsstoenad-eller-gjenlevendeytelse",
                 "/api/v2/vedtak/loepende-vedtak",
