@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.OFTPSimuleringsresultat
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.ResultatType
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.SimuleringOFTPSpec
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.SimuleringOffentligTjenestepensjonSpec
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.*
 import org.junit.jupiter.api.Test
 
@@ -39,12 +39,12 @@ class TpSimuleringClientMapperTest {
         assertEquals("tpOrdningX", result.simuleringsResultat?.tpOrdning)
         assertEquals(2021, result.simuleringsResultat?.perioder?.get(0)?.aar)
         assertEquals(100, result.simuleringsResultat?.perioder?.get(0)?.beloep)
-        assertTrue(result.simuleringsResultat?.btpInkludert!!)
+        assertTrue(result.simuleringsResultat?.betingetTjenestepensjonInkludert!!)
     }
 
     @Test
     fun `map to dto`() {
-        val spec = SimuleringOFTPSpec(
+        val spec = SimuleringOffentligTjenestepensjonSpec(
             foedselsdato = LocalDate.parse("1963-02-24"),
             uttaksdato = LocalDate.parse("2026-03-01"),
             sisteInntekt = 1,

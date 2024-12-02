@@ -277,7 +277,7 @@ class TjenestepensjonSimuleringControllerTest {
                     Utbetaling(aar = 83, beloep = 208560),
                     Utbetaling(aar = 84, beloep = 208560),
                     Utbetaling(aar = 85, beloep = 208560)),
-                btpInkludert = true),
+                betingetTjenestepensjonInkludert = true),
             tpOrdninger = listOf("Statens pensjonskasse")
         )
 

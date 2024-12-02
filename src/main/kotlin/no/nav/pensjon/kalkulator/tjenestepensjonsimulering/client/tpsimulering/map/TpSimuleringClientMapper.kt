@@ -22,13 +22,13 @@ object TpSimuleringClientMapper {
                             beloep = utbetalingDto.beloep,
                         )
                     },
-                btpInkludert = it.betingetTjenestepensjonErInkludert,
+                betingetTjenestepensjonInkludert = it.betingetTjenestepensjonErInkludert,
             )
         },
         tpOrdninger = dto.relevanteTpOrdninger,
     )
 
-    fun toDto(spec: SimuleringOFTPSpec, pid: Pid) = SimuleringOFTPSpecDto(
+    fun toDto(spec: SimuleringOffentligTjenestepensjonSpec, pid: Pid) = SimuleringOFTPSpecDto(
         pid = pid.value,
         foedselsdato = spec.foedselsdato,
         uttaksdato = spec.uttaksdato,

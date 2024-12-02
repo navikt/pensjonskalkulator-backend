@@ -14,7 +14,7 @@ object TjenestepensjonSimuleringResultMapperV2 {
                 simuleringsresultat = Simuleringsresultat(
                     utbetalingsperioder = it.perioder
                         .map { utbetaling -> UtbetalingPerAar(utbetaling.aar, utbetaling.beloep) },
-                    betingetTjenestepensjonErInkludert = it.btpInkludert,
+                    betingetTjenestepensjonErInkludert = it.betingetTjenestepensjonInkludert,
                 )
             )
         },

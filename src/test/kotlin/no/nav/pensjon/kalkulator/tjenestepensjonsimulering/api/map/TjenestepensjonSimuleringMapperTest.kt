@@ -24,7 +24,7 @@ class TjenestepensjonSimuleringMapperTest {
                         beloep = 100
                     )
                 ),
-                btpInkludert = true
+                betingetTjenestepensjonInkludert = true
             ),
             tpOrdninger = listOf("tpOrdningY")
         )

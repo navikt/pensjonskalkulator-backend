@@ -28,7 +28,7 @@ enum class ResultatType(val externalValue: ResultatTypeDto) {
 data class SimuleringsResultat(
     val tpOrdning: String,
     val perioder: List<Utbetaling>,
-    val btpInkludert: Boolean,
+    val betingetTjenestepensjonInkludert: Boolean,
 )
 
 data class Utbetaling(

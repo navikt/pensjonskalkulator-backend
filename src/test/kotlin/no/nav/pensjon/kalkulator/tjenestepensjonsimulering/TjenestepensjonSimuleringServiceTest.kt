@@ -36,7 +36,7 @@ class TjenestepensjonSimuleringServiceTest {
 
     @Test
     fun `hent pid, map request og hent simulering fra client`() {
-        val request = SimuleringOFTPSpec(
+        val request = SimuleringOffentligTjenestepensjonSpec(
             foedselsdato = LocalDate.parse("1990-01-01"),
             uttaksdato = LocalDate.of(2053, 3, 1),
             sisteInntekt = 500000,
@@ -52,7 +52,7 @@ class TjenestepensjonSimuleringServiceTest {
                 simuleringsResultat = SimuleringsResultat(
                     tpOrdning = "tpOrdning",
                     perioder = listOf(Utbetaling(aar = 2021, beloep = 1000)),
-                    btpInkludert = true
+                    betingetTjenestepensjonInkludert = true
                 ),
                 tpOrdninger = listOf("tpOrdning")
             )
@@ -65,7 +65,7 @@ class TjenestepensjonSimuleringServiceTest {
         assertEquals("tpOrdning", result.simuleringsResultat!!.tpOrdning)
         assertEquals(2021, result.simuleringsResultat.perioder[0].aar)
         assertEquals(1000, result.simuleringsResultat.perioder[0].beloep)
-        assertTrue(result.simuleringsResultat.btpInkludert)
+        assertTrue(result.simuleringsResultat.betingetTjenestepensjonInkludert)
         assertEquals("tpOrdning", result.tpOrdninger[0])
     }
 }

@@ -37,10 +37,10 @@ class TpSimuleringClient(
             ReactorClientHttpConnector(
                 HttpClient
                     .create()
-                    .doOnConnected { it.addHandlerLast(ReadTimeoutHandler(ON_CONNECTED_READ_TIMEOUT)) })
+                    .doOnConnected { it.addHandlerLast(ReadTimeoutHandler(ON_CONNECTED_READ_TIMEOUT_SECONDS)) })
         ).build()
 
-    override fun hentTjenestepensjonSimulering(request: SimuleringOFTPSpec, pid: Pid): OFTPSimuleringsresultat {
+    override fun hentTjenestepensjonSimulering(request: SimuleringOffentligTjenestepensjonSpec, pid: Pid): OFTPSimuleringsresultat {
         val uri = "/$API_PATH"
         log.debug { "POST to URL: '$uri'" }
 
@@ -75,6 +75,6 @@ class TpSimuleringClient(
     companion object {
         private const val API_PATH = "v2025/tjenestepensjon/v1/simulering"
         private val service = EgressService.TJENESTEPENSJON_SIMULERING
-        private const val ON_CONNECTED_READ_TIMEOUT = 45
+        private const val ON_CONNECTED_READ_TIMEOUT_SECONDS = 45
     }
 }

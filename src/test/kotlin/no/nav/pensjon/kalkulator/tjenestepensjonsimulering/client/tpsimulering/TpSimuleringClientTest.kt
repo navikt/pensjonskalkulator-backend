@@ -42,7 +42,7 @@ class TpSimuleringClientTest : WebClientTest() {
     @Test
     fun `hent tjenestepensjonSimulering hvor responsen har ingen utbetalingsperioder`() {
         arrange(ingenUtbetalingsperioderResponse())
-        val req = SimuleringOFTPSpec(
+        val req = SimuleringOffentligTjenestepensjonSpec(
             foedselsdato = LocalDate.of(1964, 2, 3),
             uttaksdato = LocalDate.of(2027, 2, 3),
             sisteInntekt = 0,
@@ -62,7 +62,7 @@ class TpSimuleringClientTest : WebClientTest() {
     @Test
     fun `hent tjenestepensjon simulering OK`() {
         arrange(okResponse())
-        val req = SimuleringOFTPSpec(
+        val req = SimuleringOffentligTjenestepensjonSpec(
             foedselsdato = LocalDate.of(1964, 2, 3),
             uttaksdato = LocalDate.of(2027, 2, 3),
             sisteInntekt = 500000,
@@ -85,7 +85,7 @@ class TpSimuleringClientTest : WebClientTest() {
     @Test
     fun `hent tjenestepensjon simulering for bruker som ikke er medlem`() {
         arrange(ikkeMedlemResponse())
-        val req = SimuleringOFTPSpec(
+        val req = SimuleringOffentligTjenestepensjonSpec(
             foedselsdato = LocalDate.of(1964, 2, 3),
             uttaksdato = LocalDate.of(2027, 2, 3),
             sisteInntekt = 500000,
@@ -105,7 +105,7 @@ class TpSimuleringClientTest : WebClientTest() {
     @Test
     fun `hent tjenestepensjon simulering for tp-ordning som ikke stoettes`() {
         arrange(tpOrdningStoettesIkkeResponse())
-        val req = SimuleringOFTPSpec(
+        val req = SimuleringOffentligTjenestepensjonSpec(
             foedselsdato = LocalDate.of(1964, 2, 3),
             uttaksdato = LocalDate.of(2027, 2, 3),
             sisteInntekt = 500000,
@@ -126,7 +126,7 @@ class TpSimuleringClientTest : WebClientTest() {
     @Test
     fun `hent tjenestepensjon simulering kom med teksnisk feil fra tp-ordning`() {
         arrange(tekniskFeilResponse())
-        val req = SimuleringOFTPSpec(
+        val req = SimuleringOffentligTjenestepensjonSpec(
             foedselsdato = LocalDate.of(1964, 2, 3),
             uttaksdato = LocalDate.of(2027, 2, 3),
             sisteInntekt = 500000,

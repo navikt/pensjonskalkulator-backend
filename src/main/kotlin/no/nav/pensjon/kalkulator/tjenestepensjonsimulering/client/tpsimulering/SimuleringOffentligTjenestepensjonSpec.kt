@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering
 
 import java.time.LocalDate
 
-data class SimuleringOFTPSpec(
+data class SimuleringOffentligTjenestepensjonSpec(
     val foedselsdato: LocalDate,
     val uttaksdato: LocalDate,
     val sisteInntekt: Int,

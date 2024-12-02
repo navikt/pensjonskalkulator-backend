@@ -3,13 +3,13 @@ package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map
 import no.nav.pensjon.kalkulator.simulering.PensjonUtil.uttakDato
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.IngressSimuleringOFTPSpecV2
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.UtenlandsoppholdV2
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.SimuleringOFTPSpec
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.SimuleringOffentligTjenestepensjonSpec
 import java.time.LocalDate
 
 object TjenestepensjonSimuleringSpecMapperV2 {
 
-    fun fromDto(spec: IngressSimuleringOFTPSpecV2) : SimuleringOFTPSpec {
-        return SimuleringOFTPSpec(
+    fun fromDto(spec: IngressSimuleringOFTPSpecV2) : SimuleringOffentligTjenestepensjonSpec {
+        return SimuleringOffentligTjenestepensjonSpec(
             foedselsdato = spec.foedselsdato,
             uttaksdato = uttakDato(spec.foedselsdato, spec.uttaksalder),
             sisteInntekt = spec.aarligInntektFoerUttakBeloep,
@@ -20,17 +20,17 @@ object TjenestepensjonSimuleringSpecMapperV2 {
         )
     }
 
-    fun antallAar(oppholdListe: List<UtenlandsoppholdV2>): Int {
+    private fun antallAar(oppholdListe: List<UtenlandsoppholdV2>): Int {
         val sammenslattePerioder = slaaSammenOverlappendePerioder(oppholdListe)
         val antallDager = antallDager(sammenslattePerioder)
         return (antallDager / DAGER_PER_AAR).toInt()
     }
 
-    fun antallDager(oppholdListe: List<UtenlandsoppholdV2>): Long {
+    private fun antallDager(oppholdListe: List<UtenlandsoppholdV2>): Long {
         return oppholdListe.sumOf { (it.tom ?: LocalDate.now()).toEpochDay() + 1 - it.fom.toEpochDay() }
     }
 
-    fun slaaSammenOverlappendePerioder(oppholdListe: List<UtenlandsoppholdV2>): List<UtenlandsoppholdV2> {
+    private fun slaaSammenOverlappendePerioder(oppholdListe: List<UtenlandsoppholdV2>): List<UtenlandsoppholdV2> {
         if (oppholdListe.isEmpty()) return emptyList()
         val sortertePerioder = oppholdListe.sortedBy { it.fom }
 
