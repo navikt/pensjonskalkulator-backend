@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.ResultatType
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class OffentligTjenestepensjonSimuleringsresultatDto (
-    val simuleringsresultatStatus: SimuleringsresultatStatus = SimuleringsresultatStatus.OK,
+data class OffentligTjenestepensjonSimuleringsresultatDtoV1 (
+    val simuleringsresultatStatus: SimuleringsresultatStatusV1 = SimuleringsresultatStatusV1.OK,
     val muligeTpLeverandoerListe: List<String> = emptyList(),
-    val simulertTjenestepensjon: SimulertTjenestepensjon? = null,
+    val simulertTjenestepensjon: SimulertTjenestepensjonV1? = null,
 )
 
-enum class SimuleringsresultatStatus(val resultatType: ResultatType?) {
+enum class SimuleringsresultatStatusV1(val resultatType: ResultatType?) {
     OK(ResultatType.OK),
     BRUKER_ER_IKKE_MEDLEM_AV_TP_ORDNING(ResultatType.IKKE_MEDLEM),
     TP_ORDNING_STOETTES_IKKE(ResultatType.TP_ORDNING_STOETTES_IKKE),
@@ -22,17 +22,17 @@ enum class SimuleringsresultatStatus(val resultatType: ResultatType?) {
     }
 }
 
-data class SimulertTjenestepensjon(
+data class SimulertTjenestepensjonV1(
     val tpLeverandoer: String,
-    val simuleringsresultat: Simuleringsresultat
+    val simuleringsresultat: SimuleringsresultatV1
 )
 
-data class Simuleringsresultat(
-    val utbetalingsperioder: List<UtbetalingPerAar>,
+data class SimuleringsresultatV1(
+    val utbetalingsperioder: List<UtbetalingPerAarV1>,
     val betingetTjenestepensjonErInkludert: Boolean = false
 )
 
-data class UtbetalingPerAar(
+data class UtbetalingPerAarV1(
     val aar: Int,
     val beloep: Int,
 )
