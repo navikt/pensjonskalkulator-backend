@@ -7,11 +7,14 @@ import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.client.SkjermingClient
+import no.nav.pensjon.kalkulator.tech.selftest.PingResult
+import no.nav.pensjon.kalkulator.tech.selftest.ServiceStatus
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
@@ -20,10 +23,11 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 /**
  * Client for accessing the 'skjermede-personer-pip' service
  * (see https://github.com/navikt/skjerming/tree/main/apps/skjermede-personer-pip)
+ * NOM = Nav organisasjonsmaster
  */
 @Component
 class NomSkjermingClient(
-    @Value("\${skjermede-personer.url}") baseUrl: String,
+    @Value("\${skjermede-personer.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
@@ -32,27 +36,21 @@ class NomSkjermingClient(
 
     private val log = KotlinLogging.logger {}
 
-    override fun pingPath(): String = path("dummy")
-
-    override fun service(): EgressService = service
-
     override fun personErTilgjengelig(pid: Pid): Boolean {
-        val uri = "/${path(pid.value)}"
-        log.debug { "GET from URI: '$uri'" }
+        val uri = "/$API_RESOURCE"
+        log.debug { "POST to URI: '$uri'" }
 
-        try {
-            val erSkjermet = webClient
-                .get()
+        return try {
+            webClient
+                .post()
                 .uri(uri)
+                .bodyValue(NomSkjermingSpec(pid.value))
                 .headers(::setHeaders)
                 .retrieve()
                 .bodyToMono(Boolean::class.java)
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
-                .also { countCalls(MetricResult.OK) }
-                ?: true
-
-            return !erSkjermet
+                .also { countCalls(MetricResult.OK) } == false
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $uri", e)
         } catch (e: WebClientResponseException) {
@@ -60,23 +58,61 @@ class NomSkjermingClient(
         }
     }
 
-    override fun setPingHeaders(headers: HttpHeaders) {
-        setHeaders(headers)
+    override fun ping(): PingResult {
+        val uri = pingPath()
+
+        return try {
+            webClient
+                .options()
+                .uri(uri)
+                .headers(::setPingHeaders)
+                .retrieve()
+                .toBodilessEntity()
+                .retryWhen(retryBackoffSpec(uri))
+                .block()
+
+            PingResult(
+                service,
+                status = ServiceStatus.UP,
+                endpoint = "$baseUrl$uri",
+                message = "Ping OK"
+            )
+        } catch (e: EgressException) {
+            // Happens if failing to obtain access token
+            down(e)
+        } catch (e: WebClientRequestException) {
+            down(e)
+        } catch (e: WebClientResponseException) {
+            down(e.responseBodyAsString)
+        }
     }
-
-    override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
-
-    private fun path(skjermetObjectId: String) = "$API_RESOURCE?$OBJECT_TYPE=$skjermetObjectId"
 
     private fun setHeaders(headers: HttpHeaders) {
         headers.setBearerAuth(EgressAccess.token(service).value)
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
+        headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_JSON_VALUE
     }
+
+    override fun setPingHeaders(headers: HttpHeaders) {
+        headers.setBearerAuth(EgressAccess.token(service).value)
+        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
+    }
+
+    override fun pingPath(): String = "/$API_RESOURCE"
+
+    override fun service(): EgressService = service
+
+    private fun down(e: Throwable) = down(message = e.message ?: "Failed calling $service")
+
+    private fun down(message: String) = PingResult(
+        service,
+        status = ServiceStatus.DOWN,
+        endpoint = "$baseUrl${pingPath()}",
+        message
+    )
 
     companion object {
         private const val API_RESOURCE = "skjermet"
-        private const val OBJECT_TYPE = "personident"
-
         private val service = EgressService.SKJERMEDE_PERSONER
     }
 }
