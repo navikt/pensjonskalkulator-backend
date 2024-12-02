@@ -56,6 +56,8 @@ class OpenApiConfiguration {
                 "/api/sak-status",
                 "/api/tpo-medlemskap",
                 "/api/v1/tpo-medlemskap",
+                "/api/v2/simuler-oftp",
+                "/api/v1/simuler-oftp",
                 "/api/status",
             )
             .build()
