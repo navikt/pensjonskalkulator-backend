@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map
 
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.OffentligTjenestepensjonSimuleringsresultatDto
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.SimuleringsresultatStatus
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.OffentligTjenestepensjonSimuleringsresultatDtoV1
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.SimuleringsresultatStatusV1
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -29,9 +29,9 @@ class TjenestepensjonSimuleringMapperTest {
             tpOrdninger = listOf("tpOrdningY")
         )
 
-        val result: OffentligTjenestepensjonSimuleringsresultatDto = TjenestepensjonSimuleringResultMapperV2.toDto(source)
+        val result: OffentligTjenestepensjonSimuleringsresultatDtoV1 = TjenestepensjonSimuleringResultMapperV1.toDto(source)
 
-        assertEquals(SimuleringsresultatStatus.OK, result.simuleringsresultatStatus)
+        assertEquals(SimuleringsresultatStatusV1.OK, result.simuleringsresultatStatus)
         assertEquals("tpOrdningY", result.muligeTpLeverandoerListe[0])
         assertEquals("tpOrdningX", result.simulertTjenestepensjon?.tpLeverandoer)
         assertEquals(2021, result.simulertTjenestepensjon?.simuleringsresultat?.utbetalingsperioder?.get(0)?.aar)

@@ -7,8 +7,8 @@ import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.TjenestepensjonSimuleringService
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.*
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map.TjenestepensjonSimuleringResultMapperV2
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map.TjenestepensjonSimuleringSpecMapperV2.fromDto
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map.TjenestepensjonSimuleringResultMapperV1
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map.TjenestepensjonSimuleringSpecMapperV1.fromDto
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -23,49 +23,22 @@ class TjenestepensjonSimuleringController(
 
     private val log = KotlinLogging.logger {}
 
-    @PostMapping("v2/simuler-oftp")
-    @Operation(
-        summary = "Simuler offentlig tjenestepensjon hos tp-leverandør bruker er medlem av",
-        description = "Simulerer offentlig tjenestepensjon hos tp-leverandør som har ansvar for brukers tjenestepensjon"
-    )
-    fun simulerOffentligTjenestepensjon(@RequestBody spec: IngressSimuleringOffentligTjenestepensjonSpecV2): OffentligTjenestepensjonSimuleringsresultatDto {
-        traceAid.begin()
-        log.debug { "Request for simuler Offentlig tjenestepensjon" }
-
-        return try {
-            TjenestepensjonSimuleringResultMapperV2.toDto(timed(service::hentTjenestepensjonSimulering, fromDto(spec), "simulerOffentligTjenestepensjon"))
-                .also { log.debug { "Simuler Offentlig tjenestepensjon respons: $it" } }
-        } catch (e: EgressException) {
-            handleError(e)!!
-        } finally {
-            traceAid.end()
-        }
-    }
-
     @PostMapping("v1/simuler-oftp")
     @Operation(
         summary = "Simuler offentlig tjenestepensjon hos tp-leverandør bruker er medlem av",
         description = "Simulerer offentlig tjenestepensjon hos tp-leverandør som har ansvar for brukers tjenestepensjon"
     )
-    fun simulerOffentligTjenestepensjonV1(@RequestBody spec: IngressSimuleringOFTPSpecV1): OffentligTjenestepensjonSimuleringsresultatDto {
+    fun simulerOffentligTjenestepensjonV1(@RequestBody spec: IngressSimuleringOffentligTjenestepensjonSpecV1): OffentligTjenestepensjonSimuleringsresultatDtoV1 {
         traceAid.begin()
-        log.debug { "Request for simuler Offentlig tjenestepensjon" }
+        log.debug { "Request for simuler Offentlig tjenestepensjon V1" }
 
         return try {
-            OffentligTjenestepensjonSimuleringsresultatDto(
-                simuleringsresultatStatus = SimuleringsresultatStatus.OK,
-                muligeTpLeverandoerListe = listOf("Statens pensjonskasse"),
-                simulertTjenestepensjon = SimulertTjenestepensjon(
-                    tpLeverandoer = "Statens pensjonskasse",
-                    simuleringsresultat = Simuleringsresultat(
-                        betingetTjenestepensjonErInkludert = true,
-                        utbetalingsperioder = IntRange(spec.uttaksalder.aar, spec.uttaksalder.aar + 15)
-                            .map { UtbetalingPerAar(aar = it, beloep = 57000) }
-                    )
-                )
-            )
+            TjenestepensjonSimuleringResultMapperV1.toDto(timed(service::hentTjenestepensjonSimulering, fromDto(spec), "simulerOffentligTjenestepensjon"))
+                .also { log.debug { "Simuler Offentlig tjenestepensjon respons: $it" } }
         } catch (e: EgressException) {
-            handleError(e)!!
+            handleError(e, "V1")!!
+        } finally {
+            traceAid.end()
         }
     }
 

@@ -3,17 +3,17 @@ package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.*
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.OffentligTjenestepensjonSimuleringsresultat
 
-object TjenestepensjonSimuleringResultMapperV2 {
+object TjenestepensjonSimuleringResultMapperV1 {
 
-    fun toDto(simuleringsresultat: OffentligTjenestepensjonSimuleringsresultat) = OffentligTjenestepensjonSimuleringsresultatDto(
-        simuleringsresultatStatus = SimuleringsresultatStatus.fromResultatType(simuleringsresultat.simuleringsResultatStatus.resultatType),
+    fun toDto(simuleringsresultat: OffentligTjenestepensjonSimuleringsresultat) = OffentligTjenestepensjonSimuleringsresultatDtoV1(
+        simuleringsresultatStatus = SimuleringsresultatStatusV1.fromResultatType(simuleringsresultat.simuleringsResultatStatus.resultatType),
         muligeTpLeverandoerListe = simuleringsresultat.tpOrdninger,
         simulertTjenestepensjon = simuleringsresultat.simuleringsResultat?.let {
-            SimulertTjenestepensjon(
+            SimulertTjenestepensjonV1(
                 tpLeverandoer = it.tpOrdning,
-                simuleringsresultat = Simuleringsresultat(
+                simuleringsresultat = SimuleringsresultatV1(
                     utbetalingsperioder = it.perioder
-                        .map { utbetaling -> UtbetalingPerAar(utbetaling.aar, utbetaling.beloep) },
+                        .map { utbetaling -> UtbetalingPerAarV1(utbetaling.aar, utbetaling.beloep) },
                     betingetTjenestepensjonErInkludert = it.betingetTjenestepensjonInkludert,
                 )
             )
