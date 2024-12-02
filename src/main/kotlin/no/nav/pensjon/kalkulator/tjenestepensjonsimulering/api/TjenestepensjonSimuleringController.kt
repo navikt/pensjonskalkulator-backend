@@ -1,10 +1,11 @@
-package no.nav.pensjon.kalkulator.tjenestepensjonsimulering
+package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api
 
 import io.swagger.v3.oas.annotations.Operation
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.TjenestepensjonSimuleringService
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.*
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map.TjenestepensjonSimuleringResultMapperV2
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map.TjenestepensjonSimuleringSpecMapperV2.fromDto
@@ -27,7 +28,7 @@ class TjenestepensjonSimuleringController(
         summary = "Simuler offentlig tjenestepensjon hos tp-leverandør bruker er medlem av",
         description = "Simulerer offentlig tjenestepensjon hos tp-leverandør som har ansvar for brukers tjenestepensjon"
     )
-    fun simulerOffentligTjenestepensjon(@RequestBody spec: IngressSimuleringOFTPSpecV2): OFTPSimuleringsresultatDto {
+    fun simulerOffentligTjenestepensjon(@RequestBody spec: IngressSimuleringOffentligTjenestepensjonSpecV2): OffentligTjenestepensjonSimuleringsresultatDto {
         traceAid.begin()
         log.debug { "Request for simuler Offentlig tjenestepensjon" }
 
@@ -46,12 +47,12 @@ class TjenestepensjonSimuleringController(
         summary = "Simuler offentlig tjenestepensjon hos tp-leverandør bruker er medlem av",
         description = "Simulerer offentlig tjenestepensjon hos tp-leverandør som har ansvar for brukers tjenestepensjon"
     )
-    fun simulerOffentligTjenestepensjonV1(@RequestBody spec: IngressSimuleringOFTPSpecV1): OFTPSimuleringsresultatDto {
+    fun simulerOffentligTjenestepensjonV1(@RequestBody spec: IngressSimuleringOFTPSpecV1): OffentligTjenestepensjonSimuleringsresultatDto {
         traceAid.begin()
         log.debug { "Request for simuler Offentlig tjenestepensjon" }
 
         return try {
-            OFTPSimuleringsresultatDto(
+            OffentligTjenestepensjonSimuleringsresultatDto(
                 simuleringsresultatStatus = SimuleringsresultatStatus.OK,
                 muligeTpLeverandoerListe = listOf("Statens pensjonskasse"),
                 simulertTjenestepensjon = SimulertTjenestepensjon(

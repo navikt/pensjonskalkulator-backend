@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering
 
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.ResultatTypeDto
 
-data class OFTPSimuleringsresultat(
+data class OffentligTjenestepensjonSimuleringsresultat(
     val simuleringsResultatStatus: SimuleringsResultatStatus,
     val simuleringsResultat: SimuleringsResultat? = null,
     val tpOrdninger: List<String> = emptyList(),

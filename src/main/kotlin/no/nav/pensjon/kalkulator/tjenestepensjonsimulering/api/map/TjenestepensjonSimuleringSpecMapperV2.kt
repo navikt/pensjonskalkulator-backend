@@ -1,14 +1,14 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map
 
 import no.nav.pensjon.kalkulator.simulering.PensjonUtil.uttakDato
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.IngressSimuleringOFTPSpecV2
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.IngressSimuleringOffentligTjenestepensjonSpecV2
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.UtenlandsoppholdV2
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.SimuleringOffentligTjenestepensjonSpec
 import java.time.LocalDate
 
 object TjenestepensjonSimuleringSpecMapperV2 {
 
-    fun fromDto(spec: IngressSimuleringOFTPSpecV2) : SimuleringOffentligTjenestepensjonSpec {
+    fun fromDto(spec: IngressSimuleringOffentligTjenestepensjonSpecV2) : SimuleringOffentligTjenestepensjonSpec {
         return SimuleringOffentligTjenestepensjonSpec(
             foedselsdato = spec.foedselsdato,
             uttaksdato = uttakDato(spec.foedselsdato, spec.uttaksalder),

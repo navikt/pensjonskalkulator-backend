@@ -40,7 +40,7 @@ class TpSimuleringClient(
                     .doOnConnected { it.addHandlerLast(ReadTimeoutHandler(ON_CONNECTED_READ_TIMEOUT_SECONDS)) })
         ).build()
 
-    override fun hentTjenestepensjonSimulering(request: SimuleringOffentligTjenestepensjonSpec, pid: Pid): OFTPSimuleringsresultat {
+    override fun hentTjenestepensjonSimulering(request: SimuleringOffentligTjenestepensjonSpec, pid: Pid): OffentligTjenestepensjonSimuleringsresultat {
         val uri = "/$API_PATH"
         log.debug { "POST to URL: '$uri'" }
 

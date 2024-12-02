@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map
 
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.IngressSimuleringOFTPSpecV2
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.IngressSimuleringOffentligTjenestepensjonSpecV2
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.UtenlandsoppholdV2
 import org.junit.jupiter.api.Test
 
@@ -13,7 +13,7 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
 
     @Test
     fun `map from dto med utenlandsperioder`() {
-        val spec = IngressSimuleringOFTPSpecV2(
+        val spec = IngressSimuleringOffentligTjenestepensjonSpecV2(
             foedselsdato = LocalDate.parse("1963-02-24"),
             uttaksalder = Alder(63, 0),
             aarligInntektFoerUttakBeloep = 1,
@@ -45,7 +45,7 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
 
     @Test
     fun `fromDto haandterer overlappende perioder`() {
-        val spec = IngressSimuleringOFTPSpecV2(
+        val spec = IngressSimuleringOffentligTjenestepensjonSpecV2(
             foedselsdato = LocalDate.parse("1963-02-24"),
             uttaksalder = Alder(63, 0),
             aarligInntektFoerUttakBeloep = 1,
@@ -91,7 +91,7 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
     fun `fromDto haandterer overlappende perioder uten til og med dato`() {
         val fom = LocalDate.parse("2021-11-29")
         val antallAar = Period.between(fom, LocalDate.now().plusDays(1)).years //fom - inclusive, tom - inclusive too
-        val spec = IngressSimuleringOFTPSpecV2(
+        val spec = IngressSimuleringOffentligTjenestepensjonSpecV2(
             foedselsdato = LocalDate.parse("1963-02-24"),
             uttaksalder = Alder(63, 0),
             aarligInntektFoerUttakBeloep = 1,

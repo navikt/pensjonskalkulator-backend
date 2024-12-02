@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.ResultatType
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class OFTPSimuleringsresultatDto (
+data class OffentligTjenestepensjonSimuleringsresultatDto (
     val simuleringsresultatStatus: SimuleringsresultatStatus = SimuleringsresultatStatus.OK,
     val muligeTpLeverandoerListe: List<String> = emptyList(),
     val simulertTjenestepensjon: SimulertTjenestepensjon? = null,

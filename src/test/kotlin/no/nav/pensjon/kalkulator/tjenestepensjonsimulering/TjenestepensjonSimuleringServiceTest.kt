@@ -47,7 +47,7 @@ class TjenestepensjonSimuleringServiceTest {
         )
 
         `when`(tjenestepensjonSimuleringClient.hentTjenestepensjonSimulering(request, pid)).thenReturn(
-            OFTPSimuleringsresultat(
+            OffentligTjenestepensjonSimuleringsresultat(
                 simuleringsResultatStatus = SimuleringsResultatStatus(resultatType = ResultatType.OK),
                 simuleringsResultat = SimuleringsResultat(
                     tpOrdning = "tpOrdning",
