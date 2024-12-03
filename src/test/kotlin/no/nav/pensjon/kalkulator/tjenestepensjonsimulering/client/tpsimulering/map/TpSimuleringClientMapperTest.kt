@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.map
 
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.OffentligTjenestepensjonSimuleringsresultat
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.ResultatType
@@ -22,9 +23,10 @@ class TpSimuleringClientMapperTest {
             simuleringsResultat = SimuleringsResultatDto(
                 tpLeverandoer = "tpOrdningX",
                 utbetalingsperioder = listOf(
-                    UtbetalingPerAar(
-                        aar = 2021,
-                        beloep = 100
+                    UtbetalingPerAlder(
+                        startAlder = Alder(62, 0),
+                        sluttAlder = Alder(63, 0),
+                        maanedligBeloep = 100
                     )
                 ),
                 betingetTjenestepensjonErInkludert = true
@@ -37,8 +39,9 @@ class TpSimuleringClientMapperTest {
         assertEquals(ResultatType.OK, result.simuleringsResultatStatus.resultatType)
         assertEquals("tpOrdningY", result.tpOrdninger[0])
         assertEquals("tpOrdningX", result.simuleringsResultat?.tpOrdning)
-        assertEquals(2021, result.simuleringsResultat?.perioder?.get(0)?.aar)
-        assertEquals(100, result.simuleringsResultat?.perioder?.get(0)?.beloep)
+        assertEquals(dto.simuleringsResultat!!.utbetalingsperioder[0].startAlder, result.simuleringsResultat?.perioder?.get(0)?.startAlder)
+        assertEquals(dto.simuleringsResultat.utbetalingsperioder[0].sluttAlder, result.simuleringsResultat?.perioder?.get(0)?.sluttAlder)
+        assertEquals(100, result.simuleringsResultat?.perioder?.get(0)?.maanedligBeloep)
         assertTrue(result.simuleringsResultat?.betingetTjenestepensjonInkludert!!)
     }
 

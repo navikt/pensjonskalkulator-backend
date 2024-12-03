@@ -13,7 +13,7 @@ object TjenestepensjonSimuleringResultMapperV1 {
                 tpLeverandoer = it.tpOrdning,
                 simuleringsresultat = SimuleringsresultatV1(
                     utbetalingsperioder = it.perioder
-                        .map { utbetaling -> UtbetalingPerAarV1(utbetaling.aar, utbetaling.beloep) },
+                        .map { utbetaling -> UtbetalingsperiodeV1(utbetaling.startAlder, utbetaling.sluttAlder, utbetaling.maanedligBeloep) },
                     betingetTjenestepensjonErInkludert = it.betingetTjenestepensjonInkludert,
                 )
             )

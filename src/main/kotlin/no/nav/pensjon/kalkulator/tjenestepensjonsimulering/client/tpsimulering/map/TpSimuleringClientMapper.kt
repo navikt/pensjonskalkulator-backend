@@ -18,8 +18,9 @@ object TpSimuleringClientMapper {
                 perioder = it.utbetalingsperioder
                     .map { utbetalingDto ->
                         Utbetaling(
-                            aar = utbetalingDto.aar,
-                            beloep = utbetalingDto.beloep,
+                            startAlder = utbetalingDto.startAlder,
+                            sluttAlder = utbetalingDto.sluttAlder,
+                            maanedligBeloep = utbetalingDto.maanedligBeloep
                         )
                     },
                 betingetTjenestepensjonInkludert = it.betingetTjenestepensjonErInkludert,

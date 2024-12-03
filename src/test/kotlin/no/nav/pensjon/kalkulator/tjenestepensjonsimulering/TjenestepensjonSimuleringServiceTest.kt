@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering
 
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
@@ -46,12 +47,15 @@ class TjenestepensjonSimuleringServiceTest {
             eps2G = true
         )
 
+        val start = Alder(62,1)
+        val slutt = Alder(63, 1)
+
         `when`(tjenestepensjonSimuleringClient.hentTjenestepensjonSimulering(request, pid)).thenReturn(
             OffentligTjenestepensjonSimuleringsresultat(
                 simuleringsResultatStatus = SimuleringsResultatStatus(resultatType = ResultatType.OK),
                 simuleringsResultat = SimuleringsResultat(
                     tpOrdning = "tpOrdning",
-                    perioder = listOf(Utbetaling(aar = 2021, beloep = 1000)),
+                    perioder = listOf(Utbetaling(startAlder = start, sluttAlder = slutt, maanedligBeloep = 1000)),
                     betingetTjenestepensjonInkludert = true
                 ),
                 tpOrdninger = listOf("tpOrdning")
@@ -63,8 +67,9 @@ class TjenestepensjonSimuleringServiceTest {
         assertNotNull(result)
         assertEquals(ResultatType.OK, result.simuleringsResultatStatus.resultatType)
         assertEquals("tpOrdning", result.simuleringsResultat!!.tpOrdning)
-        assertEquals(2021, result.simuleringsResultat.perioder[0].aar)
-        assertEquals(1000, result.simuleringsResultat.perioder[0].beloep)
+        assertEquals(start, result.simuleringsResultat.perioder[0].startAlder)
+        assertEquals(slutt, result.simuleringsResultat.perioder[0].sluttAlder)
+        assertEquals(1000, result.simuleringsResultat.perioder[0].maanedligBeloep)
         assertTrue(result.simuleringsResultat.betingetTjenestepensjonInkludert)
         assertEquals("tpOrdning", result.tpOrdninger[0])
     }

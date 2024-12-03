@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map
 
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.OffentligTjenestepensjonSimuleringsresultatDtoV1
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.SimuleringsresultatStatusV1
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.*
@@ -11,6 +12,8 @@ class TjenestepensjonSimuleringMapperTest {
 
     @Test
     fun `map all fields to dto`() {
+        val start = Alder(62, 0)
+        val slutt = Alder(63, 0)
         val source = OffentligTjenestepensjonSimuleringsresultat(
             simuleringsResultatStatus = SimuleringsResultatStatus(
                 resultatType = ResultatType.OK,
@@ -20,8 +23,9 @@ class TjenestepensjonSimuleringMapperTest {
                 tpOrdning = "tpOrdningX",
                 perioder = listOf(
                     Utbetaling(
-                        aar = 2021,
-                        beloep = 100
+                        startAlder = start,
+                        sluttAlder = slutt,
+                        maanedligBeloep = 100
                     )
                 ),
                 betingetTjenestepensjonInkludert = true
@@ -34,8 +38,9 @@ class TjenestepensjonSimuleringMapperTest {
         assertEquals(SimuleringsresultatStatusV1.OK, result.simuleringsresultatStatus)
         assertEquals("tpOrdningY", result.muligeTpLeverandoerListe[0])
         assertEquals("tpOrdningX", result.simulertTjenestepensjon?.tpLeverandoer)
-        assertEquals(2021, result.simulertTjenestepensjon?.simuleringsresultat?.utbetalingsperioder?.get(0)?.aar)
-        assertEquals(100, result.simulertTjenestepensjon?.simuleringsresultat?.utbetalingsperioder?.get(0)?.beloep)
+        assertEquals(start, result.simulertTjenestepensjon?.simuleringsresultat?.utbetalingsperioder?.get(0)?.startAlder)
+        assertEquals(slutt, result.simulertTjenestepensjon?.simuleringsresultat?.utbetalingsperioder?.get(0)?.sluttAlder)
+        assertEquals(100, result.simulertTjenestepensjon?.simuleringsresultat?.utbetalingsperioder?.get(0)?.aarligUtbetaling)
         assertTrue(result.simulertTjenestepensjon?.simuleringsresultat?.betingetTjenestepensjonErInkludert!!)
     }
 }

@@ -77,9 +77,23 @@ class TpSimuleringClientTest : WebClientTest() {
         assertEquals(ResultatType.OK, resp.simuleringsResultatStatus.resultatType)
         assertNull(resp.simuleringsResultatStatus.feilmelding)
         assertEquals(listOf("Statens pensjonskasse"), resp.tpOrdninger)
-        assertEquals(23, resp.simuleringsResultat!!.perioder.size)
-        assertEquals(63, resp.simuleringsResultat.perioder[0].aar)
-        assertEquals(57225, resp.simuleringsResultat.perioder[0].beloep)
+        assertEquals(3, resp.simuleringsResultat!!.perioder.size)
+        assertEquals(62, resp.simuleringsResultat.perioder[0].startAlder.aar)
+        assertEquals(1, resp.simuleringsResultat.perioder[0].startAlder.maaneder)
+        assertEquals(63, resp.simuleringsResultat.perioder[0].sluttAlder?.aar)
+        assertEquals(3, resp.simuleringsResultat.perioder[0].sluttAlder?.maaneder)
+        assertEquals(1000, resp.simuleringsResultat.perioder[0].maanedligBeloep)
+
+        assertEquals(63, resp.simuleringsResultat.perioder[1].startAlder.aar)
+        assertEquals(4, resp.simuleringsResultat.perioder[1].startAlder.maaneder)
+        assertEquals(63, resp.simuleringsResultat.perioder[1].sluttAlder?.aar)
+        assertEquals(6, resp.simuleringsResultat.perioder[1].sluttAlder?.maaneder)
+        assertEquals(2000, resp.simuleringsResultat.perioder[1].maanedligBeloep)
+
+        assertEquals(63, resp.simuleringsResultat.perioder[2].startAlder.aar)
+        assertEquals(7, resp.simuleringsResultat.perioder[2].startAlder.maaneder)
+        assertNull(resp.simuleringsResultat.perioder[2].sluttAlder)
+        assertEquals(3000, resp.simuleringsResultat.perioder[2].maanedligBeloep)
     }
 
     @Test
@@ -199,99 +213,37 @@ class TpSimuleringClientTest : WebClientTest() {
   "simuleringsResultat": {
     "tpLeverandoer": "Statens Pensjonskasse",
     "utbetalingsperioder": [
-      {
-        "aar": 63,
-        "beloep": 57225
-      },
-      {
-        "aar": 64,
-        "beloep": 228900
-      },
-      {
-        "aar": 65,
-        "beloep": 228900
-      },
-      {
-        "aar": 66,
-        "beloep": 228900
-      },
-      {
-        "aar": 67,
-        "beloep": 209112
-      },
-      {
-        "aar": 68,
-        "beloep": 209112
-      },
-      {
-        "aar": 69,
-        "beloep": 209112
-      },
-      {
-        "aar": 70,
-        "beloep": 209112
-      },
-      {
-        "aar": 71,
-        "beloep": 209112
-      },
-      {
-        "aar": 72,
-        "beloep": 209112
-      },
-      {
-        "aar": 73,
-        "beloep": 209112
-      },
-      {
-        "aar": 74,
-        "beloep": 209112
-      },
-      {
-        "aar": 75,
-        "beloep": 209112
-      },
-      {
-        "aar": 76,
-        "beloep": 209112
-      },
-      {
-        "aar": 77,
-        "beloep": 209112
-      },
-      {
-        "aar": 78,
-        "beloep": 209112
-      },
-      {
-        "aar": 79,
-        "beloep": 209112
-      },
-      {
-        "aar": 80,
-        "beloep": 209112
-      },
-      {
-        "aar": 81,
-        "beloep": 209112
-      },
-      {
-        "aar": 82,
-        "beloep": 209112
-      },
-      {
-        "aar": 83,
-        "beloep": 209112
-      },
-      {
-        "aar": 84,
-        "beloep": 209112
-      },
-      {
-        "aar": 85,
-        "beloep": 209112
-      }
-    ],
+    {
+        "startAlder": {
+            "aar": 62,
+            "maaneder": 1
+        },
+        "sluttAlder": {
+            "aar": 63,
+            "maaneder": 3
+        },
+        "maanedligBeloep": 1000
+    },
+    {
+        "startAlder": {
+            "aar": 63,
+            "maaneder": 4
+        },
+        "sluttAlder": {
+            "aar": 63,
+            "maaneder": 6
+        },
+        "maanedligBeloep": 2000
+    },
+    {
+        "startAlder": {
+            "aar": 63,
+            "maaneder": 7
+        },
+        "sluttAlder": null,
+        "maanedligBeloep": 3000
+    }
+],
     "betingetTjenestepensjonErInkludert": false
   },
   "relevanteTpOrdninger": [
