@@ -21,6 +21,7 @@ data class HeltUttak(
          * Tom = til og med.
          */
         val defaultHeltUttakInntektTomAlder = Alder(aar = 79, maaneder = 11) // til og med
+        val defaultHeltUttakInntekt = Inntekt(aarligBeloep = 0, tomAlder = defaultHeltUttakInntektTomAlder)
     }
 }
 

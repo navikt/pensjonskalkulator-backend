@@ -46,7 +46,7 @@ data class AnonymSimuleringHeltUttakV1(
 )
 
 data class AnonymSimuleringInntektV1(
-    val beloep: Int,
+    val beloep: Int = 0,
     val sluttAlder: AnonymSimuleringAlderV1?
 )
 
