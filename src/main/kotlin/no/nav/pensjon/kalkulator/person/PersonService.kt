@@ -4,6 +4,7 @@ import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.tech.metric.Metrics
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
+import no.nav.pensjon.kalkulator.uttaksalder.normalder.NormertPensjoneringsalderService
 import org.springframework.stereotype.Service
 import java.util.Collections.synchronizedMap
 
@@ -12,7 +13,8 @@ class PersonService(
     private val client: PersonClient,
     private val pidGetter: PidGetter,
     private val aldersgruppeFinder: AldersgruppeFinder,
-    private val navnRequirement: NavnRequirement
+    private val navnRequirement: NavnRequirement,
+    private val normalderService: NormertPensjoneringsalderService
 ) {
     private val cachedPersonerVedPid: MutableMap<Pid, Person> = synchronizedMap(mutableMapOf())
 
@@ -28,16 +30,13 @@ class PersonService(
         client.fetchPerson(
             pid = pid.also(::validate),
             fetchFulltNavn = navnRequirement.needFulltNavn()
-        )?.also(::observe) ?: throw NotFoundException("person")
+        )
+            ?.let { it.withPensjoneringAldre(normalderService.getAldre(it.foedselsdato)) }
+            ?.also(::updateMetrics)
+            ?: throw NotFoundException("person")
 
     private fun validate(pid: Pid) {
         if (pid.isValid.not()) throw NotFoundException("person")
-    }
-
-    private fun observe(person: Person?) {
-        person?.let {
-            updateMetrics(it)
-        }
     }
 
     private fun updateMetrics(person: Person) {

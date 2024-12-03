@@ -9,7 +9,6 @@ data class PensjonsavtaleSpec(
     val uttaksperioder: List<UttaksperiodeSpec>,
     val harEpsPensjon: Boolean? = null,
     val harEpsPensjonsgivendeInntektOver2G: Boolean? = null,
-    val antallAarIUtlandetEtter16: Int = 0,
     val sivilstand: Sivilstand? = null
 )
 

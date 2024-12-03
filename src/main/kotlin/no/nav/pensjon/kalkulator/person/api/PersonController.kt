@@ -5,16 +5,14 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import jakarta.servlet.http.HttpServletRequest
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.person.PersonService
-import no.nav.pensjon.kalkulator.person.api.dto.PersonSpecV3
+import no.nav.pensjon.kalkulator.person.api.dto.PersonResultV4
 import no.nav.pensjon.kalkulator.person.api.dto.PersonV2
-import no.nav.pensjon.kalkulator.person.api.dto.PersonV3
-import no.nav.pensjon.kalkulator.person.api.map.PersonMapperV2.dtoV2
-import no.nav.pensjon.kalkulator.person.api.map.PersonMapperV3
+import no.nav.pensjon.kalkulator.person.api.map.PersonMapperV2
+import no.nav.pensjon.kalkulator.person.api.map.PersonMapperV4
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.http.HttpStatus
@@ -33,7 +31,7 @@ class PersonController(
     @GetMapping("v2/person")
     @Operation(
         summary = "Hent personinformasjon",
-        description = "Henter personinformasjon om den innloggede brukeren."
+        description = "Henter informasjon om personen hvis person-ID er angitt enten i bearer-tokenet eller som fnr-header."
     )
     @ApiResponses(
         value = [
@@ -57,7 +55,7 @@ class PersonController(
         log.debug { "Request for personinformasjon V2" }
 
         return try {
-            dtoV2(timed(service::getPerson, "person"))
+            PersonMapperV2.dtoV2(timed(service::getPerson, "person"))
                 .also { log.debug { "Personinformasjon respons: $it" } }
         } catch (e: NotFoundException) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, e.message)
@@ -68,10 +66,10 @@ class PersonController(
         }
     }
 
-    @PostMapping("v3/person")
+    @GetMapping("v4/person")
     @Operation(
         summary = "Hent personinformasjon",
-        description = "Henter informasjon om personen hvis person-ID er angitt enten i auth-tokenet eller i body."
+        description = "Henter informasjon om personen hvis person-ID er angitt enten i bearer-tokenet eller som fnr-header."
     )
     @ApiResponses(
         value = [
@@ -90,22 +88,17 @@ class PersonController(
             ),
         ]
     )
-    fun personV3(
-        @RequestBody(required = false) spec: PersonSpecV3?,
-        request: HttpServletRequest
-    ): PersonV3 {
+    fun personV4(): PersonResultV4 {
         traceAid.begin()
-        log.debug { "Request for personinformasjon V3" }
+        log.debug { "Request for personinformasjon V4" }
 
         return try {
-            spec?.pid?.let { request.setAttribute("pid", it) }
-
-            PersonMapperV3.dtoV3(timed(service::getPerson, "person"))
+            PersonMapperV4.dtoV4(timed(service::getPerson, "person"))
                 .also { log.debug { "Personinformasjon respons: $it" } }
         } catch (e: NotFoundException) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, e.message)
         } catch (e: EgressException) {
-            handleError(e, "V3")!!
+            handleError(e, "V4")!!
         } finally {
             traceAid.end()
         }

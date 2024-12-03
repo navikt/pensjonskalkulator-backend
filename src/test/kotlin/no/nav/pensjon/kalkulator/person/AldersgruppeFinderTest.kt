@@ -22,18 +22,18 @@ class AldersgruppeFinderTest {
 
         val finder = AldersgruppeFinder(timeProvider)
 
-        assertEquals("60-69", finder.aldersgruppe(person(1959)))
-        assertEquals("60-69", finder.aldersgruppe(person(1960)))
-        assertEquals("50-59", finder.aldersgruppe(person(1961)))
+        assertEquals("100-109", finder.aldersgruppe(person(foedselAar = 1918)))
+        assertEquals("60-69", finder.aldersgruppe(person(foedselAar = 1959)))
+        assertEquals("60-69", finder.aldersgruppe(person(foedselAar = 1960)))
+        assertEquals("50-59", finder.aldersgruppe(person(foedselAar = 1961)))
+        assertEquals("10-19", finder.aldersgruppe(person(foedselAar = 2010)))
     }
 
     private companion object {
-        private fun person(foedselsaar: Int) =
+        private fun person(foedselAar: Int) =
             Person(
-                "",
-                LocalDate.of(foedselsaar, 1, 1),
-                Sivilstand.UOPPGITT,
-                AdressebeskyttelseGradering.UGRADERT
+                navn = "",
+                foedselsdato = LocalDate.of(foedselAar, 1, 1)
             )
     }
 }

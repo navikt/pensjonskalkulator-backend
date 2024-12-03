@@ -1,9 +1,7 @@
 package no.nav.pensjon.kalkulator.simulering.api.dto
 
-import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
-import org.springframework.util.StringUtils.hasLength
 
 /**
  * Incoming (ingress) data transfer object (DTO) containing specification for 'anonym simulering av alderspensjon'.
@@ -24,9 +22,9 @@ import org.springframework.util.StringUtils.hasLength
  * - Antall år med inntekt etter start av helt uttak
  */
 data class AnonymSimuleringSpecV1(
-    val simuleringType: String?,
+    val simuleringstype: AnonymSimuleringTypeV1?,
     val foedselAar: Int,
-    val sivilstand: String?,
+    val sivilstand: AnonymSivilstandV1?,
     val epsHarInntektOver2G: Boolean? = false,
     val epsHarPensjon: Boolean? = false,
     val utenlandsAntallAar: Int? = 0,
@@ -38,12 +36,12 @@ data class AnonymSimuleringSpecV1(
 
 data class AnonymSimuleringGradertUttakV1(
     val grad: Int,
-    val uttakAlder: AnonymSimuleringAlderV1,
+    val uttaksalder: AnonymSimuleringAlderV1,
     val aarligInntektVsaPensjonBeloep: Int?
 )
 
 data class AnonymSimuleringHeltUttakV1(
-    val uttakAlder: AnonymSimuleringAlderV1,
+    val uttaksalder: AnonymSimuleringAlderV1,
     val aarligInntektVsaPensjon: AnonymSimuleringInntektV1?
 )
 
@@ -59,41 +57,13 @@ data class AnonymSimuleringAlderV1(val aar: Int, val maaneder: Int) {
     }
 }
 
-enum class AnonymSimuleringTypeV1(val externalValue: String, val internalValue: SimuleringType) {
-    ALDERSPENSJON("ALDERSPENSJON", SimuleringType.ALDERSPENSJON),
-    ALDERSPENSJON_MED_AFP_PRIVAT("ALDERSPENSJON_MED_AFP_PRIVAT", SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT);
-
-    companion object {
-        private val values = AnonymSimuleringTypeV1.entries.toTypedArray()
-        private val log = KotlinLogging.logger {}
-
-        fun fromExternalValue(value: String?) =
-            values.singleOrNull { it.externalValue.equals(value, true) } ?: default(value)
-
-        private fun default(externalValue: String?) =
-            if (hasLength(externalValue))
-                ALDERSPENSJON.also { log.warn { "Unknown AnonymSimuleringTypeV1: '$externalValue'" } }
-            else
-                ALDERSPENSJON
-    }
+enum class AnonymSimuleringTypeV1(val externalValue: SimuleringType) {
+    ALDERSPENSJON(SimuleringType.ALDERSPENSJON),
+    ALDERSPENSJON_MED_AFP_PRIVAT(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT);
 }
 
-enum class AnonymSivilstandV1(val externalValue: String, val internalValue: Sivilstand) {
-    UGIFT("UGIFT", Sivilstand.UGIFT),
-    GIFT("GIFT", Sivilstand.GIFT),
-    SAMBOER("SAMBOER", Sivilstand.SAMBOER);
-
-    companion object {
-        private val values = AnonymSivilstandV1.entries.toTypedArray()
-        private val log = KotlinLogging.logger {}
-
-        fun fromExternalValue(value: String?) =
-            values.singleOrNull { it.externalValue.equals(value, true) } ?: default(value)
-
-        private fun default(externalValue: String?) =
-            if (hasLength(externalValue))
-                UGIFT.also { log.warn { "Unknown AnonymSivilstandV1: '$externalValue'" } }
-            else
-                UGIFT
-    }
+enum class AnonymSivilstandV1(val externalValue: Sivilstand) {
+    UGIFT(Sivilstand.UGIFT),
+    GIFT(Sivilstand.GIFT),
+    SAMBOER(Sivilstand.SAMBOER);
 }

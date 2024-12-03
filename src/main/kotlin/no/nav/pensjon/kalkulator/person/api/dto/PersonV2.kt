@@ -7,5 +7,5 @@ data class PersonV2(
     val navn: String,
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     val foedselsdato: LocalDate,
-    val sivilstand: ApiSivilstand
+    val sivilstand: SivilstandV2
 )

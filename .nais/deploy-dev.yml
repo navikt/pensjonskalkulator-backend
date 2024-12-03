@@ -96,6 +96,7 @@ spec:
         - application: etterlatte-api
           namespace: etterlatte
           cluster: dev-gcp
+        - application: tjenestepensjon-simulering
       external:
         - host: pdl-api.dev-fss-pub.nais.io
         - host: pensjon-pen-q2.dev-fss-pub.nais.io
@@ -154,6 +155,10 @@ spec:
       value: dev-fss:pensjonsamhandling:tp-q2
     - name: TJENESTEPENSJON_URL
       value: https://tp-api-q2.dev-fss-pub.nais.io
+    - name: TJENESTEPENSJON_SIMULERING_SERVICE_ID
+      value: dev-gcp:pensjonskalkulator:tjenestepensjon-simulering
+    - name: TJENESTEPENSJON_SIMULERING_URL
+      value: http://tjenestepensjon-simulering
     - name: OMSTILLINGSSTOENAD_SERVICE_ID
       value: dev-gcp:etterlatte:etterlatte-api
     - name: OMSTILLINGSSTOENAD_SERVICE_URL
@@ -168,8 +173,6 @@ spec:
       value: JSON
     - name: PKB_LOGGING_LEVEL
       value: DEBUG
-    - name: JAVA_TOOL_OPTIONS # only in dev
-      value: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
   envFrom:
     - secret: pensjonskalkulator-backend-unleash-api-token
     - secret: pkb-pid-encryption

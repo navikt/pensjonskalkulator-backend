@@ -50,7 +50,6 @@ class PensjonsavtaleSpecMapperV2Test {
                     ),
                     harEpsPensjon = true,
                     harEpsPensjonsgivendeInntektOver2G = true,
-                    antallAarIUtlandetEtter16 = 5,
                     sivilstand = Sivilstand.SEPARERT_PARTNER
                 )
     }
@@ -79,7 +78,6 @@ class PensjonsavtaleSpecMapperV2Test {
                     uttaksperioder = emptyList(),
                     harEpsPensjon = null,
                     harEpsPensjonsgivendeInntektOver2G = null,
-                    antallAarIUtlandetEtter16 = 5,
                     sivilstand = null
                 )
     }
