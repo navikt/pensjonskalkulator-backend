@@ -13,16 +13,6 @@ data class IngressUttaksalderSpecForHeltUttakV1(
     val utenlandsperiodeListe: List<UttaksalderUtenlandsperiodeSpecV1>? = null
 )
 
-data class IngressUttaksalderSpecForGradertUttakV1(
-    val simuleringstype: SimuleringType?,
-    val sivilstand: Sivilstand?,
-    val harEps: Boolean?,
-    val aarligInntektFoerUttakBeloep: Int?,
-    val gradertUttak: IngressUttaksalderGradertUttakV1,
-    val heltUttak: IngressUttaksalderHeltUttakV1,
-    val utenlandsperiodeListe: List<UttaksalderUtenlandsperiodeSpecV1>? = null
-)
-
 data class IngressUttaksalderInntektV1(
     val beloep: Int,
     val sluttAlder: IngressUttaksalderAlderV1? = null
