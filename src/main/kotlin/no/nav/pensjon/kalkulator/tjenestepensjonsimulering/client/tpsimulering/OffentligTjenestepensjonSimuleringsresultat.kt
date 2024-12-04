@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering
 
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.ResultatTypeDto
 
 data class OffentligTjenestepensjonSimuleringsresultat(
@@ -32,6 +33,7 @@ data class SimuleringsResultat(
 )
 
 data class Utbetaling(
-    val aar: Int,
-    val beloep: Int,
+    val startAlder: Alder,
+    val sluttAlder: Alder?,
+    val maanedligBeloep: Int,
 )

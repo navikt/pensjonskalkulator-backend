@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.ResultatType
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -28,11 +29,13 @@ data class SimulertTjenestepensjonV1(
 )
 
 data class SimuleringsresultatV1(
-    val utbetalingsperioder: List<UtbetalingPerAarV1>,
+    val utbetalingsperioder: List<UtbetalingsperiodeV1>,
     val betingetTjenestepensjonErInkludert: Boolean = false
 )
 
-data class UtbetalingPerAarV1(
-    val aar: Int,
-    val beloep: Int,
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class UtbetalingsperiodeV1(
+    val startAlder: Alder,
+    val sluttAlder: Alder?,
+    val aarligUtbetaling: Int,
 )

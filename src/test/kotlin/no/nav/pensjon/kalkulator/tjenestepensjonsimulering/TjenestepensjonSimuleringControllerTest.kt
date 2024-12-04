@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering
 
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
@@ -141,96 +142,33 @@ class TjenestepensjonSimuleringControllerTest {
         "simuleringsresultat": {
             "utbetalingsperioder": [
                 {
-                    "aar": 63,
-                    "beloep": 227844
+                    "startAlder": {
+                        "aar": 63,
+                        "maaneder": 0
+                    },
+                    "sluttAlder": {
+                        "aar": 66,
+                        "maaneder": 11
+                    },
+                    "aarligUtbetaling": 2640000
                 },
                 {
-                    "aar": 64,
-                    "beloep": 227844
+                    "startAlder": {
+                        "aar": 67,
+                        "maaneder": 0
+                    },
+                    "sluttAlder": {
+                        "aar": 72,
+                        "maaneder": 0
+                    },
+                    "aarligUtbetaling": 3000000
                 },
                 {
-                    "aar": 65,
-                    "beloep": 227844
-                },
-                {
-                    "aar": 66,
-                    "beloep": 227844
-                },
-                {
-                    "aar": 67,
-                    "beloep": 208560
-                },
-                {
-                    "aar": 68,
-                    "beloep": 208560
-                },
-                {
-                    "aar": 69,
-                    "beloep": 208560
-                },
-                {
-                    "aar": 70,
-                    "beloep": 208560
-                },
-                {
-                    "aar": 71,
-                    "beloep": 208560
-                },
-                {
-                    "aar": 72,
-                    "beloep": 208560
-                },
-                {
-                    "aar": 73,
-                    "beloep": 208560
-                },
-                {
-                    "aar": 74,
-                    "beloep": 208560
-                },
-                {
-                    "aar": 75,
-                    "beloep": 208560
-                },
-                {
-                    "aar": 76,
-                    "beloep": 208560
-                },
-                {
-                    "aar": 77,
-                    "beloep": 208560
-                },
-                {
-                    "aar": 78,
-                    "beloep": 208560
-                },
-                {
-                    "aar": 79,
-                    "beloep": 208560
-                },
-                {
-                    "aar": 80,
-                    "beloep": 208560
-                },
-                {
-                    "aar": 81,
-                    "beloep": 208560
-                },
-                {
-                    "aar": 82,
-                    "beloep": 208560
-                },
-                {
-                    "aar": 83,
-                    "beloep": 208560
-                },
-                {
-                    "aar": 84,
-                    "beloep": 208560
-                },
-                {
-                    "aar": 85,
-                    "beloep": 208560
+                    "startAlder": {
+                        "aar": 72,
+                        "maaneder": 1
+                    },
+                    "aarligUtbetaling": 1200000
                 }
             ],
             "betingetTjenestepensjonErInkludert": true
@@ -255,29 +193,13 @@ class TjenestepensjonSimuleringControllerTest {
             simuleringsResultat = SimuleringsResultat(
                 tpOrdning = "Statens Pensjonskasse",
                 perioder = listOf(
-                    Utbetaling(aar = 63, beloep = 227844),
-                    Utbetaling(aar = 64, beloep = 227844),
-                    Utbetaling(aar = 65, beloep = 227844),
-                    Utbetaling(aar = 66, beloep = 227844),
-                    Utbetaling(aar = 67, beloep = 208560),
-                    Utbetaling(aar = 68, beloep = 208560),
-                    Utbetaling(aar = 69, beloep = 208560),
-                    Utbetaling(aar = 70, beloep = 208560),
-                    Utbetaling(aar = 71, beloep = 208560),
-                    Utbetaling(aar = 72, beloep = 208560),
-                    Utbetaling(aar = 73, beloep = 208560),
-                    Utbetaling(aar = 74, beloep = 208560),
-                    Utbetaling(aar = 75, beloep = 208560),
-                    Utbetaling(aar = 76, beloep = 208560),
-                    Utbetaling(aar = 77, beloep = 208560),
-                    Utbetaling(aar = 78, beloep = 208560),
-                    Utbetaling(aar = 79, beloep = 208560),
-                    Utbetaling(aar = 80, beloep = 208560),
-                    Utbetaling(aar = 81, beloep = 208560),
-                    Utbetaling(aar = 82, beloep = 208560),
-                    Utbetaling(aar = 83, beloep = 208560),
-                    Utbetaling(aar = 84, beloep = 208560),
-                    Utbetaling(aar = 85, beloep = 208560)),
+                    Utbetaling(startAlder = Alder(63, 0), sluttAlder = Alder(66, 11),
+                        maanedligBeloep = 220000),
+                    Utbetaling(startAlder = Alder(67, 0), sluttAlder = Alder(72, 0),
+                        maanedligBeloep = 250000),
+                    Utbetaling(startAlder = Alder(72, 1), sluttAlder = null,
+                        maanedligBeloep = 100000),
+                ),
                 betingetTjenestepensjonInkludert = true),
             tpOrdninger = listOf("Statens pensjonskasse")
         )
