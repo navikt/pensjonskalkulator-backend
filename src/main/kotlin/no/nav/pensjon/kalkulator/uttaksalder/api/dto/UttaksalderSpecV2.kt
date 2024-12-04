@@ -4,18 +4,19 @@ import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import java.time.LocalDate
 
-data class IngressUttaksalderSpecForHeltUttakV1(
+data class UttaksalderSpecV2(
     val simuleringstype: SimuleringType?,
-    val sivilstand: Sivilstand?,
-    val harEps: Boolean?,
     val aarligInntektFoerUttakBeloep: Int?,
-    val aarligInntektVsaPensjon: IngressUttaksalderInntektV1?,
-    val utenlandsperiodeListe: List<UttaksalderUtenlandsperiodeSpecV1>? = null
+    val aarligInntektVsaPensjon: UttaksalderInntektSpecV2?,
+    val utenlandsperiodeListe: List<UttaksalderUtenlandsperiodeSpecV2>? = null,
+    val sivilstand: Sivilstand?,
+    val epsHarInntektOver2G: Boolean,
+    val epsHarPensjon: Boolean
 )
 
-data class IngressUttaksalderInntektV1(
+data class UttaksalderInntektSpecV2(
     val beloep: Int,
-    val sluttAlder: IngressUttaksalderAlderV1? = null
+    val sluttAlder: UttaksalderAlderSpecV2? = null
 ) {
     init {
         require(if (beloep != 0) sluttAlder != null else true) {
@@ -24,14 +25,14 @@ data class IngressUttaksalderInntektV1(
     }
 }
 
-data class IngressUttaksalderAlderV1(val aar: Int, val maaneder: Int) {
+data class UttaksalderAlderSpecV2(val aar: Int, val maaneder: Int) {
     init {
         require(aar in 0..200) { "0 <= aar <= 200" }
         require(maaneder in 0..11) { "0 <= maaneder <= 11" }
     }
 }
 
-data class UttaksalderUtenlandsperiodeSpecV1(
+data class UttaksalderUtenlandsperiodeSpecV2(
     val fom: LocalDate,
     val tom: LocalDate?,
     val landkode: String,
