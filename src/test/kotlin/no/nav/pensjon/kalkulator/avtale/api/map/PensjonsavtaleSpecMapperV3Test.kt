@@ -56,14 +56,15 @@ class PensjonsavtaleSpecMapperV3Test {
         PensjonsavtaleSpecMapperV3.fromDtoV3(
             PensjonsavtaleSpecV3(
                 aarligInntektFoerUttakBeloep = -1,
-                uttaksperioder = emptyList()
+                uttaksperioder = emptyList(),
+                epsHarInntektOver2G = false
             )
         ) shouldBe
                 PensjonsavtaleSpec(
                     aarligInntektFoerUttak = -1,
                     uttaksperioder = emptyList(),
                     harEpsPensjon = null,
-                    harEpsPensjonsgivendeInntektOver2G = null,
+                    harEpsPensjonsgivendeInntektOver2G = false,
                     sivilstand = null
                 )
     }
