@@ -6,9 +6,9 @@ data class PensjonsavtaleSpecV3(
     val aarligInntektFoerUttakBeloep: Int,
     val uttaksperioder: List<PensjonsavtaleUttaksperiodeSpecV3>,
     val harAfp: Boolean? = false,
-    val epsHarPensjon: Boolean? = null,
+    val sivilstand: PensjonsavtaleSivilstandSpecV3? = null,
     val epsHarInntektOver2G: Boolean,
-    val sivilstand: PensjonsavtaleSivilstandSpecV3? = null
+    val epsHarPensjon: Boolean
 )
 
 data class PensjonsavtaleUttaksperiodeSpecV3(
