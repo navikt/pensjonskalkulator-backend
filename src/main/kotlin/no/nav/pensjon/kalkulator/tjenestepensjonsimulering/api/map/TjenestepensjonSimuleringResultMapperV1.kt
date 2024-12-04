@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map
 
+import no.nav.pensjon.kalkulator.tech.time.DateUtil.MAANEDER_PER_AAR
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.*
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.OffentligTjenestepensjonSimuleringsresultat
 
@@ -13,11 +14,10 @@ object TjenestepensjonSimuleringResultMapperV1 {
                 tpLeverandoer = it.tpOrdning,
                 simuleringsresultat = SimuleringsresultatV1(
                     utbetalingsperioder = it.perioder
-                        .map { utbetaling -> UtbetalingsperiodeV1(utbetaling.startAlder, utbetaling.sluttAlder, utbetaling.maanedligBeloep) },
+                        .map { utbetaling -> UtbetalingsperiodeV1(utbetaling.startAlder, utbetaling.sluttAlder, utbetaling.maanedligBeloep * MAANEDER_PER_AAR) },
                     betingetTjenestepensjonErInkludert = it.betingetTjenestepensjonInkludert,
                 )
             )
         },
     )
-
 }

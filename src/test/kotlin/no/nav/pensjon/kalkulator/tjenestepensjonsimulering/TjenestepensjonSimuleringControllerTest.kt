@@ -150,7 +150,7 @@ class TjenestepensjonSimuleringControllerTest {
                         "aar": 66,
                         "maaneder": 11
                     },
-                    "aarligUtbetaling": 220000
+                    "aarligUtbetaling": 2640000
                 },
                 {
                     "startAlder": {
@@ -161,14 +161,14 @@ class TjenestepensjonSimuleringControllerTest {
                         "aar": 72,
                         "maaneder": 0
                     },
-                    "aarligUtbetaling": 250000
+                    "aarligUtbetaling": 3000000
                 },
                 {
                     "startAlder": {
                         "aar": 72,
                         "maaneder": 1
                     },
-                    "aarligUtbetaling": 100000
+                    "aarligUtbetaling": 1200000
                 }
             ],
             "betingetTjenestepensjonErInkludert": true

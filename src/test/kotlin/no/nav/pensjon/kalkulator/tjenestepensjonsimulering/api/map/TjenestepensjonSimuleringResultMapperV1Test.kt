@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-class TjenestepensjonSimuleringMapperTest {
+class TjenestepensjonSimuleringResultMapperV1Test {
 
     @Test
-    fun `map all fields to dto`() {
+    fun `map all fields to dto and convert monthly to annual payout`() {
         val start = Alder(62, 0)
         val slutt = Alder(63, 0)
         val source = OffentligTjenestepensjonSimuleringsresultat(
@@ -40,7 +40,7 @@ class TjenestepensjonSimuleringMapperTest {
         assertEquals("tpOrdningX", result.simulertTjenestepensjon?.tpLeverandoer)
         assertEquals(start, result.simulertTjenestepensjon?.simuleringsresultat?.utbetalingsperioder?.get(0)?.startAlder)
         assertEquals(slutt, result.simulertTjenestepensjon?.simuleringsresultat?.utbetalingsperioder?.get(0)?.sluttAlder)
-        assertEquals(100, result.simulertTjenestepensjon?.simuleringsresultat?.utbetalingsperioder?.get(0)?.aarligUtbetaling)
+        assertEquals(1200, result.simulertTjenestepensjon?.simuleringsresultat?.utbetalingsperioder?.get(0)?.aarligUtbetaling)
         assertTrue(result.simulertTjenestepensjon?.simuleringsresultat?.betingetTjenestepensjonErInkludert!!)
     }
 }
