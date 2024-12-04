@@ -57,13 +57,14 @@ class PensjonsavtaleSpecMapperV3Test {
             PensjonsavtaleSpecV3(
                 aarligInntektFoerUttakBeloep = -1,
                 uttaksperioder = emptyList(),
-                epsHarInntektOver2G = false
+                epsHarInntektOver2G = false,
+                epsHarPensjon = false
             )
         ) shouldBe
                 PensjonsavtaleSpec(
                     aarligInntektFoerUttak = -1,
                     uttaksperioder = emptyList(),
-                    harEpsPensjon = null,
+                    harEpsPensjon = false,
                     harEpsPensjonsgivendeInntektOver2G = false,
                     sivilstand = null
                 )

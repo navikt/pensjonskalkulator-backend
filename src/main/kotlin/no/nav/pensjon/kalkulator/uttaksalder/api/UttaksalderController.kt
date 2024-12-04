@@ -12,17 +12,17 @@ import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.AlderDto
-import no.nav.pensjon.kalkulator.uttaksalder.api.dto.IngressUttaksalderSpecForGradertUttakV1
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.IngressUttaksalderSpecForHeltUttakV1
-import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderMapperV1.fromIngressSpecForGradertUttakV1
+import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderResultV2
+import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderSpecV2
 import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderMapperV1.fromIngressSpecForHeltUttakV1
 import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderMapperV1.toDto
-import org.springframework.http.HttpStatus
+import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderResultMapperV2.resultV2
+import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderSpecMapperV2.fromDtoV2
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("api")
@@ -74,11 +74,10 @@ class UttaksalderController(
         }
     }
 
-    @PostMapping("v1/tidligste-gradert-uttaksalder")
+    @PostMapping("v2/tidligste-hel-uttaksalder")
     @Operation(
-        summary = "Første mulige uttaksalder ved gradert uttak",
-        description = "Finn første mulige uttaksalder for innlogget bruker ved gradert (20–80 %) uttak." +
-                " Feltet 'harEps' brukes til å angi om brukeren har ektefelle/partner/samboer eller ei",
+        summary = "Tidligst mulige uttaksalder ved helt uttak",
+        description = "Finn tidligst mulige uttaksalder for innlogget bruker ved helt (100 %) uttak.",
     )
     @ApiResponses(
         value = [
@@ -92,26 +91,23 @@ class UttaksalderController(
             ),
         ]
     )
-    fun finnTidligsteGradertUttaksalderV1(@RequestBody spec: IngressUttaksalderSpecForGradertUttakV1): AlderDto? {
+    fun finnTidligsteHelUttaksalderV2(@RequestBody spec: UttaksalderSpecV2): UttaksalderResultV2? {
         traceAid.begin()
-        val version = "V1"
-        log.debug { "Request for gradert uttaksalder-søk $version: $spec" }
+        val version = "V2"
+        log.debug { "Request for hel uttaksalder-søk $version: $spec" }
 
         return try {
-            toDto(
+            resultV2(
                 timed(
-                    service::finnTidligsteUttaksalder,
-                    fromIngressSpecForGradertUttakV1(spec),
-                    "finnTidligsteGradertUttaksalderV1"
+                    function = service::finnTidligsteUttaksalder,
+                    argument = fromDtoV2(spec),
+                    functionName = "TMU $version"
                 )
-            )
-                .also { log.debug { "Gradert uttaksalder-søk respons $version: $it" } }
-        } catch (e: IllegalArgumentException) {
-            handle(e)
-        } catch (e: BadRequestException) {
-            badRequest(e)!!
+            ).also { log.debug { "Hel uttaksalder-søk respons $version: $it" } }
         } catch (e: EgressException) {
             handleError(e, version)
+        } catch (e: BadRequestException) {
+            badRequest(e)!!
         } finally {
             traceAid.end()
         }
@@ -119,15 +115,7 @@ class UttaksalderController(
 
     override fun errorMessage() = ERROR_MESSAGE
 
-    private fun handle(e: IllegalArgumentException): AlderDto? {
-        throw ResponseStatusException(
-            HttpStatus.BAD_REQUEST,
-            "Call ID: ${traceAid.callId()} | Error: ${errorMessage()} | Details: ${e.message}",
-            e
-        )
-    }
-
     private companion object {
-        private const val ERROR_MESSAGE = "feil ved bestemmelse av første mulige uttaksalder"
+        private const val ERROR_MESSAGE = "feil ved bestemmelse av tidligst mulige uttaksalder"
     }
 }

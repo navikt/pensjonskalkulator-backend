@@ -13,6 +13,9 @@ import no.nav.pensjon.kalkulator.simulering.SimuleringService
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import no.nav.pensjon.kalkulator.simulering.api.map.AnonymSimuleringResultMapperV1.resultatV1
 import no.nav.pensjon.kalkulator.simulering.api.map.AnonymSimuleringSpecMapperV1
+import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringExtendedResultMapperV8.extendedResultV8
+import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultMapperV8.resultV8
+import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringSpecMapperV8.fromSpecV8
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringExtendedResultMapperV7.extendedResultV7
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringResultMapperV7.resultatV7
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringSpecMapperV7.fromIngressSimuleringSpecV7
@@ -20,14 +23,9 @@ import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import org.intellij.lang.annotations.Language
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("api")
@@ -94,6 +92,57 @@ class SimuleringController(
         }
     }
 
+    @PostMapping("v8/alderspensjon/simulering")
+    @Operation(
+        summary = "Simuler alderspensjon",
+        description = "Lag en prognose for framtidig alderspensjon med støtte for AFP i offentlig sektor." +
+                " Feltet 'epsHarInntektOver2G' brukes til å angi hvorvidt ektefelle/partner/samboer har inntekt" +
+                " over 2 ganger grunnbeløpet. Dersom simulering med de angitte parametre resulterer i avslag i" +
+                " vilkårsprøvingen, vil responsen inneholde alternative parametre som vil gi et innvilget" +
+                " simuleringsresultat"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Simulering utført"
+            ),
+            ApiResponse(
+                responseCode = "503", description = "Simulering kunne ikke utføres av tekniske årsaker",
+                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
+            ),
+        ]
+    )
+    fun simulerAlderspensjonV8(@RequestBody spec: PersonligSimuleringSpecV8): PersonligSimuleringResultV8 {
+        traceAid.begin()
+        log.debug { "Request for V8 simulering: $spec" }
+
+        return try {
+            if (feature.isEnabled("utvidet-simuleringsresultat"))
+                extendedResultV8(
+                    timed(
+                        function = service::simulerAlderspensjon,
+                        argument = fromSpecV8(spec),
+                        functionName = "alderspensjon/simulering"
+                    )
+                ).also { log.debug { "Simulering V8 respons: $it" } }
+            else
+                resultV8(
+                    timed(
+                        function = service::simulerAlderspensjon,
+                        argument = fromSpecV8(spec),
+                        functionName = "alderspensjon/simulering"
+                    )
+                ).also { log.debug { "Simulering V8 respons: $it" } }
+        } catch (e: BadRequestException) {
+            badRequest(e)!!
+        } catch (e: EgressException) {
+            if (e.isConflict) vilkaarIkkeOppfyltV8() else handleError(e, "V8")!!
+        } finally {
+            traceAid.end()
+        }
+    }
+
     @PostMapping("v1/alderspensjon/anonym-simulering")
     @Operation(
         summary = "Simuler alderspensjon anonymt (ikke innlogget)",
@@ -119,16 +168,16 @@ class SimuleringController(
         traceAid.begin()
         log.debug { "Request for anonym simulering V1: $spec" }
 
-
         return try {
-            ResponseEntity.ok(resultatV1(
-                timed(
-                    anonymService::simulerAlderspensjon,
-                    AnonymSimuleringSpecMapperV1.fromAnonymSimuleringSpecV1(spec),
-                    "alderspensjon/anonym-simulering"
-                )
-                    .also { log.debug { "Anonym simulering V1 respons: $it" } }
-            ))
+            ResponseEntity.ok(
+                resultatV1(
+                    timed(
+                        anonymService::simulerAlderspensjon,
+                        AnonymSimuleringSpecMapperV1.fromAnonymSimuleringSpecV1(spec),
+                        "alderspensjon/anonym-simulering"
+                    )
+                        .also { log.debug { "Anonym simulering V1 respons: $it" } }
+                ))
         } catch (e: BadRequestException) {
             badRequest(e)!!
         } catch (e: EgressException) {
@@ -159,8 +208,16 @@ class SimuleringController(
                 harForLiteTrygdetid = false
             )
 
-        @Language("json")
-        const val VILKAAR_IKKE_OPPFYLT_EXAMPLE_V7 =
-            """{"alderspensjon":[],"vilkaarsproeving":{"vilkaarErOppfylt":false}}"""
+        private fun vilkaarIkkeOppfyltV8() =
+            PersonligSimuleringResultV8(
+                alderspensjon = emptyList(),
+                afpPrivat = null,
+                afpOffentlig = null,
+                vilkaarsproeving = PersonligSimuleringVilkaarsproevingResultV8(
+                    vilkaarErOppfylt = false,
+                    alternativ = null
+                ),
+                harForLiteTrygdetid = false
+            )
     }
 }
