@@ -126,7 +126,7 @@ spec:
     - name: TJENESTEPENSJON_URL
       value: https://tp-api.prod-fss-pub.nais.io
     - name: TJENESTEPENSJON_SIMULERING_SERVICE_ID
-      value: dev-gcp:pensjonskalkulator:tjenestepensjon-simulering
+      value: prod-gcp:pensjonskalkulator:tjenestepensjon-simulering
     - name: TJENESTEPENSJON_SIMULERING_URL
       value: http://tjenestepensjon-simulering
     - name: OMSTILLINGSSTOENAD_SERVICE_ID
