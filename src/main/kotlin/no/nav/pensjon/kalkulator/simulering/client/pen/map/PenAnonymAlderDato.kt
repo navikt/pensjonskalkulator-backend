@@ -10,15 +10,17 @@ data class PenAnonymAlderDato(
     val alder: PenAnonymAlderSpec,
     val dato: LocalDate
 ) {
-    constructor(fodselsdato: LocalDate, alder: PenAnonymAlderSpec)
-            : this(alder, datoVedAlder(fodselsdato, alder))
+    constructor(foedselsdato: LocalDate, alder: PenAnonymAlderSpec)
+            : this(alder, datoVedAlder(foedselsdato, alder))
 
     private companion object {
-        private fun datoVedAlder(fodselsdato: LocalDate, alder: PenAnonymAlderSpec): LocalDate =
-            alder.let {
-                fodselsdato
-                    .plusYears(it.aar.toLong())
-                    .plusMonths(it.maaneder.toLong())
-            }
+        /**
+         * Pensjonsrelatert dato er første dag i måneden etter 'aldersbasert' dato.
+         */
+        private fun datoVedAlder(foedselsdato: LocalDate, alder: PenAnonymAlderSpec): LocalDate =
+            foedselsdato
+                .plusYears(alder.aar.toLong())
+                .withDayOfMonth(1) // første dag i...
+                .plusMonths(alder.maaneder.toLong() + 1L) // ...måneden etter 'aldersbasert' dato
     }
 }
