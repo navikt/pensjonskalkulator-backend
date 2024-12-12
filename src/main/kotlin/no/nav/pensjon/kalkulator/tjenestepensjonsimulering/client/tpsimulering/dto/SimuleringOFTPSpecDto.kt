@@ -11,4 +11,7 @@ data class SimuleringOFTPSpecDto(
     val brukerBaOmAfp: Boolean,
     val epsPensjon: Boolean,
     val eps2G: Boolean,
+    val fremtidigeInntekter: List<FremtidigInntektSimuleringOFTPSpecDto> = emptyList()
 )
+
+data class FremtidigInntektSimuleringOFTPSpecDto(val fraOgMed: LocalDate, val aarligInntekt: Int)

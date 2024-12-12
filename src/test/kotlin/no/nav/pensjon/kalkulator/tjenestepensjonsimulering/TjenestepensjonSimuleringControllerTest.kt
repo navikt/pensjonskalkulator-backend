@@ -47,8 +47,8 @@ class TjenestepensjonSimuleringControllerTest {
     private lateinit var auditor: Auditor
 
     @Test
-    fun `simuler offentlig tjenestepensjon`() {
-        `when`(service.hentTjenestepensjonSimulering(anyNonNull())).thenReturn(RESULTAT_OK_V1)
+    fun `simuler offentlig tjenestepensjon V1`() {
+        `when`(service.hentTjenestepensjonSimulering(anyNonNull())).thenReturn(RESULTAT_OK_V2)
 
         mvc.perform(
             post(URL_V1)
@@ -61,8 +61,22 @@ class TjenestepensjonSimuleringControllerTest {
     }
 
     @Test
+    fun `simuler offentlig tjenestepensjon V2`() {
+        `when`(service.hentTjenestepensjonSimuleringV2(anyNonNull())).thenReturn(RESULTAT_OK_V2)
+
+        mvc.perform(
+            post(URL_V2)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(REQUEST_BODY_V2)
+        )
+            .andExpect(status().isOk())
+            .andExpect(content().json(RESPONSE_BODY_OK_V1))
+    }
+
+    @Test
     fun `simuler offentlig tjenestepensjon hvor det feiler hos tp-ordning`() {
-        `when`(service.hentTjenestepensjonSimulering(anyNonNull())).thenReturn(RESULTAT_TEKNISK_FEIL_V1)
+        `when`(service.hentTjenestepensjonSimulering(anyNonNull())).thenReturn(RESULTAT_TEKNISK_FEIL_V2)
 
         mvc.perform(
             post(URL_V1)
@@ -71,12 +85,12 @@ class TjenestepensjonSimuleringControllerTest {
                 .content(REQUEST_BODY_V1)
         )
             .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY_TEKNISK_FEIL_V1))
+            .andExpect(content().json(RESPONSE_BODY_TEKNISK_FEIL_V2))
     }
 
     @Test
     fun `simuler offentlig tjenestepensjon naar bruker ikke er medlem`() {
-        `when`(service.hentTjenestepensjonSimulering(anyNonNull())).thenReturn(RESULTAT_BRUKER_ER_IKKE_MEDLEM_V1)
+        `when`(service.hentTjenestepensjonSimulering(anyNonNull())).thenReturn(RESULTAT_BRUKER_ER_IKKE_MEDLEM_V2)
 
         mvc.perform(
             post(URL_V1)
@@ -85,12 +99,12 @@ class TjenestepensjonSimuleringControllerTest {
                 .content(REQUEST_BODY_V1)
         )
             .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY_BRUKER_ER_IKKE_MEDLEM_V1))
+            .andExpect(content().json(RESPONSE_BODY_BRUKER_ER_IKKE_MEDLEM_V2))
     }
 
     @Test
     fun `simuler offentlig tjenestepensjon naar bruker er medlem hos TP-ordning som ikke stoettes`() {
-        `when`(service.hentTjenestepensjonSimulering(anyNonNull())).thenReturn(RESULTAT_TP_ORDNING_STOETTES_IKKE_V1)
+        `when`(service.hentTjenestepensjonSimulering(anyNonNull())).thenReturn(RESULTAT_TP_ORDNING_STOETTES_IKKE_V2)
 
         mvc.perform(
             post(URL_V1)
@@ -99,12 +113,12 @@ class TjenestepensjonSimuleringControllerTest {
                 .content(REQUEST_BODY_V1)
         )
             .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY_TP_ORDNING_STOETTES_IKKE_V1))
+            .andExpect(content().json(RESPONSE_BODY_TP_ORDNING_STOETTES_IKKE_V2))
     }
 
     @Test
     fun `simuler offentlig tjenestepensjon naar TP-ordning returnerer tom respons`() {
-        `when`(service.hentTjenestepensjonSimulering(anyNonNull())).thenReturn(RESULTAT_TOM_RESPONS_FRA_TP_ORDNING_V1)
+        `when`(service.hentTjenestepensjonSimulering(anyNonNull())).thenReturn(RESULTAT_TOM_RESPONS_FRA_TP_ORDNING_V2)
 
         mvc.perform(
             post(URL_V1)
@@ -113,7 +127,7 @@ class TjenestepensjonSimuleringControllerTest {
                 .content(REQUEST_BODY_V1)
         )
             .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY_TOM_RESPONS_FRA_TP_ORDNING_V1))
+            .andExpect(content().json(RESPONSE_BODY_TOM_RESPONS_FRA_TP_ORDNING_V2))
     }
 
     @Test
@@ -131,6 +145,7 @@ class TjenestepensjonSimuleringControllerTest {
 
     private companion object {
         private const val URL_V1 = "/api/v1/simuler-oftp"
+        private const val URL_V2 = "/api/v2/simuler-oftp"
         @Language("json")
         private const val RESPONSE_BODY_OK_V1 = """{
     "simuleringsresultatStatus": "OK",
@@ -188,7 +203,32 @@ class TjenestepensjonSimuleringControllerTest {
     "brukerBaOmAfpOffentlig": false
 }"""
 
-        private val RESULTAT_OK_V1 = OffentligTjenestepensjonSimuleringsresultat(
+        private const val REQUEST_BODY_V2 = """{
+    "foedselsdato": "1964-01-02",
+    "aarligInntektFoerUttakBeloep": 900000,
+    "gradertUttak": {
+        "uttaksalder": { "aar": 63, "maaneder": 0 },
+        "aarligInntektVsaPensjonBeloep": 75000
+    },
+    "heltUttak": {
+        "uttaksalder": { "aar": 67, "maaneder": 1 },
+        "aarligInntektVsaPensjon": {
+           "beloep": 50000,
+           "sluttAlder": { "aar": 75, "maaneder": 0 } 
+        }
+    },
+    "utenlandsperiodeListe": [
+        {
+            "fom": "2020-01-01",
+            "tom": "2021-01-01"
+        }
+    ],
+    "epsHarPensjon": false,
+    "epsHarInntektOver2G": false,
+    "brukerBaOmAfp": false
+}"""
+
+        private val RESULTAT_OK_V2 = OffentligTjenestepensjonSimuleringsresultat(
             simuleringsResultatStatus = SimuleringsResultatStatus(resultatType = ResultatType.OK, feilmelding = null),
             simuleringsResultat = SimuleringsResultat(
                 tpOrdning = "Statens Pensjonskasse",
@@ -204,40 +244,40 @@ class TjenestepensjonSimuleringControllerTest {
             tpOrdninger = listOf("Statens pensjonskasse")
         )
 
-        private const val RESPONSE_BODY_TEKNISK_FEIL_V1 = """{
+        private const val RESPONSE_BODY_TEKNISK_FEIL_V2 = """{
         "simuleringsresultatStatus": "TEKNISK_FEIL",
         "muligeTpLeverandoerListe": [
             "Bodø kommunale pensjonskasse",
             "Statens pensjonskasse"
         ]
     }"""
-        private val RESULTAT_TEKNISK_FEIL_V1 = OffentligTjenestepensjonSimuleringsresultat(
+        private val RESULTAT_TEKNISK_FEIL_V2 = OffentligTjenestepensjonSimuleringsresultat(
             simuleringsResultatStatus = SimuleringsResultatStatus(resultatType = ResultatType.TEKNISK_FEIL, feilmelding = "Noe gikk galt"),
             tpOrdninger = listOf("Bodø kommunale pensjonskasse","Statens pensjonskasse")
         )
 
-        private const val RESPONSE_BODY_BRUKER_ER_IKKE_MEDLEM_V1 = """{
+        private const val RESPONSE_BODY_BRUKER_ER_IKKE_MEDLEM_V2 = """{
         "simuleringsresultatStatus": "BRUKER_ER_IKKE_MEDLEM_AV_TP_ORDNING",
         "muligeTpLeverandoerListe": []
     }"""
-        private val RESULTAT_BRUKER_ER_IKKE_MEDLEM_V1 = OffentligTjenestepensjonSimuleringsresultat(
+        private val RESULTAT_BRUKER_ER_IKKE_MEDLEM_V2 = OffentligTjenestepensjonSimuleringsresultat(
             simuleringsResultatStatus = SimuleringsResultatStatus(resultatType = ResultatType.IKKE_MEDLEM, feilmelding = "Ikke medlem")
         )
 
-        private const val RESPONSE_BODY_TP_ORDNING_STOETTES_IKKE_V1 = """{
+        private const val RESPONSE_BODY_TP_ORDNING_STOETTES_IKKE_V2 = """{
         "simuleringsresultatStatus": "TP_ORDNING_STOETTES_IKKE",
             "muligeTpLeverandoerListe": ["Pensjonstrygden uten navn"]
     }"""
-        private val RESULTAT_TP_ORDNING_STOETTES_IKKE_V1 = OffentligTjenestepensjonSimuleringsresultat(
+        private val RESULTAT_TP_ORDNING_STOETTES_IKKE_V2 = OffentligTjenestepensjonSimuleringsresultat(
             simuleringsResultatStatus = SimuleringsResultatStatus(resultatType = ResultatType.TP_ORDNING_STOETTES_IKKE, feilmelding = "TP-ordning støttes ikke"),
             tpOrdninger = listOf("Pensjonstrygden uten navn")
         )
 
-        private const val RESPONSE_BODY_TOM_RESPONS_FRA_TP_ORDNING_V1 = """{
+        private const val RESPONSE_BODY_TOM_RESPONS_FRA_TP_ORDNING_V2 = """{
         "simuleringsresultatStatus": "TOM_SIMULERING_FRA_TP_ORDNING",
             "muligeTpLeverandoerListe": ["Pensjonstrygden med navn"]
     }"""
-        private val RESULTAT_TOM_RESPONS_FRA_TP_ORDNING_V1 = OffentligTjenestepensjonSimuleringsresultat(
+        private val RESULTAT_TOM_RESPONS_FRA_TP_ORDNING_V2 = OffentligTjenestepensjonSimuleringsresultat(
             simuleringsResultatStatus = SimuleringsResultatStatus(resultatType = ResultatType.TOM_RESPONS, feilmelding = "Ingen utbetalingsperioder fra TP-ordning"),
             tpOrdninger = listOf("Pensjonstrygden med navn")
         )

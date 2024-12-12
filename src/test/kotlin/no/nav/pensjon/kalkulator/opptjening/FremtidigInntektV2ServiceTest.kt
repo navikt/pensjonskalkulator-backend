@@ -14,7 +14,7 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 
 @ExtendWith(SpringExtension::class)
-class InntektServiceTest {
+class FremtidigInntektV2ServiceTest {
 
     private lateinit var service: InntektService
 

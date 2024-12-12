@@ -72,6 +72,10 @@ spec:
         - application: pensjonskalkulator-uinnlogget-dreambox
         - application: pensjonskalkulator-uinnlogget-magicbox
         - application: pensjonskalkulator-uinnlogget-sandbox
+        - application: pensjonskalkulator-frontend-coffeebox
+        - application: pensjonskalkulator-veiledning-frontend-coffeebox
+        - application: pensjonskalkulator-frontend-codebox
+        - application: pensjonskalkulator-veiledning-frontend-codebox
         - application: azure-token-generator # only in dev
           namespace: aura
         - application: wonderwalled-idporten # only in dev
