@@ -8,7 +8,9 @@ import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.TjenestepensjonSimuleringService
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.*
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map.TjenestepensjonSimuleringResultMapperV1
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map.TjenestepensjonSimuleringResultMapperV2
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map.TjenestepensjonSimuleringSpecMapperV1.fromDto
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map.TjenestepensjonSimuleringSpecMapperV2
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -37,6 +39,25 @@ class TjenestepensjonSimuleringController(
                 .also { log.debug { "Simuler Offentlig tjenestepensjon respons: $it" } }
         } catch (e: EgressException) {
             handleError(e, "V1")!!
+        } finally {
+            traceAid.end()
+        }
+    }
+
+    @PostMapping("v2/simuler-oftp")
+    @Operation(
+        summary = "Simuler offentlig tjenestepensjon hos tp-leverandør bruker er medlem av",
+        description = "Simulerer offentlig tjenestepensjon hos tp-leverandør som har ansvar for brukers tjenestepensjon"
+    )
+    fun simulerOffentligTjenestepensjonV2(@RequestBody spec: IngressSimuleringOffentligTjenestepensjonSpecV2): OffentligTjenestepensjonSimuleringsresultatDtoV2 {
+        traceAid.begin()
+        log.debug { "Request for simuler Offentlig tjenestepensjon V2" }
+
+        return try {
+            TjenestepensjonSimuleringResultMapperV2.toDto(timed(service::hentTjenestepensjonSimulering, TjenestepensjonSimuleringSpecMapperV2.fromDto(spec), "simulerOffentligTjenestepensjon"))
+                .also { log.debug { "Simuler Offentlig tjenestepensjon respons: $it" } }
+        } catch (e: EgressException) {
+            handleError(e, "V2")!!
         } finally {
             traceAid.end()
         }
