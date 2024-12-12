@@ -6,7 +6,7 @@ import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.O
 
 object TjenestepensjonSimuleringResultMapperV2 {
 
-    fun toDto(simuleringsresultat: OffentligTjenestepensjonSimuleringsresultat) = OffentligTjenestepensjonSimuleringsresultatDtoV2(
+    fun toDtoV2(simuleringsresultat: OffentligTjenestepensjonSimuleringsresultat) = OffentligTjenestepensjonSimuleringsresultatDtoV2(
         simuleringsresultatStatus = SimuleringsresultatStatusV2.fromResultatType(simuleringsresultat.simuleringsResultatStatus.resultatType),
         muligeTpLeverandoerListe = simuleringsresultat.tpOrdninger,
         simulertTjenestepensjon = simuleringsresultat.simuleringsResultat?.let {

@@ -4,21 +4,76 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.simulering.PensjonUtil.uttakDato
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.IngressSimuleringOffentligTjenestepensjonSpecV2
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.UtenlandsoppholdV2
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.SimuleringOffentligTjenestepensjonSpec
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.FremtidigInntektV2
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.SimuleringOffentligTjenestepensjonSpecV2
 import java.time.LocalDate
 
 object TjenestepensjonSimuleringSpecMapperV2 {
 
-    fun fromDto(spec: IngressSimuleringOffentligTjenestepensjonSpecV2): SimuleringOffentligTjenestepensjonSpec {
-        return SimuleringOffentligTjenestepensjonSpec(
+    fun fromDtoV2(spec: IngressSimuleringOffentligTjenestepensjonSpecV2): SimuleringOffentligTjenestepensjonSpecV2 {
+        return SimuleringOffentligTjenestepensjonSpecV2(
             foedselsdato = spec.foedselsdato,
             uttaksdato = uttakDato(spec.foedselsdato, mapToUttaksalder(spec)),
             sisteInntekt = spec.aarligInntektFoerUttakBeloep,
+            fremtidigeInntekter = mapToFremtidigInntektV2(spec),
             aarIUtlandetEtter16 = antallAar(spec.utenlandsperiodeListe),
             brukerBaOmAfp = spec.brukerBaOmAfp,
             epsPensjon = spec.epsHarPensjon,
             eps2G = spec.epsHarInntektOver2G
         )
+    }
+
+    private fun mapToFremtidigInntektV2(
+        spec: IngressSimuleringOffentligTjenestepensjonSpecV2,
+    ): List<FremtidigInntektV2> {
+        val inntekter: MutableList<FremtidigInntektV2> = mutableListOf()
+        spec.gradertUttak?.aarligInntektVsaPensjonBeloep?.let {
+            inntekter.add(
+                FremtidigInntektV2(
+                    fom = uttakDato(
+                        spec.foedselsdato,
+                        Alder(spec.gradertUttak.uttaksalder.aar, spec.gradertUttak.uttaksalder.maaneder)
+                    ),
+                    beloep = it
+                )
+            )
+        }
+
+        spec.heltUttak.aarligInntektVsaPensjon?.let {
+            inntekter.add(
+                FremtidigInntektV2(
+                    fom = uttakDato(
+                        spec.foedselsdato,
+                        Alder(spec.heltUttak.uttaksalder.aar, spec.heltUttak.uttaksalder.maaneder)
+                    ),
+                    beloep = it.beloep
+                )
+            )
+            inntekter.add(
+                FremtidigInntektV2(
+                    fom = uttakDato(
+                        spec.foedselsdato,
+                        Alder(it.sluttAlder.aar, it.sluttAlder.maaneder)
+                    ).plusMonths(1), //sluttAlder er tom, '0' inntekt starter en måned etter
+                    beloep = 0
+                )
+            )
+        } ?: inntekter.add(
+            FremtidigInntektV2(
+                fom = uttakDato(
+                    spec.foedselsdato,
+                    if (inntekter.isEmpty()){
+                        mapToUttaksalder(spec) //0-inntekt starter ved gradert uttaksdato med mindre helt uttak er spesifisert, da starter 0-inntekt ved helt uttaksdato
+                    }
+                    else { // gradert uttak er spesifisert med inntekt ved siden av, 0-inntekt starter ved helt uttaksdato
+                        Alder(spec.heltUttak.uttaksalder.aar, spec.heltUttak.uttaksalder.maaneder)
+                    }
+                ),
+                beloep = 0
+            )
+        )
+
+        return inntekter
     }
 
     private fun mapToUttaksalder(spec: IngressSimuleringOffentligTjenestepensjonSpecV2): Alder {

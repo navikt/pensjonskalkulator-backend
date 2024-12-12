@@ -25,7 +25,7 @@ import java.math.BigDecimal
 
 @WebMvcTest(InntektController::class)
 @Import(MockSecurityConfiguration::class)
-class InntektControllerTest {
+class FremtidigInntektV2ControllerTest {
 
     @Autowired
     private lateinit var mvc: MockMvc
