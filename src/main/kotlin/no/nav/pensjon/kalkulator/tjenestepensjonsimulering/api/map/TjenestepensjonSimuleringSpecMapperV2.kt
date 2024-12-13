@@ -82,16 +82,17 @@ object TjenestepensjonSimuleringSpecMapperV2 {
     }
 
     private fun antallAar(oppholdListe: List<UtenlandsoppholdV2>): Int {
-        val sammenslattePerioder = slaaSammenOverlappendePerioder(oppholdListe)
-        val antallDager = antallDager(sammenslattePerioder)
+        val dagensDato = LocalDate.now()
+        val sammenslattePerioder = slaaSammenOverlappendePerioder(oppholdListe, dagensDato)
+        val antallDager = antallDager(sammenslattePerioder, dagensDato)
         return (antallDager / DAGER_PER_AAR).toInt()
     }
 
-    private fun antallDager(oppholdListe: List<UtenlandsoppholdV2>): Long {
-        return oppholdListe.sumOf { (it.tom ?: LocalDate.now()).toEpochDay() + 1 - it.fom.toEpochDay() }
+    private fun antallDager(oppholdListe: List<UtenlandsoppholdV2>, dagensDato: LocalDate): Long {
+        return oppholdListe.sumOf { (it.tom ?: dagensDato).toEpochDay() + 1 - it.fom.toEpochDay() }
     }
 
-    private fun slaaSammenOverlappendePerioder(oppholdListe: List<UtenlandsoppholdV2>): List<UtenlandsoppholdV2> {
+    private fun slaaSammenOverlappendePerioder(oppholdListe: List<UtenlandsoppholdV2>, dagensDato: LocalDate): List<UtenlandsoppholdV2> {
         if (oppholdListe.isEmpty()) return emptyList()
         val sortertePerioder = oppholdListe.sortedBy { it.fom }
 
@@ -99,11 +100,11 @@ object TjenestepensjonSimuleringSpecMapperV2 {
         var gjeldendePeriode = sortertePerioder.first()
 
         for (periode in sortertePerioder.drop(1)) {
-            if (periode.fom <= (gjeldendePeriode.tom ?: LocalDate.now()).plusDays(1)) {
+            if (periode.fom <= (gjeldendePeriode.tom ?: dagensDato).plusDays(1)) {
                 // Slå sammen perioder hvis de overlapper eller henger sammen
                 gjeldendePeriode = UtenlandsoppholdV2(
                     fom = gjeldendePeriode.fom,
-                    tom = maxOf(gjeldendePeriode.tom ?: LocalDate.now(), periode.tom ?: LocalDate.now())
+                    tom = maxOf(gjeldendePeriode.tom ?: dagensDato, periode.tom ?: dagensDato)
                 )
             } else {
                 // Legg til gjeldende periode og start ny
