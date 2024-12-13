@@ -42,10 +42,11 @@ class TpSimuleringClientTest : WebClientTest() {
     @Test
     fun `hent tjenestepensjonSimulering hvor responsen har ingen utbetalingsperioder`() {
         arrange(ingenUtbetalingsperioderResponse())
-        val req = SimuleringOffentligTjenestepensjonSpec(
+        val req = SimuleringOffentligTjenestepensjonSpecV2(
             foedselsdato = LocalDate.of(1964, 2, 3),
             uttaksdato = LocalDate.of(2027, 2, 3),
             sisteInntekt = 0,
+            fremtidigeInntekter = emptyList(),
             aarIUtlandetEtter16 = 1,
             brukerBaOmAfp = true,
             epsPensjon = true,
@@ -62,10 +63,15 @@ class TpSimuleringClientTest : WebClientTest() {
     @Test
     fun `hent tjenestepensjon simulering OK`() {
         arrange(okResponse())
-        val req = SimuleringOffentligTjenestepensjonSpec(
+        val req = SimuleringOffentligTjenestepensjonSpecV2(
             foedselsdato = LocalDate.of(1964, 2, 3),
             uttaksdato = LocalDate.of(2027, 2, 3),
             sisteInntekt = 500000,
+            fremtidigeInntekter = listOf(
+                FremtidigInntektV2(LocalDate.of(2028, 1, 1), 600000),
+                FremtidigInntektV2(LocalDate.of(2029, 1, 1), 700000),
+                FremtidigInntektV2(LocalDate.of(2030, 1, 1), 0),
+            ),
             aarIUtlandetEtter16 = 1,
             brukerBaOmAfp = true,
             epsPensjon = true,
@@ -99,10 +105,11 @@ class TpSimuleringClientTest : WebClientTest() {
     @Test
     fun `hent tjenestepensjon simulering for bruker som ikke er medlem`() {
         arrange(ikkeMedlemResponse())
-        val req = SimuleringOffentligTjenestepensjonSpec(
+        val req = SimuleringOffentligTjenestepensjonSpecV2(
             foedselsdato = LocalDate.of(1964, 2, 3),
-            uttaksdato = LocalDate.of(2027, 2, 3),
+            uttaksdato = LocalDate.of(2027, 2, 1),
             sisteInntekt = 500000,
+            fremtidigeInntekter = listOf(FremtidigInntektV2(LocalDate.of(2027, 2, 1), 0),),
             aarIUtlandetEtter16 = 1,
             brukerBaOmAfp = true,
             epsPensjon = true,
@@ -119,10 +126,11 @@ class TpSimuleringClientTest : WebClientTest() {
     @Test
     fun `hent tjenestepensjon simulering for tp-ordning som ikke stoettes`() {
         arrange(tpOrdningStoettesIkkeResponse())
-        val req = SimuleringOffentligTjenestepensjonSpec(
+        val req = SimuleringOffentligTjenestepensjonSpecV2(
             foedselsdato = LocalDate.of(1964, 2, 3),
             uttaksdato = LocalDate.of(2027, 2, 3),
             sisteInntekt = 500000,
+            fremtidigeInntekter = listOf(FremtidigInntektV2(LocalDate.of(2027, 2, 1), 0),),
             aarIUtlandetEtter16 = 1,
             brukerBaOmAfp = true,
             epsPensjon = true,
@@ -140,10 +148,11 @@ class TpSimuleringClientTest : WebClientTest() {
     @Test
     fun `hent tjenestepensjon simulering kom med teksnisk feil fra tp-ordning`() {
         arrange(tekniskFeilResponse())
-        val req = SimuleringOffentligTjenestepensjonSpec(
+        val req = SimuleringOffentligTjenestepensjonSpecV2(
             foedselsdato = LocalDate.of(1964, 2, 3),
             uttaksdato = LocalDate.of(2027, 2, 3),
             sisteInntekt = 500000,
+            fremtidigeInntekter = listOf(FremtidigInntektV2(LocalDate.of(2027, 2, 1), 0),),
             aarIUtlandetEtter16 = 1,
             brukerBaOmAfp = true,
             epsPensjon = true,

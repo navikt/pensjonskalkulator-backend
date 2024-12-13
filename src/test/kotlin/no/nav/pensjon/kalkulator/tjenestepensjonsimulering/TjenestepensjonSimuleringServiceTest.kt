@@ -36,11 +36,21 @@ class TjenestepensjonSimuleringServiceTest {
     }
 
     @Test
-    fun `hent pid, map request og hent simulering fra client`() {
-        val request = SimuleringOffentligTjenestepensjonSpec(
+    fun `hent pid, map request V2 og hent simulering fra client`() {
+        val request = SimuleringOffentligTjenestepensjonSpecV2(
             foedselsdato = LocalDate.parse("1990-01-01"),
             uttaksdato = LocalDate.of(2053, 3, 1),
             sisteInntekt = 500000,
+            fremtidigeInntekter = listOf(
+                FremtidigInntektV2(
+                    fom = LocalDate.of(2053, 3, 1),
+                    beloep = 500000
+                ),
+                FremtidigInntektV2(
+                    fom = LocalDate.of(2060, 3, 1),
+                    beloep = 0
+                )
+            ),
             aarIUtlandetEtter16 = 6,
             brukerBaOmAfp = true,
             epsPensjon = true,
@@ -62,7 +72,7 @@ class TjenestepensjonSimuleringServiceTest {
             )
         )
 
-        val result = service.hentTjenestepensjonSimulering(request)
+        val result = service.hentTjenestepensjonSimuleringV2(request)
 
         assertNotNull(result)
         assertEquals(ResultatType.OK, result.simuleringsResultatStatus.resultatType)

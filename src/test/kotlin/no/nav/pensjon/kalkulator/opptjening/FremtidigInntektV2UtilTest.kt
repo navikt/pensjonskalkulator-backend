@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import java.math.BigDecimal
 
-class InntektUtilTest {
+class FremtidigInntektV2UtilTest {
 
     @Test
     fun `pensjonsgivendeInntekt gir 0 hvis ingen inntekter`() {

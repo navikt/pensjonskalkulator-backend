@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 
-class InntektMapperTest {
+class FremtidigInntektV2MapperTest {
 
     @Test
     fun `toDto maps aar and beloep`() {
