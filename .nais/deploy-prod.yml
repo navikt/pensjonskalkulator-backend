@@ -51,6 +51,7 @@ spec:
     inbound:
       rules:
         - application: pensjonskalkulator-frontend
+        - application: pensjonskalkulator-uinnlogget-frontend
         - application: pensjonskalkulator-veiledning-frontend
     outbound:
       rules:
