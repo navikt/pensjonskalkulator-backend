@@ -9,7 +9,7 @@ data class OffentligTjenestepensjonSimuleringsresultatDtoV2 (
     val simuleringsresultatStatus: SimuleringsresultatStatusV2 = SimuleringsresultatStatusV2.OK,
     val muligeTpLeverandoerListe: List<String> = emptyList(),
     val simulertTjenestepensjon: SimulertTjenestepensjonV2? = null,
-    var serviceData: List<String> = emptyList(),
+    var serviceData: List<String>? = null,
 )
 
 enum class SimuleringsresultatStatusV2(val resultatType: ResultatType?) {
