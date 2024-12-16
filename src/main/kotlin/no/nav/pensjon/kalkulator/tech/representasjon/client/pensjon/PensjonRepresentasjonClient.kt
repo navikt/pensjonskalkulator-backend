@@ -72,7 +72,7 @@ class PensjonRepresentasjonClient(
     override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
 
     private fun uri(): String =
-        UriComponentsBuilder.fromHttpUrl(baseUrl)
+        UriComponentsBuilder.fromUriString(baseUrl)
             .path(PATH)
             .queryParam(VALID_REPRESENTASJON_TYPER_QUERY_PARAM_NAME, representasjonTypeListe)
             .queryParam(INCLUDE_FULLMAKT_GIVER_NAVN_QUERY_PARAM_NAME, false)
