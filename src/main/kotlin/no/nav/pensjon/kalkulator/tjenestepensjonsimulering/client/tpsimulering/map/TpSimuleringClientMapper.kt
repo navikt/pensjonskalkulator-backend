@@ -28,6 +28,7 @@ object TpSimuleringClientMapper {
             )
         },
         tpOrdninger = dto.relevanteTpOrdninger,
+        serviceData = dto.serviceData.orEmpty(),
     )
 
     fun toDto(spec: SimuleringOffentligTjenestepensjonSpec, pid: Pid) = SimuleringOFTPSpecDto(

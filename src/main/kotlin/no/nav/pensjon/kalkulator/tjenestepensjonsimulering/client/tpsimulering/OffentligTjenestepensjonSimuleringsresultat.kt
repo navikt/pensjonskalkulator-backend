@@ -7,6 +7,7 @@ data class OffentligTjenestepensjonSimuleringsresultat(
     val simuleringsResultatStatus: SimuleringsResultatStatus,
     val simuleringsResultat: SimuleringsResultat? = null,
     val tpOrdninger: List<String> = emptyList(),
+    var serviceData: List<String> = emptyList(),
 )
 
 data class SimuleringsResultatStatus(

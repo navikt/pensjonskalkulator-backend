@@ -19,5 +19,6 @@ object TjenestepensjonSimuleringResultMapperV2 {
                 )
             )
         },
+        serviceData = simuleringsresultat.serviceData
     )
 }
