@@ -7,13 +7,12 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.omstillingsstoenad.OmstillingOgGjenlevendeYtelseServiceTest.Companion.now
 import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.TimeProvider
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
+import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.utbetaling.client.UtbetalingClient
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.math.BigDecimal
@@ -77,6 +76,13 @@ class UtbetalingServiceTest {
         sisteUtbetaling shouldNotBe null
         sisteUtbetaling!!.totalBeloep shouldBe utbetaling.beloep
         sisteUtbetaling.posteringsdato shouldBe utbetaling.posteringsdato
+    }
+
+    @Test
+    fun `hentSisteMaanedsUtbetaling feiler med EgressException`() = runTest {
+        `when`(utbetalingClient.hentSisteMaanedsUtbetaling(pid)).thenThrow(EgressException("Failed to fetch utbetalinger"))
+        val sisteUtbetaling = service.hentSisteMaanedsUtbetaling()
+        sisteUtbetaling shouldBe  null
     }
 
     @Test
