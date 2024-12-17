@@ -80,15 +80,8 @@ class UtbetalingServiceTest {
 
     @Test
     fun `hentSisteMaanedsUtbetaling feiler med EgressException`() = runTest {
-        val utbetaling = dummyUtbetaling(
-            fom = LocalDate.of(YEAR, Month.SEPTEMBER, MONTH_START),
-            beloep = BigDecimal.TEN,
-        )
-
         `when`(utbetalingClient.hentSisteMaanedsUtbetaling(pid)).thenThrow(EgressException("Failed to fetch utbetalinger"))
-
         val sisteUtbetaling = service.hentSisteMaanedsUtbetaling()
-
         sisteUtbetaling shouldBe  null
     }
 
