@@ -19,6 +19,7 @@ import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringSpecMappe
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringExtendedResultMapperV7.extendedResultV7
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringResultMapperV7.resultatV7
 import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringSpecMapperV7.fromIngressSimuleringSpecV7
+import no.nav.pensjon.kalkulator.tech.metric.Metrics
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.BadRequestException
@@ -71,8 +72,10 @@ class SimuleringController(
                         fromIngressSimuleringSpecV7(spec),
                         "alderspensjon/simulering"
                     )
-                )
-                    .also { log.debug { "Simulering V7 respons: $it" } }
+                ).also {
+                    log.debug { "Simulering V7 respons: $it" }
+                    Metrics.countType(eventName = SIMULERING_TYPE_METRIC_NAME, type = spec.simuleringstype.name)
+                }
             else
                 resultatV7(
                     timed(
@@ -80,9 +83,10 @@ class SimuleringController(
                         fromIngressSimuleringSpecV7(spec),
                         "alderspensjon/simulering"
                     )
-                )
-                    .also { log.debug { "Simulering V7 respons: $it" } }
-
+                ).also {
+                    log.debug { "Simulering V7 respons: $it" }
+                    Metrics.countType(eventName = SIMULERING_TYPE_METRIC_NAME, type = spec.simuleringstype.name)
+                }
         } catch (e: BadRequestException) {
             badRequest(e)!!
         } catch (e: EgressException) {
@@ -125,7 +129,10 @@ class SimuleringController(
                         argument = fromSpecV8(spec),
                         functionName = "alderspensjon/simulering"
                     )
-                ).also { log.debug { "Simulering V8 respons: $it" } }
+                ).also {
+                    log.debug { "Simulering V8 respons: $it" }
+                    Metrics.countType(eventName = SIMULERING_TYPE_METRIC_NAME, type = spec.simuleringstype.name)
+                }
             else
                 resultV8(
                     timed(
@@ -133,7 +140,10 @@ class SimuleringController(
                         argument = fromSpecV8(spec),
                         functionName = "alderspensjon/simulering"
                     )
-                ).also { log.debug { "Simulering V8 respons: $it" } }
+                ).also {
+                    log.debug { "Simulering V8 respons: $it" }
+                    Metrics.countType(eventName = SIMULERING_TYPE_METRIC_NAME, type = spec.simuleringstype.name)
+                }
         } catch (e: BadRequestException) {
             badRequest(e)!!
         } catch (e: EgressException) {
@@ -175,8 +185,10 @@ class SimuleringController(
                         anonymService::simulerAlderspensjon,
                         AnonymSimuleringSpecMapperV1.fromAnonymSimuleringSpecV1(spec),
                         "alderspensjon/anonym-simulering"
-                    )
-                        .also { log.debug { "Anonym simulering V1 respons: $it" } }
+                    ).also {
+                        log.debug { "Anonym simulering V1 respons: $it" }
+                        Metrics.countType(eventName = SIMULERING_TYPE_METRIC_NAME, type = "anonym")
+                    }
                 ))
         } catch (e: BadRequestException) {
             badRequest(e)!!
@@ -198,6 +210,7 @@ class SimuleringController(
 
     companion object {
         private const val ERROR_MESSAGE = "feil ved simulering"
+        private const val SIMULERING_TYPE_METRIC_NAME = "simulering-type"
 
         private fun vilkaarIkkeOppfyltV7() =
             SimuleringResultatV7(
