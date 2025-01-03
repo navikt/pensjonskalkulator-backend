@@ -210,7 +210,7 @@ class SimuleringController(
 
     companion object {
         private const val ERROR_MESSAGE = "feil ved simulering"
-        private const val SIMULERING_TYPE_METRIC_NAME = "simulering-type"
+        private const val SIMULERING_TYPE_METRIC_NAME = "simulering_type"
 
         private fun vilkaarIkkeOppfyltV7() =
             SimuleringResultatV7(

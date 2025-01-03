@@ -7,11 +7,9 @@ import no.nav.pensjon.kalkulator.tech.metric.Metrics.countEvent
 
 object NorskPensjonPensjonsavtaleMetrics {
 
-    private const val KATEGORIER_EVENT_NAME = "avtalekategorier"
     private const val KATEGORIER_UTEN_UTBETALINGSPERIODER_EVENT_NAME = "avtalekategorierutenperioder"
     private const val UNDERKATEGORIER_EVENT_NAME = "avtaleunderkategorier"
     private const val MAANEDER_EVENT_NAME = "avtaleperiodemaaneder"
-    private const val PERIODE_ANTALL_EVENT_NAME = "avtaleperiodeantall"
     private const val MANGLENDE_SLUTTMAANED_INDIKATOR = ">"
     private const val MANGLENDE_KATEGORI_INDIKATOR = "UDEFINERT"
 
@@ -23,16 +21,14 @@ object NorskPensjonPensjonsavtaleMetrics {
         countKategorier(rettigheter)
         countKategorierUtenUtbetalingsperioder(rettigheter)
         countMaaneder(rettigheter)
-        countPeriodeAntall(rettigheter)
     }
 
+    /**
+     * Teller forekomster av underkategorier.
+     * Utelater hovedkategorier (individuelleOrdninger, offentligTjenestepensjon, privatTjenestepensjon).
+     */
     private fun countKategorier(rettigheter: List<PensjonsrettighetDto>) {
         rettigheter.forEach {
-            countEvent(
-                eventName = KATEGORIER_EVENT_NAME,
-                result = it.kategori ?: MANGLENDE_KATEGORI_INDIKATOR
-            )
-
             countEvent(
                 eventName = UNDERKATEGORIER_EVENT_NAME,
                 result = it.underkategori ?: MANGLENDE_KATEGORI_INDIKATOR
@@ -57,18 +53,8 @@ object NorskPensjonPensjonsavtaleMetrics {
             .forEach(::countMaaneder)
     }
 
-    private fun countPeriodeAntall(rettigheter: List<PensjonsrettighetDto>) {
-        rettigheter
-            .map { it.utbetalingsperioder.orEmpty().size }
-            .forEach(::countPeriodeAntall)
-    }
-
     private fun countMaaneder(periode: UtbetalingsperiodeDto) {
         countEvent(eventName = MAANEDER_EVENT_NAME, result = "${periode.startMaaned}-${sluttMaaned(periode)}")
-    }
-
-    private fun countPeriodeAntall(antall: Int) {
-        countEvent(eventName = PERIODE_ANTALL_EVENT_NAME, result = "$antall")
     }
 
     private fun sluttMaaned(periode: UtbetalingsperiodeDto) = periode.sluttMaaned ?: MANGLENDE_SLUTTMAANED_INDIKATOR
