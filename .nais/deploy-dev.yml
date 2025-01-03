@@ -78,6 +78,8 @@ spec:
         - application: pensjonskalkulator-uinnlogget-sandbox
         - application: azure-token-generator # only in dev
           namespace: aura
+        - application: tokenx-token-generator # only in dev
+          namespace: aura
         - application: wonderwalled-idporten # only in dev
           namespace: aura
     outbound:
