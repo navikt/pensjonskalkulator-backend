@@ -7,16 +7,16 @@ object Metrics {
 
     fun countEgressCall(service: String, result: String) {
         Metrics
-            .counter("{$PREFIX}_egress_call", "service", service, "result", result)
+            .counter("${PREFIX}_egress_call", "service", service, "result", result)
             .increment()
     }
 
     fun countEvent(eventName: String, result: String) {
-        Metrics.counter("{$PREFIX}_$eventName", "result", result).increment()
+        Metrics.counter("${PREFIX}_$eventName", "result", result).increment()
     }
 
     fun countType(eventName: String, type: String) {
-        Metrics.counter("{$PREFIX}_$eventName", "type", type).increment()
+        Metrics.counter("${PREFIX}_$eventName", "type", type).increment()
     }
 }
 
