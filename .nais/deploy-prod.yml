@@ -55,6 +55,8 @@ spec:
         - application: pensjonskalkulator-veiledning-frontend
     outbound:
       rules:
+        - application: etterlatte-api
+          namespace: etterlatte
         - application: pdl-api
           namespace: pdl
           cluster: prod-fss
@@ -66,12 +68,10 @@ spec:
           cluster: prod-fss
         - application: skjermede-personer-pip
           namespace: nom
+        - application: tjenestepensjon-simulering
         - application: tp
           namespace: pensjonsamhandling
           cluster: prod-fss
-        - application: etterlatte-api
-          namespace: etterlatte
-        - application: tjenestepensjon-simulering
       external:
         - host: idporten.no
         - host: pdl-api.prod-fss-pub.nais.io
@@ -132,7 +132,7 @@ spec:
       value: http://tjenestepensjon-simulering
     - name: OMSTILLINGSSTOENAD_SERVICE_ID
       value: prod-gcp:etterlatte:etterlatte-api
-    - name: OMSTILLINGSSTOENAD_SERVICE_URL
+    - name: OMSTILLINGSSTOENAD_URL
       value: http://etterlatte-api.etterlatte
     - name: PKB_FRONTEND_ENTRA_CLIENT_ID
       value: irrelevant-when-obo-token-used

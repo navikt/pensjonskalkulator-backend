@@ -14,7 +14,6 @@ class EgressServiceSecurityConfiguration {
 
     @Bean
     fun egressServiceListsByAudience(
-        @Value("\${pensjon-regler.service-id}") pensjonReglerServiceId: String,
         @Value("\${pen.service-id}") pensjonsfagligKjerneServiceId: String,
         @Value("\${popp.service-id}") pensjonsopptjeningServiceId: String,
         @Value("\${pensjon-representasjon.service-id}") pensjonRepresentasjonServiceId: String,
@@ -24,7 +23,7 @@ class EgressServiceSecurityConfiguration {
         @Value("\${tjenestepensjon.service-id}") tjenestepensjonServiceId: String,
         @Value("\${tjenestepensjon.simulering.service-id}") tjenestepensjonSimuleringServiceId: String,
         @Value("\${proxy.service-id}") proxyServiceId: String,
-        @Value("\${omstillingsstoenad-service-id}") omstillingsstoenadServiceId: String,
+        @Value("\${omstillingsstoenad.service-id}") omstillingsstoenadServiceId: String,
         @Value("\${sokos.utbetaldata.service-id}") utbetalingDataServiceId: String,
     ) =
         EgressServiceListsByAudience(
