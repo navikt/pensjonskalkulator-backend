@@ -2,11 +2,13 @@ package no.nav.pensjon.kalkulator.tech.security.egress
 
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonTarget
+import no.nav.pensjon.kalkulator.tech.representasjon.RepresentertRolle
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import no.nav.pensjon.kalkulator.tech.security.egress.token.RawJwt
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.oauth2.jwt.Jwt
 
 /**
  * Authentication data is initially obtained by Spring Security.
@@ -24,6 +26,10 @@ class EnrichedAuthentication(
         egressTokenSuppliersByService.value[service]?.apply(ingressToken) ?: RawJwt("")
 
     fun needFulltNavn(): Boolean = target.rolle.needFulltNavn
+
+    fun veilederInnlogget(): Boolean = target.rolle == RepresentertRolle.UNDER_VEILEDNING
+
+    fun getClaim(key: String): String? = (credentials as? Jwt)?.claims[key] as? String
 
     fun targetPid(): Pid? = target.pid
 
