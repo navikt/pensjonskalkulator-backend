@@ -50,4 +50,4 @@ class EnrichedAuthentication(
     }
 }
 
-fun Authentication.enriched(): EnrichedAuthentication = this as EnrichedAuthentication
+fun Authentication.enriched(): EnrichedAuthentication? = this as? EnrichedAuthentication

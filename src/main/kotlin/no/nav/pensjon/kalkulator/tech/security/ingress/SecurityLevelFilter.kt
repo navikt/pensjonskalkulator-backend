@@ -29,9 +29,9 @@ class SecurityLevelFilter(
 
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
         try {
-            with(authentication()) {
-                if (veilederInnlogget().not())
-                    getClaim(SECURITY_LEVEL_CLAIM_KEY)?.let(::validate)
+            authentication()?.let {
+                if (it.veilederInnlogget().not())
+                    it.getClaim(SECURITY_LEVEL_CLAIM_KEY)?.let(::validate)
             }
         } catch (e: AccessDeniedException) {
             log.warn { "Access denied - ${e.message}" }
@@ -50,8 +50,8 @@ class SecurityLevelFilter(
     private fun harStrengtFortroligAdresse(pid: Pid): Boolean =
         adresseService.adressebeskyttelseGradering(pid).fortrolighet == Fortrolighet.STRENG
 
-    private fun authentication(): EnrichedAuthentication =
-        SecurityContextHolder.getContext().authentication.enriched()
+    private fun authentication(): EnrichedAuthentication? =
+        SecurityContextHolder.getContext().authentication?.enriched()
 
     private companion object {
         private const val SECURITY_LEVEL_CLAIM_KEY = "acr" // Authentication Context class Reference

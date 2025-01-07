@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.tech.status
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
@@ -26,6 +27,9 @@ class StatusControllerTest {
 
     @MockitoBean
     private lateinit var pidExtractor: PidExtractor
+
+    @MockitoBean
+    private lateinit var fortroligAdresseService: FortroligAdresseService
 
     @MockitoBean
     private lateinit var groupMembershipService: GroupMembershipService

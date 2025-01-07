@@ -6,6 +6,7 @@ import no.nav.pensjon.kalkulator.ekskludering.EkskluderingStatus
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.intellij.lang.annotations.Language
@@ -37,6 +38,9 @@ class EkskluderingControllerTest {
 
     @MockitoBean
     private lateinit var pidExtractor: PidExtractor
+
+    @MockitoBean
+    private lateinit var fortroligAdresseService: FortroligAdresseService
 
     @MockitoBean
     private lateinit var groupMembershipService: GroupMembershipService

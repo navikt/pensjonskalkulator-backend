@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.tech.toggle.api
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
@@ -31,6 +32,9 @@ class FeatureToggleControllerTest {
 
     @MockitoBean
     private lateinit var pidExtractor: PidExtractor
+
+    @MockitoBean
+    private lateinit var fortroligAdresseService: FortroligAdresseService
 
     @MockitoBean
     private lateinit var groupMembershipService: GroupMembershipService
