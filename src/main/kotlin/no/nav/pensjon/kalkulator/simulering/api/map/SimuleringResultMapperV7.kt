@@ -16,7 +16,7 @@ object SimuleringResultMapperV7 {
     fun resultatV7(source: SimuleringResult, foedselsdato: LocalDate) =
         SimuleringResultatV7(
             alderspensjon = source.alderspensjon.map(::alderspensjon)
-                .let { justerAlderspensjonIInnevaerendeAar(it, foedselsdato) },
+                .let { justerAlderspensjonIInnevaerendeAarV7(it, foedselsdato) },
             alderspensjonMaanedligVedEndring = AlderspensjonsMaanedligV7(
                 gradertUttakMaanedligBeloep = source.alderspensjonMaanedsbeloep?.gradertUttak,
                 heltUttakMaanedligBeloep = source.alderspensjonMaanedsbeloep?.heltUttak ?: 0,
@@ -38,7 +38,7 @@ object SimuleringResultMapperV7 {
      * replace it with age of current year and add it back to the list,
      * if alderspensjon for current year already exists, replace it.
      */
-    fun justerAlderspensjonIInnevaerendeAar(
+    fun justerAlderspensjonIInnevaerendeAarV7(
         alderspensjonList: List<AlderspensjonsberegningV7>,
         foedselsdato: LocalDate
     ): List<AlderspensjonsberegningV7> {

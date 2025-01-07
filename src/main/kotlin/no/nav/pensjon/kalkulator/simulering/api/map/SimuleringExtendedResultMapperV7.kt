@@ -4,7 +4,7 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
-import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringResultMapperV7.justerAlderspensjonIInnevaerendeAar
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringResultMapperV7.justerAlderspensjonIInnevaerendeAarV7
 import java.time.LocalDate
 
 /**
@@ -15,7 +15,7 @@ object SimuleringExtendedResultMapperV7 {
 
     fun extendedResultV7(source: SimuleringResult, foedselsdato: LocalDate) =
         SimuleringResultatV7(
-            alderspensjon = source.alderspensjon.map(::alderspensjon).let { justerAlderspensjonIInnevaerendeAar(it, foedselsdato) },
+            alderspensjon = source.alderspensjon.map(::alderspensjon).let { justerAlderspensjonIInnevaerendeAarV7(it, foedselsdato) },
             alderspensjonMaanedligVedEndring = AlderspensjonsMaanedligV7(
                 gradertUttakMaanedligBeloep = source.alderspensjonMaanedsbeloep?.gradertUttak,
                 heltUttakMaanedligBeloep = source.alderspensjonMaanedsbeloep?.heltUttak ?: 0,

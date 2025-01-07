@@ -130,7 +130,8 @@ class SimuleringController(
                         function = service::simulerAlderspensjon,
                         argument = fromSpecV8(spec),
                         functionName = "alderspensjon/simulering"
-                    )
+                    ),
+                    spec.foedselsdato
                 ).also {
                     log.debug { "Simulering V8 respons: $it" }
                     Metrics.countType(eventName = SIMULERING_TYPE_METRIC_NAME, type = spec.simuleringstype.name)
@@ -141,7 +142,8 @@ class SimuleringController(
                         function = service::simulerAlderspensjon,
                         argument = fromSpecV8(spec),
                         functionName = "alderspensjon/simulering"
-                    )
+                    ),
+                    spec.foedselsdato
                 ).also {
                     log.debug { "Simulering V8 respons: $it" }
                     Metrics.countType(eventName = SIMULERING_TYPE_METRIC_NAME, type = spec.simuleringstype.name)
