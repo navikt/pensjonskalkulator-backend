@@ -4,6 +4,8 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
+import no.nav.pensjon.kalkulator.simulering.api.map.SimuleringResultMapperV7.justerAlderspensjonIInnevaerendeAar
+import java.time.LocalDate
 
 /**
  * Maps between data transfer objects (DTOs) and domain objects related to simulering.
@@ -11,9 +13,9 @@ import no.nav.pensjon.kalkulator.simulering.api.dto.*
  */
 object SimuleringExtendedResultMapperV7 {
 
-    fun extendedResultV7(source: SimuleringResult) =
+    fun extendedResultV7(source: SimuleringResult, foedselsdato: LocalDate) =
         SimuleringResultatV7(
-            alderspensjon = source.alderspensjon.map(::alderspensjon),
+            alderspensjon = source.alderspensjon.map(::alderspensjon).let { justerAlderspensjonIInnevaerendeAar(it, foedselsdato) },
             alderspensjonMaanedligVedEndring = AlderspensjonsMaanedligV7(
                 gradertUttakMaanedligBeloep = source.alderspensjonMaanedsbeloep?.gradertUttak,
                 heltUttakMaanedligBeloep = source.alderspensjonMaanedsbeloep?.heltUttak ?: 0,

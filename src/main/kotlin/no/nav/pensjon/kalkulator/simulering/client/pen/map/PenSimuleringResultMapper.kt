@@ -10,7 +10,7 @@ object PenSimuleringResultMapper {
 
     fun fromDto(dto: PenSimuleringResultDto) =
         SimuleringResult(
-            alderspensjon = dto.alderspensjon.map(::alderspensjon).let { bytt0AlderMedAlderIInnevaerendeAar(it) },
+            alderspensjon = dto.alderspensjon.map(::alderspensjon),
             alderspensjonMaanedsbeloep = alderspensjonMaanedsbeloep(dto.alderspensjonMaanedsbeloep),
             afpPrivat = dto.afpPrivat.map(::afpPrivat),
             afpOffentlig = dto.afpOffentliglivsvarig.map(::afpOffentlig),
@@ -19,21 +19,6 @@ object PenSimuleringResultMapper {
             trygdetid = dto.trygdetid ?: 0,
             opptjeningGrunnlagListe = dto.opptjeningGrunnlagListe.orEmpty().map(::opptjeningGrunnlag)
         )
-
-    /*
-    * Pesys returnerer inneværende års alderspensjon med alder 0. Vi setter den til det faktiske alderen.
-    * */
-    private fun bytt0AlderMedAlderIInnevaerendeAar(alderspensjonList: List<SimulertAlderspensjon>): List<SimulertAlderspensjon> {
-        return alderspensjonList
-            .filterNot { it.alder == 0 }
-            .let { filteredList ->
-                alderspensjonList
-                    .firstOrNull { it.alder == 0 }
-                    ?.let { filteredList + it.copy(alder = filteredList.minOf { it.alder } - 1) }
-                    ?: filteredList
-            }
-            .sortedBy { it.alder }
-    }
 
     private fun opptjeningGrunnlag(dto: PenOpptjeningGrunnlag) =
         SimulertOpptjeningGrunnlag(dto.aar, dto.pensjonsgivendeInntekt)

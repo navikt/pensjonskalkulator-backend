@@ -4,16 +4,19 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
+import java.time.LocalDate
 
 /**
  * Maps between data transfer objects (DTOs) and domain objects related to simulering.
- * The DTOs are specified by version 6 of the API offered to clients.
+ * Rearranges alderspensjon for current year, when applicable.
+ * The DTOs are specified by version 7 of the API offered to clients.
  */
 object SimuleringResultMapperV7 {
 
-    fun resultatV7(source: SimuleringResult) =
+    fun resultatV7(source: SimuleringResult, foedselsdato: LocalDate) =
         SimuleringResultatV7(
-            alderspensjon = source.alderspensjon.map(::alderspensjon),
+            alderspensjon = source.alderspensjon.map(::alderspensjon)
+                .let { justerAlderspensjonIInnevaerendeAar(it, foedselsdato) },
             alderspensjonMaanedligVedEndring = AlderspensjonsMaanedligV7(
                 gradertUttakMaanedligBeloep = source.alderspensjonMaanedsbeloep?.gradertUttak,
                 heltUttakMaanedligBeloep = source.alderspensjonMaanedsbeloep?.heltUttak ?: 0,
@@ -29,6 +32,37 @@ object SimuleringResultMapperV7 {
             source.alder,
             source.beloep
         )
+
+    /**
+     * When list contains alderspensjon with age 0,
+     * replace it with age of current year and add it back to the list,
+     * if alderspensjon for current year already exists, replace it.
+     */
+    fun justerAlderspensjonIInnevaerendeAar(
+        alderspensjonList: List<AlderspensjonsberegningV7>,
+        foedselsdato: LocalDate
+    ): List<AlderspensjonsberegningV7> {
+        alderspensjonList
+            .firstOrNull { it.alder == 0 }
+            ?.let {
+                val innevaerendeAarAlder = Alder.from(foedselsdato, LocalDate.now()).aar
+                val oppdatertAlderspensjonList = alderspensjonList
+                    .filter { it.alder != 0 }
+                    .filter { it.alder != innevaerendeAarAlder}
+                    .toMutableList()
+                oppdatertAlderspensjonList.add(
+                    AlderspensjonsberegningV7(
+                        innevaerendeAarAlder,
+                        it.beloep,
+                        it.inntektspensjonBeloep,
+                        it.garantipensjonBeloep,
+                        it.delingstall,
+                        it.pensjonBeholdningFoerUttakBeloep
+                    )
+                )
+                return oppdatertAlderspensjonList.sortedBy { it.alder }
+            } ?: return alderspensjonList
+    }
 
     private fun offentligAfp(source: SimulertAfpOffentlig) =
         PensjonsberegningAfpOffentligV7(source.alder, source.beloep)

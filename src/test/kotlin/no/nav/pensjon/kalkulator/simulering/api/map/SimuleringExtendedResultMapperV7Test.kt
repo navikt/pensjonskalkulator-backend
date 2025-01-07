@@ -4,6 +4,7 @@ import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class SimuleringExtendedResultMapperV7Test {
 
@@ -31,7 +32,7 @@ class SimuleringExtendedResultMapperV7Test {
                     SimulertOpptjeningGrunnlag(aar = 2001, pensjonsgivendeInntektBeloep = 501000),
                     SimulertOpptjeningGrunnlag(aar = 2002, pensjonsgivendeInntektBeloep = 502000)
                 )
-            )
+            ), LocalDate.now().minusYears(67).minusMonths(1)
         ) shouldBe SimuleringResultatV7(
             alderspensjon = listOf(
                 AlderspensjonsberegningV7(

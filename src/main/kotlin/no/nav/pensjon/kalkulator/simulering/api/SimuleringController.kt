@@ -71,7 +71,8 @@ class SimuleringController(
                         service::simulerAlderspensjon,
                         fromIngressSimuleringSpecV7(spec),
                         "alderspensjon/simulering"
-                    )
+                    ),
+                    spec.foedselsdato
                 ).also {
                     log.debug { "Simulering V7 respons: $it" }
                     Metrics.countType(eventName = SIMULERING_TYPE_METRIC_NAME, type = spec.simuleringstype.name)
@@ -82,7 +83,8 @@ class SimuleringController(
                         service::simulerAlderspensjon,
                         fromIngressSimuleringSpecV7(spec),
                         "alderspensjon/simulering"
-                    )
+                    ),
+                    spec.foedselsdato
                 ).also {
                     log.debug { "Simulering V7 respons: $it" }
                     Metrics.countType(eventName = SIMULERING_TYPE_METRIC_NAME, type = spec.simuleringstype.name)
