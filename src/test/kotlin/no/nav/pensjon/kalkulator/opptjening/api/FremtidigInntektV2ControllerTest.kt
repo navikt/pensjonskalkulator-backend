@@ -6,6 +6,7 @@ import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.intellij.lang.annotations.Language
@@ -38,6 +39,9 @@ class FremtidigInntektV2ControllerTest {
 
     @MockitoBean
     private lateinit var pidExtractor: PidExtractor
+
+    @MockitoBean
+    private lateinit var fortroligAdresseService: FortroligAdresseService
 
     @MockitoBean
     private lateinit var groupMembershipService: GroupMembershipService

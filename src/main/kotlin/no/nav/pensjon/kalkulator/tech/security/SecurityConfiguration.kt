@@ -5,6 +5,7 @@ import no.nav.pensjon.kalkulator.tech.security.egress.SecurityContextEnricher
 import no.nav.pensjon.kalkulator.tech.security.ingress.AudienceValidator
 import no.nav.pensjon.kalkulator.tech.security.ingress.AuthenticationEnricherFilter
 import no.nav.pensjon.kalkulator.tech.security.ingress.LoggingAuthenticationEntryPoint
+import no.nav.pensjon.kalkulator.tech.security.ingress.SecurityLevelFilter
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.ImpersonalAccessFilter
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.SecurityContextNavIdExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.jwt.RequestClaimExtractor
@@ -128,6 +129,7 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
         http: HttpSecurity,
         securityContextEnricher: SecurityContextEnricher,
         impersonalAccessFilter: ImpersonalAccessFilter,
+        securityLevelFilter: SecurityLevelFilter,
         authResolver: AuthenticationManagerResolver<HttpServletRequest>,
         authenticationEntryPoint: LoggingAuthenticationEntryPoint,
         @Value("\${pkb.request-matcher.internal}") internalRequestMatcher: String
@@ -137,6 +139,7 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
             BasicAuthenticationFilter::class.java
         )
             .addFilterAfter(impersonalAccessFilter, AuthenticationEnricherFilter::class.java)
+            .addFilterAfter(securityLevelFilter, ImpersonalAccessFilter::class.java)
 
         return http.csrf {
             it.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
