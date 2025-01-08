@@ -34,7 +34,7 @@ class ImpersonalAccessFilter(
                     forbidden(response as HttpServletResponse)
                     return
                 }
-            } catch (e: NotFoundException) {
+            } catch (_: NotFoundException) {
                 notFound(response as HttpServletResponse)
                 return
             }
