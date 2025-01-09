@@ -13,10 +13,10 @@ spec:
     cpuThresholdPercentage: 70
   resources:
     limits:
-      memory: 2048Mi
+      memory: 3072Mi
     requests:
       cpu: 500m
-      memory: 1024Mi
+      memory: 1536Mi
   ingresses:
     - https://pensjonskalkulator-backend.intern.nav.no
   port: 8080
@@ -94,6 +94,10 @@ spec:
       value: https://pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
     - name: NORSK_PENSJON_URL
       value: https://pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
+    - name: OMSTILLINGSSTOENAD_SERVICE_ID
+      value: prod-gcp:etterlatte:etterlatte-api
+    - name: OMSTILLINGSSTOENAD_URL
+      value: http://etterlatte-api.etterlatte
     - name: PEN_SERVICE_ID
       value: prod-fss:pensjondeployer:pensjon-pen
     - name: PEN_URL
@@ -130,10 +134,6 @@ spec:
       value: prod-gcp:pensjonskalkulator:tjenestepensjon-simulering
     - name: TJENESTEPENSJON_SIMULERING_URL
       value: http://tjenestepensjon-simulering
-    - name: OMSTILLINGSSTOENAD_SERVICE_ID
-      value: prod-gcp:etterlatte:etterlatte-api
-    - name: OMSTILLINGSSTOENAD_URL
-      value: http://etterlatte-api.etterlatte
     - name: PKB_FRONTEND_ENTRA_CLIENT_ID
       value: irrelevant-when-obo-token-used
     - name: PKB_GROUP_ID_SAKSBEHANDLER
