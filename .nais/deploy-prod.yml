@@ -66,6 +66,7 @@ spec:
         - application: pensjon-selvbetjening-fss-gateway
           namespace: pensjonselvbetjening
           cluster: prod-fss
+        - application: pensjonssimulator
         - application: skjermede-personer-pip
           namespace: nom
         - application: tjenestepensjon-simulering
