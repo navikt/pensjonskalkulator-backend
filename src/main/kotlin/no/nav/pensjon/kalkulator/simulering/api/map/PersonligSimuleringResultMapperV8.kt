@@ -29,9 +29,7 @@ object PersonligSimuleringResultMapperV8 {
         )
 
     /**
-     * When list contains alderspensjon with age 0,
-     * replace it with age of current year and add it back to the list,
-     * if alderspensjon for current year already exists, replace it.
+     * Assign a pension with age 0 to the current age, or remove it from the list if the current age already exists.
      */
     fun justerAlderspensjonIInnevaerendeAarV8(
         alderspensjonList: List<PersonligSimuleringAlderspensjonResultV8>,
@@ -41,10 +39,11 @@ object PersonligSimuleringResultMapperV8 {
             .firstOrNull { it.alder == 0 }
             ?.let {
                 val innevaerendeAarAlder = Alder.from(foedselsdato, LocalDate.now()).aar
-                val oppdatertAlderspensjonList = alderspensjonList
-                    .filter { it.alder != 0 }
-                    .filter { it.alder != innevaerendeAarAlder}
-                    .toMutableList()
+                val oppdatertAlderspensjonList = alderspensjonList.filter { it.alder != 0 }.toMutableList()
+
+                if (oppdatertAlderspensjonList.any { it.alder == innevaerendeAarAlder }) {
+                    return oppdatertAlderspensjonList.sortedBy { it.alder }
+                }
                 oppdatertAlderspensjonList.add(
                     PersonligSimuleringAlderspensjonResultV8(
                         innevaerendeAarAlder,

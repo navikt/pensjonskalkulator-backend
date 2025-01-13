@@ -58,7 +58,7 @@ class PersonligSimuleringResultMapperV8Test{
     }
 
     @Test
-    fun `resultatV8 assigns 0 age to current age, replacing existing alderspensjon at current age, when mapping domain to V8 DTO`() {
+    fun `resultatV8 ignores alderspensjon with age 0 when mapping domain to V8 DTO`() {
         PersonligSimuleringResultMapperV8.resultV8(
             SimuleringResult(
                 alderspensjon = listOf(
@@ -103,7 +103,7 @@ class PersonligSimuleringResultMapperV8Test{
             alderspensjon = listOf(
                 PersonligSimuleringAlderspensjonResultV8(
                     alder = 67,
-                    beloep = 1,
+                    beloep = 123456,
                     inntektspensjonBeloep = null,
                     garantipensjonBeloep = null,
                     delingstall = null,
