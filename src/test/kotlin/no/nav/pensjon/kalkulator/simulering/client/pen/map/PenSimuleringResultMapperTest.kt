@@ -58,7 +58,7 @@ class PenSimuleringResultMapperTest {
     }
 
     @Test
-    fun `0 alder byttes med alder ett aar lavere enn laveste alder i listen og sorterer listen`() {
+    fun `0 alder beholdes i listen`() {
         PenSimuleringResultMapper.fromDto(
             PenSimuleringResultDto(
                 alderspensjon = listOf(
@@ -118,12 +118,12 @@ class PenSimuleringResultMapperTest {
         ) shouldBe SimuleringResult(
             alderspensjon = listOf(
                 SimulertAlderspensjon(
-                    alder = 49,
-                    beloep = 1,
-                    inntektspensjonBeloep = 2,
-                    garantipensjonBeloep = 3,
-                    delingstall = 0.4,
-                    pensjonBeholdningFoerUttak = 5
+                    alder = 100,
+                    beloep = 1001,
+                    inntektspensjonBeloep = 2001,
+                    garantipensjonBeloep = 3001,
+                    delingstall = 0.51,
+                    pensjonBeholdningFoerUttak = 4001
                 ),
                 SimulertAlderspensjon(
                     alder = 50,
@@ -142,13 +142,13 @@ class PenSimuleringResultMapperTest {
                     pensjonBeholdningFoerUttak = 4001
                 ),
                 SimulertAlderspensjon(
-                    alder = 100,
-                    beloep = 1001,
-                    inntektspensjonBeloep = 2001,
-                    garantipensjonBeloep = 3001,
-                    delingstall = 0.51,
-                    pensjonBeholdningFoerUttak = 4001
-                )
+                    alder = 0,
+                    beloep = 1,
+                    inntektspensjonBeloep = 2,
+                    garantipensjonBeloep = 3,
+                    delingstall = 0.4,
+                    pensjonBeholdningFoerUttak = 5
+                ),
             ),
             alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(
                 gradertUttak = null,
