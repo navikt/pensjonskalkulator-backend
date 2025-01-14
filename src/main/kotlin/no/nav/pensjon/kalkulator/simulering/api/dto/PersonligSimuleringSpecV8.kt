@@ -46,4 +46,9 @@ data class PersonligSimuleringUtenlandsperiodeSpecV8(
 data class PersonligSimuleringAlderSpecV8(
     val aar: Int,
     val maaneder: Int
-)
+){
+    init {
+        require(aar in 0..200) { "0 <= aar <= 200" }
+        require(maaneder in 0..11) { "0 <= maaneder <= 11" }
+    }
+}
