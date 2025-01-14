@@ -177,6 +177,23 @@ class SimuleringControllerTest {
             .andExpect(content().json(responseBodyForGradertUttakV8()))
     }
 
+    @Test
+    fun `simulerer endring av alderspensjon med offentlig livsvarig AFP V8`() {
+        val spec = impersonalGradertUttakSpec(SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG)
+        `when`(simuleringService.simulerAlderspensjon(spec))
+            .thenReturn(simuleringsresultat(spec.simuleringType, heltUttak = false))
+        enableUtvidetResult()
+
+        mvc.perform(
+            post(URL_V8)
+                .with(csrf())
+                .content(gradertUttakRequestBody(SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG))
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk())
+            .andExpect(content().json(responseBodyMedLivsvarigOffentligAfpV8()))
+    }
+
     private fun enableUtvidetResult() {
         `when`(feature.isEnabled("utvidet-simuleringsresultat")).thenReturn(true)
     }
@@ -454,6 +471,29 @@ class SimuleringControllerTest {
                     ),
                     afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 22056)),
                     afpOffentlig = emptyList(),
+                    vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
+                    harForLiteTrygdetid = false,
+                    trygdetid = 0,
+                    opptjeningGrunnlagListe = emptyList()
+                )
+
+                SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG -> SimuleringResult(
+                    alderspensjon = listOf(
+                        SimulertAlderspensjon(
+                            alder = 67,
+                            beloep = PENSJONSBELOEP,
+                            inntektspensjonBeloep = 0,
+                            garantipensjonBeloep = 0,
+                            delingstall = 0.0,
+                            pensjonBeholdningFoerUttak = 0
+                        )
+                    ),
+                    alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(
+                        gradertUttak = if (heltUttak) null else 0,
+                        heltUttak = 0
+                    ),
+                    afpPrivat = emptyList(),
+                    afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 22056)),
                     vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                     harForLiteTrygdetid = false,
                     trygdetid = 0,
