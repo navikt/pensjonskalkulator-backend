@@ -9,8 +9,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.simulering.AnonymSimuleringService
+import no.nav.pensjon.kalkulator.simulering.SimuleringException
 import no.nav.pensjon.kalkulator.simulering.SimuleringService
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
+import no.nav.pensjon.kalkulator.simulering.api.map.AnonymSimuleringResultMapperV1.errorV1
 import no.nav.pensjon.kalkulator.simulering.api.map.AnonymSimuleringResultMapperV1.resultatV1
 import no.nav.pensjon.kalkulator.simulering.api.map.AnonymSimuleringSpecMapperV1
 import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringExtendedResultMapperV8.extendedResultV8
@@ -116,7 +118,7 @@ class SimuleringController(
             ),
         ]
     )
-    fun simulerAnonymAlderspensjonV1(@RequestBody spec: AnonymSimuleringSpecV1): ResponseEntity<AnonymSimuleringResultV1?>? {
+    fun simulerAnonymAlderspensjonV1(@RequestBody spec: AnonymSimuleringSpecV1): ResponseEntity<AnonymSimuleringResultV1> {
         traceAid.begin()
         log.debug { "Request for anonym simulering V1: $spec" }
 
@@ -136,17 +138,23 @@ class SimuleringController(
             badRequest(e)!!
         } catch (e: EgressException) {
             if (e.isConflict && e.errorObj != null) throw e
-            else ResponseEntity.badRequest().body(handleError(e, "V6"))
+            else ResponseEntity.badRequest().body(handleError(e, "V1"))
         } finally {
             traceAid.end()
         }
     }
 
     @ExceptionHandler(EgressException::class)
-    fun handleError(e: EgressException): ResponseEntity<AnonymSimuleringErrorV1> {
-        val status = e.statusCode ?: HttpStatus.INTERNAL_SERVER_ERROR
-        return ResponseEntity.status(status).body(e.errorObj)
-    }
+    fun handleError(e: EgressException): ResponseEntity<AnonymSimuleringErrorV1> =
+        ResponseEntity
+            .status(e.statusCode ?: HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(e.errorObj)
+
+    @ExceptionHandler(SimuleringException::class)
+    fun handleError(e: SimuleringException): ResponseEntity<AnonymSimuleringErrorV1> =
+        ResponseEntity
+            .status(HttpStatus.CONFLICT.value())
+            .body(e.error?.let(::errorV1))
 
     override fun errorMessage() = ERROR_MESSAGE
 

@@ -18,6 +18,12 @@ object AnonymSimuleringResultMapperV1 {
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving)
         )
 
+    fun errorV1(source: SimuleringError) =
+        AnonymSimuleringErrorV1(
+            status = source.status,
+            message = source.message
+        )
+
     private fun vilkaarsproeving(source: Vilkaarsproeving) =
         AnonymVilkaarsproevingV1(
             vilkaarErOppfylt = source.innvilget,
