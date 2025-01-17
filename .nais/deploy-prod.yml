@@ -109,6 +109,10 @@ spec:
       value: prod-fss:pensjon-person:pensjon-representasjon
     - name: PENSJON_REPRESENTASJON_URL
       value: https://pensjon-representasjon.prod-fss-pub.nais.io
+    - name: PENSJONSSIMULATOR_SERVICE_ID
+      value: prod-gcp:pensjonskalkulator:pensjonssimulator
+    - name: PENSJONSSIMULATOR_URL
+      value: http://pensjonssimulator
     - name: PERSONDATA_SERVICE_ID
       value: prod-fss:pdl:pdl-api
     - name: PERSONDATA_URL

@@ -9,6 +9,8 @@ interface SimuleringClient {
         impersonalSpec: ImpersonalSimuleringSpec,
         personalSpec: PersonalSimuleringSpec
     ): SimuleringResult
+}
 
+interface AnonymSimuleringClient {
     fun simulerAnonymAlderspensjon(spec: ImpersonalSimuleringSpec): SimuleringResult
 }
