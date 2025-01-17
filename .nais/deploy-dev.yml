@@ -49,11 +49,6 @@ spec:
           - NAVident
   tokenx:
     enabled: true
-  maskinporten:
-    enabled: true # only in dev
-    scopes:
-      consumes:
-        - name: "nav:pensjonssimulator:simulering"
   accessPolicy:
     inbound:
       rules:
@@ -108,7 +103,6 @@ spec:
         - host: pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
         - host: pensjon-testdata-facade.dev-fss-pub.nais.io # only in dev
         - host: pensjonskalkulator-unleash-api.nav.cloud.nais.io
-        - host: pensjonssimulator.ekstern.dev.nav.no # only in dev
         - host: skjermede-personer-pip.intern.dev.nav.no
         - host: test.idporten.no
         - host: tp-api-q2.dev-fss-pub.nais.io
@@ -134,6 +128,10 @@ spec:
       value: dev-fss:pensjon-q2:pensjon-pen-q2
     - name: PEN_URL
       value: https://pensjon-pen-q2.dev-fss-pub.nais.io
+    - name: PENSJONSSIMULATOR_SERVICE_ID
+      value: dev-gcp:pensjonskalkulator:pensjonssimulator
+    - name: PENSJONSSIMULATOR_URL
+      value: http://pensjonssimulator
     - name: PENSJON_REGLER_URL
       value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: PENSJON_REPRESENTASJON_SERVICE_ID

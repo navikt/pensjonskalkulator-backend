@@ -28,9 +28,9 @@ import java.time.LocalDate
 
 @SpringBootTest
 @TestPropertySource("classpath:application-test.properties")
-class PenSimuleringClientTest : WebClientTest() {
+class PensjonssimulatorClientTest : WebClientTest() {
 
-    private lateinit var client: PenSimuleringClient
+    private lateinit var client: PensjonssimulatorClient
 
     @Autowired
     private lateinit var webClientBuilder: WebClient.Builder
@@ -40,7 +40,7 @@ class PenSimuleringClientTest : WebClientTest() {
 
     @BeforeEach
     fun initialize() {
-        client = PenSimuleringClient(baseUrl(), webClientBuilder, traceAid, retryAttempts = "1")
+        client = PensjonssimulatorClient(baseUrl(), webClientBuilder, traceAid, retryAttempts = "1")
         arrangeSecurityContext()
     }
 
