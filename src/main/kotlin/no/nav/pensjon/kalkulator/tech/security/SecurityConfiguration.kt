@@ -66,6 +66,7 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
         ProviderManager(tokenXProvider, entraIdProvider)
 
     @Bean("token-x-provider")
+    @Primary
     fun tokenXProvider(
         @Value("\${token-x.issuer}") issuer: String,
         @Value("\${token-x.client.id}") audience: String
