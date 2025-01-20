@@ -33,6 +33,7 @@ enum class EgressService(
         description = "Pensjonssimulator",
         shortName = "PS",
         purpose = "Simulering av alderspensjon",
+        authType = AuthType.MACHINE_INSIDE_NAV
     ),
     TJENESTEPENSJON("Tjenestepensjon", "TP", "Tjenestepensjonsforhold"),
     TJENESTEPENSJON_SIMULERING("Tjenestepensjon simulering", "TpS", "Hente simulering av OFTP fra eksterne"),

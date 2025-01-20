@@ -138,6 +138,10 @@ spec:
       value: dev-fss:pensjon-person:pensjon-representasjon-q2
     - name: PENSJON_REPRESENTASJON_URL
       value: https://pensjon-representasjon-q2.dev-fss-pub.nais.io
+    - name: PENSJONSSIMULATOR_SERVICE_ID
+      value: dev-gcp:pensjonskalkulator:pensjonssimulator
+    - name: PENSJONSSIMULATOR_URL
+      value: http://pensjonssimulator
     - name: PERSONDATA_SERVICE_ID
       value: dev-fss:pdl:pdl-api
     - name: PERSONDATA_URL
