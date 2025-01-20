@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.simulering.api.map
 import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
+import org.springframework.http.HttpStatus
 
 /**
  * Maps between data transfer objects (DTOs) and domain objects related to simulering.
@@ -20,7 +21,7 @@ object AnonymSimuleringResultMapperV1 {
 
     fun errorV1(source: SimuleringError) =
         AnonymSimuleringErrorV1(
-            status = source.status,
+            status = HttpStatus.CONFLICT.value().toString(),
             message = source.message
         )
 

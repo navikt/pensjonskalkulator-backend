@@ -118,7 +118,7 @@ class SimuleringController(
             ),
         ]
     )
-    fun simulerAnonymAlderspensjonV1(@RequestBody spec: AnonymSimuleringSpecV1): ResponseEntity<AnonymSimuleringResultV1> {
+    fun simulerAnonymAlderspensjonV1(@RequestBody spec: AnonymSimuleringSpecV1): ResponseEntity<Any> {
         traceAid.begin()
         log.debug { "Request for anonym simulering V1: $spec" }
 
@@ -134,6 +134,8 @@ class SimuleringController(
                         Metrics.countType(eventName = SIMULERING_TYPE_METRIC_NAME, type = "anonym")
                     }
                 ))
+        } catch (e: SimuleringException) {
+            ResponseEntity.status(HttpStatus.CONFLICT.value()).body(e.error?.let(::errorV1))
         } catch (e: BadRequestException) {
             badRequest(e)!!
         } catch (e: EgressException) {
@@ -149,12 +151,6 @@ class SimuleringController(
         ResponseEntity
             .status(e.statusCode ?: HttpStatus.INTERNAL_SERVER_ERROR)
             .body(e.errorObj)
-
-    @ExceptionHandler(SimuleringException::class)
-    fun handleError(e: SimuleringException): ResponseEntity<AnonymSimuleringErrorV1> =
-        ResponseEntity
-            .status(HttpStatus.CONFLICT.value())
-            .body(e.error?.let(::errorV1))
 
     override fun errorMessage() = ERROR_MESSAGE
 
