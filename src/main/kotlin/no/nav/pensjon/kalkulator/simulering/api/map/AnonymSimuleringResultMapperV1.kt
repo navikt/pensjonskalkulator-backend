@@ -3,7 +3,6 @@ package no.nav.pensjon.kalkulator.simulering.api.map
 import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
-import org.springframework.http.HttpStatus
 
 /**
  * Maps between data transfer objects (DTOs) and domain objects related to simulering.
@@ -19,10 +18,10 @@ object AnonymSimuleringResultMapperV1 {
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving)
         )
 
-    fun errorV1(source: SimuleringError) =
+    fun errorV1(exception: SimuleringException) =
         AnonymSimuleringErrorV1(
-            status = HttpStatus.CONFLICT.value().toString(),
-            message = source.message
+            status = exception.error?.message ?: exception.javaClass.simpleName,
+            message = exception.message ?: "unknown cause" // not used by frontend
         )
 
     private fun vilkaarsproeving(source: Vilkaarsproeving) =
