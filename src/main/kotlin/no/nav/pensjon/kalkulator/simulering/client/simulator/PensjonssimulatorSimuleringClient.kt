@@ -3,9 +3,14 @@ package no.nav.pensjon.kalkulator.simulering.client.simulator
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
+import no.nav.pensjon.kalkulator.simulering.PersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.SimuleringResult
 import no.nav.pensjon.kalkulator.simulering.Vilkaarsproeving
 import no.nav.pensjon.kalkulator.simulering.client.AnonymSimuleringClient
+import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
+import no.nav.pensjon.kalkulator.simulering.client.pen.dto.PenSimuleringResultDto
+import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenSimuleringResultMapper
+import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenSimuleringSpecMapper
 import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.SimulatorAnonymSimuleringResultEnvelope
 import no.nav.pensjon.kalkulator.simulering.client.simulator.map.SimulatorAnonymSimuleringResultMapper
 import no.nav.pensjon.kalkulator.simulering.client.simulator.map.SimulatorAnonymSimuleringSpecMapper
@@ -26,14 +31,40 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 @Component
 class PensjonssimulatorSimuleringClient(
-    @Value("\${pensjonssimulator.url}") val baseUrl: String,
-    val webClientBuilder: WebClient.Builder,
+    @Value("\${pensjonssimulator.url}") private val baseUrl: String,
+    webClientBuilder: WebClient.Builder,
     val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") private val retryAttempts: String
-) : ExternalServiceClient(retryAttempts), AnonymSimuleringClient, Pingable {
+) : ExternalServiceClient(retryAttempts), AnonymSimuleringClient, SimuleringClient, Pingable {
 
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
     private val log = KotlinLogging.logger {}
+
+    override fun simulerAlderspensjon(
+        impersonalSpec: ImpersonalSimuleringSpec,
+        personalSpec: PersonalSimuleringSpec
+    ): SimuleringResult {
+        val url = "$baseUrl/$SIMULER_ALDERSPENSJON_RESOURCE"
+        log.debug { "POST to URL: '$url'" }
+
+        return try {
+            return webClient
+                .post()
+                .uri(url)
+                .headers(::setHeaders)
+                .bodyValue(PenSimuleringSpecMapper.toDto(impersonalSpec, personalSpec))
+                .retrieve()
+                .bodyToMono(PenSimuleringResultDto::class.java)
+                .retryWhen(retryBackoffSpec(url))
+                .block()
+                ?.let(PenSimuleringResultMapper::fromDto)
+                ?: emptyResult()
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling ${service()}", e)
+        } catch (e: WebClientResponseException) {
+            throw EgressException(e.responseBodyAsString, e)
+        }
+    }
 
     override fun simulerAnonymAlderspensjon(spec: ImpersonalSimuleringSpec): SimuleringResult {
         val url = "$baseUrl/$ANONYM_SIMULER_ALDERSPENSJON_RESOURCE"
@@ -74,6 +105,7 @@ class PensjonssimulatorSimuleringClient(
     }
 
     private companion object {
+        private const val SIMULER_ALDERSPENSJON_RESOURCE = "api/nav/v3/simuler-alderspensjon"
         private const val ANONYM_SIMULER_ALDERSPENSJON_RESOURCE = "api/anonym/v1/simuler-alderspensjon"
         private val service = EgressService.PENSJONSSIMULATOR
 

@@ -47,7 +47,6 @@ class PensjonssimulatorSimuleringClientTest : WebClientTest() {
     /**
      * NAU = Nærmest Angitt Uttak (alternative simuleringsparametre)
      */
-    /* TODO
     @Test
     fun `simulerAlderspensjon der responsen har alternativ NAU-beregning`() {
         arrange(alternativPensjonResponse())
@@ -93,7 +92,7 @@ class PensjonssimulatorSimuleringClientTest : WebClientTest() {
             assertEquals(65000, this[1].beloep)
         }
     }
-*/
+
     private fun assertGradertUttakRequestBody() {
         ByteArrayOutputStream().use {
             takeRequest().body.copyTo(it)
