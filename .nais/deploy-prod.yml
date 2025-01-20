@@ -74,7 +74,6 @@ spec:
           namespace: pensjonsamhandling
           cluster: prod-fss
       external:
-        - host: idporten.no
         - host: pdl-api.prod-fss-pub.nais.io
         - host: pensjon-pen.prod-fss-pub.nais.io
         - host: pensjon-popp.prod-fss-pub.nais.io
@@ -85,10 +84,6 @@ spec:
         - host: tp-api.prod-fss-pub.nais.io
         - host: sokos-utbetaldata.prod-fss-pub.nais.io
   env:
-    - name: IDPORTEN_ISSUER
-      value: https://idporten.no
-    - name: IDPORTEN_PING_URL
-      value: https://idporten.no/.well-known/openid-configuration
     - name: FSS_GATEWAY_SERVICE_ID
       value: prod-fss:pensjonselvbetjening:pensjon-selvbetjening-fss-gateway
     - name: FSS_GATEWAY_URL

@@ -48,10 +48,9 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
     @Bean("personal")
     @Primary
     fun personalProviderManager(
-        @Qualifier("id-porten-provider") idPortenProvider: AuthenticationProvider,
         @Qualifier("token-x-provider") tokenXProvider: AuthenticationProvider
     ) =
-        ProviderManager(idPortenProvider, tokenXProvider)
+        ProviderManager(tokenXProvider)
 
     @Bean("impersonal")
     fun impersonalProviderManager(
@@ -61,25 +60,10 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
 
     @Bean("universal")
     fun universalProviderManager(
-        @Qualifier("id-porten-provider") idPortenProvider: AuthenticationProvider,
         @Qualifier("token-x-provider") tokenXProvider: AuthenticationProvider,
         @Qualifier("entra-id-provider") entraIdProvider: AuthenticationProvider
     ) =
-        ProviderManager(idPortenProvider, tokenXProvider, entraIdProvider)
-
-    @Bean("id-porten-provider")
-    @Primary
-    fun idPortenProvider(
-        @Value("\${idporten.issuer}") issuer: String,
-        @Value("\${idporten.audience}") audience: String
-    ) =
-        JwtAuthenticationProvider(
-            jwtDecoder(
-                issuerUri = issuer,
-                frontendAudiences = listOf(audience),
-                backendAudience = ""
-            )
-        )
+        ProviderManager(tokenXProvider, entraIdProvider)
 
     @Bean("token-x-provider")
     fun tokenXProvider(
