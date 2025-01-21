@@ -46,9 +46,11 @@ jobs:
   call-buildAndDeploySandbox:
     needs: createNewSandbox
     permissions:
+      actions: "read"
       contents: "read"
       checks: "write"
       id-token: "write"
       packages: "write"
+      security-events: "write"
     secrets: inherit
     uses: ./.github/workflows/deploy-dev.yaml
