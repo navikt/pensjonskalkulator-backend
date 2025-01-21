@@ -4,6 +4,7 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
+import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultMapperV8.justerAfpPrivatIInnevaerendeAarV8
 import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultMapperV8.justerAlderspensjonIInnevaerendeAarV8
 import java.time.LocalDate
 
@@ -17,7 +18,7 @@ object PersonligSimuleringExtendedResultMapperV8 {
         PersonligSimuleringResultV8(
             alderspensjon = source.alderspensjon.map(::alderspensjon).let { justerAlderspensjonIInnevaerendeAarV8(it, foedselsdato) },
             alderspensjonMaanedligVedEndring = maanedligPensjon(source.alderspensjonMaanedsbeloep),
-            afpPrivat = source.afpPrivat.map(::privatAfp),
+            afpPrivat = source.afpPrivat.map(::privatAfp).let { justerAfpPrivatIInnevaerendeAarV8(it, foedselsdato) },
             afpOffentlig = source.afpOffentlig.map(::offentligAfp),
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving),
             harForLiteTrygdetid = source.harForLiteTrygdetid,
