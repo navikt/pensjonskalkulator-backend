@@ -1,14 +1,12 @@
-package no.nav.pensjon.kalkulator.common.client.pen
+package no.nav.pensjon.kalkulator.simulering.client.simulator.map
 
 import no.nav.pensjon.kalkulator.person.Sivilstand
 
 /**
- * The 'externalValue' is sivilstand values used by PEN (pensjonsfaglig kjerne).
- * PEN supports the concept of 'samboer' (unlike Folkeregisteret/PDL).
- * The source of PEN's sivilstand values is:
- * https://github.com/navikt/pesys/blob/main/pen/domain/nav-domain-pensjon-pen-api/src/main/java/no/nav/domain/pensjon/kjerne/kodetabeller/SivilstandTypeCode.java
+ * The 'externalValue' is sivilstand values used by pensjonssimulator.
+ * pensjonssimulator supports the concept of 'samboer' (unlike Folkeregisteret/PDL).
  */
-enum class PenSivilstand(val externalValue: String, val internalValue: Sivilstand) {
+enum class SimulatorSivilstand(val externalValue: String, val internalValue: Sivilstand) {
 
     ENKE_ELLER_ENKEMANN("ENKE", Sivilstand.ENKE_ELLER_ENKEMANN),
     GIFT("GIFT", Sivilstand.GIFT),
@@ -28,7 +26,7 @@ enum class PenSivilstand(val externalValue: String, val internalValue: Sivilstan
 
 
     companion object {
-        fun fromInternalValue(sivilstand: Sivilstand?): PenSivilstand =
+        fun fromInternalValue(sivilstand: Sivilstand?): SimulatorSivilstand =
             when (sivilstand) {
                 Sivilstand.UOPPGITT -> UDEFINERT // ambiguous UDEFINERT/GJENLEVENDE_*
                 Sivilstand.GIFT -> GIFT // ambiguous GIFT/-_LEVER_ADSKILT

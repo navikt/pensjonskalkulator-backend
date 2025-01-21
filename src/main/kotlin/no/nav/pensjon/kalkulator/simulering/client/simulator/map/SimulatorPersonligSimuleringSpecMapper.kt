@@ -1,7 +1,5 @@
 package no.nav.pensjon.kalkulator.simulering.client.simulator.map
 
-import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
-import no.nav.pensjon.kalkulator.common.client.pen.PenUttaksgrad
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.GradertUttak
 import no.nav.pensjon.kalkulator.general.HeltUttak
@@ -19,7 +17,7 @@ object SimulatorPersonligSimuleringSpecMapper {
         SimulatorSimuleringSpec(
             simuleringstype = SimulatorSimuleringType.fromInternalValue(impersonalSpec.simuleringType).externalValue,
             pid = personalSpec.pid.value,
-            sivilstand = PenSivilstand.fromInternalValue(personalSpec.sivilstand).externalValue,
+            sivilstand = SimulatorSivilstand.fromInternalValue(personalSpec.sivilstand).externalValue,
             epsHarInntektOver2G = impersonalSpec.eps.harInntektOver2G,
             epsHarPensjon = false, // NB: Ikke-støttet verdi
             sisteInntekt = personalSpec.aarligInntektFoerUttak,
@@ -31,7 +29,7 @@ object SimulatorPersonligSimuleringSpecMapper {
 
     private fun gradertUttak(source: GradertUttak) =
         SimulatorGradertUttakSpec(
-            grad = PenUttaksgrad.fromInternalValue(source.grad).externalValue,
+            grad = SimulatorUttaksgrad.fromInternalValue(source.grad).externalValue,
             uttakFomAlder = alder(source.uttakFomAlder),
             aarligInntekt = source.aarligInntekt
         )

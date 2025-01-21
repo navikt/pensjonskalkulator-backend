@@ -1,7 +1,5 @@
 package no.nav.pensjon.kalkulator.simulering.client.simulator.map
 
-import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
-import no.nav.pensjon.kalkulator.common.client.pen.PenUttaksgrad
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
@@ -32,14 +30,14 @@ object SimulatorAnonymSimuleringSpecMapper {
         return SimulatorAnonymSimuleringSpec(
             simuleringType = SimulatorSimuleringType.fromInternalValue(spec.simuleringType).externalValue,
             fodselsar = spec.foedselAar,
-            sivilstatus = PenSivilstand.fromInternalValue(spec.sivilstand).externalValue,
+            sivilstatus = SimulatorSivilstand.fromInternalValue(spec.sivilstand).externalValue,
             eps2G = spec.eps.harInntektOver2G,
             epsPensjon = spec.eps.harPensjon,
             utenlandsopphold = spec.utenlandsopphold.antallAar ?: 0,
             antArInntektOverG = spec.inntektOver1GAntallAar ?: 0,
             forventetInntekt = spec.forventetAarligInntektFoerUttak ?: 0,
             forsteUttakDato = gradertUttakFom ?: heltUttakFom,
-            utg = uttaksgrad.let { PenUttaksgrad.fromInternalValue(it).externalValue },
+            utg = uttaksgrad.let { SimulatorUttaksgrad.fromInternalValue(it).externalValue },
             inntektUnderGradertUttak = spec.gradertUttak?.aarligInntekt,
             heltUttakDato = heltUttakFom,
             inntektEtterHeltUttak = spec.heltUttak.inntekt.aarligBeloep,

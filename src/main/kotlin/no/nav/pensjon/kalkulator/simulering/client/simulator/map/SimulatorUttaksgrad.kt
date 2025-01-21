@@ -1,13 +1,11 @@
-package no.nav.pensjon.kalkulator.common.client.pen
+package no.nav.pensjon.kalkulator.simulering.client.simulator.map
 
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 
 /**
- * The 'externalValue' is uttaksgrad values used by PEN (pensjonsfaglig kjerne).
- * The source of PEN's uttaksgrad values is:
- * https://github.com/navikt/pesys/blob/main/pen/domain/nav-domain-pensjon-pen-api/src/main/java/no/nav/domain/pensjon/kjerne/kodetabeller/UttaksgradCode.java
+ * The 'externalValue' is uttaksgrad values used by pensjonssimulator.
  */
-enum class PenUttaksgrad(val externalValue: String, val internalValue: Uttaksgrad) {
+enum class SimulatorUttaksgrad(val externalValue: String, val internalValue: Uttaksgrad) {
 
     NULL("P_0", Uttaksgrad.NULL),
     TJUE_PROSENT("P_20", Uttaksgrad.TJUE_PROSENT),
@@ -18,7 +16,7 @@ enum class PenUttaksgrad(val externalValue: String, val internalValue: Uttaksgra
     HUNDRE_PROSENT("P_100", Uttaksgrad.HUNDRE_PROSENT);
 
     companion object {
-        fun fromInternalValue(grad: Uttaksgrad?): PenUttaksgrad =
+        fun fromInternalValue(grad: Uttaksgrad?): SimulatorUttaksgrad =
             entries.firstOrNull { it.internalValue == grad } ?: HUNDRE_PROSENT
     }
 }
