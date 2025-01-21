@@ -9,6 +9,7 @@ on:
       - 'CODEOWNERS'
       - 'LICENSE'
       - 'README.md'
+  workflow_call:
 
 jobs:
   build:
