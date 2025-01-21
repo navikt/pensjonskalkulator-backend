@@ -1,4 +1,4 @@
-name: Build, push, deploy
+name: Build and deploy to Prod
 
 on:
   push:
@@ -9,12 +9,6 @@ on:
       - 'CODEOWNERS'
       - 'LICENSE'
       - 'README.md'
-  workflow_dispatch:
-    inputs:
-      prod:
-        description: Deploy to production
-        type: boolean
-        required: false
 
 jobs:
   build:
@@ -55,31 +49,10 @@ jobs:
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
     outputs:
       image: ${{ steps.image-creation.outputs.image }}
-  deploy-dev:
-    name: Deploy to dev-gcp
-    needs: [ build ]
-    if: |
-      github.event_name == 'push' ||
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.prod != 'true')
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Deploy
-        uses: nais/deploy/actions/deploy@v2
-        env:
-          CLUSTER: dev-gcp
-          IMAGE: ${{ needs.build.outputs.image }}
-          RESOURCE: .nais/deploy-dev.yml
+
   deploy-prod:
     name: Deploy to prod-gcp
     needs: [ build ]
-    if: |
-      github.ref == 'refs/heads/main' &&
-      github.event_name == 'workflow_dispatch' &&
-      github.event.inputs.prod == 'true'
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -95,7 +68,6 @@ jobs:
   trivy-imagescan:
     name: Scan Docker image
     needs: [ build ]
-    if: github.ref == 'refs/heads/main'
     env:
       TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db
     runs-on: ubuntu-latest
