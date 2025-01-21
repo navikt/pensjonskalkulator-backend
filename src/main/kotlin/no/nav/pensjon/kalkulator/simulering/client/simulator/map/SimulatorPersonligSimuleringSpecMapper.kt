@@ -1,5 +1,7 @@
 package no.nav.pensjon.kalkulator.simulering.client.simulator.map
 
+import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
+import no.nav.pensjon.kalkulator.common.client.pen.PenUttaksgrad
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.GradertUttak
 import no.nav.pensjon.kalkulator.general.HeltUttak
@@ -8,7 +10,7 @@ import no.nav.pensjon.kalkulator.simulering.Opphold
 import no.nav.pensjon.kalkulator.simulering.PersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.*
 
-object SimulatorSimuleringSpecMapper {
+object SimulatorPersonligSimuleringSpecMapper {
 
     fun toDto(
         impersonalSpec: ImpersonalSimuleringSpec,
@@ -17,7 +19,7 @@ object SimulatorSimuleringSpecMapper {
         SimulatorSimuleringSpec(
             simuleringstype = SimulatorSimuleringType.fromInternalValue(impersonalSpec.simuleringType).externalValue,
             pid = personalSpec.pid.value,
-            sivilstand = SimulatorSivilstand.fromInternalValue(personalSpec.sivilstand).externalValue,
+            sivilstand = PenSivilstand.fromInternalValue(personalSpec.sivilstand).externalValue,
             epsHarInntektOver2G = impersonalSpec.eps.harInntektOver2G,
             epsHarPensjon = false, // NB: Ikke-støttet verdi
             sisteInntekt = personalSpec.aarligInntektFoerUttak,
@@ -27,28 +29,28 @@ object SimulatorSimuleringSpecMapper {
             utenlandsperiodeListe = impersonalSpec.utenlandsopphold.periodeListe.map(::utlandPeriode)
         )
 
-    private fun gradertUttak(spec: GradertUttak) =
+    private fun gradertUttak(source: GradertUttak) =
         SimulatorGradertUttakSpec(
-            grad = SimulatorUttaksgrad.fromInternalValue(spec.grad).externalValue,
-            uttakFomAlder = alder(spec.uttakFomAlder),
-            aarligInntekt = spec.aarligInntekt
+            grad = PenUttaksgrad.fromInternalValue(source.grad).externalValue,
+            uttakFomAlder = alder(source.uttakFomAlder),
+            aarligInntekt = source.aarligInntekt
         )
 
-    private fun heltUttak(spec: HeltUttak) =
+    private fun heltUttak(source: HeltUttak) =
         SimulatorHeltUttakSpec(
-            uttakFomAlder = alder(spec.uttakFomAlder!!), // mandatory in context of simulering
-            aarligInntekt = spec.inntekt?.aarligBeloep ?: 0,
-            inntektTomAlder = spec.inntekt?.let { alder(it.tomAlder) } ?: alder(spec.uttakFomAlder)
+            uttakFomAlder = alder(source.uttakFomAlder!!), // mandatory in context of simulering
+            aarligInntekt = source.inntekt?.aarligBeloep ?: 0,
+            inntektTomAlder = source.inntekt?.let { alder(it.tomAlder) } ?: alder(source.uttakFomAlder)
         )
 
-    private fun utlandPeriode(spec: Opphold) =
+    private fun utlandPeriode(source: Opphold) =
         SimulatorUtlandPeriodeSpec(
-            fom = spec.fom,
-            tom = spec.tom,
-            land = spec.land.name,
-            arbeidetUtenlands = spec.arbeidet
+            fom = source.fom,
+            tom = source.tom,
+            land = source.land.name,
+            arbeidetUtenlands = source.arbeidet
         )
 
-    private fun alder(spec: Alder) =
-        SimulatorAlderSpec(spec.aar, spec.maaneder)
+    private fun alder(source: Alder) =
+        SimulatorAlderSpec(source.aar, source.maaneder)
 }

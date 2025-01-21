@@ -5,7 +5,6 @@ import no.nav.pensjon.kalkulator.common.client.pen.PenUttaksgrad
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
-import no.nav.pensjon.kalkulator.simulering.client.pen.map.PenSimuleringType
 import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.SimulatorAnonymAlderSpec
 import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.SimulatorAnonymSimuleringSpec
 import java.time.LocalDate
@@ -13,25 +12,25 @@ import java.time.LocalDate
 object SimulatorAnonymSimuleringSpecMapper {
 
     fun toDto(spec: ImpersonalSimuleringSpec): SimulatorAnonymSimuleringSpec {
-        val fodselsdato: LocalDate =
+        val foedselsdato: LocalDate =
             spec.foedselAar?.let { LocalDate.of(it, 1, 1) }
                 ?: throw IllegalArgumentException("Undefined foedselAar")
 
         val gradertUttakFom: LocalDate? =
             spec.gradertUttak?.uttakFomAlder?.let {
-                SimulatorAnonymAlderDato(fodselsdato, alder(it)).dato
+                SimulatorAnonymAlderDato(foedselsdato, alder(it)).dato
             }
 
         val heltUttakFom: LocalDate =
-            SimulatorAnonymAlderDato(fodselsdato, alder = alder(spec.heltUttak.uttakFomAlder!!)).dato
+            SimulatorAnonymAlderDato(foedselsdato, alder = alder(spec.heltUttak.uttakFomAlder!!)).dato
 
         val inntektTom: LocalDate =
-            SimulatorAnonymAlderDato(fodselsdato, alder = alder(spec.heltUttak.inntekt!!.tomAlder)).dato
+            SimulatorAnonymAlderDato(foedselsdato, alder = alder(spec.heltUttak.inntekt!!.tomAlder)).dato
 
         val uttaksgrad = spec.gradertUttak?.grad ?: Uttaksgrad.HUNDRE_PROSENT
 
         return SimulatorAnonymSimuleringSpec(
-            simuleringType = PenSimuleringType.Companion.fromInternalValue(spec.simuleringType).externalValue,
+            simuleringType = SimulatorSimuleringType.fromInternalValue(spec.simuleringType).externalValue,
             fodselsar = spec.foedselAar,
             sivilstatus = PenSivilstand.fromInternalValue(spec.sivilstand).externalValue,
             eps2G = spec.eps.harInntektOver2G,
@@ -78,6 +77,6 @@ object SimulatorAnonymSimuleringSpecMapper {
             inntektTomAlder = alder(uttak.inntekt?.tomAlder ?: uttak.uttakFomAlder)
         )
     */
-    private fun alder(alder: Alder) =
-        SimulatorAnonymAlderSpec(alder.aar, alder.maaneder)
+    private fun alder(source: Alder) =
+        SimulatorAnonymAlderSpec(source.aar, source.maaneder)
 }

@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
-import no.nav.pensjon.kalkulator.simulering.AnonymSimuleringService
 import no.nav.pensjon.kalkulator.simulering.SimuleringException
 import no.nav.pensjon.kalkulator.simulering.SimuleringService
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("api")
 class SimuleringController(
     private val service: SimuleringService,
-    private val anonymService: AnonymSimuleringService,
     private val feature: FeatureToggleService,
     private val traceAid: TraceAid
 ) : ControllerBase(traceAid) {
@@ -126,7 +124,7 @@ class SimuleringController(
             ResponseEntity.ok(
                 resultatV1(
                     timed(
-                        anonymService::simulerAlderspensjon,
+                        service::simulerAlderspensjon,
                         AnonymSimuleringSpecMapperV1.fromAnonymSimuleringSpecV1(spec),
                         "alderspensjon/anonym-simulering"
                     ).also {
