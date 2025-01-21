@@ -8,7 +8,6 @@ import no.nav.pensjon.kalkulator.person.client.pdl.PdlPersonClient
 import no.nav.pensjon.kalkulator.tech.representasjon.client.pensjon.PensjonRepresentasjonClient
 import no.nav.pensjon.kalkulator.tech.security.egress.azuread.AzureAdOAuth2MetadataClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.client.nom.NomSkjermingClient
-import no.nav.pensjon.kalkulator.tech.security.ingress.ping.IdPortenPingClient
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClient
 import org.springframework.stereotype.Component
 import java.time.LocalTime
@@ -17,7 +16,6 @@ import java.time.LocalTime
 class SelfTest(
     fssGatewayClient: FssGatewayPingClient,
     grunnbeloepClient: PensjonReglerGrunnbeloepClient,
-    idPortenClient: IdPortenPingClient,
     entraIdClient: AzureAdOAuth2MetadataClient,
     opptjeningClient: PoppOpptjeningsgrunnlagClient,
     penClient: PenPingClient,
@@ -30,7 +28,6 @@ class SelfTest(
     private val services: List<Pingable> = listOf(
         fssGatewayClient,
         grunnbeloepClient,
-        idPortenClient,
         entraIdClient,
         opptjeningClient,
         penClient,

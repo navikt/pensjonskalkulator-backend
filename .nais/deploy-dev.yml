@@ -110,14 +110,9 @@ spec:
         - host: pensjonskalkulator-unleash-api.nav.cloud.nais.io
         - host: pensjonssimulator.ekstern.dev.nav.no # only in dev
         - host: skjermede-personer-pip.intern.dev.nav.no
-        - host: test.idporten.no
         - host: tp-api-q2.dev-fss-pub.nais.io
         - host: sokos-utbetaldata.dev-fss-pub.nais.io
   env:
-    - name: IDPORTEN_ISSUER
-      value: https://test.idporten.no
-    - name: IDPORTEN_PING_URL
-      value: https://test.idporten.no/.well-known/openid-configuration
     - name: FSS_GATEWAY_SERVICE_ID
       value: dev-fss:pensjonselvbetjening:pensjon-selvbetjening-fss-gateway
     - name: FSS_GATEWAY_URL
