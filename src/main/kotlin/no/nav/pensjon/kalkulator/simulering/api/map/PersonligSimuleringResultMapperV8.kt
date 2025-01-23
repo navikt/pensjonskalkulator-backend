@@ -16,7 +16,7 @@ object PersonligSimuleringResultMapperV8 {
         PersonligSimuleringResultV8(
             alderspensjon = source.alderspensjon.map(::alderspensjon).let { justerAlderspensjonIInnevaerendeAarV8(it, foedselsdato) },
             alderspensjonMaanedligVedEndring = maanedligPensjon(source.alderspensjonMaanedsbeloep),
-            afpPrivat = source.afpPrivat.map(::privatAfp),
+            afpPrivat = source.afpPrivat.map(::privatAfp).let { justerAfpPrivatIInnevaerendeAarV8(it, foedselsdato) },
             afpOffentlig = source.afpOffentlig.map(::offentligAfp),
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving),
             harForLiteTrygdetid = source.harForLiteTrygdetid,
@@ -56,6 +56,32 @@ object PersonligSimuleringResultMapperV8 {
                 )
                 return oppdatertAlderspensjonList.sortedBy { it.alder }
             } ?: return alderspensjonList
+    }
+
+    /**
+     * Assign a Afp Privat with age 0 to the current age, or remove it from the list if the current age already exists.
+     */
+    fun justerAfpPrivatIInnevaerendeAarV8(
+        afpPrivatList: List<PersonligSimuleringAarligPensjonResultV8>,
+        foedselsdato: LocalDate
+    ): List<PersonligSimuleringAarligPensjonResultV8> {
+        afpPrivatList
+            .firstOrNull { it.alder == 0 }
+            ?.let {
+                val innevaerendeAarAlder = Alder.from(foedselsdato, LocalDate.now()).aar
+                val oppdatertAfpPrivatList = afpPrivatList.filter { it.alder != 0 }.toMutableList()
+
+                if (oppdatertAfpPrivatList.any { it.alder == innevaerendeAarAlder }) {
+                    return oppdatertAfpPrivatList.sortedBy { it.alder }
+                }
+                oppdatertAfpPrivatList.add(
+                    PersonligSimuleringAarligPensjonResultV8(
+                        innevaerendeAarAlder,
+                        it.beloep,
+                    )
+                )
+                return oppdatertAfpPrivatList.sortedBy { it.alder }
+            } ?: return afpPrivatList
     }
 
     private fun maanedligPensjon(source: AlderspensjonMaanedsbeloep?) =
