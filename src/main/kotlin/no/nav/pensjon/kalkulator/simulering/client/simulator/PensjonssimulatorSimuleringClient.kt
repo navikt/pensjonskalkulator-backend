@@ -69,22 +69,24 @@ class PensjonssimulatorSimuleringClient(
         personalSpec: PersonalSimuleringSpec
     ): SimuleringResult {
         val url = "$baseUrl/$SIMULER_ALDERSPENSJON_PERSONLIG_RESOURCE"
-        log.debug { "POST to URL: '$url'" }
+        val spec = SimulatorPersonligSimuleringSpecMapper.toDto(impersonalSpec, personalSpec)
 
         return try {
-            webClient
-                .post()
-                .uri(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .headers(::setHeaders)
-                .bodyValue(SimulatorPersonligSimuleringSpecMapper.toDto(impersonalSpec, personalSpec))
-                .retrieve()
-                .bodyToMono(SimulatorPersonligSimuleringResult::class.java)
-                .retryWhen(retryBackoffSpec(url))
-                .block()
-                ?.let(SimulatorPersonligSimuleringResultMapper::fromDto)
-                ?: emptyResult()
+            val result: SimulatorPersonligSimuleringResult? =
+                webClient
+                    .post()
+                    .uri(url)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .headers(::setHeaders)
+                    .bodyValue(spec)
+                    .retrieve()
+                    .bodyToMono(SimulatorPersonligSimuleringResult::class.java)
+                    .retryWhen(retryBackoffSpec(url))
+                    .block()
+
+            result?.error?.let { log.warn { "Error from simulator - $it - spec $spec" } }
+            result?.let(SimulatorPersonligSimuleringResultMapper::fromDto) ?: emptyResult()
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {

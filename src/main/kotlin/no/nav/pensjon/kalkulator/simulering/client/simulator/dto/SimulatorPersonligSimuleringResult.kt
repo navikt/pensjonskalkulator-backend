@@ -10,7 +10,8 @@ data class SimulatorPersonligSimuleringResult(
     val vilkaarsproeving: SimulatorPersonligVilkaarsproeving?,
     val tilstrekkeligTrygdetidForGarantipensjon: Boolean?,
     val trygdetid: Int?,
-    val opptjeningGrunnlagListe: List<SimulatorPersonligOpptjeningGrunnlag>?
+    val opptjeningGrunnlagListe: List<SimulatorPersonligOpptjeningGrunnlag>?,
+    val error: SimulatorPersonligSimuleringError?
 )
 
 data class SimulatorPersonligPensjon(
@@ -45,6 +46,11 @@ data class SimulatorPersonligVilkaarsproeving(
 data class SimulatorPersonligOpptjeningGrunnlag(
     val aar: Int,
     val pensjonsgivendeInntektBeloep: Int
+)
+
+data class SimulatorPersonligSimuleringError(
+    val exception: String?,
+    val message: String
 )
 
 data class SimulatorPersonligAlternativ(

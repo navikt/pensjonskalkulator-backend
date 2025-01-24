@@ -31,7 +31,8 @@ class SimulatorPersonligSimuleringResultMapperTest {
                 trygdetid = 10,
                 opptjeningGrunnlagListe = listOf(
                     SimulatorPersonligOpptjeningGrunnlag(aar = 2001, pensjonsgivendeInntektBeloep = 123000)
-                )
+                ),
+                error = null
             )
         ) shouldBe SimuleringResult(
             alderspensjon = emptyList(),
@@ -92,7 +93,8 @@ class SimulatorPersonligSimuleringResultMapperTest {
                 trygdetid = 10,
                 opptjeningGrunnlagListe = listOf(
                     SimulatorPersonligOpptjeningGrunnlag(aar = 2001, pensjonsgivendeInntektBeloep = 123000)
-                )
+                ),
+                error = null
             )
         ) shouldBe SimuleringResult(
             alderspensjon = listOf(
