@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering.client.simulator
 
+import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.GradertUttak
 import no.nav.pensjon.kalkulator.general.HeltUttak
@@ -47,13 +48,12 @@ class PensjonssimulatorSimuleringClientTest : WebClientTest() {
     /**
      * NAU = Nærmest Angitt Uttak (alternative simuleringsparametre)
      */
-    /* TODO
     @Test
-    fun `simulerAlderspensjon der responsen har alternativ NAU-beregning`() {
+    fun `simulerPersonligAlderspensjon der responsen har alternativ NAU-beregning`() {
         arrange(alternativPensjonResponse())
 
         val response: SimuleringResult =
-            client.simulerAlderspensjon(impersonalSpec(), personalSpec(Sivilstand.ENKE_ELLER_ENKEMANN))
+            client.simulerPersonligAlderspensjon(impersonalSpec(), personalSpec(Sivilstand.ENKE_ELLER_ENKEMANN))
 
         with(response.alderspensjon) {
             assertEquals(15, size)
@@ -72,17 +72,42 @@ class PensjonssimulatorSimuleringClientTest : WebClientTest() {
     }
 
     @Test
-    fun `simulerAlderspensjon sends request body with gradert uttak when specified`() {
+    fun `simulerPersonligAlderspensjon sends request body with gradert uttak when specified`() {
         arrange(alternativPensjonResponse())
-        client.simulerAlderspensjon(impersonalGradertUttakSpec(), personalSpec(Sivilstand.ENKE_ELLER_ENKEMANN))
+        client.simulerPersonligAlderspensjon(impersonalGradertUttakSpec(), personalSpec(Sivilstand.ENKE_ELLER_ENKEMANN))
         assertGradertUttakRequestBody()
     }
 
     @Test
-    fun `simulerAlderspensjon med Afp offentlig sends request body with correct simuleringType`() {
+    fun `simulerPersonligAlderspensjon med ikke-oppfylte vilkaar returnerer alternativ`() {
+        arrange(vilkaarIkkeOppfyltResponse())
+
+        val result = client.simulerPersonligAlderspensjon(impersonalGradertUttakSpec(), personalSpec(Sivilstand.UGIFT))
+
+        result shouldBe SimuleringResult(
+            alderspensjon = emptyList(),
+            alderspensjonMaanedsbeloep = null,
+            afpPrivat = emptyList(),
+            afpOffentlig = emptyList(),
+            vilkaarsproeving = Vilkaarsproeving(
+                innvilget = false,
+                alternativ = Alternativ(
+                    gradertUttakAlder = null,
+                    uttakGrad = Uttaksgrad.HUNDRE_PROSENT,
+                    heltUttakAlder = Alder(aar = 67, maaneder = 0)
+                )
+            ),
+            harForLiteTrygdetid = false,
+            trygdetid = 0,
+            opptjeningGrunnlagListe = emptyList()
+        )
+    }
+
+    @Test
+    fun `simulerPersonligAlderspensjon med livsvarig offentlig AFP sends request body with correct simuleringstype`() {
         arrange(pensjonMedAfpOffentligResponse())
         val response: SimuleringResult =
-            client.simulerAlderspensjon(impersonalGradertUttakSpec(), personalSpec(Sivilstand.UGIFT))
+            client.simulerPersonligAlderspensjon(impersonalGradertUttakSpec(), personalSpec(Sivilstand.UGIFT))
 
         assertEquals(0, response.afpPrivat.size)
         with(response.afpOffentlig) {
@@ -93,7 +118,7 @@ class PensjonssimulatorSimuleringClientTest : WebClientTest() {
             assertEquals(65000, this[1].beloep)
         }
     }
-*/
+
     private fun assertGradertUttakRequestBody() {
         ByteArrayOutputStream().use {
             takeRequest().body.copyTo(it)
@@ -102,6 +127,25 @@ class PensjonssimulatorSimuleringClientTest : WebClientTest() {
     }
 
     private companion object {
+
+        @Language("json")
+        private const val VILKAAR_IKKE_OPPFYLT_BODY = """{
+    "alderspensjonListe": [],
+    "privatAfpListe": [],
+    "livsvarigOffentligAfpListe": [],
+    "vilkaarsproeving": {
+        "vilkaarErOppfylt": false,
+        "alternativ": {
+            "uttaksgrad": 100,
+            "heltUttakAlder": {
+                "aar": 67,
+                "maaneder": 0
+            }
+        }
+    },
+    "trygdetid": 0,
+    "opptjeningGrunnlagListe": []
+}"""
 
         @Language("json")
         private const val EXPECTED_GRADERT_UTTAK_REQUEST_BODY = """{
@@ -139,88 +183,85 @@ class PensjonssimulatorSimuleringClientTest : WebClientTest() {
   } ]
 }"""
 
-        /**
-         * Actual response from pensjon-pen-q2 2024-03-19
-         */
         @Language("json")
         private const val ALTERNATIV_PENSJON = """{
-    "alderspensjon": [
+    "alderspensjonListe": [
         {
-            "alder": 63,
+            "alderAar": 63,
             "beloep": 13956
         },
         {
-            "alder": 64,
+            "alderAar": 64,
             "beloep": 83736
         },
         {
-            "alder": 65,
+            "alderAar": 65,
             "beloep": 153174
         },
         {
-            "alder": 66,
+            "alderAar": 66,
             "beloep": 222612
         },
         {
-            "alder": 67,
+            "alderAar": 67,
             "beloep": 222612
         },
         {
-            "alder": 68,
+            "alderAar": 68,
             "beloep": 222612
         },
         {
-            "alder": 69,
+            "alderAar": 69,
             "beloep": 222612
         },
         {
-            "alder": 70,
+            "alderAar": 70,
             "beloep": 222612
         },
         {
-            "alder": 71,
+            "alderAar": 71,
             "beloep": 222612
         },
         {
-            "alder": 72,
+            "alderAar": 72,
             "beloep": 222612
         },
         {
-            "alder": 73,
+            "alderAar": 73,
             "beloep": 222612
         },
         {
-            "alder": 74,
+            "alderAar": 74,
             "beloep": 222612
         },
         {
-            "alder": 75,
+            "alderAar": 75,
             "beloep": 222612
         },
         {
-            "alder": 76,
+            "alderAar": 76,
             "beloep": 222612
         },
         {
-            "alder": 77,
+            "alderAar": 77,
             "beloep": 222612
         }
     ],
     "alderspensjonMaanedsbeloep": {
-        "maanedsbeloepVedGradertUttak": 13000,
-        "maanedsbeloepVedHeltUttak": 26000
+        "gradertUttakBeloep": 13000,
+        "heltUttakBeloep": 26000
     },
-    "afpPrivat": [],
-    "afpOffentliglivsvarig": [],
+    "privatAfpListe": [],
+    "livsvarigOffentligAfpListe": [],
     "vilkaarsproeving": {
         "vilkaarErOppfylt": false,
         "alternativ": {
-            "gradertUttaksalder": {
+            "gradertUttakAlder": {
                 "aar": 63,
                 "maaneder": 10
             },
             "uttaksgrad": 40,
-            "heltUttaksalder": {
+            "heltUttakAlder": {
                 "aar": 65,
                 "maaneder": 6
             }
@@ -230,76 +271,76 @@ class PensjonssimulatorSimuleringClientTest : WebClientTest() {
 
         @Language("json")
         private const val PENSJON_MED_AFP_OFFENTLIG = """{
-    "alderspensjon": [
+    "alderspensjonListe": [
         {
-            "alder": 62,
+            "alderAar": 62,
             "beloep": 222612
         },
         {
-            "alder": 63,
+            "alderAar": 63,
             "beloep": 222612
         },
         {
-            "alder": 64,
+            "alderAar": 64,
             "beloep": 222612
         },
         {
-            "alder": 65,
+            "alderAar": 65,
             "beloep": 222612
         },
         {
-            "alder": 66,
+            "alderAar": 66,
             "beloep": 222612
         },
         {
-            "alder": 67,
+            "alderAar": 67,
             "beloep": 222612
         },
         {
-            "alder": 68,
+            "alderAar": 68,
             "beloep": 222612
         },
         {
-            "alder": 69,
+            "alderAar": 69,
             "beloep": 222612
         },
         {
-            "alder": 70,
+            "alderAar": 70,
             "beloep": 222612
         },
         {
-            "alder": 71,
+            "alderAar": 71,
             "beloep": 222612
         },
         {
-            "alder": 72,
+            "alderAar": 72,
             "beloep": 222612
         },
         {
-            "alder": 73,
+            "alderAar": 73,
             "beloep": 222612
         },
         {
-            "alder": 74,
+            "alderAar": 74,
             "beloep": 222612
         },
         {
-            "alder": 75,
+            "alderAar": 75,
             "beloep": 222612
         }
     ],
     "alderspensjonMaanedsbeloep": {
-        "maanedsbeloepVedGradertUttak": 13000,
-        "maanedsbeloepVedHeltUttak": 26000
+        "gradertUttakBeloep": 13000,
+        "heltUttakBeloep": 26000
     },
-    "afpPrivat": [],
-    "afpOffentliglivsvarig": [
+    "privatAfpListe": [],
+    "livsvarigOffentligAfpListe": [
       {
-            "alder": 62,
+            "alderAar": 62,
             "beloep": 55000
         },
         {
-            "alder": 63,
+            "alderAar": 63,
             "beloep": 65000
         }
     ],
@@ -364,6 +405,8 @@ class PensjonssimulatorSimuleringClientTest : WebClientTest() {
                 aarligInntektFoerUttak = 123000,
                 sivilstand = sivilstand
             )
+
+        private fun vilkaarIkkeOppfyltResponse() = jsonResponse(HttpStatus.OK).setBody(VILKAAR_IKKE_OPPFYLT_BODY)
 
         private fun alternativPensjonResponse() = jsonResponse(HttpStatus.OK).setBody(ALTERNATIV_PENSJON)
 

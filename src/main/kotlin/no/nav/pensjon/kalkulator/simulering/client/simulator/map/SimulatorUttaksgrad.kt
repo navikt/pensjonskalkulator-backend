@@ -4,8 +4,6 @@ import no.nav.pensjon.kalkulator.general.Uttaksgrad
 
 /**
  * The 'externalValue' is uttaksgrad values used by pensjonssimulator.
- * The original source of the uttaksgrad values is PEN:
- * https://github.com/navikt/pesys/blob/main/pen/domain/nav-domain-pensjon-pen-api/src/main/java/no/nav/domain/pensjon/kjerne/kodetabeller/UttaksgradCode.java
  */
 enum class SimulatorUttaksgrad(val externalValue: String, val internalValue: Uttaksgrad) {
 

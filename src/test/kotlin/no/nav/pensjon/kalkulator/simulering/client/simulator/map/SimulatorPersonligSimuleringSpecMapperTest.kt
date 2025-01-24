@@ -1,21 +1,22 @@
-package no.nav.pensjon.kalkulator.simulering.client.pen.map
+package no.nav.pensjon.kalkulator.simulering.client.simulator.map
 
 import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.*
-import no.nav.pensjon.kalkulator.simulering.client.pen.dto.*
-import no.nav.pensjon.kalkulator.testutil.Assertions.assertAlder
+import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.SimulatorAlderSpec
+import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.SimulatorSimuleringSpec
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class PenSimuleringSpecMapperTest {
+class SimulatorPersonligSimuleringSpecMapperTest {
 
     @Test
-    fun `toDto maps domain object to PEN-specific data transfer object`() {
-        val dto: SimuleringEgressSpecDto = PenSimuleringSpecMapper.toDto(impersonalSpec(), personalSpec())
+    fun `toDto maps domain object to simulator-specific data transfer object`() {
+        val dto: SimulatorSimuleringSpec =
+            SimulatorPersonligSimuleringSpecMapper.toDto(impersonalSpec(), personalSpec())
 
         with(dto) {
             assertEquals("ALDER", simuleringstype)
@@ -26,14 +27,14 @@ class PenSimuleringSpecMapperTest {
             assertEquals(100_000, sisteInntekt)
             assertEquals(1, uttaksar)
             with(gradertUttak!!) {
-                assertEquals(AlderSpecDto(67, 1), uttakFomAlder)
+                assertEquals(SimulatorAlderSpec(aar = 67, maaneder = 1), uttakFomAlder)
                 assertEquals("P_80", grad)
                 assertEquals(12_000, aarligInntekt)
             }
             with(heltUttak) {
-                assertEquals(AlderSpecDto(68, 11), uttakFomAlder)
+                assertEquals(SimulatorAlderSpec(aar = 68, maaneder = 11), uttakFomAlder)
                 assertEquals(6_000, aarligInntekt)
-                assertEquals(AlderSpecDto(70, 3), inntektTomAlder)
+                assertEquals(SimulatorAlderSpec(aar = 70, maaneder = 3), inntektTomAlder)
             }
         }
     }
@@ -46,14 +47,14 @@ class PenSimuleringSpecMapperTest {
                 eps = Eps(harInntektOver2G = true, harPensjon = false),
                 gradertUttak = GradertUttak(
                     grad = Uttaksgrad.AATTI_PROSENT,
-                    uttakFomAlder = Alder(67, 1),
+                    uttakFomAlder = Alder(aar = 67, maaneder = 1),
                     aarligInntekt = 12_000
                 ),
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(68, 11),
                     inntekt = Inntekt(
                         aarligBeloep = 6_000,
-                        tomAlder = Alder(70, 3)
+                        tomAlder = Alder(aar = 70, maaneder = 3)
                     )
                 ),
                 utenlandsopphold = Utenlandsopphold(

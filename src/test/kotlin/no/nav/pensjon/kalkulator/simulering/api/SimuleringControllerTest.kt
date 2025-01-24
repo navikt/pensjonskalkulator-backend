@@ -39,9 +39,6 @@ class SimuleringControllerTest {
     private lateinit var simuleringService: SimuleringService
 
     @MockitoBean
-    private lateinit var anonymSimuleringService: AnonymSimuleringService
-
-    @MockitoBean
     private lateinit var feature: FeatureToggleService
 
     @MockitoBean

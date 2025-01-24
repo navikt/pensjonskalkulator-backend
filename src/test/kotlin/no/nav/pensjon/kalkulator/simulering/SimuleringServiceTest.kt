@@ -47,7 +47,7 @@ class SimuleringServiceTest {
     @Test
     fun `simulerAlderspensjon uses specified inntekt and sivilstand`() {
         val incomingSpec = impersonalSimuleringSpec(REGISTRERT_INNTEKT, Sivilstand.UOPPGITT)
-        `when`(simuleringClient.simulerAlderspensjon(incomingSpec, personalSpec)).thenReturn(simuleringResult)
+        `when`(simuleringClient.simulerPersonligAlderspensjon(incomingSpec, personalSpec)).thenReturn(simuleringResult)
 
         val response = service.simulerAlderspensjon(incomingSpec)
 
@@ -60,7 +60,7 @@ class SimuleringServiceTest {
         val incomingSpec = impersonalSimuleringSpec(null, null)
         `when`(inntektService.sistePensjonsgivendeInntekt()).thenReturn(inntekt)
         `when`(personClient.fetchPerson(pid, fetchFulltNavn = false)).thenReturn(person())
-        `when`(simuleringClient.simulerAlderspensjon(incomingSpec, personalSpec)).thenReturn(simuleringResult)
+        `when`(simuleringClient.simulerPersonligAlderspensjon(incomingSpec, personalSpec)).thenReturn(simuleringResult)
 
         val response = service.simulerAlderspensjon(incomingSpec)
 
