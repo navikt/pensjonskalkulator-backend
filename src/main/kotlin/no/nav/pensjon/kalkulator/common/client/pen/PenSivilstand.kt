@@ -35,5 +35,8 @@ enum class PenSivilstand(val externalValue: String, val internalValue: Sivilstan
                 Sivilstand.REGISTRERT_PARTNER -> REGISTRERT_PARTNER // ambiguous REGISTRERT_PARTNER/-_LEVER_ADSKILT
                 else -> entries.firstOrNull { it.internalValue == sivilstand } ?: UDEFINERT
             }
+
+        fun fromExternalValue(value: String): PenSivilstand =
+            entries.firstOrNull { it.externalValue == value } ?: UDEFINERT
     }
 }

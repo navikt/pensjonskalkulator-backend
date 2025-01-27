@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.vedtak
 
+import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.vedtak.client.LoependeVedtakClient
@@ -35,7 +36,8 @@ class LoependeVedtakServiceTest {
             LoependeVedtak(
                 alderspensjon = LoependeAlderspensjonDetaljer(
                     grad = 1,
-                    fom = LocalDate.parse("2020-10-01")
+                    fom = LocalDate.parse("2020-10-01"),
+                    sivilstand = PenSivilstand.UGIFT,
                 ),
                 fremtidigLoependeVedtakAp = true,
                 ufoeretrygd = LoependeUfoeretrygdDetaljer(
@@ -54,6 +56,7 @@ class LoependeVedtakServiceTest {
         with(loependeVedtak) {
             assertEquals(1, alderspensjon?.grad)
             assertEquals(LocalDate.parse("2020-10-01"), alderspensjon?.fom)
+            assertEquals(PenSivilstand.UGIFT, alderspensjon?.sivilstand)
             assertTrue(loependeVedtak.fremtidigLoependeVedtakAp)
             assertEquals(2, ufoeretrygd?.grad)
             assertEquals(LocalDate.parse("2021-10-01"), ufoeretrygd?.fom)
