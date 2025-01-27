@@ -39,9 +39,6 @@ class SimuleringControllerTest {
     private lateinit var simuleringService: SimuleringService
 
     @MockitoBean
-    private lateinit var anonymSimuleringService: AnonymSimuleringService
-
-    @MockitoBean
     private lateinit var feature: FeatureToggleService
 
     @MockitoBean
@@ -62,7 +59,7 @@ class SimuleringControllerTest {
     @Test
     fun `simulerer hel alderspensjon V8`() {
         val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON, epsHarInntektOver2G = true)
-        `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
+        `when`(simuleringService.simulerPersonligAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
         enableUtvidetResult()
 
         mvc.perform(
@@ -78,7 +75,7 @@ class SimuleringControllerTest {
     @Test
     fun `simulerer alderspensjon med gradert uttak V8`() {
         val spec = impersonalGradertUttakSpec()
-        `when`(simuleringService.simulerAlderspensjon(spec))
+        `when`(simuleringService.simulerPersonligAlderspensjon(spec))
             .thenReturn(simuleringsresultat(spec.simuleringType, heltUttak = false))
         enableUtvidetResult()
 
@@ -95,7 +92,7 @@ class SimuleringControllerTest {
     @Test
     fun `simulerer alderspensjon med privat AFP V8`() {
         val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT, epsHarInntektOver2G = true)
-        `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
+        `when`(simuleringService.simulerPersonligAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
         enableUtvidetResult()
 
         mvc.perform(
@@ -114,7 +111,7 @@ class SimuleringControllerTest {
             SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG,
             epsHarInntektOver2G = true
         )
-        `when`(simuleringService.simulerAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
+        `when`(simuleringService.simulerPersonligAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
         enableUtvidetResult()
 
         mvc.perform(
@@ -130,7 +127,7 @@ class SimuleringControllerTest {
     @Test
     fun `simulering responds 'vilkaar ikke oppfylt' when Conflict V8`() {
         val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT, epsHarInntektOver2G = true)
-        `when`(simuleringService.simulerAlderspensjon(spec)).thenThrow(conflict())
+        `when`(simuleringService.simulerPersonligAlderspensjon(spec)).thenThrow(conflict())
         enableUtvidetResult()
 
         mvc.perform(
@@ -146,7 +143,7 @@ class SimuleringControllerTest {
     @Test
     fun `simulerer endring av alderspensjon V8`() {
         val spec = impersonalGradertUttakSpec(SimuleringType.ENDRING_ALDERSPENSJON)
-        `when`(simuleringService.simulerAlderspensjon(spec))
+        `when`(simuleringService.simulerPersonligAlderspensjon(spec))
             .thenReturn(simuleringsresultat(spec.simuleringType, heltUttak = false))
         enableUtvidetResult()
 
@@ -163,7 +160,7 @@ class SimuleringControllerTest {
     @Test
     fun `simulerer endring av alderspensjon med privat AFP V8`() {
         val spec = impersonalGradertUttakSpec(SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT)
-        `when`(simuleringService.simulerAlderspensjon(spec))
+        `when`(simuleringService.simulerPersonligAlderspensjon(spec))
             .thenReturn(simuleringsresultat(spec.simuleringType, heltUttak = false))
         enableUtvidetResult()
 
@@ -180,7 +177,7 @@ class SimuleringControllerTest {
     @Test
     fun `simulerer endring av alderspensjon med offentlig livsvarig AFP V8`() {
         val spec = impersonalGradertUttakSpec(SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG)
-        `when`(simuleringService.simulerAlderspensjon(spec))
+        `when`(simuleringService.simulerPersonligAlderspensjon(spec))
             .thenReturn(simuleringsresultat(spec.simuleringType, heltUttak = false))
         enableUtvidetResult()
 
