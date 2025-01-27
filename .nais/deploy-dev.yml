@@ -108,7 +108,6 @@ spec:
         - host: pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
         - host: pensjon-testdata-facade.dev-fss-pub.nais.io # only in dev
         - host: pensjonskalkulator-unleash-api.nav.cloud.nais.io
-        - host: pensjonssimulator.ekstern.dev.nav.no # only in dev
         - host: skjermede-personer-pip.intern.dev.nav.no
         - host: tp-api-q2.dev-fss-pub.nais.io
         - host: sokos-utbetaldata.dev-fss-pub.nais.io

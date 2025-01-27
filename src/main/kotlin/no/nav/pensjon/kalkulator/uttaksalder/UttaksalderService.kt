@@ -41,7 +41,7 @@ class UttaksalderService(
         val gunstigstSimuleringSpec =
             lavesteUttaksalderService.lavesteUttaksalderSimuleringSpec(impersonalSpec, personalSpec, harEps)
 
-        val result = simuleringService.simulerAlderspensjon(gunstigstSimuleringSpec)
+        val result = simuleringService.simulerPersonligAlderspensjon(gunstigstSimuleringSpec)
 
         // TMU er enten:
         // - Den lavest mulige fremtidige alder for helt uttak (hvis vilkårsprøvingen av denne gir OK), eller

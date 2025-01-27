@@ -19,7 +19,10 @@ class SimuleringService(
 ) {
     private val log = KotlinLogging.logger {}
 
-    fun simulerAlderspensjon(impersonalSpec: ImpersonalSimuleringSpec): SimuleringResult {
+    fun simulerAnonymAlderspensjon(spec: ImpersonalSimuleringSpec): SimuleringResult =
+        simuleringClient.simulerAnonymAlderspensjon(spec)
+
+    fun simulerPersonligAlderspensjon(impersonalSpec: ImpersonalSimuleringSpec): SimuleringResult {
         val pid = pidGetter.pid()
 
         val personalSpec = PersonalSimuleringSpec(
@@ -31,7 +34,7 @@ class SimuleringService(
 
         log.debug { "Simulerer med parametre $impersonalSpec og $personalSpec" }
         checkAlder(pid.dato()) // NB: eksakt alder kan ikke alltid utledes fra fødselsnummer
-        return simuleringClient.simulerAlderspensjon(impersonalSpec, personalSpec)
+        return simuleringClient.simulerPersonligAlderspensjon(impersonalSpec, personalSpec)
     }
 
     private fun sivilstand(pid: Pid) =
