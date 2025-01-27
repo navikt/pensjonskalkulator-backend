@@ -154,7 +154,7 @@ internal class UttaksalderServiceTest {
 
         service.finnTidligsteUttaksalder(impersonalSpec)
 
-        verify(simuleringService, times(1)).simulerAlderspensjon(simuleringSpec)
+        verify(simuleringService, times(1)).simulerPersonligAlderspensjon(simuleringSpec)
     }
 
     private fun arrangeLavesteUttaksalder(
@@ -202,7 +202,7 @@ internal class UttaksalderServiceTest {
 
         service.finnTidligsteUttaksalder(impersonalSpec)
 
-        verify(simuleringService, times(1)).simulerAlderspensjon(simuleringSpec)
+        verify(simuleringService, times(1)).simulerPersonligAlderspensjon(simuleringSpec)
     }
 
     @Test
@@ -236,7 +236,7 @@ internal class UttaksalderServiceTest {
 
         service.finnTidligsteUttaksalder(impersonalSpec)
 
-        verify(simuleringService, times(1)).simulerAlderspensjon(simuleringSpec)
+        verify(simuleringService, times(1)).simulerPersonligAlderspensjon(simuleringSpec)
     }
 
     private fun arrangeSimulering(
@@ -248,7 +248,7 @@ internal class UttaksalderServiceTest {
         val simuleringSpec = simuleringSpec(uttaksalderSpec, epsHarInntektOver2G, person, angittInntekt)
 
         `when`(
-            simuleringService.simulerAlderspensjon(simuleringSpec)
+            simuleringService.simulerPersonligAlderspensjon(simuleringSpec)
         ).thenReturn(
             SimuleringResult(
                 alderspensjon = emptyList(),

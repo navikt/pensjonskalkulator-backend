@@ -65,7 +65,7 @@ class SimuleringController(
             if (feature.isEnabled("utvidet-simuleringsresultat"))
                 extendedResultV8(
                     timed(
-                        function = service::simulerAlderspensjon,
+                        function = service::simulerPersonligAlderspensjon,
                         argument = fromSpecV8(spec),
                         functionName = "alderspensjon/simulering"
                     ),
@@ -77,7 +77,7 @@ class SimuleringController(
             else
                 resultV8(
                     timed(
-                        function = service::simulerAlderspensjon,
+                        function = service::simulerPersonligAlderspensjon,
                         argument = fromSpecV8(spec),
                         functionName = "alderspensjon/simulering"
                     ),
@@ -124,7 +124,7 @@ class SimuleringController(
             ResponseEntity.ok(
                 resultatV1(
                     timed(
-                        service::simulerAlderspensjon,
+                        service::simulerAnonymAlderspensjon,
                         AnonymSimuleringSpecMapperV1.fromAnonymSimuleringSpecV1(spec),
                         "alderspensjon/anonym-simulering"
                     ).also {

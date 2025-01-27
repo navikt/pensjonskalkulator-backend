@@ -19,7 +19,10 @@ class SimuleringService(
 ) {
     private val log = KotlinLogging.logger {}
 
-    fun simulerAlderspensjon(impersonalSpec: ImpersonalSimuleringSpec): SimuleringResult {
+    fun simulerAnonymAlderspensjon(spec: ImpersonalSimuleringSpec): SimuleringResult =
+        simuleringClient.simulerAnonymAlderspensjon(spec)
+
+    fun simulerPersonligAlderspensjon(impersonalSpec: ImpersonalSimuleringSpec): SimuleringResult {
         val pid = pidGetter.pid()
 
         val personalSpec = PersonalSimuleringSpec(
