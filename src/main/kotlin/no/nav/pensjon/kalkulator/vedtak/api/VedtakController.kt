@@ -13,8 +13,10 @@ import no.nav.pensjon.kalkulator.vedtak.LoependeVedtakService
 import no.nav.pensjon.kalkulator.vedtak.VedtakMedUtbetalingService
 import no.nav.pensjon.kalkulator.vedtak.api.dto.LoependeVedtakV1
 import no.nav.pensjon.kalkulator.vedtak.api.dto.LoependeVedtakV2
+import no.nav.pensjon.kalkulator.vedtak.api.dto.LoependeVedtakV3
 import no.nav.pensjon.kalkulator.vedtak.api.map.LoependeVedtakMapperV1
 import no.nav.pensjon.kalkulator.vedtak.api.map.LoependeVedtakMapperV2
+import no.nav.pensjon.kalkulator.vedtak.api.map.LoependeVedtakMapperV3
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -88,6 +90,38 @@ class VedtakController(
                 .also { log.debug { "Hent løpende vedtak V2 respons $version" } }
         } catch (e: EgressException) {
             handleError(e, "V2")!!
+        } finally {
+            traceAid.end()
+        }
+    }
+
+    @GetMapping("/v3/vedtak/loepende-vedtak")
+    @Operation(
+        summary = "Har løpende vedtak",
+        description = "Hvorvidt den innloggede brukeren har løpende uføretrygd med uttaksgrad, alderspensjon med uttaksgrad, AFP i privat eller offentlig sektor"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Henting av løpende vedtak utført"
+            ),
+            ApiResponse(
+                responseCode = "503", description = "Henting av løpende vedtak kunne ikke utføres av tekniske årsaker",
+                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
+            ),
+        ]
+    )
+    suspend fun hentLoependeVedtakV3(): LoependeVedtakV3 {
+        traceAid.begin()
+        val version = "V3"
+        log.debug { "Request for hent løpende vedtak $version" }
+
+        return try {
+            LoependeVedtakMapperV3.toDto(timed(service::hentVedtakMedUtbetaling, "hentLoependeVedtakV2"))
+                .also { log.debug { "Hent løpende vedtak respons $version" } }
+        } catch (e: EgressException) {
+            handleError(e, version)!!
         } finally {
             traceAid.end()
         }

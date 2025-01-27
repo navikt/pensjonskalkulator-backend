@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.vedtak
 
 import kotlinx.coroutines.test.runTest
+import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.omstillingsstoenad.OmstillingOgGjenlevendeYtelseServiceTest.Companion.now
 import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.TimeProvider
@@ -49,7 +50,8 @@ class VedtakMedUtbetalingServiceTest {
             LoependeVedtak(
                 alderspensjon = LoependeAlderspensjonDetaljer(
                     grad = 1,
-                    fom = AP_START_DATO
+                    fom = AP_START_DATO,
+                    sivilstand = PenSivilstand.GIFT
                 ),
                 fremtidigLoependeVedtakAp = true,
                 ufoeretrygd = LoependeUfoeretrygdDetaljer(
@@ -72,6 +74,7 @@ class VedtakMedUtbetalingServiceTest {
         assertNotNull(vedtak)
         assertEquals(1, vedtak.alderspensjon?.grad)
         assertEquals(AP_START_DATO, vedtak.alderspensjon?.fom)
+        assertEquals(PenSivilstand.GIFT, vedtak.alderspensjon?.sivilstand)
         assertTrue(vedtak.fremtidigLoependeVedtakAp)
         assertNotNull(vedtak.alderspensjon?.utbetalingSisteMaaned)
         assertEquals(SISTE_AP_UTBETALING_DATO, vedtak.alderspensjon?.utbetalingSisteMaaned?.posteringsdato)

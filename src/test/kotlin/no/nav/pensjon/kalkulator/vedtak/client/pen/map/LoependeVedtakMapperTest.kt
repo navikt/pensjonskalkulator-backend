@@ -2,7 +2,8 @@ package no.nav.pensjon.kalkulator.vedtak.client.pen.map
 
 import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenGjeldendeVedtakDto
 import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenLoependeVedtakDto
-import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenGjeldendeVedtakMedGradDto
+import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenGjeldendeUfoeregradDto
+import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenGjeldendeVedtakApDto
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -13,9 +14,9 @@ class LoependeVedtakMapperTest {
     @Test
     fun `Map from PEN og ignorer gammel afpOffentlig`() {
         val dto = PenLoependeVedtakDto(
-            alderspensjon = PenGjeldendeVedtakMedGradDto(1, LocalDate.of(2021, 1, 1)),
+            alderspensjon = PenGjeldendeVedtakApDto(1, LocalDate.of(2021, 1, 1), sivilstand = "UGIF"),
             fremtidigLoependeVedtakAp = true,
-            ufoeretrygd = PenGjeldendeVedtakMedGradDto(2, LocalDate.of(2021, 1, 1)),
+            ufoeretrygd = PenGjeldendeUfoeregradDto(2, LocalDate.of(2021, 1, 1)),
             afpPrivat = PenGjeldendeVedtakDto(LocalDate.of(2021, 1, 1)),
             afpOffentlig = PenGjeldendeVedtakDto(LocalDate.of(2021, 1, 1)),
         )
@@ -24,6 +25,7 @@ class LoependeVedtakMapperTest {
 
         assertEquals(1, result.alderspensjon?.grad)
         assertEquals(LocalDate.of(2021, 1, 1), result.alderspensjon?.fom)
+        assertEquals("UGIFT", result.alderspensjon?.sivilstand?.name)
         assertTrue(result.fremtidigLoependeVedtakAp)
         assertEquals(2, result.ufoeretrygd?.grad)
         assertEquals(LocalDate.of(2021, 1, 1), result.ufoeretrygd?.fom)
