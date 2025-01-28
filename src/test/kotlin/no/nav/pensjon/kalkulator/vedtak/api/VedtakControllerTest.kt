@@ -1,9 +1,8 @@
 package no.nav.pensjon.kalkulator.vedtak.api
 
 import kotlinx.coroutines.test.runTest
-import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
-import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
+import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
@@ -60,7 +59,7 @@ class VedtakControllerTest {
                 alderspensjon = LoependeAlderspensjonDetaljer(
                     grad = 1,
                     fom = LocalDate.parse("2020-12-01"),
-                    sivilstand = PenSivilstand.GIFT
+                    sivilstand = Sivilstand.GIFT
                 ),
                 fremtidigLoependeVedtakAp = true,
                 ufoeretrygd = LoependeUfoeretrygdDetaljer(
@@ -107,7 +106,7 @@ class VedtakControllerTest {
                 alderspensjon = LoependeAlderspensjonDetaljer(
                     grad = 1,
                     fom = LocalDate.parse("2020-12-01"),
-                    sivilstand = PenSivilstand.GIFT
+                    sivilstand = Sivilstand.GIFT
                 ),
                 fremtidigLoependeVedtakAp = true,
                 ufoeretrygd = LoependeUfoeretrygdDetaljer(
@@ -154,7 +153,7 @@ class VedtakControllerTest {
                 alderspensjon = LoependeAlderspensjonDetaljer(
                     grad = 1,
                     fom = LocalDate.parse("2020-12-01"),
-                    sivilstand = PenSivilstand.GIFT
+                    sivilstand = Sivilstand.GIFT
                 ),
                 fremtidigLoependeVedtakAp = true,
                 ufoeretrygd = LoependeUfoeretrygdDetaljer(

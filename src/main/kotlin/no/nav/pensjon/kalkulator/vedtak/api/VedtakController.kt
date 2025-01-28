@@ -118,7 +118,7 @@ class VedtakController(
         log.debug { "Request for hent løpende vedtak $version" }
 
         return try {
-            LoependeVedtakMapperV3.toDto(timed(service::hentVedtakMedUtbetaling, "hentLoependeVedtakV2"))
+            LoependeVedtakMapperV3.toDto(timed(service::hentVedtakMedUtbetaling, "hentLoependeVedtakV3"))
                 .also { log.debug { "Hent løpende vedtak respons $version" } }
         } catch (e: EgressException) {
             handleError(e, version)!!

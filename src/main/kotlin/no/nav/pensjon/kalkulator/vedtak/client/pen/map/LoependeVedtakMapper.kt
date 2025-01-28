@@ -30,7 +30,7 @@ object LoependeVedtakMapper {
             LoependeAlderspensjonDetaljer(
                 grad = it.grad,
                 fom = it.fraOgMed,
-                sivilstand = PenSivilstand.fromExternalValue(it.sivilstand)
+                sivilstand = PenSivilstand.toInternalValue(it.sivilstand)
             )
         }
 

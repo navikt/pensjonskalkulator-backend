@@ -1,9 +1,9 @@
 package no.nav.pensjon.kalkulator.vedtak.client.pen
 
-import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
+import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.intellij.lang.annotations.Language
@@ -43,7 +43,7 @@ class PenLoependeVedtakClientTest : WebClientTest() {
         with(response) {
             assertEquals(100, alderspensjon?.grad)
             assertEquals("2025-10-01", alderspensjon?.fom.toString())
-            assertEquals(PenSivilstand.UGIFT, alderspensjon?.sivilstand)
+            assertEquals(Sivilstand.UGIFT, alderspensjon?.sivilstand)
             assertEquals(null, ufoeretrygd)
             assertEquals(null, afpPrivat)
             assertEquals(null, afpOffentlig)
@@ -70,7 +70,7 @@ class PenLoependeVedtakClientTest : WebClientTest() {
         with(response) {
             assertEquals(100, alderspensjon?.grad)
             assertEquals("2025-10-01", alderspensjon?.fom.toString())
-            assertEquals(PenSivilstand.GIFT, alderspensjon?.sivilstand)
+            assertEquals(Sivilstand.GIFT, alderspensjon?.sivilstand)
             assertEquals(100, ufoeretrygd?.grad)
             assertEquals("2022-07-01", ufoeretrygd?.fom.toString())
             assertEquals(null, afpPrivat)
@@ -85,7 +85,7 @@ class PenLoependeVedtakClientTest : WebClientTest() {
         with(response) {
             assertEquals(100, alderspensjon?.grad)
             assertEquals("2025-10-01", alderspensjon?.fom.toString())
-            assertEquals(PenSivilstand.SKILT, alderspensjon?.sivilstand)
+            assertEquals(Sivilstand.SKILT, alderspensjon?.sivilstand)
             assertEquals(100, ufoeretrygd?.grad)
             assertEquals("2022-07-01", ufoeretrygd?.fom.toString())
             assertEquals("2022-07-01", afpPrivat?.fom.toString())
@@ -100,7 +100,7 @@ class PenLoependeVedtakClientTest : WebClientTest() {
         with(response) {
             assertEquals(100, alderspensjon?.grad)
             assertEquals("2025-10-01", alderspensjon?.fom.toString())
-            assertEquals(PenSivilstand.ENKE_ELLER_ENKEMANN, alderspensjon?.sivilstand)
+            assertEquals(Sivilstand.ENKE_ELLER_ENKEMANN, alderspensjon?.sivilstand)
             assertEquals(100, ufoeretrygd?.grad)
             assertEquals("2022-07-01", ufoeretrygd?.fom.toString())
             assertEquals("2022-07-01", afpPrivat?.fom.toString())
