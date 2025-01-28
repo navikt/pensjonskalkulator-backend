@@ -27,7 +27,7 @@ object LoependeVedtakMapperV3 {
                     utbetalingsdato = it.posteringsdato,
                 )
             },
-            sivilstand = SivilstandV3.valueOf(alderspensjon.sivilstand.name)
+            sivilstand = SivilstandV3.fromInternalValue(alderspensjon.sivilstand)
         )
     }
 

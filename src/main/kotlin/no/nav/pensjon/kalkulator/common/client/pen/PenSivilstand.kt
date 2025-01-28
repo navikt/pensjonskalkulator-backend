@@ -36,7 +36,7 @@ enum class PenSivilstand(val externalValue: String, val internalValue: Sivilstan
                 else -> entries.firstOrNull { it.internalValue == sivilstand } ?: UDEFINERT
             }
 
-        fun fromExternalValue(value: String): PenSivilstand =
-            entries.firstOrNull { it.externalValue == value } ?: UDEFINERT
+        fun toInternalValue(value: String): Sivilstand =
+            entries.firstOrNull { it.externalValue == value }?.internalValue ?: Sivilstand.UOPPGITT
     }
 }

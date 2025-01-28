@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.vedtak
 
-import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstand
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -26,7 +26,7 @@ data class LoependeAlderspensjonDetaljer(
     val grad: Int,
     val fom: LocalDate,
     var utbetalingSisteMaaned: UtbetalingSisteMaaned? = null,
-    val sivilstand: PenSivilstand,
+    val sivilstand: Sivilstand,
 )
 
 data class UtbetalingSisteMaaned(
