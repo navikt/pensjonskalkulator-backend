@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.vedtak.api.map
 
+import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.vedtak.LoependeAlderspensjonDetaljer
 import no.nav.pensjon.kalkulator.vedtak.LoependeUfoeretrygdDetaljer
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtak
@@ -15,7 +16,8 @@ class LoependeVedtakMapperV2Test {
         val vedtak = LoependeVedtak(
             alderspensjon = LoependeAlderspensjonDetaljer(
                 grad = 100,
-                fom = LocalDate.parse("2020-10-01")
+                fom = LocalDate.parse("2020-10-01"),
+                sivilstand = Sivilstand.GIFT
             ),
             fremtidigLoependeVedtakAp = true,
             ufoeretrygd = LoependeUfoeretrygdDetaljer(

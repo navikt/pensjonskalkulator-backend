@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.vedtak.client.pen
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
+import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.intellij.lang.annotations.Language
@@ -42,6 +43,7 @@ class PenLoependeVedtakClientTest : WebClientTest() {
         with(response) {
             assertEquals(100, alderspensjon?.grad)
             assertEquals("2025-10-01", alderspensjon?.fom.toString())
+            assertEquals(Sivilstand.UGIFT, alderspensjon?.sivilstand)
             assertEquals(null, ufoeretrygd)
             assertEquals(null, afpPrivat)
             assertEquals(null, afpOffentlig)
@@ -68,6 +70,7 @@ class PenLoependeVedtakClientTest : WebClientTest() {
         with(response) {
             assertEquals(100, alderspensjon?.grad)
             assertEquals("2025-10-01", alderspensjon?.fom.toString())
+            assertEquals(Sivilstand.GIFT, alderspensjon?.sivilstand)
             assertEquals(100, ufoeretrygd?.grad)
             assertEquals("2022-07-01", ufoeretrygd?.fom.toString())
             assertEquals(null, afpPrivat)
@@ -82,6 +85,7 @@ class PenLoependeVedtakClientTest : WebClientTest() {
         with(response) {
             assertEquals(100, alderspensjon?.grad)
             assertEquals("2025-10-01", alderspensjon?.fom.toString())
+            assertEquals(Sivilstand.SKILT, alderspensjon?.sivilstand)
             assertEquals(100, ufoeretrygd?.grad)
             assertEquals("2022-07-01", ufoeretrygd?.fom.toString())
             assertEquals("2022-07-01", afpPrivat?.fom.toString())
@@ -96,6 +100,7 @@ class PenLoependeVedtakClientTest : WebClientTest() {
         with(response) {
             assertEquals(100, alderspensjon?.grad)
             assertEquals("2025-10-01", alderspensjon?.fom.toString())
+            assertEquals(Sivilstand.ENKE_ELLER_ENKEMANN, alderspensjon?.sivilstand)
             assertEquals(100, ufoeretrygd?.grad)
             assertEquals("2022-07-01", ufoeretrygd?.fom.toString())
             assertEquals("2022-07-01", afpPrivat?.fom.toString())
@@ -144,7 +149,7 @@ class PenLoependeVedtakClientTest : WebClientTest() {
     private companion object {
         @Language("json")
         private const val VEDTAK_AP = """
-{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01"},"ufoeretrygd":null,"afpPrivat":null,"afp":null}
+{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"UGIF"},"ufoeretrygd":null,"afpPrivat":null,"afp":null}
 """
         @Language("json")
         private const val VEDTAK_UFORE = """
@@ -152,15 +157,15 @@ class PenLoependeVedtakClientTest : WebClientTest() {
 """
         @Language("json")
         private const val VEDTAK_AP_OG_UFORE = """
-{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01"},"ufoeretrygd":{"grad":100,"fraOgMed":"2022-07-01"},"afpPrivat":null,"afp":null}
+{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"GIFT"},"ufoeretrygd":{"grad":100,"fraOgMed":"2022-07-01"},"afpPrivat":null,"afp":null}
 """
         @Language("json")
         private const val VEDTAK_AP_OG_UFORE_OG_AFPPRIVAT = """
-{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01"},"ufoeretrygd":{"grad":100,"fraOgMed":"2022-07-01"},"afpPrivat":{"grad":100,"fraOgMed":"2022-07-01"},"afp":null}
+{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"SKIL"},"ufoeretrygd":{"grad":100,"fraOgMed":"2022-07-01"},"afpPrivat":{"grad":100,"fraOgMed":"2022-07-01"},"afp":null}
 """
         @Language("json")
         private const val VEDTAK_AP_OG_UFORE_OG_AFPPRIVAT_OG_AFP = """
-{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01"},"ufoeretrygd":{"grad":100,"fraOgMed":"2022-07-01"},"afpPrivat":{"grad":100,"fraOgMed":"2022-07-01"},"afp":{"grad":100,"fraOgMed":"2022-07-01"}}
+{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"ENKE"},"ufoeretrygd":{"grad":100,"fraOgMed":"2022-07-01"},"afpPrivat":{"grad":100,"fraOgMed":"2022-07-01"},"afp":{"grad":100,"fraOgMed":"2022-07-01"}}
 """
         @Language("json")
         private const val VEDTAK_INGEN = """

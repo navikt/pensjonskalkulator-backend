@@ -1,12 +1,14 @@
 package no.nav.pensjon.kalkulator.vedtak.client.pen.map
 
+import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
 import no.nav.pensjon.kalkulator.vedtak.LoependeAlderspensjonDetaljer
 import no.nav.pensjon.kalkulator.vedtak.LoependeUfoeretrygdDetaljer
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtak
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtakDetaljer
 import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenGjeldendeVedtakDto
 import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenLoependeVedtakDto
-import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenGjeldendeVedtakMedGradDto
+import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenGjeldendeUfoeregradDto
+import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenGjeldendeVedtakApDto
 
 object LoependeVedtakMapper {
 
@@ -23,7 +25,15 @@ object LoependeVedtakMapper {
 
     private fun fromDto(dto: PenGjeldendeVedtakDto?) = dto?.let { LoependeVedtakDetaljer(it.fraOgMed) }
 
-    private fun fromAlderspensjonDto(dto: PenGjeldendeVedtakMedGradDto?) = dto?.let { LoependeAlderspensjonDetaljer(it.grad, it.fraOgMed) }
+    private fun fromAlderspensjonDto(dto: PenGjeldendeVedtakApDto?) = dto
+        ?.let {
+            LoependeAlderspensjonDetaljer(
+                grad = it.grad,
+                fom = it.fraOgMed,
+                sivilstand = PenSivilstand.toInternalValue(it.sivilstand)
+            )
+        }
 
-    private fun fromUfoeretrygdDto(dto: PenGjeldendeVedtakMedGradDto?) = dto?.let { LoependeUfoeretrygdDetaljer(it.grad, it.fraOgMed) }
+    private fun fromUfoeretrygdDto(dto: PenGjeldendeUfoeregradDto?) =
+        dto?.let { LoependeUfoeretrygdDetaljer(it.grad, it.fraOgMed) }
 }
