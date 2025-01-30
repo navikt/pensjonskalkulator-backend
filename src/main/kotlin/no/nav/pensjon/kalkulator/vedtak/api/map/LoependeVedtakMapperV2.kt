@@ -11,7 +11,7 @@ object LoependeVedtakMapperV2 {
 
     fun toDto(vedtak: LoependeVedtak) = LoependeVedtakV2(
         alderspensjon = toAlderspensjonDetaljerV2Dto(vedtak.alderspensjon),
-        harFremtidigLoependeVedtak = vedtak.fremtidigLoependeVedtakAp,
+        harFremtidigLoependeVedtak = vedtak.fremtidigLoependeVedtakAp != null,
         ufoeretrygd = toUfoeretrygdDetaljerV2Dto(vedtak.ufoeretrygd),
         afpPrivat = toLoependeFraV2Dto(vedtak.afpPrivat),
         afpOffentlig = toLoependeFraV2Dto(vedtak.afpOffentlig),

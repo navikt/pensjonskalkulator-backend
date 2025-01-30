@@ -14,9 +14,11 @@ import no.nav.pensjon.kalkulator.vedtak.VedtakMedUtbetalingService
 import no.nav.pensjon.kalkulator.vedtak.api.dto.LoependeVedtakV1
 import no.nav.pensjon.kalkulator.vedtak.api.dto.LoependeVedtakV2
 import no.nav.pensjon.kalkulator.vedtak.api.dto.LoependeVedtakV3
+import no.nav.pensjon.kalkulator.vedtak.api.dto.LoependeVedtakV4
 import no.nav.pensjon.kalkulator.vedtak.api.map.LoependeVedtakMapperV1
 import no.nav.pensjon.kalkulator.vedtak.api.map.LoependeVedtakMapperV2
 import no.nav.pensjon.kalkulator.vedtak.api.map.LoependeVedtakMapperV3
+import no.nav.pensjon.kalkulator.vedtak.api.map.LoependeVedtakMapperV4
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -119,6 +121,38 @@ class VedtakController(
 
         return try {
             LoependeVedtakMapperV3.toDto(timed(service::hentVedtakMedUtbetaling, "hentLoependeVedtakV3"))
+                .also { log.debug { "Hent løpende vedtak respons $version" } }
+        } catch (e: EgressException) {
+            handleError(e, version)!!
+        } finally {
+            traceAid.end()
+        }
+    }
+
+    @GetMapping("/v4/vedtak/loepende-vedtak")
+    @Operation(
+        summary = "Har løpende vedtak",
+        description = "Hvorvidt den innloggede brukeren har løpende uføretrygd med uttaksgrad, alderspensjon med uttaksgrad, AFP i privat eller offentlig sektor"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Henting av løpende vedtak utført"
+            ),
+            ApiResponse(
+                responseCode = "503", description = "Henting av løpende vedtak kunne ikke utføres av tekniske årsaker",
+                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
+            ),
+        ]
+    )
+    suspend fun hentLoependeVedtakV4(): LoependeVedtakV4 {
+        traceAid.begin()
+        val version = "V4"
+        log.debug { "Request for hent løpende vedtak $version" }
+
+        return try {
+            LoependeVedtakMapperV4.toDto(timed(service::hentVedtakMedUtbetaling, "hentLoependeVedtak$version"))
                 .also { log.debug { "Hent løpende vedtak respons $version" } }
         } catch (e: EgressException) {
             handleError(e, version)!!

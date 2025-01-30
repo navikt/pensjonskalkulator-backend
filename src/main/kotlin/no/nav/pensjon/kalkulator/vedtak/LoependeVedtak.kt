@@ -6,7 +6,7 @@ import java.time.LocalDate
 
 data class LoependeVedtak(
     val alderspensjon: LoependeAlderspensjonDetaljer?,
-    val fremtidigLoependeVedtakAp: Boolean,
+    val fremtidigLoependeVedtakAp: FremtidigAlderspensjonDetaljer?,
     val ufoeretrygd: LoependeUfoeretrygdDetaljer?,
     val afpPrivat: LoependeVedtakDetaljer?,
     val afpOffentlig: LoependeVedtakDetaljer?,
@@ -32,4 +32,10 @@ data class LoependeAlderspensjonDetaljer(
 data class UtbetalingSisteMaaned(
     val beloep: BigDecimal?,
     val posteringsdato: LocalDate,
+)
+
+data class FremtidigAlderspensjonDetaljer(
+    val grad: Int,
+    val fom: LocalDate,
+    val sivilstand: Sivilstand,
 )

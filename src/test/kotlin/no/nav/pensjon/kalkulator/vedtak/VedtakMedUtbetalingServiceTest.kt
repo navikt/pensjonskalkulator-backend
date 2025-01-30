@@ -53,7 +53,11 @@ class VedtakMedUtbetalingServiceTest {
                     fom = AP_START_DATO,
                     sivilstand = Sivilstand.GIFT
                 ),
-                fremtidigLoependeVedtakAp = true,
+                fremtidigLoependeVedtakAp = FremtidigAlderspensjonDetaljer(
+                    grad = 1,
+                    fom = AP_START_DATO.plusMonths(6),
+                    sivilstand = Sivilstand.SEPARERT
+                ),
                 ufoeretrygd = LoependeUfoeretrygdDetaljer(
                     grad = 2,
                     fom = UFOERETRYGD_START_DATO
@@ -75,7 +79,10 @@ class VedtakMedUtbetalingServiceTest {
         assertEquals(1, vedtak.alderspensjon?.grad)
         assertEquals(AP_START_DATO, vedtak.alderspensjon?.fom)
         assertEquals(Sivilstand.GIFT, vedtak.alderspensjon?.sivilstand)
-        assertTrue(vedtak.fremtidigLoependeVedtakAp)
+        assertNotNull(vedtak.fremtidigLoependeVedtakAp)
+        assertEquals(1, vedtak.fremtidigLoependeVedtakAp?.grad)
+        assertEquals(AP_START_DATO.plusMonths(6), vedtak.fremtidigLoependeVedtakAp?.fom)
+        assertEquals(Sivilstand.SEPARERT, vedtak.fremtidigLoependeVedtakAp?.sivilstand)
         assertNotNull(vedtak.alderspensjon?.utbetalingSisteMaaned)
         assertEquals(SISTE_AP_UTBETALING_DATO, vedtak.alderspensjon?.utbetalingSisteMaaned?.posteringsdato)
         assertEquals(BigDecimal.TEN, vedtak.alderspensjon?.utbetalingSisteMaaned?.beloep)

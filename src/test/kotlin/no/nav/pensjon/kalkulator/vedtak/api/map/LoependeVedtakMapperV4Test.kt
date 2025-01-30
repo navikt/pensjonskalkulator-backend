@@ -2,11 +2,12 @@ package no.nav.pensjon.kalkulator.vedtak.api.map
 
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.vedtak.*
+import no.nav.pensjon.kalkulator.vedtak.api.dto.LoependeVedtakV4
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class LoependeVedtakMapperV2Test {
+class LoependeVedtakMapperV4Test {
 
     @Test
     fun `map to dto`() {
@@ -33,11 +34,14 @@ class LoependeVedtakMapperV2Test {
             )
         )
 
-        val dto = LoependeVedtakMapperV2.toDto(vedtak)
+        val dto: LoependeVedtakV4 = LoependeVedtakMapperV4.toDto(vedtak)
 
         with(dto) {
             assertEquals(100, alderspensjon?.grad)
             assertEquals(LocalDate.parse("2020-10-01"), alderspensjon?.fom)
+            assertEquals("GIFT", alderspensjon?.sivilstand.toString())
+            assertEquals(10, dto.fremtidigAlderspensjon?.grad)
+            assertEquals(LocalDate.parse("2021-12-01"), dto.fremtidigAlderspensjon?.fom)
             assertEquals(50, ufoeretrygd.grad)
             assertEquals(LocalDate.parse("2022-10-01"), afpPrivat?.fom)
             assertEquals(LocalDate.parse("2023-10-01"), afpOffentlig?.fom)
@@ -58,11 +62,12 @@ class LoependeVedtakMapperV2Test {
             afpOffentlig = null
         )
 
-        val dto = LoependeVedtakMapperV2.toDto(vedtak)
+        val dto = LoependeVedtakMapperV4.toDto(vedtak)
 
         with(dto) {
             assertNull(dto.alderspensjon)
-            assertTrue(dto.harFremtidigLoependeVedtak)
+            assertEquals(10, dto.fremtidigAlderspensjon?.grad)
+            assertEquals(LocalDate.parse("2021-12-01"), dto.fremtidigAlderspensjon?.fom)
             assertNotNull(dto.ufoeretrygd)
             assertEquals(0, ufoeretrygd.grad)
             assertNull(dto.afpPrivat)

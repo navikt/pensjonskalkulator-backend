@@ -4,7 +4,7 @@ import java.time.LocalDate
 
 data class PenLoependeVedtakDto(
     val alderspensjon: PenGjeldendeVedtakApDto?,
-    val fremtidigLoependeVedtakAp: Boolean,
+    val alderspensjonIFremtid: PenGjeldendeVedtakApDto?,
     val ufoeretrygd: PenGjeldendeUfoeregradDto?,
     val afpPrivat: PenGjeldendeVedtakDto?,
     val afpOffentlig: PenGjeldendeVedtakDto?, //Afp i Offentlig Sektor for brukere født før 1963

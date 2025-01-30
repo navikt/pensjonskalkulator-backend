@@ -41,6 +41,7 @@ class OpenApiConfiguration {
                 "/api/v3/pensjonsavtaler",
                 "/api/v2/pensjonsavtaler",
                 "/api/v1/loepende-omstillingsstoenad-eller-gjenlevendeytelse",
+                "/api/v4/vedtak/loepende-vedtak",
                 "/api/v3/vedtak/loepende-vedtak",
                 "/api/v2/vedtak/loepende-vedtak",
                 "/api/v1/vedtak/loepende-vedtak",
