@@ -1,10 +1,7 @@
 package no.nav.pensjon.kalkulator.vedtak.api.map
 
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.vedtak.LoependeAlderspensjonDetaljer
-import no.nav.pensjon.kalkulator.vedtak.LoependeUfoeretrygdDetaljer
-import no.nav.pensjon.kalkulator.vedtak.LoependeVedtak
-import no.nav.pensjon.kalkulator.vedtak.LoependeVedtakDetaljer
+import no.nav.pensjon.kalkulator.vedtak.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
@@ -20,7 +17,11 @@ class LoependeVedtakMapperV1Test {
                 fom = LocalDate.parse("2020-10-01"),
                 sivilstand = Sivilstand.GIFT,
             ),
-            fremtidigLoependeVedtakAp = true,
+            fremtidigLoependeVedtakAp = FremtidigAlderspensjonDetaljer(
+                grad = 10,
+                fom = LocalDate.parse("2021-12-01"),
+                sivilstand = Sivilstand.SKILT
+            ),
             ufoeretrygd = LoependeUfoeretrygdDetaljer(
                 grad = 50,
                 fom = LocalDate.parse("2021-10-01")
@@ -51,7 +52,11 @@ class LoependeVedtakMapperV1Test {
     fun `map ingen vedtak to dto`() {
         val vedtak = LoependeVedtak(
             alderspensjon = null,
-            fremtidigLoependeVedtakAp = true,
+            fremtidigLoependeVedtakAp = FremtidigAlderspensjonDetaljer(
+                grad = 10,
+                fom = LocalDate.parse("2021-12-01"),
+                sivilstand = Sivilstand.SKILT
+            ),
             ufoeretrygd = null,
             afpPrivat = null,
             afpOffentlig = null
