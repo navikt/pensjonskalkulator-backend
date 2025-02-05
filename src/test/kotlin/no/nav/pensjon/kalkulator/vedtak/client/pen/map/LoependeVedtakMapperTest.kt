@@ -14,8 +14,8 @@ class LoependeVedtakMapperTest {
     @Test
     fun `Map from PEN og ignorer gammel afpOffentlig`() {
         val dto = PenLoependeVedtakDto(
-            alderspensjon = PenGjeldendeVedtakApDto(1, LocalDate.of(2021, 1, 1), sivilstand = "UGIF"),
-            alderspensjonIFremtid = PenGjeldendeVedtakApDto(3, LocalDate.of(2022, 1, 1), sivilstand = "GIFT"),
+            alderspensjon = PenGjeldendeVedtakApDto(1, LocalDate.of(2021, 1, 1), sivilstand = "UGIF", sivilstatus = "SAMB"),
+            alderspensjonIFremtid = PenGjeldendeVedtakApDto(3, LocalDate.of(2022, 1, 1), sivilstand = "GIFT", sivilstatus = "GIFT"),
             ufoeretrygd = PenGjeldendeUfoeregradDto(2, LocalDate.of(2021, 1, 1)),
             afpPrivat = PenGjeldendeVedtakDto(LocalDate.of(2021, 1, 1)),
             afpOffentlig = PenGjeldendeVedtakDto(LocalDate.of(2021, 1, 1)),
@@ -25,7 +25,7 @@ class LoependeVedtakMapperTest {
 
         assertEquals(1, result.alderspensjon?.grad)
         assertEquals(LocalDate.of(2021, 1, 1), result.alderspensjon?.fom)
-        assertEquals("UGIFT", result.alderspensjon?.sivilstand?.name)
+        assertEquals("SAMBOER", result.alderspensjon?.sivilstand?.name)
         assertNotNull(result.fremtidigLoependeVedtakAp)
         assertEquals(3, result.fremtidigLoependeVedtakAp?.grad)
         assertEquals(LocalDate.of(2022, 1, 1), result.fremtidigLoependeVedtakAp?.fom)
