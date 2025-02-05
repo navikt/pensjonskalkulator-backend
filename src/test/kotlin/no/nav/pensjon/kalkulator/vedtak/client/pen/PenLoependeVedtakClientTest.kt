@@ -149,7 +149,7 @@ class PenLoependeVedtakClientTest : WebClientTest() {
     private companion object {
         @Language("json")
         private const val VEDTAK_AP = """
-{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"UGIF"},"ufoeretrygd":null,"afpPrivat":null,"afp":null}
+{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"UGIF","sivilstatus":"UGIF"},"ufoeretrygd":null,"afpPrivat":null,"afp":null}
 """
         @Language("json")
         private const val VEDTAK_UFORE = """
@@ -157,15 +157,15 @@ class PenLoependeVedtakClientTest : WebClientTest() {
 """
         @Language("json")
         private const val VEDTAK_AP_OG_UFORE = """
-{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"GIFT"},"ufoeretrygd":{"grad":100,"fraOgMed":"2022-07-01"},"afpPrivat":null,"afp":null}
+{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"GIFT","sivilstatus":"GIFT"},"ufoeretrygd":{"grad":100,"fraOgMed":"2022-07-01"},"afpPrivat":null,"afp":null}
 """
         @Language("json")
         private const val VEDTAK_AP_OG_UFORE_OG_AFPPRIVAT = """
-{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"SKIL"},"ufoeretrygd":{"grad":100,"fraOgMed":"2022-07-01"},"afpPrivat":{"grad":100,"fraOgMed":"2022-07-01"},"afp":null}
+{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"SKIL","sivilstatus":"SKIL"},"ufoeretrygd":{"grad":100,"fraOgMed":"2022-07-01"},"afpPrivat":{"grad":100,"fraOgMed":"2022-07-01"},"afp":null}
 """
         @Language("json")
         private const val VEDTAK_AP_OG_UFORE_OG_AFPPRIVAT_OG_AFP = """
-{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"ENKE"},"ufoeretrygd":{"grad":100,"fraOgMed":"2022-07-01"},"afpPrivat":{"grad":100,"fraOgMed":"2022-07-01"},"afp":{"grad":100,"fraOgMed":"2022-07-01"}}
+{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"ENKE","sivilstatus":"ENKE"},"ufoeretrygd":{"grad":100,"fraOgMed":"2022-07-01"},"afpPrivat":{"grad":100,"fraOgMed":"2022-07-01"},"afp":{"grad":100,"fraOgMed":"2022-07-01"}}
 """
         @Language("json")
         private const val VEDTAK_INGEN = """

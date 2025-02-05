@@ -27,7 +27,7 @@ object LoependeVedtakMapper {
             LoependeAlderspensjonDetaljer(
                 grad = it.grad,
                 fom = it.fraOgMed,
-                sivilstand = PenSivilstand.toInternalValue(it.sivilstand)
+                sivilstand = PenSivilstand.toInternalValue(it.sivilstatus)
             )
         }
 
@@ -36,7 +36,7 @@ object LoependeVedtakMapper {
             FremtidigAlderspensjonDetaljer(
                 grad = it.grad,
                 fom = it.fraOgMed,
-                sivilstand = PenSivilstand.toInternalValue(it.sivilstand)
+                sivilstand = PenSivilstand.toInternalValue(it.sivilstatus)
             )
         }
 
