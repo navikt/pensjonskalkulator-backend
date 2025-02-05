@@ -19,7 +19,7 @@ object SimulatorPersonligSimuleringSpecMapper {
             pid = personalSpec.pid.value,
             sivilstand = SimulatorSivilstand.fromInternalValue(personalSpec.sivilstand).externalValue,
             epsHarInntektOver2G = impersonalSpec.eps.harInntektOver2G,
-            epsHarPensjon = false, // NB: Ikke-støttet verdi
+            epsHarPensjon = impersonalSpec.eps.harPensjon,
             sisteInntekt = personalSpec.aarligInntektFoerUttak,
             uttaksar = 1,
             gradertUttak = impersonalSpec.gradertUttak?.let(::gradertUttak),
