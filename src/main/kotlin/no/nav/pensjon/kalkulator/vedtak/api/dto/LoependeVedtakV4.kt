@@ -61,8 +61,8 @@ enum class SivilstandV4(val internalValue: Sivilstand) {
     REGISTRERT_PARTNER(Sivilstand.REGISTRERT_PARTNER),
     SEPARERT_PARTNER(Sivilstand.SEPARERT_PARTNER),
     SKILT_PARTNER(Sivilstand.SKILT_PARTNER),
-    GJENLEVENDE_PARTNER(Sivilstand.GJENLEVENDE_PARTNER);
-    // No SAMBOER in this context
+    GJENLEVENDE_PARTNER(Sivilstand.GJENLEVENDE_PARTNER),
+    SAMBOER(Sivilstand.SAMBOER);
 
     companion object {
         private val values = entries.toTypedArray()

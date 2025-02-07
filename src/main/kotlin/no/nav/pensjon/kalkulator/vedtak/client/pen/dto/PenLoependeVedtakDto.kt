@@ -19,6 +19,7 @@ data class PenGjeldendeVedtakApDto(
     val grad: Int,
     val fraOgMed: LocalDate,
     val sivilstand: String,
+    val sivilstatus: String,
 )
 
 data class PenGjeldendeVedtakDto(
