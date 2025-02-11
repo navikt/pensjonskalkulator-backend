@@ -22,6 +22,7 @@ class TpSimuleringClientMapperTest {
             ),
             simuleringsResultat = SimuleringsResultatDto(
                 tpLeverandoer = "tpOrdningX",
+                tpNummer = "1",
                 utbetalingsperioder = listOf(
                     UtbetalingPerAlder(
                         startAlder = Alder(62, 0),
@@ -39,8 +40,9 @@ class TpSimuleringClientMapperTest {
         assertEquals(ResultatType.OK, result.simuleringsResultatStatus.resultatType)
         assertEquals("tpOrdningY", result.tpOrdninger[0])
         assertEquals("tpOrdningX", result.simuleringsResultat?.tpOrdning)
+        assertEquals("1", result.simuleringsResultat?.tpNummer)
         assertEquals(dto.simuleringsResultat!!.utbetalingsperioder[0].startAlder, result.simuleringsResultat?.perioder?.get(0)?.startAlder)
-        assertEquals(dto.simuleringsResultat.utbetalingsperioder[0].sluttAlder, result.simuleringsResultat?.perioder?.get(0)?.sluttAlder)
+        assertEquals(dto.simuleringsResultat!!.utbetalingsperioder[0].sluttAlder, result.simuleringsResultat?.perioder?.get(0)?.sluttAlder)
         assertEquals(100, result.simuleringsResultat?.perioder?.get(0)?.maanedligBeloep)
         assertTrue(result.simuleringsResultat?.betingetTjenestepensjonInkludert!!)
     }

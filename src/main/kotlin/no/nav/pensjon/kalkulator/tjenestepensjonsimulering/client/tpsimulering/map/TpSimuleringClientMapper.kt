@@ -16,6 +16,7 @@ object TpSimuleringClientMapper {
         simuleringsResultat = dto.simuleringsResultat?.let {
             SimuleringsResultat(
                 tpOrdning = it.tpLeverandoer,
+                tpNummer = it.tpNummer,
                 perioder = it.utbetalingsperioder
                     .map { utbetalingDto ->
                         Utbetaling(

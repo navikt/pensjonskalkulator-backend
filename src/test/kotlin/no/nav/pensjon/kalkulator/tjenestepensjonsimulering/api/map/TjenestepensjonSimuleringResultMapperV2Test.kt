@@ -21,6 +21,7 @@ class TjenestepensjonSimuleringResultMapperV2Test{
             ),
             simuleringsResultat = SimuleringsResultat(
                 tpOrdning = "tpOrdningX",
+                tpNummer = "1",
                 perioder = listOf(
                     Utbetaling(
                         startAlder = start,
@@ -38,6 +39,7 @@ class TjenestepensjonSimuleringResultMapperV2Test{
         assertEquals(SimuleringsresultatStatusV2.OK, result.simuleringsresultatStatus)
         assertEquals("tpOrdningY", result.muligeTpLeverandoerListe[0])
         assertEquals("tpOrdningX", result.simulertTjenestepensjon?.tpLeverandoer)
+        assertEquals("1", result.simulertTjenestepensjon?.tpNummer)
         assertEquals(start, result.simulertTjenestepensjon?.simuleringsresultat?.utbetalingsperioder?.get(0)?.startAlder)
         assertEquals(slutt, result.simulertTjenestepensjon?.simuleringsresultat?.utbetalingsperioder?.get(0)?.sluttAlder)
         assertEquals(1200, result.simulertTjenestepensjon?.simuleringsresultat?.utbetalingsperioder?.get(0)?.aarligUtbetaling)

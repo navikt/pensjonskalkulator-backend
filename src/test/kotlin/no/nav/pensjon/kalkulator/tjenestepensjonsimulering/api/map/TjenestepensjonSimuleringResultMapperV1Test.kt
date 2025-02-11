@@ -21,6 +21,7 @@ class TjenestepensjonSimuleringResultMapperV1Test {
             ),
             simuleringsResultat = SimuleringsResultat(
                 tpOrdning = "tpOrdningX",
+                tpNummer = "1",
                 perioder = listOf(
                     Utbetaling(
                         startAlder = start,

@@ -65,6 +65,7 @@ class TjenestepensjonSimuleringServiceTest {
                 simuleringsResultatStatus = SimuleringsResultatStatus(resultatType = ResultatType.OK),
                 simuleringsResultat = SimuleringsResultat(
                     tpOrdning = "tpOrdning",
+                    tpNummer = "111111",
                     perioder = listOf(Utbetaling(startAlder = start, sluttAlder = slutt, maanedligBeloep = 1000)),
                     betingetTjenestepensjonInkludert = true
                 ),
@@ -76,11 +77,13 @@ class TjenestepensjonSimuleringServiceTest {
 
         assertNotNull(result)
         assertEquals(ResultatType.OK, result.simuleringsResultatStatus.resultatType)
+        assertNotNull(result.simuleringsResultat)
         assertEquals("tpOrdning", result.simuleringsResultat!!.tpOrdning)
-        assertEquals(start, result.simuleringsResultat.perioder[0].startAlder)
-        assertEquals(slutt, result.simuleringsResultat.perioder[0].sluttAlder)
-        assertEquals(1000, result.simuleringsResultat.perioder[0].maanedligBeloep)
-        assertTrue(result.simuleringsResultat.betingetTjenestepensjonInkludert)
+        assertEquals("111111", result.simuleringsResultat!!.tpNummer)
+        assertEquals(start, result.simuleringsResultat!!.perioder.get(0).startAlder)
+        assertEquals(slutt, result.simuleringsResultat!!.perioder[0].sluttAlder)
+        assertEquals(1000, result.simuleringsResultat!!.perioder[0].maanedligBeloep)
+        assertTrue(result.simuleringsResultat!!.betingetTjenestepensjonInkludert)
         assertEquals("tpOrdning", result.tpOrdninger[0])
     }
 }

@@ -236,6 +236,7 @@ class TjenestepensjonSimuleringControllerTest {
             simuleringsResultatStatus = SimuleringsResultatStatus(resultatType = ResultatType.OK, feilmelding = null),
             simuleringsResultat = SimuleringsResultat(
                 tpOrdning = "Statens Pensjonskasse",
+                tpNummer = "111111",
                 perioder = listOf(
                     Utbetaling(startAlder = Alder(63, 0), sluttAlder = Alder(66, 11),
                         maanedligBeloep = 220000),
