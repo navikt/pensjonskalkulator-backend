@@ -83,23 +83,25 @@ class TpSimuleringClientTest : WebClientTest() {
         assertEquals(ResultatType.OK, resp.simuleringsResultatStatus.resultatType)
         assertNull(resp.simuleringsResultatStatus.feilmelding)
         assertEquals(listOf("Statens pensjonskasse"), resp.tpOrdninger)
+        assertEquals("Statens Pensjonskasse", resp.simuleringsResultat!!.tpOrdning)
+        assertEquals("1", resp.simuleringsResultat!!.tpNummer)
         assertEquals(3, resp.simuleringsResultat!!.perioder.size)
-        assertEquals(62, resp.simuleringsResultat.perioder[0].startAlder.aar)
-        assertEquals(1, resp.simuleringsResultat.perioder[0].startAlder.maaneder)
-        assertEquals(63, resp.simuleringsResultat.perioder[0].sluttAlder?.aar)
-        assertEquals(3, resp.simuleringsResultat.perioder[0].sluttAlder?.maaneder)
-        assertEquals(1000, resp.simuleringsResultat.perioder[0].maanedligBeloep)
+        assertEquals(62, resp.simuleringsResultat!!.perioder[0].startAlder.aar)
+        assertEquals(1, resp.simuleringsResultat!!.perioder[0].startAlder.maaneder)
+        assertEquals(63, resp.simuleringsResultat!!.perioder[0].sluttAlder?.aar)
+        assertEquals(3, resp.simuleringsResultat!!.perioder[0].sluttAlder?.maaneder)
+        assertEquals(1000, resp.simuleringsResultat!!.perioder[0].maanedligBeloep)
 
-        assertEquals(63, resp.simuleringsResultat.perioder[1].startAlder.aar)
-        assertEquals(4, resp.simuleringsResultat.perioder[1].startAlder.maaneder)
-        assertEquals(63, resp.simuleringsResultat.perioder[1].sluttAlder?.aar)
-        assertEquals(6, resp.simuleringsResultat.perioder[1].sluttAlder?.maaneder)
-        assertEquals(2000, resp.simuleringsResultat.perioder[1].maanedligBeloep)
+        assertEquals(63, resp.simuleringsResultat!!.perioder[1].startAlder.aar)
+        assertEquals(4, resp.simuleringsResultat!!.perioder[1].startAlder.maaneder)
+        assertEquals(63, resp.simuleringsResultat!!.perioder[1].sluttAlder?.aar)
+        assertEquals(6, resp.simuleringsResultat!!.perioder[1].sluttAlder?.maaneder)
+        assertEquals(2000, resp.simuleringsResultat!!.perioder[1].maanedligBeloep)
 
-        assertEquals(63, resp.simuleringsResultat.perioder[2].startAlder.aar)
-        assertEquals(7, resp.simuleringsResultat.perioder[2].startAlder.maaneder)
-        assertNull(resp.simuleringsResultat.perioder[2].sluttAlder)
-        assertEquals(3000, resp.simuleringsResultat.perioder[2].maanedligBeloep)
+        assertEquals(63, resp.simuleringsResultat!!.perioder[2].startAlder.aar)
+        assertEquals(7, resp.simuleringsResultat!!.perioder[2].startAlder.maaneder)
+        assertNull(resp.simuleringsResultat!!.perioder[2].sluttAlder)
+        assertEquals(3000, resp.simuleringsResultat!!.perioder[2].maanedligBeloep)
     }
 
     @Test
@@ -221,6 +223,7 @@ class TpSimuleringClientTest : WebClientTest() {
   },
   "simuleringsResultat": {
     "tpLeverandoer": "Statens Pensjonskasse",
+    "tpNummer": "1",
     "utbetalingsperioder": [
     {
         "startAlder": {

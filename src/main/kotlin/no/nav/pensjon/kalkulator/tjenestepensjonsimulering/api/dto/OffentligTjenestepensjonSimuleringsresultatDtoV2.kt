@@ -26,6 +26,7 @@ enum class SimuleringsresultatStatusV2(val resultatType: ResultatType?) {
 
 data class SimulertTjenestepensjonV2(
     val tpLeverandoer: String,
+    val tpNummer: String,
     val simuleringsresultat: SimuleringsresultatV2
 )
 
