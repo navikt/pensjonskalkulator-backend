@@ -63,9 +63,12 @@ class LavesteUttaksalderService(
     private fun teoretiskLavesteFremtidigeUttaksalder(): Alder =
         naermesteFremtidigeAlder(teoretiskLavesteUttaksalder())
 
+    /**
+     * 'Nærmeste fremtidige alder' er alder på 1. dag av neste måned.
+     */
     private fun naermesteFremtidigeAlder(alder: Alder): Alder =
         with(naavaerendeAlder()) {
-            if (this lessThan alder) alder else this plussMaaneder 1
+            if (this lessThan alder) alder else this
         }
 
     private fun teoretiskLavesteUttaksalder(): Alder = normAlderService.nedreAldersgrense()
