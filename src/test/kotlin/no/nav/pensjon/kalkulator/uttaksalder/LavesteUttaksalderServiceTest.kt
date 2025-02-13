@@ -55,8 +55,8 @@ internal class LavesteUttaksalderServiceTest {
                 harEps = false
             )
 
-        // Uttak kan starte måneden etter fylte 64 år:
-        simuleringSpec.gradertUttak?.uttakFomAlder shouldBe Alder(aar = 64, maaneder = 1)
+        // Uttak kan starte 1. dag i måneden etter fylte 64 år:
+        simuleringSpec.gradertUttak?.uttakFomAlder shouldBe Alder(aar = 64, maaneder = 0)
         simuleringSpec.heltUttak.uttakFomAlder shouldBe Alder(aar = 67, maaneder = 0)
     }
 
@@ -74,8 +74,8 @@ internal class LavesteUttaksalderServiceTest {
                 harEps = false
             )
 
-        // Uttak kan starte måneden etter fylte 64 år:
-        simuleringSpec.heltUttak.uttakFomAlder shouldBe Alder(aar = 64, maaneder = 1)
+        // Uttak kan starte 1. dag i måneden etter fylte 64 år:
+        simuleringSpec.heltUttak.uttakFomAlder shouldBe Alder(aar = 64, maaneder = 0)
         simuleringSpec.gradertUttak shouldBe null
     }
 
