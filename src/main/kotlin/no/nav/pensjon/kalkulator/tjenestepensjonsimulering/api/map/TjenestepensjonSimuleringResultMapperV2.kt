@@ -12,6 +12,7 @@ object TjenestepensjonSimuleringResultMapperV2 {
         simulertTjenestepensjon = simuleringsresultat.simuleringsResultat?.let {
             SimulertTjenestepensjonV2(
                 tpLeverandoer = it.tpOrdning,
+                tpNummer = it.tpNummer,
                 simuleringsresultat = SimuleringsresultatV2(
                     utbetalingsperioder = it.perioder
                         .map { utbetaling -> UtbetalingsperiodeV2(utbetaling.startAlder, utbetaling.sluttAlder, utbetaling.maanedligBeloep * MAANEDER_PER_AAR) },
