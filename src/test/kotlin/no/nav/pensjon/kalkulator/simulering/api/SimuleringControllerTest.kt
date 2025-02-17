@@ -58,7 +58,7 @@ class SimuleringControllerTest {
 
     @Test
     fun `simulerer hel alderspensjon V8`() {
-        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON, epsHarInntektOver2G = true)
+        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON)
         `when`(simuleringService.simulerPersonligAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
         enableUtvidetResult()
 
@@ -91,7 +91,7 @@ class SimuleringControllerTest {
 
     @Test
     fun `simulerer alderspensjon med privat AFP V8`() {
-        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT, epsHarInntektOver2G = true)
+        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
         `when`(simuleringService.simulerPersonligAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
         enableUtvidetResult()
 
@@ -108,8 +108,7 @@ class SimuleringControllerTest {
     @Test
     fun `simulerer alderspensjon med livsvarig offentlig AFP V8`() {
         val spec = impersonalHeltUttakSpec(
-            SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG,
-            epsHarInntektOver2G = true
+            SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG
         )
         `when`(simuleringService.simulerPersonligAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
         enableUtvidetResult()
@@ -126,7 +125,7 @@ class SimuleringControllerTest {
 
     @Test
     fun `simulering responds 'vilkaar ikke oppfylt' when Conflict V8`() {
-        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT, epsHarInntektOver2G = true)
+        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
         `when`(simuleringService.simulerPersonligAlderspensjon(spec)).thenThrow(conflict())
         enableUtvidetResult()
 
@@ -242,10 +241,10 @@ class SimuleringControllerTest {
             }
         }""".trimIndent()
 
-        private fun impersonalHeltUttakSpec(simuleringType: SimuleringType, epsHarInntektOver2G: Boolean = false) =
+        private fun impersonalHeltUttakSpec(simuleringType: SimuleringType) =
             ImpersonalSimuleringSpec(
                 simuleringType = simuleringType,
-                eps = Eps(harInntektOver2G = epsHarInntektOver2G, harPensjon = false),
+                eps = Eps(harInntektOver2G = true, harPensjon = false),
                 forventetAarligInntektFoerUttak = 100_000,
                 sivilstand = Sivilstand.UGIFT,
                 heltUttak = HeltUttak(
@@ -367,7 +366,19 @@ class SimuleringControllerTest {
                             inntektspensjonBeloep = 0,
                             garantipensjonBeloep = 0,
                             delingstall = 0.0,
-                            pensjonBeholdningFoerUttak = 0
+                            pensjonBeholdningFoerUttak = 0,
+                            andelsbroekKap19 = 0.0,
+                            andelsbroekKap20 = 0.0,
+                            sluttpoengtall = 0.0,
+                            trygdetidKap19 = 0,
+                            trygdetidKap20 = 0,
+                            poengaarFoer92 = 0,
+                            poengaarEtter91 = 0,
+                            forholdstall = 0.0,
+                            grunnpensjon = 0,
+                            tilleggspensjon = 0,
+                            pensjonstillegg = 0,
+                            skjermingstillegg = 0
                         )
                     ),
                     alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(
@@ -390,7 +401,19 @@ class SimuleringControllerTest {
                             inntektspensjonBeloep = 0,
                             garantipensjonBeloep = 0,
                             delingstall = 0.0,
-                            pensjonBeholdningFoerUttak = 0
+                            pensjonBeholdningFoerUttak = 0,
+                            andelsbroekKap19 = 0.0,
+                            andelsbroekKap20 = 0.0,
+                            sluttpoengtall = 0.0,
+                            trygdetidKap19 = 0,
+                            trygdetidKap20 = 0,
+                            poengaarFoer92 = 0,
+                            poengaarEtter91 = 0,
+                            forholdstall = 0.0,
+                            grunnpensjon = 0,
+                            tilleggspensjon = 0,
+                            pensjonstillegg = 0,
+                            skjermingstillegg = 0
                         )
                     ),
                     alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(
@@ -413,7 +436,19 @@ class SimuleringControllerTest {
                             inntektspensjonBeloep = 0,
                             garantipensjonBeloep = 0,
                             delingstall = 0.0,
-                            pensjonBeholdningFoerUttak = 0
+                            pensjonBeholdningFoerUttak = 0,
+                            andelsbroekKap19 = 0.0,
+                            andelsbroekKap20 = 0.0,
+                            sluttpoengtall = 0.0,
+                            trygdetidKap19 = 0,
+                            trygdetidKap20 = 0,
+                            poengaarFoer92 = 0,
+                            poengaarEtter91 = 0,
+                            forholdstall = 0.0,
+                            grunnpensjon = 0,
+                            tilleggspensjon = 0,
+                            pensjonstillegg = 0,
+                            skjermingstillegg = 0
                         )
                     ),
                     alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(
@@ -436,7 +471,19 @@ class SimuleringControllerTest {
                             inntektspensjonBeloep = 0,
                             garantipensjonBeloep = 0,
                             delingstall = 0.0,
-                            pensjonBeholdningFoerUttak = 0
+                            pensjonBeholdningFoerUttak = 0,
+                            andelsbroekKap19 = 0.0,
+                            andelsbroekKap20 = 0.0,
+                            sluttpoengtall = 0.0,
+                            trygdetidKap19 = 0,
+                            trygdetidKap20 = 0,
+                            poengaarFoer92 = 0,
+                            poengaarEtter91 = 0,
+                            forholdstall = 0.0,
+                            grunnpensjon = 0,
+                            tilleggspensjon = 0,
+                            pensjonstillegg = 0,
+                            skjermingstillegg = 0
                         )
                     ),
                     alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(
@@ -459,7 +506,19 @@ class SimuleringControllerTest {
                             inntektspensjonBeloep = 0,
                             garantipensjonBeloep = 0,
                             delingstall = 0.0,
-                            pensjonBeholdningFoerUttak = 0
+                            pensjonBeholdningFoerUttak = 0,
+                            andelsbroekKap19 = 0.0,
+                            andelsbroekKap20 = 0.0,
+                            sluttpoengtall = 0.0,
+                            trygdetidKap19 = 0,
+                            trygdetidKap20 = 0,
+                            poengaarFoer92 = 0,
+                            poengaarEtter91 = 0,
+                            forholdstall = 0.0,
+                            grunnpensjon = 0,
+                            tilleggspensjon = 0,
+                            pensjonstillegg = 0,
+                            skjermingstillegg = 0
                         )
                     ),
                     alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(
@@ -482,7 +541,19 @@ class SimuleringControllerTest {
                             inntektspensjonBeloep = 0,
                             garantipensjonBeloep = 0,
                             delingstall = 0.0,
-                            pensjonBeholdningFoerUttak = 0
+                            pensjonBeholdningFoerUttak = 0,
+                            andelsbroekKap19 = 0.0,
+                            andelsbroekKap20 = 0.0,
+                            sluttpoengtall = 0.0,
+                            trygdetidKap19 = 0,
+                            trygdetidKap20 = 0,
+                            poengaarFoer92 = 0,
+                            poengaarEtter91 = 0,
+                            forholdstall = 0.0,
+                            grunnpensjon = 0,
+                            tilleggspensjon = 0,
+                            pensjonstillegg = 0,
+                            skjermingstillegg = 0
                         )
                     ),
                     alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(
