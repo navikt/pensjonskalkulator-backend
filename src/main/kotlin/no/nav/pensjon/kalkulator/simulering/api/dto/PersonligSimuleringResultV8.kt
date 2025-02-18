@@ -27,12 +27,24 @@ data class PersonligSimuleringAlderspensjonResultV8(
     val inntektspensjonBeloep: Int? = null,
     val garantipensjonBeloep: Int? = null,
     val delingstall: Double? = null,
-    val pensjonBeholdningFoerUttakBeloep: Int? = null
+    val pensjonBeholdningFoerUttakBeloep: Int? = null,
+    val andelsbroekKap19: Double? = null,
+    val andelsbroekKap20: Double? = null,
+    val sluttpoengtall: Double? = null,
+    val trygdetidKap19: Int? = null,
+    val trygdetidKap20: Int? = null,
+    val poengaarFoer92: Int? = null,
+    val poengaarEtter91: Int? = null,
+    val forholdstall: Double? = null,
+    val grunnpensjon: Int? = null,
+    val tilleggspensjon: Int? = null,
+    val pensjonstillegg: Int? = null,
+    val skjermingstillegg: Int? = null
 )
 
 data class PersonligSimuleringAarligPensjonResultV8(
     val alder: Int,
-    val beloep: Int
+    val beloep: Int,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

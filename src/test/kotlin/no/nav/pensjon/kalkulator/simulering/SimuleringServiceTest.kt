@@ -89,7 +89,19 @@ class SimuleringServiceTest {
                         inntektspensjonBeloep = 0,
                         garantipensjonBeloep = 0,
                         delingstall = 0.0,
-                        pensjonBeholdningFoerUttak = 0
+                        pensjonBeholdningFoerUttak = 0,
+                        andelsbroekKap19 = 0.0,
+                        andelsbroekKap20 = 0.0,
+                        sluttpoengtall = 0.0,
+                        trygdetidKap19 = 0,
+                        trygdetidKap20 = 0,
+                        poengaarFoer92 = 0,
+                        poengaarEtter91 = 0,
+                        forholdstall = 0.0,
+                        grunnpensjon = 0,
+                        tilleggspensjon = 0,
+                        pensjonstillegg = 0,
+                        skjermingstillegg = 0
                     )
                 ),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(

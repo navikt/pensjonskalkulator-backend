@@ -51,7 +51,19 @@ object PersonligSimuleringResultMapperV8 {
                         it.inntektspensjonBeloep,
                         it.garantipensjonBeloep,
                         it.delingstall,
-                        it.pensjonBeholdningFoerUttakBeloep
+                        it.pensjonBeholdningFoerUttakBeloep,
+                        it.andelsbroekKap19,
+                        it.andelsbroekKap20,
+                        it.sluttpoengtall,
+                        it.trygdetidKap19,
+                        it.trygdetidKap20,
+                        it.poengaarFoer92,
+                        it.poengaarEtter91,
+                        it.forholdstall,
+                        it.grunnpensjon,
+                        it.tilleggspensjon,
+                        it.pensjonstillegg,
+                        it.skjermingstillegg
                     )
                 )
                 return oppdatertAlderspensjonList.sortedBy { it.alder }
