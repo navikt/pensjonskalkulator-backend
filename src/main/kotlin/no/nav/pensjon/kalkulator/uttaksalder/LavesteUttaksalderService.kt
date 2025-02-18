@@ -40,7 +40,8 @@ class LavesteUttaksalderService(
             )
         )
 
-    private fun foedselDato(): LocalDate = personService.getPerson().foedselsdato
+    private fun foedselsdato(): LocalDate =
+        personService.getPerson().foedselsdato
 
     private fun simuleringGradertUttak(source: UttaksalderGradertUttak) =
         GradertUttak(
@@ -58,22 +59,28 @@ class LavesteUttaksalderService(
         )
 
     private fun defaultHeltUttakFremtidigFomAlderIfGradert(): Alder =
-        naermesteFremtidigeAlder(defaultHeltUttakFomAlderIfGradert())
+        alderPaaFremtidigUttaksdato(defaultHeltUttakFomAlderIfGradert())
 
     private fun teoretiskLavesteFremtidigeUttaksalder(): Alder =
-        naermesteFremtidigeAlder(teoretiskLavesteUttaksalder())
+        alderPaaFremtidigUttaksdato(teoretiskLavesteUttaksalder())
 
     /**
      * 'Nærmeste fremtidige alder' er alder på 1. dag av neste måned.
      */
-    private fun naermesteFremtidigeAlder(alder: Alder): Alder =
-        with(naavaerendeAlder()) {
-            if (this lessThan alder) alder else this
+    private fun alderPaaFremtidigUttaksdato(minimumAlder: Alder): Alder =
+        with(alderPaaNaermesteFremtidigeUttaksdato()) {
+            if (this lessThan minimumAlder) minimumAlder else this
         }
 
-    private fun teoretiskLavesteUttaksalder(): Alder = normAlderService.nedreAldersgrense()
+    private fun teoretiskLavesteUttaksalder(): Alder =
+        normAlderService.nedreAldersgrense()
 
-    private fun defaultHeltUttakFomAlderIfGradert(): Alder = normAlderService.normAlder()
+    private fun defaultHeltUttakFomAlderIfGradert(): Alder =
+        normAlderService.normAlder()
 
-    private fun naavaerendeAlder() = Alder.from(foedselDato(), todayProvider.date())
+    private fun alderPaaNaermesteFremtidigeUttaksdato() =
+        Alder.from(
+            foedselDato = foedselsdato(),
+            dato = todayProvider.date().plusMonths(1).withDayOfMonth(1)
+        )
 }

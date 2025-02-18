@@ -51,10 +51,11 @@ class AlderTest {
 
     @Test
     fun `test from`() {
+        // Ved lik månedsdag anses ikke måneden for helt fylt - dermed 1 måned fratrekk
         Alder.from(
             foedselDato = LocalDate.of(2001, 1, 1),
             dato = LocalDate.of(2024, 1, 1)
-        ) shouldBe Alder(aar = 23, maaneder = 0)
+        ) shouldBe Alder(aar = 22, maaneder = 11)
 
         Alder.from(
             foedselDato = LocalDate.of(1970, 2, 2),
