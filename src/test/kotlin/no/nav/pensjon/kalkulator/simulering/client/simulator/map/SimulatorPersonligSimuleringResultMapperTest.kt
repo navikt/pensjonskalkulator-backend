@@ -72,7 +72,19 @@ class SimulatorPersonligSimuleringResultMapperTest {
                         inntektspensjon = 2,
                         garantipensjon = 3,
                         delingstall = 0.4,
-                        pensjonBeholdningFoerUttak = 5
+                        pensjonBeholdningFoerUttak = 5,
+                        andelsbroekKap19 = 0.6,
+                        andelsbroekKap20 = 0.4,
+                        sluttpoengtall = 5.11,
+                        trygdetidKap19 = 40,
+                        trygdetidKap20 = 40,
+                        poengaarFoer92 = 13,
+                        poengaarEtter91 = 27,
+                        forholdstall = 0.971,
+                        grunnpensjon = 55810,
+                        tilleggspensjon = 134641,
+                        pensjonstillegg = -70243,
+                        skjermingstillegg = 0
                     ),
                 ),
                 alderspensjonMaanedsbeloep = SimulatorPersonligMaanedsbeloep(
@@ -107,7 +119,19 @@ class SimulatorPersonligSimuleringResultMapperTest {
                     inntektspensjonBeloep = 2,
                     garantipensjonBeloep = 3,
                     delingstall = 0.4,
-                    pensjonBeholdningFoerUttak = 5
+                    pensjonBeholdningFoerUttak = 5,
+                    andelsbroekKap19 = 0.6,
+                    andelsbroekKap20 = 0.4,
+                    sluttpoengtall = 5.11,
+                    trygdetidKap19 = 40,
+                    trygdetidKap20 = 40,
+                    poengaarFoer92 = 13,
+                    poengaarEtter91 = 27,
+                    forholdstall = 0.971,
+                    grunnpensjon = 55810,
+                    tilleggspensjon = 134641,
+                    pensjonstillegg = -70243,
+                    skjermingstillegg = 0
                 ),
             ),
             alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = null, heltUttak = 0),
@@ -137,7 +161,19 @@ class SimulatorPersonligSimuleringResultMapperTest {
                 inntektspensjon = 2001,
                 garantipensjon = 3001,
                 delingstall = 0.51,
-                pensjonBeholdningFoerUttak = 4001
+                pensjonBeholdningFoerUttak = 4001,
+                andelsbroekKap19 = 0.6,
+                andelsbroekKap20 = 0.4,
+                sluttpoengtall = 5.11,
+                trygdetidKap19 = 40,
+                trygdetidKap20 = 40,
+                poengaarFoer92 = 13,
+                poengaarEtter91 = 27,
+                forholdstall = 0.971,
+                grunnpensjon = 50810,
+                tilleggspensjon = 134641,
+                pensjonstillegg = 61243,
+                skjermingstillegg = 0
             )
 
         private fun alderspensjon(alderAar: Int) =
@@ -147,7 +183,19 @@ class SimulatorPersonligSimuleringResultMapperTest {
                 inntektspensjonBeloep = 2001,
                 garantipensjonBeloep = 3001,
                 delingstall = 0.51,
-                pensjonBeholdningFoerUttak = 4001
+                pensjonBeholdningFoerUttak = 4001,
+                andelsbroekKap19 = 0.6,
+                andelsbroekKap20 = 0.4,
+                sluttpoengtall = 5.11,
+                trygdetidKap19 = 40,
+                trygdetidKap20 = 40,
+                poengaarFoer92 = 13,
+                poengaarEtter91 = 27,
+                forholdstall = 0.971,
+                grunnpensjon = 50810,
+                tilleggspensjon = 134641,
+                pensjonstillegg = 61243,
+                skjermingstillegg = 0
             )
     }
 }

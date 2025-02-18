@@ -18,7 +18,19 @@ class PersonligSimuleringExtendedResultMapperV8Test{
                         inntektspensjonBeloep = 1,
                         garantipensjonBeloep = 2,
                         delingstall = 3.4,
-                        pensjonBeholdningFoerUttak = 5
+                        pensjonBeholdningFoerUttak = 5,
+                        andelsbroekKap19 = 0.6,
+                        andelsbroekKap20 = 0.4,
+                        sluttpoengtall = 5.11,
+                        trygdetidKap19 = 40,
+                        trygdetidKap20 = 40,
+                        poengaarFoer92 = 13,
+                        poengaarEtter91 = 27,
+                        forholdstall = 0.971,
+                        grunnpensjon = 55810,
+                        tilleggspensjon = 134641,
+                        pensjonstillegg = -70243,
+                        skjermingstillegg = 0
                     )
                 ),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
@@ -40,7 +52,19 @@ class PersonligSimuleringExtendedResultMapperV8Test{
                     inntektspensjonBeloep = 1,
                     garantipensjonBeloep = 2,
                     delingstall = 3.4,
-                    pensjonBeholdningFoerUttakBeloep = 5
+                    pensjonBeholdningFoerUttakBeloep = 5,
+                    andelsbroekKap19 = 0.6,
+                    andelsbroekKap20 = 0.4,
+                    sluttpoengtall = 5.11,
+                    trygdetidKap19 = 40,
+                    trygdetidKap20 = 40,
+                    poengaarFoer92 = 13,
+                    poengaarEtter91 = 27,
+                    forholdstall = 0.971,
+                    grunnpensjon = 55810,
+                    tilleggspensjon = 134641,
+                    pensjonstillegg = -70243,
+                    skjermingstillegg = 0
                 )
             ),
             alderspensjonMaanedligVedEndring = PersonligSimuleringMaanedligPensjonResultV8(

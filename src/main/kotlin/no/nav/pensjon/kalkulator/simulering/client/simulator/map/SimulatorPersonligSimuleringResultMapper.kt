@@ -26,7 +26,19 @@ object SimulatorPersonligSimuleringResultMapper {
             inntektspensjonBeloep = dto.inntektspensjon ?: 0,
             garantipensjonBeloep = dto.garantipensjon ?: 0,
             delingstall = dto.delingstall ?: 0.0,
-            pensjonBeholdningFoerUttak = dto.pensjonBeholdningFoerUttak ?: 0
+            pensjonBeholdningFoerUttak = dto.pensjonBeholdningFoerUttak ?: 0,
+            andelsbroekKap19 = dto.andelsbroekKap19 ?: 0.0,
+            andelsbroekKap20 = dto.andelsbroekKap20 ?: 0.0,
+            sluttpoengtall = dto.sluttpoengtall ?: 0.0,
+            trygdetidKap19 = dto.trygdetidKap19 ?: 0,
+            trygdetidKap20 = dto.trygdetidKap20 ?: 0,
+            poengaarFoer92 = dto.poengaarFoer92 ?: 0,
+            poengaarEtter91 = dto.poengaarEtter91 ?: 0,
+            forholdstall = dto.forholdstall ?: 0.0,
+            grunnpensjon = dto.grunnpensjon ?: 0,
+            tilleggspensjon = dto.tilleggspensjon ?: 0,
+            pensjonstillegg = dto.pensjonstillegg ?: 0,
+            skjermingstillegg = dto.skjermingstillegg ?: 0
         )
 
     private fun privatAfp(dto: SimulatorPersonligPrivatAfp) =
