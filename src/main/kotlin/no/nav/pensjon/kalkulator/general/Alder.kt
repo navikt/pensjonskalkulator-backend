@@ -29,7 +29,8 @@ data class Alder(val aar: Int, val maaneder: Int) {
     companion object {
 
         fun from(foedselDato: LocalDate, dato: LocalDate): Alder {
-            val delmaanedFratrekk = if (dato.dayOfMonth - foedselDato.dayOfMonth < 0) 1 else 0
+            // NB: Hvis samme dayOfMonth regnes ikke måneden som helt fylt, dermed fratrekk 1
+            val delmaanedFratrekk = if (dato.dayOfMonth - foedselDato.dayOfMonth <= 0) 1 else 0
 
             return normalisedAlder(
                 aar = dato.year - foedselDato.year,
