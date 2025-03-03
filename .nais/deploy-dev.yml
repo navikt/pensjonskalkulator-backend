@@ -77,9 +77,9 @@ spec:
         - application: pensjonskalkulator-uinnlogget-magicbox
         - application: pensjonskalkulator-uinnlogget-sandbox
         - application: azure-token-generator # only in dev
-          namespace: aura
+          namespace: nais
         - application: tokenx-token-generator # only in dev
-          namespace: aura
+          namespace: nais
     outbound:
       rules:
         - application: etterlatte-api
