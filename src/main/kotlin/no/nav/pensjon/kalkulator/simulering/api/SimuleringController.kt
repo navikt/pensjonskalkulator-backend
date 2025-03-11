@@ -25,7 +25,6 @@ import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("api")
@@ -61,7 +60,6 @@ class SimuleringController(
     fun simulerAlderspensjonV8(@RequestBody spec: PersonligSimuleringSpecV8): PersonligSimuleringResultV8 {
         traceAid.begin()
         log.debug { "Request for V8 simulering: $spec" }
-        throw ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Midlertidig utilgjengelig")
 
         return try {
             if (feature.isEnabled("utvidet-simuleringsresultat"))
@@ -121,7 +119,6 @@ class SimuleringController(
     fun simulerAnonymAlderspensjonV1(@RequestBody spec: AnonymSimuleringSpecV1): ResponseEntity<AnonymSimuleringResultV1> {
         traceAid.begin()
         log.debug { "Request for anonym simulering V1: $spec" }
-        throw ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Midlertidig utilgjengelig")
 
         return try {
             ResponseEntity.ok(
