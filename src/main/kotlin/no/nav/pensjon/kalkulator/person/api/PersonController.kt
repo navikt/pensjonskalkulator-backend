@@ -18,7 +18,6 @@ import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
-
 @RestController
 @RequestMapping("api")
 class PersonController(
@@ -53,6 +52,7 @@ class PersonController(
     fun personV2(): PersonV2 {
         traceAid.begin()
         log.debug { "Request for personinformasjon V2" }
+        throw ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Midlertidig utilgjengelig")
 
         return try {
             PersonMapperV2.dtoV2(timed(service::getPerson, "person"))
@@ -91,6 +91,7 @@ class PersonController(
     fun personV4(): PersonResultV4 {
         traceAid.begin()
         log.debug { "Request for personinformasjon V4" }
+        throw ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Midlertidig utilgjengelig")
 
         return try {
             PersonMapperV4.dtoV4(timed(service::getPerson, "person"))
