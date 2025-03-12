@@ -1,5 +1,5 @@
 package no.nav.pensjon.kalkulator.person.api
-/*
+
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PersonFactory.skiltPerson
 import no.nav.pensjon.kalkulator.person.PersonService
@@ -100,4 +100,3 @@ class PersonControllerTest {
 }"""
     }
 }
-*/
