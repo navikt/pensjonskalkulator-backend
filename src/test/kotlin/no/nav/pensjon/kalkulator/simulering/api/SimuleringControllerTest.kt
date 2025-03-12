@@ -1,5 +1,5 @@
 package no.nav.pensjon.kalkulator.simulering.api
-/*
+
 import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
@@ -572,4 +572,3 @@ class SimuleringControllerTest {
         private fun conflict() = EgressException(message = "", statusCode = HttpStatus.CONFLICT)
     }
 }
-*/
