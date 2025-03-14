@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
+import no.nav.pensjon.kalkulator.simulering.SimuleringException
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -108,6 +109,8 @@ class UttaksalderController(
             handleError(e, version)
         } catch (e: BadRequestException) {
             badRequest(e)!!
+        } catch (e: SimuleringException) {
+            handleError(EgressException(e.message!!, e), version)
         } finally {
             traceAid.end()
         }

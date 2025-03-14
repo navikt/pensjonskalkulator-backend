@@ -15,6 +15,7 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.*
@@ -67,6 +68,20 @@ class SimuleringServiceTest {
         assertEquals(PENSJONSBELOEP, response.alderspensjon[0].beloep)
         verify(inntektService, times(1)).sistePensjonsgivendeInntekt()
         verify(personClient, times(1)).fetchPerson(pid, fetchFulltNavn = false)
+    }
+
+    @Test
+    fun `simulerPersonligAlderspensjon throws SimuleringException when AFP Offentlig is empty`() {
+        val incomingSpec = impersonalSimuleringSpec(null, null).copy(simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG)
+        `when`(inntektService.sistePensjonsgivendeInntekt()).thenReturn(inntekt)
+        `when`(personClient.fetchPerson(pid, fetchFulltNavn = false)).thenReturn(person())
+        `when`(simuleringClient.simulerPersonligAlderspensjon(incomingSpec, personalSpec)).thenReturn(simuleringResult.copy(afpOffentlig = emptyList()))
+
+        val exception = assertThrows<SimuleringException> {
+            service.simulerPersonligAlderspensjon(incomingSpec)
+        }
+
+        assertEquals("Henting av AFP Offentlig feilet", exception.message)
     }
 
     private companion object {
