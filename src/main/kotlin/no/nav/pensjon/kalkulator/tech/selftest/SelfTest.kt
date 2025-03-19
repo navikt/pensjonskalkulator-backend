@@ -2,7 +2,6 @@ package no.nav.pensjon.kalkulator.tech.selftest
 
 import no.nav.pensjon.kalkulator.common.client.fssgw.FssGatewayPingClient
 import no.nav.pensjon.kalkulator.common.client.pen.PenPingClient
-import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.PensjonReglerGrunnbeloepClient
 import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.client.pdl.PdlPersonClient
 import no.nav.pensjon.kalkulator.tech.representasjon.client.pensjon.PensjonRepresentasjonClient
@@ -15,7 +14,6 @@ import java.time.LocalTime
 @Component
 class SelfTest(
     fssGatewayClient: FssGatewayPingClient,
-    grunnbeloepClient: PensjonReglerGrunnbeloepClient,
     entraIdClient: AzureAdOAuth2MetadataClient,
     opptjeningClient: PoppOpptjeningsgrunnlagClient,
     penClient: PenPingClient,
@@ -27,7 +25,6 @@ class SelfTest(
 
     private val services: List<Pingable> = listOf(
         fssGatewayClient,
-        grunnbeloepClient,
         entraIdClient,
         opptjeningClient,
         penClient,
