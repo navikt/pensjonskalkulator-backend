@@ -2,7 +2,6 @@ package no.nav.pensjon.kalkulator.tech.selftest
 
 import no.nav.pensjon.kalkulator.common.client.fssgw.FssGatewayPingClient
 import no.nav.pensjon.kalkulator.common.client.pen.PenPingClient
-import no.nav.pensjon.kalkulator.grunnbeloep.client.regler.PensjonReglerGrunnbeloepClient
 import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.client.pdl.PdlPersonClient
 import no.nav.pensjon.kalkulator.tech.representasjon.client.pensjon.PensjonRepresentasjonClient
@@ -29,9 +28,6 @@ class SelfTestTest {
     private lateinit var fssGatewayClient: FssGatewayPingClient
 
     @Mock
-    private lateinit var grunnbeloepClient: PensjonReglerGrunnbeloepClient
-
-    @Mock
     private lateinit var entraIdClient: AzureAdOAuth2MetadataClient
 
     @Mock
@@ -56,7 +52,6 @@ class SelfTestTest {
     fun initialize() {
         selfTest = TestClass(
             fssGatewayClient,
-            grunnbeloepClient,
             entraIdClient,
             opptjeningClient,
             penClient,
@@ -139,9 +134,6 @@ $TABLE_BODY
         `when`(fssGatewayClient.ping())
             .thenReturn(PingResult(EgressService.FSS_GATEWAY, status, "fssgw-endpoint", "fssgw-message"))
 
-        `when`(grunnbeloepClient.ping())
-            .thenReturn(PingResult(EgressService.PENSJON_REGLER, status, "regler-endpoint", "regler-message"))
-
         `when`(entraIdClient.ping())
             .thenReturn(PingResult(EgressService.MICROSOFT_ENTRA_ID, status, "entraid-endpoint", "entraid-message"))
 
@@ -166,7 +158,6 @@ $TABLE_BODY
 
     private class TestClass(
         fssGatewayClient: FssGatewayPingClient,
-        grunnbeloepClient: PensjonReglerGrunnbeloepClient,
         entraIdOAuth2MetadataClient: AzureAdOAuth2MetadataClient,
         opptjeningClient: PoppOpptjeningsgrunnlagClient,
         penClient: PenPingClient,
@@ -177,7 +168,6 @@ $TABLE_BODY
     ) :
         SelfTest(
             fssGatewayClient,
-            grunnbeloepClient,
             entraIdOAuth2MetadataClient,
             opptjeningClient,
             penClient,
@@ -196,7 +186,6 @@ $TABLE_BODY
         @Language("json")
         private const val UP_CHECKS: String = "[" +
                 "{\"endpoint\":\"fssgw-endpoint\",\"description\":\"Fagsystemsone-gateway\",\"result\":0}, " +
-                "{\"endpoint\":\"regler-endpoint\",\"description\":\"Pensjon-regler\",\"result\":0}, " +
                 "{\"endpoint\":\"entraid-endpoint\",\"description\":\"Microsoft Entra ID\",\"result\":0}, " +
                 "{\"endpoint\":\"popp-endpoint\",\"description\":\"Pensjonsopptjening\",\"result\":0}, " +
                 "{\"endpoint\":\"pen-endpoint\",\"description\":\"Pensjonsfaglig kjerne\",\"result\":0}, " +
@@ -209,7 +198,6 @@ $TABLE_BODY
         @Language("json")
         private const val DOWN_CHECKS: String = "[" +
                 "{\"endpoint\":\"fssgw-endpoint\",\"description\":\"Fagsystemsone-gateway\",\"errorMessage\":\"fssgw-message\",\"result\":1}, " +
-                "{\"endpoint\":\"regler-endpoint\",\"description\":\"Pensjon-regler\",\"errorMessage\":\"regler-message\",\"result\":1}, " +
                 "{\"endpoint\":\"entraid-endpoint\",\"description\":\"Microsoft Entra ID\",\"errorMessage\":\"entraid-message\",\"result\":1}, " +
                 "{\"endpoint\":\"popp-endpoint\",\"description\":\"Pensjonsopptjening\",\"errorMessage\":\"popp-message\",\"result\":1}, " +
                 "{\"endpoint\":\"pen-endpoint\",\"description\":\"Pensjonsfaglig kjerne\",\"errorMessage\":\"pen-message\",\"result\":1}, " +
@@ -222,7 +210,6 @@ $TABLE_BODY
         @Language("html")
         private const val TABLE_BODY: String = "<tbody>" +
                 "<tr><td>Fagsystemsone-gateway</td><td style=\"background-color:green;text-align:center;\">UP</td><td>fssgw-message</td><td>fssgw-endpoint</td><td>Tilgang til Fagsystemsonen</td></tr>" +
-                "<tr><td>Pensjon-regler</td><td style=\"background-color:green;text-align:center;\">UP</td><td>regler-message</td><td>regler-endpoint</td><td>Pensjonsregler</td></tr>" +
                 "<tr><td>Microsoft Entra ID</td><td style=\"background-color:green;text-align:center;\">UP</td><td>entraid-message</td><td>entraid-endpoint</td><td>OAuth2 configuration data</td></tr>" +
                 "<tr><td>Pensjonsopptjening</td><td style=\"background-color:green;text-align:center;\">UP</td><td>popp-message</td><td>popp-endpoint</td><td>Pensjonsopptjeningsdata</td></tr>" +
                 "<tr><td>Pensjonsfaglig kjerne</td><td style=\"background-color:green;text-align:center;\">UP</td><td>pen-message</td><td>pen-endpoint</td><td>Simulering, pensjonsdata</td></tr>" +
