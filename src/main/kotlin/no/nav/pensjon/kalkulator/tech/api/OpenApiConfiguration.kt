@@ -44,7 +44,6 @@ class OpenApiConfiguration {
                 "/api/v4/vedtak/loepende-vedtak",
                 "/api/v3/vedtak/loepende-vedtak",
                 "/api/v2/vedtak/loepende-vedtak",
-                "/api/v1/vedtak/loepende-vedtak",
                 "/api/v1/ekskludert",
                 "/api/v2/ekskludert",
                 "/api/v1/land-liste",
@@ -72,7 +71,7 @@ class OpenApiConfiguration {
         return GroupedOpenApi.builder()
             .group("deprecated")
             .pathsToMatch(
-                "/api/grunnbeloep",
+                "/api/v1/vedtak/loepende-vedtak",
             )
             .build()
     }
