@@ -29,7 +29,7 @@ class EnrichedAuthenticationTest {
     @BeforeEach
     fun initialize() {
         val tokenSuppliersByService =
-            EgressTokenSuppliersByService(mapOf(EgressService.PENSJON_REGLER to Function { RawJwt("token1") }))
+            EgressTokenSuppliersByService(mapOf(EgressService.PENSJONSSIMULATOR to Function { RawJwt("token1") }))
 
         enrichedAuthentication =
             EnrichedAuthentication(
@@ -41,7 +41,7 @@ class EnrichedAuthenticationTest {
 
     @Test
     fun `getEgressAccessToken returns access token for given egress service`() {
-        val token = enrichedAuthentication.getEgressAccessToken(EgressService.PENSJON_REGLER, "")
+        val token = enrichedAuthentication.getEgressAccessToken(EgressService.PENSJONSSIMULATOR, "")
         assertEquals("token1", token.value)
     }
 
