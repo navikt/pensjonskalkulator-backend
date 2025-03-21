@@ -81,7 +81,7 @@ class SimuleringServiceTest {
             service.simulerPersonligAlderspensjon(incomingSpec)
         }
 
-        assertEquals("Henting av AFP Offentlig feilet", exception.message)
+        assertEquals(SimuleringStatus.AFP_IKKE_I_VILKAARSPROEVING, exception.status)
     }
 
     private companion object {

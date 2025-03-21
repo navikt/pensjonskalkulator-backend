@@ -12,14 +12,14 @@ import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
-import no.nav.pensjon.kalkulator.uttaksalder.api.dto.AlderDto
-import no.nav.pensjon.kalkulator.uttaksalder.api.dto.IngressUttaksalderSpecForHeltUttakV1
-import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderResultV2
-import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderSpecV2
+import no.nav.pensjon.kalkulator.uttaksalder.api.dto.*
 import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderMapperV1.fromIngressSpecForHeltUttakV1
 import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderMapperV1.toDto
 import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderResultMapperV2.resultV2
 import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderSpecMapperV2.fromDtoV2
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -75,6 +75,7 @@ class UttaksalderController(
         }
     }
 
+
     @PostMapping("v2/tidligste-hel-uttaksalder")
     @Operation(
         summary = "Tidligst mulige uttaksalder ved helt uttak",
@@ -110,10 +111,16 @@ class UttaksalderController(
         } catch (e: BadRequestException) {
             badRequest(e)!!
         } catch (e: SimuleringException) {
-            handleError(EgressException(e.message!!, e), version)
+            e.status?.let { throw e } ?: handleError(EgressException(e.message ?: "", e), version)
         } finally {
             traceAid.end()
         }
+    }
+
+    @ExceptionHandler(SimuleringException::class)
+    fun handleError(e: SimuleringException): ResponseEntity<UttaksalderError> {
+        log.error(e) { "SimuleringException" }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body( UttaksalderError(e.status!!, e.message))
     }
 
     override fun errorMessage() = ERROR_MESSAGE

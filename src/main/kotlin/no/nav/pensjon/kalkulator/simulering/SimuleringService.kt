@@ -40,7 +40,7 @@ class SimuleringService(
                 simuleringResult.afpOffentlig.isEmpty()
             )
                 throw SimuleringException(
-                    "Henting av AFP Offentlig feilet"
+                    status = SimuleringStatus.AFP_IKKE_I_VILKAARSPROEVING
                 )
         }
     }
