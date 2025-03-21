@@ -34,7 +34,15 @@ class SimuleringService(
 
         log.debug { "Simulerer med parametre $impersonalSpec og $personalSpec" }
         checkAlder(pid.dato()) // NB: eksakt alder kan ikke alltid utledes fra fødselsnummer
-        return simuleringClient.simulerPersonligAlderspensjon(impersonalSpec, personalSpec)
+        return simuleringClient.simulerPersonligAlderspensjon(impersonalSpec, personalSpec).also { simuleringResult ->
+            if (
+                impersonalSpec.simuleringType == SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG &&
+                simuleringResult.afpOffentlig.isEmpty()
+            )
+                throw SimuleringException(
+                    status = SimuleringStatus.AFP_IKKE_I_VILKAARSPROEVING
+                )
+        }
     }
 
     private fun sivilstand(pid: Pid) =
