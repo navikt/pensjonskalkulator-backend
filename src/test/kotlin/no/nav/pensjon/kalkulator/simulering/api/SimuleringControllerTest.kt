@@ -393,6 +393,41 @@ class SimuleringControllerTest {
                     opptjeningGrunnlagListe = emptyList()
                 )
 
+                SimuleringType.AFP_ETTERF_ALDER -> SimuleringResult(
+                    alderspensjon = listOf(
+                        SimulertAlderspensjon(
+                            alder = 67,
+                            beloep = PENSJONSBELOEP,
+                            inntektspensjonBeloep = 0,
+                            garantipensjonBeloep = 0,
+                            delingstall = 0.0,
+                            pensjonBeholdningFoerUttak = 0,
+                            andelsbroekKap19 = 0.0,
+                            andelsbroekKap20 = 0.0,
+                            sluttpoengtall = 0.0,
+                            trygdetidKap19 = 0,
+                            trygdetidKap20 = 0,
+                            poengaarFoer92 = 0,
+                            poengaarEtter91 = 0,
+                            forholdstall = 0.0,
+                            grunnpensjon = 0,
+                            tilleggspensjon = 0,
+                            pensjonstillegg = 0,
+                            skjermingstillegg = 0
+                        )
+                    ),
+                    alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(
+                        gradertUttak = if (heltUttak) null else 0,
+                        heltUttak = 0
+                    ),
+                    afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 22056)),
+                    afpOffentlig = emptyList(),
+                    vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
+                    harForLiteTrygdetid = false,
+                    trygdetid = 0,
+                    opptjeningGrunnlagListe = emptyList()
+                )
+
                 SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT -> SimuleringResult(
                     alderspensjon = listOf(
                         SimulertAlderspensjon(
