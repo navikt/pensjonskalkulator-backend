@@ -322,7 +322,7 @@ class SimuleringControllerTest {
                 {
                     "heltUttakMaanedligBeloep": 0
                 },
-            "afpPrivat": 
+            "afpPrivat":
               [
                 {
                   "beloep": 22056,

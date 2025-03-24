@@ -18,7 +18,6 @@ import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
-
 @RestController
 @RequestMapping("api")
 class PersonController(

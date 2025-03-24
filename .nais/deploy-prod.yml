@@ -15,7 +15,7 @@ spec:
     limits:
       memory: 3072Mi
     requests:
-      cpu: 500m
+      cpu: 200m
       memory: 1536Mi
   ingresses:
     - https://pensjonskalkulator-backend.intern.nav.no
@@ -81,8 +81,8 @@ spec:
         - host: pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
         - host: pensjonskalkulator-unleash-api.nav.cloud.nais.io
         - host: skjermede-personer-pip.intern.nav.no
-        - host: tp-api.prod-fss-pub.nais.io
         - host: sokos-utbetaldata.prod-fss-pub.nais.io
+        - host: tp-api.prod-fss-pub.nais.io
   env:
     - name: FSS_GATEWAY_SERVICE_ID
       value: prod-fss:pensjonselvbetjening:pensjon-selvbetjening-fss-gateway
@@ -98,8 +98,6 @@ spec:
       value: prod-fss:pensjondeployer:pensjon-pen
     - name: PEN_URL
       value: https://pensjon-pen.prod-fss-pub.nais.io
-    - name: PENSJON_REGLER_URL
-      value: https://pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
     - name: PENSJON_REPRESENTASJON_SERVICE_ID
       value: prod-fss:pensjon-person:pensjon-representasjon
     - name: PENSJON_REPRESENTASJON_URL
