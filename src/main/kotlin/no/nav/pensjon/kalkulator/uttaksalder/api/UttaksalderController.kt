@@ -3,11 +3,13 @@ package no.nav.pensjon.kalkulator.uttaksalder.api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
+import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.simulering.SimuleringException
+import no.nav.pensjon.kalkulator.simulering.api.dto.AnonymSimuleringErrorV1
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -89,8 +91,11 @@ class UttaksalderController(
             ),
             ApiResponse(
                 responseCode = "503", description = "Søk etter uttaksalder kunne ikke utføres av tekniske årsaker",
-                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
-            ),
+                content = [
+                    Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)]),
+                    Content(schema = Schema(implementation = UttaksalderError::class))
+                ]
+            )
         ]
     )
     fun finnTidligsteHelUttaksalderV2(@RequestBody spec: UttaksalderSpecV2): UttaksalderResultV2? {
