@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.simulering
 data class SimuleringResult(
     val alderspensjon: List<SimulertAlderspensjon>,
     val alderspensjonMaanedsbeloep: AlderspensjonMaanedsbeloep? = null,
+    val pre2025OffentligAfp: SimulertPre2025OffentligAfp? = null,
     val afpPrivat: List<SimulertAfpPrivat>,
     val afpOffentlig: List<SimulertAfpOffentlig>,
     val vilkaarsproeving: Vilkaarsproeving,

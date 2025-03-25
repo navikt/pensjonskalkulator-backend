@@ -18,6 +18,7 @@ object PersonligSimuleringExtendedResultMapperV8 {
         PersonligSimuleringResultV8(
             alderspensjon = source.alderspensjon.map(::alderspensjon).let { justerAlderspensjonIInnevaerendeAarV8(it, foedselsdato) },
             alderspensjonMaanedligVedEndring = maanedligPensjon(source.alderspensjonMaanedsbeloep),
+            pre2025OffentligAfp = source.pre2025OffentligAfp?.let(::pre2025OffentligAfp),
             afpPrivat = source.afpPrivat.map(::privatAfp).let { justerAfpPrivatIInnevaerendeAarV8(it, foedselsdato) },
             afpOffentlig = source.afpOffentlig.map(::offentligAfp),
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving),
@@ -52,6 +53,22 @@ object PersonligSimuleringExtendedResultMapperV8 {
         PersonligSimuleringMaanedligPensjonResultV8(
             gradertUttakMaanedligBeloep = source?.gradertUttak,
             heltUttakMaanedligBeloep = source?.heltUttak ?: 0
+        )
+
+    private fun pre2025OffentligAfp(source: SimulertPre2025OffentligAfp?) =
+        PersonligSimuleringPre2025OffentligAfpResultV8(
+            alderAar = source?.alderAar ?: 0,
+            totalbelopAfp = source?.totalbelopAfp ?: 0,
+            tidligereArbeidsinntekt = source?.tidligereArbeidsinntekt ?: 0,
+            grunnbelop = source?.grunnbelop ?: 0,
+            sluttpoengtall = source?.sluttpoengtall ?: 0.0,
+            trygdetid = source?.trygdetid ?: 0,
+            poeangaarFoer92 = source?.poeangaarFoer92 ?: 0,
+            poeangaarEtter91 = source?.poeangaarEtter91 ?: 0,
+            grunnpensjon = source?.grunnpensjon ?: 0,
+            tilleggspensjon = source?.tilleggspensjon ?: 0,
+            afpTillegg = source?.afpTillegg ?: 0,
+            sertillegg = source?.sertillegg ?: 0
         )
 
     private fun privatAfp(source: SimulertAfpPrivat) =
