@@ -26,7 +26,7 @@ object SimulatorPersonligSimuleringSpecMapper {
             heltUttak = heltUttak(impersonalSpec.heltUttak),
             utenlandsperiodeListe = impersonalSpec.utenlandsopphold.periodeListe.map(::utlandPeriode),
             afpInntektMaanedFoerUttak = impersonalSpec.afpInntektMaanedFoerUttak,
-            afpOrdning = SimulatorAfpOrdningType.fromInternalValue(impersonalSpec.afpOrdning)?.externalValue
+            afpOrdning = SimulatorAfpOrdningType.fromInternalValue(impersonalSpec.afpOrdning).externalValue
         )
 
     private fun gradertUttak(source: GradertUttak) =

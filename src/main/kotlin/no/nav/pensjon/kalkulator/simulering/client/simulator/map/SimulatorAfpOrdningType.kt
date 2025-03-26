@@ -16,6 +16,6 @@ enum class SimulatorAfpOrdningType (val externalValue: String, val internalValue
         private val values = SimulatorAfpOrdningType.entries.toTypedArray()
 
         fun fromInternalValue(value: AfpOrdningType?) =
-            values.singleOrNull { it.internalValue == value }
+            values.singleOrNull { it.internalValue == value } ?: AFPKOM
     }
 }
