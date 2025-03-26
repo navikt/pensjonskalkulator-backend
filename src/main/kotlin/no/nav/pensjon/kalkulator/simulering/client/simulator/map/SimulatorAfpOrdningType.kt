@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.simulering.client.simulator.map
 
 import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
 
-enum class SimulatorAfpOrdningType (val externalValue: String, val internalValue: AfpOrdningType?) {
+enum class SimulatorAfpOrdningType (val externalValue: String, val internalValue: AfpOrdningType) {
 
     AFPKOM("AFPKOM", AfpOrdningType.AFPKOM),
     AFPSTAT("AFPSTAT", AfpOrdningType.AFPSTAT),

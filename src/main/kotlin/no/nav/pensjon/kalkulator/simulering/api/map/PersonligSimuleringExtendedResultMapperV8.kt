@@ -55,20 +55,20 @@ object PersonligSimuleringExtendedResultMapperV8 {
             heltUttakMaanedligBeloep = source?.heltUttak ?: 0
         )
 
-    private fun pre2025OffentligAfp(source: SimulertPre2025OffentligAfp?) =
+    private fun pre2025OffentligAfp(source: SimulertPre2025OffentligAfp) =
         PersonligSimuleringPre2025OffentligAfpResultV8(
-            alderAar = source?.alderAar ?: 0,
-            totalbelopAfp = source?.totalbelopAfp ?: 0,
-            tidligereArbeidsinntekt = source?.tidligereArbeidsinntekt ?: 0,
-            grunnbelop = source?.grunnbelop ?: 0,
-            sluttpoengtall = source?.sluttpoengtall ?: 0.0,
-            trygdetid = source?.trygdetid ?: 0,
-            poeangaarFoer92 = source?.poeangaarFoer92 ?: 0,
-            poeangaarEtter91 = source?.poeangaarEtter91 ?: 0,
-            grunnpensjon = source?.grunnpensjon ?: 0,
-            tilleggspensjon = source?.tilleggspensjon ?: 0,
-            afpTillegg = source?.afpTillegg ?: 0,
-            sertillegg = source?.sertillegg ?: 0
+            alderAar = source.alderAar,
+            totaltAfpBeloep = source.totaltAfpBeloep,
+            tidligereArbeidsinntekt = source.tidligereArbeidsinntekt,
+            grunnbeloep = source.grunnbeloep,
+            sluttpoengtall = source.sluttpoengtall,
+            trygdetid = source.trygdetid,
+            poengaarTom1991 = source.poengaarTom1991,
+            poengaarFom1992 = source.poengaarFom1992,
+            grunnpensjon = source.grunnpensjon,
+            tilleggspensjon = source.tilleggspensjon,
+            afpTillegg = source.afpTillegg,
+            saertillegg = source.saertillegg
         )
 
     private fun privatAfp(source: SimulertAfpPrivat) =
