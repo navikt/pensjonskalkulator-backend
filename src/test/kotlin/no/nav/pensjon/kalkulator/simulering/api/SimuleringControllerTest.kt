@@ -393,7 +393,7 @@ class SimuleringControllerTest {
                     opptjeningGrunnlagListe = emptyList()
                 )
 
-                SimuleringType.AFP_ETTERF_ALDER -> SimuleringResult(
+                SimuleringType.PRE2025_OFFENTLIG_AFP_ETTERFULGT_AV_ALDERSPENSJON -> SimuleringResult(
                     alderspensjon = listOf(
                         SimulertAlderspensjon(
                             alder = 67,
