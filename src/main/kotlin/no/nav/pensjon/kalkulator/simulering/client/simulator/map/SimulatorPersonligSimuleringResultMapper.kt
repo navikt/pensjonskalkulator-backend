@@ -45,17 +45,17 @@ object SimulatorPersonligSimuleringResultMapper {
     private fun pre2025OffentligAfp(dto: SimulatorPre2025OffentligAfp) =
         SimulertPre2025OffentligAfp(
             alderAar = dto.alderAar,
-            totaltAfpBeloep = dto.totalbelopAfp,
+            totaltAfpBeloep = dto.totaltAfpBeloep,
             tidligereArbeidsinntekt = dto.tidligereArbeidsinntekt,
-            grunnbeloep = dto.grunnbelop,
+            grunnbeloep = dto.grunnbeloep,
             sluttpoengtall = dto.sluttpoengtall,
             trygdetid = dto.trygdetid,
-            poengaarTom1991 = dto.poeangaarFoer92,
-            poengaarFom1992 = dto.poeangaarEtter91,
+            poengaarTom1991 = dto.poengaarTom1991,
+            poengaarFom1992 = dto.poengaarFom1992,
             grunnpensjon = dto.grunnpensjon,
             tilleggspensjon = dto.tilleggspensjon,
             afpTillegg = dto.afpTillegg,
-            saertillegg = dto.sertillegg
+            saertillegg = dto.saertillegg
         )
 
     private fun privatAfp(dto: SimulatorPersonligPrivatAfp) =
