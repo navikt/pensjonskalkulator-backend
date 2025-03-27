@@ -5,6 +5,7 @@ package no.nav.pensjon.kalkulator.simulering.client.simulator.dto
 data class SimulatorPersonligSimuleringResult(
     val alderspensjonListe: List<SimulatorPersonligPensjon>,
     val alderspensjonMaanedsbeloep: SimulatorPersonligMaanedsbeloep?,
+    val pre2025OffentligAfp: SimulatorPre2025OffentligAfp?,
     val privatAfpListe: List<SimulatorPersonligPrivatAfp>,
     val livsvarigOffentligAfpListe: List<SimulatorPersonligLivsvarigOffentligAfp>,
     val vilkaarsproeving: SimulatorPersonligVilkaarsproeving?,
@@ -38,6 +39,21 @@ data class SimulatorPersonligPensjon(
 data class SimulatorPersonligMaanedsbeloep(
     val gradertUttakBeloep: Int?,
     val heltUttakBeloep: Int
+)
+
+data class SimulatorPre2025OffentligAfp(
+    val alderAar: Int,
+    val totaltAfpBeloep: Int,
+    val tidligereArbeidsinntekt: Int,
+    val grunnbeloep: Int,
+    val sluttpoengtall: Double,
+    val trygdetid: Int,
+    val poengaarTom1991: Int,
+    val poengaarFom1992: Int,
+    val grunnpensjon: Int,
+    val tilleggspensjon: Int,
+    val afpTillegg: Int,
+    val saertillegg: Int
 )
 
 data class SimulatorPersonligPrivatAfp(

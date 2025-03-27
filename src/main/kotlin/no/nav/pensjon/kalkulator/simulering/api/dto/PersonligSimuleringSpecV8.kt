@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.simulering.api.dto
 
 import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import java.time.LocalDate
 
@@ -17,7 +18,9 @@ data class PersonligSimuleringSpecV8(
     val utenlandsperiodeListe: List<PersonligSimuleringUtenlandsperiodeSpecV8>? = null,
     val sivilstand: Sivilstand?,
     val epsHarInntektOver2G: Boolean,
-    val epsHarPensjon: Boolean
+    val epsHarPensjon: Boolean,
+    val afpInntektMaanedFoerUttak: Int?,
+    val afpOrdning: AfpOrdningType? = null
 )
 
 data class PersonligSimuleringGradertUttakSpecV8(

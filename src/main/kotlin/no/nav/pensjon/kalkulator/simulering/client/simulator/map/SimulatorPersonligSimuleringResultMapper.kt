@@ -11,6 +11,7 @@ object SimulatorPersonligSimuleringResultMapper {
         SimuleringResult(
             alderspensjon = dto.alderspensjonListe.map(::alderspensjon),
             alderspensjonMaanedsbeloep = dto.alderspensjonMaanedsbeloep?.let(::alderspensjonMaanedsbeloep),
+            pre2025OffentligAfp = dto.pre2025OffentligAfp?.let(::pre2025OffentligAfp),
             afpPrivat = dto.privatAfpListe.map(::privatAfp),
             afpOffentlig = dto.livsvarigOffentligAfpListe.map(::livsvarigOffentligAfp),
             vilkaarsproeving = dto.vilkaarsproeving?.let(::vilkaarsproeving) ?: Vilkaarsproeving(innvilget = true),
@@ -39,6 +40,22 @@ object SimulatorPersonligSimuleringResultMapper {
             tilleggspensjon = dto.tilleggspensjon ?: 0,
             pensjonstillegg = dto.pensjonstillegg ?: 0,
             skjermingstillegg = dto.skjermingstillegg ?: 0
+        )
+
+    private fun pre2025OffentligAfp(dto: SimulatorPre2025OffentligAfp) =
+        SimulertPre2025OffentligAfp(
+            alderAar = dto.alderAar,
+            totaltAfpBeloep = dto.totaltAfpBeloep,
+            tidligereArbeidsinntekt = dto.tidligereArbeidsinntekt,
+            grunnbeloep = dto.grunnbeloep,
+            sluttpoengtall = dto.sluttpoengtall,
+            trygdetid = dto.trygdetid,
+            poengaarTom1991 = dto.poengaarTom1991,
+            poengaarFom1992 = dto.poengaarFom1992,
+            grunnpensjon = dto.grunnpensjon,
+            tilleggspensjon = dto.tilleggspensjon,
+            afpTillegg = dto.afpTillegg,
+            saertillegg = dto.saertillegg
         )
 
     private fun privatAfp(dto: SimulatorPersonligPrivatAfp) =
