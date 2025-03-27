@@ -163,6 +163,7 @@ class SimuleringController(
         private fun vilkaarIkkeOppfyltV8() =
             PersonligSimuleringResultV8(
                 alderspensjon = emptyList(),
+                pre2025OffentligAfp = null,
                 afpPrivat = null,
                 afpOffentlig = null,
                 vilkaarsproeving = PersonligSimuleringVilkaarsproevingResultV8(

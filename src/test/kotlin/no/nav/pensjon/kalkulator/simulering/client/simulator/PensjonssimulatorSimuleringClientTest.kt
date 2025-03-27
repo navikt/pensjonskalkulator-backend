@@ -180,7 +180,8 @@ class PensjonssimulatorSimuleringClientTest : WebClientTest() {
     "tom" : "1999-11-30",
     "land" : "AUS",
     "arbeidetUtenlands" : true
-  } ]
+  } ],
+  "afpOrdning" : "AFPKOM"
 }"""
 
         @Language("json")

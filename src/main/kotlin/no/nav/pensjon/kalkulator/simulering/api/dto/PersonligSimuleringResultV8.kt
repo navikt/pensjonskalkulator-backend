@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 data class PersonligSimuleringResultV8(
     val alderspensjon: List<PersonligSimuleringAlderspensjonResultV8> = emptyList(),
     val alderspensjonMaanedligVedEndring: PersonligSimuleringMaanedligPensjonResultV8? = null,
+    val pre2025OffentligAfp: PersonligSimuleringPre2025OffentligAfpResultV8? = null,
     val afpPrivat: List<PersonligSimuleringAarligPensjonResultV8>? = emptyList(),
     val afpOffentlig: List<PersonligSimuleringAarligPensjonResultV8>? = emptyList(),
     val vilkaarsproeving: PersonligSimuleringVilkaarsproevingResultV8,
@@ -40,6 +41,22 @@ data class PersonligSimuleringAlderspensjonResultV8(
     val tilleggspensjon: Int? = null,
     val pensjonstillegg: Int? = null,
     val skjermingstillegg: Int? = null
+)
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class PersonligSimuleringPre2025OffentligAfpResultV8(
+    val alderAar: Int,
+    val totaltAfpBeloep: Int,
+    val tidligereArbeidsinntekt: Int,
+    val grunnbeloep: Int,
+    val sluttpoengtall: Double,
+    val trygdetid: Int,
+    val poengaarTom1991: Int,
+    val poengaarFom1992: Int,
+    val grunnpensjon: Int,
+    val tilleggspensjon: Int,
+    val afpTillegg: Int,
+    val saertillegg: Int
 )
 
 data class PersonligSimuleringAarligPensjonResultV8(

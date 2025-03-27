@@ -16,7 +16,9 @@ data class SimulatorSimuleringSpec(
     val uttaksar: Int,
     val gradertUttak: SimulatorGradertUttakSpec? = null,
     val heltUttak: SimulatorHeltUttakSpec,
-    val utenlandsperiodeListe: List<SimulatorUtlandPeriodeSpec>
+    val utenlandsperiodeListe: List<SimulatorUtlandPeriodeSpec>,
+    val afpInntektMaanedFoerUttak: Int?,
+    val afpOrdning: String? = null
 ) {
     /**
      * toString with redacted person ID
@@ -31,7 +33,9 @@ data class SimulatorSimuleringSpec(
                 "uttaksar: $uttaksar, " +
                 "gradertUttak: $gradertUttak, " +
                 "heltUttak: $heltUttak, " +
-                "utenlandsperiodeListe: $utenlandsperiodeListe"
+                "utenlandsperiodeListe: $utenlandsperiodeListe, " +
+                "afpInntektMaanedFoerUttak: $afpInntektMaanedFoerUttak, " +
+                "afpOrdning: $afpOrdning, "
 }
 
 data class SimulatorGradertUttakSpec(

@@ -19,7 +19,9 @@ object PersonligSimuleringSpecMapperV8 {
             sivilstand = source.sivilstand,
             gradertUttak = source.gradertUttak?.let(::gradertUttak),
             heltUttak = heltUttak(source.heltUttak),
-            utenlandsopphold = utenlandsopphold(source)
+            utenlandsopphold = utenlandsopphold(source),
+            afpInntektMaanedFoerUttak = source.afpInntektMaanedFoerUttak,
+            afpOrdning = source.afpOrdning
         )
 
     private fun eps(source: PersonligSimuleringSpecV8) =

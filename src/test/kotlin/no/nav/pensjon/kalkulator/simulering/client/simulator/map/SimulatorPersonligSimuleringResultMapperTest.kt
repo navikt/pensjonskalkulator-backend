@@ -17,6 +17,7 @@ class SimulatorPersonligSimuleringResultMapperTest {
                     gradertUttakBeloep = null,
                     heltUttakBeloep = 0
                 ),
+                pre2025OffentligAfp = null,
                 privatAfpListe = emptyList(),
                 livsvarigOffentligAfpListe = emptyList(),
                 vilkaarsproeving = SimulatorPersonligVilkaarsproeving(
@@ -91,6 +92,7 @@ class SimulatorPersonligSimuleringResultMapperTest {
                     gradertUttakBeloep = null,
                     heltUttakBeloep = 0
                 ),
+                pre2025OffentligAfp = null,
                 privatAfpListe = emptyList(),
                 livsvarigOffentligAfpListe = emptyList(),
                 vilkaarsproeving = SimulatorPersonligVilkaarsproeving(
