@@ -25,8 +25,7 @@ class PenUfoeregradClient(
         doGet(
             object : ParameterizedTypeReference<UfoeregradPenDto>() {},
             PATH,
-            pid,
-            deprecatedBasePath = false
+            pid
         )?.let(UfoeregradMapper::fromDto) ?: throw EgressException("Kunne ikke hente uføregrad for brukeren")
 
     private companion object {

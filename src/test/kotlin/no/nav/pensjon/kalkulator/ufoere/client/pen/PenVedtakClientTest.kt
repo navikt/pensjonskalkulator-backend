@@ -1,5 +1,7 @@
 package no.nav.pensjon.kalkulator.ufoere.client.pen
 
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.mock.DateFactory.date
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
@@ -8,7 +10,6 @@ import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.ufoere.Sakstype
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mock
@@ -44,21 +45,11 @@ class PenVedtakClientTest : WebClientTest() {
 
         val vedtaksliste = client.bestemGjeldendeVedtak(pid, date)
 
-        val request = takeRequest()
-        assertEquals(pid.value, request.getHeader("fnr"))
-        assertEquals("2023-04-05", request.requestUrl?.queryParameter("fom") ?: "")
-        assertEquals(Sakstype.UFOEREPENSJON, vedtaksliste[0].sakstype)
-    }
-
-    @Test
-    fun `bestemGjeldendeVedtak uses correct PEN api-path`() {
-        arrange(okResponse())
-
-        client.bestemGjeldendeVedtak(pid, date)
-
-        val request = takeRequest()
-        assertTrue(request.path?.contains("/pen/springapi") == true)
-        assertTrue(request.path?.contains("/pen/api") == false)
+        with(takeRequest()) {
+            getHeader("fnr") shouldBe pid.value
+            requestUrl?.queryParameter("fom") shouldBe "2023-04-05"
+        }
+        vedtaksliste[0].sakstype shouldBe Sakstype.UFOEREPENSJON
     }
 
     @Test
@@ -68,7 +59,7 @@ class PenVedtakClientTest : WebClientTest() {
 
         val response = client.bestemGjeldendeVedtak(pid, date)
 
-        assertEquals(Sakstype.UFOEREPENSJON, response[0].sakstype)
+        response[0].sakstype shouldBe Sakstype.UFOEREPENSJON
     }
 
     @Test
@@ -76,11 +67,7 @@ class PenVedtakClientTest : WebClientTest() {
         arrange(jsonResponse(HttpStatus.BAD_REQUEST).setBody("My bad"))
         // No 2nd response arranged, since no retry
 
-        val exception = assertThrows(EgressException::class.java) {
-            client.bestemGjeldendeVedtak(pid, date)
-        }
-
-        assertEquals("My bad", exception.message)
+        shouldThrow<EgressException> { client.bestemGjeldendeVedtak(pid, date) }.message shouldBe "My bad"
     }
 
     @Test
@@ -88,15 +75,12 @@ class PenVedtakClientTest : WebClientTest() {
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
         arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil")) // for retry
 
-        val exception = assertThrows(EgressException::class.java) {
-            client.bestemGjeldendeVedtak(pid, date)
-        }
+        val exception = shouldThrow<EgressException> { client.bestemGjeldendeVedtak(pid, date) }
 
-        assertEquals(
-            "Failed calling /pen/springapi/vedtak/bestemgjeldende?fom=2023-04-05",
-            exception.message
-        )
-        assertEquals("Feil", (exception.cause as EgressException).message)
+        with(exception) {
+            message shouldBe "Failed calling /api/vedtak/bestemgjeldende?fom=2023-04-05"
+            (cause as EgressException).message shouldBe "Feil"
+        }
     }
 
     private companion object {
