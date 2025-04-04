@@ -40,5 +40,5 @@ data class UtbetalingsperiodeV2(
     val startAlder: Alder,
     val sluttAlder: Alder?,
     val aarligUtbetaling: Int,
-    val maanedtligUtbetaling: Int,
+    val maanedligUtbetaling: Int?,
 )
