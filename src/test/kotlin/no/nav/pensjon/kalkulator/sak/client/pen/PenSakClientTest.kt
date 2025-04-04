@@ -1,5 +1,7 @@
 package no.nav.pensjon.kalkulator.sak.client.pen
 
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
@@ -8,10 +10,8 @@ import no.nav.pensjon.kalkulator.sak.SakType
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.mockito.Mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -44,8 +44,8 @@ class PenSakClientTest : WebClientTest() {
         val response = client.fetchSaker(pid)
 
         with(response[0]) {
-            assertEquals(SakStatus.LOEPENDE, status)
-            assertEquals(SakType.UFOERETRYGD, type)
+            status shouldBe SakStatus.LOEPENDE
+            type shouldBe SakType.UFOERETRYGD
         }
     }
 
@@ -53,15 +53,15 @@ class PenSakClientTest : WebClientTest() {
     fun `fetchSaker throws EgressException when response is '404 Not Found'`() {
         arrange(notFoundResponse())
 
-        val exception = assertThrows<EgressException> { client.fetchSaker(pid) }
+        val exception = shouldThrow<EgressException> { client.fetchSaker(pid) }
 
-        assertEquals(
-            """{
+        with(exception) {
+            message shouldBe """{
     "feilmelding": "Personen med fødselsnummer ${pid.value} finnes ikke i den lokale oversikten over personer. (PEN029)",
     "merknader": []
-}""", exception.message
-        )
-        assertTrue(exception.isClientError)
+}"""
+            isClientError shouldBe true
+        }
     }
 
     @Test
@@ -69,10 +69,12 @@ class PenSakClientTest : WebClientTest() {
         arrange(serverErrorResponse())
         arrange(serverErrorResponse()) // 1 retry
 
-        val exception = assertThrows<EgressException> { client.fetchSaker(pid) }
+        val exception = shouldThrow<EgressException> { client.fetchSaker(pid) }
 
-        assertEquals("Failed calling /pen/springapi/sak/sammendrag", exception.message)
-        assertFalse(exception.isClientError)
+        with(exception) {
+            message shouldBe "Failed calling /api/sak/sammendrag"
+            isClientError shouldBe false
+        }
     }
 
     private companion object {
@@ -101,7 +103,7 @@ class PenSakClientTest : WebClientTest() {
     "timestamp": "2023-10-13T10:38:43+0200",
     "status": 500,
     "error": "Internal Server Error",
-    "path": "/pen/springapi/sak/sammendrag"
+    "path": "/api/sak/sammendrag"
 }"""
 
         private fun okResponse() = jsonResponse(HttpStatus.OK).setBody(PEN_SAK)
