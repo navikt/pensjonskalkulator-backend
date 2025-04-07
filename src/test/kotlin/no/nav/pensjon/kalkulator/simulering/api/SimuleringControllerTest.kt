@@ -491,7 +491,7 @@ class SimuleringControllerTest {
                         heltUttak = 0
                     ),
                     afpPrivat = emptyList(),
-                    afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 22056)),
+                    afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 22056, maanedligBeloep = 1900)),
                     vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                     harForLiteTrygdetid = false,
                     trygdetid = 0,
@@ -596,7 +596,7 @@ class SimuleringControllerTest {
                         heltUttak = 0
                     ),
                     afpPrivat = emptyList(),
-                    afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 22056)),
+                    afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 22056, maanedligBeloep = 1900)),
                     vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                     harForLiteTrygdetid = false,
                     trygdetid = 0,

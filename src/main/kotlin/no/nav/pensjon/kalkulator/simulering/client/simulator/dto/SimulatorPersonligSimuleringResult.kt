@@ -64,7 +64,8 @@ data class SimulatorPersonligPrivatAfp(
 
 data class SimulatorPersonligLivsvarigOffentligAfp(
     val alderAar: Int,
-    val beloep: Int
+    val beloep: Int,
+    val maanedligBeloep: Int
 )
 
 data class SimulatorPersonligVilkaarsproeving(
