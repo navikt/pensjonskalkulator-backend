@@ -62,7 +62,7 @@ object SimulatorPersonligSimuleringResultMapper {
         SimulertAfpPrivat(dto.alderAar, dto.beloep, dto.maanedligBeloep ?: 0)
 
     private fun livsvarigOffentligAfp(dto: SimulatorPersonligLivsvarigOffentligAfp) =
-        SimulertAfpOffentlig(dto.alderAar, dto.beloep)
+        SimulertAfpOffentlig(dto.alderAar, dto.beloep, dto.maanedligBeloep)
 
     private fun vilkaarsproeving(dto: SimulatorPersonligVilkaarsproeving) =
         Vilkaarsproeving(

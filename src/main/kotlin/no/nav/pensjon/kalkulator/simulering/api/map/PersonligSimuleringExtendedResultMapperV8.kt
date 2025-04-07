@@ -75,7 +75,7 @@ object PersonligSimuleringExtendedResultMapperV8 {
         PersonligSimuleringAarligPensjonResultV8(alder = source.alder, beloep = source.beloep, maanedligBeloep = source.maanedligBeloep)
 
     private fun offentligAfp(source: SimulertAfpOffentlig) =
-        PersonligSimuleringAarligPensjonResultV8(alder = source.alder, beloep = source.beloep)
+        PersonligSimuleringAarligPensjonResultV8(alder = source.alder, beloep = source.beloep, maanedligBeloep = source.maanedligBeloep)
 
     private fun vilkaarsproeving(source: Vilkaarsproeving) =
         PersonligSimuleringVilkaarsproevingResultV8(
