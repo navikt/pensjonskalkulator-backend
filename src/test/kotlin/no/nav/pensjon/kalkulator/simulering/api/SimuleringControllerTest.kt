@@ -420,7 +420,7 @@ class SimuleringControllerTest {
                         gradertUttak = if (heltUttak) null else 0,
                         heltUttak = 0
                     ),
-                    afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 22056)),
+                    afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 22056, maanedligBeloep = 1900)),
                     afpOffentlig = emptyList(),
                     vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                     harForLiteTrygdetid = false,
@@ -455,7 +455,7 @@ class SimuleringControllerTest {
                         gradertUttak = if (heltUttak) null else 0,
                         heltUttak = 0
                     ),
-                    afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 22056)),
+                    afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 22056, maanedligBeloep = 1900)),
                     afpOffentlig = emptyList(),
                     vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                     harForLiteTrygdetid = false,
@@ -560,7 +560,7 @@ class SimuleringControllerTest {
                         gradertUttak = if (heltUttak) null else 0,
                         heltUttak = 0
                     ),
-                    afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 22056)),
+                    afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 22056, maanedligBeloep = 1900)),
                     afpOffentlig = emptyList(),
                     vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                     harForLiteTrygdetid = false,

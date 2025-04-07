@@ -62,6 +62,7 @@ data class PersonligSimuleringPre2025OffentligAfpResultV8(
 data class PersonligSimuleringAarligPensjonResultV8(
     val alder: Int,
     val beloep: Int,
+    val maanedligBeloep: Int? = 0
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
