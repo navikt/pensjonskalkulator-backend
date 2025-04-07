@@ -46,7 +46,8 @@ object SimulatorAnonymSimuleringResultMapper {
     private fun privatAfp(dto: SimulatorAnonymPrivatAfpPeriode) =
         SimulertAfpPrivat(
             alder = dto.alder ?: 0,
-            beloep = dto.belopArlig ?: 0
+            beloep = dto.belopArlig ?: 0,
+            maanedligBeloep = 0 // Ikke relevant i anonym kontekst enda
         )
 
     private fun livsvarigOffentligAfp(dto: SimulatorAnonymLivsvarigOffentligAfpPeriode) =
