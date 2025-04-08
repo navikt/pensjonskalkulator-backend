@@ -1,7 +1,6 @@
 package no.nav.pensjon.kalkulator.omstillingsstoenad.client
 
 import kotlinx.coroutines.reactor.awaitSingle
-import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.omstillingsstoenad.client.dto.MottarOmstillingsstoenadDto
 import no.nav.pensjon.kalkulator.person.Pid
@@ -30,24 +29,23 @@ class EtterlatteOmstillingsstoenadClient(
 ) : ExternalServiceClient(retryAttempts), OmstillingsstoenadClient {
 
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
-    private val log = KotlinLogging.logger {}
 
     override suspend fun mottarOmstillingsstoenad(pid: Pid, paaDato: LocalDate): Boolean {
         val uri = uri(paaDato)
-        log.debug { "GET from URL: '$uri'" }
 
         return try {
             webClient
-                .get()
+                .post()
                 .uri(uri)
-                .headers { setHeaders(it, pid) }
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(::setHeaders)
+                .bodyValue(RequestBody(pid.value))
                 .retrieve()
                 .bodyToMono(MottarOmstillingsstoenadDto::class.java)
                 .retryWhen(retryBackoffSpec(uri))
                 .awaitSingle()
                 ?.omstillingsstoenad
-                .also { countCalls(MetricResult.OK) }
-                ?: false
+                .also { countCalls(MetricResult.OK) } == true
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $uri", e)
         } catch (e: WebClientResponseException) {
@@ -66,12 +64,12 @@ class EtterlatteOmstillingsstoenadClient(
             .build()
             .toString()
 
-    private fun setHeaders(headers: HttpHeaders, pid: Pid) {
+    private fun setHeaders(headers: HttpHeaders) {
         headers.setBearerAuth(EgressAccess.token(service).value)
-        headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_JSON_VALUE
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
-        headers[CustomHttpHeaders.PID] = pid.value
     }
+
+    private data class RequestBody(val foedselsnummer: String)
 
     companion object {
         private const val MOTTAR_OMSTILLINGSSTOENAD_PATH = "api/pensjon/vedtak/har-loepende-oms"

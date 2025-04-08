@@ -1,77 +1,112 @@
 package no.nav.pensjon.kalkulator.omstillingsstoenad.client
 
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
-import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
+import no.nav.pensjon.kalkulator.WebClientTestConfig
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.mock.WebClientTest
+import no.nav.pensjon.kalkulator.mock.TestObjects.jwt
+import no.nav.pensjon.kalkulator.mock.TestObjects.pid1
+import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonTarget
+import no.nav.pensjon.kalkulator.tech.representasjon.RepresentertRolle
+import no.nav.pensjon.kalkulator.tech.security.egress.EnrichedAuthentication
+import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
-import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.mockito.Mock
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
+import org.mockito.Mockito.mock
+import org.springframework.boot.autoconfigure.AutoConfigurations
+import org.springframework.boot.test.context.runner.ApplicationContextRunner
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.TestPropertySource
+import org.springframework.http.MediaType
+import org.springframework.security.authentication.TestingAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDate
 
-@SpringBootTest
-@TestPropertySource("classpath:application-test.properties")
-class EtterlatteOmstillingsstoenadClientTest : WebClientTest() {
+class EtterlatteOmstillingsstoenadClientTest : FunSpec({
+    var server: MockWebServer? = null
+    var baseUrl: String? = null
+    val dato = LocalDate.of(2025, 1, 1)
 
-    private lateinit var client: EtterlatteOmstillingsstoenadClient
+    beforeSpec {
+        SecurityContextHolder.setContext(SecurityContextHolder.createEmptyContext())
 
-    @Autowired
-    private lateinit var webClientBuilder: WebClient.Builder
-
-    @Mock
-    private lateinit var traceAid: TraceAid
-
-    @BeforeEach
-    fun initialize() {
-        client = EtterlatteOmstillingsstoenadClient(
-            baseUrl = baseUrl(),
-            webClientBuilder = webClientBuilder,
-            traceAid = traceAid,
-            retryAttempts = RETRY_ATTEMPTS
+        SecurityContextHolder.getContext().authentication = EnrichedAuthentication(
+            initialAuth = TestingAuthenticationToken("TEST_USER", jwt),
+            egressTokenSuppliersByService = EgressTokenSuppliersByService(mapOf()),
+            target = RepresentasjonTarget(pid = pid1, rolle = RepresentertRolle.FULLMAKT_GIVER)
         )
 
-        arrangeSecurityContext()
+        server = MockWebServer().also { it.start() }
+        baseUrl = server.let { "http://localhost:${it.port}" }
     }
 
-    @Test
-    fun `bruker mottar omstillingsstoenad`() = runTest {
-        arrange(okStatusResponse(true))
-        assertTrue(client.mottarOmstillingsstoenad(pid, dato))
+    afterSpec {
+        server?.shutdown()
     }
 
-    @Test
-    fun `bruker mottar ikke omstillingsstoenad`() = runTest {
-        arrange(okStatusResponse(false))
-        assertFalse(client.mottarOmstillingsstoenad(pid, dato))
+    test("omstillinsstoenadClient sender foedselsnummer i body + returnerer false naar stoenad ikke mottas") {
+        val contextRunner = ApplicationContextRunner().withConfiguration(
+            AutoConfigurations.of(WebClientTestConfig::class.java)
+        )
+
+        server?.enqueue(
+            MockResponse()
+                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .setResponseCode(HttpStatus.OK.value())
+                .setBody(statusResponseBody(false).trimIndent())
+        )
+
+        contextRunner.run {
+            val client = EtterlatteOmstillingsstoenadClient(
+                baseUrl = baseUrl!!,
+                webClientBuilder = it.getBean(WebClient.Builder::class.java),
+                traceAid = mock(TraceAid::class.java),
+                retryAttempts = "0"
+            )
+
+            runTest {
+                client.mottarOmstillingsstoenad(pid, paaDato = dato) shouldBe false
+                server?.takeRequest()?.body?.readUtf8() shouldBe """{"foedselsnummer":"12906498357"}"""
+            }
+        }
     }
 
-    @Test
-    fun `omstillinsstoenadClient gjentar request ved serverfeil`() = runTest {
-        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
-        arrange(okStatusResponse(true))
-        assertTrue(client.mottarOmstillingsstoenad(pid, dato))
+    test("omstillinsstoenadClient gjentar request ved serverfeil + returnerer true naar stoenad mottas") {
+        val contextRunner = ApplicationContextRunner().withConfiguration(
+            AutoConfigurations.of(WebClientTestConfig::class.java)
+        )
+
+        server?.enqueue( // first attempt
+            MockResponse()
+                .setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .setBody("Feil")
+        )
+        server?.enqueue( // second attempt
+            MockResponse()
+                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .setResponseCode(HttpStatus.OK.value())
+                .setBody(statusResponseBody(true).trimIndent())
+        )
+
+        contextRunner.run {
+            val client = EtterlatteOmstillingsstoenadClient(
+                baseUrl = baseUrl!!,
+                webClientBuilder = it.getBean(WebClient.Builder::class.java),
+                traceAid = mock(TraceAid::class.java),
+                retryAttempts = "1"
+            )
+
+            runTest {
+                client.mottarOmstillingsstoenad(pid, paaDato = dato) shouldBe true
+            }
+        }
     }
+})
 
-    companion object{
-        private const val RETRY_ATTEMPTS = "1"
-        private val dato = LocalDate.now()
-
-        private fun okStatusResponse(value: Boolean) = jsonResponse().setBody(statusResponseBody(value).trimIndent())
-
-        @Language("json")
-        private fun statusResponseBody(value: Boolean) =
-            """{
-                 "omstillingsstoenad": $value
-             }
-             """
-    }
-}
+private fun statusResponseBody(value: Boolean) =
+    """{
+    "omstillingsstoenad": $value
+}"""
