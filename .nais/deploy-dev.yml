@@ -76,6 +76,9 @@ spec:
         - application: pensjonskalkulator-uinnlogget-dreambox
         - application: pensjonskalkulator-uinnlogget-magicbox
         - application: pensjonskalkulator-uinnlogget-sandbox
+        - application: '*'
+          namespace: pensjonskalkulator
+          cluster: dev-gcp
         - application: azure-token-generator # only in dev
           namespace: nais
         - application: tokenx-token-generator # only in dev
