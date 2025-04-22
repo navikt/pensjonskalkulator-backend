@@ -68,7 +68,8 @@ object PersonligSimuleringExtendedResultMapperV8 {
             grunnpensjon = source.grunnpensjon,
             tilleggspensjon = source.tilleggspensjon,
             afpTillegg = source.afpTillegg,
-            saertillegg = source.saertillegg
+            saertillegg = source.saertillegg,
+            afpGrad = source.afpGrad
         )
 
     private fun privatAfp(source: SimulertAfpPrivat) =

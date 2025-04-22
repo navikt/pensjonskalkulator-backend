@@ -55,7 +55,8 @@ object SimulatorPersonligSimuleringResultMapper {
             grunnpensjon = dto.grunnpensjon,
             tilleggspensjon = dto.tilleggspensjon,
             afpTillegg = dto.afpTillegg,
-            saertillegg = dto.saertillegg
+            saertillegg = dto.saertillegg,
+            afpGrad = dto.afpGrad
         )
 
     private fun privatAfp(dto: SimulatorPersonligPrivatAfp) =
