@@ -54,7 +54,8 @@ data class SimulatorPre2025OffentligAfp(
     val tilleggspensjon: Int,
     val afpTillegg: Int,
     val saertillegg: Int,
-    val afpGrad: Int
+    val afpGrad: Int,
+    val afpAvkortetTil70Prosent: Boolean
 )
 
 data class SimulatorPersonligPrivatAfp(

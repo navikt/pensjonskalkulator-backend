@@ -57,7 +57,8 @@ data class PersonligSimuleringPre2025OffentligAfpResultV8(
     val tilleggspensjon: Int,
     val afpTillegg: Int,
     val saertillegg: Int,
-    val afpGrad: Int
+    val afpGrad: Int,
+    val afpAvkortetTil70Prosent: Boolean
 )
 
 data class PersonligSimuleringAarligPensjonResultV8(
