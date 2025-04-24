@@ -91,6 +91,7 @@ object PersonligSimuleringResultMapperV8 {
                     PersonligSimuleringAarligPensjonResultV8(
                         innevaerendeAarAlder,
                         it.beloep,
+                        it.maanedligBeloep
                     )
                 )
                 return oppdatertAfpPrivatList.sortedBy { it.alder }
@@ -121,10 +122,10 @@ object PersonligSimuleringResultMapperV8 {
         )
 
     private fun privatAfp(source: SimulertAfpPrivat) =
-        PersonligSimuleringAarligPensjonResultV8(alder = source.alder, beloep = source.beloep)
+        PersonligSimuleringAarligPensjonResultV8(alder = source.alder, beloep = source.beloep, maanedligBeloep = source.maanedligBeloep)
 
     private fun offentligAfp(source: SimulertAfpOffentlig) =
-        PersonligSimuleringAarligPensjonResultV8(alder = source.alder, beloep = source.beloep)
+        PersonligSimuleringAarligPensjonResultV8(alder = source.alder, beloep = source.beloep, maanedligBeloep = source.maanedligBeloep)
 
     private fun vilkaarsproeving(source: Vilkaarsproeving) =
         PersonligSimuleringVilkaarsproevingResultV8(
