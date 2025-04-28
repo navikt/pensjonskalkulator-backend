@@ -19,7 +19,7 @@ data class PersonligSimuleringSpecV8(
     val sivilstand: Sivilstand?,
     val epsHarInntektOver2G: Boolean,
     val epsHarPensjon: Boolean,
-    val afpInntektMaanedFoerUttak: Int?,
+    val afpInntektMaanedFoerUttak: Boolean?,
     val afpOrdning: AfpOrdningType? = null
 )
 

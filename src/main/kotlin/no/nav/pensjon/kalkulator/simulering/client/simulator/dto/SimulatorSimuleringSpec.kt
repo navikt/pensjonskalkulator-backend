@@ -17,7 +17,7 @@ data class SimulatorSimuleringSpec(
     val gradertUttak: SimulatorGradertUttakSpec? = null,
     val heltUttak: SimulatorHeltUttakSpec,
     val utenlandsperiodeListe: List<SimulatorUtlandPeriodeSpec>,
-    val afpInntektMaanedFoerUttak: Int?,
+    val afpInntektMaanedFoerUttak: Boolean?,
     val afpOrdning: String? = null
 ) {
     /**
