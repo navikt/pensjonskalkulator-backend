@@ -18,9 +18,11 @@ import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
+import org.springframework.http.MediaType
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import java.io.PrintWriter
 
 @ExtendWith(SpringExtension::class)
 class SecurityLevelFilterTest {
@@ -35,6 +37,9 @@ class SecurityLevelFilterTest {
     private lateinit var chain: FilterChain
 
     @Mock
+    private lateinit var writer: PrintWriter
+
+    @Mock
     private lateinit var adresseService: FortroligAdresseService
 
     @Mock
@@ -44,9 +49,14 @@ class SecurityLevelFilterTest {
     fun `when strengt fortrolig adresse and insufficient security level then doFilter breaks filter chain`() {
         arrangeAdresse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
         arrangeSecurityContext("idporten-loa-substantial", RepresentertRolle.SELV) // insufficient
+        `when`(response.writer).thenReturn(writer)
 
         SecurityLevelFilter(adresseService, pidGetter).doFilter(request, response, chain)
+
         verify(chain, never()).doFilter(request, response)
+        verify(response, times(1)).status = 403
+        verify(response, times(1)).contentType = MediaType.APPLICATION_JSON_VALUE
+        verify(writer, times(1)).append("""{ "reason": "INSUFFICIENT_LEVEL_OF_ASSURANCE" }""")
     }
 
     @Test
@@ -73,10 +83,14 @@ class SecurityLevelFilterTest {
     fun `when strengt fortrolig adresse and security level 3 then doFilter breaks filter chain`() {
         arrangeAdresse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
         arrangeSecurityContext("Level3", RepresentertRolle.FULLMAKT_GIVER)
+        `when`(response.writer).thenReturn(writer)
 
         SecurityLevelFilter(adresseService, pidGetter).doFilter(request, response, chain)
 
         verify(chain, never()).doFilter(request, response)
+        verify(response, times(1)).status = 403
+        verify(response, times(1)).contentType = MediaType.APPLICATION_JSON_VALUE
+        verify(writer, times(1)).append("""{ "reason": "INSUFFICIENT_LEVEL_OF_ASSURANCE" }""")
     }
 
     @Test
