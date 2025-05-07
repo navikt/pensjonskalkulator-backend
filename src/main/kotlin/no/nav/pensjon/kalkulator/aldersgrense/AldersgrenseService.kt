@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.aldersgrense.api
+package no.nav.pensjon.kalkulator.aldersgrense
 
 import no.nav.pensjon.kalkulator.aldersgrense.api.dto.AldersgrenseSpec
 import no.nav.pensjon.kalkulator.general.Alder

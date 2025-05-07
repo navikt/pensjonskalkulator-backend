@@ -6,7 +6,8 @@ import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
-import no.nav.pensjon.kalkulator.aldersgrense.api.dto.AldersgrenseResponse
+import no.nav.pensjon.kalkulator.aldersgrense.AldersgrenseService
+import no.nav.pensjon.kalkulator.aldersgrense.api.dto.AldersgrenseResultV1
 import no.nav.pensjon.kalkulator.aldersgrense.api.dto.AldersgrenseSpec
 import no.nav.pensjon.kalkulator.aldersgrense.api.map.AldersgrenseMapperV1
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
@@ -43,7 +44,7 @@ class AldersgrenseController(
             ),
         ]
     )
-    fun aldersgrenserV1(@RequestBody spec: AldersgrenseSpec): AldersgrenseResponse {
+    fun aldersgrenserV1(@RequestBody spec: AldersgrenseSpec): AldersgrenseResultV1 {
         traceAid.begin()
         log.debug { "Request for aldersgrense V1" }
 
@@ -53,7 +54,7 @@ class AldersgrenseController(
         } catch (e: NotFoundException) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, e.message)
         } catch (e: EgressException) {
-            handleError<AldersgrenseResponse>(e, "V1")!!
+            handleError<AldersgrenseResultV1>(e, "V1")!!
         } finally {
             traceAid.end()
         }
