@@ -10,6 +10,7 @@ import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonService
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonTarget
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentertRolle
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
+import no.nav.pensjon.kalkulator.tech.security.ingress.AccessDeniedReason
 import no.nav.pensjon.kalkulator.tech.security.ingress.SecurityContextPidExtractor
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import org.springframework.security.access.AccessDeniedException
@@ -104,7 +105,7 @@ class SecurityContextEnricher(
 
         private fun invalidRepresentasjonForhold(): Nothing {
             Metrics.countEvent(eventName = "obo", result = "avvist")
-            throw AccessDeniedException("Intet gyldig representasjonsforhold funnet")
+            throw AccessDeniedException(AccessDeniedReason.INVALID_REPRESENTASJON.name)
         }
     }
 }
