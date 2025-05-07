@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.aldersgrense.api.dto
 
-data class AldersgrenseResponse(
+data class AldersgrenseResultV1(
     val normertPensjoneringsalder: PersonAlder,
     val nedreAldersgrense: PersonAlder
 )
