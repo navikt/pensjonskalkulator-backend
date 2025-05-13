@@ -19,10 +19,15 @@ class AuthenticationEnricherFilter(private val enricher: SecurityContextEnricher
     private val log = KotlinLogging.logger {}
 
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
+        if ((request as HttpServletRequest).requestURI.startsWith(FEATURE_URI)) {
+            chain.doFilter(request, response)
+            return
+        }
+
         val httpResponse = response as HttpServletResponse
 
         try {
-            enricher.enrichAuthentication(request as HttpServletRequest, httpResponse)
+            enricher.enrichAuthentication(request, httpResponse)
         } catch (e: AccessDeniedException) {
             handleAccessDenied(response = httpResponse, reason = e.message ?: AccessDeniedReason.NONE.name)
             return
@@ -34,5 +39,12 @@ class AuthenticationEnricherFilter(private val enricher: SecurityContextEnricher
     private fun handleAccessDenied(response: HttpServletResponse, reason: String) {
         log.warn { "Access denied - $reason" }
         respondForbidden(response, reason)
+    }
+
+    private companion object {
+        /**
+         * Request for state of feature toggle requires no authentication or access check.
+         */
+        private const val FEATURE_URI = "/api/feature/"
     }
 }
