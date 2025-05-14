@@ -49,11 +49,11 @@ class SecurityLevelFilterTest {
     fun `when strengt fortrolig adresse and insufficient security level then doFilter breaks filter chain`() {
         arrangeAdresse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
         arrangeSecurityContext("idporten-loa-substantial", RepresentertRolle.SELV) // insufficient
-        `when`(response.writer).thenReturn(writer)
+        arrangeRequestAndResponse()
 
         SecurityLevelFilter(adresseService, pidGetter).doFilter(request, response, chain)
 
-        verify(chain, never()).doFilter(request, response)
+        assertFilterChainBroken()
         verify(response, times(1)).status = 403
         verify(response, times(1)).contentType = MediaType.APPLICATION_JSON_VALUE
         verify(writer, times(1)).append("""{ "reason": "INSUFFICIENT_LEVEL_OF_ASSURANCE" }""")
@@ -63,31 +63,33 @@ class SecurityLevelFilterTest {
     fun `when strengt fortrolig adresse and high security level then doFilter continues filter chain`() {
         arrangeAdresse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
         arrangeSecurityContext("idporten-loa-high", RepresentertRolle.SELV)
+        arrangeRequest()
 
         SecurityLevelFilter(adresseService, pidGetter).doFilter(request, response, chain)
 
-        verify(chain, times(1)).doFilter(request, response)
+        assertFilterChainContinued()
     }
 
     @Test
     fun `when strengt fortrolig adresse and security level 4 then doFilter continues filter chain`() {
         arrangeAdresse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
         arrangeSecurityContext("Level4", RepresentertRolle.FULLMAKT_GIVER)
+        arrangeRequest()
 
         SecurityLevelFilter(adresseService, pidGetter).doFilter(request, response, chain)
 
-        verify(chain, times(1)).doFilter(request, response)
+        assertFilterChainContinued()
     }
 
     @Test
     fun `when strengt fortrolig adresse and security level 3 then doFilter breaks filter chain`() {
         arrangeAdresse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
         arrangeSecurityContext("Level3", RepresentertRolle.FULLMAKT_GIVER)
-        `when`(response.writer).thenReturn(writer)
+        arrangeRequestAndResponse()
 
         SecurityLevelFilter(adresseService, pidGetter).doFilter(request, response, chain)
 
-        verify(chain, never()).doFilter(request, response)
+        assertFilterChainBroken()
         verify(response, times(1)).status = 403
         verify(response, times(1)).contentType = MediaType.APPLICATION_JSON_VALUE
         verify(writer, times(1)).append("""{ "reason": "INSUFFICIENT_LEVEL_OF_ASSURANCE" }""")
@@ -97,22 +99,54 @@ class SecurityLevelFilterTest {
     fun `when fortrolig adresse and substantial security level then doFilter continues filter chain`() {
         arrangeAdresse(AdressebeskyttelseGradering.FORTROLIG)
         arrangeSecurityContext("idporten-loa-substantial", RepresentertRolle.SELV)
+        arrangeRequest()
 
         SecurityLevelFilter(adresseService, pidGetter).doFilter(request, response, chain)
 
-        verify(chain, times(1)).doFilter(request, response)
+        assertFilterChainContinued()
     }
 
     @Test
     fun `when veileder innlogget then doFilter continues filter chain`() {
         arrangeSecurityContext("", RepresentertRolle.UNDER_VEILEDNING)
+        arrangeRequest()
+
         SecurityLevelFilter(adresseService, pidGetter).doFilter(request, response, chain)
-        verify(chain, times(1)).doFilter(request, response)
+        assertFilterChainContinued()
+    }
+
+    @Test
+    fun `if 'feature' request then access check is skipped and filter chain continues`() {
+        arrangeRequest("/api/feature/foo")
+        arrangeAdresse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
+        arrangeSecurityContext("Level3", RepresentertRolle.SELV)
+
+        SecurityLevelFilter(adresseService, pidGetter).doFilter(request, response, chain)
+
+        verify(response, never()).status = 403 // i.e. access check is skipped
+        assertFilterChainContinued()
     }
 
     private fun arrangeAdresse(gradering: AdressebeskyttelseGradering) {
         `when`(adresseService.adressebeskyttelseGradering(pid)).thenReturn(gradering)
         `when`(pidGetter.pid()).thenReturn(pid)
+    }
+
+    private fun arrangeRequest(uri: String = "/api/foo") {
+        `when`(request.requestURI).thenReturn(uri)
+    }
+
+    private fun arrangeRequestAndResponse() {
+        arrangeRequest()
+        `when`(response.writer).thenReturn(writer)
+    }
+
+    private fun assertFilterChainBroken() {
+        verify(chain, never()).doFilter(request, response)
+    }
+
+    private fun assertFilterChainContinued() {
+        verify(chain, times(1)).doFilter(request, response)
     }
 
     private companion object {

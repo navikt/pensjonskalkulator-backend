@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.tech.security.ingress
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletRequest
 import jakarta.servlet.ServletResponse
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.person.Fortrolighet
@@ -28,10 +29,15 @@ class SecurityLevelFilter(
     private val log = KotlinLogging.logger {}
 
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
+        if ((request as HttpServletRequest).requestURI.startsWith(FEATURE_URI)) {
+            chain.doFilter(request, response)
+            return
+        }
+
         try {
             authentication()?.let {
                 if (it.veilederInnlogget().not())
-                    it.getClaim(SECURITY_LEVEL_CLAIM_KEY)?.let(::validate)
+                    it.getClaim(ASSURANCE_LEVEL_CLAIM_KEY)?.let(::validate)
             }
         } catch (e: AccessDeniedException) {
             log.warn { "Access denied - ${e.message}" }
@@ -56,7 +62,13 @@ class SecurityLevelFilter(
     }
 
     private companion object {
-        private const val SECURITY_LEVEL_CLAIM_KEY = "acr" // Authentication Context class Reference
+        private const val ASSURANCE_LEVEL_CLAIM_KEY = "acr" // Authentication Context class Reference
+
+        /**
+         * Request for state of feature toggle requires no authentication or access check.
+         */
+        private const val FEATURE_URI = "/api/feature/"
+
         private val highAssuranceLevelList = listOf<String>("idporten-loa-high", "Level4")
 
         private fun authentication(): EnrichedAuthentication? =
