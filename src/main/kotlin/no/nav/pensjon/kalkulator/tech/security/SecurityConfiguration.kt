@@ -175,9 +175,9 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
         hasLength(requestClaimExtractor.extractAuthorizationClaim(request, SecurityContextNavIdExtractor.CLAIM_KEY))
 
     companion object {
+        const val FEATURE_URI = "/api/feature/"
         private const val ANONYM_SIMULERING_URI = "/api/v1/alderspensjon/anonym-simulering"
         private const val ANSATT_ID_URI = "/api/v1/ansatt-id"
-        private const val FEATURE_URI = "/api/feature/"
         private const val ENCRYPTION_URI = "/api/v1/encrypt"
 
         fun hasPidHeader(request: HttpServletRequest): Boolean =

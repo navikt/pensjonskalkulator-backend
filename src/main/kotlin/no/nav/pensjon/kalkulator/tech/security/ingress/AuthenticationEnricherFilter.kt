@@ -6,6 +6,7 @@ import jakarta.servlet.ServletResponse
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.tech.security.SecurityConfiguration.Companion.FEATURE_URI
 import no.nav.pensjon.kalkulator.tech.security.egress.SecurityContextEnricher
 import no.nav.pensjon.kalkulator.tech.security.ingress.Responder.respondForbidden
 import org.springframework.security.access.AccessDeniedException
@@ -19,6 +20,7 @@ class AuthenticationEnricherFilter(private val enricher: SecurityContextEnricher
     private val log = KotlinLogging.logger {}
 
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
+        // Request for state of feature toggle requires no authentication or access check:
         if ((request as HttpServletRequest).requestURI.startsWith(FEATURE_URI)) {
             chain.doFilter(request, response)
             return
@@ -39,12 +41,5 @@ class AuthenticationEnricherFilter(private val enricher: SecurityContextEnricher
     private fun handleAccessDenied(response: HttpServletResponse, reason: String) {
         log.warn { "Access denied - $reason" }
         respondForbidden(response, reason)
-    }
-
-    private companion object {
-        /**
-         * Request for state of feature toggle requires no authentication or access check.
-         */
-        private const val FEATURE_URI = "/api/feature/"
     }
 }
