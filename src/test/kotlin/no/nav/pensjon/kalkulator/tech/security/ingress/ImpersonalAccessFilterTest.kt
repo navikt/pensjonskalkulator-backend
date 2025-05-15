@@ -38,7 +38,10 @@ class ImpersonalAccessFilterTest {
     @Test
     fun `when no fnr in header then doFilter continues filter chain`() {
         `when`(request.getHeader("fnr")).thenReturn(null)
+        `when`(request.requestURI).thenReturn("/api/foo")
+
         ImpersonalAccessFilter(pidExtractor, groupMembershipService, auditor).doFilter(request, response, chain)
+
         verify(chain, times(1)).doFilter(request, response)
     }
 
@@ -47,6 +50,7 @@ class ImpersonalAccessFilterTest {
         `when`(request.getHeader("fnr")).thenReturn(pid.value)
         `when`(pidExtractor.pid()).thenReturn(pid)
         `when`(groupMembershipService.innloggetBrukerHarTilgang(pid)).thenReturn(false)
+        `when`(request.requestURI).thenReturn("/api/foo")
 
         ImpersonalAccessFilter(pidExtractor, groupMembershipService, auditor).doFilter(request, response, chain)
 
@@ -59,6 +63,7 @@ class ImpersonalAccessFilterTest {
         `when`(request.getHeader("fnr")).thenReturn(pid.value)
         `when`(pidExtractor.pid()).thenReturn(pid)
         `when`(groupMembershipService.innloggetBrukerHarTilgang(pid)).thenThrow(NotFoundException("person"))
+        `when`(request.requestURI).thenReturn("/api/foo")
 
         ImpersonalAccessFilter(pidExtractor, groupMembershipService, auditor).doFilter(request, response, chain)
 
@@ -76,6 +81,16 @@ class ImpersonalAccessFilterTest {
         ImpersonalAccessFilter(pidExtractor, groupMembershipService, auditor).doFilter(request, response, chain)
 
         verify(auditor, times(1)).audit(pid, "/foo")
+        verify(chain, times(1)).doFilter(request, response)
+    }
+
+    @Test
+    fun `if 'feature' request then access check is skipped and filter chain continues`() {
+        `when`(request.requestURI).thenReturn("/api/feature/foo")
+
+        ImpersonalAccessFilter(pidExtractor, groupMembershipService, auditor).doFilter(request, response, chain)
+
+        verify(pidExtractor, never()).pid()
         verify(chain, times(1)).doFilter(request, response)
     }
 }
