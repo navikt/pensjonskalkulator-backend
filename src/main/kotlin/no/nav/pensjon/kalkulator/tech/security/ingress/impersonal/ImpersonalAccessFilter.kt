@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
+import no.nav.pensjon.kalkulator.tech.security.SecurityConfiguration.Companion.FEATURE_URI
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
@@ -26,7 +27,13 @@ class ImpersonalAccessFilter(
     private val log = KotlinLogging.logger {}
 
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
-        if (hasPid(request as HttpServletRequest)) {
+        // Request for state of feature toggle requires no authentication or access check:
+        if ((request as HttpServletRequest).requestURI.startsWith(FEATURE_URI)) {
+            chain.doFilter(request, response)
+            return
+        }
+
+        if (hasPid(request)) {
             val pid = pidGetter.pid()
 
             try {
