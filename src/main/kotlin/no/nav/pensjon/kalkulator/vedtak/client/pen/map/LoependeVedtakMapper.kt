@@ -16,7 +16,7 @@ object LoependeVedtakMapper {
             ufoeretrygd = fromUfoeretrygdDto(dto.ufoeretrygd),
             afpPrivat = fromDto(dto.afpPrivat),
             afpOffentlig = null,
-            afpOffentligForBrukereFoedtFoer1963 = fromDto(dto.afpOffentlig)
+            pre2025OffentligAfp = fromDto(dto.afpOffentlig)
         )
     }
 

@@ -12,6 +12,7 @@ object LoependeVedtakMapperV4 {
         ufoeretrygd = toUfoeretrygdDetaljerV4Dto(vedtak.ufoeretrygd),
         afpPrivat = toLoependeFraV4Dto(vedtak.afpPrivat),
         afpOffentlig = toLoependeFraV4Dto(vedtak.afpOffentlig),
+        pre2025OffentligAfp = toLoependeFraV4Dto(vedtak.pre2025OffentligAfp),
     )
 
     private fun toAlderspensjonDetaljerV4Dto(alderspensjon: LoependeAlderspensjonDetaljer?) = alderspensjon?.let {
