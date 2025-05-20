@@ -1,13 +1,13 @@
 package no.nav.pensjon.kalkulator.person.api.map
 
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
+import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService.Companion.defaultAldersgrenser
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.api.dto.PersonAlderV4
 import no.nav.pensjon.kalkulator.person.api.dto.PersonPensjoneringAldreV4
 import no.nav.pensjon.kalkulator.person.api.dto.PersonResultV4
 import no.nav.pensjon.kalkulator.person.api.dto.PersonSivilstandV4
-import no.nav.pensjon.kalkulator.uttaksalder.normalder.NormertPensjoneringsalderService
-import no.nav.pensjon.kalkulator.uttaksalder.normalder.PensjoneringAldre
 import java.time.LocalDate
 
 object PersonMapperV4 {
@@ -28,13 +28,13 @@ object PersonMapperV4 {
             navn = "",
             foedselsdato = LocalDate.MIN,
             sivilstand = PersonSivilstandV4.UOPPGITT,
-            pensjoneringAldre = NormertPensjoneringsalderService.defaultAldre.let(::pensjoneringAldre)
+            pensjoneringAldre = defaultAldersgrenser.let(::pensjoneringAldre)
         )
 
-    private fun pensjoneringAldre(source: PensjoneringAldre) =
+    private fun pensjoneringAldre(source: Aldersgrenser) =
         PersonPensjoneringAldreV4(
             normertPensjoneringsalder = alder(source.normalder),
-            nedreAldersgrense = alder(source.nedreAldersgrense)
+            nedreAldersgrense = alder(source.nedreAlder)
         )
 
     private fun alder(source: Alder) =
