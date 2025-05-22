@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.normalder
+package no.nav.pensjon.kalkulator.uttaksalder.normalder
 
 import no.nav.pensjon.kalkulator.general.Alder
 import org.springframework.stereotype.Service
