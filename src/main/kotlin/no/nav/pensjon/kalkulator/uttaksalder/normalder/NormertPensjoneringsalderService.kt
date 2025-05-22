@@ -4,6 +4,7 @@ import no.nav.pensjon.kalkulator.general.Alder
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
+@Deprecated("Use NormertPensjonsalderService")
 @Service
 class NormertPensjoneringsalderService {
     //TODO use PEN service

@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.uttaksalder
 
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.general.alder.NormAlderService
+import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService
 import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.Sivilstand
@@ -17,7 +17,7 @@ class UttaksalderService(
     private val inntektService: InntektService,
     private val personService: PersonService,
     private val pidGetter: PidGetter,
-    private val normAlderService: NormAlderService,
+    private val normalderService: NormertPensjonsalderService,
     private val lavesteUttaksalderService: LavesteUttaksalderService
 ) {
     private val log = KotlinLogging.logger {}
@@ -61,11 +61,14 @@ class UttaksalderService(
         }
     }
 
-    private fun sisteInntekt(): Int = inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact()
+    private fun sisteInntekt(): Int =
+        inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact()
 
-    private fun sivilstand(): Sivilstand = personService.getPerson().sivilstand
+    private fun sivilstand(): Sivilstand =
+        personService.getPerson().sivilstand
 
-    private fun teoretiskLavesteUttaksalder(): Alder = normAlderService.nedreAldersgrense()
+    private fun teoretiskLavesteUttaksalder(): Alder =
+        normalderService.nedreAlder(personService.getPerson().foedselsdato)
 
     private fun updateMetric(alder: Alder?) {
         val maaneder = alder?.let {

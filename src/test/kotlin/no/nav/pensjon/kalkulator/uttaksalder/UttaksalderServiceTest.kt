@@ -2,10 +2,10 @@ package no.nav.pensjon.kalkulator.uttaksalder
 
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.HeltUttak
-import no.nav.pensjon.kalkulator.general.alder.NormAlderService
 import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.mock.PersonFactory.person
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService
 import no.nav.pensjon.kalkulator.opptjening.Inntekt
 import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
@@ -41,7 +41,7 @@ internal class UttaksalderServiceTest {
     private lateinit var pidGetter: PidGetter
 
     @Mock
-    private lateinit var normAlderService: NormAlderService
+    private lateinit var normalderService: NormertPensjonsalderService
 
     @Mock
     private lateinit var lavesteUttaksalderService: LavesteUttaksalderService
@@ -49,11 +49,11 @@ internal class UttaksalderServiceTest {
     @BeforeEach
     fun initialize() {
         service = UttaksalderService(
-            simuleringService, inntektService, personService, pidGetter, normAlderService, lavesteUttaksalderService
+            simuleringService, inntektService, personService, pidGetter, normalderService, lavesteUttaksalderService
         )
 
         `when`(pidGetter.pid()).thenReturn(pid)
-        `when`(normAlderService.nedreAldersgrense()).thenReturn(Alder(aar = 62, maaneder = 0))
+        `when`(normalderService.nedreAlder(LocalDate.of(1963, 12, 31))).thenReturn(Alder(aar = 62, maaneder = 0))
     }
 
     @Test
@@ -111,7 +111,7 @@ internal class UttaksalderServiceTest {
         )
         val personalSpec = PersonalUttaksalderSpec(
             pid = pid,
-            sivilstand = person.sivilstand, //  Sivilstand.SAMBOER,
+            sivilstand = person.sivilstand, // Sivilstand.SAMBOER
             harEps = false,
             aarligInntektFoerUttak = inntekt.beloep.intValueExact()
         )
@@ -120,7 +120,7 @@ internal class UttaksalderServiceTest {
 
         service.finnTidligsteUttaksalder(impersonalSpec)
 
-        verify(personService, times(1)).getPerson()
+        verify(personService, times(2)).getPerson() // sivilstand + fødselsdato
         verify(inntektService, times(1)).sistePensjonsgivendeInntekt()
     }
 
