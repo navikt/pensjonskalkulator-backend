@@ -5,17 +5,16 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.general.UttaksalderGradertUttak
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
-import no.nav.pensjon.kalkulator.general.alder.NormAlderService
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.simulering.*
-import org.junit.jupiter.api.BeforeEach
+import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
-import org.mockito.Mockito.*
+import org.mockito.Mockito.`when`
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDate
 
@@ -28,13 +27,7 @@ internal class LavesteUttaksalderServiceTest {
     private lateinit var personService: PersonService
 
     @Mock
-    private lateinit var normAlderService: NormAlderService
-
-    @BeforeEach
-    fun initialize() {
-        `when`(normAlderService.nedreAldersgrense()).thenReturn(Alder(aar = 62, maaneder = 0))
-        `when`(normAlderService.normAlder()).thenReturn(Alder(aar = 67, maaneder = 0))
-    }
+    private lateinit var normalderService: NormertPensjonsalderService
 
     @Test
     fun `lavesteUttaksalderSimuleringSpec inneholder laveste fremtidige alder for gradert uttak`() {
@@ -131,8 +124,10 @@ internal class LavesteUttaksalderServiceTest {
     }
 
     private fun arrangeService(foedselsdato: LocalDate, dagensDato: LocalDate): LocalDate {
-        service = LavesteUttaksalderService(personService, normAlderService, todayProvider = { dagensDato })
+        service = LavesteUttaksalderService(personService, normalderService, todayProvider = { dagensDato })
         `when`(personService.getPerson()).thenReturn(Person(navn = "", foedselsdato))
+        `when`(normalderService.nedreAlder(foedselsdato)).thenReturn(Alder(aar = 62, maaneder = 0))
+        `when`(normalderService.normalder(foedselsdato)).thenReturn(Alder(aar = 67, maaneder = 0))
         return foedselsdato
     }
 

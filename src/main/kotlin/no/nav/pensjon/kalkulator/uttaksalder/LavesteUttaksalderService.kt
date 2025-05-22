@@ -4,7 +4,7 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.GradertUttak
 import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.general.UttaksalderGradertUttak
-import no.nav.pensjon.kalkulator.general.alder.NormAlderService
+import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.simulering.Eps
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
@@ -16,7 +16,7 @@ import java.time.LocalDate
 @Service
 class LavesteUttaksalderService(
     private val personService: PersonService,
-    private val normAlderService: NormAlderService,
+    private val normalderService: NormertPensjonsalderService,
     private val todayProvider: DateProvider
 ) {
     fun lavesteUttaksalderSimuleringSpec(
@@ -73,10 +73,10 @@ class LavesteUttaksalderService(
         }
 
     private fun teoretiskLavesteUttaksalder(): Alder =
-        normAlderService.nedreAldersgrense()
+        normalderService.nedreAlder(personService.getPerson().foedselsdato)
 
     private fun defaultHeltUttakFomAlderIfGradert(): Alder =
-        normAlderService.normAlder()
+        normalderService.normalder(personService.getPerson().foedselsdato)
 
     private fun alderPaaNaermesteFremtidigeUttaksdato() =
         Alder.from(

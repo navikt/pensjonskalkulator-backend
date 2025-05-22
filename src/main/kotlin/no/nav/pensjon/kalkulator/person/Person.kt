@@ -1,19 +1,19 @@
 package no.nav.pensjon.kalkulator.person
 
-import no.nav.pensjon.kalkulator.uttaksalder.normalder.NormertPensjoneringsalderService
-import no.nav.pensjon.kalkulator.uttaksalder.normalder.PensjoneringAldre
+import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
+import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService.Companion.defaultAldersgrenser
 import java.time.LocalDate
 
 data class Person(
     val navn: String,
     val foedselsdato: LocalDate,
-    val pensjoneringAldre: PensjoneringAldre = NormertPensjoneringsalderService.defaultAldre,
+    val pensjoneringAldre: Aldersgrenser = defaultAldersgrenser,
     val sivilstand: Sivilstand = Sivilstand.UOPPGITT,
     val adressebeskyttelse: AdressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT
 ) {
     val harFoedselsdato = foedselsdato >= minimumFoedselsdato
 
-    fun withPensjoneringAldre(pensjoneringAldre: PensjoneringAldre) =
+    fun withPensjoneringAldre(pensjoneringAldre: Aldersgrenser) =
         Person(
             navn,
             foedselsdato,
