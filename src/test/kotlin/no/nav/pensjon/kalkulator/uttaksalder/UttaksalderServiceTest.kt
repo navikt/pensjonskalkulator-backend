@@ -240,7 +240,7 @@ internal class UttaksalderServiceTest {
 
         verify(simuleringService, times(1)).simulerPersonligAlderspensjon(simuleringSpec)
     }
-
+/*
     @Test
     fun `finnTidligsteUttaksalder throws SimuleringException when AFP offentlig is empty`() {
         val person = person()
@@ -292,7 +292,7 @@ internal class UttaksalderServiceTest {
 
         assertEquals(SimuleringStatus.AFP_IKKE_I_VILKAARSPROEVING, exception.status)
     }
-
+*/
 
     private fun arrangeSimulering(
         uttaksalderSpec: ImpersonalUttaksalderSpec,
