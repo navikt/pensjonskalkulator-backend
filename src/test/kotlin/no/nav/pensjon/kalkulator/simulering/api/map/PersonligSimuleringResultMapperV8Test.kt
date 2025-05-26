@@ -34,8 +34,8 @@ class PersonligSimuleringResultMapperV8Test{
                     )
                 ),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
-                afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 12000)),
-                afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000)),
+                afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
+                afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                 harForLiteTrygdetid = true,
                 trygdetid = 10,
@@ -60,8 +60,8 @@ class PersonligSimuleringResultMapperV8Test{
                 gradertUttakMaanedligBeloep = 6,
                 heltUttakMaanedligBeloep = 7
             ),
-            afpPrivat = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000)),
-            afpOffentlig = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000)),
+            afpPrivat = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
+            afpOffentlig = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
             vilkaarsproeving = PersonligSimuleringVilkaarsproevingResultV8(vilkaarErOppfylt = true, alternativ = null),
             harForLiteTrygdetid = true,
             trygdetid = null,
@@ -136,8 +136,8 @@ class PersonligSimuleringResultMapperV8Test{
                     )
                 ),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
-                afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 12000)),
-                afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000)),
+                afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
+                afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                 harForLiteTrygdetid = true,
                 trygdetid = 10,
@@ -170,8 +170,8 @@ class PersonligSimuleringResultMapperV8Test{
                 gradertUttakMaanedligBeloep = 6,
                 heltUttakMaanedligBeloep = 7
             ),
-            afpPrivat = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000)),
-            afpOffentlig = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000)),
+            afpPrivat = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
+            afpOffentlig = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
             vilkaarsproeving = PersonligSimuleringVilkaarsproevingResultV8(vilkaarErOppfylt = true, alternativ = null),
             harForLiteTrygdetid = true,
             trygdetid = null,
@@ -246,8 +246,8 @@ class PersonligSimuleringResultMapperV8Test{
                     )
                 ),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
-                afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 12000)),
-                afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000)),
+                afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
+                afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                 harForLiteTrygdetid = true,
                 trygdetid = 10,
@@ -288,8 +288,8 @@ class PersonligSimuleringResultMapperV8Test{
                 gradertUttakMaanedligBeloep = 6,
                 heltUttakMaanedligBeloep = 7
             ),
-            afpPrivat = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000)),
-            afpOffentlig = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000)),
+            afpPrivat = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
+            afpOffentlig = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
             vilkaarsproeving = PersonligSimuleringVilkaarsproevingResultV8(vilkaarErOppfylt = true, alternativ = null),
             harForLiteTrygdetid = true,
             trygdetid = null,
@@ -325,11 +325,11 @@ class PersonligSimuleringResultMapperV8Test{
                 ),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
                 afpPrivat = listOf(
-                    SimulertAfpPrivat(alder = 67, beloep = 12000),
-                    SimulertAfpPrivat(alder = 68, beloep = 13000),
-                    SimulertAfpPrivat(alder = 0, beloep = 14000),
+                    SimulertAfpPrivat(alder = 67, beloep = 12000, maanedligBeloep = 1000),
+                    SimulertAfpPrivat(alder = 68, beloep = 13000, maanedligBeloep = 1000),
+                    SimulertAfpPrivat(alder = 0, beloep = 14000, maanedligBeloep = 1000),
                     ),
-                afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000)),
+                afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                 harForLiteTrygdetid = true,
                 trygdetid = 10,
@@ -355,10 +355,10 @@ class PersonligSimuleringResultMapperV8Test{
                 heltUttakMaanedligBeloep = 7
             ),
             afpPrivat = listOf(
-                PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000),
-                PersonligSimuleringAarligPensjonResultV8(alder = 68, beloep = 13000)
+                PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000, maanedligBeloep = 1000),
+                PersonligSimuleringAarligPensjonResultV8(alder = 68, beloep = 13000, maanedligBeloep = 1000)
             ),
-            afpOffentlig = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000)),
+            afpOffentlig = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
             vilkaarsproeving = PersonligSimuleringVilkaarsproevingResultV8(vilkaarErOppfylt = true, alternativ = null),
             harForLiteTrygdetid = true,
             trygdetid = null,
@@ -394,11 +394,11 @@ class PersonligSimuleringResultMapperV8Test{
                 ),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
                 afpPrivat = listOf(
-                    SimulertAfpPrivat(alder = 68, beloep = 12000),
-                    SimulertAfpPrivat(alder = 69, beloep = 13000),
-                    SimulertAfpPrivat(alder = 0, beloep = 14000),
+                    SimulertAfpPrivat(alder = 68, beloep = 12000, maanedligBeloep = 1000),
+                    SimulertAfpPrivat(alder = 69, beloep = 13000, maanedligBeloep = 1000),
+                    SimulertAfpPrivat(alder = 0, beloep = 14000, maanedligBeloep = 1000),
                 ),
-                afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000)),
+                afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                 harForLiteTrygdetid = true,
                 trygdetid = 10,
@@ -436,11 +436,11 @@ class PersonligSimuleringResultMapperV8Test{
                 heltUttakMaanedligBeloep = 7
             ),
             afpPrivat = listOf(
-                PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 14000),
-                PersonligSimuleringAarligPensjonResultV8(alder = 68, beloep = 12000),
-                PersonligSimuleringAarligPensjonResultV8(alder = 69, beloep = 13000)
+                PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 14000, maanedligBeloep = 1000),
+                PersonligSimuleringAarligPensjonResultV8(alder = 68, beloep = 12000, maanedligBeloep = 1000),
+                PersonligSimuleringAarligPensjonResultV8(alder = 69, beloep = 13000, maanedligBeloep = 1000)
             ),
-            afpOffentlig = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000)),
+            afpOffentlig = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
             vilkaarsproeving = PersonligSimuleringVilkaarsproevingResultV8(vilkaarErOppfylt = true, alternativ = null),
             harForLiteTrygdetid = true,
             trygdetid = null,

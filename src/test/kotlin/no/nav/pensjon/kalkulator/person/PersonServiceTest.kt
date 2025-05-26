@@ -6,18 +6,18 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.PersonFactory
 import no.nav.pensjon.kalkulator.mock.PersonFactory.person
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
+import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService
+import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService.Companion.defaultAldersgrenser
+import no.nav.pensjon.kalkulator.normalder.VerdiStatus
 import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
-import no.nav.pensjon.kalkulator.uttaksalder.normalder.NormertPensjoneringsalderService
-import no.nav.pensjon.kalkulator.uttaksalder.normalder.PensjoneringAldre
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
-import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.*
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @ExtendWith(SpringExtension::class)
@@ -33,7 +33,7 @@ class PersonServiceTest {
     private lateinit var aldersgruppeFinder: AldersgruppeFinder
 
     @Mock
-    private lateinit var normalderService: NormertPensjoneringsalderService
+    private lateinit var normalderService: NormertPensjonsalderService
 
     @Mock
     private lateinit var navnRequirement: NavnRequirement
@@ -45,17 +45,23 @@ class PersonServiceTest {
     }
 
     @Test
-    fun `getPerson returns person with normert pensjoneringsalder`() {
+    fun `getPerson returns person with normert pensjonsalder`() {
         arrangePerson(
-            pensjoneringAldre = PensjoneringAldre(
+            pensjoneringAldre = Aldersgrenser(
+                aarskull = 1964,
+                nedreAlder = Alder(aar = 62, maaneder = 4),
                 normalder = Alder(aar = 67, maaneder = 4),
-                nedreAldersgrense = Alder(aar = 62, maaneder = 4)
+                oevreAlder = Alder(aar = 75, maaneder = 4),
+                verdiStatus = VerdiStatus.PROGNOSE
             )
         )
 
-        service().getPerson().pensjoneringAldre shouldBe PensjoneringAldre(
+        service().getPerson().pensjoneringAldre shouldBe Aldersgrenser(
+            aarskull = 1964,
+            nedreAlder = Alder(aar = 62, maaneder = 4),
             normalder = Alder(aar = 67, maaneder = 4),
-            nedreAldersgrense = Alder(aar = 62, maaneder = 4)
+            oevreAlder = Alder(aar = 75, maaneder = 4),
+            verdiStatus = VerdiStatus.PROGNOSE
         )
     }
 
@@ -82,14 +88,14 @@ class PersonServiceTest {
 
     private fun arrangePerson(
         pid: Pid = PersonFactory.pid,
-        pensjoneringAldre: PensjoneringAldre = NormertPensjoneringsalderService.defaultAldre
+        pensjoneringAldre: Aldersgrenser = defaultAldersgrenser
     ): Person {
         with(person().withPensjoneringAldre(pensjoneringAldre)) {
             `when`(pidGetter.pid()).thenReturn(pid)
             `when`(client.fetchPerson(pid, fetchFulltNavn = false)).thenReturn(this)
             `when`(aldersgruppeFinder.aldersgruppe(person = this)).thenReturn("")
             `when`(navnRequirement.needFulltNavn()).thenReturn(false)
-            `when`(normalderService.getAldre(this.foedselsdato)).thenReturn(pensjoneringAldre)
+            `when`(normalderService.aldersgrenser(this.foedselsdato)).thenReturn(pensjoneringAldre)
             return this
         }
     }

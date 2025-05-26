@@ -18,7 +18,7 @@ data class ImpersonalSimuleringSpec(
     val gradertUttak: GradertUttak? = null,
     val heltUttak: HeltUttak,
     val utenlandsopphold: Utenlandsopphold,
-    val afpInntektMaanedFoerUttak: Int? = null,
+    val afpInntektMaanedFoerUttak: Boolean? = null,
     val afpOrdning: AfpOrdningType? = null,
 
     // For 'anonym simulering' only:

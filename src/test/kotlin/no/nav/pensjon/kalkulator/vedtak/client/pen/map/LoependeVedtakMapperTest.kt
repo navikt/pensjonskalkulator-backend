@@ -32,7 +32,7 @@ class LoependeVedtakMapperTest {
 
         with(result) {
             afpOffentlig shouldBe null
-            afpOffentligForBrukereFoedtFoer1963?.fom shouldBe LocalDate.of(2021, 6, 15)
+            pre2025OffentligAfp?.fom shouldBe LocalDate.of(2021, 6, 15)
             afpPrivat?.fom shouldBe LocalDate.of(2021, 12, 31)
 
             with(alderspensjon!!) {

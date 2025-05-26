@@ -111,7 +111,7 @@ class SecurityContextEnricherTest {
             securityContextEnricher().enrichAuthentication(request, response)
         }
 
-        assertEquals("Intet gyldig representasjonsforhold funnet", exception.message)
+        assertEquals("INVALID_REPRESENTASJON", exception.message)
         assertNull(securityContextTargetPid()?.value)
     }
 

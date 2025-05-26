@@ -55,14 +55,16 @@ object SimulatorPersonligSimuleringResultMapper {
             grunnpensjon = dto.grunnpensjon,
             tilleggspensjon = dto.tilleggspensjon,
             afpTillegg = dto.afpTillegg,
-            saertillegg = dto.saertillegg
+            saertillegg = dto.saertillegg,
+            afpGrad = dto.afpGrad,
+            afpAvkortetTil70Prosent = dto.afpAvkortetTil70Prosent
         )
 
     private fun privatAfp(dto: SimulatorPersonligPrivatAfp) =
-        SimulertAfpPrivat(dto.alderAar, dto.beloep)
+        SimulertAfpPrivat(dto.alderAar, dto.beloep, dto.maanedligBeloep ?: 0)
 
     private fun livsvarigOffentligAfp(dto: SimulatorPersonligLivsvarigOffentligAfp) =
-        SimulertAfpOffentlig(dto.alderAar, dto.beloep)
+        SimulertAfpOffentlig(dto.alderAar, dto.beloep, dto.maanedligBeloep)
 
     private fun vilkaarsproeving(dto: SimulatorPersonligVilkaarsproeving) =
         Vilkaarsproeving(

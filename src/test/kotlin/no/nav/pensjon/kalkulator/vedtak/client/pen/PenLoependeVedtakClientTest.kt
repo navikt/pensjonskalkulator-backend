@@ -1,5 +1,7 @@
 package no.nav.pensjon.kalkulator.vedtak.client.pen
 
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.WebClientTest
@@ -7,10 +9,8 @@ import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.mockito.Mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -39,84 +39,112 @@ class PenLoependeVedtakClientTest : WebClientTest() {
     @Test
     fun `hent loepende vedtak med alderspensjon`() {
         arrange(vedtakApResponse())
+
         val response = client.hentLoependeVedtak(pid)
+
         with(response) {
-            assertEquals(100, alderspensjon?.grad)
-            assertEquals("2025-10-01", alderspensjon?.fom.toString())
-            assertEquals(Sivilstand.UGIFT, alderspensjon?.sivilstand)
-            assertEquals(null, ufoeretrygd)
-            assertEquals(null, afpPrivat)
-            assertEquals(null, afpOffentlig)
+            with(alderspensjon!!) {
+                grad shouldBe 100
+                fom.toString() shouldBe "2025-10-01"
+                sivilstand shouldBe Sivilstand.UGIFT
+            }
+            ufoeretrygd shouldBe null
+            afpPrivat shouldBe null
+            afpOffentlig shouldBe null
         }
     }
 
     @Test
     fun `hent loepende vedtak med ufoere`() {
-        arrange(vedtakUforeResponse())
+        arrange(vedtakUfoereResponse())
+
         val response = client.hentLoependeVedtak(pid)
+
         with(response) {
-            assertEquals(null, alderspensjon)
-            assertEquals(100, ufoeretrygd?.grad)
-            assertEquals("2022-07-01", ufoeretrygd?.fom.toString())
-            assertEquals(null, afpPrivat)
-            assertEquals(null, afpOffentlig)
+            alderspensjon shouldBe null
+            with(ufoeretrygd!!) {
+                grad shouldBe 100
+                fom.toString() shouldBe "2022-07-01"
+            }
+            afpPrivat shouldBe null
+            afpOffentlig shouldBe null
         }
     }
 
     @Test
     fun `hent loepende vedtak med alderspensjon og ufoere`() {
-        arrange(vedtakApOgUforeResponse())
+        arrange(vedtakApOgUfoereResponse())
+
         val response = client.hentLoependeVedtak(pid)
+
         with(response) {
-            assertEquals(100, alderspensjon?.grad)
-            assertEquals("2025-10-01", alderspensjon?.fom.toString())
-            assertEquals(Sivilstand.GIFT, alderspensjon?.sivilstand)
-            assertEquals(100, ufoeretrygd?.grad)
-            assertEquals("2022-07-01", ufoeretrygd?.fom.toString())
-            assertEquals(null, afpPrivat)
-            assertEquals(null, afpOffentlig)
+            with(alderspensjon!!) {
+                grad shouldBe 100
+                fom.toString() shouldBe "2025-10-01"
+                sivilstand shouldBe Sivilstand.GIFT
+            }
+            with(ufoeretrygd!!) {
+                grad shouldBe 100
+                fom.toString() shouldBe "2022-07-01"
+            }
+            afpPrivat shouldBe null
+            afpOffentlig shouldBe null
         }
     }
 
     @Test
-    fun `hent loepende vedtak med alderspensjon, ufoere og afpPrivat`() {
-        arrange(vedtakApOgUforeOgAfpPrivatResponse())
+    fun `hent loepende vedtak med alderspensjon, ufoere og privat AFP`() {
+        arrange(vedtakApOgUfoereOgPrivatAfpResponse())
+
         val response = client.hentLoependeVedtak(pid)
+
         with(response) {
-            assertEquals(100, alderspensjon?.grad)
-            assertEquals("2025-10-01", alderspensjon?.fom.toString())
-            assertEquals(Sivilstand.SKILT, alderspensjon?.sivilstand)
-            assertEquals(100, ufoeretrygd?.grad)
-            assertEquals("2022-07-01", ufoeretrygd?.fom.toString())
-            assertEquals("2022-07-01", afpPrivat?.fom.toString())
-            assertEquals(null, afpOffentlig)
+            with(alderspensjon!!) {
+                grad shouldBe 100
+                fom.toString() shouldBe "2025-10-01"
+                sivilstand shouldBe Sivilstand.SKILT
+            }
+            with(ufoeretrygd!!) {
+                grad shouldBe 100
+                fom.toString() shouldBe "2022-07-01"
+            }
+            afpPrivat?.fom.toString() shouldBe "2022-07-01"
+            afpOffentlig shouldBe null
         }
     }
 
     @Test
-    fun `hent loepende vedtak med alderspensjon, ufoere, afpPrivat og gammel afpOffentlig`() {
-        arrange(vedtakApOgUforeOgAfpPrivatOgAfpResponse())
+    fun `hent loepende vedtak med alderspensjon, ufoere, privat AFP og pre-2025 offentlig AFP`() {
+        arrange(vedtakApOgUfoereOgPrivatAfpOgPre2025OffentligAfpResponse())
+
         val response = client.hentLoependeVedtak(pid)
+
         with(response) {
-            assertEquals(100, alderspensjon?.grad)
-            assertEquals("2025-10-01", alderspensjon?.fom.toString())
-            assertEquals(Sivilstand.ENKE_ELLER_ENKEMANN, alderspensjon?.sivilstand)
-            assertEquals(100, ufoeretrygd?.grad)
-            assertEquals("2022-07-01", ufoeretrygd?.fom.toString())
-            assertEquals("2022-07-01", afpPrivat?.fom.toString())
-            assertEquals(null, afpOffentlig)
+            with(alderspensjon!!) {
+                grad shouldBe 100
+                fom.toString() shouldBe "2025-10-01"
+                sivilstand shouldBe Sivilstand.ENKE_ELLER_ENKEMANN
+            }
+            with(ufoeretrygd!!) {
+                grad shouldBe 100
+                fom.toString() shouldBe "2022-07-01"
+            }
+            afpPrivat?.fom.toString() shouldBe "2022-07-01"
+            afpOffentlig shouldBe null
         }
     }
 
     @Test
     fun `hent loepende vedtak med ingen vedtak`() {
         arrange(vedtakIngenResponse())
+
         val response = client.hentLoependeVedtak(pid)
+
         with(response) {
-            assertEquals(null, alderspensjon)
-            assertEquals(null, ufoeretrygd)
-            assertEquals(null, afpPrivat)
-            assertEquals(null, afpOffentlig)
+            alderspensjon shouldBe null
+            ufoeretrygd shouldBe null
+            afpPrivat shouldBe null
+            afpOffentlig shouldBe null
         }
     }
 
@@ -124,15 +152,15 @@ class PenLoependeVedtakClientTest : WebClientTest() {
     fun `hentLoependeVedtak throws EgressException when response is '404 Not Found'`() {
         arrange(notFoundResponse())
 
-        val exception = assertThrows<EgressException> { client.hentLoependeVedtak(pid) }
+        val exception = shouldThrow<EgressException> { client.hentLoependeVedtak(pid) }
 
-        assertEquals(
-            """{
+        with(exception) {
+            message shouldBe """{
     "feilmelding": "Personen med fødselsnummer ${pid.value} finnes ikke i den lokale oversikten over personer. (PEN029)",
     "merknader": []
-}""", exception.message
-        )
-        assertTrue(exception.isClientError)
+}"""
+            exception.isClientError shouldBe true
+        }
     }
 
     @Test
@@ -140,10 +168,12 @@ class PenLoependeVedtakClientTest : WebClientTest() {
         arrange(serverErrorResponse())
         arrange(serverErrorResponse()) // 1 retry
 
-        val exception = assertThrows<EgressException> { client.hentLoependeVedtak(pid) }
+        val exception = shouldThrow<EgressException> { client.hentLoependeVedtak(pid) }
 
-        assertEquals("Failed calling /pen/api/simulering/vedtak/loependevedtak", exception.message)
-        assertFalse(exception.isClientError)
+        with(exception) {
+            message shouldBe "Failed calling /api/simulering/vedtak/loependevedtak"
+            exception.isClientError shouldBe false
+        }
     }
 
     private companion object {
@@ -151,22 +181,27 @@ class PenLoependeVedtakClientTest : WebClientTest() {
         private const val VEDTAK_AP = """
 {"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"UGIF","sivilstatus":"UGIF"},"ufoeretrygd":null,"afpPrivat":null,"afp":null}
 """
+
         @Language("json")
-        private const val VEDTAK_UFORE = """
+        private const val VEDTAK_UFOERE = """
 {"alderspensjon":null,"ufoeretrygd":{"grad":100,"fraOgMed":"2022-07-01"},"afpPrivat":null,"afp":null}
 """
+
         @Language("json")
-        private const val VEDTAK_AP_OG_UFORE = """
+        private const val VEDTAK_AP_OG_UFOERE = """
 {"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"GIFT","sivilstatus":"GIFT"},"ufoeretrygd":{"grad":100,"fraOgMed":"2022-07-01"},"afpPrivat":null,"afp":null}
 """
+
         @Language("json")
-        private const val VEDTAK_AP_OG_UFORE_OG_AFPPRIVAT = """
+        private const val VEDTAK_AP_OG_UFOERE_OG_PRIVAT_AFP = """
 {"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"SKIL","sivilstatus":"SKIL"},"ufoeretrygd":{"grad":100,"fraOgMed":"2022-07-01"},"afpPrivat":{"grad":100,"fraOgMed":"2022-07-01"},"afp":null}
 """
+
         @Language("json")
-        private const val VEDTAK_AP_OG_UFORE_OG_AFPPRIVAT_OG_AFP = """
+        private const val VEDTAK_AP_OG_UFOERE_OG_PRIVAT_AFP_OG_PRE2025_OFFENTLIG_AFP = """
 {"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"ENKE","sivilstatus":"ENKE"},"ufoeretrygd":{"grad":100,"fraOgMed":"2022-07-01"},"afpPrivat":{"grad":100,"fraOgMed":"2022-07-01"},"afp":{"grad":100,"fraOgMed":"2022-07-01"}}
 """
+
         @Language("json")
         private const val VEDTAK_INGEN = """
 {"alderspensjon":null,"ufoeretrygd":null,"afpPrivat":null,"afp":null}
@@ -183,14 +218,19 @@ class PenLoependeVedtakClientTest : WebClientTest() {
     "timestamp": "2023-10-13T10:38:43+0200",
     "status": 500,
     "error": "Internal Server Error",
-    "path": "/pen/api/simulering/vedtak/loependevedtak"
+    "path": "/api/simulering/vedtak/loependevedtak"
 }"""
 
         private fun vedtakApResponse() = jsonResponse(HttpStatus.OK).setBody(VEDTAK_AP)
-        private fun vedtakUforeResponse() = jsonResponse(HttpStatus.OK).setBody(VEDTAK_UFORE)
-        private fun vedtakApOgUforeResponse() = jsonResponse(HttpStatus.OK).setBody(VEDTAK_AP_OG_UFORE)
-        private fun vedtakApOgUforeOgAfpPrivatResponse() = jsonResponse(HttpStatus.OK).setBody(VEDTAK_AP_OG_UFORE_OG_AFPPRIVAT)
-        private fun vedtakApOgUforeOgAfpPrivatOgAfpResponse() = jsonResponse(HttpStatus.OK).setBody(VEDTAK_AP_OG_UFORE_OG_AFPPRIVAT_OG_AFP)
+        private fun vedtakUfoereResponse() = jsonResponse(HttpStatus.OK).setBody(VEDTAK_UFOERE)
+        private fun vedtakApOgUfoereResponse() = jsonResponse(HttpStatus.OK).setBody(VEDTAK_AP_OG_UFOERE)
+
+        private fun vedtakApOgUfoereOgPrivatAfpResponse() =
+            jsonResponse(HttpStatus.OK).setBody(VEDTAK_AP_OG_UFOERE_OG_PRIVAT_AFP)
+
+        private fun vedtakApOgUfoereOgPrivatAfpOgPre2025OffentligAfpResponse() =
+            jsonResponse(HttpStatus.OK).setBody(VEDTAK_AP_OG_UFOERE_OG_PRIVAT_AFP_OG_PRE2025_OFFENTLIG_AFP)
+
         private fun vedtakIngenResponse() = jsonResponse(HttpStatus.OK).setBody(VEDTAK_INGEN)
 
         private fun notFoundResponse() = jsonResponse(HttpStatus.NOT_FOUND).setBody(PERSON_NOT_FOUND)

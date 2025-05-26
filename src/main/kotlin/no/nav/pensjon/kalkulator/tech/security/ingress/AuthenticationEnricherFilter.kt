@@ -6,8 +6,9 @@ import jakarta.servlet.ServletResponse
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.tech.security.SecurityConfiguration.Companion.FEATURE_URI
 import no.nav.pensjon.kalkulator.tech.security.egress.SecurityContextEnricher
-import org.springframework.http.HttpStatus
+import no.nav.pensjon.kalkulator.tech.security.ingress.Responder.respondForbidden
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.filter.GenericFilterBean
 
@@ -19,14 +20,26 @@ class AuthenticationEnricherFilter(private val enricher: SecurityContextEnricher
     private val log = KotlinLogging.logger {}
 
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
+        // Request for state of feature toggle requires no authentication or access check:
+        if ((request as HttpServletRequest).requestURI.startsWith(FEATURE_URI)) {
+            chain.doFilter(request, response)
+            return
+        }
+
+        val httpResponse = response as HttpServletResponse
+
         try {
-            enricher.enrichAuthentication(request as HttpServletRequest, response as HttpServletResponse)
+            enricher.enrichAuthentication(request, httpResponse)
         } catch (e: AccessDeniedException) {
-            log.warn { "Access denied - ${e.message}" }
-            (response as HttpServletResponse).sendError(HttpStatus.FORBIDDEN.value(), e.message)
+            handleAccessDenied(response = httpResponse, reason = e.message ?: AccessDeniedReason.NONE.name)
             return
         }
 
         chain.doFilter(request, response)
+    }
+
+    private fun handleAccessDenied(response: HttpServletResponse, reason: String) {
+        log.warn { "Access denied - $reason" }
+        respondForbidden(response, reason)
     }
 }
