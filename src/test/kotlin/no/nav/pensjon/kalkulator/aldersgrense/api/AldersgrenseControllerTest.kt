@@ -4,12 +4,13 @@ import no.nav.pensjon.kalkulator.aldersgrense.AldersgrenseService
 import no.nav.pensjon.kalkulator.aldersgrense.api.dto.AldersgrenseSpec
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
+import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
+import no.nav.pensjon.kalkulator.normalder.VerdiStatus
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
-import no.nav.pensjon.kalkulator.uttaksalder.normalder.PensjoneringAldre
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -52,12 +53,15 @@ class AldersgrenseControllerTest {
     @Test
     fun `test 'aldersgrense' endpoint version 1 with birth year 1963`() {
         val spec = AldersgrenseSpec(foedselsdato = 1963)
-        val pensjoneringAldre = PensjoneringAldre(
+        val aldersgrenser = Aldersgrenser(
+            aarskull = 1963,
             normalder = Alder(aar = 67, maaneder = 0),
-            nedreAldersgrense = Alder(aar = 62, maaneder = 0)
+            nedreAlder = Alder(aar = 62, maaneder = 0),
+            oevreAlder = Alder(aar = 75, maaneder = 0),
+            verdiStatus = VerdiStatus.FAST
         )
 
-        `when`(service.hentAldersgrenser(spec)).thenReturn(pensjoneringAldre)
+        `when`(service.hentAldersgrenser(spec)).thenReturn(aldersgrenser)
 
         mvc.perform(
             post(URL_V1)
@@ -72,12 +76,15 @@ class AldersgrenseControllerTest {
     @Test
     fun `test 'aldersgrense' endpoint version 1 with birth year 1970`() {
         val spec = AldersgrenseSpec(foedselsdato = 1970)
-        val pensjoneringAldre = PensjoneringAldre(
+        val aldersgrenser = Aldersgrenser(
+            aarskull = 1970,
             normalder = Alder(aar = 67, maaneder = 0),
-            nedreAldersgrense = Alder(aar = 62, maaneder = 0)
+            nedreAlder = Alder(aar = 62, maaneder = 0),
+            oevreAlder = Alder(aar = 75, maaneder = 0),
+            verdiStatus = VerdiStatus.FAST
         )
 
-        `when`(service.hentAldersgrenser(spec)).thenReturn(pensjoneringAldre)
+        `when`(service.hentAldersgrenser(spec)).thenReturn(aldersgrenser)
 
         mvc.perform(
             post(URL_V1)
@@ -105,7 +112,7 @@ class AldersgrenseControllerTest {
         @Language("json")
         private const val RESPONSE_BODY_1963 = """{
             "normertPensjoneringsalder": {
-                "aar": 62,
+                "aar": 67,
                 "maaneder": 0
             },
             "nedreAldersgrense": {
@@ -117,7 +124,7 @@ class AldersgrenseControllerTest {
         @Language("json")
         private const val RESPONSE_BODY_1970 = """{
             "normertPensjoneringsalder": {
-                "aar": 62,
+                "aar": 67,
                 "maaneder": 0
             },
             "nedreAldersgrense": {
