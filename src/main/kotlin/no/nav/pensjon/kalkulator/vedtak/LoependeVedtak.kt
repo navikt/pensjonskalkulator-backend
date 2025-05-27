@@ -25,11 +25,11 @@ data class LoependeVedtakDetaljer(
 data class LoependeAlderspensjonDetaljer(
     val grad: Int,
     val fom: LocalDate,
-    var utbetalingSisteMaaned: UtbetalingSisteMaaned? = null,
+    var utbetalingSisteMaaned: Utbetaling? = null,
     val sivilstand: Sivilstand,
 )
 
-data class UtbetalingSisteMaaned(
+data class Utbetaling(
     val beloep: BigDecimal?,
     val posteringsdato: LocalDate,
 )

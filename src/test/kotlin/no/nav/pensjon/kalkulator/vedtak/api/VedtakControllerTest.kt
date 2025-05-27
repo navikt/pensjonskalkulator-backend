@@ -79,10 +79,10 @@ class VedtakControllerTest {
             )
         )
 
-        val res = mvc.get(URL_V1).andReturn()
+        val result = mvc.get(URL_V1).andReturn()
 
-        assertEquals(200, res.response.status)
-        assertEquals(RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V1, res.response.contentAsString)
+        assertEquals(200, result.response.status)
+        assertEquals(RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V1, result.response.contentAsString)
     }
 
     @Test
@@ -101,10 +101,10 @@ class VedtakControllerTest {
             )
         )
 
-        val res = mvc.get(URL_V1).andReturn()
+        val result = mvc.get(URL_V1).andReturn()
 
-        assertEquals(200, res.response.status)
-        assertEquals(RESPONSE_BODY_INGEN_VEDTAK_V1, res.response.contentAsString)
+        assertEquals(200, result.response.status)
+        assertEquals(RESPONSE_BODY_INGEN_VEDTAK_V1, result.response.contentAsString)
     }
 
     @Test
@@ -134,10 +134,10 @@ class VedtakControllerTest {
             )
         )
 
-        val res = mvc.get(URL_V2).asyncDispatch().andReturn()
+        val result = mvc.get(URL_V2).asyncDispatch().andReturn()
 
-        assertEquals(200, res.response.status)
-        assertEquals(RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V2, res.response.contentAsString)
+        assertEquals(200, result.response.status)
+        assertEquals(RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V2, result.response.contentAsString)
     }
 
     @Test
@@ -156,10 +156,10 @@ class VedtakControllerTest {
             )
         )
 
-        val res = mvc.get(URL_V2).asyncDispatch().andReturn()
+        val result = mvc.get(URL_V2).asyncDispatch().andReturn()
 
-        assertEquals(200, res.response.status)
-        assertEquals(RESPONSE_BODY_INGEN_VEDTAK_V2, res.response.contentAsString)
+        assertEquals(200, result.response.status)
+        assertEquals(RESPONSE_BODY_INGEN_VEDTAK_V2, result.response.contentAsString)
     }
 
     @Test
@@ -189,10 +189,10 @@ class VedtakControllerTest {
             )
         )
 
-        val res = mvc.get(URL_V3).asyncDispatch().andReturn()
+        val result = mvc.get(URL_V3).asyncDispatch().andReturn()
 
-        assertEquals(200, res.response.status)
-        assertEquals(RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V3, res.response.contentAsString)
+        assertEquals(200, result.response.status)
+        assertEquals(RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V3, result.response.contentAsString)
     }
 
     @Test
@@ -211,10 +211,10 @@ class VedtakControllerTest {
             )
         )
 
-        val res = mvc.get(URL_V3).asyncDispatch().andReturn()
+        val result = mvc.get(URL_V3).asyncDispatch().andReturn()
 
-        assertEquals(200, res.response.status)
-        assertEquals(RESPONSE_BODY_INGEN_VEDTAK_V3, res.response.contentAsString)
+        assertEquals(200, result.response.status)
+        assertEquals(RESPONSE_BODY_INGEN_VEDTAK_V3, result.response.contentAsString)
     }
 
 
@@ -245,10 +245,10 @@ class VedtakControllerTest {
             )
         )
 
-        val res = mvc.get(URL_V4).asyncDispatch().andReturn()
+        val result = mvc.get(URL_V4).asyncDispatch().andReturn()
 
-        assertEquals(200, res.response.status)
-        assertEquals(RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V4, res.response.contentAsString)
+        assertEquals(200, result.response.status)
+        assertEquals(RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V4, result.response.contentAsString)
     }
 
     @Test
@@ -263,10 +263,10 @@ class VedtakControllerTest {
             )
         )
 
-        val res = mvc.get(URL_V4).asyncDispatch().andReturn()
+        val result = mvc.get(URL_V4).asyncDispatch().andReturn()
 
-        assertEquals(200, res.response.status)
-        assertEquals(RESPONSE_BODY_INGEN_VEDTAK_V4, res.response.contentAsString)
+        assertEquals(200, result.response.status)
+        assertEquals(RESPONSE_BODY_INGEN_VEDTAK_V4, result.response.contentAsString)
     }
 
     private companion object {
@@ -289,7 +289,7 @@ class VedtakControllerTest {
 
         @Language("json")
         private const val RESPONSE_BODY_INGEN_VEDTAK_V4 =
-            """{"ufoeretrygd":{"grad":0}}"""
+            """{"harLoependeVedtak":false,"ufoeretrygd":{"grad":0}}"""
 
         @Language("json")
         private const val RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V1 =
@@ -305,8 +305,6 @@ class VedtakControllerTest {
 
         @Language("json")
         private const val RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V4 =
-            """{"alderspensjon":{"grad":1,"fom":"2020-12-01","sivilstand":"GIFT"},"fremtidigAlderspensjon":{"grad":10,"fom":"2021-12-01"},"ufoeretrygd":{"grad":2},"afpPrivat":{"fom":"2022-12-01"},"afpOffentlig":{"fom":"2023-12-01"}}"""
-
-
+            """{"harLoependeVedtak":false,"alderspensjon":{"grad":1,"fom":"2020-12-01","sivilstand":"GIFT"},"fremtidigAlderspensjon":{"grad":10,"fom":"2021-12-01"},"ufoeretrygd":{"grad":2},"afpPrivat":{"fom":"2022-12-01"},"afpOffentlig":{"fom":"2023-12-01"}}"""
     }
 }

@@ -7,38 +7,46 @@ import java.math.BigDecimal
 object LoependeVedtakMapperV4 {
 
     fun toDto(vedtak: LoependeVedtak) = LoependeVedtakV4(
-        alderspensjon = toAlderspensjonDetaljerV4Dto(vedtak.alderspensjon),
-        fremtidigAlderspensjon = toAlderspensjonDetaljerV4Dto(vedtak.fremtidigLoependeVedtakAp),
-        ufoeretrygd = toUfoeretrygdDetaljerV4Dto(vedtak.ufoeretrygd),
-        afpPrivat = toLoependeFraV4Dto(vedtak.afpPrivat),
-        afpOffentlig = toLoependeFraV4Dto(vedtak.afpOffentlig),
-        pre2025OffentligAfp = toLoependeFraV4Dto(vedtak.pre2025OffentligAfp),
+        harLoependeVedtak = hasContent(vedtak),
+        alderspensjon = vedtak.alderspensjon?.let(::toAlderspensjonDetaljerV4Dto),
+        fremtidigAlderspensjon = vedtak.fremtidigLoependeVedtakAp?.let(::toAlderspensjonDetaljerV4Dto),
+        ufoeretrygd = vedtak.ufoeretrygd?.let(::toUfoeretrygdDetaljerV4Dto) ?: UfoeretrygdDetaljerV4(grad = 0),
+        afpPrivat = vedtak.afpPrivat?.let(::toLoependeFraV4Dto),
+        afpOffentlig = vedtak.afpOffentlig?.let(::toLoependeFraV4Dto),
+        pre2025OffentligAfp = vedtak.pre2025OffentligAfp?.let(::toLoependeFraV4Dto),
     )
 
-    private fun toAlderspensjonDetaljerV4Dto(alderspensjon: LoependeAlderspensjonDetaljer?) = alderspensjon?.let {
+    private fun hasContent(vedtak: LoependeVedtak): Boolean =
+        vedtak.alderspensjon != null &&
+                vedtak.fremtidigLoependeVedtakAp != null &&
+                vedtak.ufoeretrygd != null &&
+                vedtak.afpPrivat != null &&
+                vedtak.afpOffentlig != null &&
+                vedtak.pre2025OffentligAfp != null
+
+    private fun toAlderspensjonDetaljerV4Dto(alderspensjon: LoependeAlderspensjonDetaljer) =
         AlderspensjonDetaljerV4(
             grad = alderspensjon.grad,
             fom = alderspensjon.fom,
-            sisteUtbetaling = alderspensjon.utbetalingSisteMaaned?.let {
-                UtbetalingV4(
-                    beloep = it.beloep ?: BigDecimal(0),
-                    utbetalingsdato = it.posteringsdato,
-                )
-            },
+            sisteUtbetaling = alderspensjon.utbetalingSisteMaaned?.let(::toUtbetalingV4),
             sivilstand = SivilstandV4.fromInternalValue(alderspensjon.sivilstand)
         )
-    }
 
-    private fun toAlderspensjonDetaljerV4Dto(alderspensjon: FremtidigAlderspensjonDetaljer?) = alderspensjon?.let {
+    private fun toAlderspensjonDetaljerV4Dto(alderspensjon: FremtidigAlderspensjonDetaljer) =
         FremtidigAlderspensjonDetaljerV4(
             grad = alderspensjon.grad,
             fom = alderspensjon.fom,
         )
-    }
 
+    private fun toUfoeretrygdDetaljerV4Dto(ufoeretrygd: LoependeUfoeretrygdDetaljer) =
+        UfoeretrygdDetaljerV4(grad = ufoeretrygd.grad)
 
-    private fun toUfoeretrygdDetaljerV4Dto(ufoeretrygd: LoependeUfoeretrygdDetaljer?) : UfoeretrygdDetaljerV4 = UfoeretrygdDetaljerV4(grad = ufoeretrygd?.grad?: 0)
+    private fun toLoependeFraV4Dto(vedtak: LoependeVedtakDetaljer) =
+        LoependeFraV4(fom = vedtak.fom)
 
-    private fun toLoependeFraV4Dto(loependeVedtakDetaljer: LoependeVedtakDetaljer?) = loependeVedtakDetaljer?.fom?.let { LoependeFraV4(fom = it) }
-
+    private fun toUtbetalingV4(utbetaling: Utbetaling) =
+        UtbetalingV4(
+            beloep = utbetaling.beloep ?: BigDecimal.ZERO,
+            utbetalingsdato = utbetaling.posteringsdato
+        )
 }
