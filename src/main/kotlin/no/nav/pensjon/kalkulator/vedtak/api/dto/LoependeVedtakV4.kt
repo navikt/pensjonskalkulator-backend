@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.vedtak.api.dto
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING
 import com.fasterxml.jackson.annotation.JsonInclude
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.person.Sivilstand
@@ -9,6 +10,7 @@ import java.time.LocalDate
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class LoependeVedtakV4(
+    val harLoependeVedtak: Boolean,
     val alderspensjon: AlderspensjonDetaljerV4?,
     val fremtidigAlderspensjon: FremtidigAlderspensjonDetaljerV4?,
     val ufoeretrygd: UfoeretrygdDetaljerV4,
@@ -20,7 +22,7 @@ data class LoependeVedtakV4(
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class AlderspensjonDetaljerV4(
     val grad: Int = 0,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val fom: LocalDate,
     val sisteUtbetaling: UtbetalingV4? = null,
     val sivilstand: SivilstandV4,
@@ -29,13 +31,13 @@ data class AlderspensjonDetaljerV4(
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class FremtidigAlderspensjonDetaljerV4(
     val grad: Int = 0,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val fom: LocalDate,
 )
 
 data class UtbetalingV4(
     val beloep: BigDecimal,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val utbetalingsdato: LocalDate,
 )
 
@@ -46,7 +48,7 @@ data class UfoeretrygdDetaljerV4(
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class LoependeFraV4(
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val fom: LocalDate,
 )
 
