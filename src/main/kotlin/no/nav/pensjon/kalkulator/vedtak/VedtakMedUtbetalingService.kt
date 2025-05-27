@@ -12,23 +12,21 @@ class VedtakMedUtbetalingService(
     val loependeVedtakService: LoependeVedtakService,
     val utbetalingService: UtbetalingService
 ) {
+    suspend fun hentVedtakMedUtbetaling(): LoependeVedtak =
+        withContext(Dispatchers.IO + SecurityCoroutineContext()) {
 
-    suspend fun hentVedtakMedUtbetaling(): LoependeVedtak {
-        return withContext(Dispatchers.IO + SecurityCoroutineContext()) {
-
-            val loependeVedtakDeferred =  async { loependeVedtakService.hentLoependeVedtak() }
-            val sisteMaanedsUtbetalingDeferred =  async { utbetalingService.hentSisteMaanedsUtbetaling() }
+            val loependeVedtakDeferred = async { loependeVedtakService.hentLoependeVedtak() }
+            val sisteMaanedsUtbetalingDeferred = async { utbetalingService.hentSisteMaanedsUtbetaling() }
 
             val loependeVedtak = loependeVedtakDeferred.await()
             val sisteMaanedsUtbetaling = sisteMaanedsUtbetalingDeferred.await()
 
             sisteMaanedsUtbetaling?.let {
-                loependeVedtak.alderspensjon?.utbetalingSisteMaaned = UtbetalingSisteMaaned(
+                loependeVedtak.alderspensjon?.utbetalingSisteMaaned = Utbetaling(
                     beloep = it.totalBeloep,
-                    posteringsdato = it.posteringsdato //brukere vil se utbetaling tigligst mulig uavhengig av utbetalingsstatus
+                    posteringsdato = it.posteringsdato //brukere vil se utbetaling tidligst mulig uavhengig av utbetalingsstatus
                 )
             }
             loependeVedtak
         }
-    }
 }
