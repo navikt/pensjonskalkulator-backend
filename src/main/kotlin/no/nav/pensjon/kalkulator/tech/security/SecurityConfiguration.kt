@@ -160,6 +160,7 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
      */
     private fun isImpersonal(request: HttpServletRequest): Boolean =
         request.requestURI == ANONYM_SIMULERING_URI
+                || request.requestURI == ALDERSGRENSE_URI
                 || request.requestURI == ANSATT_ID_URI && hasAnsattIdClaim(request)
                 || hasPidHeader(request)
 
@@ -177,6 +178,7 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
     companion object {
         const val FEATURE_URI = "/api/feature/"
         private const val ANONYM_SIMULERING_URI = "/api/v1/alderspensjon/anonym-simulering"
+        private const val ALDERSGRENSE_URI = "/api/v1/aldersgrense"
         private const val ANSATT_ID_URI = "/api/v1/ansatt-id"
         private const val ENCRYPTION_URI = "/api/v1/encrypt"
 
