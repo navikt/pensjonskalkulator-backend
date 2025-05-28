@@ -1,35 +1,84 @@
 package no.nav.pensjon.kalkulator.tech.security
 
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.springframework.test.context.junit.jupiter.SpringExtension
+import no.nav.pensjon.kalkulator.tech.security.ingress.jwt.RequestClaimExtractor
+import org.springframework.security.authentication.ProviderManager
 
-@ExtendWith(SpringExtension::class)
-class SecurityConfigurationTest {
+class SecurityConfigurationTest : FunSpec({
 
-    @Mock
-    private lateinit var request: HttpServletRequest
+    val claimExtractor = mockk<RequestClaimExtractor>()
+    val personalProviderManager = mockk<ProviderManager>()
+    val impersonalProviderManager = mockk<ProviderManager>()
+    val universalProviderManager = mockk<ProviderManager>()
 
-    @Test
-    fun `when no 'fnr' header then hasPidHeader returns false`() {
-        `when`(request.getHeader("fnr")).thenReturn(null)
-        assertFalse(SecurityConfiguration.hasPidHeader(request))
+    test("tokenAuthenticationManagerResolver uses universalProviderManager when request for feature toggle") {
+        val request = mockk<HttpServletRequest>().also {
+            every { it.requestURI } returns "/api/feature/"
+        }
+
+        SecurityConfiguration(claimExtractor).tokenAuthenticationManagerResolver(
+            personalProviderManager,
+            impersonalProviderManager,
+            universalProviderManager
+        ).resolve(request) shouldBe universalProviderManager
     }
 
-    @Test
-    fun `when empty 'fnr' header then hasPidHeader returns false`() {
-        `when`(request.getHeader("fnr")).thenReturn("")
-        assertFalse(SecurityConfiguration.hasPidHeader(request))
+    test("tokenAuthenticationManagerResolver uses universalProviderManager when request for encryption") {
+        val request = mockk<HttpServletRequest>().also {
+            every { it.requestURI } returns "/api/v1/encrypt"
+            every { it.getHeader("fnr") } returns pid.value // universalProviderManager used despite this header
+        }
+
+        SecurityConfiguration(claimExtractor).tokenAuthenticationManagerResolver(
+            personalProviderManager,
+            impersonalProviderManager,
+            universalProviderManager
+        ).resolve(request) shouldBe universalProviderManager
     }
 
-    @Test
-    fun `when non-empty 'fnr' header then hasPidHeader returns true`() {
-        `when`(request.getHeader("fnr")).thenReturn(pid.value)
-        assertTrue(SecurityConfiguration.hasPidHeader(request))
+    test("tokenAuthenticationManagerResolver uses impersonalProviderManager when request has fnr header") {
+        val request = mockk<HttpServletRequest>().also {
+            every { it.getHeader("fnr") } returns pid.value
+            every { it.requestURI } returns "non-universal"
+        }
+
+        SecurityConfiguration(claimExtractor).tokenAuthenticationManagerResolver(
+            personalProviderManager,
+            impersonalProviderManager,
+            universalProviderManager
+        ).resolve(request) shouldBe impersonalProviderManager
     }
-}
+
+    test("tokenAuthenticationManagerResolver uses impersonalProviderManager when request for ansatt-ID has NAVident claim") {
+        val request = mockk<HttpServletRequest>().also {
+            every { it.requestURI } returns "/api/v1/ansatt-id"
+        }
+        val navIdentClaimExtractor = mockk<RequestClaimExtractor>().also {
+            every { it.extractAuthorizationClaim(request, "NAVident") } returns "non-empty"
+        }
+
+        SecurityConfiguration(navIdentClaimExtractor).tokenAuthenticationManagerResolver(
+            personalProviderManager,
+            impersonalProviderManager,
+            universalProviderManager
+        ).resolve(request) shouldBe impersonalProviderManager
+    }
+
+    test("tokenAuthenticationManagerResolver uses personalProviderManager by default") {
+        val request = mockk<HttpServletRequest>().also {
+            every { it.getHeader("fnr") } returns null
+            every { it.requestURI } returns "foo"
+        }
+
+        SecurityConfiguration(claimExtractor).tokenAuthenticationManagerResolver(
+            personalProviderManager,
+            impersonalProviderManager,
+            universalProviderManager
+        ).resolve(request) shouldBe personalProviderManager
+    }
+})
