@@ -37,14 +37,6 @@ import org.springframework.util.StringUtils.hasLength
 @EnableWebSecurity
 class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtractor) {
 
-    /**
-     * Supports two issuer configurations (ID-porten and TokenX).
-     * -----
-     * Tokens issued for frontend are accepted as well as tokens issued for backend.
-     * This is in order to support both these scenarios:
-     * - Frontend forwards Wonderwall token to backend without exchanging it
-     * - Frontend exchanges Wonderwall token into TokenX or Entra ID OBO token, and uses the latter when calling backend
-     */
     @Bean("personal")
     @Primary
     fun personalProviderManager(
@@ -71,27 +63,14 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
         @Value("\${token-x.issuer}") issuer: String,
         @Value("\${token-x.client.id}") audience: String
     ) =
-        JwtAuthenticationProvider(
-            jwtDecoder(
-                issuerUri = issuer,
-                frontendAudiences = emptyList(),
-                backendAudience = audience
-            )
-        )
+        JwtAuthenticationProvider(jwtDecoder(issuer, audience))
 
     @Bean("entra-id-provider")
     fun entraIdProvider(
         @Value("\${azure.openid.config.issuer}") issuer: String,
-        @Value("\${pkb.frontend.entra.client.id}") frontendAudiences: String,
-        @Value("\${azure-app.client-id}") backendAudience: String
+        @Value("\${azure-app.client-id}") audience: String
     ) =
-        JwtAuthenticationProvider(
-            jwtDecoder(
-                issuerUri = issuer,
-                frontendAudiences = frontendAudiences.split(","),
-                backendAudience
-            )
-        )
+        JwtAuthenticationProvider(jwtDecoder(issuer, audience))
 
     @Bean
     fun tokenAuthenticationManagerResolver(
@@ -182,24 +161,20 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
         private const val ANSATT_ID_URI = "/api/v1/ansatt-id"
         private const val ENCRYPTION_URI = "/api/v1/encrypt"
 
-        fun hasPidHeader(request: HttpServletRequest): Boolean =
+        private fun hasPidHeader(request: HttpServletRequest): Boolean =
             hasLength(request.getHeader(CustomHttpHeaders.PID))
 
-        private fun jwtDecoder(
-            issuerUri: String,
-            frontendAudiences: List<String>,
-            backendAudience: String
-        ): JwtDecoder {
-            val decoder = JwtDecoders.fromIssuerLocation(issuerUri) as NimbusJwtDecoder
-
-            decoder.setJwtValidator(
-                DelegatingOAuth2TokenValidator(
-                    JwtValidators.createDefaultWithIssuer(issuerUri),
-                    AudienceValidator(frontendAudiences, backendAudience)
+        private fun jwtDecoder(issuer: String, audience: String): JwtDecoder =
+            decoder(issuer).apply {
+                setJwtValidator(
+                    DelegatingOAuth2TokenValidator(
+                        JwtValidators.createDefaultWithIssuer(issuer),
+                        AudienceValidator(audience)
+                    )
                 )
-            )
+            }
 
-            return decoder
-        }
+        private fun decoder(issuer: String) =
+            JwtDecoders.fromIssuerLocation(issuer) as NimbusJwtDecoder
     }
 }
