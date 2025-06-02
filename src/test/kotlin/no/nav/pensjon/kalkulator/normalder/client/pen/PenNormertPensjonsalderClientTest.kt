@@ -4,26 +4,13 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.mock.TestObjects.jwt
-import no.nav.pensjon.kalkulator.mock.TestObjects.pid1
 import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
 import no.nav.pensjon.kalkulator.normalder.VerdiStatus
-import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonTarget
-import no.nav.pensjon.kalkulator.tech.representasjon.RepresentertRolle
-import no.nav.pensjon.kalkulator.tech.security.egress.EnrichedAuthentication
-import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
-import okhttp3.mockwebserver.MockResponse
+import no.nav.pensjon.kalkulator.testutil.Arrange
+import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
-import org.springframework.boot.autoconfigure.AutoConfigurations
-import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
-import org.springframework.boot.test.context.runner.ApplicationContextRunner
 import org.springframework.cache.caffeine.CaffeineCacheManager
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
-import org.springframework.security.authentication.TestingAuthenticationToken
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.reactive.function.client.WebClient
 
 class PenNormertPensjonsalderClientTest : FunSpec({
@@ -31,14 +18,7 @@ class PenNormertPensjonsalderClientTest : FunSpec({
     var baseUrl: String? = null
 
     beforeSpec {
-        SecurityContextHolder.setContext(SecurityContextHolder.createEmptyContext())
-
-        SecurityContextHolder.getContext().authentication = EnrichedAuthentication(
-            initialAuth = TestingAuthenticationToken("TEST_USER", jwt),
-            egressTokenSuppliersByService = EgressTokenSuppliersByService(mapOf()),
-            target = RepresentasjonTarget(pid = pid1, rolle = RepresentertRolle.SELV)
-        )
-
+        Arrange.security()
         server = MockWebServer().also { it.start() }
         baseUrl = "http://localhost:${server.port}"
     }
@@ -48,17 +28,9 @@ class PenNormertPensjonsalderClientTest : FunSpec({
     }
 
     test("fetchNormalderListe should return liste med normerte pensjonsaldre") {
-        val contextRunner = ApplicationContextRunner().withConfiguration(
-            AutoConfigurations.of(WebClientAutoConfiguration::class.java)
-        )
+        server?.arrangeOkJsonResponse(PenNormalderResponse.BODY)
 
-        server?.enqueue(
-            MockResponse()
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .setResponseCode(HttpStatus.OK.value()).setBody(PenNormalderResponse.BODY)
-        )
-
-        contextRunner.run {
+        Arrange.webClientContextRunner().run {
             val client = PenNormertPensjonsalderClient(
                 baseUrl!!,
                 retryAttempts = "0",
