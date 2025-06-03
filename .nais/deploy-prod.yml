@@ -136,8 +136,6 @@ spec:
       value: prod-gcp:pensjonskalkulator:tjenestepensjon-simulering
     - name: TJENESTEPENSJON_SIMULERING_URL
       value: http://tjenestepensjon-simulering
-    - name: PKB_FRONTEND_ENTRA_CLIENT_ID
-      value: irrelevant-when-obo-token-used
     - name: PKB_GROUP_ID_SAKSBEHANDLER
       value: 0af3955f-df85-4eb0-b5b2-45bf2c8aeb9e
     - name: PKB_GROUP_ID_EGNE_ANSATTE
