@@ -1,75 +1,76 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.v3
 
+import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTest.Companion.EN_AVTALE_RESPONSE_BODY
-import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTest.Companion.assertRequestBody
-import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTest.Companion.okResponse
-import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTest.Companion.spec
-import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
+import io.mockk.every
+import io.mockk.mockk
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonMockPensjonsavtaleClientTestObjects.BODY_WITHOUT_HEADER
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.EN_AVTALE_RESPONSE_BODY
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.avtaleSpec
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.avtaleMedToUtbetalingsperioder
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.mock.XmlMapperFactory.xmlMapper
 import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.SamlTokenService
 import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.SamlTokenServiceTest.Companion.SAML_ASSERTION
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import no.nav.pensjon.kalkulator.testutil.Arrange
+import no.nav.pensjon.kalkulator.testutil.arrangeOkXmlResponse
+import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.TestPropertySource
+import org.springframework.boot.test.context.assertj.AssertableApplicationContext
 import org.springframework.web.reactive.function.client.WebClient
+import java.io.ByteArrayOutputStream
+import java.nio.charset.StandardCharsets
 
-@SpringBootTest
-@TestPropertySource("classpath:application-test.properties")
-class NorskPensjonMockPensjonsavtaleClientTest : WebClientTest() {
+class NorskPensjonMockPensjonsavtaleClientTest : FunSpec({
 
-    private lateinit var client: NorskPensjonMockPensjonsavtaleClient
+    var server: MockWebServer? = null
+    var baseUrl: String? = null
+    val xmlMapper = xmlMapper()
+    val traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" }
+    val tokenGetter = mockk<SamlTokenService>().apply { every { assertion() } returns SAML_ASSERTION }
 
-    @Mock
-    private lateinit var tokenService: SamlTokenService
-
-    @Mock
-    private lateinit var traceAid: TraceAid
-
-    @Autowired
-    private lateinit var webClientBuilder: WebClient.Builder
-
-    @BeforeEach
-    fun initialize() {
-        `when`(tokenService.assertion()).thenReturn(SAML_ASSERTION)
-        `when`(traceAid.callId()).thenReturn("id1")
-        arrangeSecurityContext()
-
-        client = NorskPensjonMockPensjonsavtaleClient(
-            mockUrl = baseUrl(),
-            tokenGetter = tokenService,
-            webClientBuilder = webClientBuilder,
-            xmlMapper = xmlMapper(),
-            traceAid = traceAid,
+    fun pensjonsavtaleClient(context: AssertableApplicationContext) =
+        NorskPensjonMockPensjonsavtaleClient(
+            baseUrl!!,
+            tokenGetter,
+            webClientBuilder = context.getBean(WebClient.Builder::class.java),
+            traceAid,
+            xmlMapper,
             retryAttempts = "1"
         )
+
+    beforeSpec {
+        Arrange.security()
+        server = MockWebServer().also { it.start() }
+        baseUrl = "http://localhost:${server.port}"
     }
 
-    @Test
-    fun `fetchAvtaler handles 1 avtale with 2 utbetalingsperioder & request has a Header without SAML`() {
-        arrange(okResponse(EN_AVTALE_RESPONSE_BODY))
-
-        val avtaler = client.fetchAvtaler(spec(), pid).avtaler
-
-        assertRequestBody(EXPECTED_REQUEST_BODY)
-        assertEquals(1, avtaler.size)
-        avtaler[0] shouldBe avtaleMedToUtbetalingsperioder()
+    afterSpec {
+        server?.shutdown()
     }
 
-    companion object {
+    test("fetchAvtaler handles 1 avtale with 2 utbetalingsperioder & request has SOAP header without SAML") {
+        server!!.arrangeOkXmlResponse(EN_AVTALE_RESPONSE_BODY)
 
-        @Language("xml")
-        private const val EXPECTED_REQUEST_BODY = """<?xml version="1.0" ?>
+        Arrange.webClientContextRunner().run {
+            val avtaler = pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid).avtaler
+
+            avtaler.size shouldBe 1
+            avtaler[0] shouldBe avtaleMedToUtbetalingsperioder
+
+            ByteArrayOutputStream().use {
+                server.takeRequest().apply { body.copyTo(it) }
+                it.toString(StandardCharsets.UTF_8) shouldBe BODY_WITHOUT_HEADER
+            }
+        }
+    }
+})
+
+object NorskPensjonMockPensjonsavtaleClientTestObjects {
+
+    @Language("xml")
+    const val BODY_WITHOUT_HEADER = """<?xml version="1.0" ?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:typ="http://norskpensjon.no/api/pensjonskalkulator/v3/typer">
     <S:Header>
     </S:Header>
@@ -102,5 +103,4 @@ class NorskPensjonMockPensjonsavtaleClientTest : WebClientTest() {
         </typ:kalkulatorForespoersel>
     </S:Body>
 </S:Envelope>"""
-    }
 }

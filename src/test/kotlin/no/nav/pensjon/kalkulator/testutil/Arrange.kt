@@ -42,6 +42,14 @@ fun MockWebServer.arrangeOkJsonResponse(body: String) {
     )
 }
 
+fun MockWebServer.arrangeOkXmlResponse(body: String) {
+    this.enqueue(
+        MockResponse()
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
+            .setResponseCode(HttpStatus.OK.value()).setBody(body)
+    )
+}
+
 fun MockWebServer.arrangeResponse(status: HttpStatus, body: String) {
     this.enqueue(MockResponse().setResponseCode(status.value()).setBody(body))
 }
