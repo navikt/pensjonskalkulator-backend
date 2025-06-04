@@ -1,101 +1,108 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.token
 
-import no.nav.pensjon.kalkulator.mock.WebClientTest
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import no.nav.pensjon.kalkulator.tech.security.egress.token.CacheAwareTokenClientTestObjects.ACCESS_TOKEN
+import no.nav.pensjon.kalkulator.tech.security.egress.token.CacheAwareTokenClientTestObjects.AUDIENCE
+import no.nav.pensjon.kalkulator.tech.security.egress.token.CacheAwareTokenClientTestObjects.PID1
+import no.nav.pensjon.kalkulator.tech.security.egress.token.CacheAwareTokenClientTestObjects.TOKEN_ACCESS_PARAM
+import no.nav.pensjon.kalkulator.tech.security.egress.token.CacheAwareTokenClientTestObjects.tokenData
 import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.ExpirationChecker
-import okhttp3.mockwebserver.MockResponse
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.HttpStatus
-import org.springframework.test.context.TestPropertySource
+import no.nav.pensjon.kalkulator.testutil.Arrange
+import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
+import okhttp3.mockwebserver.MockWebServer
+import org.springframework.beans.factory.BeanFactory
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDateTime
 
-@SpringBootTest
-@TestPropertySource("classpath:application-test.properties")
-class CacheAwareTokenClientTest : WebClientTest() {
+class CacheAwareTokenClientTest : FunSpec({
 
-    private lateinit var tokenGetter: TestClass
+    var server: MockWebServer? = null
+    var baseUrl: String? = null
 
-    @Autowired
-    private lateinit var webClientBuilder: WebClient.Builder
+    val expirationChecker = mockk<ExpirationChecker>().apply {
+        every { time() } returns LocalDateTime.of(2021, 1, 1, 1, 0, 0)
+        every { isExpired(issuedTime = LocalDateTime.of(2021, 1, 1, 1, 0, 0), expiresInSeconds = 299) } returns false
+    }
 
-    @Mock
-    private lateinit var expirationChecker: ExpirationChecker
-
-    @BeforeEach
-    fun initialize() {
-        tokenGetter = TestClass(
-            webClient = webClientBuilder.baseUrl(baseUrl()).build(),
-            expirationChecker = expirationChecker
+    fun client(context: BeanFactory) =
+        TestClass(
+            webClientBuilder = context.getBean(WebClient.Builder::class.java).baseUrl(baseUrl!!),
+            expirationChecker
         )
+
+    beforeTest {
+        Arrange.security()
+        server = MockWebServer().apply { start() }
+        baseUrl = "http://localhost:${server.port}"
     }
 
-    @Test
-    fun `getTokenData caches token data()`() {
-        arrange(tokenResponse(1))
-        `when`(expirationChecker.time()).thenReturn(LocalDateTime.MIN)
-
-        val tokenData = tokenGetter.getTokenData(TOKEN_ACCESS_PARAM, AUDIENCE, PID1)
-        // Next statement will fail if token not cached, since only one response is enqueued:
-        val cachedTokenData = tokenGetter.getTokenData(TOKEN_ACCESS_PARAM, AUDIENCE, PID1)
-
-        assertEquals("${ACCESS_TOKEN}1", tokenData.accessToken)
-        assertEquals("${ACCESS_TOKEN}1", cachedTokenData.accessToken)
+    afterTest {
+        server?.shutdown()
     }
 
-    @Test
-    fun `clearTokenData removes token data from cache`() {
-        arrange(tokenResponse(1))
-        arrange(tokenResponse(2)) // 2 responses needed since cache is cleared
-        `when`(expirationChecker.time()).thenReturn(LocalDateTime.MIN)
-        val tokenData1 = tokenGetter.getTokenData(TOKEN_ACCESS_PARAM, AUDIENCE, PID1)
-        assertEquals("${ACCESS_TOKEN}1", tokenData1.accessToken)
+    test("getTokenData should cache token data") {
+        server?.arrangeOkJsonResponse(tokenData(1))
 
-        tokenGetter.clearTokenData(AUDIENCE, PID1)
+        Arrange.webClientContextRunner().run {
+            val client = client(context = it)
+            val tokenData = client.getTokenData(TOKEN_ACCESS_PARAM, AUDIENCE, PID1)
+            // Next statement will fail if token not cached, since only one response is enqueued:
+            val cachedTokenData = client.getTokenData(TOKEN_ACCESS_PARAM, AUDIENCE, PID1)
 
-        val tokenData2 = tokenGetter.getTokenData(TOKEN_ACCESS_PARAM, AUDIENCE, PID1)
-        assertEquals("${ACCESS_TOKEN}2", tokenData2.accessToken) // would be 1 if cache not cleared
+            tokenData.accessToken shouldBe "${ACCESS_TOKEN}1"
+            cachedTokenData.accessToken shouldBe "${ACCESS_TOKEN}1"
+        }
     }
 
-    private fun tokenResponse(number: Int): MockResponse {
-        return jsonResponse(HttpStatus.OK)
-            .setBody(
-                """
+    test("clearTokenData should remove token data from cache") {
+        server?.arrangeOkJsonResponse(tokenData(1))
+        server?.arrangeOkJsonResponse(tokenData(2))  // 2 responses needed since cache is cleared
+
+        Arrange.webClientContextRunner().run {
+            val client = client(context = it)
+            val tokenData1 = client.getTokenData(TOKEN_ACCESS_PARAM, AUDIENCE, PID1)
+            tokenData1.accessToken shouldBe "${ACCESS_TOKEN}1"
+
+            client.clearTokenData(AUDIENCE, PID1)
+
+            val tokenData2 = client.getTokenData(TOKEN_ACCESS_PARAM, AUDIENCE, PID1)
+            tokenData2.accessToken shouldBe "${ACCESS_TOKEN}2" // would be 1 if cache not cleared
+        }
+    }
+})
+
+private object CacheAwareTokenClientTestObjects {
+
+    const val ACCESS_TOKEN = "token"
+    const val EXPIRES_IN = 299L
+    const val PID1 = "PID1"
+    const val AUDIENCE = "audience1"
+    val TOKEN_ACCESS_PARAM = TokenAccessParameter.clientCredentials("scope1")
+
+    fun tokenData(number: Int): String =
+        """
 {
   "access_token": "$ACCESS_TOKEN$number",
   "issued_token_type": "urn:ietf:params:oauth:token-type:access_token",
   "token_type": "Bearer",
   "expires_in": $EXPIRES_IN
 }"""
-            )
-    }
+}
 
-    private class TestClass(
-        webClient: WebClient,
-        expirationChecker: ExpirationChecker
-    ) : CacheAwareTokenClient(webClient, expirationChecker, "1") {
-        private var cleanupTrigger = 1000
+class TestClass(
+    webClientBuilder: WebClient.Builder,
+    expirationChecker: ExpirationChecker
+) : CacheAwareTokenClient(webClientBuilder.build(), expirationChecker, "1") {
 
-        override fun getCleanupTrigger(): Int = cleanupTrigger
+    override fun getCleanupTrigger(): Int = 1000
 
-        override fun prepareTokenRequestBody(
-            accessParameter: TokenAccessParameter,
-            audience: String
-        ): MultiValueMap<String, String> = LinkedMultiValueMap()
-    }
-
-    companion object {
-        private const val ACCESS_TOKEN = "token"
-        private const val EXPIRES_IN = 299L
-        private const val PID1 = "PID1"
-        private const val AUDIENCE = "audience1"
-        private val TOKEN_ACCESS_PARAM = TokenAccessParameter.clientCredentials("scope1")
-    }
+    override fun prepareTokenRequestBody(
+        accessParameter: TokenAccessParameter,
+        audience: String
+    ): MultiValueMap<String, String> = LinkedMultiValueMap()
 }

@@ -1,93 +1,107 @@
 package no.nav.pensjon.kalkulator.ufoere.client.pen
 
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.DateFactory.date
-import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
+import no.nav.pensjon.kalkulator.testutil.Arrange
+import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
+import no.nav.pensjon.kalkulator.testutil.arrangeResponse
 import no.nav.pensjon.kalkulator.ufoere.Sakstype
+import no.nav.pensjon.kalkulator.ufoere.client.pen.PenVedtakClientTestObjects.RESPONSE
+import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.beans.factory.BeanFactory
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.TestPropertySource
 import org.springframework.web.reactive.function.client.WebClient
+import java.io.ByteArrayOutputStream
 
-@SpringBootTest
-@TestPropertySource("classpath:application-test.properties")
-class PenVedtakClientTest : WebClientTest() {
+class PenVedtakClientTest : FunSpec({
 
-    private lateinit var client: PenVedtakClient
+    var server: MockWebServer? = null
+    var baseUrl: String? = null
+    val traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" }
 
-    @Autowired
-    private lateinit var webClientBuilder: WebClient.Builder
+    fun client(context: BeanFactory) =
+        PenVedtakClient(
+            baseUrl!!,
+            webClientBuilder = context.getBean(WebClient.Builder::class.java),
+            traceAid,
+            retryAttempts = "1"
+        )
 
-    @Mock
-    private lateinit var traceAid: TraceAid
-
-    @BeforeEach
-    fun initialize() {
-        `when`(traceAid.callId()).thenReturn("id1")
-        client = PenVedtakClient(baseUrl(), webClientBuilder, traceAid, "1")
-        arrangeSecurityContext()
+    beforeSpec {
+        Arrange.security()
+        server = MockWebServer().apply { start() }
+        baseUrl = "http://localhost:${server.port}"
     }
 
-    @Test
-    fun `bestemGjeldendeVedtak uses supplied PID in request and returns sakstype`() {
-        arrange(okResponse())
+    afterSpec {
+        server?.shutdown()
+    }
 
-        val vedtaksliste = client.bestemGjeldendeVedtak(pid, date)
+    test("bestemGjeldendeVedtak uses supplied PID in request and returns sakstype") {
+        server!!.arrangeOkJsonResponse(RESPONSE)
 
-        with(takeRequest()) {
-            getHeader("fnr") shouldBe pid.value
-            requestUrl?.queryParameter("fom") shouldBe "2023-04-05"
+        Arrange.webClientContextRunner().run {
+
+            val vedtaksliste = client(context = it).bestemGjeldendeVedtak(pid, date)
+
+            ByteArrayOutputStream().use {
+                server.takeRequest().apply {
+                    getHeader("fnr") shouldBe pid.value
+                    requestUrl?.queryParameter("fom") shouldBe "2023-04-05"
+                }
+            }
+            vedtaksliste[0].sakstype shouldBe Sakstype.UFOEREPENSJON
         }
-        vedtaksliste[0].sakstype shouldBe Sakstype.UFOEREPENSJON
     }
 
-    @Test
-    fun `bestemGjeldendeVedtak retries in case of server error`() {
-        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
-        arrange(okResponse())
+    test("bestemGjeldendeVedtak retries in case of server error") {
+        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Feil")
+        server?.arrangeOkJsonResponse(RESPONSE)
 
-        val response = client.bestemGjeldendeVedtak(pid, date)
-
-        response[0].sakstype shouldBe Sakstype.UFOEREPENSJON
+        Arrange.webClientContextRunner().run {
+            val response = client(context = it).bestemGjeldendeVedtak(pid, date)
+            response[0].sakstype shouldBe Sakstype.UFOEREPENSJON
+        }
     }
 
-    @Test
-    fun `bestemGjeldendeVedtak does not retry in case of client error`() {
-        arrange(jsonResponse(HttpStatus.BAD_REQUEST).setBody("My bad"))
+    test("bestemGjeldendeVedtak does not retry in case of client error") {
+        server?.arrangeResponse(HttpStatus.BAD_REQUEST, "My bad")
         // No 2nd response arranged, since no retry
 
-        shouldThrow<EgressException> { client.bestemGjeldendeVedtak(pid, date) }.message shouldBe "My bad"
-    }
-
-    @Test
-    fun `bestemGjeldendeVedtak handles server error`() {
-        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
-        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil")) // for retry
-
-        val exception = shouldThrow<EgressException> { client.bestemGjeldendeVedtak(pid, date) }
-
-        with(exception) {
-            message shouldBe "Failed calling /api/vedtak/bestemgjeldende?fom=2023-04-05"
-            (cause as EgressException).message shouldBe "Feil"
+        Arrange.webClientContextRunner().run {
+            shouldThrow<EgressException> {
+                client(context = it).bestemGjeldendeVedtak(pid, date)
+            }.message shouldBe "My bad"
         }
     }
 
-    private companion object {
-        private fun okResponse() = jsonResponse(HttpStatus.OK).setBody(RESPONSE)
+    test("bestemGjeldendeVedtak handles server error") {
+        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Feil")
+        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Feil") // for retry
 
-        @Language("JSON")
-        private const val RESPONSE = """[
+        Arrange.webClientContextRunner().run {
+            val exception = shouldThrow<EgressException> { client(context = it).bestemGjeldendeVedtak(pid, date) }
+
+            with(exception) {
+                message shouldBe "Failed calling /api/vedtak/bestemgjeldende?fom=2023-04-05"
+                (cause as EgressException).message shouldBe "Feil"
+            }
+        }
+    }
+})
+
+object PenVedtakClientTestObjects {
+
+    @Language("JSON")
+    const val RESPONSE = """[
 {
     "vedtakId": 42805245,
     "vedtakstype": "REGULERING",
@@ -151,5 +165,4 @@ class PenVedtakClientTest : WebClientTest() {
     }
 }
 ]"""
-    }
 }

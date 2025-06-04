@@ -14,12 +14,13 @@ import org.springframework.cache.caffeine.CaffeineCacheManager
 import org.springframework.web.reactive.function.client.WebClient
 
 class PenNormertPensjonsalderClientTest : FunSpec({
+
     var server: MockWebServer? = null
     var baseUrl: String? = null
 
     beforeSpec {
         Arrange.security()
-        server = MockWebServer().also { it.start() }
+        server = MockWebServer().apply { start() }
         baseUrl = "http://localhost:${server.port}"
     }
 
@@ -28,7 +29,7 @@ class PenNormertPensjonsalderClientTest : FunSpec({
     }
 
     test("fetchNormalderListe should return liste med normerte pensjonsaldre") {
-        server?.arrangeOkJsonResponse(PenNormalderResponse.BODY)
+        server?.arrangeOkJsonResponse(PenNormertPensjonsalderClientTestObjects.BODY)
 
         Arrange.webClientContextRunner().run {
             val client = PenNormertPensjonsalderClient(
@@ -80,7 +81,7 @@ class PenNormertPensjonsalderClientTest : FunSpec({
     }
 })
 
-object PenNormalderResponse {
+private object PenNormertPensjonsalderClientTestObjects {
 
     @Language("json")
     const val BODY = """{

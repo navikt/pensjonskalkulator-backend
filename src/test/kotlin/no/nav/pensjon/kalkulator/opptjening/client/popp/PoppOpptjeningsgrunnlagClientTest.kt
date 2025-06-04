@@ -1,107 +1,110 @@
 package no.nav.pensjon.kalkulator.opptjening.client.popp
 
-import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningsgrunnlag
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
+import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningsgrunnlagClientTestObjects.RESPONSE_BODY
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
+import no.nav.pensjon.kalkulator.testutil.Arrange
+import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
+import no.nav.pensjon.kalkulator.testutil.arrangeResponse
+import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertThrows
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.mockito.Mock
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.beans.factory.BeanFactory
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.TestPropertySource
 import org.springframework.web.reactive.function.client.WebClient
 import java.math.BigDecimal
 
-@SpringBootTest
-@TestPropertySource("classpath:application-test.properties")
-class PoppOpptjeningsgrunnlagClientTest : WebClientTest() {
+class PoppOpptjeningsgrunnlagClientTest : FunSpec({
 
-    private lateinit var client: PoppOpptjeningsgrunnlagClient
+    var server: MockWebServer? = null
+    var baseUrl: String? = null
+    val traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" }
 
-    @Autowired
-    private lateinit var webClientBuilder: WebClient.Builder
-
-    @Mock
-    private lateinit var traceAid: TraceAid
-
-    @BeforeEach
-    fun initialize() {
-        client = PoppOpptjeningsgrunnlagClient(
-            baseUrl = baseUrl(),
-            webClientBuilder = webClientBuilder,
-            traceAid = traceAid,
-            retryAttempts = RETRY_ATTEMPTS
+    fun opptjeningClient(context: BeanFactory) =
+        PoppOpptjeningsgrunnlagClient(
+            baseUrl!!,
+            webClientBuilder = context.getBean(WebClient.Builder::class.java),
+            traceAid,
+            retryAttempts = "1"
         )
+
+    beforeSpec {
+        Arrange.security()
+        server = MockWebServer().apply { start() }
+        baseUrl = "http://localhost:${server.port}"
     }
 
-    @Test
-    fun `fetchOpptjeningsgrunnlag returns opptjeningsgrunnlag when OK response`() {
-        arrangeSecurityContext()
-        arrange(okResponse())
-
-        val response: Opptjeningsgrunnlag = client.fetchOpptjeningsgrunnlag(pid)
-
-        val inntekt2017 = response.inntekter.first { it.aar == 2017 }
-        val inntekt2018 = response.inntekter.first { it.aar == 2018 }
-        assertEquals(BigDecimal("280241"), inntekt2017.beloep)
-        assertEquals(Opptjeningstype.OTHER, inntekt2017.type)
-        assertEquals(BigDecimal("280242"), inntekt2018.beloep)
-        assertEquals(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, inntekt2018.type)
+    afterSpec {
+        server?.shutdown()
     }
 
-    @Test
-    fun `fetchOpptjeningsgrunnlag retries in case of server error`() {
-        arrangeSecurityContext()
-        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
-        arrange(okResponse())
+    test("fetchOpptjeningsgrunnlag returns opptjeningsgrunnlag when OK response") {
+        server!!.arrangeOkJsonResponse(RESPONSE_BODY)
 
-        val response: Opptjeningsgrunnlag = client.fetchOpptjeningsgrunnlag(pid)
+        Arrange.webClientContextRunner().run {
+            val response: Opptjeningsgrunnlag = opptjeningClient(context = it).fetchOpptjeningsgrunnlag(pid)
 
-        val inntekt2017 = response.inntekter.first { it.aar == 2017 }
-        val inntekt2018 = response.inntekter.first { it.aar == 2018 }
-        assertEquals(BigDecimal("280241"), inntekt2017.beloep)
-        assertEquals(Opptjeningstype.OTHER, inntekt2017.type)
-        assertEquals(BigDecimal("280242"), inntekt2018.beloep)
-        assertEquals(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, inntekt2018.type)
+            with(response.inntekter.first { it.aar == 2017 }) {
+                beloep shouldBe BigDecimal("280241")
+                type shouldBe Opptjeningstype.OTHER
+            }
+            with(response.inntekter.first { it.aar == 2018 }) {
+                beloep shouldBe BigDecimal("280242")
+                type shouldBe Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT
+            }
+        }
     }
 
-    @Test
-    fun `fetchOpptjeningsgrunnlag does not retry in case of client error`() {
-        arrangeSecurityContext()
-        arrange(jsonResponse(HttpStatus.BAD_REQUEST).setBody("My bad"))
+    test("fetchOpptjeningsgrunnlag retries in case of server error") {
+        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Feil")
+        server?.arrangeOkJsonResponse(RESPONSE_BODY)
+
+        Arrange.webClientContextRunner().run {
+            opptjeningClient(context = it).fetchOpptjeningsgrunnlag(pid)
+                .inntekter[0].beloep shouldBe BigDecimal("280241")
+        }
+    }
+
+    test("fetchOpptjeningsgrunnlag does not retry in case of client error") {
+        server?.arrangeResponse(HttpStatus.BAD_REQUEST, "My bad")
         // No 2nd response arranged, since no retry
 
-        val exception = assertThrows(EgressException::class.java) { client.fetchOpptjeningsgrunnlag(pid) }
-
-        assertEquals("My bad", exception.message)
+        Arrange.webClientContextRunner().run {
+            shouldThrow<EgressException> {
+                opptjeningClient(context = it).fetchOpptjeningsgrunnlag(pid)
+            }.message shouldBe "My bad"
+        }
     }
 
-    @Test
-    fun `fetchOpptjeningsgrunnlag handles server error`() {
-        arrangeSecurityContext()
-        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
-        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil")) // for retry
+    test("fetchOpptjeningsgrunnlag handles server error") {
+        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Feil")
+        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Feil") // for retry
 
-        val exception = assertThrows(EgressException::class.java) { client.fetchOpptjeningsgrunnlag(pid) }
+        Arrange.webClientContextRunner().run {
+            val exception = shouldThrow<EgressException> {
+                opptjeningClient(context = it).fetchOpptjeningsgrunnlag(pid)
+            }
 
-        assertEquals("Failed calling ${baseUrl()}/popp/api/opptjeningsgrunnlag", exception.message)
-        assertEquals("Feil", (exception.cause as EgressException).message)
+            with(exception) {
+                message shouldBe "Failed calling $baseUrl/popp/api/opptjeningsgrunnlag"
+                (cause as EgressException).message shouldBe "Feil"
+            }
+        }
     }
+})
 
-    companion object {
-        private const val RETRY_ATTEMPTS = "1"
+object PoppOpptjeningsgrunnlagClientTestObjects {
 
-        @Language("json")
-        private const val RESPONSE_BODY =
-            """
+    @Language("json")
+    const val RESPONSE_BODY =
+        """
              {
                  "opptjeningsGrunnlag": {
                      "fnr": "04925398980",
@@ -145,7 +148,4 @@ class PoppOpptjeningsgrunnlagClientTest : WebClientTest() {
                  }
              }
              """
-
-        private fun okResponse() = jsonResponse().setBody(RESPONSE_BODY.trimIndent())
-    }
 }

@@ -57,7 +57,7 @@ class NorskPensjonPensjonsavtaleClientTest : FunSpec({
 
     beforeSpec {
         Arrange.security()
-        server = MockWebServer().also { it.start() }
+        server = MockWebServer().apply { start() }
         baseUrl = "http://localhost:${server.port}"
     }
 

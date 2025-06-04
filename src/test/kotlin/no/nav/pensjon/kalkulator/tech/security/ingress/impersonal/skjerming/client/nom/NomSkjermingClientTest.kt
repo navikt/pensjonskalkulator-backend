@@ -1,62 +1,54 @@
 package no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.client.nom
 
-import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
-import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.mockito.Mock
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.TestPropertySource
+import no.nav.pensjon.kalkulator.testutil.Arrange
+import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
+import okhttp3.mockwebserver.MockWebServer
+import org.springframework.beans.factory.BeanFactory
 import org.springframework.web.reactive.function.client.WebClient
 
-@SpringBootTest
-@TestPropertySource("classpath:application-test.properties")
-class NomSkjermingClientTest : WebClientTest() {
+class NomSkjermingClientTest : FunSpec({
 
-    private lateinit var client: NomSkjermingClient
+    var server: MockWebServer? = null
+    var baseUrl: String? = null
+    val traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" }
 
-    @Autowired
-    private lateinit var webClientBuilder: WebClient.Builder
-
-    @Mock
-    private lateinit var traceAid: TraceAid
-
-    @BeforeEach
-    fun initialize() {
-        client = NomSkjermingClient(
-            baseUrl = baseUrl(),
-            webClientBuilder = webClientBuilder,
-            traceAid = traceAid,
-            retryAttempts = RETRY_ATTEMPTS
+    fun client(context: BeanFactory) =
+        NomSkjermingClient(
+            baseUrl!!,
+            webClientBuilder = context.getBean(WebClient.Builder::class.java),
+            traceAid,
+            retryAttempts = "1"
         )
 
-        arrangeSecurityContext()
+    beforeSpec {
+        Arrange.security()
+        server = MockWebServer().apply { start() }
+        baseUrl = "http://localhost:${server.port}"
     }
 
-    @Test
-    fun `harTilgangTilPerson returns true when person is not skjermet`() {
-        arrange(skjermingResponse(erSkjermet = false))
-        assertTrue(client.personErTilgjengelig(pid))
+    afterSpec {
+        server?.shutdown()
     }
 
-    @Test
-    fun `harTilgangTilPerson returns false when person is skjermet`() {
-        arrange(skjermingResponse(erSkjermet = true))
-        assertFalse(client.personErTilgjengelig(pid))
+    test("harTilgangTilPerson should return 'true' when person is not skjermet") {
+        server?.arrangeOkJsonResponse("false") // false => ikke skjermet
+
+        Arrange.webClientContextRunner().run {
+            client(context = it).personErTilgjengelig(pid) shouldBe true
+        }
     }
 
-    companion object {
-        private const val RETRY_ATTEMPTS = "1"
+    test("harTilgangTilPerson should return 'false' when person is skjermet") {
+        server?.arrangeOkJsonResponse("true") // true => skjermet
 
-        @Language("json")
-        private fun skjermingResponseBody(erSkjermet: Boolean) = "$erSkjermet"
-
-        private fun skjermingResponse(erSkjermet: Boolean) =
-            jsonResponse().setBody(skjermingResponseBody(erSkjermet).trimIndent())
+        Arrange.webClientContextRunner().run {
+            client(context = it).personErTilgjengelig(pid) shouldBe false
+        }
     }
-}
+})

@@ -17,7 +17,6 @@ import no.nav.pensjon.kalkulator.testutil.Arrange
 import no.nav.pensjon.kalkulator.testutil.arrangeOkXmlResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
-import org.springframework.boot.test.context.assertj.AssertableApplicationContext
 import org.springframework.web.reactive.function.client.WebClient
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
@@ -26,23 +25,10 @@ class NorskPensjonMockPensjonsavtaleClientTest : FunSpec({
 
     var server: MockWebServer? = null
     var baseUrl: String? = null
-    val xmlMapper = xmlMapper()
-    val traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" }
-    val tokenGetter = mockk<SamlTokenService>().apply { every { assertion() } returns SAML_ASSERTION }
-
-    fun pensjonsavtaleClient(context: AssertableApplicationContext) =
-        NorskPensjonMockPensjonsavtaleClient(
-            baseUrl!!,
-            tokenGetter,
-            webClientBuilder = context.getBean(WebClient.Builder::class.java),
-            traceAid,
-            xmlMapper,
-            retryAttempts = "1"
-        )
 
     beforeSpec {
         Arrange.security()
-        server = MockWebServer().also { it.start() }
+        server = MockWebServer().apply { start() }
         baseUrl = "http://localhost:${server.port}"
     }
 
@@ -54,7 +40,14 @@ class NorskPensjonMockPensjonsavtaleClientTest : FunSpec({
         server!!.arrangeOkXmlResponse(EN_AVTALE_RESPONSE_BODY)
 
         Arrange.webClientContextRunner().run {
-            val avtaler = pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid).avtaler
+            val avtaler = NorskPensjonMockPensjonsavtaleClient(
+                baseUrl!!,
+                tokenGetter = mockk<SamlTokenService>().apply { every { assertion() } returns SAML_ASSERTION },
+                webClientBuilder = it.getBean(WebClient.Builder::class.java),
+                traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" },
+                xmlMapper = xmlMapper(),
+                retryAttempts = "1"
+            ).fetchAvtaler(avtaleSpec, pid).avtaler
 
             avtaler.size shouldBe 1
             avtaler[0] shouldBe avtaleMedToUtbetalingsperioder
@@ -67,7 +60,7 @@ class NorskPensjonMockPensjonsavtaleClientTest : FunSpec({
     }
 })
 
-object NorskPensjonMockPensjonsavtaleClientTestObjects {
+private object NorskPensjonMockPensjonsavtaleClientTestObjects {
 
     @Language("xml")
     const val BODY_WITHOUT_HEADER = """<?xml version="1.0" ?>
