@@ -1,164 +1,245 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.v3
 
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.pensjon.kalkulator.avtale.*
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.EN_AVTALE_RESPONSE_BODY
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.ERROR_RESPONSE_BODY
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.EXPECTED_REQUEST_BODY
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.INGEN_AVTALER_RESPONSE_BODY
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.TO_AVTALER_RESPONSE_BODY
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.UKJENTE_AARSAKER_RESPONSE_BODY
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.UTILGJENGELIGE_SELSKAP_RESPONSE_BODY
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.UTILSTREKKELIG_DATA_RESPONSE_BODY
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.avtaleMedEnUtbetalingsperiode
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.avtaleSpec
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.avtaleUtenUtbetalingsperioder
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
-import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
+import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.avtaleMedToUtbetalingsperioder
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.mock.XmlMapperFactory.xmlMapper
 import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.SamlTokenService
 import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.SamlTokenServiceTest.Companion.SAML_ASSERTION
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
+import no.nav.pensjon.kalkulator.testutil.Arrange
+import no.nav.pensjon.kalkulator.testutil.arrangeOkXmlResponse
+import no.nav.pensjon.kalkulator.testutil.arrangeResponse
+import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.context.assertj.AssertableApplicationContext
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.TestPropertySource
 import org.springframework.web.reactive.function.client.WebClient
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
 
-@SpringBootTest
-@TestPropertySource("classpath:application-test.properties")
-class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
+class NorskPensjonPensjonsavtaleClientTest : FunSpec({
 
-    private lateinit var client: NorskPensjonPensjonsavtaleClient
+    var server: MockWebServer? = null
+    var baseUrl: String? = null
+    val xmlMapper = xmlMapper()
+    val traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" }
+    val tokenGetter = mockk<SamlTokenService>().apply { every { assertion() } returns SAML_ASSERTION }
 
-    @Mock
-    private lateinit var tokenService: SamlTokenService
-
-    @Mock
-    private lateinit var traceAid: TraceAid
-
-    @Autowired
-    private lateinit var webClientBuilder: WebClient.Builder
-
-    @BeforeEach
-    fun initialize() {
-        `when`(tokenService.assertion()).thenReturn(SAML_ASSERTION)
-        `when`(traceAid.callId()).thenReturn("id1")
-        arrangeSecurityContext()
-
-        client = NorskPensjonPensjonsavtaleClient(
-            baseUrl = baseUrl(),
-            tokenGetter = tokenService,
-            webClientBuilder = webClientBuilder,
-            xmlMapper = xmlMapper(),
-            traceAid = traceAid,
+    fun pensjonsavtaleClient(context: AssertableApplicationContext) =
+        NorskPensjonPensjonsavtaleClient(
+            baseUrl!!,
+            tokenGetter,
+            webClientBuilder = context.getBean(WebClient.Builder::class.java),
+            xmlMapper,
+            traceAid,
             retryAttempts = "1"
         )
+
+    beforeSpec {
+        Arrange.security()
+        server = MockWebServer().apply { start() }
+        baseUrl = "http://localhost:${server.port}"
     }
 
-    @Test
-    fun `fetchAvtaler handles 1 avtale with 2 utbetalingsperioder`() {
-        arrange(okResponse(EN_AVTALE_RESPONSE_BODY))
-
-        val avtaler = client.fetchAvtaler(spec(), pid).avtaler
-
-        assertRequestBody(EXPECTED_REQUEST_BODY)
-        assertEquals(1, avtaler.size)
-        avtaler[0] shouldBe avtaleMedToUtbetalingsperioder()
+    afterSpec {
+        server?.shutdown()
     }
 
-    @Test
-    fun `fetchAvtaler handles 2 pensjonsavtaler with 1 utbetalingsperiode each`() {
-        arrange(okResponse(TO_AVTALER_RESPONSE_BODY))
+    test("fetchAvtaler handles 1 avtale with 2 utbetalingsperioder") {
+        server!!.arrangeOkXmlResponse(EN_AVTALE_RESPONSE_BODY)
 
-        val avtaler = client.fetchAvtaler(spec(), pid).avtaler
+        Arrange.webClientContextRunner().run {
+            val avtaler = pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid).avtaler
 
-        assertEquals(2, avtaler.size)
-        avtaler[0] shouldBe avtaleMedEnUtbetalingsperiode()
-        avtaler[1] shouldBe avtaleUtenUtbetalingsperioder()
-    }
+            avtaler.size shouldBe 1
+            avtaler[0] shouldBe avtaleMedToUtbetalingsperioder
 
-    @Test
-    fun `fetchAvtaler handles 0 pensjonsavtaler`() {
-        arrange(okResponse(INGEN_AVTALER_RESPONSE_BODY))
-
-        val avtaler = client.fetchAvtaler(spec(), pid).avtaler
-
-        assertTrue(avtaler.isEmpty())
-    }
-
-    @Test
-    fun `fetchAvtaler handles utilgjengelige selskaper`() {
-        arrange(okResponse(UTILGJENGELIGE_SELSKAP_RESPONSE_BODY))
-
-        val selskaper = client.fetchAvtaler(spec(), pid).utilgjengeligeSelskap
-
-        assertEquals(2, selskaper.size)
-        selskaper[0] shouldBe Selskap("Selskap1", true, 1, AvtaleKategori.PRIVAT_AFP, "Feil1")
-        selskaper[1] shouldBe Selskap("Selskap2", false)
-    }
-
-    @Test
-    fun `fetchAvtaler handles utilstrekkelig data`() {
-        arrange(okResponse(UTILSTREKKELIG_DATA_RESPONSE_BODY))
-        val aarsak = client.fetchAvtaler(spec(), pid).avtaler[0].manglendeBeregningAarsak
-        assertEquals(ManglendeEksternBeregningAarsak.UTILSTREKKELIG_DATA, aarsak)
-    }
-
-    @Test
-    fun `fetchAvtaler handles ukjente aarsaker`() {
-        arrange(okResponse(UKJENTE_AARSAKER_RESPONSE_BODY))
-
-        val avtale = client.fetchAvtaler(spec(), pid).avtaler[0]
-
-        with(avtale) {
-            assertEquals(ManglendeEksternBeregningAarsak.UNKNOWN, manglendeBeregningAarsak)
-            assertEquals(ManglendeEksternGraderingAarsak.UNKNOWN, manglendeGraderingAarsak)
+            ByteArrayOutputStream().use {
+                server.takeRequest().apply { body.copyTo(it) }
+                it.toString(StandardCharsets.UTF_8) shouldBe EXPECTED_REQUEST_BODY
+            }
         }
     }
 
-    @Test
-    fun `fetchAvtaler retries in case of server error`() {
-        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody(ERROR_RESPONSE_BODY))
-        arrange(okResponse(INGEN_AVTALER_RESPONSE_BODY))
+    test("fetchAvtaler handles 2 pensjonsavtaler with 1 utbetalingsperiode each") {
+        server?.arrangeOkXmlResponse(TO_AVTALER_RESPONSE_BODY)
 
-        val avtaler = client.fetchAvtaler(spec(), pid).avtaler
+        Arrange.webClientContextRunner().run {
+            val avtaler = pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid).avtaler
 
-        assertTrue(avtaler.isEmpty())
+            avtaler.size shouldBe 2
+            avtaler[0] shouldBe avtaleMedEnUtbetalingsperiode
+            avtaler[1] shouldBe avtaleUtenUtbetalingsperioder
+        }
     }
 
-    @Test
-    fun `fetchAvtaler does not retry in case of client error`() {
-        arrange(jsonResponse(HttpStatus.BAD_REQUEST).setBody("My bad"))
+    test("fetchAvtaler handles 0 pensjonsavtaler") {
+        server?.arrangeOkXmlResponse(INGEN_AVTALER_RESPONSE_BODY)
+
+        Arrange.webClientContextRunner().run {
+            pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid).avtaler.isEmpty() shouldBe true
+        }
+    }
+
+    test("fetchAvtaler handles utilgjengelige selskaper") {
+        server?.arrangeOkXmlResponse(UTILGJENGELIGE_SELSKAP_RESPONSE_BODY)
+
+        Arrange.webClientContextRunner().run {
+            val selskaper = pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid).utilgjengeligeSelskap
+
+            selskaper.size shouldBe 2
+            selskaper[0] shouldBe Selskap("Selskap1", true, 1, AvtaleKategori.PRIVAT_AFP, "Feil1")
+            selskaper[1] shouldBe Selskap("Selskap2", false)
+        }
+    }
+
+    test("fetchAvtaler handles utilstrekkelig data") {
+        server?.arrangeOkXmlResponse(UTILSTREKKELIG_DATA_RESPONSE_BODY)
+
+        Arrange.webClientContextRunner().run {
+            pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid)
+                .avtaler[0].manglendeBeregningAarsak shouldBe ManglendeEksternBeregningAarsak.UTILSTREKKELIG_DATA
+        }
+    }
+
+    test("fetchAvtaler handles ukjente årsaker") {
+        server?.arrangeOkXmlResponse(UKJENTE_AARSAKER_RESPONSE_BODY)
+
+        Arrange.webClientContextRunner().run {
+            val avtale = pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid).avtaler[0]
+
+            with(avtale) {
+                manglendeBeregningAarsak shouldBe ManglendeEksternBeregningAarsak.UNKNOWN
+                manglendeGraderingAarsak shouldBe ManglendeEksternGraderingAarsak.UNKNOWN
+            }
+        }
+    }
+
+    test("fetchAvtaler retries in case of server error") {
+        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Feil")
+        server?.arrangeOkXmlResponse(INGEN_AVTALER_RESPONSE_BODY)
+
+        Arrange.webClientContextRunner().run {
+            pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid).avtaler.isEmpty() shouldBe true
+        }
+    }
+
+    test("fetchAvtaler does not retry in case of client error") {
+        server?.arrangeResponse(HttpStatus.BAD_REQUEST, "My bad")
         // No 2nd response arranged, since no retry
 
-        val exception = assertThrows<EgressException> { client.fetchAvtaler(spec(), pid) }
-
-        assertEquals("My bad", exception.message)
+        Arrange.webClientContextRunner().run {
+            shouldThrow<EgressException> {
+                pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid)
+            }.message shouldBe "My bad"
+        }
     }
 
-    @Test
-    fun `fetchAvtaler handles server error`() {
-        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody(ERROR_RESPONSE_BODY))
-        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody(ERROR_RESPONSE_BODY)) // for retry
+    test("fetchAvtaler handles server error") {
+        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, ERROR_RESPONSE_BODY)
+        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, ERROR_RESPONSE_BODY) // for retry
 
-        val exception = assertThrows<EgressException> { client.fetchAvtaler(spec(), pid) }
-
-        assertEquals(
-            "Code: soap11:Client | String: A problem occurred." +
+        Arrange.webClientContextRunner().run {
+            shouldThrow<EgressException> {
+                pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid)
+            }.message shouldBe "Code: soap11:Client | String: A problem occurred." +
                     " | Actor: urn:nav:ikt:plattform:samhandling:q1_partner-gw-pep-sbs:OutboundDynamicSecurityGateway" +
-                    " | Detail: { Transaction: 4870241 | Global transaction: da10915547fa547004a2951 }",
-            exception.message
-        )
+                    " | Detail: { Transaction: 4870241 | Global transaction: da10915547fa547004a2951 }"
+        }
     }
+})
 
-    companion object {
+object NorskPensjonPensjonsavtaleClientTestObjects {
 
-        @Language("xml")
-        private const val EXPECTED_REQUEST_BODY = """<?xml version="1.0" ?>
+    val avtaleSpec =
+        PensjonsavtaleSpec(
+            aarligInntektFoerUttak = 123000,
+            uttaksperioder = listOf(uttaksperiodeSpec(1), uttaksperiodeSpec(2)),
+        )
+
+    val avtaleUtenUtbetalingsperioder =
+        Pensjonsavtale(
+            avtalenummer = "",
+            arbeidsgiver = "ukjent",
+            selskapsnavn = "Selskap2",
+            produktbetegnelse = "Produkt2",
+            kategori = AvtaleKategori.FOLKETRYGD,
+            underkategori = AvtaleUnderkategori.NONE,
+            innskuddssaldo = 0,
+            naavaerendeAvtaltAarligInnskudd = 0,
+            pensjonsbeholdningForventet = 0,
+            pensjonsbeholdningNedreGrense = 0,
+            pensjonsbeholdningOvreGrense = 0,
+            avkastningsgaranti = false,
+            beregningsmodell = EksternBeregningsmodell.NONE,
+            startAar = 0,
+            sluttAar = null,
+            opplysningsdato = "ukjent",
+            manglendeGraderingAarsak = ManglendeEksternGraderingAarsak.NONE,
+            manglendeBeregningAarsak = ManglendeEksternBeregningAarsak.NONE,
+            utbetalingsperioder = emptyList()
+        )
+
+    private val utbetalingsperiodeMedSluttalder =
+        Utbetalingsperiode(
+            startAlder = Alder(aar = 71, maaneder = 0),
+            sluttAlder = Alder(aar = 81, maaneder = 1),
+            aarligUtbetaling = 10000,
+            grad = Uttaksgrad.HUNDRE_PROSENT
+        )
+
+    val avtaleMedEnUtbetalingsperiode =
+        Pensjonsavtale(
+            avtalenummer = "Avtale1",
+            arbeidsgiver = "Firma1",
+            selskapsnavn = "Selskap1",
+            produktbetegnelse = "Produkt1",
+            kategori = AvtaleKategori.INDIVIDUELL_ORDNING,
+            underkategori = AvtaleUnderkategori.FORENINGSKOLLEKTIV,
+            innskuddssaldo = 1000,
+            naavaerendeAvtaltAarligInnskudd = 100,
+            pensjonsbeholdningForventet = 0,
+            pensjonsbeholdningNedreGrense = 0,
+            pensjonsbeholdningOvreGrense = 0,
+            avkastningsgaranti = false,
+            beregningsmodell = EksternBeregningsmodell.BRANSJEAVTALE,
+            startAar = 70,
+            sluttAar = 80,
+            opplysningsdato = "2023-01-01",
+            manglendeGraderingAarsak = ManglendeEksternGraderingAarsak.NONE,
+            manglendeBeregningAarsak = ManglendeEksternBeregningAarsak.NONE,
+            utbetalingsperioder = listOf(utbetalingsperiodeMedSluttalder)
+        )
+
+    fun uttaksperiodeSpec(value: Int) =
+        UttaksperiodeSpec(
+            startAlder = Alder(aar = value + 62, maaneder = value),
+            grad = if (value < 2) Uttaksgrad.AATTI_PROSENT else Uttaksgrad.HUNDRE_PROSENT,
+            aarligInntekt = InntektSpec(aarligBeloep = value * 100000, tomAlder = null)
+        )
+
+    @Language("xml")
+    const val EXPECTED_REQUEST_BODY = """<?xml version="1.0" ?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:typ="http://norskpensjon.no/api/pensjonskalkulator/v3/typer">
     <S:Header>
         $SAML_ASSERTION
@@ -193,18 +274,18 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
     </S:Body>
 </S:Envelope>"""
 
-        @Language("xml")
-        private const val INGEN_AVTALER_RESPONSE_BODY =
-            """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    @Language("xml")
+    const val INGEN_AVTALER_RESPONSE_BODY =
+        """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Header/>
     <soap:Body wsu:Id="x" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
         <ns2:pensjonsrettigheter xmlns:ns2="http://x.no/api/pensjonskalkulator/v3/typer" />
     </soap:Body>
 </soap:Envelope>"""
 
-        @Language("xml")
-        const val EN_AVTALE_RESPONSE_BODY =
-            """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    @Language("xml")
+    const val EN_AVTALE_RESPONSE_BODY =
+        """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Header/>
     <soap:Body wsu:Id="x" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
         <ns2:pensjonsrettigheter xmlns:ns2="http://x.no/api/pensjonskalkulator/v3/typer">
@@ -246,9 +327,9 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
     </soap:Body>
 </soap:Envelope>"""
 
-        @Language("xml")
-        private const val TO_AVTALER_RESPONSE_BODY =
-            """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    @Language("xml")
+    const val TO_AVTALER_RESPONSE_BODY =
+        """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Header/>
     <soap:Body wsu:Id="x" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
         <ns2:pensjonsrettigheter xmlns:ns2="http://x.no/api/pensjonskalkulator/v3/typer">
@@ -284,8 +365,8 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
     </soap:Body>
 </soap:Envelope>"""
 
-        @Language("xml")
-        private const val UTILGJENGELIGE_SELSKAP_RESPONSE_BODY = """
+    @Language("xml")
+    const val UTILGJENGELIGE_SELSKAP_RESPONSE_BODY = """
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Header/>
     <soap:Body wsu:Id="id-54ce654f-eb05-465e-bd30-36b2c081c3b8" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
@@ -305,8 +386,8 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
     </soap:Body>
 </soap:Envelope>"""
 
-        @Language("xml")
-        private const val ERROR_RESPONSE_BODY = """
+    @Language("xml")
+    const val ERROR_RESPONSE_BODY = """
 <soap11:Envelope xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:soap11="http://schemas.xmlsoap.org/soap/envelope/">
     <soap11:Header>
         <wsa:Action>http://www.w3.org/2005/08/addressing/soap/fault</wsa:Action>
@@ -325,9 +406,9 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
 </soap11:Envelope>
 """
 
-        @Language("xml")
-        private const val UTILSTREKKELIG_DATA_RESPONSE_BODY =
-            """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    @Language("xml")
+    const val UTILSTREKKELIG_DATA_RESPONSE_BODY =
+        """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Header/>
     <soap:Body wsu:Id="id-cc25c7d6-15cb-4b45-a11b-164e92644ff4" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
         <ns2:pensjonsrettigheter xmlns:ns2="http://norskpensjon.no/api/pensjonskalkulator/v3/typer">
@@ -360,9 +441,9 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
     </soap:Body>
 </soap:Envelope>"""
 
-        @Language("xml")
-        private const val UKJENTE_AARSAKER_RESPONSE_BODY =
-            """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    @Language("xml")
+    const val UKJENTE_AARSAKER_RESPONSE_BODY =
+        """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Header/>
     <soap:Body wsu:Id="id-cc25c7d6-15cb-4b45-a11b-164e92644ff4" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
         <ns2:pensjonsrettigheter xmlns:ns2="http://norskpensjon.no/api/pensjonskalkulator/v3/typer">
@@ -373,116 +454,4 @@ class NorskPensjonPensjonsavtaleClientTest : WebClientTest() {
         </ns2:pensjonsrettigheter>
     </soap:Body>
 </soap:Envelope>"""
-
-        fun okResponse(avtale: String) = jsonResponse(HttpStatus.OK).setBody(avtale)
-
-        fun spec() =
-            PensjonsavtaleSpec(
-                aarligInntektFoerUttak = 123000,
-                uttaksperioder = listOf(uttaksperiodeSpec(1), uttaksperiodeSpec(2)),
-            )
-
-        private fun uttaksperiodeSpec(value: Int) =
-            UttaksperiodeSpec(
-                startAlder = Alder(aar = value + 62, maaneder = value),
-                grad = if (value < 2) Uttaksgrad.AATTI_PROSENT else Uttaksgrad.HUNDRE_PROSENT,
-                aarligInntekt = InntektSpec(aarligBeloep = value * 100000, tomAlder = null)
-            )
-
-        private fun avtaleUtenUtbetalingsperioder() =
-            Pensjonsavtale(
-                avtalenummer = "",
-                arbeidsgiver = "ukjent",
-                selskapsnavn = "Selskap2",
-                produktbetegnelse = "Produkt2",
-                kategori = AvtaleKategori.FOLKETRYGD,
-                underkategori = AvtaleUnderkategori.NONE,
-                innskuddssaldo = 0,
-                naavaerendeAvtaltAarligInnskudd = 0,
-                pensjonsbeholdningForventet = 0,
-                pensjonsbeholdningNedreGrense = 0,
-                pensjonsbeholdningOvreGrense = 0,
-                avkastningsgaranti = false,
-                beregningsmodell = EksternBeregningsmodell.NONE,
-                startAar = 0,
-                sluttAar = null,
-                opplysningsdato = "ukjent",
-                manglendeGraderingAarsak = ManglendeEksternGraderingAarsak.NONE,
-                manglendeBeregningAarsak = ManglendeEksternBeregningAarsak.NONE,
-                utbetalingsperioder = emptyList()
-            )
-
-        private fun avtaleMedEnUtbetalingsperiode() =
-            Pensjonsavtale(
-                avtalenummer = "Avtale1",
-                arbeidsgiver = "Firma1",
-                selskapsnavn = "Selskap1",
-                produktbetegnelse = "Produkt1",
-                kategori = AvtaleKategori.INDIVIDUELL_ORDNING,
-                underkategori = AvtaleUnderkategori.FORENINGSKOLLEKTIV,
-                innskuddssaldo = 1000,
-                naavaerendeAvtaltAarligInnskudd = 100,
-                pensjonsbeholdningForventet = 0,
-                pensjonsbeholdningNedreGrense = 0,
-                pensjonsbeholdningOvreGrense = 0,
-                avkastningsgaranti = false,
-                beregningsmodell = EksternBeregningsmodell.BRANSJEAVTALE,
-                startAar = 70,
-                sluttAar = 80,
-                opplysningsdato = "2023-01-01",
-                manglendeGraderingAarsak = ManglendeEksternGraderingAarsak.NONE,
-                manglendeBeregningAarsak = ManglendeEksternBeregningAarsak.NONE,
-                utbetalingsperioder = listOf(utbetalingsperiodeMedSluttalder())
-            )
-
-        private fun avtaleMedToUtbetalingsperioder() =
-            Pensjonsavtale(
-                avtalenummer = "Avtale1",
-                arbeidsgiver = "Firma1",
-                selskapsnavn = "Selskap1",
-                produktbetegnelse = "Produkt1",
-                kategori = AvtaleKategori.INDIVIDUELL_ORDNING,
-                underkategori = AvtaleUnderkategori.FORENINGSKOLLEKTIV,
-                innskuddssaldo = 1000,
-                naavaerendeAvtaltAarligInnskudd = 100,
-                pensjonsbeholdningForventet = 1000000,
-                pensjonsbeholdningNedreGrense = 900000,
-                pensjonsbeholdningOvreGrense = 1100000,
-                avkastningsgaranti = false,
-                beregningsmodell = EksternBeregningsmodell.BRANSJEAVTALE,
-                startAar = 70,
-                sluttAar = 80,
-                opplysningsdato = "2023-01-01",
-                manglendeGraderingAarsak = ManglendeEksternGraderingAarsak.IKKE_STOETTET,
-                manglendeBeregningAarsak = ManglendeEksternBeregningAarsak.UKJENT_PRODUKTTYPE,
-                utbetalingsperioder = listOf(
-                    utbetalingsperiodeMedSluttalder(),
-                    utbetalingsperiodeUtenSluttalder()
-                )
-            )
-
-        private fun utbetalingsperiodeMedSluttalder() =
-            Utbetalingsperiode(
-                startAlder = Alder(aar = 71, maaneder = 0),
-                sluttAlder = Alder(aar = 81, maaneder = 1),
-                aarligUtbetaling = 10000,
-                grad = Uttaksgrad.HUNDRE_PROSENT
-            )
-
-        private fun utbetalingsperiodeUtenSluttalder() =
-            Utbetalingsperiode(
-                startAlder = Alder(aar = 72, maaneder = 1),
-                sluttAlder = null,
-                aarligUtbetaling = 20000,
-                grad = Uttaksgrad.AATTI_PROSENT
-            )
-
-        fun assertRequestBody(body: String) {
-            ByteArrayOutputStream().use {
-                val request = takeRequest()
-                request.body.copyTo(it)
-                assertEquals(body, it.toString(StandardCharsets.UTF_8))
-            }
-        }
-    }
 }

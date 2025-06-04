@@ -6,17 +6,7 @@ import no.nav.pensjon.kalkulator.general.Uttaksgrad
 
 object PensjonsavtaleFactory {
 
-    fun pensjonsavtaler() = pensjonsavtaler(67)
-
-    fun pensjonsavtalerV3(kategorier: List<AvtaleKategori>) =
-        Pensjonsavtaler(kategorier.map(::pensjonsavtale), listOf(selskapV3()))
-
-    fun pensjonsavtaler(startalder: Int) = Pensjonsavtaler(listOf(pensjonsavtale(startalder)), listOf(selskap()))
-
-    // Avtaler med felter støttet i versjon 3 av tjenesten til Norsk Pensjon
-    fun pensjonsavtalerV3() = Pensjonsavtaler(listOf(avtaleMedToUtbetalingsperioder()), listOf(selskapV3()))
-
-    fun avtaleMedToUtbetalingsperioder() =
+    val avtaleMedToUtbetalingsperioder =
         Pensjonsavtale(
             avtalenummer = "Avtale1",
             arbeidsgiver = "Firma1",
@@ -41,6 +31,16 @@ object PensjonsavtaleFactory {
                 utbetalingsperiodeUtenSluttalder()
             )
         )
+
+    fun pensjonsavtaler() = pensjonsavtaler(67)
+
+    fun pensjonsavtalerV3(kategorier: List<AvtaleKategori>) =
+        Pensjonsavtaler(kategorier.map(::pensjonsavtale), listOf(selskapV3()))
+
+    fun pensjonsavtaler(startalder: Int) = Pensjonsavtaler(listOf(pensjonsavtale(startalder)), listOf(selskap()))
+
+    // Avtaler med felter støttet i versjon 3 av tjenesten til Norsk Pensjon
+    fun pensjonsavtalerV3() = Pensjonsavtaler(listOf(avtaleMedToUtbetalingsperioder), listOf(selskapV3()))
 
     private fun utbetalingsperiodeMedSluttalder() =
         Utbetalingsperiode(
