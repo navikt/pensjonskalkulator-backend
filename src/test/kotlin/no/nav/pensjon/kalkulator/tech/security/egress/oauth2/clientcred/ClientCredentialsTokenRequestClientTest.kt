@@ -1,86 +1,88 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.oauth2.clientcred
 
-import no.nav.pensjon.kalkulator.mock.WebClientTest
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.clientcred.ClientCredentialsTokenRequestClientTestObjects.ACCESS_TOKEN
+import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.clientcred.ClientCredentialsTokenRequestClientTestObjects.AUDIENCE
+import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.clientcred.ClientCredentialsTokenRequestClientTestObjects.TOKEN_DATA
+import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.clientcred.ClientCredentialsTokenRequestClientTestObjects.USER
+import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.clientcred.ClientCredentialsTokenRequestClientTestObjects.tokenAccessParameter
 import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenAccessParameter
 import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenData
 import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.ExpirationChecker
-import okhttp3.mockwebserver.MockResponse
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.HttpStatus
-import org.springframework.test.context.TestPropertySource
+import no.nav.pensjon.kalkulator.testutil.Arrange
+import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
+import okhttp3.mockwebserver.MockWebServer
+import org.springframework.beans.factory.BeanFactory
 import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDateTime
 
-@SpringBootTest
-@TestPropertySource("classpath:application-test.properties")
-class ClientCredentialsTokenRequestClientTest : WebClientTest() {
+class ClientCredentialsTokenRequestClientTest : FunSpec({
 
-    private lateinit var client: ClientCredentialsTokenRequestClient
+    var server: MockWebServer? = null
+    var baseUrl: String? = null
 
-    @Autowired
-    private lateinit var webClientBuilder: WebClient.Builder
+    val expirationChecker = mockk<ExpirationChecker>().apply {
+        every { time() } returns LocalDateTime.of(2021, 1, 1, 1, 0, 0)
+        every { isExpired(issuedTime = LocalDateTime.of(2021, 1, 1, 1, 0, 0), expiresInSeconds = 299) } returns false
+    }
 
-    @Mock
-    private lateinit var expirationChecker: ExpirationChecker
-
-    @BeforeEach
-    fun initialize() {
-        client = ClientCredentialsTokenRequestClient(
-            tokenEndpoint = baseUrl(),
-            webClientBuilder = webClientBuilder,
-            expirationChecker = expirationChecker,
+    fun client(context: BeanFactory) =
+        ClientCredentialsTokenRequestClient(
+            baseUrl!!,
+            webClientBuilder = context.getBean(WebClient.Builder::class.java),
+            expirationChecker,
             credentials = ClientCredentials("id1", "secret1"),
             retryAttempts = "1"
         )
+
+    beforeTest {
+        Arrange.security()
+        server = MockWebServer().apply { start() }
+        baseUrl = "http://localhost:${server.port}"
     }
 
-    @Test
-    fun `getTokenData returns token data`() {
-        arrange(tokenResponse())
-        `when`(expirationChecker.time()).thenReturn(LocalDateTime.MIN)
-
-        val tokenData: TokenData = client.getTokenData(tokenAccessParameter, AUDIENCE, USER)
-
-        assertEquals(ACCESS_TOKEN, tokenData.accessToken)
+    afterTest {
+        server?.shutdown()
     }
 
-    @Test
-    fun `getTokenData caches token data`() {
-        arrange(tokenResponse())
-        `when`(expirationChecker.time()).thenReturn(LocalDateTime.MIN)
+    test("getTokenData should return token data") {
+        server?.arrangeOkJsonResponse(TOKEN_DATA)
 
-        val tokenData: TokenData = client.getTokenData(tokenAccessParameter, AUDIENCE, USER)
-        // Next statement will fail if token not cached, since only one response is enqueued:
-        val cachedTokenData: TokenData = client.getTokenData(tokenAccessParameter, AUDIENCE, USER)
-
-        assertEquals(ACCESS_TOKEN, tokenData.accessToken)
-        assertEquals(ACCESS_TOKEN, cachedTokenData.accessToken)
+        Arrange.webClientContextRunner().run {
+            client(context = it).getTokenData(tokenAccessParameter, AUDIENCE, USER).accessToken shouldBe ACCESS_TOKEN
+        }
     }
 
-    companion object {
-        private const val ACCESS_TOKEN = "token1"
-        private const val AUDIENCE = "audience1"
-        private const val USER = "user1"
-        private val tokenAccessParameter = TokenAccessParameter.clientCredentials("scope1")
+    test("getTokenData should cache token data") {
+        server?.arrangeOkJsonResponse(TOKEN_DATA)
 
-        private fun tokenResponse(): MockResponse {
-            // Based on actual response from TokenDings
-            return jsonResponse(HttpStatus.OK)
-                .setBody(
-                    """
+        Arrange.webClientContextRunner().run {
+            val client = client(context = it)
+            val tokenData: TokenData = client.getTokenData(tokenAccessParameter, AUDIENCE, USER)
+            // Next statement will fail if token not cached, since only one response is enqueued:
+            val cachedTokenData: TokenData = client.getTokenData(tokenAccessParameter, AUDIENCE, USER)
+
+            tokenData.accessToken shouldBe ACCESS_TOKEN
+            cachedTokenData.accessToken shouldBe ACCESS_TOKEN
+        }
+    }
+})
+
+private object ClientCredentialsTokenRequestClientTestObjects {
+    const val ACCESS_TOKEN = "token1"
+    const val AUDIENCE = "audience1"
+    const val USER = "user1"
+
+    const val TOKEN_DATA = """
 {
   "access_token": "$ACCESS_TOKEN",
   "issued_token_type": "urn:ietf:params:oauth:token-type:access_token",
   "token_type": "Bearer",
   "expires_in": 299
 }"""
-                )
-        }
-    }
+
+    val tokenAccessParameter = TokenAccessParameter.clientCredentials("scope1")
 }

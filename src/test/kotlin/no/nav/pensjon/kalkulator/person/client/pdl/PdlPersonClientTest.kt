@@ -1,157 +1,188 @@
 package no.nav.pensjon.kalkulator.person.client.pdl
 
+import io.kotest.assertions.throwables.shouldNotThrowAny
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.mockk
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
-import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
-import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.mock.WebClientTest
+import no.nav.pensjon.kalkulator.mock.TestObjects.pid1
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import okhttp3.mockwebserver.MockResponse
+import no.nav.pensjon.kalkulator.testutil.Arrange
+import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
+import no.nav.pensjon.kalkulator.testutil.arrangeResponse
+import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.beans.factory.BeanFactory
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.TestPropertySource
 import org.springframework.web.reactive.function.client.WebClient
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
 import java.time.LocalDate
 
-@SpringBootTest
-@TestPropertySource("classpath:application-test.properties")
-class PdlPersonClientTest : WebClientTest() {
+class PdlPersonClientTest : FunSpec({
 
-    private lateinit var client: PdlPersonClient
+    var server: MockWebServer? = null
+    var baseUrl: String? = null
+    val traceAid = mockk<TraceAid>(relaxed = true)
 
-    @Autowired
-    private lateinit var webClientBuilder: WebClient.Builder
+    fun client(context: BeanFactory) =
+        PdlPersonClient(
+            baseUrl!!,
+            webClientBuilder = context.getBean(WebClient.Builder::class.java),
+            traceAid,
+            retryAttempts = "1"
+        )
 
-    @Mock
-    private lateinit var traceAid: TraceAid
-
-    @BeforeEach
-    fun initialize() {
-        `when`(traceAid.callId()).thenReturn("id1")
-        client = PdlPersonClient(baseUrl(), webClientBuilder, traceAid, retryAttempts = "1")
-        arrangeSecurityContext()
+    beforeSpec {
+        Arrange.security()
+        server = MockWebServer().apply { start() }
+        baseUrl = "http://localhost:${server.port}"
     }
 
-    @Test
-    fun `fetchPerson uses supplied PID in request to PDL`() {
-        arrange(okPersonaliaResponse())
+    afterSpec {
+        server?.shutdown()
+    }
 
-        client.fetchPerson(pid, fetchFulltNavn = false)
+    test("fetchPerson uses supplied PID in request to PDL") {
+        server!!.arrangeOkJsonResponse(PdlPersonClientTestObjects.PERSONALIA_JSON)
 
-        ByteArrayOutputStream().use {
-            val request = takeRequest()
-            request.body.copyTo(it)
-            assertEquals("B353", request.getHeader("behandlingsnummer"))
-            assertEquals("PEN", request.getHeader("tema"))
-            assertEquals(
-                """{
+        Arrange.webClientContextRunner().run {
+            client(context = it).fetchPerson(pid = pid1, fetchFulltNavn = false)
+
+            ByteArrayOutputStream().use {
+                server.takeRequest().apply {
+                    body.copyTo(it)
+                    getHeader("behandlingsnummer") shouldBe "B353"
+                    getHeader("tema") shouldBe "PEN"
+                }
+                it.toString(StandardCharsets.UTF_8) shouldBe
+                        """{
 	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { fornavn }, foedselsdato { foedselsdato }, sivilstand(historikk: false) { type } } }",
 	"variables": {
-		"ident": "12906498357"
+		"ident": "22925399748"
 	}
-}""",
-                it.toString(StandardCharsets.UTF_8)
-            )
+}"""
+            }
+
         }
     }
 
-    @Test
-    fun `fetchPerson returns person when OK response`() {
-        arrange(okPersonaliaResponse())
+    test("fetchAdressebeskyttelse returns adressebeskyttelsesgradering when OK response") {
+        server?.arrangeOkJsonResponse(PdlPersonClientTestObjects.ADRESSEBESKYTTELSE_JSON)
 
-        val response: Person = client.fetchPerson(pid, fetchFulltNavn = false)!!
+        Arrange.webClientContextRunner().run {
+            val response: Person = client(context = it).fetchAdressebeskyttelse(pid1)!!
 
-        assertEquals("Ola-Kari", response.navn)
-        assertEquals(LocalDate.of(1963, 12, 31), response.foedselsdato)
-        assertTrue(response.harFoedselsdato)
-        assertEquals(Sivilstand.UGIFT, response.sivilstand)
+            with(response) {
+                adressebeskyttelse shouldBe AdressebeskyttelseGradering.STRENGT_FORTROLIG
+            }
+        }
     }
 
-    @Test
-    fun `fetchPerson returns partial person when receiving partial graphql-response`() {
-        arrange(partialPersonaliaResponse())
+    test("fetchPerson returns person when OK response") {
+        server?.arrangeOkJsonResponse(PdlPersonClientTestObjects.PERSONALIA_JSON)
 
-        val response: Person = client.fetchPerson(pid, fetchFulltNavn = false)!!
+        Arrange.webClientContextRunner().run {
+            val response: Person = client(context = it).fetchPerson(pid1, fetchFulltNavn = false)!!
 
-        assertEquals("Ola-Kari", response.navn)
-        assertEquals(LocalDate.MIN, response.foedselsdato)
-        assertFalse(response.harFoedselsdato)
-        assertEquals(Sivilstand.UOPPGITT, response.sivilstand)
+            with(response) {
+                navn shouldBe "Ola-Kari"
+                foedselsdato shouldBe LocalDate.of(1963, 12, 31)
+                harFoedselsdato shouldBe true
+                sivilstand shouldBe Sivilstand.UGIFT
+            }
+        }
     }
 
-    @Test
-    fun `fetchPerson retries in case of server error`() {
-        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
-        arrange(okPersonaliaResponse())
+    test("fetchPerson returns partial person when receiving partial graphql-response") {
+        server?.arrangeOkJsonResponse(PdlPersonClientTestObjects.PARTIAL_PERSONALIA_JSON)
 
-        val response: Person = client.fetchPerson(pid, fetchFulltNavn = false)!!
+        Arrange.webClientContextRunner().run {
+            val response: Person = client(context = it).fetchPerson(pid1, fetchFulltNavn = false)!!
 
-        assertEquals("Ola-Kari", response.navn)
-        assertEquals(Sivilstand.UGIFT, response.sivilstand)
+            with(response) {
+                navn shouldBe "Ola-Kari"
+                foedselsdato shouldBe LocalDate.MIN
+                harFoedselsdato shouldBe false
+                sivilstand shouldBe Sivilstand.UOPPGITT
+            }
+        }
     }
 
-    @Test
-    fun `fetchPerson does not retry in case of client error`() {
-        arrange(jsonResponse(HttpStatus.BAD_REQUEST).setBody("My bad"))
+    test("fetchPerson handles extended response") {
+        server?.arrangeOkJsonResponse(PdlPersonClientTestObjects.EXTENSION_JSON)
+
+        Arrange.webClientContextRunner().run {
+            // extension data is only logged, so just check that no exception occurs:
+            shouldNotThrowAny { client(context = it).fetchPerson(pid1, fetchFulltNavn = false)!! }
+        }
+    }
+
+    test("fetchPerson handles person ikke funnet") {
+        server?.arrangeOkJsonResponse(PdlPersonClientTestObjects.PERSON_IKKE_FUNNET_JSON)
+
+        Arrange.webClientContextRunner().run {
+            shouldThrow<NotFoundException> {
+                client(context = it).fetchPerson(pid1, fetchFulltNavn = false)
+            }.message shouldBe "person"
+        }
+    }
+
+    test("fetchPerson handles server error") {
+        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Feil")
+        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Feil")
+
+        Arrange.webClientContextRunner().run {
+            val exception = shouldThrow<EgressException> {
+                client(context = it).fetchPerson(pid1, fetchFulltNavn = false)
+            }
+
+            with(exception) {
+                message shouldBe "Failed calling ${baseUrl}/graphql"
+                (cause as EgressException).message shouldBe "Feil"
+            }
+        }
+    }
+
+    test("fetchPerson does not retry in case of client error") {
+        server?.arrangeResponse(HttpStatus.BAD_REQUEST, "My bad")
         // No 2nd response arranged, since no retry
 
-        val exception = assertThrows(EgressException::class.java) { client.fetchPerson(pid, fetchFulltNavn = false) }
-
-        assertEquals("My bad", exception.message)
+        Arrange.webClientContextRunner().run {
+            shouldThrow<EgressException> {
+                client(context = it).fetchPerson(
+                    pid1,
+                    fetchFulltNavn = false
+                )
+            }.message shouldBe "My bad"
+        }
     }
 
-    @Test
-    fun `fetchPerson handles server error`() {
-        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
-        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil")) // for retry
+    test("fetchPerson retries in case of server error") {
+        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Feil")
+        server?.arrangeOkJsonResponse(PdlPersonClientTestObjects.PERSONALIA_JSON)
 
-        val exception = assertThrows<EgressException> { client.fetchPerson(pid, fetchFulltNavn = false) }
+        Arrange.webClientContextRunner().run {
+            val response: Person = client(context = it).fetchPerson(pid1, fetchFulltNavn = false)!!
 
-        assertEquals("Failed calling ${baseUrl()}/graphql", exception.message)
-        assertEquals("Feil", (exception.cause as EgressException).message)
+            with(response) {
+                navn shouldBe "Ola-Kari"
+                sivilstand shouldBe Sivilstand.UGIFT
+            }
+        }
     }
+})
 
-    @Test
-    fun `fetchPerson handles extended response`() {
-        arrange(extendedResponse())
-        // extension data is only logged, so just check that no exception occurs:
-        assertDoesNotThrow { client.fetchPerson(pid, fetchFulltNavn = false) }
-    }
+private object PdlPersonClientTestObjects {
 
-    @Test
-    fun `fetchPerson handles person ikke funnet`() {
-        arrange(personIkkeFunnetResponse())
-        val exception = assertThrows<NotFoundException> { client.fetchPerson(pid, fetchFulltNavn = false) }
-        assertEquals("person", exception.message)
-    }
-
-    @Test
-    fun `fetchAdressebeskyttelse returns adressebeskyttelsesgradering when OK response`() {
-        arrange(okAdressebeskyttelseResponse())
-
-        val response: Person = client.fetchAdressebeskyttelse(pid)!!
-
-        assertEquals(AdressebeskyttelseGradering.STRENGT_FORTROLIG, response.adressebeskyttelse)
-    }
-
-    companion object {
-
-        // Actual response from PDL in Q2:
-        @Language("JSON")
-        private const val PERSONALIA_JSON = """{
+    // Actual response from PDL in Q2:
+    @Language("JSON")
+    const val PERSONALIA_JSON = """{
               "data": {
                 "hentPerson": {
                   "navn": [
@@ -173,8 +204,8 @@ class PdlPersonClientTest : WebClientTest() {
               }
             }"""
 
-        @Language("JSON")
-        private const val PARTIAL_PERSONALIA_JSON = """{
+    @Language("JSON")
+    const val PARTIAL_PERSONALIA_JSON = """{
               "data": {
                 "hentPerson": {
                   "navn": [
@@ -187,8 +218,8 @@ class PdlPersonClientTest : WebClientTest() {
               }
             }"""
 
-        @Language("JSON")
-        private const val EXTENSION_JSON = """{
+    @Language("JSON")
+    const val EXTENSION_JSON = """{
               "data": {
                 "hentPerson": {
                   "navn": [
@@ -223,8 +254,8 @@ class PdlPersonClientTest : WebClientTest() {
               }
             }"""
 
-        @Language("JSON")
-        private const val ADRESSEBESKYTTELSE_JSON = """{
+    @Language("JSON")
+    const val ADRESSEBESKYTTELSE_JSON = """{
               "data": {
                 "hentPerson": {
                   "adressebeskyttelse": [
@@ -236,8 +267,8 @@ class PdlPersonClientTest : WebClientTest() {
               }
             }"""
 
-        @Language("JSON")
-        private const val PERSON_IKKE_FUNNET_JSON = """{
+    @Language("JSON")
+    const val PERSON_IKKE_FUNNET_JSON = """{
     "errors": [
         {
             "message": "Fant ikke person",
@@ -260,20 +291,4 @@ class PdlPersonClientTest : WebClientTest() {
         "hentPerson": null
     }
 }"""
-
-        private fun okPersonaliaResponse(): MockResponse =
-            jsonResponse(HttpStatus.OK).setBody(PERSONALIA_JSON.trimIndent())
-
-        private fun okAdressebeskyttelseResponse(): MockResponse =
-            jsonResponse(HttpStatus.OK).setBody(ADRESSEBESKYTTELSE_JSON.trimIndent())
-
-        private fun partialPersonaliaResponse(): MockResponse =
-            jsonResponse(HttpStatus.OK).setBody(PARTIAL_PERSONALIA_JSON.trimIndent())
-
-        private fun extendedResponse(): MockResponse =
-            jsonResponse(HttpStatus.OK).setBody(EXTENSION_JSON.trimIndent())
-
-        private fun personIkkeFunnetResponse(): MockResponse =
-            jsonResponse(HttpStatus.OK).setBody(PERSON_IKKE_FUNNET_JSON.trimIndent())
-    }
 }

@@ -1,64 +1,66 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.token.saml.client.gandalf
 
-import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
-import no.nav.pensjon.kalkulator.mock.WebClientTest
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.client.gandalf.GandalfSamlTokenClientTestObjects.SAML_TOKEN_RESPONSE_BODY
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import no.nav.pensjon.kalkulator.testutil.Arrange
+import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
+import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.mockito.Mock
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.TestPropertySource
+import org.springframework.beans.factory.BeanFactory
 import org.springframework.web.reactive.function.client.WebClient
 
-@SpringBootTest
-@TestPropertySource("classpath:application-test.properties")
-class GandalfSamlTokenClientTest : WebClientTest() {
+class GandalfSamlTokenClientTest : FunSpec({
 
-    private lateinit var client: GandalfSamlTokenClient
+    var server: MockWebServer? = null
+    var baseUrl: String? = null
+    val traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" }
 
-    @Autowired
-    private lateinit var webClientBuilder: WebClient.Builder
-
-    @Mock
-    private lateinit var traceAid: TraceAid
-
-    @BeforeEach
-    fun initialize() {
-        client = GandalfSamlTokenClient(
-            baseUrl = baseUrl(),
-            webClientBuilder = webClientBuilder,
-            traceAid = traceAid,
+    fun client(context: BeanFactory) =
+        GandalfSamlTokenClient(
+            baseUrl!!,
+            webClientBuilder = context.getBean(WebClient.Builder::class.java),
+            traceAid,
             retryAttempts = "1"
         )
+
+    beforeSpec {
+        Arrange.security()
+        server = MockWebServer().apply { start() }
+        baseUrl = "http://localhost:${server.port}"
     }
 
-    @Test
-    fun `fetchSamlToken returns access token data when OK response`() {
-        arrangeSecurityContext()
-        arrange(okResponse())
-
-        val response = client.fetchSamlToken()
-
-        assertEquals("PHNhb...lvbj4", response.access_token)
-        assertEquals("urn:ietf:params:oauth:token-type:saml2", response.issued_token_type)
-        assertEquals("Bearer", response.token_type)
-        assertEquals(2649, response.expires_in)
+    afterSpec {
+        server?.shutdown()
     }
 
-    private companion object {
+    test("fetchSamlToken returns access token data when OK response") {
+        server?.arrangeOkJsonResponse(SAML_TOKEN_RESPONSE_BODY)
 
-        // access_token is a Base64-encoded SAML token
-        @Language("json")
-        private const val SAML_TOKEN_RESPONSE_BODY = """{
+        Arrange.webClientContextRunner().run {
+            val response = client(context = it).fetchSamlToken()
+
+            with(response) {
+                access_token shouldBe "PHNhb...lvbj4"
+                issued_token_type shouldBe "urn:ietf:params:oauth:token-type:saml2"
+                token_type shouldBe "Bearer"
+                expires_in shouldBe 2649
+            }
+        }
+    }
+})
+
+private object GandalfSamlTokenClientTestObjects {
+
+    // access_token is a Base64-encoded SAML token
+    @Language("json")
+    const val SAML_TOKEN_RESPONSE_BODY = """{
     "access_token": "PHNhb...lvbj4",
     "issued_token_type": "urn:ietf:params:oauth:token-type:saml2",
     "token_type": "Bearer",
     "expires_in": 2649
 }"""
-
-        private fun okResponse() = jsonResponse().setBody(SAML_TOKEN_RESPONSE_BODY)
-    }
 }
