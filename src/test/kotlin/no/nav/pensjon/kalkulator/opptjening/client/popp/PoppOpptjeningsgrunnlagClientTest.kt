@@ -3,7 +3,6 @@ package no.nav.pensjon.kalkulator.opptjening.client.popp
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.every
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningsgrunnlag
@@ -25,7 +24,7 @@ class PoppOpptjeningsgrunnlagClientTest : FunSpec({
 
     var server: MockWebServer? = null
     var baseUrl: String? = null
-    val traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" }
+    val traceAid = mockk<TraceAid>(relaxed = true)
 
     fun opptjeningClient(context: BeanFactory) =
         PoppOpptjeningsgrunnlagClient(
@@ -46,7 +45,7 @@ class PoppOpptjeningsgrunnlagClientTest : FunSpec({
     }
 
     test("fetchOpptjeningsgrunnlag returns opptjeningsgrunnlag when OK response") {
-        server!!.arrangeOkJsonResponse(RESPONSE_BODY)
+        server?.arrangeOkJsonResponse(RESPONSE_BODY)
 
         Arrange.webClientContextRunner().run {
             val response: Opptjeningsgrunnlag = opptjeningClient(context = it).fetchOpptjeningsgrunnlag(pid)
@@ -100,7 +99,7 @@ class PoppOpptjeningsgrunnlagClientTest : FunSpec({
     }
 })
 
-object PoppOpptjeningsgrunnlagClientTestObjects {
+private object PoppOpptjeningsgrunnlagClientTestObjects {
 
     @Language("json")
     const val RESPONSE_BODY =

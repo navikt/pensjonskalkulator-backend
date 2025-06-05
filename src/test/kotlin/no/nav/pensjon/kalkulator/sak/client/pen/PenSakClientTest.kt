@@ -3,7 +3,6 @@ package no.nav.pensjon.kalkulator.sak.client.pen
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.every
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.sak.SakStatus
@@ -26,7 +25,7 @@ class PenSakClientTest : FunSpec({
 
     var server: MockWebServer? = null
     var baseUrl: String? = null
-    val traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" }
+    val traceAid = mockk<TraceAid>(relaxed = true)
 
     fun client(context: BeanFactory) =
         PenSakClient(
@@ -90,7 +89,7 @@ class PenSakClientTest : FunSpec({
     }
 })
 
-object PenSakClientTestObjects {
+private object PenSakClientTestObjects {
 
     @Language("json")
     const val PEN_SAK = """[
