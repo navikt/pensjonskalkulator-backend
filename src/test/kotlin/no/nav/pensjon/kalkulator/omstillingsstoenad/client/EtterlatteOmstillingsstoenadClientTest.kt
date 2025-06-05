@@ -2,7 +2,6 @@ package no.nav.pensjon.kalkulator.omstillingsstoenad.client
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
@@ -21,7 +20,7 @@ class EtterlatteOmstillingsstoenadClientTest : FunSpec({
     var server: MockWebServer? = null
     var baseUrl: String? = null
     val dato = LocalDate.of(2025, 1, 1)
-    val traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" }
+    val traceAid = mockk<TraceAid>(relaxed = true)
 
     fun client(context: BeanFactory) =
         EtterlatteOmstillingsstoenadClient(
