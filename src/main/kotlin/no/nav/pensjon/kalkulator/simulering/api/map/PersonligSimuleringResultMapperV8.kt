@@ -75,9 +75,9 @@ object PersonligSimuleringResultMapperV8 {
      * Assign a Afp Privat with age 0 to the current age, or remove it from the list if the current age already exists.
      */
     fun justerAfpPrivatIInnevaerendeAarV8(
-        afpPrivatList: List<PersonligSimuleringAarligPensjonResultV8>,
+        afpPrivatList: List<PersonligSimuleringAfpPrivatResultV8>,
         foedselsdato: LocalDate
-    ): List<PersonligSimuleringAarligPensjonResultV8> {
+    ): List<PersonligSimuleringAfpPrivatResultV8> {
         afpPrivatList
             .firstOrNull { it.alder == 0 }
             ?.let {
@@ -88,9 +88,12 @@ object PersonligSimuleringResultMapperV8 {
                     return oppdatertAfpPrivatList.sortedBy { it.alder }
                 }
                 oppdatertAfpPrivatList.add(
-                    PersonligSimuleringAarligPensjonResultV8(
+                    PersonligSimuleringAfpPrivatResultV8(
                         innevaerendeAarAlder,
                         it.beloep,
+                        it.kompensasjonstillegg,
+                        it.kronetillegg,
+                        it.livsvarig,
                         it.maanedligBeloep
                     )
                 )
@@ -123,7 +126,7 @@ object PersonligSimuleringResultMapperV8 {
         )
 
     private fun privatAfp(source: SimulertAfpPrivat) =
-        PersonligSimuleringAarligPensjonResultV8(alder = source.alder, beloep = source.beloep, maanedligBeloep = source.maanedligBeloep)
+        PersonligSimuleringAfpPrivatResultV8(alder = source.alder, beloep = source.beloep, kompensasjonstillegg = source.kompensasjonstillegg, kronetillegg = source.kronetillegg, livsvarig = source.livsvarig, maanedligBeloep = source.maanedligBeloep)
 
     private fun offentligAfp(source: SimulertAfpOffentlig) =
         PersonligSimuleringAarligPensjonResultV8(alder = source.alder, beloep = source.beloep, maanedligBeloep = source.maanedligBeloep)

@@ -47,6 +47,9 @@ object SimulatorAnonymSimuleringResultMapper {
         SimulertAfpPrivat(
             alder = dto.alder ?: 0,
             beloep = dto.belopArlig ?: 0,
+            kompensasjonstillegg = 0, // Ikke relevant i anonym kontekst enda
+            kronetillegg = 0, // Ikke relevant i anonym kontekst enda
+            livsvarig = 0, // Ikke relevant i anonym kontekst enda
             maanedligBeloep = 0 // Ikke relevant i anonym kontekst enda
         )
 
