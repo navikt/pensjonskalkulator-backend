@@ -7,7 +7,7 @@ data class PersonligSimuleringResultV8(
     val alderspensjon: List<PersonligSimuleringAlderspensjonResultV8> = emptyList(),
     val alderspensjonMaanedligVedEndring: PersonligSimuleringMaanedligPensjonResultV8? = null,
     val pre2025OffentligAfp: PersonligSimuleringPre2025OffentligAfpResultV8? = null,
-    val afpPrivat: List<PersonligSimuleringAarligPensjonResultV8>? = emptyList(),
+    val afpPrivat: List<PersonligSimuleringAfpPrivatResultV8>? = emptyList(),
     val afpOffentlig: List<PersonligSimuleringAarligPensjonResultV8>? = emptyList(),
     val vilkaarsproeving: PersonligSimuleringVilkaarsproevingResultV8,
     val harForLiteTrygdetid: Boolean? = false,
@@ -59,6 +59,15 @@ data class PersonligSimuleringPre2025OffentligAfpResultV8(
     val saertillegg: Int,
     val afpGrad: Int,
     val afpAvkortetTil70Prosent: Boolean
+)
+
+data class PersonligSimuleringAfpPrivatResultV8(
+    val alder: Int,
+    val beloep: Int,
+    val kompensasjonstillegg: Int,
+    val kronetillegg: Int,
+    val livsvarig: Int,
+    val maanedligBeloep: Int?
 )
 
 data class PersonligSimuleringAarligPensjonResultV8(
