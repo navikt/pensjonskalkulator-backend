@@ -1,183 +1,166 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering
 
-import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import no.nav.pensjon.kalkulator.testutil.Arrange
+import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.TpSimuleringClientTestObjects.IKKE_MEDLEM
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.TpSimuleringClientTestObjects.INGEN_UTBETALINGSPERIODER
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.TpSimuleringClientTestObjects.OK
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.TpSimuleringClientTestObjects.TEKNISK_FEIL
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.TpSimuleringClientTestObjects.TP_ORDNING_STOETTES_IKKE
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.TpSimuleringClientTestObjects.spec
+import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.mockito.Mock
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.TestPropertySource
+import org.springframework.beans.factory.BeanFactory
 import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDate
 
-@SpringBootTest
-@TestPropertySource("classpath:application-test.properties")
-class TpSimuleringClientTest : WebClientTest() {
+class TpSimuleringClientTest : FunSpec({
 
-    private lateinit var client: TpSimuleringClient
+    var server: MockWebServer? = null
+    var baseUrl: String? = null
+    val traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" }
 
-    @Autowired
-    private lateinit var webClientBuilder: WebClient.Builder
-
-    @Mock
-    private lateinit var traceAid: TraceAid
-
-    @BeforeEach
-    fun initialize() {
-        client = TpSimuleringClient(
-            baseUrl = baseUrl(),
-            webClientBuilder = webClientBuilder,
-            traceAid = traceAid,
-            retryAttempts = RETRY_ATTEMPTS
+    fun client(context: BeanFactory) =
+        TpSimuleringClient(
+            baseUrl!!,
+            webClientBuilder = context.getBean(WebClient.Builder::class.java),
+            traceAid,
+            retryAttempts = "1"
         )
 
-        arrangeSecurityContext()
+    beforeSpec {
+        Arrange.security()
+        server = MockWebServer().apply { start() }
+        baseUrl = "http://localhost:${server.port}"
     }
 
-    @Test
-    fun `hent tjenestepensjonSimulering hvor responsen har ingen utbetalingsperioder`() {
-        arrange(ingenUtbetalingsperioderResponse())
-        val req = SimuleringOffentligTjenestepensjonSpecV2(
-            foedselsdato = LocalDate.of(1964, 2, 3),
-            uttaksdato = LocalDate.of(2027, 2, 3),
-            sisteInntekt = 0,
-            fremtidigeInntekter = emptyList(),
-            aarIUtlandetEtter16 = 1,
-            brukerBaOmAfp = true,
-            epsPensjon = true,
-            eps2G = true,
-        )
-        val resp = client.hentTjenestepensjonSimulering(req, pid)
-
-        assertNull(resp.simuleringsResultat)
-        assertEquals(ResultatType.TOM_RESPONS, resp.simuleringsResultatStatus.resultatType)
-        assertEquals("Simulering fra Statens Pensjonskasse inneholder ingen utbetalingsperioder", resp.simuleringsResultatStatus.feilmelding)
-        assertEquals(listOf("Statens pensjonskasse"), resp.tpOrdninger)
+    afterSpec {
+        server?.shutdown()
     }
 
-    @Test
-    fun `hent tjenestepensjon simulering OK`() {
-        arrange(okResponse())
-        val req = SimuleringOffentligTjenestepensjonSpecV2(
-            foedselsdato = LocalDate.of(1964, 2, 3),
-            uttaksdato = LocalDate.of(2027, 2, 3),
-            sisteInntekt = 500000,
-            fremtidigeInntekter = listOf(
-                FremtidigInntektV2(LocalDate.of(2028, 1, 1), 600000),
-                FremtidigInntektV2(LocalDate.of(2029, 1, 1), 700000),
-                FremtidigInntektV2(LocalDate.of(2030, 1, 1), 0),
-            ),
-            aarIUtlandetEtter16 = 1,
-            brukerBaOmAfp = true,
-            epsPensjon = true,
-            eps2G = true,
-        )
-        val resp = client.hentTjenestepensjonSimulering(req, pid)
+    test("hent tjenestepensjonssimulering hvor responsen har ingen utbetalingsperioder") {
+        server?.arrangeOkJsonResponse(INGEN_UTBETALINGSPERIODER)
 
-        assertNotNull(resp.simuleringsResultat)
-        assertEquals(ResultatType.OK, resp.simuleringsResultatStatus.resultatType)
-        assertNull(resp.simuleringsResultatStatus.feilmelding)
-        assertEquals(listOf("Statens pensjonskasse"), resp.tpOrdninger)
-        assertEquals("Statens Pensjonskasse", resp.simuleringsResultat!!.tpOrdning)
-        assertEquals("1", resp.simuleringsResultat!!.tpNummer)
-        assertEquals(3, resp.simuleringsResultat!!.perioder.size)
-        assertEquals(62, resp.simuleringsResultat!!.perioder[0].startAlder.aar)
-        assertEquals(1, resp.simuleringsResultat!!.perioder[0].startAlder.maaneder)
-        assertEquals(63, resp.simuleringsResultat!!.perioder[0].sluttAlder?.aar)
-        assertEquals(3, resp.simuleringsResultat!!.perioder[0].sluttAlder?.maaneder)
-        assertEquals(1000, resp.simuleringsResultat!!.perioder[0].maanedligBeloep)
+        Arrange.webClientContextRunner().run {
+            val result = client(context = it).hentTjenestepensjonSimulering(spec, pid)
 
-        assertEquals(63, resp.simuleringsResultat!!.perioder[1].startAlder.aar)
-        assertEquals(4, resp.simuleringsResultat!!.perioder[1].startAlder.maaneder)
-        assertEquals(63, resp.simuleringsResultat!!.perioder[1].sluttAlder?.aar)
-        assertEquals(6, resp.simuleringsResultat!!.perioder[1].sluttAlder?.maaneder)
-        assertEquals(2000, resp.simuleringsResultat!!.perioder[1].maanedligBeloep)
-
-        assertEquals(63, resp.simuleringsResultat!!.perioder[2].startAlder.aar)
-        assertEquals(7, resp.simuleringsResultat!!.perioder[2].startAlder.maaneder)
-        assertNull(resp.simuleringsResultat!!.perioder[2].sluttAlder)
-        assertEquals(3000, resp.simuleringsResultat!!.perioder[2].maanedligBeloep)
+            result shouldBe OffentligTjenestepensjonSimuleringsresultat(
+                simuleringsResultatStatus = SimuleringsResultatStatus(
+                    resultatType = ResultatType.TOM_RESPONS,
+                    feilmelding = "Simulering fra Statens Pensjonskasse inneholder ingen utbetalingsperioder"
+                ),
+                simuleringsResultat = null,
+                tpOrdninger = listOf("Statens pensjonskasse"),
+                serviceData = emptyList()
+            )
+        }
     }
 
-    @Test
-    fun `hent tjenestepensjon simulering for bruker som ikke er medlem`() {
-        arrange(ikkeMedlemResponse())
-        val req = SimuleringOffentligTjenestepensjonSpecV2(
-            foedselsdato = LocalDate.of(1964, 2, 3),
-            uttaksdato = LocalDate.of(2027, 2, 1),
-            sisteInntekt = 500000,
-            fremtidigeInntekter = listOf(FremtidigInntektV2(LocalDate.of(2027, 2, 1), 0),),
-            aarIUtlandetEtter16 = 1,
-            brukerBaOmAfp = true,
-            epsPensjon = true,
-            eps2G = true,
-        )
-        val resp = client.hentTjenestepensjonSimulering(req, pid)
+    test("hent tjenestepensjonssimulering OK") {
+        server?.arrangeOkJsonResponse(OK)
 
-        assertNull(resp.simuleringsResultat)
-        assertEquals(ResultatType.IKKE_MEDLEM, resp.simuleringsResultatStatus.resultatType)
-        assertNotNull(resp.simuleringsResultatStatus.feilmelding)
-        assertTrue(resp.tpOrdninger.isEmpty())
+        Arrange.webClientContextRunner().run {
+            val result = client(context = it).hentTjenestepensjonSimulering(spec, pid)
+
+            result shouldBe OffentligTjenestepensjonSimuleringsresultat(
+                simuleringsResultatStatus = SimuleringsResultatStatus(
+                    resultatType = ResultatType.OK,
+                    feilmelding = null
+                ),
+                simuleringsResultat = SimuleringsResultat(
+                    tpOrdning = "Statens Pensjonskasse",
+                    tpNummer = "1",
+                    perioder = listOf(
+                        Utbetaling(
+                            startAlder = Alder(62, 1),
+                            sluttAlder = Alder(63, 3),
+                            maanedligBeloep = 1000
+                        ),
+                        Utbetaling(
+                            startAlder = Alder(63, 4),
+                            sluttAlder = Alder(63, 6),
+                            maanedligBeloep = 2000
+                        ),
+                        Utbetaling(
+                            startAlder = Alder(63, 7),
+                            sluttAlder = null,
+                            maanedligBeloep = 3000
+                        )
+                    ),
+                    betingetTjenestepensjonInkludert = false
+                ),
+                tpOrdninger = listOf("Statens pensjonskasse"),
+                serviceData = emptyList()
+            )
+        }
     }
 
-    @Test
-    fun `hent tjenestepensjon simulering for tp-ordning som ikke stoettes`() {
-        arrange(tpOrdningStoettesIkkeResponse())
-        val req = SimuleringOffentligTjenestepensjonSpecV2(
-            foedselsdato = LocalDate.of(1964, 2, 3),
-            uttaksdato = LocalDate.of(2027, 2, 3),
-            sisteInntekt = 500000,
-            fremtidigeInntekter = listOf(FremtidigInntektV2(LocalDate.of(2027, 2, 1), 0),),
-            aarIUtlandetEtter16 = 1,
-            brukerBaOmAfp = true,
-            epsPensjon = true,
-            eps2G = true,
-        )
-        val resp = client.hentTjenestepensjonSimulering(req, pid)
+    test("hent tjenestepensjonssimulering for person som ikke er medlem") {
+        server?.arrangeOkJsonResponse(IKKE_MEDLEM)
 
-        assertNull(resp.simuleringsResultat)
-        assertEquals(ResultatType.TP_ORDNING_STOETTES_IKKE, resp.simuleringsResultatStatus.resultatType)
-        assertNotNull(resp.simuleringsResultatStatus.feilmelding)
-        assertTrue(resp.tpOrdninger.isNotEmpty())
-        assertEquals("Pensjonskasse A", resp.tpOrdninger[0])
+        Arrange.webClientContextRunner().run {
+            val result = client(context = it).hentTjenestepensjonSimulering(spec, pid)
+
+            result shouldBe OffentligTjenestepensjonSimuleringsresultat(
+                simuleringsResultatStatus = SimuleringsResultatStatus(
+                    resultatType = ResultatType.IKKE_MEDLEM,
+                    feilmelding = "Ikke medlem"
+                ),
+                simuleringsResultat = null,
+                tpOrdninger = emptyList(),
+                serviceData = emptyList()
+            )
+        }
     }
 
-    @Test
-    fun `hent tjenestepensjon simulering kom med teksnisk feil fra tp-ordning`() {
-        arrange(tekniskFeilResponse())
-        val req = SimuleringOffentligTjenestepensjonSpecV2(
-            foedselsdato = LocalDate.of(1964, 2, 3),
-            uttaksdato = LocalDate.of(2027, 2, 3),
-            sisteInntekt = 500000,
-            fremtidigeInntekter = listOf(FremtidigInntektV2(LocalDate.of(2027, 2, 1), 0),),
-            aarIUtlandetEtter16 = 1,
-            brukerBaOmAfp = true,
-            epsPensjon = true,
-            eps2G = true,
-        )
-        val resp = client.hentTjenestepensjonSimulering(req, pid)
+    test("hent tjenestepensjonssimulering for TP-ordning som ikke stoettes") {
+        server?.arrangeOkJsonResponse(TP_ORDNING_STOETTES_IKKE)
 
-        assertNull(resp.simuleringsResultat)
-        assertEquals(ResultatType.TEKNISK_FEIL, resp.simuleringsResultatStatus.resultatType)
-        assertNotNull(resp.simuleringsResultatStatus.feilmelding)
-        assertTrue(resp.tpOrdninger.isNotEmpty())
-        assertEquals("Pensjonskasse A", resp.tpOrdninger[0])
+        Arrange.webClientContextRunner().run {
+            val result = client(context = it).hentTjenestepensjonSimulering(spec, pid)
+
+            result shouldBe OffentligTjenestepensjonSimuleringsresultat(
+                simuleringsResultatStatus = SimuleringsResultatStatus(
+                    resultatType = ResultatType.TP_ORDNING_STOETTES_IKKE,
+                    feilmelding = "Stoettes ikke"
+                ),
+                simuleringsResultat = null,
+                tpOrdninger = listOf("Pensjonskasse A"),
+                serviceData = emptyList()
+            )
+        }
     }
 
-    companion object {
-        private const val RETRY_ATTEMPTS = "1"
-        private fun ingenUtbetalingsperioderResponse() = jsonResponse().setBody(ingenUtbetalingsperioder().trimIndent())
-        private fun ikkeMedlemResponse() = jsonResponse().setBody(ikkeMedlem().trimIndent())
-        private fun tpOrdningStoettesIkkeResponse() = jsonResponse().setBody(tpOrdningStoettesIkke().trimIndent())
-        private fun tekniskFeilResponse() = jsonResponse().setBody(tekniskFeil().trimIndent())
-        private fun okResponse() = jsonResponse().setBody(ok().trimIndent())
-        @Language("json")
-        private fun ingenUtbetalingsperioder() = """{
+    test("hent tjenestepensjonssimulering kom med teknisk feil fra TP-ordning") {
+        server?.arrangeOkJsonResponse(TEKNISK_FEIL)
+
+        Arrange.webClientContextRunner().run {
+            val result = client(context = it).hentTjenestepensjonSimulering(spec, pid)
+
+            result shouldBe OffentligTjenestepensjonSimuleringsresultat(
+                simuleringsResultatStatus = SimuleringsResultatStatus(
+                    resultatType = ResultatType.TEKNISK_FEIL,
+                    feilmelding = "Bruker er bare 2 år gammel"
+                ),
+                simuleringsResultat = null,
+                tpOrdninger = listOf("Pensjonskasse A"),
+                serviceData = emptyList()
+            )
+        }
+    }
+})
+
+object TpSimuleringClientTestObjects {
+
+    @Language("json")
+    const val INGEN_UTBETALINGSPERIODER = """{
   "simuleringsResultatStatus": {
     "resultatType": "INGEN_UTBETALINGSPERIODER_FRA_TP_ORDNING",
     "feilmelding": "Simulering fra Statens Pensjonskasse inneholder ingen utbetalingsperioder"
@@ -187,8 +170,9 @@ class TpSimuleringClientTest : WebClientTest() {
     "Statens pensjonskasse"
   ]
 }"""
-        @Language("json")
-        private fun ikkeMedlem() = """{
+
+    @Language("json")
+    const val IKKE_MEDLEM = """{
   "simuleringsResultatStatus": {
     "resultatType": "BRUKER_ER_IKKE_MEDLEM_HOS_TP_ORDNING",
     "feilmelding": "Ikke medlem"
@@ -196,8 +180,9 @@ class TpSimuleringClientTest : WebClientTest() {
   "simuleringsResultat": null,
   "relevanteTpOrdninger": []
 }"""
-        @Language("json")
-        private fun tpOrdningStoettesIkke() = """{
+
+    @Language("json")
+    const val TP_ORDNING_STOETTES_IKKE = """{
   "simuleringsResultatStatus": {
     "resultatType": "TP_ORDNING_ER_IKKE_STOTTET",
     "feilmelding": "Stoettes ikke"
@@ -205,8 +190,9 @@ class TpSimuleringClientTest : WebClientTest() {
   "simuleringsResultat": null,
   "relevanteTpOrdninger": ["Pensjonskasse A"]
 }"""
-        @Language("json")
-        private fun tekniskFeil() = """{
+
+    @Language("json")
+    const val TEKNISK_FEIL = """{
   "simuleringsResultatStatus": {
     "resultatType": "TEKNISK_FEIL_FRA_TP_ORDNING",
     "feilmelding": "Bruker er bare 2 år gammel"
@@ -215,8 +201,8 @@ class TpSimuleringClientTest : WebClientTest() {
   "relevanteTpOrdninger": ["Pensjonskasse A"]
 }"""
 
-        @Language("json")
-        private fun ok() = """{
+    @Language("json")
+    const val OK = """{
   "simuleringsResultatStatus": {
     "resultatType": "SUCCESS",
     "feilmelding": null
@@ -262,5 +248,15 @@ class TpSimuleringClientTest : WebClientTest() {
     "Statens pensjonskasse"
   ]
 }"""
-    }
+
+    val spec = SimuleringOffentligTjenestepensjonSpecV2(
+        foedselsdato = LocalDate.of(1964, 6, 15),
+        uttaksdato = LocalDate.of(2027, 2, 1),
+        sisteInntekt = 0,
+        fremtidigeInntekter = emptyList(),
+        aarIUtlandetEtter16 = 1,
+        brukerBaOmAfp = true,
+        epsPensjon = false,
+        eps2G = true
+    )
 }

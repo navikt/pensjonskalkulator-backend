@@ -1,149 +1,177 @@
 package no.nav.pensjon.kalkulator.tjenestepensjon.client.tp
 
-import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration.Companion.arrangeSecurityContext
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.mock.WebClientTest
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
+import no.nav.pensjon.kalkulator.testutil.Arrange
+import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
+import no.nav.pensjon.kalkulator.testutil.arrangeResponse
+import no.nav.pensjon.kalkulator.tjenestepensjon.Forhold
+import no.nav.pensjon.kalkulator.tjenestepensjon.Tjenestepensjon
+import no.nav.pensjon.kalkulator.tjenestepensjon.Ytelse
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClientTestObjects.TJENESTEPENSJON
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClientTestObjects.TJENESTEPENSJONSFORHOLD
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClientTestObjects.apotekerResponseBody
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClientTestObjects.dato
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClientTestObjects.statusResponseBody
+import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.mockito.Mock
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.beans.factory.BeanFactory
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.TestPropertySource
 import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDate
 
-@SpringBootTest
-@TestPropertySource("classpath:application-test.properties")
-class TpTjenestepensjonClientTest : WebClientTest() {
+class TpTjenestepensjonClientTest : FunSpec({
 
-    private lateinit var client: TpTjenestepensjonClient
+    var server: MockWebServer? = null
+    var baseUrl: String? = null
+    val traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" }
 
-    @Autowired
-    private lateinit var webClientBuilder: WebClient.Builder
-
-    @Mock
-    private lateinit var traceAid: TraceAid
-
-    @BeforeEach
-    fun initialize() {
-        client = TpTjenestepensjonClient(
-            baseUrl = baseUrl(),
-            webClientBuilder = webClientBuilder,
-            traceAid = traceAid,
-            retryAttempts = RETRY_ATTEMPTS
+    fun client(context: BeanFactory) =
+        TpTjenestepensjonClient(
+            baseUrl!!,
+            webClientBuilder = context.getBean(WebClient.Builder::class.java),
+            traceAid,
+            retryAttempts = "1"
         )
 
-        arrangeSecurityContext()
+    beforeSpec {
+        Arrange.security()
+        server = MockWebServer().apply { start() }
+        baseUrl = "http://localhost:${server.port}"
     }
 
-    @Test
-    fun `'harTjenestepensjonsforhold' gir 'true' naar personen har tjenestepensjonsforhold`() {
-        arrange(okStatusResponse(true))
-        assertTrue(client.harTjenestepensjonsforhold(pid, dato))
+    afterSpec {
+        server?.shutdown()
     }
 
-    @Test
-    fun `'erApoteker' gir 'true' naar personen er medlem av Apotekerforeningen`() {
-        arrange(okApotekerResponse(true))
-        assertTrue(client.erApoteker(pid))
-    }
+    test("'harTjenestepensjonsforhold' gir 'true' når personen har tjenestepensjonsforhold") {
+        server?.arrangeOkJsonResponse(statusResponseBody(true))
 
-    @Test
-    fun `'erApoteker' gir 'false' naar personen ikke er medlem av Apotekerforeningen`() {
-        arrange(okApotekerResponse(false))
-        assertFalse(client.erApoteker(pid))
-    }
-
-    @Test
-    fun `'tjenestepensjon' gir forhold-liste naar personen har tjenestepensjonsforhold`() {
-        arrange(okForholdResponse())
-        val tjenestepensjonsforhold = client.tjenestepensjon(pid)
-
-        with(tjenestepensjonsforhold.forholdList[0]) {
-            assertEquals("3100", ordning)
-            assertEquals(1, ytelser.size)
-            assertNull(datoSistOpptjening)
-            with(ytelser[0]) {
-                assertEquals("ALDER", type)
-                assertEquals(LocalDate.of(2021, 2, 3), this.datoInnmeldtYtelseFom)
-                assertEquals(LocalDate.of(2022, 7, 16), this.datoYtelseIverksattFom)
-                assertEquals(LocalDate.of(2027, 8, 15), this.datoYtelseIverksattTom)
-            }
+        Arrange.webClientContextRunner().run {
+            client(context = it).harTjenestepensjonsforhold(pid, dato) shouldBe true
         }
     }
 
-    @Test
-    fun `'tjenestepensjon' gir forhold-liste naar personen har hatt tjenestepensjonsforhold`() {
-        arrange(okTjenestepensjonsforholdResponse())
-        val tjenestepensjonsforhold = client.tjenestepensjonsforhold(pid)
+    test("'erApoteker' gir 'true' når personen er medlem av Apotekerforeningen") {
+        server?.arrangeOkJsonResponse(apotekerResponseBody(true))
 
-       assertEquals(listOf("Utviklers pensjonskasse", "Pensjonskasse for folk flest"), tjenestepensjonsforhold.tpOrdninger)
+        Arrange.webClientContextRunner().run {
+            client(context = it).erApoteker(pid) shouldBe true
+        }
     }
 
-    @Test
-    fun `'harTjenestepensjonsforhold' gir 'false' naar personen ikke har tjenestepensjonsforhold`() {
-        arrange(okStatusResponse(false))
-        assertFalse(client.harTjenestepensjonsforhold(pid, dato))
+    test("'erApoteker' gir 'false' når personen ikke er medlem av Apotekerforeningen") {
+        server?.arrangeOkJsonResponse(apotekerResponseBody(false))
+
+        Arrange.webClientContextRunner().run {
+            client(context = it).erApoteker(pid) shouldBe false
+        }
     }
 
-    @Test
-    fun `'harTjenestepensjonsforhold' gjentar kallet ved serverfeil`() {
-        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
-        arrange(okStatusResponse(true))
+    test("'tjenestepensjon' gir forhold-liste når personen har tjenestepensjonsforhold") {
+        server?.arrangeOkJsonResponse(TJENESTEPENSJON)
 
-        assertTrue(client.harTjenestepensjonsforhold(pid, dato))
+        Arrange.webClientContextRunner().run {
+            val tjenestepensjonsforhold = client(context = it).tjenestepensjon(pid)
+
+            tjenestepensjonsforhold shouldBe Tjenestepensjon(
+                forholdList = listOf(
+                    Forhold(
+                        ordning = "3100",
+                        ytelser = listOf(
+                            Ytelse(
+                                type = "ALDER",
+                                datoInnmeldtYtelseFom = LocalDate.of(2021, 2, 3),
+                                datoYtelseIverksattFom = LocalDate.of(2022, 7, 16),
+                                datoYtelseIverksattTom = LocalDate.of(2027, 8, 15)
+                            )
+                        ),
+                        datoSistOpptjening = null
+                    )
+                )
+            )
+        }
     }
 
-    @Test
-    fun `'harTjenestepensjonsforhold' gjentar ikke kallet ved klientfeil`() {
-        arrange(jsonResponse(HttpStatus.BAD_REQUEST).setBody("My bad"))
+    test("'tjenestepensjon' gir forhold-liste når personen har hatt tjenestepensjonsforhold") {
+        server?.arrangeOkJsonResponse(TJENESTEPENSJONSFORHOLD)
+
+        Arrange.webClientContextRunner().run {
+            client(context = it).tjenestepensjonsforhold(pid).tpOrdninger shouldBe
+                    listOf("Utviklers pensjonskasse", "Pensjonskasse for folk flest")
+        }
+    }
+
+    test("'harTjenestepensjonsforhold' gir 'false' når personen ikke har tjenestepensjonsforhold") {
+        server?.arrangeOkJsonResponse(statusResponseBody(false))
+
+        Arrange.webClientContextRunner().run {
+            client(context = it).harTjenestepensjonsforhold(pid, dato) shouldBe false
+        }
+    }
+
+    test("'harTjenestepensjonsforhold' gjentar kallet ved serverfeil") {
+        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Feil")
+        server?.arrangeOkJsonResponse(statusResponseBody(true))
+
+        Arrange.webClientContextRunner().run {
+            client(context = it).harTjenestepensjonsforhold(pid, dato) shouldBe true
+        }
+    }
+
+    test("'harTjenestepensjonsforhold' gjentar ikke kallet ved klientfeil") {
+        server?.arrangeResponse(HttpStatus.BAD_REQUEST, "My bad")
         // No 2nd response arranged, since no retry
 
-        val exception = assertThrows(EgressException::class.java) { client.harTjenestepensjonsforhold(pid, dato) }
-
-        assertEquals("My bad", exception.message)
+        Arrange.webClientContextRunner().run {
+            shouldThrow<EgressException> {
+                client(context = it).harTjenestepensjonsforhold(pid, dato)
+            }.message shouldBe "My bad"
+        }
     }
 
-    @Test
-    fun `'harTjenestepensjonsforhold' gir fornuftig feimelding ved serverfeil`() {
-        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil"))
-        arrange(jsonResponse(HttpStatus.INTERNAL_SERVER_ERROR).setBody("Feil")) // for retry
+    test("'harTjenestepensjonsforhold' gir fornuftig feilmelding ved serverfeil") {
+        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Feil")
+        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Feil") // for retry
 
-        val exception = assertThrows(EgressException::class.java) { client.harTjenestepensjonsforhold(pid, dato) }
+        Arrange.webClientContextRunner().run {
+            val exception = shouldThrow<EgressException> { client(context = it).harTjenestepensjonsforhold(pid, dato) }
 
-        assertEquals(
-            "Failed calling ${baseUrl()}/api/tjenestepensjon/haveYtelse?date=2023-02-01&ytelseType=ALDER&ordningType=TPOF",
-            exception.message
-        )
-        assertEquals("Feil", (exception.cause as EgressException).message)
+            with(exception) {
+                message shouldBe "Failed calling $baseUrl/api/tjenestepensjon/haveYtelse?date=2023-02-01&ytelseType=ALDER&ordningType=TPOF"
+                (cause as EgressException).message shouldBe "Feil"
+            }
+        }
     }
+})
 
-    companion object {
-        private const val RETRY_ATTEMPTS = "1"
-        private val dato = LocalDate.of(2023, 2, 1)
+object TpTjenestepensjonClientTestObjects {
 
-        @Language("json")
-        private fun apotekerResponseBody(value: Boolean) =
-            """{
+    val dato = LocalDate.of(2023, 2, 1)
+
+    @Language("json")
+    fun apotekerResponseBody(value: Boolean) =
+        """{
     "harLopendeForholdApotekerforeningen": $value,
     "harAndreLopendeForhold": true
 }"""
 
-        @Language("json")
-        private fun statusResponseBody(value: Boolean) =
-            """{
+    @Language("json")
+    fun statusResponseBody(value: Boolean) =
+        """{
                  "value": $value
              }
              """
 
-        @Language("json")
-        private fun forholdResponseBody() =
-            """{
+    @Language("json")
+    const val TJENESTEPENSJON =
+        """{
     "forhold": [
         {
             "ordning": "3100",
@@ -187,7 +215,8 @@ class TpTjenestepensjonClientTest : WebClientTest() {
     }
 }"""
 
-        private const val tjenestepensjonsForholdResponsBody = """
+    @Language("json")
+    const val TJENESTEPENSJONSFORHOLD = """
             {
   "fnr": "***********",
   "forhold": [
@@ -262,13 +291,4 @@ class TpTjenestepensjonClientTest : WebClientTest() {
   ]
 }
         """
-
-        private fun okApotekerResponse(value: Boolean) = jsonResponse().setBody(apotekerResponseBody(value).trimIndent())
-
-        private fun okStatusResponse(value: Boolean) = jsonResponse().setBody(statusResponseBody(value).trimIndent())
-
-        private fun okForholdResponse() = jsonResponse().setBody(forholdResponseBody().trimIndent())
-
-        private fun okTjenestepensjonsforholdResponse() = jsonResponse().setBody(tjenestepensjonsForholdResponsBody.trimIndent())
-    }
 }
