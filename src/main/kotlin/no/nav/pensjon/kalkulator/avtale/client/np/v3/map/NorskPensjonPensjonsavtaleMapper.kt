@@ -29,7 +29,7 @@ object NorskPensjonPensjonsavtaleMapper {
      * However, using 14 makes Norsk Pensjon return error "No signature in message!".
      * As a workoround the value 13 is used instead (although this represents "13 years" instead of "livsvarig").
      */
-    private const val ANTALL_AAR_REPRESENTING_LIVSVARIG = 12
+    private const val ANTALL_AAR_REPRESENTING_LIVSVARIG = 13
     private const val DEFAULT_VALUE = "ukjent"
     private const val DEFAULT_HAR_EPS_PENSJON = true // Norsk Pensjon default
     private const val DEFAULT_HAR_EPS_PENSJONSGIVENDE_INNTEKT_OVER_2G = true // Norsk Pensjon default
