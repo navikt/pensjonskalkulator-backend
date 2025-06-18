@@ -54,7 +54,8 @@ class TjenestepensjonSimuleringServiceTest {
             aarIUtlandetEtter16 = 6,
             brukerBaOmAfp = true,
             epsPensjon = true,
-            eps2G = true
+            eps2G = true,
+            erApoteker = false
         )
 
         val start = Alder(62,1)
