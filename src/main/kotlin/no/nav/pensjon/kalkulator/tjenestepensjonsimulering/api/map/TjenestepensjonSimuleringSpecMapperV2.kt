@@ -19,7 +19,8 @@ object TjenestepensjonSimuleringSpecMapperV2 {
             aarIUtlandetEtter16 = antallAar(spec.utenlandsperiodeListe),
             brukerBaOmAfp = spec.brukerBaOmAfp,
             epsPensjon = spec.epsHarPensjon,
-            eps2G = spec.epsHarInntektOver2G
+            eps2G = spec.epsHarInntektOver2G,
+            erApoteker = spec.erApoteker ?: false
         )
     }
 

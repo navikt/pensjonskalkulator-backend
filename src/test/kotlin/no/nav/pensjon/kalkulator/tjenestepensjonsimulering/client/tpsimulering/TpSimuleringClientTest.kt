@@ -38,7 +38,7 @@ class TpSimuleringClientTest : FunSpec({
     beforeSpec {
         Arrange.security()
         server = MockWebServer().apply { start() }
-        baseUrl = "http://localhost:${server.port}"
+        baseUrl = "http://localhost:${server!!.port}"
     }
 
     afterSpec {
@@ -257,6 +257,7 @@ object TpSimuleringClientTestObjects {
         aarIUtlandetEtter16 = 1,
         brukerBaOmAfp = true,
         epsPensjon = false,
-        eps2G = true
+        eps2G = true,
+        erApoteker = false
     )
 }

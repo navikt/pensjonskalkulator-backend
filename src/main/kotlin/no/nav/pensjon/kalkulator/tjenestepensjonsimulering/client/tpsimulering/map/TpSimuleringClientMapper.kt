@@ -41,6 +41,7 @@ object TpSimuleringClientMapper {
         brukerBaOmAfp = spec.brukerBaOmAfp,
         epsPensjon = spec.epsPensjon,
         eps2G = spec.eps2G,
+        erApoteker = false
     )
 
     fun toDto(spec: SimuleringOffentligTjenestepensjonSpecV2, pid: Pid) = SimuleringOFTPSpecDto(
@@ -58,5 +59,6 @@ object TpSimuleringClientMapper {
         brukerBaOmAfp = spec.brukerBaOmAfp,
         epsPensjon = spec.epsPensjon,
         eps2G = spec.eps2G,
+        erApoteker = spec.erApoteker,
     )
 }
