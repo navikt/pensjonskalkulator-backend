@@ -39,7 +39,8 @@ object SimulatorPersonligSimuleringResultMapper {
             grunnpensjon = dto.grunnpensjon ?: 0,
             tilleggspensjon = dto.tilleggspensjon ?: 0,
             pensjonstillegg = dto.pensjonstillegg ?: 0,
-            skjermingstillegg = dto.skjermingstillegg ?: 0
+            skjermingstillegg = dto.skjermingstillegg ?: 0,
+            kapittel19Gjenlevendetillegg = dto.kapittel19Gjenlevendetillegg ?: 0
         )
 
     private fun pre2025OffentligAfp(dto: SimulatorPre2025OffentligAfp) =

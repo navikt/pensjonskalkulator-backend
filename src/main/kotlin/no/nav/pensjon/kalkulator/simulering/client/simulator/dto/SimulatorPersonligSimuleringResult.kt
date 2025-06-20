@@ -1,7 +1,8 @@
 package no.nav.pensjon.kalkulator.simulering.client.simulator.dto
 
-// Corresponds to NavSimuleringResultV3 in pensjonssimulator
-// (and previously to SimuleringsresultatAlderspensjon1963Plus in PEN)
+/**
+ * Corresponds to NavSimuleringResultV3 in pensjonssimulator.
+ */
 data class SimulatorPersonligSimuleringResult(
     val alderspensjonListe: List<SimulatorPersonligPensjon>,
     val alderspensjonMaanedsbeloep: SimulatorPersonligMaanedsbeloep?,
@@ -15,6 +16,7 @@ data class SimulatorPersonligSimuleringResult(
     val error: SimulatorPersonligSimuleringError?
 )
 
+// pensjonssimulator: NavAlderspensjonV3
 data class SimulatorPersonligPensjon(
     val alderAar: Int,
     val beloep: Int,
@@ -33,7 +35,8 @@ data class SimulatorPersonligPensjon(
     val grunnpensjon: Int?,
     val tilleggspensjon: Int?,
     val pensjonstillegg: Int?,
-    val skjermingstillegg: Int?
+    val skjermingstillegg: Int?,
+    val kapittel19Gjenlevendetillegg: Int?
 )
 
 data class SimulatorPersonligMaanedsbeloep(

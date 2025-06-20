@@ -1,40 +1,19 @@
 package no.nav.pensjon.kalkulator.simulering.api.map
 
+import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
-import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class PersonligSimuleringResultMapperV8Test{
-    @Test
-    fun `resultatV8 maps domain to V8 DTO`() {
+class PersonligSimuleringResultMapperV8Test : FunSpec({
+
+    test("resultV8 maps domain to V8 DTO") {
         PersonligSimuleringResultMapperV8.resultV8(
             SimuleringResult(
-                alderspensjon = listOf(
-                    SimulertAlderspensjon(
-                        alder = 67,
-                        beloep = 123456,
-                        inntektspensjonBeloep = 1,
-                        garantipensjonBeloep = 2,
-                        delingstall = 3.4,
-                        pensjonBeholdningFoerUttak = 5,
-                        andelsbroekKap19 = 0.6,
-                        andelsbroekKap20 = 0.4,
-                        sluttpoengtall = 5.11,
-                        trygdetidKap19 = 40,
-                        trygdetidKap20 = 40,
-                        poengaarFoer92 = 13,
-                        poengaarEtter91 = 27,
-                        forholdstall = 0.971,
-                        grunnpensjon = 55810,
-                        tilleggspensjon = 134641,
-                        pensjonstillegg = -70243,
-                        skjermingstillegg = 0
-                    )
-                ),
+                alderspensjon = listOf(alderspensjon(alder = 67, beloep = 123456)),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
-                afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 12000, kompensasjonstillegg = 123, kronetillegg = 69, livsvarig = 321, maanedligBeloep = 1000)),
+                afpPrivat = listOf(privatAfp(alder = 67, beloep = 12000)),
                 afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                 harForLiteTrygdetid = true,
@@ -60,8 +39,23 @@ class PersonligSimuleringResultMapperV8Test{
                 gradertUttakMaanedligBeloep = 6,
                 heltUttakMaanedligBeloep = 7
             ),
-            afpPrivat = listOf(PersonligSimuleringAfpPrivatResultV8(alder = 67, beloep = 12000, kompensasjonstillegg = 123, kronetillegg = 69, livsvarig = 321, maanedligBeloep = 1000)),
-            afpOffentlig = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
+            afpPrivat = listOf(
+                PersonligSimuleringAfpPrivatResultV8(
+                    alder = 67,
+                    beloep = 12000,
+                    kompensasjonstillegg = 123,
+                    kronetillegg = 69,
+                    livsvarig = 321,
+                    maanedligBeloep = 1000
+                )
+            ),
+            afpOffentlig = listOf(
+                PersonligSimuleringAarligPensjonResultV8(
+                    alder = 67,
+                    beloep = 12000,
+                    maanedligBeloep = 1000
+                )
+            ),
             vilkaarsproeving = PersonligSimuleringVilkaarsproevingResultV8(vilkaarErOppfylt = true, alternativ = null),
             harForLiteTrygdetid = true,
             trygdetid = null,
@@ -69,74 +63,16 @@ class PersonligSimuleringResultMapperV8Test{
         )
     }
 
-    @Test
-    fun `resultatV8 ignores alderspensjon with age 0 when mapping domain to V8 DTO`() {
+    test("resultV8 ignores alderspensjon with age 0 when mapping domain to V8 DTO") {
         PersonligSimuleringResultMapperV8.resultV8(
             SimuleringResult(
                 alderspensjon = listOf(
-                    SimulertAlderspensjon(
-                        alder = 67,
-                        beloep = 123456,
-                        inntektspensjonBeloep = 1,
-                        garantipensjonBeloep = 2,
-                        delingstall = 3.4,
-                        pensjonBeholdningFoerUttak = 5,
-                        andelsbroekKap19 = 0.6,
-                        andelsbroekKap20 = 0.4,
-                        sluttpoengtall = 5.11,
-                        trygdetidKap19 = 40,
-                        trygdetidKap20 = 40,
-                        poengaarFoer92 = 13,
-                        poengaarEtter91 = 27,
-                        forholdstall = 0.971,
-                        grunnpensjon = 55810,
-                        tilleggspensjon = 134641,
-                        pensjonstillegg = -70243,
-                        skjermingstillegg = 0
-                    ),
-                    SimulertAlderspensjon(
-                        alder = 68,
-                        beloep = 123456,
-                        inntektspensjonBeloep = 1,
-                        garantipensjonBeloep = 2,
-                        delingstall = 3.4,
-                        pensjonBeholdningFoerUttak = 5,
-                        andelsbroekKap19 = 0.6,
-                        andelsbroekKap20 = 0.4,
-                        sluttpoengtall = 5.11,
-                        trygdetidKap19 = 40,
-                        trygdetidKap20 = 40,
-                        poengaarFoer92 = 13,
-                        poengaarEtter91 = 27,
-                        forholdstall = 0.971,
-                        grunnpensjon = 55810,
-                        tilleggspensjon = 134641,
-                        pensjonstillegg = -70243,
-                        skjermingstillegg = 0
-                    ),
-                    SimulertAlderspensjon(
-                        alder = 0,
-                        beloep = 1,
-                        inntektspensjonBeloep = 2,
-                        garantipensjonBeloep = 3,
-                        delingstall = 4.5,
-                        pensjonBeholdningFoerUttak = 6,
-                        andelsbroekKap19 = 0.6,
-                        andelsbroekKap20 = 0.4,
-                        sluttpoengtall = 5.11,
-                        trygdetidKap19 = 40,
-                        trygdetidKap20 = 40,
-                        poengaarFoer92 = 13,
-                        poengaarEtter91 = 27,
-                        forholdstall = 0.971,
-                        grunnpensjon = 55810,
-                        tilleggspensjon = 134641,
-                        pensjonstillegg = -70243,
-                        skjermingstillegg = 0
-                    )
+                    alderspensjon(alder = 67, beloep = 123456),
+                    alderspensjon(alder = 68, beloep = 123456),
+                    alderspensjon(alder = 0, beloep = 1)
                 ),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
-                afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 12000, kompensasjonstillegg = 123, kronetillegg = 69, livsvarig = 321, maanedligBeloep = 1000)),
+                afpPrivat = listOf(privatAfp(alder = 67, beloep = 12000)),
                 afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                 harForLiteTrygdetid = true,
@@ -170,8 +106,23 @@ class PersonligSimuleringResultMapperV8Test{
                 gradertUttakMaanedligBeloep = 6,
                 heltUttakMaanedligBeloep = 7
             ),
-            afpPrivat = listOf(PersonligSimuleringAfpPrivatResultV8(alder = 67, beloep = 12000, kompensasjonstillegg = 123, kronetillegg = 69, livsvarig = 321, maanedligBeloep = 1000)),
-            afpOffentlig = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
+            afpPrivat = listOf(
+                PersonligSimuleringAfpPrivatResultV8(
+                    alder = 67,
+                    beloep = 12000,
+                    kompensasjonstillegg = 123,
+                    kronetillegg = 69,
+                    livsvarig = 321,
+                    maanedligBeloep = 1000
+                )
+            ),
+            afpOffentlig = listOf(
+                PersonligSimuleringAarligPensjonResultV8(
+                    alder = 67,
+                    beloep = 12000,
+                    maanedligBeloep = 1000
+                )
+            ),
             vilkaarsproeving = PersonligSimuleringVilkaarsproevingResultV8(vilkaarErOppfylt = true, alternativ = null),
             harForLiteTrygdetid = true,
             trygdetid = null,
@@ -179,74 +130,16 @@ class PersonligSimuleringResultMapperV8Test{
         )
     }
 
-    @Test
-    fun `resultatV8 assigns 0 age to current age and adds it to the list, when mapping domain to V8 DTO`() {
+    test("resultV8 assigns 0 age to current age and adds it to the list, when mapping domain to V8 DTO") {
         PersonligSimuleringResultMapperV8.resultV8(
             SimuleringResult(
                 alderspensjon = listOf(
-                    SimulertAlderspensjon(
-                        alder = 68,
-                        beloep = 123456,
-                        inntektspensjonBeloep = 1,
-                        garantipensjonBeloep = 2,
-                        delingstall = 3.4,
-                        pensjonBeholdningFoerUttak = 5,
-                        andelsbroekKap19 = 0.6,
-                        andelsbroekKap20 = 0.4,
-                        sluttpoengtall = 5.11,
-                        trygdetidKap19 = 40,
-                        trygdetidKap20 = 40,
-                        poengaarFoer92 = 13,
-                        poengaarEtter91 = 27,
-                        forholdstall = 0.971,
-                        grunnpensjon = 55810,
-                        tilleggspensjon = 134641,
-                        pensjonstillegg = -70243,
-                        skjermingstillegg = 0
-                    ),
-                    SimulertAlderspensjon(
-                        alder = 69,
-                        beloep = 123456,
-                        inntektspensjonBeloep = 1,
-                        garantipensjonBeloep = 2,
-                        delingstall = 3.4,
-                        pensjonBeholdningFoerUttak = 5,
-                        andelsbroekKap19 = 0.6,
-                        andelsbroekKap20 = 0.4,
-                        sluttpoengtall = 5.11,
-                        trygdetidKap19 = 40,
-                        trygdetidKap20 = 40,
-                        poengaarFoer92 = 13,
-                        poengaarEtter91 = 27,
-                        forholdstall = 0.971,
-                        grunnpensjon = 55810,
-                        tilleggspensjon = 134641,
-                        pensjonstillegg = -70243,
-                        skjermingstillegg = 0
-                    ),
-                    SimulertAlderspensjon(
-                        alder = 0,
-                        beloep = 1,
-                        inntektspensjonBeloep = 2,
-                        garantipensjonBeloep = 3,
-                        delingstall = 4.5,
-                        pensjonBeholdningFoerUttak = 6,
-                        andelsbroekKap19 = 0.6,
-                        andelsbroekKap20 = 0.4,
-                        sluttpoengtall = 5.11,
-                        trygdetidKap19 = 40,
-                        trygdetidKap20 = 40,
-                        poengaarFoer92 = 13,
-                        poengaarEtter91 = 27,
-                        forholdstall = 0.971,
-                        grunnpensjon = 55810,
-                        tilleggspensjon = 134641,
-                        pensjonstillegg = -70243,
-                        skjermingstillegg = 0
-                    )
+                    alderspensjon(alder = 68, beloep = 123456),
+                    alderspensjon(alder = 69, beloep = 123456),
+                    alderspensjon(alder = 0, beloep = 1)
                 ),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
-                afpPrivat = listOf(SimulertAfpPrivat(alder = 67, beloep = 12000, kompensasjonstillegg = 123, kronetillegg = 69, livsvarig = 321, maanedligBeloep = 1000)),
+                afpPrivat = listOf(privatAfp(alder = 67, beloep = 12000)),
                 afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                 harForLiteTrygdetid = true,
@@ -288,8 +181,23 @@ class PersonligSimuleringResultMapperV8Test{
                 gradertUttakMaanedligBeloep = 6,
                 heltUttakMaanedligBeloep = 7
             ),
-            afpPrivat = listOf(PersonligSimuleringAfpPrivatResultV8(alder = 67, beloep = 12000, kompensasjonstillegg = 123, kronetillegg = 69, livsvarig = 321, maanedligBeloep = 1000)),
-            afpOffentlig = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
+            afpPrivat = listOf(
+                PersonligSimuleringAfpPrivatResultV8(
+                    alder = 67,
+                    beloep = 12000,
+                    kompensasjonstillegg = 123,
+                    kronetillegg = 69,
+                    livsvarig = 321,
+                    maanedligBeloep = 1000
+                )
+            ),
+            afpOffentlig = listOf(
+                PersonligSimuleringAarligPensjonResultV8(
+                    alder = 67,
+                    beloep = 12000,
+                    maanedligBeloep = 1000
+                )
+            ),
             vilkaarsproeving = PersonligSimuleringVilkaarsproevingResultV8(vilkaarErOppfylt = true, alternativ = null),
             harForLiteTrygdetid = true,
             trygdetid = null,
@@ -297,38 +205,16 @@ class PersonligSimuleringResultMapperV8Test{
         )
     }
 
-    @Test
-    fun `resultatV8 filters away Afp Privat with age 0 when mapping domain to V8 DTO`() {
+    test("resultV8 filters away Afp Privat with age 0 when mapping domain to V8 DTO") {
         PersonligSimuleringResultMapperV8.resultV8(
             SimuleringResult(
-                alderspensjon = listOf(
-                    SimulertAlderspensjon(
-                        alder = 67,
-                        beloep = 123456,
-                        inntektspensjonBeloep = 1,
-                        garantipensjonBeloep = 2,
-                        delingstall = 3.4,
-                        pensjonBeholdningFoerUttak = 5,
-                        andelsbroekKap19 = 0.6,
-                        andelsbroekKap20 = 0.4,
-                        sluttpoengtall = 5.11,
-                        trygdetidKap19 = 40,
-                        trygdetidKap20 = 40,
-                        poengaarFoer92 = 13,
-                        poengaarEtter91 = 27,
-                        forholdstall = 0.971,
-                        grunnpensjon = 55810,
-                        tilleggspensjon = 134641,
-                        pensjonstillegg = -70243,
-                        skjermingstillegg = 0
-                    ),
-                ),
+                alderspensjon = listOf(alderspensjon(alder = 67, beloep = 123456)),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
                 afpPrivat = listOf(
-                    SimulertAfpPrivat(alder = 67, beloep = 12000, kompensasjonstillegg = 123, kronetillegg = 69, livsvarig = 321, maanedligBeloep = 1000),
-                    SimulertAfpPrivat(alder = 68, beloep = 13000, kompensasjonstillegg = 123, kronetillegg = 69, livsvarig = 321, maanedligBeloep = 1000),
-                    SimulertAfpPrivat(alder = 0, beloep = 14000, kompensasjonstillegg = 123, kronetillegg = 69, livsvarig = 321, maanedligBeloep = 1000),
-                    ),
+                    privatAfp(alder = 67, beloep = 12000),
+                    privatAfp(alder = 68, beloep = 13000),
+                    privatAfp(alder = 0, beloep = 14000)
+                ),
                 afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                 harForLiteTrygdetid = true,
@@ -355,10 +241,30 @@ class PersonligSimuleringResultMapperV8Test{
                 heltUttakMaanedligBeloep = 7
             ),
             afpPrivat = listOf(
-                PersonligSimuleringAfpPrivatResultV8(alder = 67, beloep = 12000, kompensasjonstillegg = 123, kronetillegg = 69, livsvarig = 321, maanedligBeloep = 1000),
-                PersonligSimuleringAfpPrivatResultV8(alder = 68, beloep = 13000, kompensasjonstillegg = 123, kronetillegg = 69, livsvarig = 321, maanedligBeloep = 1000)
+                PersonligSimuleringAfpPrivatResultV8(
+                    alder = 67,
+                    beloep = 12000,
+                    kompensasjonstillegg = 123,
+                    kronetillegg = 69,
+                    livsvarig = 321,
+                    maanedligBeloep = 1000
+                ),
+                PersonligSimuleringAfpPrivatResultV8(
+                    alder = 68,
+                    beloep = 13000,
+                    kompensasjonstillegg = 123,
+                    kronetillegg = 69,
+                    livsvarig = 321,
+                    maanedligBeloep = 1000
+                )
             ),
-            afpOffentlig = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
+            afpOffentlig = listOf(
+                PersonligSimuleringAarligPensjonResultV8(
+                    alder = 67,
+                    beloep = 12000,
+                    maanedligBeloep = 1000
+                )
+            ),
             vilkaarsproeving = PersonligSimuleringVilkaarsproevingResultV8(vilkaarErOppfylt = true, alternativ = null),
             harForLiteTrygdetid = true,
             trygdetid = null,
@@ -366,37 +272,15 @@ class PersonligSimuleringResultMapperV8Test{
         )
     }
 
-    @Test
-    fun `resultatV8 assigns Afp Privat at 0 age to current age and adds it to the list, when mapping domain to V8 DTO`() {
+    test("resultV8 assigns Afp Privat at 0 age to current age and adds it to the list, when mapping domain to V8 DTO") {
         PersonligSimuleringResultMapperV8.resultV8(
             SimuleringResult(
-                alderspensjon = listOf(
-                    SimulertAlderspensjon(
-                        alder = 67,
-                        beloep = 123456,
-                        inntektspensjonBeloep = 1,
-                        garantipensjonBeloep = 2,
-                        delingstall = 3.4,
-                        pensjonBeholdningFoerUttak = 5,
-                        andelsbroekKap19 = 0.6,
-                        andelsbroekKap20 = 0.4,
-                        sluttpoengtall = 5.11,
-                        trygdetidKap19 = 40,
-                        trygdetidKap20 = 40,
-                        poengaarFoer92 = 13,
-                        poengaarEtter91 = 27,
-                        forholdstall = 0.971,
-                        grunnpensjon = 55810,
-                        tilleggspensjon = 134641,
-                        pensjonstillegg = -70243,
-                        skjermingstillegg = 0
-                    ),
-                ),
+                alderspensjon = listOf(alderspensjon(alder = 67, beloep = 123456)),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
                 afpPrivat = listOf(
-                    SimulertAfpPrivat(alder = 68, beloep = 12000, kompensasjonstillegg = 123, kronetillegg = 69, livsvarig = 321, maanedligBeloep = 1000),
-                    SimulertAfpPrivat(alder = 69, beloep = 13000, kompensasjonstillegg = 123, kronetillegg = 69, livsvarig = 321, maanedligBeloep = 1000),
-                    SimulertAfpPrivat(alder = 0, beloep = 14000, kompensasjonstillegg = 123, kronetillegg = 69, livsvarig = 321, maanedligBeloep = 1000),
+                    privatAfp(alder = 68, beloep = 12000),
+                    privatAfp(alder = 69, beloep = 13000),
+                    privatAfp(alder = 0, beloep = 14000)
                 ),
                 afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
@@ -436,15 +320,75 @@ class PersonligSimuleringResultMapperV8Test{
                 heltUttakMaanedligBeloep = 7
             ),
             afpPrivat = listOf(
-                PersonligSimuleringAfpPrivatResultV8(alder = 67, beloep = 14000, kompensasjonstillegg = 123, kronetillegg = 69, livsvarig = 321, maanedligBeloep = 1000),
-                PersonligSimuleringAfpPrivatResultV8(alder = 68, beloep = 12000, kompensasjonstillegg = 123, kronetillegg = 69, livsvarig = 321, maanedligBeloep = 1000),
-                PersonligSimuleringAfpPrivatResultV8(alder = 69, beloep = 13000, kompensasjonstillegg = 123, kronetillegg = 69, livsvarig = 321, maanedligBeloep = 1000)
+                PersonligSimuleringAfpPrivatResultV8(
+                    alder = 67,
+                    beloep = 14000,
+                    kompensasjonstillegg = 123,
+                    kronetillegg = 69,
+                    livsvarig = 321,
+                    maanedligBeloep = 1000
+                ),
+                PersonligSimuleringAfpPrivatResultV8(
+                    alder = 68,
+                    beloep = 12000,
+                    kompensasjonstillegg = 123,
+                    kronetillegg = 69,
+                    livsvarig = 321,
+                    maanedligBeloep = 1000
+                ),
+                PersonligSimuleringAfpPrivatResultV8(
+                    alder = 69,
+                    beloep = 13000,
+                    kompensasjonstillegg = 123,
+                    kronetillegg = 69,
+                    livsvarig = 321,
+                    maanedligBeloep = 1000
+                )
             ),
-            afpOffentlig = listOf(PersonligSimuleringAarligPensjonResultV8(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
+            afpOffentlig = listOf(
+                PersonligSimuleringAarligPensjonResultV8(
+                    alder = 67,
+                    beloep = 12000,
+                    maanedligBeloep = 1000
+                )
+            ),
             vilkaarsproeving = PersonligSimuleringVilkaarsproevingResultV8(vilkaarErOppfylt = true, alternativ = null),
             harForLiteTrygdetid = true,
             trygdetid = null,
             opptjeningGrunnlagListe = null
         )
     }
-}
+})
+
+private fun alderspensjon(alder: Int, beloep: Int) =
+    SimulertAlderspensjon(
+        alder,
+        beloep,
+        inntektspensjonBeloep = 1,
+        garantipensjonBeloep = 2,
+        delingstall = 3.4,
+        pensjonBeholdningFoerUttak = 5,
+        andelsbroekKap19 = 0.6,
+        andelsbroekKap20 = 0.4,
+        sluttpoengtall = 5.11,
+        trygdetidKap19 = 40,
+        trygdetidKap20 = 40,
+        poengaarFoer92 = 13,
+        poengaarEtter91 = 27,
+        forholdstall = 0.971,
+        grunnpensjon = 55810,
+        tilleggspensjon = 134641,
+        pensjonstillegg = -70243,
+        skjermingstillegg = 14,
+        kapittel19Gjenlevendetillegg = 15
+    )
+
+private fun privatAfp(alder: Int, beloep: Int) =
+    SimulertAfpPrivat(
+        alder,
+        beloep,
+        kompensasjonstillegg = 123,
+        kronetillegg = 69,
+        livsvarig = 321,
+        maanedligBeloep = 1000
+    )
