@@ -18,6 +18,7 @@ data class SimulertAlderspensjon(
     val grunnpensjon: Int?,
     val tilleggspensjon: Int?,
     val pensjonstillegg: Int?,
-    val skjermingstillegg: Int?
+    val skjermingstillegg: Int?,
+    val kapittel19Gjenlevendetillegg: Int?
 )
 

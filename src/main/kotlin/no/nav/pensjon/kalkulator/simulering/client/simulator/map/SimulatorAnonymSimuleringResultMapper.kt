@@ -40,7 +40,8 @@ object SimulatorAnonymSimuleringResultMapper {
             grunnpensjon = 0, // ditto
             tilleggspensjon = 0, // ditto
             pensjonstillegg = 0, // ditto
-            skjermingstillegg = 0 // ditto
+            skjermingstillegg = 0, // ditto
+            kapittel19Gjenlevendetillegg = 0 // ditto
         )
 
     private fun privatAfp(dto: SimulatorAnonymPrivatAfpPeriode) =

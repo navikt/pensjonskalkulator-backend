@@ -105,7 +105,6 @@ class PensjonssimulatorSimuleringClientTest : FunSpec({
         }
     }
 
-    //Unstable test (the body is sometimes from previous test)
     test("simulerPersonligAlderspensjon sends request body with gradert uttak when specified") {
         server!!.arrangeOkJsonResponse(ALTERNATIV_PENSJON)
 
@@ -224,7 +223,8 @@ private fun alderspensjon(alder: Int, beloep: Int) =
         grunnpensjon = 0,
         tilleggspensjon = 0,
         pensjonstillegg = 0,
-        skjermingstillegg = 0
+        skjermingstillegg = 0,
+        kapittel19Gjenlevendetillegg = 0
     )
 
 private object PensjonssimulatorSimuleringClientTestObjects {

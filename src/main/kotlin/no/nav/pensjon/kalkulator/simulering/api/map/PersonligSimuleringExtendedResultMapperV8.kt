@@ -10,17 +10,18 @@ import java.time.LocalDate
 
 /**
  * Maps between data transfer objects (DTOs) and domain objects related to simulering.
- * The DTOs are specified by version 6 of the API offered to clients.
+ * The DTOs are specified by version 8 of the API offered to clients.
  */
 object PersonligSimuleringExtendedResultMapperV8 {
 
     fun extendedResultV8(source: SimuleringResult, foedselsdato: LocalDate) =
         PersonligSimuleringResultV8(
-            alderspensjon = source.alderspensjon.map(::alderspensjon).let { justerAlderspensjonIInnevaerendeAarV8(it, foedselsdato) },
+            alderspensjon = source.alderspensjon.map(::alderspensjon)
+                .let { justerAlderspensjonIInnevaerendeAarV8(it, foedselsdato) },
             alderspensjonMaanedligVedEndring = maanedligPensjon(source.alderspensjonMaanedsbeloep),
             pre2025OffentligAfp = source.pre2025OffentligAfp?.let(::pre2025OffentligAfp),
             afpPrivat = source.afpPrivat.map(::privatAfp).let { justerAfpPrivatIInnevaerendeAarV8(it, foedselsdato) },
-            afpOffentlig = source.afpOffentlig.map(::offentligAfp),
+            afpOffentlig = source.afpOffentlig.map(::livsvarigOffentligAfp),
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving),
             harForLiteTrygdetid = source.harForLiteTrygdetid,
             trygdetid = source.trygdetid,
@@ -46,7 +47,8 @@ object PersonligSimuleringExtendedResultMapperV8 {
             grunnpensjon = source.grunnpensjon,
             tilleggspensjon = source.tilleggspensjon,
             pensjonstillegg = source.pensjonstillegg,
-            skjermingstillegg = source.skjermingstillegg
+            skjermingstillegg = source.skjermingstillegg,
+            kapittel19Gjenlevendetillegg = source.kapittel19Gjenlevendetillegg
         )
 
     private fun maanedligPensjon(source: AlderspensjonMaanedsbeloep?) =
@@ -74,10 +76,21 @@ object PersonligSimuleringExtendedResultMapperV8 {
         )
 
     private fun privatAfp(source: SimulertAfpPrivat) =
-        PersonligSimuleringAfpPrivatResultV8(alder = source.alder, beloep = source.beloep, kompensasjonstillegg = source.kompensasjonstillegg, kronetillegg = source.kronetillegg, livsvarig = source.livsvarig, maanedligBeloep = source.maanedligBeloep)
+        PersonligSimuleringAfpPrivatResultV8(
+            alder = source.alder,
+            beloep = source.beloep,
+            kompensasjonstillegg = source.kompensasjonstillegg,
+            kronetillegg = source.kronetillegg,
+            livsvarig = source.livsvarig,
+            maanedligBeloep = source.maanedligBeloep
+        )
 
-    private fun offentligAfp(source: SimulertAfpOffentlig) =
-        PersonligSimuleringAarligPensjonResultV8(alder = source.alder, beloep = source.beloep, maanedligBeloep = source.maanedligBeloep)
+    private fun livsvarigOffentligAfp(source: SimulertAfpOffentlig) =
+        PersonligSimuleringAarligPensjonResultV8(
+            alder = source.alder,
+            beloep = source.beloep,
+            maanedligBeloep = source.maanedligBeloep
+        )
 
     private fun vilkaarsproeving(source: Vilkaarsproeving) =
         PersonligSimuleringVilkaarsproevingResultV8(
