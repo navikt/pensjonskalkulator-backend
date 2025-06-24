@@ -40,7 +40,8 @@ data class PersonligSimuleringAlderspensjonResultV8(
     val grunnpensjon: Int? = null,
     val tilleggspensjon: Int? = null,
     val pensjonstillegg: Int? = null,
-    val skjermingstillegg: Int? = null
+    val skjermingstillegg: Int? = null,
+    val kapittel19Gjenlevendetillegg: Int? = null
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
