@@ -37,7 +37,8 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
             ),
             epsHarPensjon = true,
             epsHarInntektOver2G = true,
-            brukerBaOmAfp = true
+            brukerBaOmAfp = true,
+            erApoteker = true
         )
 
         val result: SimuleringOffentligTjenestepensjonSpecV2 = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
@@ -56,6 +57,7 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
         assertEquals(true, result.brukerBaOmAfp)
         assertEquals(true, result.epsPensjon)
         assertEquals(true, result.eps2G)
+        assertEquals(true, result.erApoteker)
     }
 
     @Test
@@ -77,7 +79,8 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
             utenlandsperiodeListe = emptyList(),
             epsHarPensjon = true,
             epsHarInntektOver2G = true,
-            brukerBaOmAfp = true
+            brukerBaOmAfp = true,
+            erApoteker = false
         )
 
         val result: SimuleringOffentligTjenestepensjonSpecV2 = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
@@ -87,6 +90,7 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
         assertEquals(LocalDate.parse("2029-02-01"), result.fremtidigeInntekter[0].fom)
         assertEquals(0, result.fremtidigeInntekter[1].beloep)
         assertEquals(LocalDate.parse("2033-04-01"), result.fremtidigeInntekter[1].fom)
+        assertEquals(false, result.erApoteker)
     }
 
     @Test
@@ -105,7 +109,8 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
             utenlandsperiodeListe = emptyList(),
             epsHarPensjon = true,
             epsHarInntektOver2G = true,
-            brukerBaOmAfp = true
+            brukerBaOmAfp = true,
+            erApoteker = null
         )
 
         val result: SimuleringOffentligTjenestepensjonSpecV2 = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
@@ -115,6 +120,7 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
         assertEquals(LocalDate.parse("2026-03-01"), result.fremtidigeInntekter[0].fom)
         assertEquals(0, result.fremtidigeInntekter[1].beloep)
         assertEquals(LocalDate.parse("2029-02-01"), result.fremtidigeInntekter[1].fom)
+        assertEquals(false, result.erApoteker)
     }
 
     @Test
@@ -133,7 +139,8 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
             utenlandsperiodeListe = emptyList(),
             epsHarPensjon = true,
             epsHarInntektOver2G = true,
-            brukerBaOmAfp = true
+            brukerBaOmAfp = true,
+            erApoteker = false
         )
 
         val result: SimuleringOffentligTjenestepensjonSpecV2 = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
@@ -141,6 +148,7 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
         assertEquals(1, result.fremtidigeInntekter.size)
         assertEquals(0, result.fremtidigeInntekter[0].beloep)
         assertEquals(LocalDate.parse("2026-03-01"), result.fremtidigeInntekter[0].fom)
+        assertEquals(false, result.erApoteker)
     }
 
     @Test
@@ -180,7 +188,8 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
             ),
             epsHarPensjon = true,
             epsHarInntektOver2G = true,
-            brukerBaOmAfp = true
+            brukerBaOmAfp = true,
+            erApoteker = true
         )
 
         val result = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
@@ -192,6 +201,7 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
         assertEquals(true, result.brukerBaOmAfp)
         assertEquals(true, result.epsPensjon)
         assertEquals(true, result.eps2G)
+        assertEquals(true, result.erApoteker)
     }
 
     @Test
@@ -233,7 +243,8 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
             ),
             epsHarPensjon = true,
             epsHarInntektOver2G = true,
-            brukerBaOmAfp = true
+            brukerBaOmAfp = true,
+            erApoteker = false
         )
 
         val result = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
@@ -245,5 +256,6 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
         assertEquals(true, result.brukerBaOmAfp)
         assertEquals(true, result.epsPensjon)
         assertEquals(true, result.eps2G)
+        assertEquals(false, result.erApoteker)
     }
 }

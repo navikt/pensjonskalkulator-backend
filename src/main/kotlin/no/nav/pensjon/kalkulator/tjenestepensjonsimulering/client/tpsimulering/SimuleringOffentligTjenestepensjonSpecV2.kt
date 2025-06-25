@@ -11,6 +11,7 @@ data class SimuleringOffentligTjenestepensjonSpecV2(
     val brukerBaOmAfp: Boolean,
     val epsPensjon: Boolean,
     val eps2G: Boolean,
+    val erApoteker: Boolean,
 )
 
 data class FremtidigInntektV2(val fom: LocalDate, val beloep: Int)

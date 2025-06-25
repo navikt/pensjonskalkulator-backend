@@ -11,6 +11,7 @@ data class IngressSimuleringOffentligTjenestepensjonSpecV2 (
     val epsHarPensjon: Boolean,
     val epsHarInntektOver2G: Boolean,
     val brukerBaOmAfp: Boolean,
+    val erApoteker: Boolean?,
 )
 
 data class UtenlandsoppholdV2 (
