@@ -58,7 +58,8 @@ object NorskPensjonPensjonsavtaleMapper {
     private fun antallInntektAarUnderHeltUttak(perioder: List<UttaksperiodeSpec>): Int {
         val heltUttakPeriode = perioder.firstOrNull { it.grad == Uttaksgrad.HUNDRE_PROSENT } ?: return 0
 
-        return heltUttakPeriode.aarligInntekt?.tomAlder
+        return if (heltUttakPeriode.aarligInntekt == null) 0
+        else heltUttakPeriode.aarligInntekt.tomAlder
             ?.let { (it.aar - heltUttakPeriode.startAlder.aar).coerceAtMost(ANTALL_AAR_REPRESENTING_LIVSVARIG) }
             ?: ANTALL_AAR_REPRESENTING_LIVSVARIG
     }
