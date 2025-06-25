@@ -14,8 +14,10 @@ import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.*
@@ -238,6 +240,59 @@ internal class UttaksalderServiceTest {
 
         verify(simuleringService, times(1)).simulerPersonligAlderspensjon(simuleringSpec)
     }
+
+    @Test
+    fun `finnTidligsteUttaksalder throws SimuleringException when AFP offentlig is empty`() {
+        val person = person()
+        `when`(personService.getPerson()).thenReturn(person)
+        `when`(pidGetter.pid()).thenReturn(pid)
+        `when`(normAlderService.nedreAldersgrense()).thenReturn(Alder(aar = 62, maaneder = 0))
+
+        val impersonalSpec = ImpersonalUttaksalderSpec(
+            simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG,
+            sivilstand = Sivilstand.GIFT,
+            harEps = true,
+            aarligInntektFoerUttak = 100_000,
+            heltUttak = HeltUttak(Alder(67, 0), null),
+            utenlandsperiodeListe = listOf(
+                Opphold(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = Land.AUS,
+                    arbeidet = true
+                )
+            )
+        )
+
+        val personalSpec = PersonalUttaksalderSpec(
+            pid = pid,
+            sivilstand = Sivilstand.GIFT,
+            harEps = true,
+            aarligInntektFoerUttak = 100_000
+        )
+
+        val simuleringSpec = arrangeSimulering(impersonalSpec, epsHarInntektOver2G = true)
+        arrangeLavesteUttaksalder(impersonalSpec, personalSpec, simuleringSpec, harEps = true)
+
+        `when`(simuleringService.simulerPersonligAlderspensjon(simuleringSpec)).thenReturn(
+            SimuleringResult(
+                alderspensjon = emptyList(),
+                afpPrivat = emptyList(),
+                afpOffentlig = emptyList(), // This should trigger the exception
+                vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
+                harForLiteTrygdetid = false,
+                trygdetid = 0,
+                opptjeningGrunnlagListe = emptyList()
+            )
+        )
+
+        val exception = assertThrows<SimuleringException> {
+            service.finnTidligsteUttaksalder(impersonalSpec)
+        }
+
+        assertEquals(SimuleringStatus.AFP_IKKE_I_VILKAARSPROEVING, exception.status)
+    }
+
 
     private fun arrangeSimulering(
         uttaksalderSpec: ImpersonalUttaksalderSpec,
