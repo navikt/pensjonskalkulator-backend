@@ -25,13 +25,13 @@ data class PdlNavn(
     val etternavn: String? = null
 )
 
-data class PdlFoedselsdato(val foedselsdato: PdlDate)
+data class PdlFoedselsdato(val foedselsdato: PdlDate?)
 
-data class PdlSivilstand(val type: String)
+data class PdlSivilstand(val type: String?)
 
-data class PdlAdressebeskyttelse(val gradering: String)
+data class PdlAdressebeskyttelse(val gradering: String?)
 
-data class PdlError(val message: String)
+data class PdlError(val message: String?)
 
 data class PdlExtensions(val warnings: List<PdlWarning>?)
 
