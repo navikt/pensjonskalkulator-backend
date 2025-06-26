@@ -5,6 +5,7 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.omstillingsstoenad.client.OmstillingsstoenadClient
 import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.TimeProvider
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,9 +38,9 @@ class OmstillingOgGjenlevendeYtelseServiceTest {
 
     @Test
     fun mottarOmstillingsstoenad() = runTest {
-        `when`(client.mottarOmstillingsstoenad(pid, paaDato)).thenReturn(true)
+        `when`(client.mottarOmstillingsstoenad(pid, paaDato)).thenReturn(false)
         val resultat = service.mottarOmstillingsstoenad()
-        assertTrue(resultat)
+        assertFalse(resultat)
     }
 
     companion object {
