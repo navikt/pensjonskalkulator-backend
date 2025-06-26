@@ -13,6 +13,6 @@ class OmstillingsstoenadService(
 ) {
 
     suspend fun mottarOmstillingsstoenad(): Boolean {
-        return false //client.mottarOmstillingsstoenad(pidGetter.pid(), timeProvider.time().toLocalDate())
+        return client.mottarOmstillingsstoenad(pidGetter.pid(), timeProvider.time().toLocalDate())
     }
 }
