@@ -68,6 +68,24 @@ class NorskPensjonPensjonsavtaleMapperTest {
         assertEquals(13, dto.antallInntektsaarEtterUttak) // max. is 13 (which represents 'livsvarig')
     }
 
+    @Test
+    fun `antallInntektsaarEtterUttak in toDto is 0 when aarligInntekt is null`() {
+        val domainObject = PensjonsavtaleSpec(
+            aarligInntektFoerUttak = 20_000,
+            uttaksperioder = listOf(
+                UttaksperiodeSpec(
+                    startAlder = Alder(67, 0),
+                    grad = Uttaksgrad.HUNDRE_PROSENT,
+                    aarligInntekt = null
+                ),
+            )
+        )
+
+        val dto = NorskPensjonPensjonsavtaleMapper.toDto(domainObject, pid)
+
+        assertEquals(0, dto.antallInntektsaarEtterUttak)
+    }
+
     private companion object {
         private fun envelope() = EnvelopeDto().apply { body = body() }
 
