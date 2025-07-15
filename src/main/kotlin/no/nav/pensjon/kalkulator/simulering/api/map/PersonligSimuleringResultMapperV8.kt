@@ -33,7 +33,7 @@ object PersonligSimuleringResultMapperV8 {
             beloep = source.beloep
         )
 
-    private fun <T> filtrerBortGjeldendeAlderFoerBursdag(
+    fun <T> filtrerBortGjeldendeAlderFoerBursdag(
         list: List<T>,
         foedselsdato: LocalDate,
         alderExtractor: (T) -> Int
