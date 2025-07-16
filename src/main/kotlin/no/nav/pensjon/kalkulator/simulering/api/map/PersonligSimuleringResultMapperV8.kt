@@ -8,16 +8,20 @@ import java.time.LocalDate
 
 /**
  * Maps between data transfer objects (DTOs) and domain objects related to simulering.
- * The DTOs are specified by version 6 of the API offered to clients.
+ * The DTOs are specified by version 8 of the API offered to clients.
  */
 object PersonligSimuleringResultMapperV8 {
 
     fun resultV8(source: SimuleringResult, foedselsdato: LocalDate) =
         PersonligSimuleringResultV8(
-            alderspensjon = source.alderspensjon.map(::alderspensjon).let { justerAlderspensjonIInnevaerendeAarV8(it, foedselsdato) },
+            alderspensjon = source.alderspensjon.map(::alderspensjon)
+                .let { justerAlderspensjonIInnevaerendeAarV8(it, foedselsdato) }
+                .let { filtrerBortGjeldendeAlderFoerBursdagIInnevaerendeMaaned(it, foedselsdato, PersonligSimuleringAlderspensjonResultV8::alder) },
             alderspensjonMaanedligVedEndring = maanedligPensjon(source.alderspensjonMaanedsbeloep),
             pre2025OffentligAfp = source.pre2025OffentligAfp?.let(::pre2025OffentligAfp),
-            afpPrivat = source.afpPrivat.map(::privatAfp).let { justerAfpPrivatIInnevaerendeAarV8(it, foedselsdato) },
+            afpPrivat = source.afpPrivat.map(::privatAfp)
+                .let { justerAfpPrivatIInnevaerendeAarV8(it, foedselsdato) }
+                .let { filtrerBortGjeldendeAlderFoerBursdagIInnevaerendeMaaned(it, foedselsdato, PersonligSimuleringAfpPrivatResultV8::alder) },
             afpOffentlig = source.afpOffentlig.map(::offentligAfp),
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving),
             harForLiteTrygdetid = source.harForLiteTrygdetid,
@@ -28,6 +32,20 @@ object PersonligSimuleringResultMapperV8 {
             alder = source.alder,
             beloep = source.beloep
         )
+
+    fun <T> filtrerBortGjeldendeAlderFoerBursdagIInnevaerendeMaaned(
+        list: List<T>,
+        foedselsdato: LocalDate,
+        alderExtractor: (T) -> Int
+    ): List<T> {
+        val naa = LocalDate.now()
+        val harBursdagSenereDenneMaaneden = foedselsdato.monthValue == naa.monthValue && foedselsdato.dayOfMonth >= naa.dayOfMonth
+        if (harBursdagSenereDenneMaaneden) {
+            val alderAarTilAaTaBort = Alder.from(foedselsdato, naa).aar
+            return list.filter { alderExtractor(it) != alderAarTilAaTaBort }
+        }
+        return list
+    }
 
     /**
      * Assign a pension with age 0 to the current age, or remove it from the list if the current age already exists.

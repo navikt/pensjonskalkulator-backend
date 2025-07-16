@@ -358,6 +358,85 @@ class PersonligSimuleringResultMapperV8Test : FunSpec({
             opptjeningGrunnlagListe = null
         )
     }
+
+    test("resultat V8 alderspensjons and afpPrivat liste fjerner dagens alder hvis bruker fyller aar senere i maaned") {
+        val now = LocalDate.now()
+        val foedselsdato = now.minusYears(63).plusMonths(1).withDayOfMonth(1).minusDays(1) //siste dag i måneden
+        PersonligSimuleringResultMapperV8.resultV8(
+            source = SimuleringResult(
+                alderspensjon = listOf(
+                    alderspensjon(alder = 62, beloep = 1),
+                    alderspensjon(alder = 63, beloep = 2),
+                    alderspensjon(alder = 64, beloep = 3)
+                ),
+                alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
+                afpPrivat = listOf(privatAfp(alder = 62, beloep = 12000),
+                    privatAfp(alder = 63, beloep = 12000), privatAfp(alder = 64, beloep = 12000)),
+                afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
+                vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
+                harForLiteTrygdetid = true,
+                trygdetid = 10,
+                opptjeningGrunnlagListe = listOf(
+                    SimulertOpptjeningGrunnlag(aar = 2001, pensjonsgivendeInntektBeloep = 501000),
+                    SimulertOpptjeningGrunnlag(aar = 2002, pensjonsgivendeInntektBeloep = 502000)
+                )
+            ),
+            foedselsdato = foedselsdato
+        ) shouldBe PersonligSimuleringResultV8(
+            alderspensjon = listOf(
+                PersonligSimuleringAlderspensjonResultV8(
+                    alder = 63,
+                    beloep = 2,
+                    inntektspensjonBeloep = null,
+                    garantipensjonBeloep = null,
+                    delingstall = null,
+                    pensjonBeholdningFoerUttakBeloep = null
+                ),
+                PersonligSimuleringAlderspensjonResultV8(
+                    alder = 64,
+                    beloep = 3,
+                    inntektspensjonBeloep = null,
+                    garantipensjonBeloep = null,
+                    delingstall = null,
+                    pensjonBeholdningFoerUttakBeloep = null
+                ),
+            ),
+            alderspensjonMaanedligVedEndring = PersonligSimuleringMaanedligPensjonResultV8(
+                gradertUttakMaanedligBeloep = 6,
+                heltUttakMaanedligBeloep = 7
+            ),
+            afpPrivat = listOf(
+                PersonligSimuleringAfpPrivatResultV8(
+                    alder = 63,
+                    beloep = 12000,
+                    kompensasjonstillegg = 123,
+                    kronetillegg = 69,
+                    livsvarig = 321,
+                    maanedligBeloep = 1000
+                ),
+                PersonligSimuleringAfpPrivatResultV8(
+                    alder = 64,
+                    beloep = 12000,
+                    kompensasjonstillegg = 123,
+                    kronetillegg = 69,
+                    livsvarig = 321,
+                    maanedligBeloep = 1000
+                )
+            ),
+            afpOffentlig = listOf(
+                PersonligSimuleringAarligPensjonResultV8(
+                    alder = 67,
+                    beloep = 12000,
+                    maanedligBeloep = 1000
+                )
+            ),
+            vilkaarsproeving = PersonligSimuleringVilkaarsproevingResultV8(vilkaarErOppfylt = true, alternativ = null),
+            harForLiteTrygdetid = true,
+            trygdetid = null,
+            opptjeningGrunnlagListe = null
+        )
+    }
+
 })
 
 private fun alderspensjon(alder: Int, beloep: Int) =
