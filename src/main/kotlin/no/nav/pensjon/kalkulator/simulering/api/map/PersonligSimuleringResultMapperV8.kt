@@ -16,12 +16,12 @@ object PersonligSimuleringResultMapperV8 {
         PersonligSimuleringResultV8(
             alderspensjon = source.alderspensjon.map(::alderspensjon)
                 .let { justerAlderspensjonIInnevaerendeAarV8(it, foedselsdato) }
-                .let { filtrerBortGjeldendeAlderFoerBursdag(it, foedselsdato, PersonligSimuleringAlderspensjonResultV8::alder) },
+                .let { filtrerBortGjeldendeAlderFoerBursdagIInnevaerendeMaaned(it, foedselsdato, PersonligSimuleringAlderspensjonResultV8::alder) },
             alderspensjonMaanedligVedEndring = maanedligPensjon(source.alderspensjonMaanedsbeloep),
             pre2025OffentligAfp = source.pre2025OffentligAfp?.let(::pre2025OffentligAfp),
             afpPrivat = source.afpPrivat.map(::privatAfp)
                 .let { justerAfpPrivatIInnevaerendeAarV8(it, foedselsdato) }
-                .let { filtrerBortGjeldendeAlderFoerBursdag(it, foedselsdato, PersonligSimuleringAfpPrivatResultV8::alder) },
+                .let { filtrerBortGjeldendeAlderFoerBursdagIInnevaerendeMaaned(it, foedselsdato, PersonligSimuleringAfpPrivatResultV8::alder) },
             afpOffentlig = source.afpOffentlig.map(::offentligAfp),
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving),
             harForLiteTrygdetid = source.harForLiteTrygdetid,
@@ -33,18 +33,18 @@ object PersonligSimuleringResultMapperV8 {
             beloep = source.beloep
         )
 
-    fun <T> filtrerBortGjeldendeAlderFoerBursdag(
+    fun <T> filtrerBortGjeldendeAlderFoerBursdagIInnevaerendeMaaned(
         list: List<T>,
         foedselsdato: LocalDate,
         alderExtractor: (T) -> Int
     ): List<T> {
-        val brukerFyllerSnartAarDenneMaaneden = foedselsdato.monthValue == LocalDate.now().monthValue
-                && foedselsdato.dayOfMonth >= LocalDate.now().dayOfMonth
-        if (brukerFyllerSnartAarDenneMaaneden) {
-            val alderAarTilAaTaBort = Alder.from(foedselsdato, LocalDate.now()).aar
-            return list.filter { alderExtractor(it) != alderAarTilAaTaBort }.sortedBy(alderExtractor)
+        val naa = LocalDate.now()
+        val harBursdagSenereDenneMaaneden = foedselsdato.monthValue == naa.monthValue && foedselsdato.dayOfMonth >= naa.dayOfMonth
+        if (harBursdagSenereDenneMaaneden) {
+            val alderAarTilAaTaBort = Alder.from(foedselsdato, naa).aar
+            return list.filter { alderExtractor(it) != alderAarTilAaTaBort }
         }
-        return list.sortedBy(alderExtractor)
+        return list
     }
 
     /**
