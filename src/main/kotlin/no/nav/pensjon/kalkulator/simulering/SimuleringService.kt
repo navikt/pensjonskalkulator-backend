@@ -8,7 +8,6 @@ import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class SimuleringService(
@@ -33,22 +32,9 @@ class SimuleringService(
         )
 
         log.debug { "Simulerer med parametre $impersonalSpec og $personalSpec" }
-        checkAlder(pid.dato()) // NB: eksakt alder kan ikke alltid utledes fra fødselsnummer
         return simuleringClient.simulerPersonligAlderspensjon(impersonalSpec, personalSpec)
     }
 
     private fun sivilstand(pid: Pid) =
         personClient.fetchPerson(pid = pid, fetchFulltNavn = false)?.sivilstand ?: Sivilstand.UOPPGITT
-
-    private fun checkAlder(foedselsdato: LocalDate) {
-        foedselsdato.let {
-            if (it < TIDLIGSTE_STOETTEDE_FOEDSELSDATO) {
-                log.warn { "Simulerer med for tidlig fødselsdato - $it" }
-            }
-        }
-    }
-
-    private companion object {
-        private val TIDLIGSTE_STOETTEDE_FOEDSELSDATO = LocalDate.of(1963, 1, 1)
-    }
 }
