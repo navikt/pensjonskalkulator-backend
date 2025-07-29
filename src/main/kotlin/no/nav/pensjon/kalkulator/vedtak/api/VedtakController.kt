@@ -146,14 +146,14 @@ class VedtakController(
             ),
         ]
     )
-    suspend fun hentLoependeVedtakV4(): LoependeVedtakV4 {
+        suspend fun hentLoependeVedtakV4(): LoependeVedtakV4 {
         traceAid.begin()
         val version = "V4"
         log.debug { "Request for hent løpende vedtak $version" }
 
         return try {
             LoependeVedtakMapperV4.toDto(timed(service::hentVedtakMedUtbetaling, "hentLoependeVedtak$version"))
-                .also { log.debug { "Hent løpende vedtak respons $version" } }
+                .also { log.debug { "Hent løpende vedtak respons $version" } }.also { log.info {"Vedtak respons: $it" } }
         } catch (e: EgressException) {
             handleError(e, version)!!
         } finally {
