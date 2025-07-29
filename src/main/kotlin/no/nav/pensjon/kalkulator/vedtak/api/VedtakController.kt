@@ -153,7 +153,7 @@ class VedtakController(
 
         return try {
             LoependeVedtakMapperV4.toDto(timed(service::hentVedtakMedUtbetaling, "hentLoependeVedtak$version"))
-                .also { log.debug { "Hent løpende vedtak respons $version" } }
+                .also { log.debug { "Hent løpende vedtak respons $version" } }.also { log.info {"Vedtak respons: $it" } }
         } catch (e: EgressException) {
             handleError(e, version)!!
         } finally {
