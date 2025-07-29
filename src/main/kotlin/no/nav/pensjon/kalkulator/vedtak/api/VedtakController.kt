@@ -146,7 +146,7 @@ class VedtakController(
             ),
         ]
     )
-        suspend fun hentLoependeVedtakV4(): LoependeVedtakV4 {
+    suspend fun hentLoependeVedtakV4(): LoependeVedtakV4 {
         traceAid.begin()
         val version = "V4"
         log.debug { "Request for hent løpende vedtak $version" }
