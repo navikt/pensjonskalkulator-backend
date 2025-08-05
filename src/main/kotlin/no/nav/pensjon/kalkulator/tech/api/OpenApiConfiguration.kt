@@ -47,6 +47,7 @@ class OpenApiConfiguration {
                 "/api/v1/ekskludert",
                 "/api/v2/ekskludert",
                 "/api/v1/land-liste",
+                "/api/v5/person",
                 "/api/v4/person",
                 "/api/v2/person",
                 "/api/v1/ansatt-id",
