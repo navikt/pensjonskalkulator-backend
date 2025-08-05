@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.person.api
 
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
+import no.nav.pensjon.kalkulator.mock.PersonFactory.personWithPensjoneringAldre
 import no.nav.pensjon.kalkulator.mock.PersonFactory.skiltPerson
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
@@ -18,7 +19,8 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(PersonController::class)
 @Import(MockSecurityConfiguration::class)
@@ -71,9 +73,23 @@ class PersonControllerTest {
             .andExpect(content().json(RESPONSE_BODY_V4))
     }
 
+    @Test
+    fun `test 'person' endpoint version 5`() {
+        `when`(service.getPerson()).thenReturn(personWithPensjoneringAldre())
+
+        mvc.perform(
+            get(URL_V5)
+                .with(csrf())
+                .content("")
+        )
+            .andExpect(status().isOk())
+            .andExpect(content().json(RESPONSE_BODY_V5))
+    }
+
     private companion object {
         private const val URL_V2 = "/api/v2/person"
         private const val URL_V4 = "/api/v4/person"
+        private const val URL_V5 = "/api/v5/person"
 
         @Language("json")
         private const val RESPONSE_BODY_V2 = """{
@@ -95,6 +111,27 @@ class PersonControllerTest {
         "nedreAldersgrense": {
             "aar": 62,
             "maaneder": 0
+        }
+    }
+}"""
+
+        @Language("json")
+        private const val RESPONSE_BODY_V5 = """{
+    "navn": "Fornavn1",
+    "foedselsdato": "1963-12-31",
+    "sivilstand": "SKILT",
+    "pensjoneringAldre": {
+        "normertPensjoneringsalder": {
+            "aar": 67,
+            "maaneder": 1
+        },
+        "nedreAldersgrense": {
+            "aar": 62,
+            "maaneder": 1
+        },
+        "oevreAldersgrense": {
+            "aar": 75,
+            "maaneder": 1
         }
     }
 }"""
