@@ -47,6 +47,7 @@ class OpenApiConfiguration {
                 "/api/v1/ekskludert",
                 "/api/v2/ekskludert",
                 "/api/v1/land-liste",
+                "/api/v5/person",
                 "/api/v4/person",
                 "/api/v2/person",
                 "/api/v1/ansatt-id",
@@ -61,6 +62,7 @@ class OpenApiConfiguration {
                 "/api/v1/tpo-medlemskap",
                 "/api/v1/simuler-oftp",
                 "/api/v2/simuler-oftp",
+                "/api/v2/aldersgrense",
                 "/api/v1/aldersgrense",
                 "/api/status",
             )

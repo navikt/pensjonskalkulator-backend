@@ -96,8 +96,55 @@ class AldersgrenseControllerTest {
             .andExpect(content().json(RESPONSE_BODY_1970))
     }
 
+    @Test
+    fun `test 'aldersgrense' endpoint V2 with birth year 1963`() {
+        val spec = AldersgrenseSpec(foedselsdato = 1963)
+        val aldersgrenser = Aldersgrenser(
+            aarskull = 1963,
+            normalder = Alder(aar = 67, maaneder = 0),
+            nedreAlder = Alder(aar = 62, maaneder = 0),
+            oevreAlder = Alder(aar = 95, maaneder = 11),
+            verdiStatus = VerdiStatus.FAST
+        )
+
+        `when`(service.hentAldersgrenser(spec)).thenReturn(aldersgrenser)
+
+        mvc.perform(
+            post(URL_V2)
+                .with(csrf())
+                .content(REQUEST_BODY_1963)
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk())
+            .andExpect(content().json(RESPONSE_BODY_1963_V2))
+    }
+
+    @Test
+    fun `test 'aldersgrense' endpoint V2 with birth year 1970`() {
+        val spec = AldersgrenseSpec(foedselsdato = 1970)
+        val aldersgrenser = Aldersgrenser(
+            aarskull = 1970,
+            normalder = Alder(aar = 67, maaneder = 0),
+            nedreAlder = Alder(aar = 62, maaneder = 0),
+            oevreAlder = Alder(aar = 75, maaneder = 0),
+            verdiStatus = VerdiStatus.FAST
+        )
+
+        `when`(service.hentAldersgrenser(spec)).thenReturn(aldersgrenser)
+
+        mvc.perform(
+            post(URL_V2)
+                .with(csrf())
+                .content(REQUEST_BODY_1970)
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk())
+            .andExpect(content().json(RESPONSE_BODY_1970_V2))
+    }
+
     private companion object {
         private const val URL_V1 = "/api/v1/aldersgrense"
+        private const val URL_V2 = "/api/v2/aldersgrense"
 
         @Language("json")
         private const val REQUEST_BODY_1963 = """{
@@ -129,6 +176,38 @@ class AldersgrenseControllerTest {
             },
             "nedreAldersgrense": {
                 "aar": 62,
+                "maaneder": 0
+            }
+        }"""
+
+        @Language("json")
+        private const val RESPONSE_BODY_1963_V2 = """{
+            "normertPensjoneringsalder": {
+                "aar": 67,
+                "maaneder": 0
+            },
+            "nedreAldersgrense": {
+                "aar": 62,
+                "maaneder": 0
+            },
+            "oevreAldersgrense": {
+                "aar": 95,
+                "maaneder": 11
+            }
+        }"""
+
+        @Language("json")
+        private const val RESPONSE_BODY_1970_V2 = """{
+            "normertPensjoneringsalder": {
+                "aar": 67,
+                "maaneder": 0
+            },
+            "nedreAldersgrense": {
+                "aar": 62,
+                "maaneder": 0
+            },
+            "oevreAldersgrense": {
+                "aar": 75,
                 "maaneder": 0
             }
         }"""
