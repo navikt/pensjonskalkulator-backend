@@ -5,8 +5,6 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
 import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService
 import no.nav.pensjon.kalkulator.normalder.VerdiStatus
-import no.nav.pensjon.kalkulator.uttaksalder.normalder.NormertPensjoneringsalderService
-import no.nav.pensjon.kalkulator.uttaksalder.normalder.PensjoneringAldre
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
