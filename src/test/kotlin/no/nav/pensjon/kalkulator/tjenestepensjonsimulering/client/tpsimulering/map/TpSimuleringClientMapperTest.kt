@@ -2,14 +2,13 @@ package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.
 
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.OffentligTjenestepensjonSimuleringsresultat
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.ResultatType
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.SimuleringOffentligTjenestepensjonSpec
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.SimuleringOffentligTjenestepensjonSpecV2
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.OffentligTjenestepensjonSimuleringsresultat
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.ResultatType
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringOffentligTjenestepensjonSpec
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import java.time.LocalDate
 
 class TpSimuleringClientMapperTest {
@@ -43,38 +42,14 @@ class TpSimuleringClientMapperTest {
         assertEquals("tpOrdningX", result.simuleringsResultat?.tpOrdning)
         assertEquals("1", result.simuleringsResultat?.tpNummer)
         assertEquals(dto.simuleringsResultat!!.utbetalingsperioder[0].startAlder, result.simuleringsResultat?.perioder?.get(0)?.startAlder)
-        assertEquals(dto.simuleringsResultat!!.utbetalingsperioder[0].sluttAlder, result.simuleringsResultat?.perioder?.get(0)?.sluttAlder)
+        assertEquals(dto.simuleringsResultat.utbetalingsperioder[0].sluttAlder, result.simuleringsResultat?.perioder?.get(0)?.sluttAlder)
         assertEquals(100, result.simuleringsResultat?.perioder?.get(0)?.maanedligBeloep)
         assertTrue(result.simuleringsResultat?.betingetTjenestepensjonInkludert!!)
     }
 
     @Test
-    fun `map to dto`() {
-        val spec = SimuleringOffentligTjenestepensjonSpec(
-            foedselsdato = LocalDate.parse("1963-02-24"),
-            uttaksdato = LocalDate.parse("2026-03-01"),
-            sisteInntekt = 1,
-            aarIUtlandetEtter16 = 3,
-            brukerBaOmAfp = true,
-            epsPensjon = true,
-            eps2G = true
-        )
-
-        val result: SimuleringOFTPSpecDto = TpSimuleringClientMapper.toDto(spec, pid)
-
-        assertEquals(pid.value, result.pid)
-        assertEquals(LocalDate.parse("1963-02-24"), result.foedselsdato)
-        assertEquals(LocalDate.parse("2026-03-01"), result.uttaksdato)
-        assertEquals(1, result.sisteInntekt)
-        assertEquals(3, result.aarIUtlandetEtter16)
-        assertEquals(true, result.brukerBaOmAfp)
-        assertEquals(true, result.epsPensjon)
-        assertEquals(true, result.eps2G)
-    }
-
-    @Test
     fun `map to dto v2`() {
-        val spec = SimuleringOffentligTjenestepensjonSpecV2(
+        val spec = SimuleringOffentligTjenestepensjonSpec(
             foedselsdato = LocalDate.parse("1963-02-24"),
             uttaksdato = LocalDate.parse("2026-03-01"),
             sisteInntekt = 1,

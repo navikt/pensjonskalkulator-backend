@@ -10,6 +10,8 @@ import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.OffentligTjenestepensjonSimuleringsresultat
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringOffentligTjenestepensjonSpec
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.TjenestepensjonSimuleringClient
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.SimulerTjenestepensjonResponseDto
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.map.TpSimuleringClientMapper
@@ -41,29 +43,6 @@ class TpSimuleringClient(
         ).build()
 
     override fun hentTjenestepensjonSimulering(request: SimuleringOffentligTjenestepensjonSpec, pid: Pid): OffentligTjenestepensjonSimuleringsresultat {
-        val uri = "/$API_PATH"
-        log.debug { "POST to URL: '$uri'" }
-
-        return try {
-            webClient
-                .post()
-                .uri(uri)
-                .bodyValue(toDto(request, pid))
-                .headers { setHeaders(it) }
-                .retrieve()
-                .bodyToMono(SimulerTjenestepensjonResponseDto::class.java)
-                .retryWhen(retryBackoffSpec(uri))
-                .block()
-                ?.let(TpSimuleringClientMapper::fromDto)
-                .also { countCalls(MetricResult.OK) } ?: throw EgressException("No response body")
-        } catch (e: WebClientRequestException) {
-            throw EgressException("Failed calling $uri", e)
-        } catch (e: WebClientResponseException) {
-            throw EgressException(e.responseBodyAsString, e)
-        }
-    }
-
-    override fun hentTjenestepensjonSimulering(request: SimuleringOffentligTjenestepensjonSpecV2, pid: Pid): OffentligTjenestepensjonSimuleringsresultat {
         val uri = "/$API_PATH"
         log.debug { "POST to URL: '$uri'" }
 

@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map
 
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.*
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.SimuleringOffentligTjenestepensjonSpecV2
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringOffentligTjenestepensjonSpec
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -11,7 +11,7 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
 
     @Test
     fun `map from dto med utenlandsperioder, gradert og helt uttak med inntekter`() {
-        val spec = IngressSimuleringOffentligTjenestepensjonSpecV2(
+        val spec = SimuleringOffentligTjenestepensjonSpecV2(
             foedselsdato = LocalDate.parse("1963-02-24"),
             aarligInntektFoerUttakBeloep = 1,
             gradertUttak = SimuleringOffentligTjenestepensjonGradertUttakV2(
@@ -41,7 +41,7 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
             erApoteker = true
         )
 
-        val result: SimuleringOffentligTjenestepensjonSpecV2 = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
+        val result: SimuleringOffentligTjenestepensjonSpec = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
 
         assertEquals(LocalDate.parse("1963-02-24"), result.foedselsdato)
         assertEquals(LocalDate.parse("2026-03-01"), result.uttaksdato)
@@ -62,7 +62,7 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
 
     @Test
     fun `map from dto med gradert uttak uten inntekt med helt uttak med inntekt`() {
-        val spec = IngressSimuleringOffentligTjenestepensjonSpecV2(
+        val spec = SimuleringOffentligTjenestepensjonSpecV2(
             foedselsdato = LocalDate.parse("1963-02-24"),
             aarligInntektFoerUttakBeloep = 1,
             gradertUttak = SimuleringOffentligTjenestepensjonGradertUttakV2(
@@ -83,7 +83,7 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
             erApoteker = false
         )
 
-        val result: SimuleringOffentligTjenestepensjonSpecV2 = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
+        val result: SimuleringOffentligTjenestepensjonSpec = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
 
         assertEquals(2, result.fremtidigeInntekter.size)
         assertEquals(3, result.fremtidigeInntekter[0].beloep)
@@ -95,7 +95,7 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
 
     @Test
     fun `map from dto med gradert uttak med inntekt og helt uttak uten inntekt`() {
-        val spec = IngressSimuleringOffentligTjenestepensjonSpecV2(
+        val spec = SimuleringOffentligTjenestepensjonSpecV2(
             foedselsdato = LocalDate.parse("1963-02-24"),
             aarligInntektFoerUttakBeloep = 1,
             gradertUttak = SimuleringOffentligTjenestepensjonGradertUttakV2(
@@ -113,7 +113,7 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
             erApoteker = null
         )
 
-        val result: SimuleringOffentligTjenestepensjonSpecV2 = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
+        val result: SimuleringOffentligTjenestepensjonSpec = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
 
         assertEquals(2, result.fremtidigeInntekter.size)
         assertEquals(2, result.fremtidigeInntekter[0].beloep)
@@ -125,7 +125,7 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
 
     @Test
     fun `map from dto med gradert uttak uten inntekt og helt uttak uten inntekt`() {
-        val spec = IngressSimuleringOffentligTjenestepensjonSpecV2(
+        val spec = SimuleringOffentligTjenestepensjonSpecV2(
             foedselsdato = LocalDate.parse("1963-02-24"),
             aarligInntektFoerUttakBeloep = 1,
             gradertUttak = SimuleringOffentligTjenestepensjonGradertUttakV2(
@@ -143,7 +143,7 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
             erApoteker = false
         )
 
-        val result: SimuleringOffentligTjenestepensjonSpecV2 = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
+        val result: SimuleringOffentligTjenestepensjonSpec = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
 
         assertEquals(1, result.fremtidigeInntekter.size)
         assertEquals(0, result.fremtidigeInntekter[0].beloep)
@@ -153,7 +153,7 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
 
     @Test
     fun `fromDto haandterer overlappende perioder`() {
-        val spec = IngressSimuleringOffentligTjenestepensjonSpecV2(
+        val spec = SimuleringOffentligTjenestepensjonSpecV2(
             foedselsdato = LocalDate.parse("1963-02-24"),
             aarligInntektFoerUttakBeloep = 1,
             gradertUttak = null,
@@ -208,7 +208,7 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
     fun `fromDto haandterer overlappende perioder uten til og med dato`() {
         val fom = LocalDate.parse("2021-11-29")
         val antallAar = Period.between(fom, LocalDate.now().plusDays(1)).years //fom - inclusive, tom - inclusive too
-        val spec = IngressSimuleringOffentligTjenestepensjonSpecV2(
+        val spec = SimuleringOffentligTjenestepensjonSpecV2(
             foedselsdato = LocalDate.parse("1963-02-24"),
             gradertUttak = null,
             heltUttak = SimuleringOffentligTjenestepensjonHeltUttakV2(
