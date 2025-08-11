@@ -1,7 +1,12 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.map
 
 import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.*
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.OffentligTjenestepensjonSimuleringsresultat
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.ResultatType
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringOffentligTjenestepensjonSpec
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringsResultat
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringsResultatStatus
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.Utbetaling
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.FremtidigInntektSimuleringOFTPSpecDto
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.SimulerTjenestepensjonResponseDto
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.SimuleringOFTPSpecDto
@@ -33,18 +38,6 @@ object TpSimuleringClientMapper {
     )
 
     fun toDto(spec: SimuleringOffentligTjenestepensjonSpec, pid: Pid) = SimuleringOFTPSpecDto(
-        pid = pid.value,
-        foedselsdato = spec.foedselsdato,
-        uttaksdato = spec.uttaksdato,
-        sisteInntekt = spec.sisteInntekt,
-        aarIUtlandetEtter16 = spec.aarIUtlandetEtter16,
-        brukerBaOmAfp = spec.brukerBaOmAfp,
-        epsPensjon = spec.epsPensjon,
-        eps2G = spec.eps2G,
-        erApoteker = false
-    )
-
-    fun toDto(spec: SimuleringOffentligTjenestepensjonSpecV2, pid: Pid) = SimuleringOFTPSpecDto(
         pid = pid.value,
         foedselsdato = spec.foedselsdato,
         uttaksdato = spec.uttaksdato,

@@ -2,14 +2,18 @@ package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.ResultatType
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.ResultatType
 
+/**
+ * Data transfer object for the result of 'simulering offentlig tjenestepensjon' version 2.
+ * Changes must be coordinated with consumers of the API.
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class OffentligTjenestepensjonSimuleringsresultatDtoV2 (
+data class OffentligTjenestepensjonSimuleringResultV2 (
     val simuleringsresultatStatus: SimuleringsresultatStatusV2 = SimuleringsresultatStatusV2.OK,
     val muligeTpLeverandoerListe: List<String> = emptyList(),
     val simulertTjenestepensjon: SimulertTjenestepensjonV2? = null,
-    var serviceData: List<String>? = null,
+    var serviceData: List<String>? = null
 )
 
 enum class SimuleringsresultatStatusV2(val resultatType: ResultatType?) {
@@ -20,7 +24,7 @@ enum class SimuleringsresultatStatusV2(val resultatType: ResultatType?) {
     TEKNISK_FEIL(null);
 
     companion object {
-        fun fromResultatType(resultatType: ResultatType) = entries.firstOrNull { it.resultatType == resultatType } ?: TEKNISK_FEIL
+        fun fromResultatType(type: ResultatType) = entries.firstOrNull { it.resultatType == type } ?: TEKNISK_FEIL
     }
 }
 
@@ -40,5 +44,5 @@ data class UtbetalingsperiodeV2(
     val startAlder: Alder,
     val sluttAlder: Alder?,
     val aarligUtbetaling: Int,
-    val maanedligUtbetaling: Int?,
+    val maanedligUtbetaling: Int?
 )
