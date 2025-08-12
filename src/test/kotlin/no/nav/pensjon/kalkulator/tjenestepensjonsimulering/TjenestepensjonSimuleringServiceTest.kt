@@ -1,11 +1,11 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering
 
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.LoependeInntekt
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.TjenestepensjonSimuleringClient
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -36,17 +36,17 @@ class TjenestepensjonSimuleringServiceTest {
     }
 
     @Test
-    fun `hent pid, map request V2 og hent simulering fra client`() {
-        val request = SimuleringOffentligTjenestepensjonSpecV2(
+    fun `hent PID, map request, og hent simulering fra client`() {
+        val request = SimuleringOffentligTjenestepensjonSpec(
             foedselsdato = LocalDate.parse("1990-01-01"),
             uttaksdato = LocalDate.of(2053, 3, 1),
             sisteInntekt = 500000,
             fremtidigeInntekter = listOf(
-                FremtidigInntektV2(
+                LoependeInntekt(
                     fom = LocalDate.of(2053, 3, 1),
                     beloep = 500000
                 ),
-                FremtidigInntektV2(
+                LoependeInntekt(
                     fom = LocalDate.of(2060, 3, 1),
                     beloep = 0
                 )
@@ -58,7 +58,7 @@ class TjenestepensjonSimuleringServiceTest {
             erApoteker = false
         )
 
-        val start = Alder(62,1)
+        val start = Alder(62, 1)
         val slutt = Alder(63, 1)
 
         `when`(tjenestepensjonSimuleringClient.hentTjenestepensjonSimulering(request, pid)).thenReturn(
@@ -74,17 +74,17 @@ class TjenestepensjonSimuleringServiceTest {
             )
         )
 
-        val result = service.hentTjenestepensjonSimuleringV2(request)
+        val result = service.hentTjenestepensjonSimulering(request)
 
         assertNotNull(result)
         assertEquals(ResultatType.OK, result.simuleringsResultatStatus.resultatType)
         assertNotNull(result.simuleringsResultat)
         assertEquals("tpOrdning", result.simuleringsResultat!!.tpOrdning)
-        assertEquals("111111", result.simuleringsResultat!!.tpNummer)
-        assertEquals(start, result.simuleringsResultat!!.perioder.get(0).startAlder)
-        assertEquals(slutt, result.simuleringsResultat!!.perioder[0].sluttAlder)
-        assertEquals(1000, result.simuleringsResultat!!.perioder[0].maanedligBeloep)
-        assertTrue(result.simuleringsResultat!!.betingetTjenestepensjonInkludert)
+        assertEquals("111111", result.simuleringsResultat.tpNummer)
+        assertEquals(start, result.simuleringsResultat.perioder.get(0).startAlder)
+        assertEquals(slutt, result.simuleringsResultat.perioder[0].sluttAlder)
+        assertEquals(1000, result.simuleringsResultat.perioder[0].maanedligBeloep)
+        assertTrue(result.simuleringsResultat.betingetTjenestepensjonInkludert)
         assertEquals("tpOrdning", result.tpOrdninger[0])
     }
 }

@@ -2,7 +2,11 @@ package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto
 
 import java.time.LocalDate
 
-data class IngressSimuleringOffentligTjenestepensjonSpecV2 (
+/**
+ * Data transfer object for specification of 'simulering offentlig tjenestepensjon' version 2.
+ * Changes must be coordinated with consumers of the API.
+ */
+data class SimuleringOffentligTjenestepensjonSpecV2 (
     val foedselsdato: LocalDate,
     val aarligInntektFoerUttakBeloep: Int,
     val gradertUttak: SimuleringOffentligTjenestepensjonGradertUttakV2?,
@@ -11,7 +15,7 @@ data class IngressSimuleringOffentligTjenestepensjonSpecV2 (
     val epsHarPensjon: Boolean,
     val epsHarInntektOver2G: Boolean,
     val brukerBaOmAfp: Boolean,
-    val erApoteker: Boolean?,
+    val erApoteker: Boolean?
 )
 
 data class UtenlandsoppholdV2 (

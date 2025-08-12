@@ -9,6 +9,12 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.testutil.Arrange
 import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.OffentligTjenestepensjonSimuleringsresultat
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.ResultatType
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringOffentligTjenestepensjonSpec
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringsResultat
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringsResultatStatus
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.Utbetaling
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.TpSimuleringClientTestObjects.IKKE_MEDLEM
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.TpSimuleringClientTestObjects.INGEN_UTBETALINGSPERIODER
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.TpSimuleringClientTestObjects.OK
@@ -38,7 +44,7 @@ class TpSimuleringClientTest : FunSpec({
     beforeSpec {
         Arrange.security()
         server = MockWebServer().apply { start() }
-        baseUrl = "http://localhost:${server!!.port}"
+        baseUrl = "http://localhost:${server.port}"
     }
 
     afterSpec {
@@ -249,7 +255,7 @@ object TpSimuleringClientTestObjects {
   ]
 }"""
 
-    val spec = SimuleringOffentligTjenestepensjonSpecV2(
+    val spec = SimuleringOffentligTjenestepensjonSpec(
         foedselsdato = LocalDate.of(1964, 6, 15),
         uttaksdato = LocalDate.of(2027, 2, 1),
         sisteInntekt = 0,
