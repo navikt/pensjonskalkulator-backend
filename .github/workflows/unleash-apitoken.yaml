@@ -13,7 +13,8 @@ jobs:
   apply-apitoken-unleash:
     name: Apply ApiToken for Unleash to cluster
     runs-on: ubuntu-latest
-    permissions: {}
+    permissions:
+      id-token: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
