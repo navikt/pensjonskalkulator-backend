@@ -24,7 +24,7 @@
         <kotlin.compiler.apiVersion>2.1</kotlin.compiler.apiVersion>
         <kotlin.compiler.languageVersion>2.1</kotlin.compiler.languageVersion>
         <kotlin.compiler.jvmTarget>21</kotlin.compiler.jvmTarget>
-        <kotlin.version>2.2.0</kotlin.version>
+        <kotlin.version>2.2.10</kotlin.version>
         <logback.version>1.5.18</logback.version>
         <okhttp3.version>5.1.0</okhttp3.version>
     </properties>
@@ -158,7 +158,7 @@
         <dependency>
             <groupId>io.getunleash</groupId>
             <artifactId>unleash-client-java</artifactId>
-            <version>11.0.2</version>
+            <version>11.1.0</version>
         </dependency>
         <dependency>
             <groupId>io.github.microutils</groupId>
@@ -243,7 +243,7 @@
         <dependency>
             <groupId>io.kotest</groupId>
             <artifactId>kotest-runner-junit5-jvm</artifactId>
-            <version>5.9.1</version>
+            <version>6.0.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
