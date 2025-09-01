@@ -8,10 +8,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.ekskludering.EkskluderingFacade
+import no.nav.pensjon.kalkulator.ekskludering.api.dto.ApotekerStatusV1
 import no.nav.pensjon.kalkulator.ekskludering.api.dto.EkskluderingStatusV1
 import no.nav.pensjon.kalkulator.ekskludering.api.dto.EkskluderingStatusV2
 import no.nav.pensjon.kalkulator.ekskludering.api.map.EkskluderingMapper.version1
 import no.nav.pensjon.kalkulator.ekskludering.api.map.EkskluderingMapper.version2
+import no.nav.pensjon.kalkulator.ekskludering.api.map.EkskluderingMapper.version3
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.web.bind.annotation.*
@@ -87,9 +89,40 @@ class EkskluderingController(
         }
     }
 
+    @GetMapping("v1/er-apoteker")
+    @Operation(
+        summary = "Om personen er ekskludert fra å bruke kalkulatoren",
+        description = "Eksludering skyldes medlemskap i Apotekerforeningen"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Sjekking av apoteker utført"
+            ),
+            ApiResponse(
+                responseCode = "503", description = "Sjekking av apoteker kunne ikke utføres av tekniske årsaker",
+                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
+            ),
+        ]
+    )
+    fun erApotekerV1(): ApotekerStatusV1 {
+        traceAid.begin()
+        log.debug { "Request for ekskludering-status" }
+
+        return try {
+            version3(timed(service::erApotekerV1, "erApotekerV1"))
+                .also { log.debug { "Eksludering-status respons: $it" } }
+        } catch (e: EgressException) {
+            handleError(e, "V1")!!
+        } finally {
+            traceAid.end()
+        }
+    }
+
     override fun errorMessage() = ERROR_MESSAGE
 
     private companion object {
-        private const val ERROR_MESSAGE = "Feil ved sjekking av ekskludering"
+        private const val ERROR_MESSAGE = "Feil ved sjekking av apoteker"
     }
 }

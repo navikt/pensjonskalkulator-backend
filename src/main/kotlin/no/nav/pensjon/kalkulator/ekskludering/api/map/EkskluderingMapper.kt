@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.ekskludering.api.map
 
 import no.nav.pensjon.kalkulator.ekskludering.EkskluderingStatus
+import no.nav.pensjon.kalkulator.ekskludering.api.dto.ApotekerStatusV1
 import no.nav.pensjon.kalkulator.ekskludering.api.dto.EkskluderingAarsakV1
 import no.nav.pensjon.kalkulator.ekskludering.api.dto.EkskluderingAarsakV2
 import no.nav.pensjon.kalkulator.ekskludering.api.dto.EkskluderingStatusV1
@@ -18,5 +19,11 @@ object EkskluderingMapper {
         EkskluderingStatusV2(
             aarsak = EkskluderingAarsakV2.fromInternalValue(source.aarsak),
             ekskludert = source.ekskludert
+        )
+
+    fun version3(source: EkskluderingStatus) =
+        ApotekerStatusV1(
+            aarsak = EkskluderingAarsakV2.fromInternalValue(source.aarsak),
+            apoteker = source.ekskludert
         )
 }
