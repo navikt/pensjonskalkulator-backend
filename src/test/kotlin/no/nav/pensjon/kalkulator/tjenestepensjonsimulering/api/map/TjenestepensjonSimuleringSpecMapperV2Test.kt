@@ -207,12 +207,14 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
     @Test
     fun `fromDto haandterer overlappende perioder uten til og med dato`() {
         val fom = LocalDate.parse("2021-11-29")
-        val antallAar = Period.between(fom, LocalDate.now().plusDays(1)).years //fom - inclusive, tom - inclusive too
+        val foedselsdato = LocalDate.parse("1963-02-24")
+        val uttaksdato = LocalDate.parse("2026-03-01")
+        val antallAar = Period.between(fom, uttaksdato.plusDays(1)).years //fom - inclusive, tom - inclusive too
         val spec = SimuleringOffentligTjenestepensjonSpecV2(
-            foedselsdato = LocalDate.parse("1963-02-24"),
+            foedselsdato = foedselsdato,
             gradertUttak = null,
             heltUttak = SimuleringOffentligTjenestepensjonHeltUttakV2(
-                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(63, 0),
+                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(63, 0), //LocalDate.parse("2026-03-01")
                 aarligInntektVsaPensjon = SimuleringOffentligTjenestepensjonInntektV2(
                     3,
                     SimuleringOffentligTjenestepensjonAlderV2(70, 0)
@@ -249,13 +251,40 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
 
         val result = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
 
-        assertEquals(LocalDate.parse("1963-02-24"), result.foedselsdato)
-        assertEquals(LocalDate.parse("2026-03-01"), result.uttaksdato)
+        assertEquals(foedselsdato, result.foedselsdato)
+        assertEquals(uttaksdato, result.uttaksdato)
         assertEquals(1, result.sisteInntekt)
         assertEquals(antallAar, result.aarIUtlandetEtter16)
         assertEquals(true, result.brukerBaOmAfp)
         assertEquals(true, result.epsPensjon)
         assertEquals(true, result.eps2G)
         assertEquals(false, result.erApoteker)
+    }
+
+    @Test
+    fun `fromDto haandterer fremtidig varig utenlandsopphold`() {
+        val spec = SimuleringOffentligTjenestepensjonSpecV2(
+            foedselsdato = LocalDate.now().minusYears(50).minusDays(1),
+            gradertUttak = null,
+            heltUttak = SimuleringOffentligTjenestepensjonHeltUttakV2(
+                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(63, 0),
+                aarligInntektVsaPensjon = null
+            ),
+            aarligInntektFoerUttakBeloep = 1,
+            utenlandsperiodeListe = listOf(
+                UtenlandsoppholdV2(
+                    fom = LocalDate.now().plusYears(10),//flytter til utlandet om 10 år og blir der i 3 år frem til uttak
+                    tom = null
+                ),
+            ),
+            epsHarPensjon = false,
+            epsHarInntektOver2G = false,
+            brukerBaOmAfp = false,
+            erApoteker = false,
+        )
+
+        val result = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
+
+        assertEquals(3, result.aarIUtlandetEtter16)
     }
 }
