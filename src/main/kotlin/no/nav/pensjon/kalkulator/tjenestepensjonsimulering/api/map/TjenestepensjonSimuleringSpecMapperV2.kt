@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map
 
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.LoependeInntekt
 import no.nav.pensjon.kalkulator.simulering.PensjonUtil.uttakDato
@@ -10,6 +11,7 @@ import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.SimuleringOff
 import java.time.LocalDate
 
 object TjenestepensjonSimuleringSpecMapperV2 {
+    private val log = KotlinLogging.logger {}
     private const val DAGER_PER_AAR = 365
 
     fun fromDtoV2(spec: SimuleringOffentligTjenestepensjonSpecV2) =
@@ -85,9 +87,11 @@ object TjenestepensjonSimuleringSpecMapperV2 {
 
     private fun antallAar(oppholdListe: List<UtenlandsoppholdV2>): Int {
         val dagensDato = LocalDate.now()
-        val sammenslattePerioder = slaaSammenOverlappendePerioder(oppholdListe, dagensDato)
+        val sammenslattePerioder: List<UtenlandsoppholdV2> = slaaSammenOverlappendePerioder(oppholdListe, dagensDato)
         val antallDager = antallDager(sammenslattePerioder, dagensDato)
-        return (antallDager / DAGER_PER_AAR).toInt()
+        val antallAar = (antallDager / DAGER_PER_AAR).toInt()
+        log.info { "Fikk perioder: $oppholdListe, sammenslåtte perioder: $sammenslattePerioder, antall Dager: $antallDager, antall år: $antallAar" }
+        return antallAar
     }
 
     private fun antallDager(oppholdListe: List<UtenlandsoppholdV2>, dagensDato: LocalDate): Long =
