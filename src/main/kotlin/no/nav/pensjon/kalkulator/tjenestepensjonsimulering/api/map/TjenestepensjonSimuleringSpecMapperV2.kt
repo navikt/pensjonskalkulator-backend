@@ -12,18 +12,20 @@ import java.time.LocalDate
 object TjenestepensjonSimuleringSpecMapperV2 {
     private const val DAGER_PER_AAR = 365
 
-    fun fromDtoV2(spec: SimuleringOffentligTjenestepensjonSpecV2) =
-        SimuleringOffentligTjenestepensjonSpec(
+    fun fromDtoV2(spec: SimuleringOffentligTjenestepensjonSpecV2): SimuleringOffentligTjenestepensjonSpec {
+        val uttaksdato = uttakDato(spec.foedselsdato, mapToUttaksalder(spec))
+        return SimuleringOffentligTjenestepensjonSpec(
             foedselsdato = spec.foedselsdato,
-            uttaksdato = uttakDato(spec.foedselsdato, mapToUttaksalder(spec)),
+            uttaksdato = uttaksdato,
             sisteInntekt = spec.aarligInntektFoerUttakBeloep,
             fremtidigeInntekter = mapToFremtidigInntektV2(spec),
-            aarIUtlandetEtter16 = antallAar(spec.utenlandsperiodeListe),
+            aarIUtlandetEtter16 = antallAar(spec.utenlandsperiodeListe, uttaksdato),
             brukerBaOmAfp = spec.brukerBaOmAfp,
             epsPensjon = spec.epsHarPensjon,
             eps2G = spec.epsHarInntektOver2G,
             erApoteker = spec.erApoteker ?: false
         )
+    }
 
     private fun mapToFremtidigInntektV2(
         spec: SimuleringOffentligTjenestepensjonSpecV2,
@@ -83,19 +85,18 @@ object TjenestepensjonSimuleringSpecMapperV2 {
     private fun mapToUttaksalder(spec: SimuleringOffentligTjenestepensjonSpecV2): Alder =
         (spec.gradertUttak?.uttaksalder ?: spec.heltUttak.uttaksalder).let(::mapToAlder)
 
-    private fun antallAar(oppholdListe: List<UtenlandsoppholdV2>): Int {
-        val dagensDato = LocalDate.now()
-        val sammenslattePerioder = slaaSammenOverlappendePerioder(oppholdListe, dagensDato)
-        val antallDager = antallDager(sammenslattePerioder, dagensDato)
+    private fun antallAar(oppholdListe: List<UtenlandsoppholdV2>, uttaksdato: LocalDate): Int {
+        val sammenslattePerioder = slaaSammenOverlappendePerioder(oppholdListe, uttaksdato)
+        val antallDager = antallDager(sammenslattePerioder, uttaksdato)
         return (antallDager / DAGER_PER_AAR).toInt()
     }
 
-    private fun antallDager(oppholdListe: List<UtenlandsoppholdV2>, dagensDato: LocalDate): Long =
-        oppholdListe.sumOf { (it.tom ?: dagensDato).toEpochDay() + 1 - it.fom.toEpochDay() }
+    private fun antallDager(oppholdListe: List<UtenlandsoppholdV2>, maksTomDato: LocalDate): Long =
+        oppholdListe.sumOf { (it.tom ?: maksTomDato).toEpochDay() + 1 - it.fom.toEpochDay() }
 
     private fun slaaSammenOverlappendePerioder(
         oppholdListe: List<UtenlandsoppholdV2>,
-        dagensDato: LocalDate
+        maksTomDato: LocalDate
     ): List<UtenlandsoppholdV2> {
         if (oppholdListe.isEmpty()) return emptyList()
         val sortertePerioder = oppholdListe.sortedBy { it.fom }
@@ -104,11 +105,11 @@ object TjenestepensjonSimuleringSpecMapperV2 {
         var gjeldendePeriode = sortertePerioder.first()
 
         for (periode in sortertePerioder.drop(1)) {
-            if (periode.fom <= (gjeldendePeriode.tom ?: dagensDato).plusDays(1)) {
+            if (periode.fom <= (gjeldendePeriode.tom ?: maksTomDato).plusDays(1)) {
                 // Slå sammen perioder hvis de overlapper eller henger sammen
                 gjeldendePeriode = UtenlandsoppholdV2(
                     fom = gjeldendePeriode.fom,
-                    tom = maxOf(gjeldendePeriode.tom ?: dagensDato, periode.tom ?: dagensDato)
+                    tom = maxOf(gjeldendePeriode.tom ?: maksTomDato, periode.tom ?: maksTomDato)
                 )
             } else {
                 // Legg til gjeldende periode og start ny
