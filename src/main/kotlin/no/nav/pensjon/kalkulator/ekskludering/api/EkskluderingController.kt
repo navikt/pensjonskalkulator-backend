@@ -13,7 +13,7 @@ import no.nav.pensjon.kalkulator.ekskludering.api.dto.EkskluderingStatusV1
 import no.nav.pensjon.kalkulator.ekskludering.api.dto.EkskluderingStatusV2
 import no.nav.pensjon.kalkulator.ekskludering.api.map.EkskluderingMapper.version1
 import no.nav.pensjon.kalkulator.ekskludering.api.map.EkskluderingMapper.version2
-import no.nav.pensjon.kalkulator.ekskludering.api.map.EkskluderingMapper.version3
+import no.nav.pensjon.kalkulator.ekskludering.api.map.EkskluderingMapper.apotekerStatusV1
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.web.bind.annotation.*
@@ -111,7 +111,7 @@ class EkskluderingController(
         log.debug { "Request for ekskludering-status" }
 
         return try {
-            version3(timed(service::erApotekerV1, "erApotekerV1"))
+            apotekerStatusV1(timed(service::erApotekerV1, "erApotekerV1"))
                 .also { log.debug { "Eksludering-status respons: $it" } }
         } catch (e: EgressException) {
             handleError(e, "V1")!!

@@ -21,7 +21,7 @@ object EkskluderingMapper {
             ekskludert = source.ekskludert
         )
 
-    fun version3(source: EkskluderingStatus) =
+    fun apotekerStatusV1(source: EkskluderingStatus) =
         ApotekerStatusV1(
             aarsak = EkskluderingAarsakV2.fromInternalValue(source.aarsak),
             apoteker = source.ekskludert
