@@ -46,15 +46,6 @@ class UttaksalderService(
 
         val result = simuleringService.simulerPersonligAlderspensjon(gunstigstSimuleringSpec)
 
-        if (
-            impersonalSpec.simuleringType == SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG &&
-            result.afpOffentlig.isEmpty()
-        )
-            throw SimuleringException(
-                status = SimuleringStatus.AFP_IKKE_I_VILKAARSPROEVING
-            )
-
-
         // TMU er enten:
         // - Den lavest mulige fremtidige alder for helt uttak (hvis vilkårsprøvingen av denne gir OK), eller
         // - Den alternative alder for helt uttak som returneres av simuleringen (vilkårsprøvingen av denne har gitt OK)
