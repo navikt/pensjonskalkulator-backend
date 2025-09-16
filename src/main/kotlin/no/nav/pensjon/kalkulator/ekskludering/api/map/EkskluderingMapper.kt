@@ -7,23 +7,27 @@ import no.nav.pensjon.kalkulator.ekskludering.api.dto.EkskluderingAarsakV2
 import no.nav.pensjon.kalkulator.ekskludering.api.dto.EkskluderingStatusV1
 import no.nav.pensjon.kalkulator.ekskludering.api.dto.EkskluderingStatusV2
 
+/**
+ * Anti-corruption layer.
+ * Maps from internal domain to data transfer objects.
+ */
 object EkskluderingMapper {
 
-    fun version1(source: EkskluderingStatus) =
+    fun statusV1(source: EkskluderingStatus) =
         EkskluderingStatusV1(
             ekskludert = source.ekskludert,
-            aarsak = EkskluderingAarsakV1.fromInternalValue(source.aarsak)
+            aarsak = EkskluderingAarsakV1.fromInternalValue(value = source.aarsak)
         )
 
-    fun version2(source: EkskluderingStatus) =
+    fun statusV2(source: EkskluderingStatus) =
         EkskluderingStatusV2(
-            aarsak = EkskluderingAarsakV2.fromInternalValue(source.aarsak),
+            aarsak = EkskluderingAarsakV2.fromInternalValue(value = source.aarsak),
             ekskludert = source.ekskludert
         )
 
     fun apotekerStatusV1(source: EkskluderingStatus) =
         ApotekerStatusV1(
-            aarsak = EkskluderingAarsakV2.fromInternalValue(source.aarsak),
+            aarsak = EkskluderingAarsakV2.fromInternalValue(value = source.aarsak),
             apoteker = source.ekskludert
         )
 }
