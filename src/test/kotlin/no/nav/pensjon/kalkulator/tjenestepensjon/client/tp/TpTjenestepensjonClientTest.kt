@@ -74,6 +74,14 @@ class TpTjenestepensjonClientTest : FunSpec({
         }
     }
 
+    test("'erApoteker' gir 'false' når personen ikke finnes i TP-registeret") {
+        server?.arrangeResponse(HttpStatus.NOT_FOUND, PERSON_IKKE_FUNNET_RESPONSE_BODY)
+
+        Arrange.webClientContextRunner().run {
+            client(context = it).erApoteker(pid) shouldBe false
+        }
+    }
+
     test("'tjenestepensjon' gir forhold-liste når personen har tjenestepensjonsforhold") {
         server?.arrangeOkJsonResponse(TJENESTEPENSJON)
 
@@ -150,6 +158,16 @@ class TpTjenestepensjonClientTest : FunSpec({
         }
     }
 })
+
+@Language("json")
+private const val PERSON_IKKE_FUNNET_RESPONSE_BODY =
+    """{
+    "type": "about:blank",
+    "title": "Not Found",
+    "status": 404,
+    "detail": "Person ikke funnet.",
+    "instance": "/api/tjenestepensjon/medlem/afp/apotekerforeningen/ersisteforhold"
+}"""
 
 object TpTjenestepensjonClientTestObjects {
 
