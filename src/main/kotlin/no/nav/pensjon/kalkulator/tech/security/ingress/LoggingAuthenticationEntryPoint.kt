@@ -5,11 +5,13 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import org.springframework.http.HttpHeaders
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.stereotype.Component
+import org.springframework.util.StringUtils.hasLength
 import java.util.*
 
 /**
@@ -28,26 +30,28 @@ class LoggingAuthenticationEntryPoint : AuthenticationEntryPoint {
         response: HttpServletResponse?,
         exception: AuthenticationException?
     ) {
-        log.error { "Authentication failed: ${exception?.message}" }
-        val auth: String? = (request as HttpServletRequest).getHeader(HttpHeaders.AUTHORIZATION)
-        auth?.let(::logJwtClaims)
-        log.debug { auth ?: "(no Authorization header)" }
-        entryPoint.commence(request, response, exception)
-    }
+        val auth: String? = request?.getHeader(HttpHeaders.AUTHORIZATION)
+        val pidHeaderProvided: Boolean = hasLength(request?.getHeader(CustomHttpHeaders.PID))
 
-    private fun logJwtClaims(auth: String) {
-        try {
-            val jwt = auth.substring("Bearer ".length)
-            val payload = decoder.decode(jwt.split(".")[1])
-            val claims: Map<String, Any?> = mapper.readValue(payload)
-            log.info { "Bad JWT - iss ${claims["iss"]}; aud ${claims["aud"]}; iat ${claims["iat"]}; exp ${claims["exp"]}" }
-        } catch (e: Exception) {
-            log.warn(e) { "Failed to log info about bad JWT - ${e.message}" }
+        log.error {
+            "Authentication failed: ${exception?.message} - URI: ${request?.requestURI}" +
+                    " - ${CustomHttpHeaders.PID} header: $pidHeaderProvided - claims: ${claimsAsString(auth)}"
         }
+
+        entryPoint.commence(request, response, exception)
     }
 
     private companion object {
         private val decoder = Base64.getDecoder()
         private val mapper = jacksonObjectMapper()
+
+        private fun claimsAsString(auth: String?): String {
+            if (auth == null) return "(no auth)"
+
+            val jwt = auth.substring("Bearer ".length)
+            val payload = decoder.decode(jwt.split(".")[1])
+            val claims: Map<String, Any?> = mapper.readValue(payload)
+            return "iss ${claims["iss"]}; aud ${claims["aud"]}; iat ${claims["iat"]}; exp ${claims["exp"]}"
+        }
     }
 }
