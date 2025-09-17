@@ -19,6 +19,7 @@ import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpTjenestepensjon
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.map.TpTjenestepensjonMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
@@ -64,6 +65,8 @@ class TpTjenestepensjonClient(
             throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
+        } catch (e: EgressException) {
+            handle(e, pid) ?: throw e
         }
     }
 
@@ -159,6 +162,14 @@ class TpTjenestepensjonClient(
         // https://github.com/navikt/tp/blob/main/tp-api/src/main/kotlin/no/nav/samhandling/tp/provider/Headers.kt
         headers[CustomHttpHeaders.PID] = pid.value
     }
+
+    private fun handle(e: EgressException, pid: Pid): Boolean? =
+        e.message?.let {
+            if (e.statusCode == HttpStatus.NOT_FOUND && it.contains("Person ikke funnet"))
+                false.also { log.warn("Person ikke funnet - $pid") }
+            else
+                null
+        }
 
     companion object {
         private const val API_PATH = "api/tjenestepensjon"
