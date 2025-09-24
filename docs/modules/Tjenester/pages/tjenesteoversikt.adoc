@@ -1,0 +1,29 @@
+= Tjenester
+
+Simulatoren tilbyr to hovedkategorier av tjenester:
+
+* Henting av data
+* Simulering av pensjon
+
+== Henting av data
+
+Følgende tjenester tilbys for henting av data for bruk i kalkulatorens frontend:
+
+* Hent persondata
+* Hent løpende vedtak
+* Hent løpende omstillingsstønad eller gjenlevendeytelse
+* Hent inntekt
+* Hent uføregrad
+* Hent normert pensjonsalder og relaterte aldersgrenser
+* Hent pensjonsavtaler fra Norsk Pensjon
+* Hent medlemskap i tjenestepensjonsordning
+* Hent ekskluderingsstatus (noen brukergrupper kan ikke bruke kalkulatoren)
+* Hent liste over land for utenlandsopphold
+
+== Simulering av pensjon
+
+Følgende tjenester tilbys for simulering (beregning av hypotetisk pensjon):
+
+* Simuler alderspensjon og AFP for angitt person
+* Simuler offentlig tjenestepensjon for angitt person
+* Simuler alderspensjon og AFP anonymt (for Navs uinnloggede pensjonskalkulator)
