@@ -1,5 +1,5 @@
-name: pensjonssimulator
-title: Pensjonssimulator
+name: pensjonskalkulator-backend
+title: Pensjonskalkulator-backend
 version: main
 start_page: ROOT:index.adoc
 nav:
