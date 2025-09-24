@@ -1,0 +1,6 @@
+name: pensjonssimulator
+title: Pensjonssimulator
+version: main
+start_page: ROOT:index.adoc
+nav:
+  - modules/Tjenester/nav.adoc
