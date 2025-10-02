@@ -35,7 +35,6 @@ enum class EgressService(
         authType = AuthType.MACHINE_INSIDE_NAV
     ),
     TJENESTEPENSJON("Tjenestepensjon", "TP", "Tjenestepensjonsforhold"),
-    TJENESTEPENSJON_SIMULERING("Tjenestepensjon simulering", "TpS", "Hente simulering av OFTP fra eksterne"),
     UTBETALING_DATA("Oekonomi utbetalingsdata", "Sokos", "Finne siste maaneds utbetaling"),
     OMSTILLINGSSTOENAD("Omstillingsstoenad", "OS", "Finne om bruker mottar omstillingsstoenad");
 
