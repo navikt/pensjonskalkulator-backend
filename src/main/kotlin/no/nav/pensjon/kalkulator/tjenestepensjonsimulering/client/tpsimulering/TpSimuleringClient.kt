@@ -27,7 +27,7 @@ import reactor.netty.http.client.HttpClient
 
 @Component
 class TpSimuleringClient(
-    @Value("\${tjenestepensjon.simulering.url}") private val baseUrl: String,
+    @param:Value("\${pensjonssimulator.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
@@ -75,8 +75,8 @@ class TpSimuleringClient(
     override fun service(): EgressService = service
 
     companion object {
-        private const val API_PATH = "v2025/tjenestepensjon/v1/simulering"
-        private val service = EgressService.TJENESTEPENSJON_SIMULERING
+        private const val API_PATH = "api/nav/v1/simuler-oftp/fra-2025"
+        private val service = EgressService.PENSJONSSIMULATOR
         private const val ON_CONNECTED_READ_TIMEOUT_SECONDS = 45
     }
 }
