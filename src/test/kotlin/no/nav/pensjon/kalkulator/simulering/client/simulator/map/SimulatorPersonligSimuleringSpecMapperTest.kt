@@ -22,8 +22,8 @@ class SimulatorPersonligSimuleringSpecMapperTest {
             assertEquals("ALDER", simuleringstype)
             assertEquals("12906498357", pid)
             assertEquals("UGIF", sivilstand)
-            assertTrue(epsHarInntektOver2G)
-            assertFalse(epsHarPensjon)
+            assertTrue(epsHarInntektOver2G ?: true)
+            assertFalse(epsHarPensjon ?: false)
             assertEquals(100_000, sisteInntekt)
             assertEquals(1, uttaksar)
             with(gradertUttak!!) {

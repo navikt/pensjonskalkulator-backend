@@ -28,8 +28,8 @@ data class ImpersonalSimuleringSpec(
 
 // Ektefelle/partner/samboer
 data class Eps (
-    val harInntektOver2G: Boolean,
-    val harPensjon: Boolean
+    val harInntektOver2G: Boolean? = null,
+    val harPensjon: Boolean? = null
 )
 
 data class Utenlandsopphold (
