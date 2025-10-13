@@ -167,6 +167,17 @@ class NorskPensjonPensjonsavtaleClientTest : FunSpec({
                     " | Detail: { Transaction: 4870241 | Global transaction: da10915547fa547004a2951 }"
         }
     }
+
+    test("fetchAvtaler handles non-XML error message") {
+        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, """{ "x": "y" }""")
+        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, """{ "x": "y" }""") // for retry
+
+        Arrange.webClientContextRunner().run {
+            shouldThrow<EgressException> {
+                pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid)
+            }.message shouldBe """Failed to call http://localhost:${server?.port}/kalkulator.pensjonsrettighetstjeneste/v3/kalkulatorPensjonTjeneste - (non-XML response) - { "x": "y" }"""
+        }
+    }
 })
 
 object NorskPensjonPensjonsavtaleClientTestObjects {

@@ -1,0 +1,28 @@
+= Pensjonskalkulator-backend
+
+Henter og tilpasser data for https://github.com/navikt/pensjonskalkulator-frontend[kalkulator-frontend] og https://github.com/navikt/pensjonskalkulator-uinnlogget-frontend[uinnlogget kalkulator-frontend].
+
+Delegerer forespørsler om simulering av pensjon videre til https://github.com/navikt/pensjonssimulator[pensjonssimulatoren].
+
+== Formål
+
+* Hente persondata fra https://github.com/navikt/pdl[PDL]
+* Hente pensjonsdata fra https://github.com/navikt/pensjon-pen[PEN] og https://norskpensjon.no/[Norsk Pensjon]
+* Hente inntektsdata fra https://github.com/navikt/popp[POPP]
+* Delegere forespørsler om simulering av pensjon (alderspensjon, AFP og tjenestepensjon)
+* Delegere forespørsler om tidligst mulig uttak av alderspensjon
+* Muliggjøre bruk av fullmakt ved simulering av pensjon
+* Muliggjøre at veiledere kan simulere pensjon på vegne av annen person
+
+== Databehandling
+
+* Applikasjonen har ingen egen persistent lagring av data.
+* Utvalgte anonymiserte data skrives til applikasjonslogg (korttidslagring).
+
+== Historikk
+
+Det ble i 2023 igangsatt utvikling av en ny pensjonskalkulator grunnet endringer i regelverket for offentlig tjenestepensjon. Endringene gjaldt fra 2025 og gjaldt personer født i 1963 eller senere.
+
+Kalkulatoren ble satt i produksjon 2. november 2023, og støttet dengang personer født i 1963 eller senere.
+
+Kalkulatoren ble i 2025 utvidet til å støtte alle aldersgrupper (lansert 2. juli 2025). Dermed kunne den tilårskomne kalkulatoren i Din pensjon (https://github.com/navikt/pensjon-pselv[PSELV]) avvikles for bruk av borgere.

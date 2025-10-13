@@ -117,14 +117,18 @@ class NorskPensjonPensjonsavtaleClient(
     }
 
     override fun toString(e: EgressException, uri: String) =
-        xmlMapper.readValue(
-            e.message,
-            EnvelopeDto::class.java
-        ).body?.fault?.let(NorskPensjonPensjonsavtaleMapper::faultToString) ?: e.message ?: "Failed to call $baseUrl$uri"
+        e.message?.let {
+            if (it.trim().startsWith(XML_START_CHARACTER))
+                xmlMapper.readValue(it, EnvelopeDto::class.java)
+                    .body?.fault?.let(NorskPensjonPensjonsavtaleMapper::faultToString) ?: it
+            else
+                "Failed to call $baseUrl$uri - (non-XML response) - $it"
+        } ?: "Failed to call $baseUrl$uri - $e"
 
     companion object {
         private const val RESOURCE = "kalkulator.pensjonsrettighetstjeneste/v3/kalkulatorPensjonTjeneste"
         private const val ORGANISASJONSNUMMER = "889640782" // ARBEIDS- OG VELFERDSETATEN
+        private const val XML_START_CHARACTER = "<"
 
         private val service = EgressService.NORSK_PENSJON
 
@@ -165,6 +169,7 @@ class NorskPensjonPensjonsavtaleClient(
                     <aarligInntekt>${spec.aarligInntekt}</aarligInntekt>
                 </uttaksperiode>"""
 
-        private fun ingenAvtaler() = Pensjonsavtaler(avtaler = emptyList(), utilgjengeligeSelskap = emptyList())
+        private fun ingenAvtaler() =
+            Pensjonsavtaler(avtaler = emptyList(), utilgjengeligeSelskap = emptyList())
     }
 }

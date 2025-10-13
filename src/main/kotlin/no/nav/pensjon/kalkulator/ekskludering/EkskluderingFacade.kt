@@ -10,22 +10,21 @@ class EkskluderingFacade(
     val sakService: SakService,
     val tjenestepensjonService: TjenestepensjonService
 ) {
-    fun erEkskludert(): EkskluderingStatus =
-        ekskluderingStatus(sakService.sakStatus()) ?: annenEkskluderingStatus()
+    fun ekskluderingPgaSakEllerApoteker(): EkskluderingStatus =
+        sakEkskludering(sakStatus = sakService.sakStatus()) ?: apotekerEkskludering()
 
-    fun erEkskludertV2(): EkskluderingStatus = annenEkskluderingStatus()
-
-    fun erApotekerV1(): EkskluderingStatus = annenEkskluderingStatus()
-
-    private fun ekskluderingStatus(sakStatus: RelevantSakStatus): EkskluderingStatus? =
-        if (sakStatus.harSak)
-            EkskluderingStatus(true, EkskluderingAarsak.from(sakStatus.sakType))
-        else
-            null
-
-    private fun annenEkskluderingStatus() =
+    fun apotekerEkskludering(): EkskluderingStatus =
         if (tjenestepensjonService.erApoteker())
             EkskluderingStatus(ekskludert = true, aarsak = EkskluderingAarsak.ER_APOTEKER)
         else
             EkskluderingStatus(ekskludert = false, aarsak = EkskluderingAarsak.NONE)
+
+    private companion object {
+
+        private fun sakEkskludering(sakStatus: RelevantSakStatus): EkskluderingStatus? =
+            if (sakStatus.harSak)
+                EkskluderingStatus(ekskludert = true, aarsak = EkskluderingAarsak.from(sakStatus.sakType))
+            else
+                null
+    }
 }

@@ -165,10 +165,6 @@ spec:
       value: dev-fss:pensjonsamhandling:tp-q2
     - name: TJENESTEPENSJON_URL
       value: https://tp-api-q2.dev-fss-pub.nais.io
-    - name: TJENESTEPENSJON_SIMULERING_SERVICE_ID
-      value: dev-gcp:pensjonskalkulator:tjenestepensjon-simulering
-    - name: TJENESTEPENSJON_SIMULERING_URL
-      value: http://tjenestepensjon-simulering
     - name: SERVER_ERROR_INCLUDE_STACKTRACE
       value: always
     - name: AUDIT_LOG_OUTPUT
