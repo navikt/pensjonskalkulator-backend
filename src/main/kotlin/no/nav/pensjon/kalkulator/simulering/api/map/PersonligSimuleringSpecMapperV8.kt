@@ -26,8 +26,8 @@ object PersonligSimuleringSpecMapperV8 {
 
     private fun eps(source: PersonligSimuleringSpecV8) =
         Eps(
-            harInntektOver2G = source.epsHarInntektOver2G,
-            harPensjon = source.epsHarPensjon
+            harInntektOver2G = source.epsHarInntektOver2G ?: false,
+            harPensjon = source.epsHarPensjon ?: false
         )
 
     private fun gradertUttak(source: PersonligSimuleringGradertUttakSpecV8) =
