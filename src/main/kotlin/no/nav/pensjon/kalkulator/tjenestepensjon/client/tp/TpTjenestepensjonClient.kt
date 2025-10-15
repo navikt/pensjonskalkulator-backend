@@ -124,7 +124,7 @@ class TpTjenestepensjonClient(
         return try {
             webClient
                 .get()
-                .uri("/$API_TP_FORHOLD/")
+                .uri("/$API_TP_FORHOLD")
                 .headers { setHeaders(it, pid) }
                 .retrieve()
                 .bodyToMono(FinnTjenestepensjonsforholdResponsDto::class.java)

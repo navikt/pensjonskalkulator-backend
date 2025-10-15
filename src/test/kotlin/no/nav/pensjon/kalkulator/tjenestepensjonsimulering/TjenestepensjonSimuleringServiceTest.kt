@@ -13,6 +13,8 @@ import no.nav.pensjon.kalkulator.vedtak.LoependeVedtakDetaljer
 import no.nav.pensjon.kalkulator.ekskludering.EkskluderingFacade
 import no.nav.pensjon.kalkulator.ekskludering.EkskluderingStatus
 import no.nav.pensjon.kalkulator.ekskludering.EkskluderingAarsak
+import no.nav.pensjon.kalkulator.tjenestepensjon.Tjenestepensjonsforhold
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClient
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -42,12 +44,16 @@ class TjenestepensjonSimuleringServiceTest {
     @Mock
     private lateinit var ekskluderingFacade: EkskluderingFacade
 
+    @Mock
+    private lateinit var tpclient: TpTjenestepensjonClient
+
     @BeforeEach
     fun initialize() {
         `when`(pidGetter.pid()).thenReturn(pid)
         `when`(loependeVedtakService.hentLoependeVedtak()).thenReturn(LoependeVedtak(null, null, null, null, null, null))
         `when`(ekskluderingFacade.apotekerEkskludering()).thenReturn(EkskluderingStatus(ekskludert = false, aarsak = EkskluderingAarsak.NONE))
-        service = TjenestepensjonSimuleringService(pidGetter, tjenestepensjonSimuleringClient, loependeVedtakService, ekskluderingFacade)
+        `when`(tpclient.tjenestepensjonsforhold(pid)).thenReturn(Tjenestepensjonsforhold(emptyList()))
+        service = TjenestepensjonSimuleringService(pidGetter, tjenestepensjonSimuleringClient, loependeVedtakService, ekskluderingFacade, tpclient)
     }
 
     @Test
