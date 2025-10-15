@@ -17,8 +17,8 @@ data class PersonligSimuleringSpecV8(
     val heltUttak: PersonligSimuleringHeltUttakSpecV8,
     val utenlandsperiodeListe: List<PersonligSimuleringUtenlandsperiodeSpecV8>? = null,
     val sivilstand: Sivilstand?,
-    val epsHarInntektOver2G: Boolean,
-    val epsHarPensjon: Boolean,
+    val epsHarInntektOver2G: Boolean? = null,
+    val epsHarPensjon: Boolean? = null,
     val afpInntektMaanedFoerUttak: Boolean?,
     val afpOrdning: AfpOrdningType? = null
 )
