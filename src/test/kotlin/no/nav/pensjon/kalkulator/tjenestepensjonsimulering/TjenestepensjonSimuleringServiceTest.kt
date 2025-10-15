@@ -112,7 +112,7 @@ class TjenestepensjonSimuleringServiceTest {
     }
 
     @Test
-    fun `returnerer IKKE_MEDLEM status naar bruker har ufoeretrygd`() {
+    fun `returnerer TP_ORDNING_STOETTES_IKKE status naar bruker har ufoeretrygd`() {
         val request = SimuleringOffentligTjenestepensjonSpec(
             foedselsdato = LocalDate.parse("1962-12-31"),
             uttaksdato = LocalDate.of(2025, 1, 1),
@@ -138,12 +138,12 @@ class TjenestepensjonSimuleringServiceTest {
 
         val result = service.hentTjenestepensjonSimulering(request)
 
-        assertEquals(ResultatType.IKKE_MEDLEM, result.simuleringsResultatStatus.resultatType)
+        assertEquals(ResultatType.TP_ORDNING_STOETTES_IKKE, result.simuleringsResultatStatus.resultatType)
         assertNull(result.simuleringsResultat)
     }
 
     @Test
-    fun `returnerer IKKE_MEDLEM status naar bruker har pre2025OffentligAfp`() {
+    fun `returnerer TP_ORDNING_STOETTES_IKKE status naar bruker har pre2025OffentligAfp`() {
         val request = SimuleringOffentligTjenestepensjonSpec(
             foedselsdato = LocalDate.parse("1962-12-31"),
             uttaksdato = LocalDate.of(2025, 1, 1),
@@ -169,12 +169,12 @@ class TjenestepensjonSimuleringServiceTest {
 
         val result = service.hentTjenestepensjonSimulering(request)
 
-        assertEquals(ResultatType.IKKE_MEDLEM, result.simuleringsResultatStatus.resultatType)
+        assertEquals(ResultatType.TP_ORDNING_STOETTES_IKKE, result.simuleringsResultatStatus.resultatType)
         assertNull(result.simuleringsResultat)
     }
 
     @Test
-    fun `returnerer IKKE_MEDLEM status naar bruker er apoteker`() {
+    fun `returnerer TP_ORDNING_STOETTES_IKKE status naar bruker er apoteker`() {
         val request = SimuleringOffentligTjenestepensjonSpec(
             foedselsdato = LocalDate.parse("1990-01-01"),
             uttaksdato = LocalDate.of(2053, 3, 1),
@@ -193,12 +193,12 @@ class TjenestepensjonSimuleringServiceTest {
 
         val result = service.hentTjenestepensjonSimulering(request)
 
-        assertEquals(ResultatType.IKKE_MEDLEM, result.simuleringsResultatStatus.resultatType)
+        assertEquals(ResultatType.TP_ORDNING_STOETTES_IKKE, result.simuleringsResultatStatus.resultatType)
         assertNull(result.simuleringsResultat)
     }
 
     @Test
-    fun `returnerer IKKE_MEDLEM status naar bruker er foedt foer 1963 og har ufoeretrygd`() {
+    fun `returnerer TP_ORDNING_STOETTES_IKKE status naar bruker er foedt foer 1963 og har ufoeretrygd`() {
         val request = SimuleringOffentligTjenestepensjonSpec(
             foedselsdato = LocalDate.parse("1962-12-31"),
             uttaksdato = LocalDate.of(2025, 1, 1),
@@ -224,12 +224,12 @@ class TjenestepensjonSimuleringServiceTest {
 
         val result = service.hentTjenestepensjonSimulering(request)
 
-        assertEquals(ResultatType.IKKE_MEDLEM, result.simuleringsResultatStatus.resultatType)
+        assertEquals(ResultatType.TP_ORDNING_STOETTES_IKKE, result.simuleringsResultatStatus.resultatType)
         assertNull(result.simuleringsResultat)
     }
 
     @Test
-    fun `returnerer IKKE_MEDLEM status naar bruker er foedt foer 1963 og har pre2025OffentligAfp`() {
+    fun `returnerer TP_ORDNING_STOETTES_IKKE status naar bruker er foedt foer 1963 og har pre2025OffentligAfp`() {
         val request = SimuleringOffentligTjenestepensjonSpec(
             foedselsdato = LocalDate.parse("1962-12-31"),
             uttaksdato = LocalDate.of(2025, 1, 1),
@@ -255,7 +255,7 @@ class TjenestepensjonSimuleringServiceTest {
 
         val result = service.hentTjenestepensjonSimulering(request)
 
-        assertEquals(ResultatType.IKKE_MEDLEM, result.simuleringsResultatStatus.resultatType)
+        assertEquals(ResultatType.TP_ORDNING_STOETTES_IKKE, result.simuleringsResultatStatus.resultatType)
         assertNull(result.simuleringsResultat)
     }
 }
