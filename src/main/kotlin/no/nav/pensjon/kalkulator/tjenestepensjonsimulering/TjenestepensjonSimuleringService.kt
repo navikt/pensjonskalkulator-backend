@@ -25,7 +25,7 @@ class TjenestepensjonSimuleringService(
         if (erApoteker || (erFoedtFoer1963 && harUfoeretrygdEllerPre2025OffentligAfp)) {
             val tpForhold = tpclient.tjenestepensjonsforhold(pid)
             return OffentligTjenestepensjonSimuleringsresultat(
-                simuleringsResultatStatus = SimuleringsResultatStatus(ResultatType.IKKE_MEDLEM),
+                simuleringsResultatStatus = SimuleringsResultatStatus(ResultatType.TP_ORDNING_STOETTES_IKKE),
                 tpOrdninger = tpForhold.tpOrdninger
             )
         }
