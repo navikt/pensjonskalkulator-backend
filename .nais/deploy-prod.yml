@@ -73,7 +73,6 @@ spec:
         - application: pensjonssimulator
         - application: skjermede-personer-pip
           namespace: nom
-        - application: tjenestepensjon-simulering
         - application: tp
           namespace: pensjonsamhandling
           cluster: prod-fss
