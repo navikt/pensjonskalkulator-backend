@@ -16,6 +16,8 @@ import no.nav.pensjon.kalkulator.tjenestepensjon.client.TjenestepensjonClient
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpApotekerDto
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpTjenestepensjonStatusDto
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpTjenestepensjonDto
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpAfpOffentligLivsvarigDto
+import no.nav.pensjon.kalkulator.tjenestepensjon.AfpOffentligLivsvarigResult
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.map.TpTjenestepensjonMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
@@ -140,6 +142,84 @@ class TpTjenestepensjonClient(
         }
     }
 
+    override fun afpOffentligLivsvarigTpNummerListe(pid: Pid): List<String> {
+        val url = "$baseUrl/$AFP_OFFENTLIG_LIVSVARIG_PATH"
+        log.debug { "GET from URL: '$url'" }
+        return try {
+            webClient
+                .get()
+                .uri("/$AFP_OFFENTLIG_LIVSVARIG_PATH")
+                .headers { setHeaders(it, pid) }
+                .retrieve()
+                .bodyToFlux(TpAfpOffentligLivsvarigDto::class.java)
+                .filter { it.tpNr != null }
+                .map { it.tpNr!! }
+                .collectList()
+                .retryWhen(retryBackoffSpec(url))
+                .block()
+                .orEmpty()
+                .also { countCalls(MetricResult.OK) }
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $url", e)
+        } catch (e: WebClientResponseException) {
+            throw EgressException(e.responseBodyAsString, e)
+        }
+    }
+
+    override fun hentAfpOffentligLivsvarigDetaljer(pid: Pid, tpNr: String, uttaksdato: LocalDate): AfpOffentligLivsvarigResult {
+        val url1 = "$baseUrl/$TP_ORDNING1_PATH/$tpNr?uttaksdato=$uttaksdato"
+        val url2 = "$baseUrl/$TP_ORDNING2_PATH/$tpNr?uttaksdato=$uttaksdato"
+        val url3 = "$baseUrl/$TP_ORDNING3_PATH/$tpNr?uttaksdato=$uttaksdato"
+        log.debug { "Parallel GET from URLs: '$url1', '$url2', '$url3'" }
+        return try {
+            // Wrapper hvert call med et success flag så vi unngår å mappe kall som feiler
+            val m1 = webClient.get().uri("/$TP_ORDNING1_PATH/$tpNr?uttaksdato=$uttaksdato").headers { setHeaders(it, pid) }
+                .retrieve()
+                .bodyToMono(String::class.java)
+                .map { true to it }
+                .onErrorReturn(false to null)
+                .defaultIfEmpty(true to null)
+
+            val m2 = webClient.get().uri("/$TP_ORDNING2_PATH/$tpNr?uttaksdato=$uttaksdato").headers { setHeaders(it, pid) }
+                .retrieve()
+                .bodyToMono(String::class.java)
+                .map { true to it }
+                .onErrorReturn(false to null)
+                .defaultIfEmpty(true to null)
+
+            val m3 = webClient.get().uri("/$TP_ORDNING3_PATH/$tpNr?uttaksdato=$uttaksdato").headers { setHeaders(it, pid) }
+                .retrieve()
+                .bodyToMono(String::class.java)
+                .map { true to it }
+                .onErrorReturn(false to null)
+                .defaultIfEmpty(true to null)
+
+            val result: AfpOffentligLivsvarigResult? = reactor.core.publisher.Mono.zip(m1, m2, m3)
+                .map { tuple ->
+                    val (ok1, s1) = tuple.t1
+                    val (ok2, s2) = tuple.t2
+                    val (ok3, s3) = tuple.t3
+
+                    // Prioritize mapping from the first successful call only (1 -> 2 -> 3)
+                    when {
+                        ok1 -> AfpOffentligLivsvarigResult(parseBool(s1), parseInt(s1))
+                        ok2 -> AfpOffentligLivsvarigResult(parseBool(s2), parseInt(s2))
+                        ok3 -> AfpOffentligLivsvarigResult(parseBool(s3), parseInt(s3))
+                        else -> AfpOffentligLivsvarigResult(null, null)
+                    }
+                }
+                .retryWhen(retryBackoffSpec("$url1|$url2|$url3"))
+                .block()
+
+            countCalls(MetricResult.OK)
+            result ?: AfpOffentligLivsvarigResult(null, null)
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling one of $url1, $url2, $url3", e)
+        } catch (e: WebClientResponseException) {
+            throw EgressException(e.responseBodyAsString, e)
+        }
+    }
+
     override fun setPingHeaders(headers: HttpHeaders) {
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
     }
@@ -171,6 +251,16 @@ class TpTjenestepensjonClient(
                 null
         }
 
+    private fun parseBool(value: String?): Boolean? = when (value?.trim()?.lowercase()) {
+        "true", "ja", "1", "y" -> true
+        "false", "nei", "0", "n" -> false
+        else -> null
+    }
+
+    private fun parseInt(value: String?): Int? = value
+        ?.let { Regex("-?\\d+").find(it)?.value }
+        ?.toIntOrNull()
+
     companion object {
         private const val API_PATH = "api/tjenestepensjon"
         private const val API_TP_FORHOLD = "api/tjenestepensjon/finnTjenestepensjonsforhold"
@@ -181,6 +271,10 @@ class TpTjenestepensjonClient(
         // https://github.com/navikt/tp/blob/main/tp-api/src/main/kotlin/no/nav/samhandling/tp/controller/TjenestepensjonController.kt
         private const val YTELSE_RESOURCE = "haveYtelse"
         private const val YTELSE_PATH = "$API_PATH/$YTELSE_RESOURCE"
+        private const val AFP_OFFENTLIG_LIVSVARIG_PATH = "$API_PATH/getAfpOffentligLivsvarigOrdninger"
+        private const val TP_ORDNING1_PATH = "$API_PATH/TPORDNING1"
+        private const val TP_ORDNING2_PATH = "$API_PATH/TPORDNING2"
+        private const val TP_ORDNING3_PATH = "$API_PATH/TPORDNING3"
 
         private val service = EgressService.TJENESTEPENSJON
     }
