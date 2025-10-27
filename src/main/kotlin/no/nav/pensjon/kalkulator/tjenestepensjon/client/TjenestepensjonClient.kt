@@ -16,9 +16,7 @@ interface TjenestepensjonClient {
 
     fun tjenestepensjonsforhold(pid: Pid) : Tjenestepensjonsforhold
 
-    // TODO: det burde ikke være mulig å få flere tp-numre, men vi trenger fortsatt en håndtering for det
     fun afpOffentligLivsvarigTpNummerListe(pid: Pid): List<String>
 
-    // Bruker første tpNr til å slå opp detaljer i de ulike TP-ordning-endepunkter parallelt og mapper til status + beloep
     fun hentAfpOffentligLivsvarigDetaljer(pid: Pid, tpNr: String, uttaksdato: LocalDate): AfpOffentligLivsvarigResult
 }

@@ -1,7 +1,11 @@
 package no.nav.pensjon.kalkulator.tjenestepensjon
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
+import no.nav.pensjon.kalkulator.tech.web.NotFoundException
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.TjenestepensjonClient
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -12,17 +16,57 @@ class TjenestepensjonService(
     private val pidGetter: PidGetter,
     private val featureToggleService: FeatureToggleService
 ) {
+    private val log = KotlinLogging.logger {}
+
     fun harTjenestepensjonsforhold() = harForhold(tjenestepensjonClient.tjenestepensjon(pidGetter.pid()))
 
     fun hentMedlemskapITjenestepensjonsordninger() = tjenestepensjonClient.tjenestepensjonsforhold(pidGetter.pid()).tpOrdninger
 
-    // Hent første tpNr, finn uttaksdato fra TP-ytelser (datoYtelseIverksattFom for ALDER), og la klienten gjøre
-    // de parallelle kallene og mappingen til status + beløp
-    fun hentAfpOffentligLivsvarigDetaljer(): AfpOffentligLivsvarigResult? {
+    // Hent alle tpNr, finn uttaksdato fra TP-ytelser (datoYtelseIverksattFom for ALDER), og la klienten gjøre
+    // kallene til alle leverandører parallelt. Prioriter INNVILGET status, ellers returner første resultat
+    fun hentAfpOffentligLivsvarigDetaljer(): AfpOffentligLivsvarigResult {
         val pid = pidGetter.pid()
-        val tpNr = tjenestepensjonClient.afpOffentligLivsvarigTpNummerListe(pid).firstOrNull() ?: return null
-        val uttaksdato = finnUttaksdato(tjenestepensjonClient.tjenestepensjon(pid)) ?: return null
-        return tjenestepensjonClient.hentAfpOffentligLivsvarigDetaljer(pid, tpNr, uttaksdato)
+        val tpNumre = tjenestepensjonClient.afpOffentligLivsvarigTpNummerListe(pid)
+
+        if (tpNumre.isEmpty()) {
+            log.info { "Bruker har ingen AFP offentlig livsvarig ordninger" }
+            throw NotFoundException("Bruker har ingen AFP offentlig livsvarig ordninger")
+        }
+
+        log.debug { "Found ${tpNumre.size} TP-numre: $tpNumre" }
+
+        val uttaksdato = finnUttaksdato(tjenestepensjonClient.tjenestepensjon(pid))
+
+        if (uttaksdato == null) {
+            log.info { "Bruker har ikke startet uttak av alderspensjon" }
+            throw NotFoundException("Bruker har ikke startet uttak av alderspensjon (ingen ALDER-ytelse funnet)")
+        }
+
+        log.debug { "Found uttaksdato: $uttaksdato" }
+
+        // Gjør parallelle kall til alle leverandører
+        val resultater = runBlocking {
+            tpNumre.map { tpNr ->
+                async {
+                    try {
+                        tjenestepensjonClient.hentAfpOffentligLivsvarigDetaljer(pid, tpNr, uttaksdato)
+                    } catch (e: Exception) {
+                        log.warn(e) { "Failed to get AFP details for tpNr=$tpNr" }
+                        null
+                    }
+                }
+            }.mapNotNull { it.await() }
+        }
+
+        if (resultater.isEmpty()) {
+            log.info { "Ingen AFP-data hentet fra noen leverandører for ${tpNumre.size} TP-ordning(er)" }
+            throw NotFoundException("Kunne ikke hente AFP-data fra noen av brukerens tjenestepensjonsordninger")
+        }
+
+        log.debug { "Got ${resultater.size} results from providers" }
+
+        // Prioriter første INNVILGET (afpStatus = true). Hvis ingen INNVILGET, returner første resultat
+        return resultater.firstOrNull { it.afpStatus == true } ?: resultater.first()
     }
 
     fun erApoteker(): Boolean =
