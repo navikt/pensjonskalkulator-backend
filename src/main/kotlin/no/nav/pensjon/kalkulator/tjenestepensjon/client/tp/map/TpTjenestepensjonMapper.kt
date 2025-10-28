@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.map
 
 import no.nav.pensjon.kalkulator.tjenestepensjon.*
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpAfpStatusType
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.*
 
 object TpTjenestepensjonMapper {
@@ -14,6 +15,22 @@ object TpTjenestepensjonMapper {
 
     fun fromDto(dto: FinnTjenestepensjonsforholdResponsDto): Tjenestepensjonsforhold =
         Tjenestepensjonsforhold(dto.forhold.orEmpty().map { it.ordning.navn })
+
+    fun fromDto(response: TpAfpOffentligLivsvarigDetaljerDto?): AfpOffentligLivsvarigResult {
+        if (response == null) {
+            return AfpOffentligLivsvarigResult(null, null)
+        }
+
+        // Map AFP status to boolean (true if INNVILGET)
+        val afpStatus = when (response.statusAfp) {
+            TpAfpStatusType.INNVILGET -> true
+            TpAfpStatusType.UKJENT, TpAfpStatusType.IKKE_SOKT, TpAfpStatusType.SOKT, TpAfpStatusType.AVSLAG -> false
+        }
+
+        val beloep = response.belopsListe.firstOrNull()?.belop
+
+        return AfpOffentligLivsvarigResult(afpStatus, beloep)
+    }
 
     private fun forhold(dto: TpForholdDto): Forhold =
         Forhold(

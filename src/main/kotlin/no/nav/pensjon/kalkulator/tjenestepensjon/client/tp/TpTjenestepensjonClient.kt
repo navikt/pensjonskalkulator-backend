@@ -16,12 +16,12 @@ import no.nav.pensjon.kalkulator.tjenestepensjon.client.TjenestepensjonClient
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpApotekerDto
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpTjenestepensjonStatusDto
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpTjenestepensjonDto
-import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpAfpOffentligLivsvarigDto
-import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpOrdningDto
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpAfpOffentligLivsvarigDetaljerDto
 import no.nav.pensjon.kalkulator.tjenestepensjon.AfpOffentligLivsvarigResult
-import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.afpOffentligLivsvarig.common.TpOrdningBaseService
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.map.TpTjenestepensjonMapper
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.config.TpOrdningConfig
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
@@ -40,7 +40,7 @@ class TpTjenestepensjonClient(
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String,
-    private val tpOrdningMap: Map<String, TpOrdningBaseService>
+    private val afpOrdningConfigMap: Map<String, TpOrdningConfig>
 ) : PingableServiceClient(baseUrl, webClientBuilder, retryAttempts),
     TjenestepensjonClient {
 
@@ -154,14 +154,12 @@ class TpTjenestepensjonClient(
                 .uri("/$AFP_OFFENTLIG_LIVSVARIG_PATH")
                 .headers { setHeadersWithDate(it, pid) }
                 .retrieve()
-                .bodyToFlux(TpAfpOffentligLivsvarigDto::class.java)
-                .filter { it.tpNr != null }
-                .map { it.tpNr!! }
-                .collectList()
+                .bodyToMono(object : ParameterizedTypeReference<List<String>>() {})
                 .retryWhen(retryBackoffSpec(url))
                 .block()
-                .orEmpty()
+                ?.also { log.info { "Parsed tpNr list: $it" } }
                 .also { countCalls(MetricResult.OK) }
+                ?: emptyList()
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
@@ -179,12 +177,11 @@ class TpTjenestepensjonClient(
                 .uri("/$TP_ORDNING_PATH/$tpNr")
                 .headers { headers -> headers[CustomHttpHeaders.CALL_ID] = traceAid.callId() }
                 .retrieve()
-                .bodyToMono(TpOrdningDto::class.java)
+                .bodyToMono(String::class.java)
                 .retryWhen(retryBackoffSpec(url))
                 .block()
-                ?.tpOrdning
                 ?.lowercase()
-                .also {
+                ?.also {
                     log.debug { "TP-ordning for tpNr=$tpNr: $it" }
                     countCalls(MetricResult.OK)
                 }
@@ -201,30 +198,52 @@ class TpTjenestepensjonClient(
         log.debug { "Fetching AFP Offentlig Livsvarig detaljer for tpNr=$tpNr, uttaksdato=$uttaksdato" }
 
         val tpOrdning = hentTpOrdning(tpNr)
+            ?: throw EgressException("Kunne ikke hente TP-ordning for tpNr=$tpNr")
 
-        if (tpOrdning == null) {
-            log.warn { "Could not determine TP-ordning for tpNr=$tpNr" }
-            throw EgressException("Kunne ikke hente TP-ordning for tpNr=$tpNr")
-        }
+        log.info { "Successfully retrieved TP-ordning='$tpOrdning' for tpNr=$tpNr" }
+        log.info { "Available AFP provider configurations: ${afpOrdningConfigMap.keys}" }
 
-        // Get the specific provider for this ordning
-        val provider = tpOrdningMap[tpOrdning]
+        val config = afpOrdningConfigMap[tpOrdning]
+            ?: throw EgressException("Ingen AFP leverandører konfigurert for TP-ordning '$tpOrdning' (tpNr=$tpNr)")
 
-        if (provider == null) {
-            log.warn { "No AFP provider configured for ordning=$tpOrdning (tpNr=$tpNr)" }
-            throw EgressException("Ingen AFP leverandører konfigurert for TP-ordning '$tpOrdning' (tpNr=$tpNr)")
-        }
+        log.debug { "Using provider ${config.name} for tpNr=$tpNr" }
 
-        log.debug { "Using provider ${provider.providerName()} for tpNr=$tpNr" }
+        return hentAfpFraLeverandoer(pid, tpNr, uttaksdato, config)
+    }
+
+    private fun hentAfpFraLeverandoer(
+        pid: Pid,
+        tpNr: String,
+        uttaksdato: LocalDate,
+        config: TpOrdningConfig
+    ): AfpOffentligLivsvarigResult {
+        val url = config.url
+            .replace("{tpnr}", tpNr)
+            .replace("{fnr}", pid.value)
+            .replace("{uttaksdato}", uttaksdato.toString())
+
+        log.debug { "${config.name}: GET from URL: '$url'" }
 
         return try {
-            val result = provider.hent(pid, tpNr, uttaksdato)
-            log.debug { "Successfully retrieved AFP data from ${provider.providerName()}" }
-            countCalls(MetricResult.OK)
-            result
+            val response = webClient
+                .get()
+                .uri(url)
+                .headers { setHeaders(it, pid) }
+                .retrieve()
+                .bodyToMono(TpAfpOffentligLivsvarigDetaljerDto::class.java)
+                .block()
+
+            TpTjenestepensjonMapper.fromDto(response)
+                .also {
+                    log.debug { "Successfully retrieved AFP data from ${config.name}" }
+                    countCalls(MetricResult.OK)
+                }
+        } catch (e: WebClientRequestException) {
+            throw EgressException("${config.name}: Request failed for URL: $url", e)
+        } catch (e: WebClientResponseException) {
+            throw EgressException("${config.name}: Response error ${e.statusCode} for URL: $url", e)
         } catch (e: Exception) {
-            log.error(e) { "Unexpected error calling ${provider.providerName()} for tpNr=$tpNr" }
-            throw EgressException("Failed calling AFP provider ${provider.providerName()}", e)
+            throw EgressException("${config.name}: Unexpected error for URL: $url", e)
         }
     }
 

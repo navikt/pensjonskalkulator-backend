@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.afpOffentligLivsvarig.config
+package no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.validation.annotation.Validated
@@ -25,3 +25,4 @@ data class TpOrdningConfig(
 data class TpOrdningProperties(
     val tilbydere: Map<String, TpOrdningConfig> = emptyMap()
 )
+
