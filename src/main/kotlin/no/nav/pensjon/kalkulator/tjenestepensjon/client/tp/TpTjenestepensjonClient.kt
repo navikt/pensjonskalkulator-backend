@@ -19,7 +19,7 @@ import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpTjenestepensjon
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpAfpOffentligLivsvarigDetaljerDto
 import no.nav.pensjon.kalkulator.tjenestepensjon.AfpOffentligLivsvarigResult
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.map.TpTjenestepensjonMapper
-import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.config.TpOrdningConfig
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.config.AfpOffentligLivsvarigProperties
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
@@ -40,7 +40,7 @@ class TpTjenestepensjonClient(
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String,
-    private val afpOrdningConfigMap: Map<String, TpOrdningConfig>
+    private val afpOffentligLivsvarigProperties: AfpOffentligLivsvarigProperties
 ) : PingableServiceClient(baseUrl, webClientBuilder, retryAttempts),
     TjenestepensjonClient {
 
@@ -201,28 +201,18 @@ class TpTjenestepensjonClient(
             ?: throw EgressException("Kunne ikke hente TP-ordning for tpNr=$tpNr")
 
         log.info { "Successfully retrieved TP-ordning='$tpOrdning' for tpNr=$tpNr" }
-        log.info { "Available AFP provider configurations: ${afpOrdningConfigMap.keys}" }
 
-        val config = afpOrdningConfigMap[tpOrdning]
+        val config = afpOffentligLivsvarigProperties.tilbydere[tpOrdning]
             ?: throw EgressException("Ingen AFP leverandører konfigurert for TP-ordning '$tpOrdning' (tpNr=$tpNr)")
 
         log.debug { "Using provider ${config.name} for tpNr=$tpNr" }
 
-        return hentAfpFraLeverandoer(pid, tpNr, uttaksdato, config)
-    }
-
-    private fun hentAfpFraLeverandoer(
-        pid: Pid,
-        tpNr: String,
-        uttaksdato: LocalDate,
-        config: TpOrdningConfig
-    ): AfpOffentligLivsvarigResult {
         val url = config.url
             .replace("{tpnr}", tpNr)
             .replace("{fnr}", pid.value)
             .replace("{uttaksdato}", uttaksdato.toString())
 
-        log.debug { "${config.name}: GET from URL: '$url'" }
+        log.debug { "GET from URL: '$url'" }
 
         return try {
             val response = webClient
