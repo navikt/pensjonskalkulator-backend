@@ -25,5 +25,5 @@ data class AfpOffentligLivsvarigLeverandoerConfig(
 @ConfigurationProperties(prefix = "livsvarig-afp-offentlig")
 @Validated
 data class AfpOffentligLivsvarigProperties(
-    val tilbydere: Map<String, AfpOffentligLivsvarigLeverandoerConfig> = emptyMap()
+    var tilbydere: Map<String, AfpOffentligLivsvarigLeverandoerConfig> = emptyMap()
 )
