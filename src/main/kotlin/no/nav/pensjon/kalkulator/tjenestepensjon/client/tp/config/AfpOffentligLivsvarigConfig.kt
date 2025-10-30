@@ -14,7 +14,8 @@ data class AfpOffentligLivsvarigLeverandoerConfig(
     @field:NotBlank
     val name: String,  // Provider display name (e.g., "KLP", "SPK")
     val scope: String = "",
-    val audience: String = ""
+    val audience: String = "",
+    val overstyrteTpNr: String = ""  // Comma-separated list of TP numbers that override the normal lookup
 )
 
 /**

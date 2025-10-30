@@ -197,7 +197,9 @@ class TpTjenestepensjonClient(
     override fun hentAfpOffentligLivsvarigDetaljer(pid: Pid, tpNr: String, uttaksdato: LocalDate): AfpOffentligLivsvarigResult {
         log.debug { "Fetching AFP Offentlig Livsvarig detaljer for tpNr=$tpNr, uttaksdato=$uttaksdato" }
 
-        val tpOrdning = hentTpOrdning(tpNr)
+        // Sjekker om tpNr er i en leverandør sine overstyrteTpNr liste
+        val tpOrdning = findTpOrdningFromOverstyrteTpNr(tpNr)
+            ?: hentTpOrdning(tpNr)
             ?: throw EgressException("Kunne ikke hente TP-ordning for tpNr=$tpNr")
 
         log.info { "Successfully retrieved TP-ordning='$tpOrdning' for tpNr=$tpNr" }
@@ -235,6 +237,25 @@ class TpTjenestepensjonClient(
         } catch (e: Exception) {
             throw EgressException("${config.name}: Unexpected error for URL: $url", e)
         }
+    }
+
+    /**
+     * Finds the TP-ordning key by checking if the tpNr exists in any provider's overstyrteTpNr list.
+     * Returns the ordning key (e.g., "aksio", "klp") if found, null otherwise.
+     */
+    private fun findTpOrdningFromOverstyrteTpNr(tpNr: String): String? {
+        return afpOffentligLivsvarigProperties.tilbydere.entries.firstOrNull { (ordning, config) ->
+            val overstyrteTpNrList = config.overstyrteTpNr
+                .split(",")
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
+
+            val found = overstyrteTpNrList.contains(tpNr)
+            if (found) {
+                log.info { "Found tpNr=$tpNr in overstyrteTpNr for ordning=$ordning, skipping hentTpOrdning call" }
+            }
+            found
+        }?.key
     }
 
     override fun setPingHeaders(headers: HttpHeaders) {
@@ -279,6 +300,8 @@ class TpTjenestepensjonClient(
         private const val PING_PATH = "actuator/health/liveness"
         private const val APOTEKER_RESOURCE = "medlem/afp/apotekerforeningen/ersisteforhold"
         private const val APOTEKER_PATH = "$API_PATH/$APOTEKER_RESOURCE"
+
+        // https://github.com/navikt/tp/blob/main/tp-api/src/main/kotlin/no/nav/samhandling/tp/controller/TjenestepensjonController.kt
         private const val YTELSE_RESOURCE = "haveYtelse"
         private const val YTELSE_PATH = "$API_PATH/$YTELSE_RESOURCE"
         private const val AFP_OFFENTLIG_LIVSVARIG_PATH = "$API_PATH/getAfpOffentligLivsvarigOrdninger"

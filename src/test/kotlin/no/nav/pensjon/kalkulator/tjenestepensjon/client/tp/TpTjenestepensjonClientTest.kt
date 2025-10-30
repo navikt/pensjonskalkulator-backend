@@ -19,6 +19,7 @@ import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClie
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClientTestObjects.apotekerResponseBody
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClientTestObjects.dato
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClientTestObjects.statusResponseBody
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.config.AfpOffentligLivsvarigProperties
 import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
 import org.springframework.beans.factory.BeanFactory
@@ -31,13 +32,15 @@ class TpTjenestepensjonClientTest : FunSpec({
     var server: MockWebServer? = null
     var baseUrl: String? = null
     val traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" }
+    val afpOffentligLivsvarigProperties = AfpOffentligLivsvarigProperties()
 
     fun client(context: BeanFactory) =
         TpTjenestepensjonClient(
             baseUrl!!,
             webClientBuilder = context.getBean(WebClient.Builder::class.java),
             traceAid,
-            retryAttempts = "1"
+            retryAttempts = "1",
+            afpOffentligLivsvarigProperties = afpOffentligLivsvarigProperties
         )
 
     beforeSpec {
