@@ -27,7 +27,7 @@ object TpTjenestepensjonMapper {
             TpAfpStatusType.UKJENT, TpAfpStatusType.IKKE_SOKT, TpAfpStatusType.SOKT, TpAfpStatusType.AVSLAG -> false
         }
 
-        val beloep = response.belopsListe.firstOrNull()?.belop
+        val beloep = response.belopsListe.lastOrNull()?.belop
 
         return AfpOffentligLivsvarigResult(afpStatus, beloep)
     }
