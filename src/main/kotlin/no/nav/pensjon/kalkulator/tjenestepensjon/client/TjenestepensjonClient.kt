@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.tjenestepensjon.client
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tjenestepensjon.Tjenestepensjonsforhold
 import no.nav.pensjon.kalkulator.tjenestepensjon.Tjenestepensjon
+import no.nav.pensjon.kalkulator.tjenestepensjon.AfpOffentligLivsvarigResult
 import java.time.LocalDate
 
 interface TjenestepensjonClient {
@@ -14,4 +15,8 @@ interface TjenestepensjonClient {
     fun tjenestepensjon(pid: Pid): Tjenestepensjon
 
     fun tjenestepensjonsforhold(pid: Pid) : Tjenestepensjonsforhold
+
+    fun afpOffentligLivsvarigTpNummerListe(pid: Pid): List<String>
+
+    fun hentAfpOffentligLivsvarigDetaljer(pid: Pid, tpNr: String, uttaksdato: LocalDate): AfpOffentligLivsvarigResult
 }

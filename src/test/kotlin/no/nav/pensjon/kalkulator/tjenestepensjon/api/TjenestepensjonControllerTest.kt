@@ -7,6 +7,7 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.Fort
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tjenestepensjon.TjenestepensjonService
+import no.nav.pensjon.kalkulator.tjenestepensjon.AfpOffentligLivsvarigResult
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -72,10 +73,25 @@ class TjenestepensjonControllerTest {
             .andExpect(content().json(RESPONSE_BODY_V1))
     }
 
+    @Test
+    fun hentAfpOffentligLivsvarigDetaljer() {
+        `when`(tjenestepensjonService.hentAfpOffentligLivsvarigDetaljer())
+            .thenReturn(AfpOffentligLivsvarigResult(afpStatus = true, beloep = 15000))
+
+        mvc.perform(
+            get(URL_AFP_OFFENTLIG_LIVSVARIG)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk())
+            .andExpect(content().json(RESPONSE_BODY_AFP_OFFENTLIG_LIVSVARIG))
+    }
+
     private companion object {
 
         private const val URL = "/api/tpo-medlemskap"
         private const val URL_V1 = "/api/v1/tpo-medlemskap"
+        private const val URL_AFP_OFFENTLIG_LIVSVARIG = "/api/v1/tpo-afp-offentlig-livsvarig"
 
         @Language("json")
         private const val RESPONSE_BODY = """{
@@ -85,6 +101,12 @@ class TjenestepensjonControllerTest {
         @Language("json")
         private const val RESPONSE_BODY_V1 = """{
         "tpLeverandoerListe": ["Maritim pensjonskasse", "Statens pensjonskasse", "Kommunal Landspensjonskasse"]
+    }"""
+
+        @Language("json")
+        private const val RESPONSE_BODY_AFP_OFFENTLIG_LIVSVARIG = """{
+        "afpStatus": true,
+        "beloep": 15000
     }"""
     }
 }
