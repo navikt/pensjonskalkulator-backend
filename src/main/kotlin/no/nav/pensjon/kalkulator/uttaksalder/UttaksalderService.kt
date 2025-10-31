@@ -6,7 +6,10 @@ import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService
 import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.simulering.SimuleringException
 import no.nav.pensjon.kalkulator.simulering.SimuleringService
+import no.nav.pensjon.kalkulator.simulering.SimuleringStatus
+import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.tech.metric.Metrics
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import org.springframework.stereotype.Service
@@ -42,6 +45,15 @@ class UttaksalderService(
             lavesteUttaksalderService.lavesteUttaksalderSimuleringSpec(impersonalSpec, personalSpec, harEps)
 
         val result = simuleringService.simulerPersonligAlderspensjon(gunstigstSimuleringSpec)
+
+        if (
+            impersonalSpec.simuleringType == SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG &&
+            result.afpOffentlig.isEmpty()
+        )
+            throw SimuleringException(
+                status = SimuleringStatus.AFP_IKKE_I_VILKAARSPROEVING
+            )
+
 
         // TMU er enten:
         // - Den lavest mulige fremtidige alder for helt uttak (hvis vilkårsprøvingen av denne gir OK), eller
