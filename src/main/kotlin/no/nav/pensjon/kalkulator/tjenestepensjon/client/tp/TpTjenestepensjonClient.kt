@@ -220,7 +220,7 @@ class TpTjenestepensjonClient(
             val response = webClient
                 .get()
                 .uri(url)
-                .headers { setHeaders(it, pid) }
+                .headers { setExternalHeaders(it, pid) }
                 .retrieve()
                 .bodyToMono(TpAfpOffentligLivsvarigDetaljerDto::class.java)
                 .block()
@@ -278,6 +278,12 @@ class TpTjenestepensjonClient(
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
 
         // https://github.com/navikt/tp/blob/main/tp-api/src/main/kotlin/no/nav/samhandling/tp/provider/Headers.kt
+        headers[CustomHttpHeaders.PID] = pid.value
+    }
+
+    private fun setExternalHeaders(headers: HttpHeaders, pid: Pid) {
+        headers.setBearerAuth(EgressAccess.token(EgressService.TP_ORDNING_SERVICE).value)
+        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
         headers[CustomHttpHeaders.PID] = pid.value
     }
 
