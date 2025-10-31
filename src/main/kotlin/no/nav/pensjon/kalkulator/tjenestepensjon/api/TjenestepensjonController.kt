@@ -57,6 +57,26 @@ class TjenestepensjonController(
         }
     }
 
+    /*TODO: VERIFISER OM VI SKAL HA ET NYTT ENDEPUNKT FOR DETTE*/
+    @GetMapping("v1/tpo-afp-offentlig-livsvarig")
+    @Operation(
+        summary = "Hent loepende livsvarig afp offentlig",
+        description = "Henter aktive medlemskap til brukeren i offentlige tjenestepensjonsordninger"
+    )
+    fun hentAfpOffentligLivsvarigDetaljer(): AfpOffentligLivsvarigDto {
+        traceAid.begin()
+        log.debug { "Request for AFP offentlig livsvarig detaljer" }
+
+        return try {
+            toDto(timed(service::hentAfpOffentligLivsvarigDetaljer, "hentAfpOffentligLivsvarigDetaljer"))
+                .also { log.debug { "AFP offentlig livsvarig detaljer respons: $it" } }
+        } catch (e: EgressException) {
+            handleError(e)!!
+        } finally {
+            traceAid.end()
+        }
+    }
+
     override fun errorMessage() = ERROR_MESSAGE
 
     private companion object {
