@@ -24,7 +24,12 @@ enum class EgressService(
         purpose = "Representasjonsforhold (fullmakt m.m.)",
         authType = AuthType.PERSON_SELF // personal token required
     ),
-    PENSJONSFAGLIG_KJERNE("Pensjonsfaglig kjerne", "PEN", "Simulering, pensjonsdata"),
+    PENSJONSFAGLIG_KJERNE(
+        description = "Pensjonsfaglig kjerne",
+        shortName = "PEN",
+        purpose = "Pensjonsdata, simulering av tjenestepensjon",
+        authType = AuthType.MACHINE_INSIDE_NAV
+    ),
     PENSJONSOPPTJENING("Pensjonsopptjening", "POPP", "Pensjonsopptjeningsdata"),
     PERSONDATALOESNINGEN("Persondataløsningen", "PDL", "Persondata"),
     SKJERMEDE_PERSONER("Skjermede personer", "SP", "Skjerming"),
