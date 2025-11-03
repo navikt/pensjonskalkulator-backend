@@ -18,7 +18,6 @@ import org.springframework.web.reactive.function.client.WebClient
 @Qualifier("token-x")
 class TokenXClient(
     @Value("\${token.x.token.endpoint}") private val tokenEndpoint: String,
-    @Value("\${pensjon-representasjon.service-id}") private val tokenAudience: String,
     webClientBuilder: WebClient.Builder,
     expirationChecker: ExpirationChecker,
     private val credentials: TokenExchangeCredentials,
@@ -31,12 +30,12 @@ class TokenXClient(
 
     override fun prepareTokenRequestBody(
         accessParameter: TokenAccessParameter,
-        audience: String // to be used when more than one TokenX audience used
+        audience: String // format: "cluster:namespace:app"
     ): MultiValueMap<String, String> =
         OAuth2ParameterBuilder()
             .tokenAccessParameter(accessParameter)
             .clientId(credentials.clientId)
-            .tokenAudience(tokenAudience)
+            .tokenAudience(audience)
             .tokenRequestAudience(tokenEndpoint)
             .jwk(RSAKey.parse(credentials.jwk))
             .tokenExchangeRequestMap()
