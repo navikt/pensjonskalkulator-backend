@@ -1,8 +1,8 @@
-package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto
+package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.ResultatType
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.ResultatType
 
 /**
  * Data transfer object for the result of 'simulering offentlig tjenestepensjon' version 2.

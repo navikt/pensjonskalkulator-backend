@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering
+package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering
 
 import io.netty.handler.timeout.ReadTimeoutHandler
 import mu.KotlinLogging
@@ -10,12 +10,12 @@ import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.OffentligTjenestepensjonSimuleringsresultat
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringOffentligTjenestepensjonSpec
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.TjenestepensjonSimuleringClient
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.SimulerTjenestepensjonResponseDto
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.map.TpSimuleringClientMapper
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.map.TpSimuleringClientMapper.toDto
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.OffentligTjenestepensjonSimuleringFoer1963Resultat
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.SimuleringOffentligTjenestepensjonFoer1963Spec
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.TjenestepensjonSimuleringFoer1963Client
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.dto.SimulerTjenestepensjonFoer1963ResponseDto
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.map.TpSimuleringFoer1963ClientMapper.toDto
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.map.TpSimuleringFoer1963ClientMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
@@ -26,12 +26,12 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.netty.http.client.HttpClient
 
 @Component
-class TpSimuleringClient(
-    @param:Value("\${pensjonssimulator.url}") private val baseUrl: String,
+class TpSimuleringPenClient(
+    @param:Value("\${pen.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
-) : ExternalServiceClient(retryAttempts), TjenestepensjonSimuleringClient {
+) : ExternalServiceClient(retryAttempts), TjenestepensjonSimuleringFoer1963Client {
 
     private val log = KotlinLogging.logger {}
     private val webClient = webClientBuilder.baseUrl(baseUrl)
@@ -42,7 +42,7 @@ class TpSimuleringClient(
                     .doOnConnected { it.addHandlerLast(ReadTimeoutHandler(ON_CONNECTED_READ_TIMEOUT_SECONDS)) })
         ).build()
 
-    override fun hentTjenestepensjonSimulering(request: SimuleringOffentligTjenestepensjonSpec, pid: Pid): OffentligTjenestepensjonSimuleringsresultat {
+    override fun hentTjenestepensjonSimulering(request: SimuleringOffentligTjenestepensjonFoer1963Spec, pid: Pid): OffentligTjenestepensjonSimuleringFoer1963Resultat {
         val uri = "/$API_PATH"
         log.debug { "POST to URL: '$uri'" }
 
@@ -53,10 +53,10 @@ class TpSimuleringClient(
                 .bodyValue(toDto(request, pid))
                 .headers { setHeaders(it) }
                 .retrieve()
-                .bodyToMono(SimulerTjenestepensjonResponseDto::class.java)
+                .bodyToMono(SimulerTjenestepensjonFoer1963ResponseDto::class.java)
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
-                ?.let(TpSimuleringClientMapper::fromDto)
+                ?.let(TpSimuleringFoer1963ClientMapper::fromDto)
                 .also { countCalls(MetricResult.OK) } ?: throw EgressException("No response body")
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $uri", e)
@@ -75,8 +75,9 @@ class TpSimuleringClient(
     override fun service(): EgressService = service
 
     companion object {
-        private const val API_PATH = "api/nav/v1/simuler-oftp/fra-2025"
-        private val service = EgressService.PENSJONSSIMULATOR
+        private const val API_PATH = "api/selvbetjening/simuler/tjenestepensjon"
+        private val service = EgressService.PENSJONSFAGLIG_KJERNE
         private const val ON_CONNECTED_READ_TIMEOUT_SECONDS = 45
     }
+
 }

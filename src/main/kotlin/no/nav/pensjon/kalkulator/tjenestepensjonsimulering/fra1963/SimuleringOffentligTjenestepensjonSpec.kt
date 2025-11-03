@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.tjenestepensjonsimulering
+package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963
 
 import no.nav.pensjon.kalkulator.general.LoependeInntekt
 import java.time.LocalDate

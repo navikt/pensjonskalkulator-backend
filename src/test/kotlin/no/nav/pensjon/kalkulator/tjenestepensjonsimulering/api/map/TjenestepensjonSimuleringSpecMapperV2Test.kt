@@ -1,7 +1,8 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map
 
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.*
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringOffentligTjenestepensjonSpec
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringOffentligTjenestepensjonSpec
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.dto.*
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.map.TjenestepensjonSimuleringSpecMapperV2
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.LocalDate

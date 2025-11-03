@@ -1,12 +1,12 @@
-package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map
+package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.map
 
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.LoependeInntekt
 import no.nav.pensjon.kalkulator.simulering.PensjonUtil.uttakDato
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.SimuleringOffentligTjenestepensjonSpecV2
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.UtenlandsoppholdV2
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringOffentligTjenestepensjonSpec
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.SimuleringOffentligTjenestepensjonAlderV2
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.dto.SimuleringOffentligTjenestepensjonSpecV2
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.dto.UtenlandsoppholdV2
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringOffentligTjenestepensjonSpec
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.dto.SimuleringOffentligTjenestepensjonAlderV2
 import java.time.LocalDate
 
 object TjenestepensjonSimuleringSpecMapperV2 {
@@ -83,7 +83,7 @@ object TjenestepensjonSimuleringSpecMapperV2 {
         Alder(source.aar, source.maaneder)
 
     private fun mapToUttaksalder(spec: SimuleringOffentligTjenestepensjonSpecV2): Alder =
-        (spec.gradertUttak?.uttaksalder ?: spec.heltUttak.uttaksalder).let(::mapToAlder)
+        (spec.gradertUttak?.uttaksalder ?: spec.heltUttak.uttaksalder).let(TjenestepensjonSimuleringSpecMapperV2::mapToAlder)
 
     private fun antallAar(oppholdListe: List<UtenlandsoppholdV2>, uttaksdato: LocalDate): Int {
         val sammenslattePerioder = slaaSammenOverlappendePerioder(oppholdListe, uttaksdato)

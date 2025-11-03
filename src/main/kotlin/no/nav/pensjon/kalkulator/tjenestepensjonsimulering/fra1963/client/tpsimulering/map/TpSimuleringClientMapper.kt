@@ -1,15 +1,15 @@
-package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.map
+package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.map
 
 import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.OffentligTjenestepensjonSimuleringsresultat
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.ResultatType
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringOffentligTjenestepensjonSpec
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringsResultat
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringsResultatStatus
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.Utbetaling
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.FremtidigInntektSimuleringOFTPSpecDto
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.SimulerTjenestepensjonResponseDto
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.SimuleringOFTPSpecDto
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.OffentligTjenestepensjonSimuleringsresultat
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.ResultatType
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringOffentligTjenestepensjonSpec
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringsResultat
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringsResultatStatus
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.Utbetaling
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.dto.FremtidigInntektSimuleringOFTPSpecDto
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.dto.SimulerTjenestepensjonResponseDto
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.dto.SimuleringOFTPSpecDto
 
 object TpSimuleringClientMapper {
 

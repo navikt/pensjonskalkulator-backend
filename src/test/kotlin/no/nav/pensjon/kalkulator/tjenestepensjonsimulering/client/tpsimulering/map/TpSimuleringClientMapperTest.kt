@@ -2,10 +2,11 @@ package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.
 
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.OffentligTjenestepensjonSimuleringsresultat
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.ResultatType
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringOffentligTjenestepensjonSpec
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.*
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.OffentligTjenestepensjonSimuleringsresultat
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.ResultatType
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringOffentligTjenestepensjonSpec
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.dto.*
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.map.TpSimuleringClientMapper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -42,7 +43,7 @@ class TpSimuleringClientMapperTest {
         assertEquals("tpOrdningX", result.simuleringsResultat?.tpOrdning)
         assertEquals("1", result.simuleringsResultat?.tpNummer)
         assertEquals(dto.simuleringsResultat!!.utbetalingsperioder[0].startAlder, result.simuleringsResultat?.perioder?.get(0)?.startAlder)
-        assertEquals(dto.simuleringsResultat.utbetalingsperioder[0].sluttAlder, result.simuleringsResultat?.perioder?.get(0)?.sluttAlder)
+        assertEquals(dto.simuleringsResultat!!.utbetalingsperioder[0].sluttAlder, result.simuleringsResultat?.perioder?.get(0)?.sluttAlder)
         assertEquals(100, result.simuleringsResultat?.perioder?.get(0)?.maanedligBeloep)
         assertTrue(result.simuleringsResultat?.betingetTjenestepensjonInkludert!!)
     }

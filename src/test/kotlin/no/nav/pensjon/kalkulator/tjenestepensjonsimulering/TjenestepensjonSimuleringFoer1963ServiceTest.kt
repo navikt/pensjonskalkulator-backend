@@ -5,7 +5,8 @@ import no.nav.pensjon.kalkulator.general.LoependeInntekt
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.TjenestepensjonSimuleringClient
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.TjenestepensjonSimuleringClient
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.*
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtak
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtakService
 import no.nav.pensjon.kalkulator.vedtak.LoependeUfoeretrygdDetaljer
@@ -25,7 +26,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDate
 
 @ExtendWith(SpringExtension::class)
-class TjenestepensjonSimuleringServiceTest {
+class TjenestepensjonSimuleringFoer1963ServiceTest {
 
     private lateinit var service: TjenestepensjonSimuleringService
 
@@ -108,6 +109,12 @@ class TjenestepensjonSimuleringServiceTest {
         assertEquals(slutt, simuleringsResultat.perioder[0].sluttAlder)
         assertEquals(1000, simuleringsResultat.perioder[0].maanedligBeloep)
         assertTrue(simuleringsResultat.betingetTjenestepensjonInkludert)
+        assertEquals("tpOrdning", result.simuleringsResultat!!.tpOrdning)
+        assertEquals("111111", result.simuleringsResultat!!.tpNummer)
+        assertEquals(start, result.simuleringsResultat!!.perioder.get(0).startAlder)
+        assertEquals(slutt, result.simuleringsResultat!!.perioder[0].sluttAlder)
+        assertEquals(1000, result.simuleringsResultat!!.perioder[0].maanedligBeloep)
+        assertTrue(result.simuleringsResultat!!.betingetTjenestepensjonInkludert)
         assertEquals("tpOrdning", result.tpOrdninger[0])
     }
 

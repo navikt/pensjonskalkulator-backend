@@ -1,7 +1,7 @@
-package no.nav.pensjon.kalkulator.tjenestepensjonsimulering
+package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963
 
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.ResultatTypeDto
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.dto.ResultatTypeDto
 
 data class OffentligTjenestepensjonSimuleringsresultat(
     val simuleringsResultatStatus: SimuleringsResultatStatus,

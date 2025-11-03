@@ -1,10 +1,10 @@
-package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map
+package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.map
 
 import no.nav.pensjon.kalkulator.tech.time.DateUtil.MAANEDER_PER_AAR
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.*
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.OffentligTjenestepensjonSimuleringsresultat
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringsResultat
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.Utbetaling
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.OffentligTjenestepensjonSimuleringsresultat
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringsResultat
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.Utbetaling
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.dto.*
 
 object TjenestepensjonSimuleringResultMapperV2 {
 
@@ -12,7 +12,7 @@ object TjenestepensjonSimuleringResultMapperV2 {
         OffentligTjenestepensjonSimuleringResultV2(
             simuleringsresultatStatus = SimuleringsresultatStatusV2.fromResultatType(resultat.simuleringsResultatStatus.resultatType),
             muligeTpLeverandoerListe = resultat.tpOrdninger,
-            simulertTjenestepensjon = resultat.simuleringsResultat?.let(::simulertTjenestepensjon),
+            simulertTjenestepensjon = resultat.simuleringsResultat?.let(TjenestepensjonSimuleringResultMapperV2::simulertTjenestepensjon),
             serviceData = resultat.serviceData
         )
 
@@ -21,7 +21,7 @@ object TjenestepensjonSimuleringResultMapperV2 {
             tpLeverandoer = resultat.tpOrdning,
             tpNummer = resultat.tpNummer,
             simuleringsresultat = SimuleringsresultatV2(
-                utbetalingsperioder = resultat.perioder.map(::utbetalingsperiode),
+                utbetalingsperioder = resultat.perioder.map(TjenestepensjonSimuleringResultMapperV2::utbetalingsperiode),
                 betingetTjenestepensjonErInkludert = resultat.betingetTjenestepensjonInkludert,
             )
         )

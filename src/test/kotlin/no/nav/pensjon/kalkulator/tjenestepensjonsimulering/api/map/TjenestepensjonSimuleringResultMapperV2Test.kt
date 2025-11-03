@@ -1,13 +1,14 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map
 
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.OffentligTjenestepensjonSimuleringsresultat
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.ResultatType
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringsResultat
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringsResultatStatus
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.Utbetaling
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.OffentligTjenestepensjonSimuleringResultV2
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto.SimuleringsresultatStatusV2
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.OffentligTjenestepensjonSimuleringsresultat
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.ResultatType
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringsResultat
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringsResultatStatus
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.Utbetaling
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.dto.OffentligTjenestepensjonSimuleringResultV2
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.dto.SimuleringsresultatStatusV2
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.map.TjenestepensjonSimuleringResultMapperV2
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
