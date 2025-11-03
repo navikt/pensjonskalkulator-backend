@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.netty.handler.timeout.ReadTimeoutHandler
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
@@ -46,18 +47,23 @@ class TpSimuleringPenClient(
         val uri = "/$API_PATH"
         log.debug { "POST to URL: '$uri'" }
 
-        return try {
-            webClient
-                .post()
+        val dto = toDto(request, pid)
+        log.debug { dto }
+        try {
+            val rawJson = webClient.post()
                 .uri(uri)
-                .bodyValue(toDto(request, pid))
+                .bodyValue(dto)
                 .headers { setHeaders(it) }
                 .retrieve()
-                .bodyToMono(SimulerTjenestepensjonFoer1963ResponseDto::class.java)
+                .bodyToMono(String::class.java)
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
-                ?.let(TpSimuleringFoer1963ClientMapper::fromDto)
-                .also { countCalls(MetricResult.OK) } ?: throw EgressException("No response body")
+
+            println("Response JSON: $rawJson")
+
+            val responseDto = jacksonObjectMapper().readValue(rawJson, SimulerTjenestepensjonFoer1963ResponseDto::class.java)
+            return TpSimuleringFoer1963ClientMapper.fromDto(responseDto)
+                .also { countCalls(MetricResult.OK) }
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $uri", e)
         } catch (e: WebClientResponseException) {
@@ -75,7 +81,7 @@ class TpSimuleringPenClient(
     override fun service(): EgressService = service
 
     companion object {
-        private const val API_PATH = "api/selvbetjening/simuler/tjenestepensjon"
+        private const val API_PATH = "api/simuler/tjenestepensjon"
         private val service = EgressService.PENSJONSFAGLIG_KJERNE
         private const val ON_CONNECTED_READ_TIMEOUT_SECONDS = 45
     }

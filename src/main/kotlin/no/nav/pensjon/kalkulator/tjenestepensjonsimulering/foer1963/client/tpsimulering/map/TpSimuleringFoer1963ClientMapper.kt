@@ -15,6 +15,7 @@ import java.time.LocalDate
 import java.time.Instant
 import java.time.ZoneId
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.UtbetalingsperiodeResultat
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 
 object TpSimuleringFoer1963ClientMapper {
 
@@ -71,9 +72,7 @@ object TpSimuleringFoer1963ClientMapper {
                 antallArInntektEtterHeltUttak = inntektTom.year - heltUttakFom.year,
                 fnrAvdod = null,
                 samtykke = true,
-                utg = spec.gradertUttak?.grad?.let {
-                    SimulatorUttaksgrad.fromInternalValue(it).externalValue
-                } ?: SimulatorUttaksgrad.HUNDRE_PROSENT.externalValue,
+                utg = "50",
                 utenlandsopphold = spec.utenlandsopphold.antallAar ?: 0,
                 flyktning = false,
                 dodsdato = null,
@@ -88,13 +87,24 @@ object TpSimuleringFoer1963ClientMapper {
         )
     }
 
+    private fun penUttaksgradValue(grad: Uttaksgrad?): String? = when (grad) {
+        null -> null
+        Uttaksgrad.NULL -> "P_0"
+        Uttaksgrad.TJUE_PROSENT -> "P_20"
+        Uttaksgrad.FOERTI_PROSENT -> "P_40"
+        Uttaksgrad.FEMTI_PROSENT -> "P_50"
+        Uttaksgrad.SEKSTI_PROSENT -> "P_60"
+        Uttaksgrad.AATTI_PROSENT -> "P_80"
+        Uttaksgrad.HUNDRE_PROSENT -> "P_100"
+    }
+
+    // Updated to build periods with periodeFom/periodeTom
     private fun utenlandsperiode(periode: Opphold) = UtenlandsperiodeForSimuleringDto(
         land = periode.land.name,
-        fom = periode.fom.toString(),
-        tom = periode.tom.toString()
+        periodeFom = periode.fom,
+        periodeTom = periode.tom
     )
 
     private fun alder(source: Alder) =
         SimulatorAlderSpec(source.aar, source.maaneder)
-
 }
