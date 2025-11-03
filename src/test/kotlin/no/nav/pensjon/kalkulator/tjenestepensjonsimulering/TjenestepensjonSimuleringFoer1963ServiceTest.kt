@@ -7,6 +7,15 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.TjenestepensjonSimuleringClient
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.*
+import no.nav.pensjon.kalkulator.vedtak.LoependeVedtak
+import no.nav.pensjon.kalkulator.vedtak.LoependeVedtakService
+import no.nav.pensjon.kalkulator.vedtak.LoependeUfoeretrygdDetaljer
+import no.nav.pensjon.kalkulator.vedtak.LoependeVedtakDetaljer
+import no.nav.pensjon.kalkulator.ekskludering.EkskluderingFacade
+import no.nav.pensjon.kalkulator.ekskludering.EkskluderingStatus
+import no.nav.pensjon.kalkulator.ekskludering.EkskluderingAarsak
+import no.nav.pensjon.kalkulator.tjenestepensjon.Tjenestepensjonsforhold
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClient
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -30,10 +39,22 @@ class TjenestepensjonSimuleringFoer1963ServiceTest {
     @Mock
     private lateinit var featureToggleService: FeatureToggleService
 
+    @Mock
+    private lateinit var loependeVedtakService: LoependeVedtakService
+
+    @Mock
+    private lateinit var ekskluderingFacade: EkskluderingFacade
+
+    @Mock
+    private lateinit var tpclient: TpTjenestepensjonClient
+
     @BeforeEach
     fun initialize() {
         `when`(pidGetter.pid()).thenReturn(pid)
-        service = TjenestepensjonSimuleringService(pidGetter, tjenestepensjonSimuleringClient)
+        `when`(loependeVedtakService.hentLoependeVedtak()).thenReturn(LoependeVedtak(null, null, null, null, null, null))
+        `when`(ekskluderingFacade.apotekerEkskludering()).thenReturn(EkskluderingStatus(ekskludert = false, aarsak = EkskluderingAarsak.NONE))
+        `when`(tpclient.tjenestepensjonsforhold(pid)).thenReturn(Tjenestepensjonsforhold(emptyList()))
+        service = TjenestepensjonSimuleringService(pidGetter, tjenestepensjonSimuleringClient, loependeVedtakService, ekskluderingFacade, tpclient)
     }
 
     @Test
@@ -80,6 +101,14 @@ class TjenestepensjonSimuleringFoer1963ServiceTest {
         assertNotNull(result)
         assertEquals(ResultatType.OK, result.simuleringsResultatStatus.resultatType)
         assertNotNull(result.simuleringsResultat)
+
+        val simuleringsResultat = result.simuleringsResultat!!
+        assertEquals("tpOrdning", simuleringsResultat.tpOrdning)
+        assertEquals("111111", simuleringsResultat.tpNummer)
+        assertEquals(start, simuleringsResultat.perioder.get(0).startAlder)
+        assertEquals(slutt, simuleringsResultat.perioder[0].sluttAlder)
+        assertEquals(1000, simuleringsResultat.perioder[0].maanedligBeloep)
+        assertTrue(simuleringsResultat.betingetTjenestepensjonInkludert)
         assertEquals("tpOrdning", result.simuleringsResultat!!.tpOrdning)
         assertEquals("111111", result.simuleringsResultat!!.tpNummer)
         assertEquals(start, result.simuleringsResultat!!.perioder.get(0).startAlder)
@@ -87,5 +116,153 @@ class TjenestepensjonSimuleringFoer1963ServiceTest {
         assertEquals(1000, result.simuleringsResultat!!.perioder[0].maanedligBeloep)
         assertTrue(result.simuleringsResultat!!.betingetTjenestepensjonInkludert)
         assertEquals("tpOrdning", result.tpOrdninger[0])
+    }
+
+    @Test
+    fun `returnerer TP_ORDNING_STOETTES_IKKE status naar bruker har ufoeretrygd`() {
+        val request = SimuleringOffentligTjenestepensjonSpec(
+            foedselsdato = LocalDate.parse("1962-12-31"),
+            uttaksdato = LocalDate.of(2025, 1, 1),
+            sisteInntekt = 500000,
+            fremtidigeInntekter = emptyList(),
+            aarIUtlandetEtter16 = 0,
+            brukerBaOmAfp = false,
+            epsPensjon = false,
+            eps2G = false,
+            erApoteker = false
+        )
+
+        `when`(loependeVedtakService.hentLoependeVedtak()).thenReturn(
+            LoependeVedtak(
+                alderspensjon = null,
+                fremtidigLoependeVedtakAp = null,
+                ufoeretrygd = LoependeUfoeretrygdDetaljer(grad = 100, fom = LocalDate.now()),
+                afpPrivat = null,
+                afpOffentlig = null,
+                pre2025OffentligAfp = null
+            )
+        )
+
+        val result = service.hentTjenestepensjonSimulering(request)
+
+        assertEquals(ResultatType.TP_ORDNING_STOETTES_IKKE, result.simuleringsResultatStatus.resultatType)
+        assertNull(result.simuleringsResultat)
+    }
+
+    @Test
+    fun `returnerer TP_ORDNING_STOETTES_IKKE status naar bruker har pre2025OffentligAfp`() {
+        val request = SimuleringOffentligTjenestepensjonSpec(
+            foedselsdato = LocalDate.parse("1962-12-31"),
+            uttaksdato = LocalDate.of(2025, 1, 1),
+            sisteInntekt = 500000,
+            fremtidigeInntekter = emptyList(),
+            aarIUtlandetEtter16 = 0,
+            brukerBaOmAfp = false,
+            epsPensjon = false,
+            eps2G = false,
+            erApoteker = false
+        )
+
+        `when`(loependeVedtakService.hentLoependeVedtak()).thenReturn(
+            LoependeVedtak(
+                alderspensjon = null,
+                fremtidigLoependeVedtakAp = null,
+                ufoeretrygd = null,
+                afpPrivat = null,
+                afpOffentlig = null,
+                pre2025OffentligAfp = LoependeVedtakDetaljer(fom = LocalDate.now())
+            )
+        )
+
+        val result = service.hentTjenestepensjonSimulering(request)
+
+        assertEquals(ResultatType.TP_ORDNING_STOETTES_IKKE, result.simuleringsResultatStatus.resultatType)
+        assertNull(result.simuleringsResultat)
+    }
+
+    @Test
+    fun `returnerer TP_ORDNING_STOETTES_IKKE status naar bruker er apoteker`() {
+        val request = SimuleringOffentligTjenestepensjonSpec(
+            foedselsdato = LocalDate.parse("1990-01-01"),
+            uttaksdato = LocalDate.of(2053, 3, 1),
+            sisteInntekt = 500000,
+            fremtidigeInntekter = emptyList(),
+            aarIUtlandetEtter16 = 0,
+            brukerBaOmAfp = false,
+            epsPensjon = false,
+            eps2G = false,
+            erApoteker = false
+        )
+
+        `when`(ekskluderingFacade.apotekerEkskludering()).thenReturn(
+            EkskluderingStatus(ekskludert = true, aarsak = EkskluderingAarsak.ER_APOTEKER)
+        )
+
+        val result = service.hentTjenestepensjonSimulering(request)
+
+        assertEquals(ResultatType.TP_ORDNING_STOETTES_IKKE, result.simuleringsResultatStatus.resultatType)
+        assertNull(result.simuleringsResultat)
+    }
+
+    @Test
+    fun `returnerer TP_ORDNING_STOETTES_IKKE status naar bruker er foedt foer 1963 og har ufoeretrygd`() {
+        val request = SimuleringOffentligTjenestepensjonSpec(
+            foedselsdato = LocalDate.parse("1962-12-31"),
+            uttaksdato = LocalDate.of(2025, 1, 1),
+            sisteInntekt = 500000,
+            fremtidigeInntekter = emptyList(),
+            aarIUtlandetEtter16 = 0,
+            brukerBaOmAfp = false,
+            epsPensjon = false,
+            eps2G = false,
+            erApoteker = false
+        )
+
+        `when`(loependeVedtakService.hentLoependeVedtak()).thenReturn(
+            LoependeVedtak(
+                alderspensjon = null,
+                fremtidigLoependeVedtakAp = null,
+                ufoeretrygd = LoependeUfoeretrygdDetaljer(grad = 100, fom = LocalDate.now()),
+                afpPrivat = null,
+                afpOffentlig = null,
+                pre2025OffentligAfp = null
+            )
+        )
+
+        val result = service.hentTjenestepensjonSimulering(request)
+
+        assertEquals(ResultatType.TP_ORDNING_STOETTES_IKKE, result.simuleringsResultatStatus.resultatType)
+        assertNull(result.simuleringsResultat)
+    }
+
+    @Test
+    fun `returnerer TP_ORDNING_STOETTES_IKKE status naar bruker er foedt foer 1963 og har pre2025OffentligAfp`() {
+        val request = SimuleringOffentligTjenestepensjonSpec(
+            foedselsdato = LocalDate.parse("1962-12-31"),
+            uttaksdato = LocalDate.of(2025, 1, 1),
+            sisteInntekt = 500000,
+            fremtidigeInntekter = emptyList(),
+            aarIUtlandetEtter16 = 0,
+            brukerBaOmAfp = false,
+            epsPensjon = false,
+            eps2G = false,
+            erApoteker = false
+        )
+
+        `when`(loependeVedtakService.hentLoependeVedtak()).thenReturn(
+            LoependeVedtak(
+                alderspensjon = null,
+                fremtidigLoependeVedtakAp = null,
+                ufoeretrygd = null,
+                afpPrivat = null,
+                afpOffentlig = null,
+                pre2025OffentligAfp = LoependeVedtakDetaljer(fom = LocalDate.now())
+            )
+        )
+
+        val result = service.hentTjenestepensjonSimulering(request)
+
+        assertEquals(ResultatType.TP_ORDNING_STOETTES_IKKE, result.simuleringsResultatStatus.resultatType)
+        assertNull(result.simuleringsResultat)
     }
 }
