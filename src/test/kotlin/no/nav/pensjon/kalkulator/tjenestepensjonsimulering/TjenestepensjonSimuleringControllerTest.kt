@@ -9,7 +9,8 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMem
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.testutil.anyNonNull
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.TjenestepensjonSimuleringController
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.TjenestepensjonSimuleringController
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.*
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`

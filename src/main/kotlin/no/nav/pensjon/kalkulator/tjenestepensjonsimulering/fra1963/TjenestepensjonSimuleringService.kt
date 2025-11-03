@@ -1,7 +1,7 @@
-package no.nav.pensjon.kalkulator.tjenestepensjonsimulering
+package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963
 
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.TjenestepensjonSimuleringClient
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.TjenestepensjonSimuleringClient
 import org.springframework.stereotype.Service
 
 @Service

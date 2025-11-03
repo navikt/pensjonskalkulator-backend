@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto
+package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.dto
 
 import no.nav.pensjon.kalkulator.general.Alder
 

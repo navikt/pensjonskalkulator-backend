@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto
+package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.dto
 
 import java.time.LocalDate
 

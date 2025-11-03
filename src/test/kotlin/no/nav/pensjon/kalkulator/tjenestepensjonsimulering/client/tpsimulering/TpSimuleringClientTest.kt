@@ -9,18 +9,19 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.testutil.Arrange
 import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.OffentligTjenestepensjonSimuleringsresultat
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.ResultatType
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringOffentligTjenestepensjonSpec
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringsResultat
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringsResultatStatus
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.Utbetaling
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.OffentligTjenestepensjonSimuleringsresultat
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.ResultatType
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringOffentligTjenestepensjonSpec
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringsResultat
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringsResultatStatus
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.Utbetaling
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.TpSimuleringClientTestObjects.IKKE_MEDLEM
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.TpSimuleringClientTestObjects.INGEN_UTBETALINGSPERIODER
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.TpSimuleringClientTestObjects.OK
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.TpSimuleringClientTestObjects.TEKNISK_FEIL
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.TpSimuleringClientTestObjects.TP_ORDNING_STOETTES_IKKE
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.TpSimuleringClientTestObjects.spec
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.TpSimuleringClient
 import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
 import org.springframework.beans.factory.BeanFactory
@@ -44,7 +45,7 @@ class TpSimuleringClientTest : FunSpec({
     beforeSpec {
         Arrange.security()
         server = MockWebServer().apply { start() }
-        baseUrl = "http://localhost:${server.port}"
+        baseUrl = "http://localhost:${server!!.port}"
     }
 
     afterSpec {
