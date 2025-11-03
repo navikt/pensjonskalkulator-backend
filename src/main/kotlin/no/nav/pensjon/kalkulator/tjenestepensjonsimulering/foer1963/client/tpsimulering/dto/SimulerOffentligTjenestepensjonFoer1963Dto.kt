@@ -45,8 +45,10 @@ data class SimuleringEtter2011Dto(
 
 data class UtenlandsperiodeForSimuleringDto(
     val land: String? = null,
-    val fom: String? = null,
-    val tom: String? = null,
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    val periodeFom: LocalDate? = null,
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    val periodeTom: LocalDate? = null,
     val pensjonType: String? = null
 )
 

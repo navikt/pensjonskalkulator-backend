@@ -98,10 +98,11 @@ object TpSimuleringFoer1963ClientMapper {
         Uttaksgrad.HUNDRE_PROSENT -> "P_100"
     }
 
+    // Updated to build periods with periodeFom/periodeTom
     private fun utenlandsperiode(periode: Opphold) = UtenlandsperiodeForSimuleringDto(
         land = periode.land.name,
-        fom = periode.fom.toString(),
-        tom = periode.tom.toString()
+        periodeFom = periode.fom,
+        periodeTom = periode.tom
     )
 
     private fun alder(source: Alder) =
