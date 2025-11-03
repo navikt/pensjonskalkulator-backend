@@ -28,7 +28,7 @@ enum class EgressService(
         description = "Pensjonsfaglig kjerne",
         shortName = "PEN",
         purpose = "Pensjonsdata, simulering av tjenestepensjon",
-        authType = AuthType.PERSON_SELF
+        authType = AuthType.MACHINE_INSIDE_NAV
     ),
     PENSJONSOPPTJENING("Pensjonsopptjening", "POPP", "Pensjonsopptjeningsdata"),
     PERSONDATALOESNINGEN("Persondataløsningen", "PDL", "Persondata"),
