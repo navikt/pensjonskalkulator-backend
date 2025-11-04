@@ -60,7 +60,7 @@ class TjenestepensjonController(
     @GetMapping("v1/tpo-afp-offentlig-livsvarig")
     @Operation(
         summary = "Hent loepende livsvarig afp offentlig",
-        description = "Henter aktive medlemskap til brukeren i offentlige tjenestepensjonsordninger"
+        description = "Henter detaljer om løpende livsvarig AFP offentlig for brukeren"
     )
     fun hentAfpOffentligLivsvarigDetaljer(): AfpOffentligLivsvarigDto {
         traceAid.begin()
