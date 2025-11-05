@@ -55,7 +55,7 @@ class LoependeVedtakMapperV4Test : FunSpec({
             ),
             ufoeretrygd = UfoeretrygdDetaljerV4(grad = 50),
             afpPrivat = LoependeFraV4(fom = LocalDate.of(2022, 10, 1)),
-            afpOffentlig = LoependeFraV4(fom = LocalDate.of(2023, 10, 1)),
+            afpOffentlig = null,
             pre2025OffentligAfp = LoependeFraV4(fom = LocalDate.of(2024, 2, 1))
         )
     }
