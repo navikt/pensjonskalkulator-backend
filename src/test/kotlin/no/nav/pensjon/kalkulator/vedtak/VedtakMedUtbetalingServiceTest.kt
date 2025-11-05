@@ -65,8 +65,7 @@ class VedtakMedUtbetalingServiceTest {
                     fom = AFP_PRIVAT_START_DATO
                 ), afpOffentlig = LoependeVedtakDetaljer(
                     fom = AFP_OFFENTLIG_START_DATO
-                ),
-                gjeldendeUttaksgradFom = LocalDate.of(2021, 1, 1)
+                )
             )
         )
 

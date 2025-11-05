@@ -14,7 +14,6 @@ object LoependeVedtakMapperV4 {
         afpPrivat = vedtak.afpPrivat?.let(::toLoependeFraV4Dto),
         afpOffentlig = vedtak.afpOffentlig?.let(::toLoependeFraV4Dto),
         pre2025OffentligAfp = vedtak.pre2025OffentligAfp?.let(::toLoependeFraV4Dto),
-        gjeldendeUttaksgradFom = vedtak.gjeldendeUttaksgradFom
     )
 
     private fun hasContent(vedtak: LoependeVedtak): Boolean =
@@ -29,6 +28,7 @@ object LoependeVedtakMapperV4 {
         AlderspensjonDetaljerV4(
             grad = alderspensjon.grad,
             fom = alderspensjon.fom,
+            uttaksgradFom = alderspensjon.uttaksgradFom ?: alderspensjon.fom,
             sisteUtbetaling = alderspensjon.utbetalingSisteMaaned?.let(::toUtbetalingV4),
             sivilstand = SivilstandV4.fromInternalValue(alderspensjon.sivilstand)
         )
