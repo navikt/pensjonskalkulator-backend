@@ -8,9 +8,13 @@ data class SimulerOffentligTjenestepensjonFoer1963Dto(
     val simuleringEtter2011: SimuleringEtter2011Dto
 )
 
+data class Fnr(
+    val pid: String
+)
+
 data class SimuleringEtter2011Dto(
     val simuleringType: String?, //SimuleringTypeCode i pen
-    val fnr: String?,
+    val fnr: Fnr?,
     val fnrAvdod: Pid?,
     val samtykke: Boolean?,
     val forventetInntekt: Int?,
@@ -53,6 +57,7 @@ data class UtenlandsperiodeForSimuleringDto(
 )
 
 data class FremtidigInntektDto(
-    val aar: Int? = null,
-    val belop: Int? = null
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    val datoFom: LocalDate,
+    val arliginntekt: Int
 )
