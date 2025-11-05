@@ -289,7 +289,7 @@ class TpTjenestepensjonClient(
 
     private fun setHeadersWithDate(headers: HttpHeaders, pid: Pid) {
         setHeaders(headers, pid)
-        headers["date"] = LocalDate.now().toString()
+        headers[CustomHttpHeaders.DATE] = LocalDate.now().toString()
     }
 
     private fun handle(e: EgressException, pid: Pid): Boolean? =
