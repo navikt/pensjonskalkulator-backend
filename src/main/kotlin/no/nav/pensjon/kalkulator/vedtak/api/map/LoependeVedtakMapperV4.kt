@@ -14,6 +14,7 @@ object LoependeVedtakMapperV4 {
         afpPrivat = vedtak.afpPrivat?.let(::toLoependeFraV4Dto),
         afpOffentlig = vedtak.afpOffentlig?.let(::toLoependeFraV4Dto),
         pre2025OffentligAfp = vedtak.pre2025OffentligAfp?.let(::toLoependeFraV4Dto),
+        gjeldendeUttaksgradFom = vedtak.gjeldendeUttaksgradFom
     )
 
     private fun hasContent(vedtak: LoependeVedtak): Boolean =

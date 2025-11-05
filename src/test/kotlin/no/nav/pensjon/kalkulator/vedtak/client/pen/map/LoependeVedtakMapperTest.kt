@@ -25,7 +25,8 @@ class LoependeVedtakMapperTest {
             ),
             ufoeretrygd = PenGjeldendeUfoeregradDto(grad = 2, fraOgMed = LocalDate.of(2021, 1, 2)),
             afpPrivat = PenGjeldendeVedtakDto(fraOgMed = LocalDate.of(2021, 12, 31)),
-            afpOffentlig = PenGjeldendeVedtakDto(fraOgMed = LocalDate.of(2021, 6, 15))
+            afpOffentlig = PenGjeldendeVedtakDto(fraOgMed = LocalDate.of(2021, 6, 15)),
+            gjeldendeUttaksgradFom = LocalDate.of(2021, 1, 1)
         )
 
         val result = LoependeVedtakMapper.fromDto(dto)
