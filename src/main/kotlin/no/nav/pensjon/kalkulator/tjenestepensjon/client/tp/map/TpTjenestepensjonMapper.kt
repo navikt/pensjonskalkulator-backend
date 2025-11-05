@@ -1,10 +1,13 @@
 package no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.map
 
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.tjenestepensjon.*
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpAfpStatusType
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.*
 
 object TpTjenestepensjonMapper {
+
+    private val log = KotlinLogging.logger {}
 
     fun fromDto(dto: TpApotekerDto): Boolean = dto.harLopendeForholdApotekerforeningen ?: false
 
@@ -28,6 +31,10 @@ object TpTjenestepensjonMapper {
         }
 
         val beloep = response.belopsListe.lastOrNull()?.belop
+
+        if (afpStatus && response.belopsListe.isEmpty()) {
+            log.warn { "AFP Offentlig Livsvarig er INNVILGET men beløpsliste er tom. Dette kan indikere datakvalitetsproblem." }
+        }
 
         return AfpOffentligLivsvarigResult(afpStatus, beloep)
     }

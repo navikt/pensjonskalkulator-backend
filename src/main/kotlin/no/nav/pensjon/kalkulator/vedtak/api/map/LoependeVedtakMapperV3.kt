@@ -1,23 +1,22 @@
 package no.nav.pensjon.kalkulator.vedtak.api.map
 
-import no.nav.pensjon.kalkulator.vedtak.LoependeAlderspensjonDetaljer
-import no.nav.pensjon.kalkulator.vedtak.LoependeUfoeretrygdDetaljer
-import no.nav.pensjon.kalkulator.vedtak.LoependeVedtak
-import no.nav.pensjon.kalkulator.vedtak.LoependeVedtakDetaljer
+import no.nav.pensjon.kalkulator.vedtak.LoependeAlderspensjon
+import no.nav.pensjon.kalkulator.vedtak.LoependeUfoeretrygd
+import no.nav.pensjon.kalkulator.vedtak.VedtakSamling
+import no.nav.pensjon.kalkulator.vedtak.LoependeEntitet
 import no.nav.pensjon.kalkulator.vedtak.api.dto.*
 import java.math.BigDecimal
 
 object LoependeVedtakMapperV3 {
 
-    fun toDto(vedtak: LoependeVedtak) = LoependeVedtakV3(
-        alderspensjon = toAlderspensjonDetaljerV3Dto(vedtak.alderspensjon),
-        harFremtidigLoependeVedtak = vedtak.fremtidigLoependeVedtakAp != null,
+    fun toDto(vedtak: VedtakSamling) = LoependeVedtakV3(
+        alderspensjon = toAlderspensjonDetaljerV3Dto(vedtak.loependeAlderspensjon),
+        harFremtidigLoependeVedtak = vedtak.fremtidigAlderspensjon != null,
         ufoeretrygd = toUfoeretrygdDetaljerV3Dto(vedtak.ufoeretrygd),
-        afpPrivat = toLoependeFraV3Dto(vedtak.afpPrivat),
-        afpOffentlig = toLoependeFraV3Dto(vedtak.afpOffentlig),
+        afpPrivat = toLoependeFraV3Dto(vedtak.privatAfp),
     )
 
-    private fun toAlderspensjonDetaljerV3Dto(alderspensjon: LoependeAlderspensjonDetaljer?) = alderspensjon?.let {
+    private fun toAlderspensjonDetaljerV3Dto(alderspensjon: LoependeAlderspensjon?) = alderspensjon?.let {
         AlderspensjonDetaljerV3(
             grad = alderspensjon.grad,
             fom = alderspensjon.fom,
@@ -31,8 +30,8 @@ object LoependeVedtakMapperV3 {
         )
     }
 
-    private fun toUfoeretrygdDetaljerV3Dto(ufoeretrygd: LoependeUfoeretrygdDetaljer?) : UfoeretrygdDetaljerV3 = UfoeretrygdDetaljerV3(grad = ufoeretrygd?.grad?: 0)
+    private fun toUfoeretrygdDetaljerV3Dto(ufoeretrygd: LoependeUfoeretrygd?) : UfoeretrygdDetaljerV3 = UfoeretrygdDetaljerV3(grad = ufoeretrygd?.grad?: 0)
 
-    private fun toLoependeFraV3Dto(loependeVedtakDetaljer: LoependeVedtakDetaljer?) = loependeVedtakDetaljer?.fom?.let { LoependeFraV3(fom = it) }
+    private fun toLoependeFraV3Dto(loependeEntitet: LoependeEntitet?) = loependeEntitet?.fom?.let { LoependeFraV3(fom = it) }
 
 }

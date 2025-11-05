@@ -1,100 +1,75 @@
 package no.nav.pensjon.kalkulator.vedtak
 
-import kotlinx.coroutines.test.runTest
-import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.omstillingsstoenad.OmstillingOgGjenlevendeYtelseServiceTest.Companion.now
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.TimeProvider
-import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.utbetaling.SamletUtbetaling
 import no.nav.pensjon.kalkulator.utbetaling.UtbetalingService
-import no.nav.pensjon.kalkulator.utbetaling.UtbetalingServiceTest.Companion.MONTH_START
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.time.Month
 
-@ExtendWith(SpringExtension::class)
-class VedtakMedUtbetalingServiceTest {
+class VedtakMedUtbetalingServiceTest : ShouldSpec({
 
-    @Mock
-    private lateinit var pidGetter: PidGetter
+    should("hente vedtak med utbetaling") {
+        val vedtakSamling = VedtakMedUtbetalingService(
+            vedtakService = arrangeVedtak(),
+            utbetalingService = arrangeUtbetaling()
+        ).hentVedtakMedUtbetaling()
 
-    @Mock
-    private lateinit var timeProvider: TimeProvider
+        with(vedtakSamling) {
+            with(loependeAlderspensjon!!) {
+                grad shouldBe 1
+                fom shouldBe LocalDate.of(2024, 8, 1)
+                sivilstand shouldBe Sivilstand.GIFT
+                with(utbetalingSisteMaaned!!) {
+                    posteringsdato shouldBe LocalDate.of(2024, 1, 1)
+                    beloep shouldBe BigDecimal.TEN
+                }
+            }
+            with(fremtidigAlderspensjon!!) {
+                grad shouldBe 1
+                fom shouldBe LocalDate.of(2025, 4, 1)
+                sivilstand shouldBe Sivilstand.SEPARERT
+            }
+            with(ufoeretrygd!!) {
+                grad shouldBe 2
+                fom shouldBe LocalDate.of(2022, 1, 1)
+            }
+            privatAfp?.fom shouldBe LocalDate.of(2023, 1, 1)
+        }
+    }
+})
 
-    @Mock
-    private lateinit var utbetalingService: UtbetalingService
-
-    @Mock
-    private lateinit var loependeVedtakService: LoependeVedtakService
-
-    private lateinit var service: VedtakMedUtbetalingService
-
-    @BeforeEach
-    fun initialize() {
-        Mockito.`when`(pidGetter.pid()).thenReturn(pid)
-        Mockito.`when`(timeProvider.time()).thenReturn(now)
-        service = VedtakMedUtbetalingService(loependeVedtakService, utbetalingService)
+private fun arrangeVedtak(): LoependeVedtakService =
+    mockk<LoependeVedtakService> {
+        every {
+            hentLoependeVedtak()
+        } returns VedtakSamling(
+            loependeAlderspensjon = LoependeAlderspensjon(
+                grad = 1,
+                fom = LocalDate.of(2024, 8, 1),
+                sivilstand = Sivilstand.GIFT
+            ),
+            fremtidigAlderspensjon = FremtidigAlderspensjon(
+                grad = 1,
+                fom = LocalDate.of(2025, 4, 1),
+                sivilstand = Sivilstand.SEPARERT
+            ),
+            ufoeretrygd = LoependeUfoeretrygd(grad = 2, fom = LocalDate.of(2022, 1, 1)),
+            privatAfp = LoependeEntitet(fom = LocalDate.of(2023, 1, 1))
+        )
     }
 
-    @Test
-    fun hentVedtakMedUtbetaling() = runTest {
-        Mockito.`when`(loependeVedtakService.hentLoependeVedtak()).thenReturn(
-            LoependeVedtak(
-                alderspensjon = LoependeAlderspensjonDetaljer(
-                    grad = 1,
-                    fom = AP_START_DATO,
-                    sivilstand = Sivilstand.GIFT
-                ),
-                fremtidigLoependeVedtakAp = FremtidigAlderspensjonDetaljer(
-                    grad = 1,
-                    fom = AP_START_DATO.plusMonths(6),
-                    sivilstand = Sivilstand.SEPARERT
-                ),
-                ufoeretrygd = LoependeUfoeretrygdDetaljer(
-                    grad = 2,
-                    fom = UFOERETRYGD_START_DATO
-                ), afpPrivat = LoependeVedtakDetaljer(
-                    fom = AFP_PRIVAT_START_DATO
-                ), afpOffentlig = LoependeVedtakDetaljer(
-                    fom = AFP_OFFENTLIG_START_DATO
-                )
-            )
+private fun arrangeUtbetaling(): UtbetalingService =
+    mockk<UtbetalingService> {
+        coEvery {
+            hentSisteMaanedsUtbetaling()
+        } returns SamletUtbetaling(
+            posteringsdato = LocalDate.of(2024, 1, 1),
+            totalBeloep = BigDecimal.TEN
         )
-
-        Mockito.`when`(utbetalingService.hentSisteMaanedsUtbetaling()).thenReturn(
-            SamletUtbetaling(posteringsdato = SISTE_AP_UTBETALING_DATO, totalBeloep = BigDecimal.TEN)
-        )
-
-        val vedtak = service.hentVedtakMedUtbetaling()
-
-        assertNotNull(vedtak)
-        assertEquals(1, vedtak.alderspensjon?.grad)
-        assertEquals(AP_START_DATO, vedtak.alderspensjon?.fom)
-        assertEquals(Sivilstand.GIFT, vedtak.alderspensjon?.sivilstand)
-        assertNotNull(vedtak.fremtidigLoependeVedtakAp)
-        assertEquals(1, vedtak.fremtidigLoependeVedtakAp?.grad)
-        assertEquals(AP_START_DATO.plusMonths(6), vedtak.fremtidigLoependeVedtakAp?.fom)
-        assertEquals(Sivilstand.SEPARERT, vedtak.fremtidigLoependeVedtakAp?.sivilstand)
-        assertNotNull(vedtak.alderspensjon?.utbetalingSisteMaaned)
-        assertEquals(SISTE_AP_UTBETALING_DATO, vedtak.alderspensjon?.utbetalingSisteMaaned?.posteringsdato)
-        assertEquals(BigDecimal.TEN, vedtak.alderspensjon?.utbetalingSisteMaaned?.beloep)
-        assertEquals(2, vedtak.ufoeretrygd?.grad)
-        assertEquals(UFOERETRYGD_START_DATO, vedtak.ufoeretrygd?.fom)
-        assertEquals(AFP_PRIVAT_START_DATO, vedtak.afpPrivat?.fom)
-        assertEquals(AFP_OFFENTLIG_START_DATO, vedtak.afpOffentlig?.fom)
     }
 
-    val AP_START_DATO = LocalDate.parse("2024-08-01")
-    val UFOERETRYGD_START_DATO = LocalDate.parse("2022-01-01")
-    val AFP_PRIVAT_START_DATO = LocalDate.parse("2023-01-01")
-    val AFP_OFFENTLIG_START_DATO = LocalDate.parse("2024-01-01")
-    val SISTE_AP_UTBETALING_DATO = LocalDate.of(2024, Month.JANUARY, MONTH_START)
-}

@@ -5,12 +5,12 @@ import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import no.nav.pensjon.kalkulator.vedtak.LoependeAlderspensjonDetaljer
-import no.nav.pensjon.kalkulator.vedtak.LoependeVedtak
+import no.nav.pensjon.kalkulator.vedtak.LoependeAlderspensjon
+import no.nav.pensjon.kalkulator.vedtak.VedtakSamling
 import no.nav.pensjon.kalkulator.vedtak.Utbetaling
 import no.nav.pensjon.kalkulator.vedtak.client.LoependeVedtakClient
 import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenLoependeVedtakDto
-import no.nav.pensjon.kalkulator.vedtak.client.pen.map.LoependeVedtakMapper
+import no.nav.pensjon.kalkulator.vedtak.client.pen.map.PenLoependeVedtakMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.stereotype.Component
@@ -26,19 +26,18 @@ class PenLoependeVedtakClient(
     @Value("\${web-client.retry-attempts}") private val retryAttempts: String
 ) : PenClient(baseUrl, webClientBuilder, traceAid, retryAttempts), LoependeVedtakClient {
 
-    override fun hentLoependeVedtak(pid: Pid): LoependeVedtak {
+    override fun hentLoependeVedtak(pid: Pid): VedtakSamling {
         if (pid.value == "01426347659") {
-            return LoependeVedtak(
-                alderspensjon = LoependeAlderspensjonDetaljer(
+            return VedtakSamling(
+                loependeAlderspensjon = LoependeAlderspensjon(
                     grad = 0,
                     fom = LocalDate.of(2025, 5, 1),
                     utbetalingSisteMaaned = Utbetaling(BigDecimal(0.0), LocalDate.of(2025, 9, 20)),
                     sivilstand = Sivilstand.GIFT
                 ),
-                fremtidigLoependeVedtakAp = null,
+                fremtidigAlderspensjon = null,
                 ufoeretrygd = null,
-                afpPrivat = null,
-                afpOffentlig = null,
+                privatAfp = null,
                 pre2025OffentligAfp = null
             )
         }
@@ -46,7 +45,7 @@ class PenLoependeVedtakClient(
             object : ParameterizedTypeReference<PenLoependeVedtakDto>() {},
             path = PATH,
             pid
-        )?.let(LoependeVedtakMapper::fromDto)
+        )?.let(PenLoependeVedtakMapper::fromDto)
             ?: throw EgressException("Kunne ikke hente loepende vedtak for brukeren")
     }
 

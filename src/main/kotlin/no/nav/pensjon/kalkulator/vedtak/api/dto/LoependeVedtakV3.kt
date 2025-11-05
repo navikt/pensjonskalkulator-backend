@@ -13,7 +13,6 @@ data class LoependeVedtakV3(
     val harFremtidigLoependeVedtak: Boolean = false,
     val ufoeretrygd: UfoeretrygdDetaljerV3,
     val afpPrivat: LoependeFraV3?,
-    val afpOffentlig: LoependeFraV3?,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

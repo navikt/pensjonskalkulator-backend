@@ -7,10 +7,10 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.TjenestepensjonSimuleringClient
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.*
-import no.nav.pensjon.kalkulator.vedtak.LoependeVedtak
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtakService
-import no.nav.pensjon.kalkulator.vedtak.LoependeUfoeretrygdDetaljer
-import no.nav.pensjon.kalkulator.vedtak.LoependeVedtakDetaljer
+import no.nav.pensjon.kalkulator.vedtak.LoependeUfoeretrygd
+import no.nav.pensjon.kalkulator.vedtak.LoependeEntitet
+import no.nav.pensjon.kalkulator.vedtak.VedtakSamling
 import no.nav.pensjon.kalkulator.ekskludering.EkskluderingFacade
 import no.nav.pensjon.kalkulator.ekskludering.EkskluderingStatus
 import no.nav.pensjon.kalkulator.ekskludering.EkskluderingAarsak
@@ -51,7 +51,7 @@ class TjenestepensjonSimuleringFoer1963ServiceTest {
     @BeforeEach
     fun initialize() {
         `when`(pidGetter.pid()).thenReturn(pid)
-        `when`(loependeVedtakService.hentLoependeVedtak()).thenReturn(LoependeVedtak(null, null, null, null, null, null))
+        `when`(loependeVedtakService.hentLoependeVedtak()).thenReturn(VedtakSamling(null, null, null, null, null))
         `when`(ekskluderingFacade.apotekerEkskludering()).thenReturn(EkskluderingStatus(ekskludert = false, aarsak = EkskluderingAarsak.NONE))
         `when`(tpclient.tjenestepensjonsforhold(pid)).thenReturn(Tjenestepensjonsforhold(emptyList()))
         service = TjenestepensjonSimuleringService(pidGetter, tjenestepensjonSimuleringClient, loependeVedtakService, ekskluderingFacade, tpclient)
@@ -133,12 +133,11 @@ class TjenestepensjonSimuleringFoer1963ServiceTest {
         )
 
         `when`(loependeVedtakService.hentLoependeVedtak()).thenReturn(
-            LoependeVedtak(
-                alderspensjon = null,
-                fremtidigLoependeVedtakAp = null,
-                ufoeretrygd = LoependeUfoeretrygdDetaljer(grad = 100, fom = LocalDate.now()),
-                afpPrivat = null,
-                afpOffentlig = null,
+            VedtakSamling(
+                loependeAlderspensjon = null,
+                fremtidigAlderspensjon = null,
+                ufoeretrygd = LoependeUfoeretrygd(grad = 100, fom = LocalDate.now()),
+                privatAfp = null,
                 pre2025OffentligAfp = null
             )
         )
@@ -164,13 +163,12 @@ class TjenestepensjonSimuleringFoer1963ServiceTest {
         )
 
         `when`(loependeVedtakService.hentLoependeVedtak()).thenReturn(
-            LoependeVedtak(
-                alderspensjon = null,
-                fremtidigLoependeVedtakAp = null,
+            VedtakSamling(
+                loependeAlderspensjon = null,
+                fremtidigAlderspensjon = null,
                 ufoeretrygd = null,
-                afpPrivat = null,
-                afpOffentlig = null,
-                pre2025OffentligAfp = LoependeVedtakDetaljer(fom = LocalDate.now())
+                privatAfp = null,
+                pre2025OffentligAfp = LoependeEntitet(fom = LocalDate.now())
             )
         )
 
@@ -219,12 +217,11 @@ class TjenestepensjonSimuleringFoer1963ServiceTest {
         )
 
         `when`(loependeVedtakService.hentLoependeVedtak()).thenReturn(
-            LoependeVedtak(
-                alderspensjon = null,
-                fremtidigLoependeVedtakAp = null,
-                ufoeretrygd = LoependeUfoeretrygdDetaljer(grad = 100, fom = LocalDate.now()),
-                afpPrivat = null,
-                afpOffentlig = null,
+            VedtakSamling(
+                loependeAlderspensjon = null,
+                fremtidigAlderspensjon = null,
+                ufoeretrygd = LoependeUfoeretrygd(grad = 100, fom = LocalDate.now()),
+                privatAfp = null,
                 pre2025OffentligAfp = null
             )
         )
@@ -250,13 +247,12 @@ class TjenestepensjonSimuleringFoer1963ServiceTest {
         )
 
         `when`(loependeVedtakService.hentLoependeVedtak()).thenReturn(
-            LoependeVedtak(
-                alderspensjon = null,
-                fremtidigLoependeVedtakAp = null,
+            VedtakSamling(
+                loependeAlderspensjon = null,
+                fremtidigAlderspensjon = null,
                 ufoeretrygd = null,
-                afpPrivat = null,
-                afpOffentlig = null,
-                pre2025OffentligAfp = LoependeVedtakDetaljer(fom = LocalDate.now())
+                privatAfp = null,
+                pre2025OffentligAfp = LoependeEntitet(fom = LocalDate.now())
             )
         )
 
