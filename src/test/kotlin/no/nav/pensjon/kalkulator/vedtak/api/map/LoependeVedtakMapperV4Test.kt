@@ -15,6 +15,7 @@ class LoependeVedtakMapperV4Test : FunSpec({
             alderspensjon = LoependeAlderspensjonDetaljer(
                 grad = 100,
                 fom = LocalDate.of(2020, 10, 1),
+                uttaksgradFom = LocalDate.of(2021, 1, 1),
                 utbetalingSisteMaaned = Utbetaling(
                     beloep = BigDecimal("100"),
                     posteringsdato = LocalDate.of(2025, 1, 1)
@@ -42,6 +43,7 @@ class LoependeVedtakMapperV4Test : FunSpec({
             alderspensjon = AlderspensjonDetaljerV4(
                 grad = 100,
                 fom = LocalDate.of(2020, 10, 1),
+                uttaksgradFom = LocalDate.of(2021, 1, 1),
                 sisteUtbetaling = UtbetalingV4(
                     beloep = BigDecimal("100"),
                     utbetalingsdato = LocalDate.of(2025, 1, 1)

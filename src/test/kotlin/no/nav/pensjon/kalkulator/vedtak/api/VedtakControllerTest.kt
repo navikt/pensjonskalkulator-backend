@@ -59,6 +59,7 @@ class VedtakControllerTest {
                 alderspensjon = LoependeAlderspensjonDetaljer(
                     grad = 1,
                     fom = LocalDate.parse("2020-12-01"),
+                    uttaksgradFom = LocalDate.of(2021, 1, 1),
                     sivilstand = Sivilstand.GIFT
                 ),
                 fremtidigLoependeVedtakAp = FremtidigAlderspensjonDetaljer(
@@ -75,7 +76,7 @@ class VedtakControllerTest {
                 ),
                 afpOffentlig = LoependeVedtakDetaljer(
                     fom = LocalDate.parse("2023-12-01")
-                ),
+                )
             )
         )
 
@@ -97,7 +98,7 @@ class VedtakControllerTest {
                 ),
                 ufoeretrygd = null,
                 afpPrivat = null,
-                afpOffentlig = null,
+                afpOffentlig = null
             )
         )
 
@@ -130,7 +131,7 @@ class VedtakControllerTest {
                 ),
                 afpOffentlig = LoependeVedtakDetaljer(
                     fom = LocalDate.parse("2023-12-01")
-                ),
+                )
             )
         )
 
@@ -152,7 +153,7 @@ class VedtakControllerTest {
                 ),
                 ufoeretrygd = null,
                 afpPrivat = null,
-                afpOffentlig = null,
+                afpOffentlig = null
             )
         )
 
@@ -185,7 +186,7 @@ class VedtakControllerTest {
                 ),
                 afpOffentlig = LoependeVedtakDetaljer(
                     fom = LocalDate.parse("2023-12-01")
-                ),
+                )
             )
         )
 
@@ -207,7 +208,7 @@ class VedtakControllerTest {
                 ),
                 ufoeretrygd = null,
                 afpPrivat = null,
-                afpOffentlig = null,
+                afpOffentlig = null
             )
         )
 
@@ -225,6 +226,7 @@ class VedtakControllerTest {
                 alderspensjon = LoependeAlderspensjonDetaljer(
                     grad = 1,
                     fom = LocalDate.parse("2020-12-01"),
+                    uttaksgradFom = LocalDate.of(2021, 1, 1),
                     sivilstand = Sivilstand.GIFT
                 ),
                 fremtidigLoependeVedtakAp = FremtidigAlderspensjonDetaljer(
@@ -241,7 +243,7 @@ class VedtakControllerTest {
                 ),
                 afpOffentlig = LoependeVedtakDetaljer(
                     fom = LocalDate.parse("2023-12-01")
-                ),
+                )
             )
         )
 
@@ -259,7 +261,7 @@ class VedtakControllerTest {
                 fremtidigLoependeVedtakAp = null,
                 ufoeretrygd = null,
                 afpPrivat = null,
-                afpOffentlig = null,
+                afpOffentlig = null
             )
         )
 
@@ -305,6 +307,6 @@ class VedtakControllerTest {
 
         @Language("json")
         private const val RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V4 =
-            """{"harLoependeVedtak":false,"alderspensjon":{"grad":1,"fom":"2020-12-01","sivilstand":"GIFT"},"fremtidigAlderspensjon":{"grad":10,"fom":"2021-12-01"},"ufoeretrygd":{"grad":2},"afpPrivat":{"fom":"2022-12-01"},"afpOffentlig":{"fom":"2023-12-01"}}"""
+            """{"harLoependeVedtak":false,"alderspensjon":{"grad":1,"fom":"2020-12-01","uttaksgradFom":"2021-01-01","sivilstand":"GIFT"},"fremtidigAlderspensjon":{"grad":10,"fom":"2021-12-01"},"ufoeretrygd":{"grad":2},"afpPrivat":{"fom":"2022-12-01"},"afpOffentlig":{"fom":"2023-12-01"}}"""
     }
 }

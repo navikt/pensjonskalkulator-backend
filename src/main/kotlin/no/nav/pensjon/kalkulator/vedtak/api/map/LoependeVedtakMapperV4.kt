@@ -28,6 +28,7 @@ object LoependeVedtakMapperV4 {
         AlderspensjonDetaljerV4(
             grad = alderspensjon.grad,
             fom = alderspensjon.fom,
+            uttaksgradFom = alderspensjon.uttaksgradFom ?: alderspensjon.fom,
             sisteUtbetaling = alderspensjon.utbetalingSisteMaaned?.let(::toUtbetalingV4),
             sivilstand = SivilstandV4.fromInternalValue(alderspensjon.sivilstand)
         )
