@@ -17,6 +17,7 @@ data class LoependeVedtakV4(
     val afpPrivat: LoependeFraV4?,
     val afpOffentlig: LoependeFraV4?,
     val pre2025OffentligAfp: LoependeFraV4? = null,
+    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val gjeldendeUttaksgradFom: LocalDate?
 )
 
