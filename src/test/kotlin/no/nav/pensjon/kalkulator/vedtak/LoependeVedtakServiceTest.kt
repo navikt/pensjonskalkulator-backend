@@ -1,76 +1,59 @@
 package no.nav.pensjon.kalkulator.vedtak
 
-import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.vedtak.client.LoependeVedtakClient
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDate
 
-@ExtendWith(SpringExtension::class)
-class LoependeVedtakServiceTest {
+class LoependeVedtakServiceTest : ShouldSpec({
 
-    @Mock
-    private lateinit var client: LoependeVedtakClient
+    should("hente løpende vedtak med eksisterende vedtak") {
+        val vedtak = LoependeVedtakService(
+            vedtakClient = arrangeVedtak(),
+            pidGetter = mockk(relaxed = true)
+        ).hentLoependeVedtak()
 
-    @Mock
-    private lateinit var pidGetter: PidGetter
-
-    private lateinit var service: LoependeVedtakService
-
-    @BeforeEach
-    fun initialize() {
-        `when`(pidGetter.pid()).thenReturn(pid)
-        service = LoependeVedtakService(client, pidGetter)
-    }
-
-    @Test
-    fun `hent loepende vedtak med eksisterende vedtak`() {
-        `when`(client.hentLoependeVedtak(pid)).thenReturn(
-            LoependeVedtak(
-                alderspensjon = LoependeAlderspensjonDetaljer(
-                    grad = 1,
-                    fom = LocalDate.parse("2020-10-01"),
-                    uttaksgradFom = LocalDate.of(2021, 1, 1),
-                    sivilstand = Sivilstand.UGIFT,
-                ),
-                fremtidigLoependeVedtakAp = FremtidigAlderspensjonDetaljer(
-                    grad = 3,
-                    fom = LocalDate.parse("2023-10-01"),
-                    sivilstand = Sivilstand.GIFT
-                ),
-                ufoeretrygd = LoependeUfoeretrygdDetaljer(
-                    grad = 2,
-                    fom = LocalDate.parse("2021-10-01")
-                ),
-                afpPrivat = LoependeVedtakDetaljer(
-                    fom = LocalDate.parse("2022-10-01")
-                ),
-                afpOffentlig = null
-            )
-        )
-
-        val loependeVedtak = service.hentLoependeVedtak()
-
-        with(loependeVedtak) {
-            assertEquals(1, alderspensjon?.grad)
-            assertEquals(LocalDate.parse("2020-10-01"), alderspensjon?.fom)
-            assertEquals(LocalDate.of(2021, 1, 1), alderspensjon?.uttaksgradFom)
-            assertEquals(Sivilstand.UGIFT, alderspensjon?.sivilstand)
-            assertNotNull(loependeVedtak.fremtidigLoependeVedtakAp)
-            assertEquals(3, fremtidigLoependeVedtakAp?.grad)
-            assertEquals(LocalDate.parse("2023-10-01"), fremtidigLoependeVedtakAp?.fom)
-            assertEquals(Sivilstand.GIFT, fremtidigLoependeVedtakAp?.sivilstand)
-            assertEquals(2, ufoeretrygd?.grad)
-            assertEquals(LocalDate.parse("2021-10-01"), ufoeretrygd?.fom)
-            assertEquals(LocalDate.parse("2022-10-01"), afpPrivat?.fom)
-            assertNull(afpOffentlig)
+        with(vedtak) {
+            with(loependeAlderspensjon!!) {
+                grad shouldBe 1
+                fom shouldBe LocalDate.of(2020, 10, 1)
+                uttaksgradFom shouldBe LocalDate.of(2021, 1, 1)
+                sivilstand shouldBe Sivilstand.UGIFT
+            }
+            with(fremtidigAlderspensjon!!) {
+                grad shouldBe 3
+                fom shouldBe LocalDate.of(2023, 10, 1)
+                sivilstand shouldBe Sivilstand.GIFT
+            }
+            with(ufoeretrygd!!) {
+                grad shouldBe 2
+                fom shouldBe LocalDate.of(2021, 10, 1)
+            }
+            privatAfp?.fom shouldBe LocalDate.of(2022, 10, 1)
         }
     }
-}
+})
+
+private fun arrangeVedtak(): LoependeVedtakClient =
+    mockk<LoependeVedtakClient> {
+        every {
+            hentLoependeVedtak(any())
+        } returns VedtakSamling(
+            loependeAlderspensjon = LoependeAlderspensjon(
+                grad = 1,
+                fom = LocalDate.of(2020, 10, 1),
+                uttaksgradFom = LocalDate.of(2021, 1, 1),
+                sivilstand = Sivilstand.UGIFT,
+            ),
+            fremtidigAlderspensjon = FremtidigAlderspensjon(
+                grad = 3,
+                fom = LocalDate.of(2023, 10, 1),
+                sivilstand = Sivilstand.GIFT
+            ),
+            ufoeretrygd = LoependeUfoeretrygd(grad = 2, fom = LocalDate.of(2021, 10, 1)),
+            privatAfp = LoependeEntitet(fom = LocalDate.of(2022, 10, 1))
+        )
+    }

@@ -4,29 +4,30 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import no.nav.pensjon.kalkulator.tech.security.ingress.SecurityCoroutineContext
+import no.nav.pensjon.kalkulator.utbetaling.SamletUtbetaling
 import no.nav.pensjon.kalkulator.utbetaling.UtbetalingService
 import org.springframework.stereotype.Service
 
 @Service
 class VedtakMedUtbetalingService(
-    val loependeVedtakService: LoependeVedtakService,
-    val utbetalingService: UtbetalingService
+    private val vedtakService: LoependeVedtakService,
+    private val utbetalingService: UtbetalingService
 ) {
-    suspend fun hentVedtakMedUtbetaling(): LoependeVedtak =
+    suspend fun hentVedtakMedUtbetaling(): VedtakSamling =
         withContext(Dispatchers.IO + SecurityCoroutineContext()) {
+            val vedtakDeferred = async { vedtakService.hentLoependeVedtak() }
+            val utbetalingDeferred = async { utbetalingService.hentSisteMaanedsUtbetaling() }
 
-            val loependeVedtakDeferred = async { loependeVedtakService.hentLoependeVedtak() }
-            val sisteMaanedsUtbetalingDeferred = async { utbetalingService.hentSisteMaanedsUtbetaling() }
-
-            val loependeVedtak = loependeVedtakDeferred.await()
-            val sisteMaanedsUtbetaling = sisteMaanedsUtbetalingDeferred.await()
+            val vedtakSamling: VedtakSamling = vedtakDeferred.await()
+            val sisteMaanedsUtbetaling: SamletUtbetaling? = utbetalingDeferred.await()
 
             sisteMaanedsUtbetaling?.let {
-                loependeVedtak.alderspensjon?.utbetalingSisteMaaned = Utbetaling(
-                    beloep = it.totalBeloep,
-                    posteringsdato = it.posteringsdato //brukere vil se utbetaling tidligst mulig uavhengig av utbetalingsstatus
+                vedtakSamling.withAlderspensjonUtbetalingSisteMaaned(
+                    Utbetaling(
+                        beloep = it.totalBeloep,
+                        posteringsdato = it.posteringsdato // brukere vil se utbetaling tidligst mulig uavhengig av utbetalingsstatus
+                    )
                 )
-            }
-            loependeVedtak
+            } ?: vedtakSamling
         }
 }
