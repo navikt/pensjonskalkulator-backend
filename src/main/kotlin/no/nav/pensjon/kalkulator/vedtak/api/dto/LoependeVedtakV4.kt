@@ -17,6 +17,7 @@ data class LoependeVedtakV4(
     val afpPrivat: LoependeFraV4?,
     val afpOffentlig: LoependeFraV4?,
     val pre2025OffentligAfp: LoependeFraV4? = null,
+    val gjeldendeUttaksgradFom: LocalDate?
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

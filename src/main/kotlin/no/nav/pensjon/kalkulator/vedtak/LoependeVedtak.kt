@@ -11,6 +11,7 @@ data class LoependeVedtak(
     val afpPrivat: LoependeVedtakDetaljer?,
     val afpOffentlig: LoependeVedtakDetaljer?,
     val pre2025OffentligAfp: LoependeVedtakDetaljer? = null,
+    val gjeldendeUttaksgradFom: LocalDate?
 )
 
 data class LoependeUfoeretrygdDetaljer(

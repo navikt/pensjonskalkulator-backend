@@ -39,7 +39,11 @@ class LoependeVedtakServiceTest {
                     fom = LocalDate.parse("2020-10-01"),
                     sivilstand = Sivilstand.UGIFT,
                 ),
-                fremtidigLoependeVedtakAp = FremtidigAlderspensjonDetaljer(3, LocalDate.parse("2023-10-01"), Sivilstand.GIFT),
+                fremtidigLoependeVedtakAp = FremtidigAlderspensjonDetaljer(
+                    grad = 3,
+                    fom = LocalDate.parse("2023-10-01"),
+                    sivilstand = Sivilstand.GIFT
+                ),
                 ufoeretrygd = LoependeUfoeretrygdDetaljer(
                     grad = 2,
                     fom = LocalDate.parse("2021-10-01")
@@ -47,7 +51,8 @@ class LoependeVedtakServiceTest {
                 afpPrivat = LoependeVedtakDetaljer(
                     fom = LocalDate.parse("2022-10-01")
                 ),
-                afpOffentlig = null
+                afpOffentlig = null,
+                gjeldendeUttaksgradFom = LocalDate.of(2021, 1, 1)
             )
         )
 
@@ -64,6 +69,7 @@ class LoependeVedtakServiceTest {
             assertEquals(2, ufoeretrygd?.grad)
             assertEquals(LocalDate.parse("2021-10-01"), ufoeretrygd?.fom)
             assertEquals(LocalDate.parse("2022-10-01"), afpPrivat?.fom)
+            assertEquals(LocalDate.of(2021, 1, 1), gjeldendeUttaksgradFom)
             assertNull(afpOffentlig)
         }
     }
