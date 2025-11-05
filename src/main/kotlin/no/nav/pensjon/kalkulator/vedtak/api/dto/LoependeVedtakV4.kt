@@ -17,8 +17,6 @@ data class LoependeVedtakV4(
     val afpPrivat: LoependeFraV4?,
     val afpOffentlig: LoependeFraV4?,
     val pre2025OffentligAfp: LoependeFraV4? = null,
-    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
-    val gjeldendeUttaksgradFom: LocalDate?
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -26,6 +24,8 @@ data class AlderspensjonDetaljerV4(
     val grad: Int = 0,
     @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val fom: LocalDate,
+    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
+    val uttaksgradFom: LocalDate,
     val sisteUtbetaling: UtbetalingV4? = null,
     val sivilstand: SivilstandV4,
 )

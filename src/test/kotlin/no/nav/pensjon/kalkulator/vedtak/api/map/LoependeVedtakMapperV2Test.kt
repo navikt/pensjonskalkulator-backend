@@ -30,8 +30,7 @@ class LoependeVedtakMapperV2Test {
             ),
             afpOffentlig = LoependeVedtakDetaljer(
                 fom = LocalDate.parse("2023-10-01")
-            ),
-            gjeldendeUttaksgradFom = null
+            )
         )
 
         val dto = LoependeVedtakMapperV2.toDto(vedtak)
@@ -56,8 +55,7 @@ class LoependeVedtakMapperV2Test {
             ),
             ufoeretrygd = null,
             afpPrivat = null,
-            afpOffentlig = null,
-            gjeldendeUttaksgradFom = null
+            afpOffentlig = null
         )
 
         val dto = LoependeVedtakMapperV2.toDto(vedtak)
