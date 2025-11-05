@@ -24,6 +24,8 @@ data class AlderspensjonDetaljerV4(
     val grad: Int = 0,
     @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val fom: LocalDate,
+    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
+    val uttaksgradFom: LocalDate,
     val sisteUtbetaling: UtbetalingV4? = null,
     val sivilstand: SivilstandV4,
 )

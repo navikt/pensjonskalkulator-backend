@@ -25,6 +25,7 @@ data class LoependeVedtakDetaljer(
 data class LoependeAlderspensjonDetaljer(
     val grad: Int,
     val fom: LocalDate,
+    val uttaksgradFom: LocalDate? = null,
     var utbetalingSisteMaaned: Utbetaling? = null,
     val sivilstand: Sivilstand,
 )
