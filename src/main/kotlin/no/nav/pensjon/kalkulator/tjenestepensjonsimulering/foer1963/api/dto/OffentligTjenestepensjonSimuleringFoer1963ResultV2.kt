@@ -1,7 +1,9 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import java.time.LocalDate
+import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.YtelseskodeFoer1963
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.dto.YtelsekodeFoer1963Dto
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class OffentligTjenestepensjonSimuleringFoer1963ResultV2(
@@ -21,12 +23,14 @@ data class SimuleringsresultatFoer1963V2(
     val utbetalingsperioder: List<UtbetalingsperiodeFoer1963V2>,
 )
 
+// Updated to same style as UtbetalingsperiodeV2 (fra1963) except maanedligUtbetaling not present
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class UtbetalingsperiodeFoer1963V2(
-    val datoFom: LocalDate?,
-    val datoTom: LocalDate?,
+    val startAlder: Alder,
+    val sluttAlder: Alder?,
+    val aarligUtbetaling: Int,
     val grad: Int?,
-    val arligUtbetaling: Double?,
-    val ytelsekode: String?,
-    val mangelfullSimuleringkode: String?
+    val ytelsekode: YtelseskodeFoer1963,
+    val mangelfullSimuleringkode: String?,
+    val maanedligUtbetaling: Int?
 )

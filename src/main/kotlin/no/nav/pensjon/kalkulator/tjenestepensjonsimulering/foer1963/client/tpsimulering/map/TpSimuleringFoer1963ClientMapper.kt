@@ -16,21 +16,28 @@ import java.time.Instant
 import java.time.ZoneId
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.UtbetalingsperiodeResultat
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
+import no.nav.pensjon.kalkulator.person.client.pdl.dto.PdlFoedselsdato
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.YtelseskodeFoer1963
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.Fnr
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.FremtidigInntektDto
 
 object TpSimuleringFoer1963ClientMapper {
 
-    fun fromDto(dto: SimulerTjenestepensjonFoer1963ResponseDto) =
+    fun fromDto(dto: SimulerTjenestepensjonFoer1963ResponseDto, foedselsdato: LocalDate) =
         dto.simulertPensjonListe.firstOrNull()?.let { sim ->
             OffentligTjenestepensjonSimuleringFoer1963Resultat(
                 tpnr = sim.tpnr,
                 navnOrdning = sim.navnOrdning,
-                utbetalingsperioder = sim.utbetalingsperioder?.map { periode ->
+                utbetalingsperioder = sim.utbetalingsperioder.map { periode ->
                     UtbetalingsperiodeResultat(
-                        datoFom = periode.datoFom?.let(::epochMillisToLocalDate),
-                        datoTom = periode.datoTom?.let(::epochMillisToLocalDate),
+                        alderFom = Alder.from(
+                            foedselsdato,
+                            periode.datoFom.let(::epochMillisToLocalDate),
+                        ),
+                        alderTom = periode.datoTom?.let(::epochMillisToLocalDate)?.let { Alder.from(foedselsdato, it) },
                         grad = periode.grad,
                         arligUtbetaling = periode.arligUtbetaling,
-                        ytelsekode = periode.ytelsekode,
+                        ytelsekode = YtelseskodeFoer1963.fromExternalValue(periode.ytelsekode!!),
                         mangelfullSimuleringkode = periode.mangelfullSimuleringkode
                     )
                 }
@@ -55,7 +62,7 @@ object TpSimuleringFoer1963ClientMapper {
         return SimulerOffentligTjenestepensjonFoer1963Dto(
             SimuleringEtter2011Dto(
                 simuleringType = SimulatorSimuleringType.fromInternalValue(spec.simuleringType).externalValue,
-                fnr = pid.value,
+                fnr = Fnr(pid.value),
                 sivilstatus = SimulatorSivilstand.fromInternalValue(spec.sivilstand).externalValue,
                 eps2G = spec.eps.harInntektOver2G,
                 epsPensjon = spec.eps.harPensjon,
@@ -82,9 +89,35 @@ object TpSimuleringFoer1963ClientMapper {
                 avdodMedlemAvFolketrygden = null,
                 avdodFlyktning = null,
                 simulerForTp = true,
-                fremtidigInntektList = null
+                fremtidigInntektList = buildFremtidigInntektList(
+                    forventetInntekt = spec.forventetAarligInntektFoerUttak,
+                    forsteUttakDato = gradertUttakFom ?: heltUttakFom
+                )
             )
         )
+    }
+
+    private fun buildFremtidigInntektList(
+        forventetInntekt: Int?,
+        forsteUttakDato: LocalDate
+    ): List<FremtidigInntektDto> {
+        if (forventetInntekt == null || forventetInntekt <= 0) {
+            return emptyList()
+        }
+
+        val today = LocalDate.now()
+
+        // Only create entries if first withdrawal is in the future
+        return if (forsteUttakDato.isAfter(today)) {
+            listOf(
+                FremtidigInntektDto(
+                    datoFom = today,
+                    arliginntekt = forventetInntekt
+                )
+            )
+        } else {
+            emptyList()
+        }
     }
 
     private fun penUttaksgradValue(grad: Uttaksgrad?): String? = when (grad) {

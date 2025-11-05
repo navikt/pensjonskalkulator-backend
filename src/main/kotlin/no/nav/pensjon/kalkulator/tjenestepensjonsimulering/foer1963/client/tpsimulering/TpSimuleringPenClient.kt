@@ -8,6 +8,7 @@ import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
+import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -28,7 +29,7 @@ import reactor.netty.http.client.HttpClient
 
 @Component
 class TpSimuleringPenClient(
-    @param:Value("\${pen.url}") private val baseUrl: String,
+    @param:Value("\${pensjonssimulator.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
@@ -49,21 +50,17 @@ class TpSimuleringPenClient(
 
         val dto = toDto(request, pid)
         log.debug { dto }
-        try {
-            val rawJson = webClient.post()
+        return try {
+            webClient.post()
                 .uri(uri)
                 .bodyValue(dto)
                 .headers { setHeaders(it) }
                 .retrieve()
-                .bodyToMono(String::class.java)
+                .bodyToMono(SimulerTjenestepensjonFoer1963ResponseDto::class.java)
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
-
-            println("Response JSON: $rawJson")
-
-            val responseDto = jacksonObjectMapper().readValue(rawJson, SimulerTjenestepensjonFoer1963ResponseDto::class.java)
-            return TpSimuleringFoer1963ClientMapper.fromDto(responseDto)
-                .also { countCalls(MetricResult.OK) }
+                ?.let { TpSimuleringFoer1963ClientMapper.fromDto(it, request.foedselsdato) }
+                .also { countCalls(MetricResult.OK) } ?: throw EgressException("No response body")
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $uri", e)
         } catch (e: WebClientResponseException) {
@@ -81,8 +78,8 @@ class TpSimuleringPenClient(
     override fun service(): EgressService = service
 
     companion object {
-        private const val API_PATH = "api/simuler/tjenestepensjon"
-        private val service = EgressService.PENSJONSFAGLIG_KJERNE
+        private const val API_PATH = "api/nav/v2/simuler-oftp/pre-2025"
+        private val service = EgressService.PENSJONSSIMULATOR
         private const val ON_CONNECTED_READ_TIMEOUT_SECONDS = 45
     }
 

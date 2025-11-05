@@ -34,8 +34,9 @@ class TjenestepensjonSimuleringFoer1963Controller(
         log.debug { "Request for simuler offentlig tjenestepensjon V2: $spec" }
 
         return try {
-            toDtoV2(timed(service::hentTjenestepensjonSimulering, fromDtoV2(spec), "simulerOffentligTjenestepensjon"))
-                .also { log.debug { "Simuler offentlig tjenestepensjon respons: $it" } }
+            toDtoV2(
+                timed(service::hentTjenestepensjonSimulering, fromDtoV2(spec), "simulerOffentligTjenestepensjon")
+            ).also { log.debug { "Simuler offentlig tjenestepensjon respons: $it" } }
         } catch (e: EgressException) {
             handleError(e, "V2")!!
         } finally {

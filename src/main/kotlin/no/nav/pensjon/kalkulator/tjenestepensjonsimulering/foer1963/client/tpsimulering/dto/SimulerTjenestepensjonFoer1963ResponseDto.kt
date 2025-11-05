@@ -14,14 +14,20 @@ data class SimulertPensjon(
     val status: String?,
     val feilkode: String?,
     val feilbeskrivelse: String?,
-    val utbetalingsperioder: List<Utbetalingsperiode>?
+    val utbetalingsperioder: List<Utbetalingsperiode> = emptyList()
 )
 
 data class Utbetalingsperiode(
-    val datoFom: Long?, // Date as milliseconds since epoch
+    val datoFom: Long,
     val datoTom: Long?, // Date as milliseconds since epoch
     val grad: Int?,
     val arligUtbetaling: Double?,
-    val ytelsekode: String?,
+    val ytelsekode: YtelsekodeFoer1963Dto?,
     val mangelfullSimuleringkode: String?
 )
+
+enum class YtelsekodeFoer1963Dto {
+    AP,
+    AFP,
+    SERALDER
+}
