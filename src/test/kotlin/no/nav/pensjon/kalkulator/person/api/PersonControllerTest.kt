@@ -1,8 +1,13 @@
 package no.nav.pensjon.kalkulator.person.api
 
+import com.ninjasquad.springmockk.MockkBean
+import io.kotest.core.spec.style.FunSpec
+import io.mockk.every
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PersonFactory.personWithPensjoneringAldre
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.PersonFactory.skiltPerson
+import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
@@ -10,13 +15,10 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.Fort
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Test
-import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
@@ -24,66 +26,73 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(PersonController::class)
 @Import(MockSecurityConfiguration::class)
-class PersonControllerTest {
+class PersonControllerTest : FunSpec() {
 
     @Autowired
     private lateinit var mvc: MockMvc
 
-    @MockitoBean
-    private lateinit var service: PersonService
+    @MockkBean
+    private lateinit var personService: PersonService
 
-    @MockitoBean
+    @MockkBean(relaxed = true)
     private lateinit var traceAid: TraceAid
 
-    @MockitoBean
+    @MockkBean
     private lateinit var pidExtractor: PidExtractor
 
-    @MockitoBean
-    private lateinit var fortroligAdresseService: FortroligAdresseService
+    @MockkBean
+    private lateinit var adresseService: FortroligAdresseService
 
-    @MockitoBean
+    @MockkBean
     private lateinit var groupMembershipService: GroupMembershipService
 
-    @MockitoBean
+    @MockkBean
     private lateinit var auditor: Auditor
 
-    @Test
-    fun `test 'person' endpoint version 2`() {
-        `when`(service.getPerson()).thenReturn(skiltPerson())
+    init {
+        beforeSpec {
+            every { traceAid.begin() } returns Unit
+            every { pidExtractor.pid() } returns pid
+            every { adresseService.adressebeskyttelseGradering(any()) } returns AdressebeskyttelseGradering.UGRADERT
+            every { groupMembershipService.innloggetBrukerHarTilgang(any()) } returns true
+            every { auditor.audit(any(), any()) } returns Unit
+        }
 
-        mvc.perform(
-            get(URL_V2)
-                .with(csrf())
-                .content("")
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY_V2))
-    }
+        test("'person' endpoint version 2") {
+            every { personService.getPerson() } returns skiltPerson()
 
-    @Test
-    fun `test 'person' endpoint version 4`() {
-        `when`(service.getPerson()).thenReturn(skiltPerson())
+            mvc.perform(
+                get(URL_V2)
+                    .with(csrf())
+                    .content("")
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(RESPONSE_BODY_V2))
+        }
 
-        mvc.perform(
-            get(URL_V4)
-                .with(csrf())
-                .content("")
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY_V4))
-    }
+        test("'person' endpoint version 4") {
+            every { personService.getPerson() } returns skiltPerson()
 
-    @Test
-    fun `test 'person' endpoint version 5`() {
-        `when`(service.getPerson()).thenReturn(personWithPensjoneringAldre())
+            mvc.perform(
+                get(URL_V4)
+                    .with(csrf())
+                    .content("")
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(RESPONSE_BODY_V4))
+        }
 
-        mvc.perform(
-            get(URL_V5)
-                .with(csrf())
-                .content("")
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY_V5))
+        test("'person' endpoint version 5") {
+            every { personService.getPerson() } returns personWithPensjoneringAldre()
+
+            mvc.perform(
+                get(URL_V5)
+                    .with(csrf())
+                    .content("")
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(RESPONSE_BODY_V5))
+        }
     }
 
     private companion object {
