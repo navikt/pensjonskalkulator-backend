@@ -1,8 +1,13 @@
 package no.nav.pensjon.kalkulator.uttaksalder.api
 
+import com.ninjasquad.springmockk.MockkBean
+import io.kotest.core.spec.style.ShouldSpec
+import io.mockk.every
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.Opphold
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
@@ -14,14 +19,11 @@ import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Test
-import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
@@ -30,85 +32,93 @@ import java.time.LocalDate
 
 @WebMvcTest(UttaksalderController::class)
 @Import(MockSecurityConfiguration::class)
-internal class UttaksalderControllerTest {
+internal class UttaksalderControllerTest : ShouldSpec() {
 
     @Autowired
     private lateinit var mvc: MockMvc
 
-    @MockitoBean
+    @MockkBean
     private lateinit var uttaksalderService: UttaksalderService
 
-    @MockitoBean
+    @MockkBean(relaxed = true)
     private lateinit var traceAid: TraceAid
 
-    @MockitoBean
+    @MockkBean
     private lateinit var pidExtractor: PidExtractor
 
-    @MockitoBean
-    private lateinit var fortroligAdresseService: FortroligAdresseService
+    @MockkBean
+    private lateinit var adresseService: FortroligAdresseService
 
-    @MockitoBean
+    @MockkBean
     private lateinit var groupMembershipService: GroupMembershipService
 
-    @MockitoBean
+    @MockkBean
     private lateinit var auditor: Auditor
 
-    @Test
-    fun `finnTidligsteHelUttaksalderV1 returns response`() {
-        val spec = ImpersonalUttaksalderSpec(
-            simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
-            sivilstand = Sivilstand.UGIFT,
-            harEps = true,
-            aarligInntektFoerUttak = 100_000,
-            heltUttak = null,
-            utenlandsperiodeListe = listOf(
-                Opphold(
-                    fom = LocalDate.of(1990, 1, 2),
-                    tom = LocalDate.of(1999, 11, 30),
-                    land = Land.AUS,
-                    arbeidet = true
+    init {
+        beforeSpec {
+            every { traceAid.begin() } returns Unit
+            every { pidExtractor.pid() } returns pid
+            every { adresseService.adressebeskyttelseGradering(any()) } returns AdressebeskyttelseGradering.UGRADERT
+            every { groupMembershipService.innloggetBrukerHarTilgang(any()) } returns true
+            every { auditor.audit(any(), any()) } returns Unit
+        }
+
+        should("normalt returnere tidligste hel uttaksalder V1") {
+            val spec = ImpersonalUttaksalderSpec(
+                simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
+                sivilstand = Sivilstand.UGIFT,
+                harEps = true,
+                aarligInntektFoerUttak = 100_000,
+                heltUttak = null,
+                utenlandsperiodeListe = listOf(
+                    Opphold(
+                        fom = LocalDate.of(1990, 1, 2),
+                        tom = LocalDate.of(1999, 11, 30),
+                        land = Land.AUS,
+                        arbeidet = true
+                    )
                 )
             )
-        )
-        `when`(uttaksalderService.finnTidligsteUttaksalder(spec)).thenReturn(uttaksalder)
+            every { uttaksalderService.finnTidligsteUttaksalder(spec) } returns uttaksalder
 
-        mvc.perform(
-            post("/api/v1/tidligste-hel-uttaksalder")
-                .with(csrf())
-                .content(requestBodyV1())
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(status().isOk)
-            .andExpect(content().json(responseBody()))
-    }
+            mvc.perform(
+                post("/api/v1/tidligste-hel-uttaksalder")
+                    .with(csrf())
+                    .content(requestBodyV1())
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+                .andExpect(status().isOk)
+                .andExpect(content().json(responseBody()))
+        }
 
-    @Test
-    fun `finnTidligsteHelUttaksalderV2 returns response`() {
-        val spec = ImpersonalUttaksalderSpec(
-            simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
-            sivilstand = Sivilstand.UGIFT,
-            harEps = true,
-            aarligInntektFoerUttak = 100_000,
-            heltUttak = null,
-            utenlandsperiodeListe = listOf(
-                Opphold(
-                    fom = LocalDate.of(1990, 1, 2),
-                    tom = LocalDate.of(1999, 11, 30),
-                    land = Land.AUS,
-                    arbeidet = true
+        should("normalt returnere tidligste hel uttaksalder V2") {
+            val spec = ImpersonalUttaksalderSpec(
+                simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
+                sivilstand = Sivilstand.UGIFT,
+                harEps = true,
+                aarligInntektFoerUttak = 100_000,
+                heltUttak = null,
+                utenlandsperiodeListe = listOf(
+                    Opphold(
+                        fom = LocalDate.of(1990, 1, 2),
+                        tom = LocalDate.of(1999, 11, 30),
+                        land = Land.AUS,
+                        arbeidet = true
+                    )
                 )
             )
-        )
-        `when`(uttaksalderService.finnTidligsteUttaksalder(spec)).thenReturn(uttaksalder)
+            every { uttaksalderService.finnTidligsteUttaksalder(spec) } returns uttaksalder
 
-        mvc.perform(
-            post("/api/v2/tidligste-hel-uttaksalder")
-                .with(csrf())
-                .content(requestBodyV2())
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(status().isOk)
-            .andExpect(content().json(responseBody()))
+            mvc.perform(
+                post("/api/v2/tidligste-hel-uttaksalder")
+                    .with(csrf())
+                    .content(requestBodyV2())
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+                .andExpect(status().isOk)
+                .andExpect(content().json(responseBody()))
+        }
     }
 
     private companion object {
