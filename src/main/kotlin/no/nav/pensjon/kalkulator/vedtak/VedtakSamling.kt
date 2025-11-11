@@ -20,12 +20,12 @@ data class VedtakSamling(
             pre2025OffentligAfp = pre2025OffentligAfp
         )
 
-     fun hasContent(): Boolean =
-        loependeAlderspensjon != null &&
-                fremtidigAlderspensjon != null &&
-                ufoeretrygd != null &&
-                privatAfp != null &&
-                pre2025OffentligAfp != null
+    fun hasContent(): Boolean =
+        loependeAlderspensjon != null
+                || fremtidigAlderspensjon != null
+                || ufoeretrygd != null
+                || privatAfp != null
+                || pre2025OffentligAfp != null
 }
 
 data class LoependeAlderspensjon(
