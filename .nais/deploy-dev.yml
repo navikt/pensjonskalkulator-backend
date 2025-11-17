@@ -172,86 +172,34 @@ spec:
       value: JSON
     - name: PKB_LOGGING_LEVEL
       value: DEBUG
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_AKSIO_NAME
-      value: Aksio
     - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_AKSIO_URL
       value: https://pensjon-afp-offentlig-mock-q2.intern.dev.nav.no/api/afp-offentlig-status/{tpnr}/hentAfpStatus/{fnr}?uttaksdato={uttaksdato}
     - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_AKSIO_SCOPE
       value: nav:pensjon:mock.livsvarig.afp.offentlig
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_AKSIO_AUDIENCE
-      value: ""
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_AKSIO_OVERSTYRTE_TPNR
-      value: "3610,3660"
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_SPK_NAME
-      value: SPK
     - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_SPK_URL
       value: https://pensjon-afp-offentlig-mock-q2.intern.dev.nav.no/api/afp-offentlig-status/{tpnr}/hentAfpStatus/{fnr}?uttaksdato={uttaksdato}
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_SPK_SCOPE
-      value: spk:nav
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_SPK_AUDIENCE
-      value: ""
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_SPK_OVERSTYRTE_TPNR
-      value: ""
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_GABLER_NAME
-      value: Gabler
     - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_GABLER_URL
       value: https://pensjon-afp-offentlig-mock-q2.intern.dev.nav.no/api/afp-offentlig-status/{tpnr}/hentAfpStatus/{fnr}?uttaksdato={uttaksdato}
     - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_GABLER_SCOPE
       value: nav:pensjon:mock.livsvarig.afp.offentlig
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_GABLER_AUDIENCE
-      value: ""
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_GABLER_OVERSTYRTE_TPNR
-      value: ""
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_GABLER2_NAME
-      value: Gabler2
     - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_GABLER2_URL
       value: https://pensjon-afp-offentlig-mock-q2.intern.dev.nav.no/api/afp-offentlig-status/{tpnr}/hentAfpStatus/{fnr}?uttaksdato={uttaksdato}
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_GABLER2_SCOPE
-      value: nav:pensjon:mock.livsvarig.afp.offentlig
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_GABLER2_AUDIENCE
-      value: ""
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_GABLER2_OVERSTYRTE_TPNR
-      value: "3410,3620,3630,3675,3700,3730,3750,3850,3860,3880,3910"
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_KLP_NAME
-      value: KLP
     - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_KLP_URL
       value: https://pensjon-afp-offentlig-mock-q2.intern.dev.nav.no/api/afp-offentlig-status/{tpnr}/hentAfpStatus/{fnr}?uttaksdato={uttaksdato}
     - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_KLP_SCOPE
       value: nav:pensjon:mock.livsvarig.afp.offentlig
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_KLP_AUDIENCE
-      value: ""
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_KLP_OVERSTYRTE_TPNR
-      value: ""
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_OPF_NAME
-      value: OPF
     - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_OPF_URL
       value: https://pensjon-afp-offentlig-mock-q2.intern.dev.nav.no/api/afp-offentlig-status/{tpnr}/hentAfpStatus/{fnr}?uttaksdato={uttaksdato}
     - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_OPF_SCOPE
       value: nav:pensjon:mock.livsvarig.afp.offentlig
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_OPF_AUDIENCE
-      value: ""
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_OPF_OVERSTYRTE_TPNR
-      value: ""
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_STOREBRAND_NAME
-      value: Storebrand
     - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_STOREBRAND_URL
       value: https://pensjon-afp-offentlig-mock-q2.intern.dev.nav.no/api/afp-offentlig-status/{tpnr}/hentAfpStatus/{fnr}?uttaksdato={uttaksdato}
     - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_STOREBRAND_SCOPE
       value: nav:pensjon:mock.livsvarig.afp.offentlig
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_STOREBRAND_AUDIENCE
-      value: ""
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_STOREBRAND_OVERSTYRTE_TPNR
-      value: ""
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_STOREBRAND_PEN_NAME
-      value: Storebrand Pensjonsforsikring
     - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_STOREBRAND_PEN_URL
       value: https://pensjon-afp-offentlig-mock-q2.intern.dev.nav.no/api/afp-offentlig-status/{tpnr}/hentAfpStatus/{fnr}?uttaksdato={uttaksdato}
     - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_STOREBRAND_PEN_SCOPE
       value: nav:pensjon:mock.livsvarig.afp.offentlig
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_STOREBRAND_PEN_AUDIENCE
-      value: ""
-    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_STOREBRAND_PEN_OVERSTYRTE_TPNR
-      value: ""
   envFrom:
     - secret: pensjonskalkulator-backend-unleash-api-token
     - secret: pkb-pid-encryption
