@@ -172,6 +172,16 @@ spec:
       value: JSON
     - name: PKB_LOGGING_LEVEL
       value: DEBUG
+    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_SPK_NAME
+      value: SPK
+    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_SPK_URL
+      value: https://pensjon-afp-offentlig-mock-q2.intern.dev.nav.no/api/afp-offentlig-status/{tpnr}/hentAfpStatus/{fnr}?uttaksdato={uttaksdato}
+    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_SPK_SCOPE
+      value: spk:nav
+    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_SPK_AUDIENCE
+      value: ""
+    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_SPK_OVERSTYRTE_TPNR
+      value: ""
   envFrom:
     - secret: pensjonskalkulator-backend-unleash-api-token
     - secret: pkb-pid-encryption
