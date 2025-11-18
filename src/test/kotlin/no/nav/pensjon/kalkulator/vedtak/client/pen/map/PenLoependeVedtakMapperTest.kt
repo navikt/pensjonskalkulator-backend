@@ -53,4 +53,31 @@ class PenLoependeVedtakMapperTest : ShouldSpec({
             }
         }
     }
+
+    should("ignore fremtidig vedtak med samme grad") {
+        val dto = PenLoependeVedtakDto(
+            alderspensjon = PenGjeldendeVedtakApDto(
+                grad = 1,
+                fraOgMed = LocalDate.of(2021, 1, 1),
+                sivilstatus = "SAMB"
+            ),
+            alderspensjonIFremtid = PenGjeldendeVedtakApDto(
+                grad = 1,
+                fraOgMed = LocalDate.now().plusMonths(2),
+                sivilstatus = "GIFT"
+            ),
+            ufoeretrygd = null,
+            afpPrivat = null,
+            afpOffentlig = null,
+            gjeldendeUttaksgradFom = LocalDate.of(2021, 1, 1)
+        )
+
+        val result = PenLoependeVedtakMapper.fromDto(dto)
+
+        with(result.loependeAlderspensjon!!) {
+            grad shouldBe 1
+            fom shouldBe LocalDate.of(2021, 1, 1)
+            sivilstand shouldBe Sivilstand.SAMBOER
+        }
+    }
 })
