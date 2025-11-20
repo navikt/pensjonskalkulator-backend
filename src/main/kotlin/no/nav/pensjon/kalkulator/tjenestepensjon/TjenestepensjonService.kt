@@ -26,7 +26,7 @@ class TjenestepensjonService(
 
         if (tpNumre.isEmpty()) {
             log.info { "Bruker har ingen AFP offentlig livsvarig ordninger" }
-            throw EgressException("Bruker har ingen AFP offentlig livsvarig ordninger")
+            return AfpOffentligLivsvarigResult(afpStatus = null, beloep = null)
         }
 
         if (tpNumre.size > 1) {
