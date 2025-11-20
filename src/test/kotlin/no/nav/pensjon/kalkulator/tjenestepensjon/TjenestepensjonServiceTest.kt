@@ -74,11 +74,9 @@ class TjenestepensjonServiceTest {
     fun `hentAfpOffentligLivsvarigDetaljer kaster exception naar bruker ikke har noen ordninger`() {
         `when`(client.afpOffentligLivsvarigTpNummerListe(pid)).thenReturn(emptyList())
 
-        val exception = assertThrows(EgressException::class.java) {
-            service.hentAfpOffentligLivsvarigDetaljer()
-        }
+        val result = service.hentAfpOffentligLivsvarigDetaljer()
 
-        assertEquals("Bruker har ingen AFP offentlig livsvarig ordninger", exception.message)
+        assertEquals(AfpOffentligLivsvarigResult(afpStatus = null, beloep = null), result)
         verify(client).afpOffentligLivsvarigTpNummerListe(pid)
         verifyNoMoreInteractions(client)
     }

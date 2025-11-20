@@ -30,7 +30,7 @@ object TpTjenestepensjonMapper {
             TpAfpStatusType.UKJENT, TpAfpStatusType.IKKE_SOKT, TpAfpStatusType.SOKT, TpAfpStatusType.AVSLAG -> false
         }
 
-        val beloep = response.belopsListe.lastOrNull()?.belop
+        val beloep = if (afpStatus) response.belopsListe.lastOrNull()?.belop else null
 
         if (afpStatus && response.belopsListe.isEmpty()) {
             log.warn { "AFP Offentlig Livsvarig er INNVILGET men beløpsliste er tom. Dette kan indikere datakvalitetsproblem." }
