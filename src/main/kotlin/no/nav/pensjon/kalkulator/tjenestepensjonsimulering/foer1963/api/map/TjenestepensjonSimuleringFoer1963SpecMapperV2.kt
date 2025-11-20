@@ -23,7 +23,7 @@ object TjenestepensjonSimuleringFoer1963SpecMapperV2 {
             utenlandsopphold = utenlandsopphold(source),
             afpInntektMaanedFoerUttak = source.afpInntektMaanedFoerUttak,
             afpOrdning = source.afpOrdning,
-            afpInntektMndForUttak = source.afpInntektMndForUttak,
+            afpInntektMndForUttak = source.afpInntektMaanedFoerUttak,
             stillingsprosentOffHeltUttak = source.stillingsprosentOffHeltUttak,
             stillingsprosentOffGradertUttak = source.stillingsprosentOffGradertUttak,
         )

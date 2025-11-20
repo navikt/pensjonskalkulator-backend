@@ -2,7 +2,6 @@ package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963
 
 import no.nav.pensjon.kalkulator.general.GradertUttak
 import no.nav.pensjon.kalkulator.general.HeltUttak
-import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
 import no.nav.pensjon.kalkulator.simulering.Eps
@@ -21,7 +20,7 @@ data class SimuleringOffentligTjenestepensjonFoer1963Spec(
     val utenlandsopphold: Utenlandsopphold,
     val afpInntektMaanedFoerUttak: Boolean? = null,
     val afpOrdning: AfpOrdningType? = null,
-    val afpInntektMndForUttak: Int?,
+    val afpInntektMndForUttak: Boolean?,
     val stillingsprosentOffHeltUttak: String,
     val stillingsprosentOffGradertUttak: String?,
 )

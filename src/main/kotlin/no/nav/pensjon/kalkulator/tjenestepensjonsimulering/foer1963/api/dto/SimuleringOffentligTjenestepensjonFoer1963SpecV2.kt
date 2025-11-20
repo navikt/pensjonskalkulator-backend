@@ -19,7 +19,6 @@ data class SimuleringOffentligTjenestepensjonFoer1963SpecV2(
     val epsHarPensjon: Boolean? = null,
     val afpInntektMaanedFoerUttak: Boolean?,
     val afpOrdning: AfpOrdningType? = null,
-    val afpInntektMndForUttak: Int?,
     val stillingsprosentOffHeltUttak: String,
     val stillingsprosentOffGradertUttak: String?,
 )
