@@ -32,7 +32,7 @@ data class SimuleringEtter2011Dto(
     val epsPensjon: Boolean?,
     val eps2G: Boolean?,
     val afpOrdning: String?, //AfpOrdningTypeCode i pen
-    val afpInntektMndForUttak: Int?,
+    val afpInntektMndForUttak: Boolean?,
     val stillingsprosentOffHeltUttak: String?, //StillingsprOffCode i pen
     val stillingsprosentOffGradertUttak: String?, //StillingsprOffCode i pen
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")

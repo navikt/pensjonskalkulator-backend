@@ -16,7 +16,6 @@ import java.time.Instant
 import java.time.ZoneId
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.UtbetalingsperiodeResultat
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
-import no.nav.pensjon.kalkulator.person.client.pdl.dto.PdlFoedselsdato
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.YtelseskodeFoer1963
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.Fnr
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.FremtidigInntektDto
@@ -57,7 +56,10 @@ object TpSimuleringFoer1963ClientMapper {
             SimulatorAnonymAlderDato(alder = alder(spec.heltUttak.uttakFomAlder!!), spec.foedselsdato).dato
 
         val inntektTom: LocalDate =
-            SimulatorAnonymAlderDato(alder = alder(spec.heltUttak.inntekt!!.tomAlder), spec.foedselsdato).dato
+            spec.heltUttak.inntekt?.tomAlder
+                ?.let { SimulatorAnonymAlderDato(alder = alder(it), spec.foedselsdato).dato }
+                ?: heltUttakFom
+
 
         return SimulerOffentligTjenestepensjonFoer1963Dto(
             SimuleringEtter2011Dto(
@@ -68,9 +70,9 @@ object TpSimuleringFoer1963ClientMapper {
                 epsPensjon = spec.eps.harPensjon,
                 forventetInntekt = spec.forventetAarligInntektFoerUttak,
                 inntektUnderGradertUttak = spec.gradertUttak?.aarligInntekt,
-                inntektEtterHeltUttak = spec.heltUttak.inntekt.aarligBeloep ?: 0,
+                inntektEtterHeltUttak = spec.heltUttak.inntekt?.aarligBeloep ?: 0,
                 utenlandsperiodeForSimuleringList = spec.utenlandsopphold.periodeListe.map(::utenlandsperiode),
-                afpInntektMndForUttak = 500000,
+                afpInntektMndForUttak = spec.afpInntektMndForUttak,
                 afpOrdning = SimulatorAfpOrdningType.fromInternalValue(spec.afpOrdning).externalValue,
                 stillingsprosentOffHeltUttak = spec.stillingsprosentOffHeltUttak,
                 stillingsprosentOffGradertUttak = spec.stillingsprosentOffGradertUttak,
