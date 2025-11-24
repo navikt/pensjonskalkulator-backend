@@ -73,7 +73,7 @@ object TpSimuleringFoer1963ClientMapper {
                 inntektEtterHeltUttak = spec.heltUttak.inntekt?.aarligBeloep ?: 0,
                 utenlandsperiodeForSimuleringList = spec.utenlandsopphold.periodeListe.map(::utenlandsperiode),
                 afpInntektMndForUttak = spec.afpInntektMndForUttak,
-                afpOrdning = SimulatorAfpOrdningType.fromInternalValue(spec.afpOrdning).externalValue,
+                afpOrdning = if (spec.afpOrdning != null) SimulatorAfpOrdningType.fromInternalValue(spec.afpOrdning).externalValue else null,
                 stillingsprosentOffHeltUttak = spec.stillingsprosentOffHeltUttak,
                 stillingsprosentOffGradertUttak = spec.stillingsprosentOffGradertUttak,
                 forsteUttakDato = gradertUttakFom ?: heltUttakFom,
@@ -81,7 +81,7 @@ object TpSimuleringFoer1963ClientMapper {
                 antallArInntektEtterHeltUttak = inntektTom.year - heltUttakFom.year,
                 fnrAvdod = null,
                 samtykke = true,
-                utg = "50",
+                utg = spec.gradertUttak?.grad?.prosentsats?.toString() ?: Uttaksgrad.HUNDRE_PROSENT.prosentsats.toString(),
                 utenlandsopphold = spec.utenlandsopphold.antallAar ?: 0,
                 flyktning = false,
                 dodsdato = null,
@@ -120,17 +120,6 @@ object TpSimuleringFoer1963ClientMapper {
         } else {
             emptyList()
         }
-    }
-
-    private fun penUttaksgradValue(grad: Uttaksgrad?): String? = when (grad) {
-        null -> null
-        Uttaksgrad.NULL -> "P_0"
-        Uttaksgrad.TJUE_PROSENT -> "P_20"
-        Uttaksgrad.FOERTI_PROSENT -> "P_40"
-        Uttaksgrad.FEMTI_PROSENT -> "P_50"
-        Uttaksgrad.SEKSTI_PROSENT -> "P_60"
-        Uttaksgrad.AATTI_PROSENT -> "P_80"
-        Uttaksgrad.HUNDRE_PROSENT -> "P_100"
     }
 
     // Updated to build periods with periodeFom/periodeTom
