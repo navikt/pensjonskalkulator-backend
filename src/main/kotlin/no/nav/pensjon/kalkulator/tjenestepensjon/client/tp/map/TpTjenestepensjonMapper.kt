@@ -30,13 +30,13 @@ object TpTjenestepensjonMapper {
             TpAfpStatusType.UKJENT, TpAfpStatusType.IKKE_SOKT, TpAfpStatusType.SOKT, TpAfpStatusType.AVSLAG -> false
         }
 
-        val beloep = if (afpStatus) response.belopsListe.lastOrNull()?.belop else null
+        val maanedligBeloep = if (afpStatus) response.belopsListe.lastOrNull()?.belop else null
 
         if (afpStatus && response.belopsListe.isEmpty()) {
             log.warn { "AFP Offentlig Livsvarig er INNVILGET men beløpsliste er tom. Dette kan indikere datakvalitetsproblem." }
         }
 
-        return AfpOffentligLivsvarigResult(afpStatus, beloep)
+        return AfpOffentligLivsvarigResult(afpStatus, maanedligBeloep)
     }
 
     private fun forhold(dto: TpForholdDto): Forhold =

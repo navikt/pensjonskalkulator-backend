@@ -182,7 +182,7 @@ class TpTjenestepensjonClient(
                 .block()
                 ?.lowercase()
                 ?.also {
-                    log.debug { "TP-ordning for tpNr=$tpNr: $it" }
+                    log.info { "TP-ordning for tpNr=$tpNr: $it" }
                     countCalls(MetricResult.OK)
                 }
         } catch (e: WebClientRequestException) {
@@ -214,7 +214,7 @@ class TpTjenestepensjonClient(
             .replace("{fnr}", pid.value)
             .replace("{uttaksdato}", uttaksdato.toString())
 
-        log.debug { "GET from URL: '$url'" }
+        log.info { "GET from URL: '$url'" }
 
         return try {
             val response = webClient
@@ -227,7 +227,7 @@ class TpTjenestepensjonClient(
 
             TpTjenestepensjonMapper.fromDto(response)
                 .also {
-                    log.debug { "Successfully retrieved AFP data from ${config.name}" }
+                    log.info { "Successfully retrieved AFP data from ${config.name}: $it" }
                     countCalls(MetricResult.OK)
                 }
         } catch (e: WebClientRequestException) {
