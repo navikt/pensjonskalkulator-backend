@@ -76,7 +76,7 @@ class TjenestepensjonControllerTest {
     @Test
     fun hentAfpOffentligLivsvarigDetaljer() {
         `when`(tjenestepensjonService.hentAfpOffentligLivsvarigDetaljer())
-            .thenReturn(AfpOffentligLivsvarigResult(afpStatus = true, beloep = 15000))
+            .thenReturn(AfpOffentligLivsvarigResult(afpStatus = true, maanedligBeloep = 15000))
 
         mvc.perform(
             get(URL_AFP_OFFENTLIG_LIVSVARIG)
@@ -106,7 +106,7 @@ class TjenestepensjonControllerTest {
         @Language("json")
         private const val RESPONSE_BODY_AFP_OFFENTLIG_LIVSVARIG = """{
         "afpStatus": true,
-        "beloep": 15000
+        "maanedligBeloep": 15000
     }"""
     }
 }

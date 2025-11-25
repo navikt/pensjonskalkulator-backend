@@ -10,6 +10,6 @@ object TjenestepensjonMapper {
     fun toDto(tpLeverandoerer: List<String>) = MedlemskapITjenestepensjonsordningDto(tpLeverandoerer)
     fun toDto(result: AfpOffentligLivsvarigResult) = AfpOffentligLivsvarigDto(
         afpStatus = result.afpStatus,
-        beloep = result.beloep
+        maanedligBeloep = result.maanedligBeloep
     )
 }

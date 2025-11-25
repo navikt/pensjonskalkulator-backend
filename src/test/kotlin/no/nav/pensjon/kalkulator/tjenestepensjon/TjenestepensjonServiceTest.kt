@@ -57,7 +57,7 @@ class TjenestepensjonServiceTest {
     @Test
     fun `hentAfpOffentligLivsvarigDetaljer returnerer korrekte detaljer naar bruker har en ordning`() {
         val tpNr = "3010"
-        val expectedResult = AfpOffentligLivsvarigResult(afpStatus = true, beloep = 15000)
+        val expectedResult = AfpOffentligLivsvarigResult(afpStatus = true, maanedligBeloep = 15000)
         val expectedUttaksdato = LocalDate.now().plusMonths(1).withDayOfMonth(1)
 
         `when`(client.afpOffentligLivsvarigTpNummerListe(pid)).thenReturn(listOf(tpNr))
@@ -76,7 +76,7 @@ class TjenestepensjonServiceTest {
 
         val result = service.hentAfpOffentligLivsvarigDetaljer()
 
-        assertEquals(AfpOffentligLivsvarigResult(afpStatus = null, beloep = null), result)
+        assertEquals(AfpOffentligLivsvarigResult(afpStatus = null, maanedligBeloep = null), result)
         verify(client).afpOffentligLivsvarigTpNummerListe(pid)
         verifyNoMoreInteractions(client)
     }
@@ -99,7 +99,7 @@ class TjenestepensjonServiceTest {
     @Test
     fun `hentAfpOffentligLivsvarigDetaljer bruker neste maaned som uttaksdato`() {
         val tpNr = "3010"
-        val expectedResult = AfpOffentligLivsvarigResult(afpStatus = false, beloep = null)
+        val expectedResult = AfpOffentligLivsvarigResult(afpStatus = false, maanedligBeloep = null)
         val expectedUttaksdato = LocalDate.now().plusMonths(1).withDayOfMonth(1)
 
         `when`(client.afpOffentligLivsvarigTpNummerListe(pid)).thenReturn(listOf(tpNr))
