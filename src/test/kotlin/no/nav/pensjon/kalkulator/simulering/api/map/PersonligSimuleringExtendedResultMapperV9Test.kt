@@ -1,15 +1,15 @@
 package no.nav.pensjon.kalkulator.simulering.api.map
 
-import io.kotest.core.spec.style.FunSpec
+import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import java.time.LocalDate
 
-class PersonligSimuleringExtendedResultMapperV8Test : FunSpec({
+class PersonligSimuleringExtendedResultMapperV9Test : ShouldSpec({
 
-    test("extendedResultV8 maps domain to V8 DTO") {
-        PersonligSimuleringExtendedResultMapperV8.extendedResultV8(
+    should("map domain to V9 DTO") {
+        PersonligSimuleringExtendedResultMapperV9.extendedResultV9(
             source = SimuleringResult(
                 alderspensjon = listOf(
                     SimulertAlderspensjon(
@@ -55,9 +55,9 @@ class PersonligSimuleringExtendedResultMapperV8Test : FunSpec({
                 )
             ),
             foedselsdato = LocalDate.of(1963, 1, 1)
-        ) shouldBe PersonligSimuleringResultV8(
+        ) shouldBe PersonligSimuleringResultV9(
             alderspensjon = listOf(
-                PersonligSimuleringAlderspensjonResultV8(
+                PersonligSimuleringAlderspensjonResultV9(
                     alder = 67,
                     beloep = 123456,
                     inntektspensjonBeloep = 1,
@@ -79,12 +79,12 @@ class PersonligSimuleringExtendedResultMapperV8Test : FunSpec({
                     kapittel19Gjenlevendetillegg = 15
                 )
             ),
-            alderspensjonMaanedligVedEndring = PersonligSimuleringMaanedligPensjonResultV8(
+            alderspensjonMaanedligVedEndring = PersonligSimuleringMaanedligPensjonResultV9(
                 gradertUttakMaanedligBeloep = 6,
                 heltUttakMaanedligBeloep = 7
             ),
             afpPrivat = listOf(
-                PersonligSimuleringAfpPrivatResultV8(
+                PersonligSimuleringAfpPrivatResultV9(
                     alder = 67,
                     beloep = 12000,
                     kompensasjonstillegg = 123,
@@ -94,18 +94,18 @@ class PersonligSimuleringExtendedResultMapperV8Test : FunSpec({
                 )
             ),
             afpOffentlig = listOf(
-                PersonligSimuleringAarligPensjonResultV8(
+                PersonligSimuleringAarligPensjonResultV9(
                     alder = 67,
                     beloep = 12000,
                     maanedligBeloep = 1000
                 )
             ),
-            vilkaarsproeving = PersonligSimuleringVilkaarsproevingResultV8(vilkaarErOppfylt = true, alternativ = null),
+            vilkaarsproeving = PersonligSimuleringVilkaarsproevingResultV9(vilkaarErOppfylt = true, alternativ = null),
             harForLiteTrygdetid = true,
             trygdetid = 10,
             opptjeningGrunnlagListe = listOf(
-                PersonligSimuleringAarligInntektResultV8(aar = 2001, pensjonsgivendeInntektBeloep = 501000),
-                PersonligSimuleringAarligInntektResultV8(aar = 2002, pensjonsgivendeInntektBeloep = 502000)
+                PersonligSimuleringAarligInntektResultV9(aar = 2001, pensjonsgivendeInntektBeloep = 501000),
+                PersonligSimuleringAarligInntektResultV9(aar = 2002, pensjonsgivendeInntektBeloep = 502000)
             )
         )
     }
