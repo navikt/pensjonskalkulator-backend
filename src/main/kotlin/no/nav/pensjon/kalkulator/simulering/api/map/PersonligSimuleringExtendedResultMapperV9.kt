@@ -4,26 +4,39 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
-import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultMapperV8.justerAfpPrivatIInnevaerendeAarV8
-import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultMapperV8.justerAlderspensjonIInnevaerendeAarV8
+import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultMapperV9.justerPrivatAfpInnevaerendeAar
+import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultMapperV9.justerAlderspensjonInnevaerendeAar
 import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultUtil.filtrerBortGjeldendeAlderFoerBursdagInnevaerendeMaaned
 import java.time.LocalDate
 
 /**
  * Maps between data transfer objects (DTOs) and domain objects related to simulering.
- * The DTOs are specified by version 8 of the API offered to clients.
+ * The DTOs are specified by version 9 of the API offered to clients.
  */
-object PersonligSimuleringExtendedResultMapperV8 {
+object PersonligSimuleringExtendedResultMapperV9 {
 
-    fun extendedResultV8(source: SimuleringResult, foedselsdato: LocalDate) =
-        PersonligSimuleringResultV8(
+    fun extendedResultV9(source: SimuleringResult, foedselsdato: LocalDate) =
+        PersonligSimuleringResultV9(
             alderspensjon = source.alderspensjon.map(::alderspensjon)
-                .let { justerAlderspensjonIInnevaerendeAarV8(it, foedselsdato) }
-                .let { filtrerBortGjeldendeAlderFoerBursdagInnevaerendeMaaned(it, foedselsdato, PersonligSimuleringAlderspensjonResultV8::alder) },
+                .let { justerAlderspensjonInnevaerendeAar(alderspensjonList = it, foedselsdato) }
+                .let {
+                    filtrerBortGjeldendeAlderFoerBursdagInnevaerendeMaaned(
+                        list = it,
+                        foedselsdato,
+                        alderExtractor = PersonligSimuleringAlderspensjonResultV9::alder
+                    )
+                },
             alderspensjonMaanedligVedEndring = maanedligPensjon(source.alderspensjonMaanedsbeloep),
             pre2025OffentligAfp = source.pre2025OffentligAfp?.let(::pre2025OffentligAfp),
-            afpPrivat = source.afpPrivat.map(::privatAfp).let { justerAfpPrivatIInnevaerendeAarV8(it, foedselsdato) }
-                .let { filtrerBortGjeldendeAlderFoerBursdagInnevaerendeMaaned(it, foedselsdato, PersonligSimuleringAfpPrivatResultV8::alder) },
+            afpPrivat = source.afpPrivat.map(::privatAfp)
+                .let { justerPrivatAfpInnevaerendeAar(afpListe = it, foedselsdato) }
+                .let {
+                    filtrerBortGjeldendeAlderFoerBursdagInnevaerendeMaaned(
+                        list = it,
+                        foedselsdato,
+                        alderExtractor = PersonligSimuleringAfpPrivatResultV9::alder
+                    )
+                },
             afpOffentlig = source.afpOffentlig.map(::livsvarigOffentligAfp),
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving),
             harForLiteTrygdetid = source.harForLiteTrygdetid,
@@ -32,7 +45,7 @@ object PersonligSimuleringExtendedResultMapperV8 {
         )
 
     private fun alderspensjon(source: SimulertAlderspensjon) =
-        PersonligSimuleringAlderspensjonResultV8(
+        PersonligSimuleringAlderspensjonResultV9(
             alder = source.alder,
             beloep = source.beloep,
             inntektspensjonBeloep = source.inntektspensjonBeloep,
@@ -55,13 +68,20 @@ object PersonligSimuleringExtendedResultMapperV8 {
         )
 
     private fun maanedligPensjon(source: AlderspensjonMaanedsbeloep?) =
-        PersonligSimuleringMaanedligPensjonResultV8(
+        PersonligSimuleringMaanedligPensjonResultV9(
             gradertUttakMaanedligBeloep = source?.gradertUttak,
             heltUttakMaanedligBeloep = source?.heltUttak ?: 0
         )
 
+    private fun livsvarigOffentligAfp(source: SimulertAfpOffentlig) =
+        PersonligSimuleringAarligPensjonResultV9(
+            alder = source.alder,
+            beloep = source.beloep,
+            maanedligBeloep = source.maanedligBeloep
+        )
+
     private fun pre2025OffentligAfp(source: SimulertPre2025OffentligAfp) =
-        PersonligSimuleringPre2025OffentligAfpResultV8(
+        PersonligSimuleringPre2025OffentligAfpResultV9(
             alderAar = source.alderAar,
             totaltAfpBeloep = source.totaltAfpBeloep,
             tidligereArbeidsinntekt = source.tidligereArbeidsinntekt,
@@ -79,7 +99,7 @@ object PersonligSimuleringExtendedResultMapperV8 {
         )
 
     private fun privatAfp(source: SimulertAfpPrivat) =
-        PersonligSimuleringAfpPrivatResultV8(
+        PersonligSimuleringAfpPrivatResultV9(
             alder = source.alder,
             beloep = source.beloep,
             kompensasjonstillegg = source.kompensasjonstillegg,
@@ -88,27 +108,20 @@ object PersonligSimuleringExtendedResultMapperV8 {
             maanedligBeloep = source.maanedligBeloep
         )
 
-    private fun livsvarigOffentligAfp(source: SimulertAfpOffentlig) =
-        PersonligSimuleringAarligPensjonResultV8(
-            alder = source.alder,
-            beloep = source.beloep,
-            maanedligBeloep = source.maanedligBeloep
-        )
-
     private fun vilkaarsproeving(source: Vilkaarsproeving) =
-        PersonligSimuleringVilkaarsproevingResultV8(
+        PersonligSimuleringVilkaarsproevingResultV9(
             vilkaarErOppfylt = source.innvilget,
             alternativ = source.alternativ?.let(::alternativ)
         )
 
     private fun opptjeningGrunnlag(source: SimulertOpptjeningGrunnlag) =
-        PersonligSimuleringAarligInntektResultV8(
+        PersonligSimuleringAarligInntektResultV9(
             aar = source.aar,
             pensjonsgivendeInntektBeloep = source.pensjonsgivendeInntektBeloep
         )
 
     private fun alternativ(source: Alternativ) =
-        PersonligSimuleringAlternativResultV8(
+        PersonligSimuleringAlternativResultV9(
             gradertUttaksalder = source.gradertUttakAlder?.let(::alder),
             uttaksgrad = prosentsats(source.uttakGrad),
             heltUttaksalder = alder(source.heltUttakAlder)
@@ -120,5 +133,5 @@ object PersonligSimuleringExtendedResultMapperV8 {
         }
 
     private fun alder(source: Alder) =
-        PersonligSimuleringAlderResultV8(aar = source.aar, maaneder = source.maaneder)
+        PersonligSimuleringAlderResultV9(aar = source.aar, maaneder = source.maaneder)
 }
