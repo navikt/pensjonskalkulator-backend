@@ -57,7 +57,12 @@ class TjenestepensjonServiceTest {
     @Test
     fun `hentAfpOffentligLivsvarigDetaljer returnerer korrekte detaljer naar bruker har en ordning`() {
         val tpNr = "3010"
-        val expectedResult = AfpOffentligLivsvarigResult(afpStatus = true, maanedligBeloep = 15000)
+        val expectedResult = AfpOffentligLivsvarigResult(
+            afpStatus = true,
+            virkningFom = LocalDate.of(2025, 1, 1),
+            maanedligBeloep = 15000,
+            sistBenyttetGrunnbeloep = 123000
+        )
         val expectedUttaksdato = LocalDate.now().plusMonths(1).withDayOfMonth(1)
 
         `when`(client.afpOffentligLivsvarigTpNummerListe(pid)).thenReturn(listOf(tpNr))
@@ -76,7 +81,12 @@ class TjenestepensjonServiceTest {
 
         val result = service.hentAfpOffentligLivsvarigDetaljer()
 
-        assertEquals(AfpOffentligLivsvarigResult(afpStatus = null, maanedligBeloep = null), result)
+        assertEquals(AfpOffentligLivsvarigResult(
+            afpStatus = null,
+            virkningFom = null,
+            maanedligBeloep = null,
+            sistBenyttetGrunnbeloep = null
+        ), result)
         verify(client).afpOffentligLivsvarigTpNummerListe(pid)
         verifyNoMoreInteractions(client)
     }
@@ -90,7 +100,7 @@ class TjenestepensjonServiceTest {
             service.hentAfpOffentligLivsvarigDetaljer()
         }
 
-        assertTrue(exception.message!!.contains("Bruker har flere AFP offentlig livsvarig ordninger"))
+        assertTrue(exception.message!!.contains("Bruker har flere ordninger for livsvarig offentlig AFP"))
         assertTrue(exception.message!!.contains("(3)"))
         verify(client).afpOffentligLivsvarigTpNummerListe(pid)
         verifyNoMoreInteractions(client)
@@ -99,7 +109,12 @@ class TjenestepensjonServiceTest {
     @Test
     fun `hentAfpOffentligLivsvarigDetaljer bruker neste maaned som uttaksdato`() {
         val tpNr = "3010"
-        val expectedResult = AfpOffentligLivsvarigResult(afpStatus = false, maanedligBeloep = null)
+        val expectedResult = AfpOffentligLivsvarigResult(
+            afpStatus = false,
+            virkningFom = null,
+            maanedligBeloep = null,
+            sistBenyttetGrunnbeloep = null
+        )
         val expectedUttaksdato = LocalDate.now().plusMonths(1).withDayOfMonth(1)
 
         `when`(client.afpOffentligLivsvarigTpNummerListe(pid)).thenReturn(listOf(tpNr))
@@ -109,7 +124,6 @@ class TjenestepensjonServiceTest {
 
         verify(client).hentAfpOffentligLivsvarigDetaljer(pid, tpNr, expectedUttaksdato)
     }
-
 
     private companion object {
         private fun tjenestepensjon() = Tjenestepensjon(forholdList = listOf(forhold()))
