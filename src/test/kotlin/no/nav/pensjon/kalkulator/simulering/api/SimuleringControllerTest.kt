@@ -212,7 +212,7 @@ class SimuleringControllerTest : ShouldSpec() {
 
     private companion object {
 
-        private const val URL_V9 = "/api/v8/alderspensjon/simulering"
+        private const val URL_V9 = "/api/v9/alderspensjon/simulering"
         private const val PENSJONSBELOEP = 123456
 
         @Language("json")
