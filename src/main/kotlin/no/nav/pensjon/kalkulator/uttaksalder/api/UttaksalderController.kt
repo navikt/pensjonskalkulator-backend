@@ -13,6 +13,7 @@ import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
+import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderError
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderResultV2
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderResultV3
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderSpecV2
@@ -51,7 +52,10 @@ class UttaksalderController(
             ),
             ApiResponse(
                 responseCode = "503", description = "Søk etter uttaksalder kunne ikke utføres av tekniske årsaker",
-                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
+                content = [
+                    Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)]),
+                    Content(schema = Schema(implementation = UttaksalderError::class))
+                ]
             ),
         ]
     )
