@@ -3,12 +3,13 @@ package no.nav.pensjon.kalkulator.uttaksalder
 import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.general.UttaksalderGradertUttak
 import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.simulering.InnvilgetLivsvarigOffentligAfpSpec
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.simulering.Opphold
 
 /**
  * Specifies impersonal parameters for finding første mulige uttaksalder.
- * 'Impersonal' means parameters that do not require person ID to be known.
+ * 'Impersonal' means parameters that are obtained without knowing the person's identity.
  */
 data class ImpersonalUttaksalderSpec(
     val simuleringType: SimuleringType,
@@ -17,5 +18,6 @@ data class ImpersonalUttaksalderSpec(
     val aarligInntektFoerUttak: Int? = null,
     val gradertUttak: UttaksalderGradertUttak? = null,
     val heltUttak: HeltUttak?,
-    val utenlandsperiodeListe: List<Opphold>
+    val utenlandsperiodeListe: List<Opphold>,
+    val innvilgetLivsvarigOffentligAfp: InnvilgetLivsvarigOffentligAfpSpec? = null
 )

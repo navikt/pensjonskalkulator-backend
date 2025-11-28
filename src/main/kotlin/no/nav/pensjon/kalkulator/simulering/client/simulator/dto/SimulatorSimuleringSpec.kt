@@ -1,11 +1,13 @@
 package no.nav.pensjon.kalkulator.simulering.client.simulator.dto
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import no.nav.pensjon.kalkulator.person.Pid.Companion.redact
 import java.time.LocalDate
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(NON_NULL)
 data class SimulatorSimuleringSpec(
     val simuleringstype: String,
     val pid: String,
@@ -18,7 +20,8 @@ data class SimulatorSimuleringSpec(
     val heltUttak: SimulatorHeltUttakSpec,
     val utenlandsperiodeListe: List<SimulatorUtlandPeriodeSpec>,
     val afpInntektMaanedFoerUttak: Boolean?,
-    val afpOrdning: String? = null
+    val afpOrdning: String? = null,
+    val innvilgetLivsvarigOffentligAfp: SimulatorInnvilgetLivsvarigOffentligAfpSpec? = null
 ) {
     /**
      * toString with redacted person ID
@@ -35,7 +38,8 @@ data class SimulatorSimuleringSpec(
                 "heltUttak: $heltUttak, " +
                 "utenlandsperiodeListe: $utenlandsperiodeListe, " +
                 "afpInntektMaanedFoerUttak: $afpInntektMaanedFoerUttak, " +
-                "afpOrdning: $afpOrdning, "
+                "afpOrdning: $afpOrdning, " +
+                "innvilgetLivsvarigOffentligAfp: $innvilgetLivsvarigOffentligAfp"
 }
 
 data class SimulatorGradertUttakSpec(
@@ -50,12 +54,22 @@ data class SimulatorHeltUttakSpec(
     val inntektTomAlder: SimulatorAlderSpec
 )
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(NON_NULL)
 data class SimulatorUtlandPeriodeSpec(
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd") val fom: LocalDate,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd") val tom: LocalDate? = null,
+    @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val fom: LocalDate,
+    @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val tom: LocalDate? = null,
     val land: String,
     val arbeidetUtenlands: Boolean
+)
+
+/**
+ * Spesifiserer egenskapene til en løpende livsvarig AFP i offentlig sektor.
+ */
+@JsonInclude(NON_NULL)
+data class SimulatorInnvilgetLivsvarigOffentligAfpSpec(
+    val aarligBruttoBeloep: Double,
+    @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val uttakFom: LocalDate,
+    val sistRegulertGrunnbeloep: Int? = null
 )
 
 data class SimulatorAlderSpec(
