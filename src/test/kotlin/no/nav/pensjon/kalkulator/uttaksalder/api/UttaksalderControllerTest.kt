@@ -68,7 +68,7 @@ internal class UttaksalderControllerTest : ShouldSpec() {
             val spec = ImpersonalUttaksalderSpec(
                 simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
                 sivilstand = Sivilstand.UGIFT,
-                harEps = true,
+                harEps = false,
                 aarligInntektFoerUttak = 100_000,
                 heltUttak = null,
                 utenlandsperiodeListe = listOf(
