@@ -54,8 +54,8 @@ class OpenApiConfiguration {
                 "/api/v2/person",
                 "/api/v1/ansatt-id",
                 "/api/v1/encrypt",
-                "/api/v2/tidligste-hel-uttaksalder",
-                "/api/v1/tidligste-hel-uttaksalder",
+                "/api/v3/tidligste-hel-uttaksalder",
+                "/api/v2/tidligste-hel-uttaksalder", // deprecated
                 "/api/v1/ufoeregrad",
                 "/api/feature/**",
                 "/api/inntekt",

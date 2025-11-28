@@ -37,7 +37,8 @@ class LavesteUttaksalderService(
             utenlandsopphold = Utenlandsopphold(
                 periodeListe = impersonalSpec.utenlandsperiodeListe,
                 antallAar = null
-            )
+            ),
+            innvilgetLivsvarigOffentligAfp = impersonalSpec.innvilgetLivsvarigOffentligAfp
         )
 
     private fun foedselsdato(): LocalDate =

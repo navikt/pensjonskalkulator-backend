@@ -64,7 +64,7 @@ internal class UttaksalderControllerTest : ShouldSpec() {
             every { auditor.audit(any(), any()) } returns Unit
         }
 
-        should("normalt returnere tidligste hel uttaksalder V1") {
+        should("normalt returnere tidligste hel uttaksalder V3") {
             val spec = ImpersonalUttaksalderSpec(
                 simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
                 sivilstand = Sivilstand.UGIFT,
@@ -78,14 +78,15 @@ internal class UttaksalderControllerTest : ShouldSpec() {
                         land = Land.AUS,
                         arbeidet = true
                     )
-                )
+                ),
+                innvilgetLivsvarigOffentligAfp = null
             )
             every { uttaksalderService.finnTidligsteUttaksalder(spec) } returns uttaksalder
 
             mvc.perform(
-                post("/api/v1/tidligste-hel-uttaksalder")
+                post("/api/v3/tidligste-hel-uttaksalder")
                     .with(csrf())
-                    .content(requestBodyV1())
+                    .content(requestBodyV3())
                     .contentType(MediaType.APPLICATION_JSON)
             )
                 .andExpect(status().isOk)
@@ -125,7 +126,7 @@ internal class UttaksalderControllerTest : ShouldSpec() {
         private val uttaksalder = Alder(aar = 67, maaneder = 10)
 
         @Language("json")
-        private fun requestBodyV1(
+        private fun requestBodyV3(
             sivilstand: Sivilstand = Sivilstand.UGIFT,
             harEps: Boolean = true,
             sisteInntekt: Int = 100_000,
