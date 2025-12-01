@@ -19,7 +19,7 @@ object PenLoependeVedtakMapper {
             loependeAlderspensjon = source.alderspensjon?.let {
                 loependeAlderspensjon(source = it, uttaksgradFom = source.gjeldendeUttaksgradFom)
             },
-            fremtidigAlderspensjon = source.alderspensjonIFremtid?.let(::fremtidigAlderspensjon),
+            fremtidigAlderspensjon = fremtidigUttakgradsendring(source),
             ufoeretrygd = source.ufoeretrygd?.let(::ufoeretrygd),
             privatAfp = source.afpPrivat?.let(::vedtak),
             pre2025OffentligAfp = source.afpOffentlig?.let(::vedtak)
@@ -36,12 +36,10 @@ object PenLoependeVedtakMapper {
             sivilstand = PenSivilstand.toInternalValue(source.sivilstatus)
         )
 
-    private fun fremtidigAlderspensjon(source: PenGjeldendeVedtakApDto) =
-        FremtidigAlderspensjon(
-            grad = source.grad,
-            fom = source.fraOgMed,
-            sivilstand = PenSivilstand.toInternalValue(source.sivilstatus)
-        )
+    private fun fremtidigUttakgradsendring(source: PenLoependeVedtakDto) =
+        source.alderspensjonIFremtid
+            ?.takeIf { it.grad != source.alderspensjon?.grad }
+            ?.let { FremtidigAlderspensjon(it.grad, it.fraOgMed, PenSivilstand.toInternalValue(it.sivilstatus)) }
 
     private fun ufoeretrygd(source: PenGjeldendeUfoeregradDto) =
         LoependeUfoeretrygd(
