@@ -38,15 +38,8 @@ object PenLoependeVedtakMapper {
 
     private fun fremtidigUttakgradsendring(source: PenLoependeVedtakDto) =
         source.alderspensjonIFremtid
-            ?.let {
-                if (it.grad != source.alderspensjon?.grad)
-                    FremtidigAlderspensjon(
-                        grad = it.grad,
-                        fom = it.fraOgMed,
-                        sivilstand = PenSivilstand.toInternalValue(it.sivilstatus)
-                    )
-                else null
-            }
+            ?.takeIf { it.grad != source.alderspensjon?.grad }
+            ?.let { FremtidigAlderspensjon(it.grad, it.fraOgMed, PenSivilstand.toInternalValue(it.sivilstatus)) }
 
     private fun ufoeretrygd(source: PenGjeldendeUfoeregradDto) =
         LoependeUfoeretrygd(
