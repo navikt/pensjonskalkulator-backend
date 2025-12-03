@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.dto
+package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.dto
 
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.AfpOrdningType

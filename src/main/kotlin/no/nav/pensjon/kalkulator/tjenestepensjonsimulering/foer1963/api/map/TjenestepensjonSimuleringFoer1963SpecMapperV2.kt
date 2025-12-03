@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.map
+package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.map
 
 import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.land.Land
@@ -7,7 +7,7 @@ import no.nav.pensjon.kalkulator.simulering.Opphold
 import no.nav.pensjon.kalkulator.simulering.Utenlandsopphold
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.SimuleringOffentligTjenestepensjonFoer1963Spec
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.dto.SimuleringOffentligTjenestepensjonFoer1963SpecV2
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.dto.SimuleringOffentligTjenestepensjonFoer1963SpecV2
 
 object TjenestepensjonSimuleringFoer1963SpecMapperV2 {
 

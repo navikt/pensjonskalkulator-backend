@@ -15,9 +15,9 @@ import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.OffentligTjenestepensjonSimuleringFoer1963Resultat
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.SimuleringOffentligTjenestepensjonFoer1963Spec
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.TjenestepensjonSimuleringFoer1963Client
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.dto.SimulerTjenestepensjonFoer1963ResponseDto
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.map.TpSimuleringFoer1963ClientMapper.toDto
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.map.TpSimuleringFoer1963ClientMapper
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.SimulerTjenestepensjonFoer1963ResponseDto
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.map.TpSimuleringFoer1963ClientMapper.toDto
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.map.TpSimuleringFoer1963ClientMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
