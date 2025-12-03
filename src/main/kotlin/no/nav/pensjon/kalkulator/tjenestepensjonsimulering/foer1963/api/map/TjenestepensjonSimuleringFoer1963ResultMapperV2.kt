@@ -1,9 +1,11 @@
-package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.map
+package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.map
 
-import no.nav.pensjon.kalkulator.general.Alder.Companion.from
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.OffentligTjenestepensjonSimuleringFoer1963Resultat
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.dto.*
-import java.time.LocalDate
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.dto.OffentligTjenestepensjonSimuleringFoer1963ResultV2
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.dto.SimuleringsresultatFoer1963V2
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.dto.SimulertTjenestepensjonFoer1963V2
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.dto.UtbetalingsperiodeFoer1963V2
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.dto.SimuleringsresultatStatusV2
 import kotlin.math.floor
 
 object TjenestepensjonSimuleringFoer1963ResultMapperV2 {
@@ -34,7 +36,8 @@ object TjenestepensjonSimuleringFoer1963ResultMapperV2 {
             simuleringsresultatStatus = SimuleringsresultatStatusV2.OK,
             muligeTpLeverandoerListe = emptyList(),
             simulertTjenestepensjon = simulert,
-            serviceData = null
+            serviceData = null,
+            feilkode = resultat.feilrespons?.feilkode
         )
     }
 }

@@ -1,16 +1,18 @@
-package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.dto
+package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.Feilkode
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.YtelseskodeFoer1963
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.dto.YtelsekodeFoer1963Dto
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.dto.SimuleringsresultatStatusV2
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class OffentligTjenestepensjonSimuleringFoer1963ResultV2(
     val simuleringsresultatStatus: SimuleringsresultatStatusV2 = SimuleringsresultatStatusV2.OK,
     val muligeTpLeverandoerListe: List<String> = emptyList(),
     val simulertTjenestepensjon: SimulertTjenestepensjonFoer1963V2? = null,
-    var serviceData: List<String>? = null
+    var serviceData: List<String>? = null,
+    val feilkode: Feilkode? = null,
 )
 
 data class SimulertTjenestepensjonFoer1963V2(

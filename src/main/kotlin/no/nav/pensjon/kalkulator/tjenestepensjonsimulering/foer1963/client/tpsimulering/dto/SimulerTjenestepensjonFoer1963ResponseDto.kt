@@ -1,7 +1,13 @@
-package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.dto
+package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto
 
 data class SimulerTjenestepensjonFoer1963ResponseDto(
-    val simulertPensjonListe: List<SimulertPensjon>
+    val simulertPensjonListe: List<SimulertPensjon>,
+    val feilrespons: FeilresponsDto?
+)
+
+data class FeilresponsDto(
+    val errorCode: FeilkodeDto,
+    val errorMessage: String,
 )
 
 data class SimulertPensjon(
@@ -30,4 +36,13 @@ enum class YtelsekodeFoer1963Dto {
     AP,
     AFP,
     SERALDER
+}
+
+enum class FeilkodeDto {
+    KUNNE_IKKE_SIMULERE,
+    UKJENT_PRODUKT,
+    MIDLERTIDIG_TEKNISK_FEIL,
+    BEREGNING_GIR_NULL_UTBETALING,
+    OPPFYLLER_IKKE_INNGANGSVILKAAR,
+    ANNEN_FEIL;
 }

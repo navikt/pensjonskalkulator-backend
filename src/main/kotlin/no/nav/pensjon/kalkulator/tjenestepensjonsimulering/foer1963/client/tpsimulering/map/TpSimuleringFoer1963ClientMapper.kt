@@ -1,22 +1,19 @@
-package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.map
+package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.map
 
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.simulering.Opphold
 import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.SimulatorAlderSpec
 import no.nav.pensjon.kalkulator.simulering.client.simulator.map.*
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.OffentligTjenestepensjonSimuleringFoer1963Resultat
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.SimuleringOffentligTjenestepensjonFoer1963Spec
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.SimulerOffentligTjenestepensjonFoer1963Dto
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.SimuleringEtter2011Dto
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.UtenlandsperiodeForSimuleringDto
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.dto.SimulerTjenestepensjonFoer1963ResponseDto
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.SimulerTjenestepensjonFoer1963ResponseDto
 import java.time.LocalDate
 import java.time.Instant
 import java.time.ZoneId
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.UtbetalingsperiodeResultat
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.YtelseskodeFoer1963
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.*
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.Fnr
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.FremtidigInntektDto
 
@@ -39,7 +36,11 @@ object TpSimuleringFoer1963ClientMapper {
                         ytelsekode = YtelseskodeFoer1963.fromExternalValue(periode.ytelsekode!!),
                         mangelfullSimuleringkode = periode.mangelfullSimuleringkode
                     )
-                }
+                },
+                feilrespons = dto.feilrespons?.let { Feilrespons(
+                    feilkode = Feilkode.fromExternalValue(it.errorCode),
+                    feilmelding = it.errorMessage
+                ) }
             )
         } ?: OffentligTjenestepensjonSimuleringFoer1963Resultat()
 
@@ -74,7 +75,7 @@ object TpSimuleringFoer1963ClientMapper {
                 utenlandsperiodeForSimuleringList = spec.utenlandsopphold.periodeListe.map(::utenlandsperiode),
                 afpInntektMndForUttak = spec.afpInntektMndForUttak,
                 afpOrdning = if (spec.afpOrdning != null) SimulatorAfpOrdningType.fromInternalValue(spec.afpOrdning).externalValue else null,
-                stillingsprosentOffHeltUttak = spec.stillingsprosentOffHeltUttak,
+                stillingsprosentOffHeltUttak = if (spec.stillingsprosentOffHeltUttak == "0") null else spec.stillingsprosentOffHeltUttak,
                 stillingsprosentOffGradertUttak = spec.stillingsprosentOffGradertUttak,
                 forsteUttakDato = gradertUttakFom ?: heltUttakFom,
                 heltUttakDato = heltUttakFom,
