@@ -6,7 +6,7 @@ package no.nav.pensjon.kalkulator.tech.representasjon
  */
 enum class RepresentertRolle(val needFulltNavn: Boolean) {
     NONE(needFulltNavn = false),
-    SELV(needFulltNavn = false), // personen er den samme som den som er innlogget
+    SELV(needFulltNavn = true), // personen er den samme som den som er innlogget; behøver fullt navn for PDF
     FULLMAKT_GIVER(needFulltNavn = true), // personen er fullmaktsgiver; den innloggede er fullmektig
     UNDER_VEILEDNING(needFulltNavn = true) // personen undergår veiledning; den innloggede er veileder
 }

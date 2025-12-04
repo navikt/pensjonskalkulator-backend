@@ -6,7 +6,6 @@ import io.mockk.every
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PersonFactory.personWithPensjoneringAldre
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.mock.PersonFactory.skiltPerson
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
@@ -58,30 +57,6 @@ class PersonControllerTest : FunSpec() {
             every { auditor.audit(any(), any()) } returns Unit
         }
 
-        test("'person' endpoint version 2") {
-            every { personService.getPerson() } returns skiltPerson()
-
-            mvc.perform(
-                get(URL_V2)
-                    .with(csrf())
-                    .content("")
-            )
-                .andExpect(status().isOk())
-                .andExpect(content().json(RESPONSE_BODY_V2))
-        }
-
-        test("'person' endpoint version 4") {
-            every { personService.getPerson() } returns skiltPerson()
-
-            mvc.perform(
-                get(URL_V4)
-                    .with(csrf())
-                    .content("")
-            )
-                .andExpect(status().isOk())
-                .andExpect(content().json(RESPONSE_BODY_V4))
-        }
-
         test("'person' endpoint version 5") {
             every { personService.getPerson() } returns personWithPensjoneringAldre()
 
@@ -93,40 +68,49 @@ class PersonControllerTest : FunSpec() {
                 .andExpect(status().isOk())
                 .andExpect(content().json(RESPONSE_BODY_V5))
         }
+
+        test("'person' endpoint version 6") {
+            every { personService.getPerson() } returns personWithPensjoneringAldre()
+
+            mvc.perform(
+                get(URL_V6)
+                    .with(csrf())
+                    .content("")
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(RESPONSE_BODY_V6))
+        }
     }
 
     private companion object {
-        private const val URL_V2 = "/api/v2/person"
-        private const val URL_V4 = "/api/v4/person"
         private const val URL_V5 = "/api/v5/person"
+        private const val URL_V6 = "/api/v6/person"
 
         @Language("json")
-        private const val RESPONSE_BODY_V2 = """{
-    "navn": "Fornavn1",
-    "foedselsdato": "1963-12-31",
-    "sivilstand": "SKILT"
-}"""
-
-        @Language("json")
-        private const val RESPONSE_BODY_V4 = """{
+        private const val RESPONSE_BODY_V5 = """{
     "navn": "Fornavn1",
     "foedselsdato": "1963-12-31",
     "sivilstand": "SKILT",
     "pensjoneringAldre": {
         "normertPensjoneringsalder": {
             "aar": 67,
-            "maaneder": 0
+            "maaneder": 1
         },
         "nedreAldersgrense": {
             "aar": 62,
-            "maaneder": 0
+            "maaneder": 1
+        },
+        "oevreAldersgrense": {
+            "aar": 75,
+            "maaneder": 1
         }
     }
 }"""
 
         @Language("json")
-        private const val RESPONSE_BODY_V5 = """{
-    "navn": "Fornavn1",
+        private const val RESPONSE_BODY_V6 = """{
+    "navn": "Fornavn1 Etternavn1",
+    "fornavn": "Fornavn1",
     "foedselsdato": "1963-12-31",
     "sivilstand": "SKILT",
     "pensjoneringAldre": {

@@ -125,7 +125,7 @@ internal class LavesteUttaksalderServiceTest {
 
     private fun arrangeService(foedselsdato: LocalDate, dagensDato: LocalDate): LocalDate {
         service = LavesteUttaksalderService(personService, normalderService, todayProvider = { dagensDato })
-        `when`(personService.getPerson()).thenReturn(Person(navn = "", foedselsdato))
+        `when`(personService.getPerson()).thenReturn(Person(navn = "", fornavn = "", foedselsdato = foedselsdato))
         `when`(normalderService.nedreAlder(foedselsdato)).thenReturn(Alder(aar = 62, maaneder = 0))
         `when`(normalderService.normalder(foedselsdato)).thenReturn(Alder(aar = 67, maaneder = 0))
         return foedselsdato

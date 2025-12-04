@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.person.api.dto
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.person.Sivilstand
 
-enum class PersonSivilstandV4(val internalValue: Sivilstand) {
+enum class PersonSivilstandV6(val internalValue: Sivilstand) {
 
     UNKNOWN(Sivilstand.UNKNOWN),
     UOPPGITT(Sivilstand.UOPPGITT),
@@ -25,7 +25,7 @@ enum class PersonSivilstandV4(val internalValue: Sivilstand) {
         fun fromInternalValue(value: Sivilstand?) =
             values.singleOrNull { it.internalValue == value } ?: default(value)
 
-        private fun default(internalValue: Sivilstand?): PersonSivilstandV4 =
+        private fun default(internalValue: Sivilstand?): PersonSivilstandV6 =
             internalValue?.let {
                 log.warn { "Unknown sivilstand '$it'" }
                 UNKNOWN

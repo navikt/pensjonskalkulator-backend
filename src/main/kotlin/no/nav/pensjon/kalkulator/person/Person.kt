@@ -6,6 +6,7 @@ import java.time.LocalDate
 
 data class Person(
     val navn: String,
+    val fornavn: String,
     val foedselsdato: LocalDate,
     val pensjoneringAldre: Aldersgrenser = defaultAldersgrenser,
     val sivilstand: Sivilstand = Sivilstand.UOPPGITT,
@@ -16,6 +17,7 @@ data class Person(
     fun withPensjoneringAldre(pensjoneringAldre: Aldersgrenser) =
         Person(
             navn,
+            fornavn,
             foedselsdato,
             pensjoneringAldre,
             sivilstand,

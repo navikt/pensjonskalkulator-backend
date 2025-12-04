@@ -12,14 +12,16 @@ object PersonFactory {
     val pid = Pid("12906498357") // synthetic fødselsnummer
     val foedselsdato = LocalDate.of(1963, 12, 31)
 
-    fun person(sivilstand: Sivilstand) = Person("Fornavn1", foedselsdato, sivilstand = sivilstand)
+    fun person(sivilstand: Sivilstand) =
+        Person(navn = "Fornavn1 Etternavn1", fornavn = "Fornavn1", foedselsdato, sivilstand = sivilstand)
 
     fun person() = person(Sivilstand.UOPPGITT)
 
     fun skiltPerson() = person(Sivilstand.SKILT)
 
     fun personWithPensjoneringAldre() = Person(
-        navn = "Fornavn1",
+        navn = "Fornavn1 Etternavn1",
+        fornavn = "Fornavn1",
         foedselsdato = foedselsdato,
         sivilstand = Sivilstand.SKILT,
         pensjoneringAldre = Aldersgrenser(

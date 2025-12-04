@@ -19,6 +19,7 @@ object PdlPersonMapper {
     private fun person(dto: PdlPerson) =
         Person(
             navn = dto.navn.orEmpty().let(::fromDto) ?: "",
+            fornavn = dto.navn?.firstOrNull()?.fornavn ?: "",
             foedselsdato = dto.foedselsdato.orEmpty().let(::fromDto) ?: LocalDate.MIN,
             sivilstand = dto.sivilstand.orEmpty().let(::fromDto),
             adressebeskyttelse = dto.adressebeskyttelse.orEmpty().let(::fromDto)

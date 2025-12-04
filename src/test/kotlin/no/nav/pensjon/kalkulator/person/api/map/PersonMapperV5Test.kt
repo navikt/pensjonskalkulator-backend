@@ -17,10 +17,11 @@ import org.junit.jupiter.api.Test
 class PersonMapperV5Test {
 
     @Test
-    fun `dtoV5 person to data transfer object version 4`() {
-        val dto: PersonResultV5 = PersonMapperV5.dtoV5(
+    fun `dtoV5 person to data transfer object version 5`() {
+        PersonMapperV5.dtoV5(
             Person(
-                navn = "Fornavn1",
+                navn = "Fornavn1 Etternavn1",
+                fornavn = "Fornavn1",
                 foedselsdato = foedselsdato,
                 pensjoneringAldre = Aldersgrenser(
                     aarskull = 1963,
@@ -32,9 +33,7 @@ class PersonMapperV5Test {
                 sivilstand = Sivilstand.GIFT,
                 adressebeskyttelse = AdressebeskyttelseGradering.FORTROLIG
             )
-        )
-
-        dto shouldBe PersonResultV5(
+        ) shouldBe PersonResultV5(
             navn = "Fornavn1",
             foedselsdato = foedselsdato,
             pensjoneringAldre = PersonPensjoneringAldreV5(
