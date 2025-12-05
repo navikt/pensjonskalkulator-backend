@@ -1,18 +1,19 @@
 package no.nav.pensjon.kalkulator.person.client.pdl.map
 
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.pdl.dto.*
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 
-class PdlPersonMapperTest {
+class PdlPersonMapperTest : ShouldSpec({
 
-    @Test
-    fun `fromDto maps response DTO to domain object`() {
+    val foedselsdato: LocalDate = LocalDate.of(1963, 12, 31)
+
+    should("map response DTO to domain object") {
         val dto = responseDto(
             fornavnListe = listOf("For-Navn"),
             foedselsdatoListe = listOf(foedselsdato),
@@ -21,109 +22,110 @@ class PdlPersonMapperTest {
 
         val person = PdlPersonMapper.fromDto(dto)
 
-        assertEquals("For-Navn", person.navn)
-        assertEquals(foedselsdato, person.foedselsdato)
-        assertTrue(person.harFoedselsdato)
-        assertEquals(Sivilstand.UGIFT, person.sivilstand)
+        person.navn shouldBe "For-Navn"
+        person.foedselsdato shouldBe foedselsdato
+        person.harFoedselsdato shouldBe true
+        person.sivilstand shouldBe Sivilstand.UGIFT
     }
 
-    @Test
-    fun `fromDto picks first fornavn`() {
+    should("pick first fornavn") {
         val dto = responseDto(fornavnListe = listOf("Kari", "Ola"))
-        assertEquals("Kari", PdlPersonMapper.fromDto(dto).navn)
+        PdlPersonMapper.fromDto(dto).navn shouldBe "Kari"
     }
 
-    @Test
-    fun `fromDto picks first foedselsdato`() {
+    should("pick first foedselsdato") {
         val dto = responseDto(foedselsdatoListe = listOf(foedselsdato, LocalDate.of(1962, 1, 1)))
-        assertEquals(foedselsdato, PdlPersonMapper.fromDto(dto).foedselsdato)
+        PdlPersonMapper.fromDto(dto).foedselsdato shouldBe foedselsdato
     }
 
-    @Test
-    fun `fromDto picks first sivilstand`() {
+    should("pick first sivilstand") {
         val dto = responseDto(sivilstandListe = listOf("UGIFT", "SKILT"))
-        assertEquals(Sivilstand.UGIFT, PdlPersonMapper.fromDto(dto).sivilstand)
+        PdlPersonMapper.fromDto(dto).sivilstand shouldBe Sivilstand.UGIFT
     }
 
-    @Test
-    fun `fromDto picks first adressebeskyttelsegradering`() {
+    should("pick first adressebeskyttelsegradering") {
         val dto = responseDto(adressebeskyttelseListe = listOf("FORTROLIG", "STRENGT_FORTROLIG"))
-        assertEquals(AdressebeskyttelseGradering.FORTROLIG, PdlPersonMapper.fromDto(dto).adressebeskyttelse)
+        PdlPersonMapper.fromDto(dto).adressebeskyttelse shouldBe AdressebeskyttelseGradering.FORTROLIG
     }
 
-    @Test
-    fun `fromDto maps DTO with null data to null`() {
-        val exception = assertThrows<NotFoundException> {
+    should("map DTO with null data to null") {
+        shouldThrow<NotFoundException> {
             PdlPersonMapper.fromDto(PdlPersonResult(data = null, extensions = null, errors = null))
-        }
-
-        assertEquals("person", exception.message)
+        }.message shouldBe "person"
     }
 
-    @Test
-    fun `fromDto maps missing fornavn to empty string`() {
-        assertEquals("", PdlPersonMapper.fromDto(responseDto(fornavnListe = emptyList())).navn)
+    should("map missing fornavn to empty string") {
+        PdlPersonMapper.fromDto(responseDto(fornavnListe = emptyList())).navn shouldBe ""
     }
 
-    @Test
-    fun `fromDto maps missing foedselsdato to minimum date`() {
+    should("fornavn and etternavn to properly cased navn") {
+        val dto = responseDto(
+            fornavnListe = listOf("FØR"),
+            etternavn = "ETTERPÅ"
+        )
+
+        val person = PdlPersonMapper.fromDto(dto)
+
+        person.navn shouldBe "Før Etterpå"
+        person.fornavn shouldBe "Før"
+    }
+
+    should("map missing foedselsdato to minimum date") {
         val person = PdlPersonMapper.fromDto(responseDto(foedselsdatoListe = emptyList()))
-        assertEquals(LocalDate.MIN, person.foedselsdato)
-        assertFalse(person.harFoedselsdato)
+        person.foedselsdato shouldBe LocalDate.MIN
+        person.harFoedselsdato shouldBe false
     }
 
-    @Test
-    fun `fromDto maps missing sivilstand to sivilstand null`() {
-        assertEquals(Sivilstand.UOPPGITT, PdlPersonMapper.fromDto(responseDto(sivilstandListe = emptyList())).sivilstand)
+    should("map missing sivilstand to sivilstand null") {
+        PdlPersonMapper.fromDto(responseDto(sivilstandListe = emptyList())).sivilstand shouldBe Sivilstand.UOPPGITT
     }
 
-    @Test
-    fun `fromDto maps unknown sivilstand to sivilstand 'uoppgitt'`() {
+    should("map unknown sivilstand to sivilstand 'uoppgitt'") {
         val dto = responseDto(sivilstandListe = listOf("not known"))
-        assertEquals(Sivilstand.UNKNOWN, PdlPersonMapper.fromDto(dto).sivilstand)
+        PdlPersonMapper.fromDto(dto).sivilstand shouldBe Sivilstand.UNKNOWN
     }
+})
 
-    private companion object {
-        val foedselsdato: LocalDate = LocalDate.of(1963, 12, 31)
-
-        private fun responseDto(
-            fornavnListe: List<String> = emptyList(),
-            foedselsdatoListe: List<LocalDate> = emptyList(),
-            sivilstandListe: List<String> = emptyList(),
-            adressebeskyttelseListe: List<String> = emptyList()
-        ) =
-            PdlPersonResult(
-                data = PdlPersonEnvelope(
-                    PdlPerson(
-                        navn = fornavnListe.map(::PdlNavn),
-                        foedselsdato = foedselsdatoListe.map(::foedsel),
-                        sivilstand = sivilstandListe.map(::PdlSivilstand),
-                        adressebeskyttelse = adressebeskyttelseListe.map(::PdlAdressebeskyttelse)
-                    )
-                ),
-                extensions = extensions(),
-                errors = errors()
+private fun responseDto(
+    fornavnListe: List<String> = emptyList(),
+    etternavn: String? = null,
+    foedselsdatoListe: List<LocalDate> = emptyList(),
+    sivilstandListe: List<String> = emptyList(),
+    adressebeskyttelseListe: List<String> = emptyList()
+) =
+    PdlPersonResult(
+        data = PdlPersonEnvelope(
+            PdlPerson(
+                navn = fornavnListe.map {
+                    PdlNavn(fornavn = it, mellomnavn = null, etternavn)
+                },
+                foedselsdato = foedselsdatoListe.map(::foedselsdato),
+                sivilstand = sivilstandListe.map(::PdlSivilstand),
+                adressebeskyttelse = adressebeskyttelseListe.map(::PdlAdressebeskyttelse)
             )
+        ),
+        extensions = extensions(),
+        errors = errors()
+    )
 
-        private fun foedsel(dato: LocalDate) = PdlFoedselsdato(PdlDate(dato))
+private fun foedselsdato(dato: LocalDate) =
+    PdlFoedselsdato(foedselsdato = PdlDate(value = dato))
 
-        private fun extensions() =
-            PdlExtensions(
-                warnings = listOf(
-                    PdlWarning(
-                        query = "query",
-                        id = "id",
-                        code = "code",
-                        message = "message",
-                        details = "details"
-                    )
-                )
+private fun extensions() =
+    PdlExtensions(
+        warnings = listOf(
+            PdlWarning(
+                query = "query",
+                id = "id",
+                code = "code",
+                message = "message",
+                details = "details"
             )
+        )
+    )
 
-        private fun errors() =
-            listOf(
-                PdlError(message = "feil1"),
-                PdlError(message = "feil2")
-            )
-    }
-}
+private fun errors() =
+    listOf(
+        PdlError(message = "feil1"),
+        PdlError(message = "feil2")
+    )
