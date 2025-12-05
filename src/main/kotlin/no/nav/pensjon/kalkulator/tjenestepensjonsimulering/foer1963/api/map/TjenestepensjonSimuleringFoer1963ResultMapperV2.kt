@@ -20,7 +20,7 @@ object TjenestepensjonSimuleringFoer1963ResultMapperV2 {
                 grad = utbetaling.grad,
                 ytelsekode = utbetaling.ytelsekode!!,
                 mangelfullSimuleringkode = utbetaling.mangelfullSimuleringkode,
-                maanedligUtbetaling = 0
+                maanedligUtbetaling = utbetaling.arligUtbetaling?.let { floor(it / 12).toInt() }
             )
         }
 
