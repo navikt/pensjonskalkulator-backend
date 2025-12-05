@@ -18,23 +18,27 @@ object PdlPersonMapper {
 
     private fun person(dto: PdlPerson) =
         Person(
-            navn = dto.navn.orEmpty().let(::fromDto) ?: "",
-            fornavn = dto.navn?.firstOrNull()?.fornavn ?: "",
-            foedselsdato = dto.foedselsdato.orEmpty().let(::fromDto) ?: LocalDate.MIN,
+            navn = dto.navn.orEmpty().let(::navn) ?: "",
+            fornavn = dto.navn.orEmpty().let(::fornavn) ?: "",
+            foedselsdato = dto.foedselsdato.orEmpty().let(::foedselsdato) ?: LocalDate.MIN,
             sivilstand = dto.sivilstand.orEmpty().let(::fromDto),
-            adressebeskyttelse = dto.adressebeskyttelse.orEmpty().let(::fromDto)
+            adressebeskyttelse = dto.adressebeskyttelse.orEmpty().let(::adressebeskyttelse)
         )
 
-    private fun fromDto(dto: List<PdlAdressebeskyttelse>): AdressebeskyttelseGradering =
+    private fun adressebeskyttelse(dto: List<PdlAdressebeskyttelse>): AdressebeskyttelseGradering =
         PdlAdressebeskyttelseGradering.fromExternalValue(dto.firstOrNull()?.gradering).internalValue
 
-    private fun fromDto(dto: List<PdlFoedselsdato>): LocalDate? = dto.firstOrNull()?.foedselsdato?.value
+    private fun foedselsdato(dto: List<PdlFoedselsdato>): LocalDate? =
+        dto.firstOrNull()?.foedselsdato?.value
 
-    private fun fromDto(dto: List<PdlNavn>): String? =
+    private fun navn(dto: List<PdlNavn>): String? =
         dto.firstOrNull()?.let { formatNavn(it.fornavn, it.mellomnavn, it.etternavn) }
 
-    private fun fromDto(dto: List<PdlSivilstand>): Sivilstand =
-        PdlSivilstandType.fromExternalValue(dto.firstOrNull()?.type).internalValue
+    private fun fornavn(dto: List<PdlNavn>): String? =
+        dto.firstOrNull()?.fornavn?.let(::formatNavn)
+
+    private fun fromDto(sivilstand: List<PdlSivilstand>): Sivilstand =
+        PdlSivilstandType.fromExternalValue(sivilstand.firstOrNull()?.type).internalValue
 
     private fun logError(dto: PdlPersonResult) {
         dto.errors?.firstOrNull()?.message?.let {
