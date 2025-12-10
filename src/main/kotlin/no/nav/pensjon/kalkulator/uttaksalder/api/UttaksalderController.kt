@@ -22,6 +22,7 @@ import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderResultMapperV2.r
 import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderResultMapperV3.resultV3
 import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderSpecMapperV2.fromDtoV2
 import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderSpecMapperV3.fromDtoV3
+import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderSpecMapperV3.fromDtoV3
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
