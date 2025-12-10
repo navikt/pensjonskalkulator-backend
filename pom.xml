@@ -11,7 +11,7 @@
     </parent>
     <groupId>no.nav.pensjon</groupId>
     <artifactId>pensjonskalkulator-backend</artifactId>
-    <version>1.6.0</version>
+    <version>1.7.0</version>
     <name>pensjonskalkulator-backend</name>
     <description>Backend for pensjonskalkulator</description>
     <packaging>jar</packaging>

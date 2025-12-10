@@ -19,8 +19,8 @@ class OpenApiConfiguration {
             .info(
                 Info()
                     .title("pensjonskalkulator API")
-                    .description("Pensjonskalkulator for brukere født i 1963 eller senere")
-                    .version("v1.6.0")
+                    .description("Tjenester for estimering av pensjonsutbetaling og innhenting av grunnlagsdata")
+                    .version("v1.7.0")
             )
             .externalDocs(
                 ExternalDocumentation()
@@ -34,9 +34,10 @@ class OpenApiConfiguration {
         return GroupedOpenApi.builder()
             .group("current")
             .pathsToMatch(
-                "/api/v8/alderspensjon/simulering",
-                "/api/v7/alderspensjon/simulering",
-                "/api/v6/alderspensjon/simulering",
+                "/api/v9/alderspensjon/simulering",
+                "/api/v8/alderspensjon/simulering", // deprecated
+                "/api/v7/alderspensjon/simulering", // deprecated
+                "/api/v6/alderspensjon/simulering", // deprecated
                 "/api/v1/alderspensjon/anonym-simulering",
                 "/api/v3/pensjonsavtaler",
                 "/api/v2/pensjonsavtaler",
@@ -52,15 +53,16 @@ class OpenApiConfiguration {
                 "/api/v5/person",
                 "/api/v1/ansatt-id",
                 "/api/v1/encrypt",
-                "/api/v2/tidligste-hel-uttaksalder",
-                "/api/v1/tidligste-hel-uttaksalder",
+                "/api/v3/tidligste-hel-uttaksalder",
+                "/api/v2/tidligste-hel-uttaksalder", // deprecated
                 "/api/v1/ufoeregrad",
                 "/api/feature/**",
                 "/api/inntekt",
                 "/api/sak-status",
                 "/api/tpo-medlemskap",
                 "/api/v1/tpo-medlemskap",
-                "/api/v1/tpo-afp-offentlig-livsvarig",
+                "/api/v2/tpo-livsvarig-offentlig-afp",
+                "/api/v1/tpo-afp-offentlig-livsvarig", // deprecated
                 "/api/v2/simuler-oftp",
                 "/api/v2/aldersgrense",
                 "/api/v1/aldersgrense",
