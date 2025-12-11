@@ -214,7 +214,12 @@ class TpTjenestepensjonClient(
             .replace("{fnr}", pid.value)
             .replace("{uttaksdato}", uttaksdato.toString())
 
-        log.info { "GET from URL: '$url'" }
+        val redactedUrl = config.url
+            .replace("{tpnr}", tpNr)
+            .replace("{fnr}", pid.displayValue)
+            .replace("{uttaksdato}", uttaksdato.toString())
+
+        log.info { "GET from URL: '$redactedUrl'" }
 
         return try {
             val response = webClient
@@ -231,11 +236,11 @@ class TpTjenestepensjonClient(
                     countCalls(MetricResult.OK)
                 }
         } catch (e: WebClientRequestException) {
-            throw EgressException("${config.name}: Request failed for URL: $url", e)
+            throw EgressException("${config.name}: Request failed for URL: $redactedUrl", e)
         } catch (e: WebClientResponseException) {
-            throw EgressException("${config.name}: Response error ${e.statusCode} for URL: $url", e)
+            throw EgressException("${config.name}: Response error ${e.statusCode} for URL: $redactedUrl", e)
         } catch (e: Exception) {
-            throw EgressException("${config.name}: Unexpected error for URL: $url", e)
+            throw EgressException("${config.name}: Unexpected error for URL: $redactedUrl", e)
         }
     }
 
