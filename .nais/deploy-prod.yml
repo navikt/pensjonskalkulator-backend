@@ -86,6 +86,13 @@ spec:
         - host: skjermede-personer-pip.intern.nav.no
         - host: sokos-utbetaldata.prod-fss-pub.nais.io
         - host: tp-api.prod-fss-pub.nais.io
+        - host: api.klp.no
+        - host: api.ofa.storebrand.no
+        - host: api.opf.no
+        - host: api.prod.spk.no
+        - host: ofa.opensjon.no
+        - host: ofa.api.gabler.no
+        - host: ofa.gabler.no
   env:
     - name: FSS_GATEWAY_SERVICE_ID
       value: prod-fss:pensjonselvbetjening:pensjon-selvbetjening-fss-gateway
