@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.map
 
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.Feilkode
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.OffentligTjenestepensjonSimuleringFoer1963Resultat
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.dto.OffentligTjenestepensjonSimuleringFoer1963ResultV2
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.dto.SimuleringsresultatFoer1963V2
@@ -33,7 +34,7 @@ object TjenestepensjonSimuleringFoer1963ResultMapperV2 {
         } else null
 
         return OffentligTjenestepensjonSimuleringFoer1963ResultV2(
-            simuleringsresultatStatus = SimuleringsresultatStatusV2.OK,
+            simuleringsresultatStatus = resultat.feilrespons?.let { if (it.feilkode == Feilkode.TEKNISK_FEIL) SimuleringsresultatStatusV2.TEKNISK_FEIL else SimuleringsresultatStatusV2.OK } ?: SimuleringsresultatStatusV2.OK,
             muligeTpLeverandoerListe = emptyList(),
             simulertTjenestepensjon = simulert,
             serviceData = null,

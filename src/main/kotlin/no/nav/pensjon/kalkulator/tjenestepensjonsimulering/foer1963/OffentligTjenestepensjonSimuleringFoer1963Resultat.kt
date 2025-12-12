@@ -3,7 +3,6 @@ package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.FeilkodeDto
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.YtelsekodeFoer1963Dto
-import java.time.LocalDate
 
 data class OffentligTjenestepensjonSimuleringFoer1963Resultat(
     val tpnr: String? = null,
@@ -38,12 +37,9 @@ data class Feilrespons(
 )
 
 enum class Feilkode(val externalValue: FeilkodeDto) {
-    KUNNE_IKKE_SIMULERE(FeilkodeDto.KUNNE_IKKE_SIMULERE),
-    UKJENT_PRODUKT(FeilkodeDto.UKJENT_PRODUKT),
-    MIDLERTIDIG_TEKNISK_FEIL(FeilkodeDto.MIDLERTIDIG_TEKNISK_FEIL),
+    TEKNISK_FEIL(FeilkodeDto.TEKNISK_FEIL),
     BEREGNING_GIR_NULL_UTBETALING(FeilkodeDto.BEREGNING_GIR_NULL_UTBETALING),
-    OPPFYLLER_IKKE_INNGANGSVILKAAR(FeilkodeDto.OPPFYLLER_IKKE_INNGANGSVILKAAR),
-    ANNEN_FEIL(FeilkodeDto.ANNEN_FEIL);
+    OPPFYLLER_IKKE_INNGANGSVILKAAR(FeilkodeDto.OPPFYLLER_IKKE_INNGANGSVILKAAR);
 
     companion object {
         fun fromExternalValue(externalValue: FeilkodeDto) = entries.first { it.externalValue == externalValue }
