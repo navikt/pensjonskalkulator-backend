@@ -35,10 +35,34 @@ enum class EgressService(
         authType = AuthType.MACHINE_INSIDE_NAV
     ),
     TJENESTEPENSJON("Tjenestepensjon", "TP", "Tjenestepensjonsforhold"),
+    AKSIO(
+        description = "Aksio",
+        shortName = "aksio",
+        purpose = "Hente løpende livsvarig offentlig AFP fra Aksio",
+        authType = AuthType.MACHINE_OUTSIDE_NAV
+    ),
+    GABLER(
+        description = "Gabler",
+        shortName = "gabler",
+        purpose = "Hente løpende livsvarig offentlig AFP fra Gabler",
+        authType = AuthType.MACHINE_OUTSIDE_NAV
+    ),
+    GABLER2(
+        description = "Gabler2",
+        shortName = "gabler2",
+        purpose = "Hente løpende livsvarig offentlig AFP fra Gabler2",
+        authType = AuthType.MACHINE_OUTSIDE_NAV
+    ),
     KLP(
         description = "KLP",
         shortName = "klp",
         purpose = "Hente løpende livsvarig offentlig AFP fra KLP",
+        authType = AuthType.MACHINE_OUTSIDE_NAV
+    ),
+    OPF(
+        description = "OPF",
+        shortName = "opf",
+        purpose = "Hente løpende livsvarig offentlig AFP fra OPF",
         authType = AuthType.MACHINE_OUTSIDE_NAV
     ),
     SPK(
@@ -47,10 +71,16 @@ enum class EgressService(
         purpose = "Hente løpende livsvarig offentlig AFP fra KLP",
         authType = AuthType.MACHINE_OUTSIDE_NAV
     ),
-    TP_ORDNING_SERVICE(
-        description = "Tjenestepensjon",
-        shortName = "TPO",
-        purpose = "Hente løpende livsvarig offentlig AFP fra annen TPO",
+    STOREBRAND_LIVSFORSIKRING(
+        description = "Storebrand Livsforsikring",
+        shortName = "storebrand",
+        purpose = "Hente løpende livsvarig offentlig AFP fra Storebrand Livsforsikring",
+        authType = AuthType.MACHINE_OUTSIDE_NAV
+    ),
+    STOREBRAND_PENSJONSTJENESTER(
+        description = "Storebrand Pensjonstjenester",
+        shortName = "storebrand_pen",
+        purpose = "Hente løpende livsvarig offentlig AFP fra Storebrand Pensjonstjenester",
         authType = AuthType.MACHINE_OUTSIDE_NAV
     ),
     UTBETALING_DATA("Oekonomi utbetalingsdata", "Sokos", "Finne siste maaneds utbetaling"),
