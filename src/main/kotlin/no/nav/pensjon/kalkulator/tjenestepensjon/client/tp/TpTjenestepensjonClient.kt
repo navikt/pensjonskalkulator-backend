@@ -194,7 +194,11 @@ class TpTjenestepensjonClient(
         }
     }
 
-    override fun hentAfpOffentligLivsvarigDetaljer(pid: Pid, tpNr: String, uttaksdato: LocalDate): AfpOffentligLivsvarigResult {
+    override fun hentAfpOffentligLivsvarigDetaljer(
+        pid: Pid,
+        tpNr: String,
+        uttaksdato: LocalDate
+    ): AfpOffentligLivsvarigResult {
         log.debug { "Fetching AFP Offentlig Livsvarig detaljer for tpNr=$tpNr, uttaksdato=$uttaksdato" }
 
         // Sjekker om tpNr er i en leverandør sine overstyrteTpNr liste
@@ -208,6 +212,7 @@ class TpTjenestepensjonClient(
             ?: throw EgressException("Ingen AFP leverandører konfigurert for TP-ordning '$tpOrdning' (tpNr=$tpNr)")
 
         log.debug { "Using provider ${config.name} for tpNr=$tpNr" }
+        val service: EgressService = EgressService.entries.first { it.shortName == tpOrdning }
 
         val url = config.url
             .replace("{tpnr}", tpNr)
@@ -225,7 +230,7 @@ class TpTjenestepensjonClient(
             val response = webClient
                 .get()
                 .uri(url)
-                .headers { setExternalHeaders(it, pid) }
+                .headers { setExternalHeaders(service, it, pid) }
                 .retrieve()
                 .bodyToMono(TpAfpOffentligLivsvarigDetaljerDto::class.java)
                 .block()
@@ -286,8 +291,8 @@ class TpTjenestepensjonClient(
         headers[CustomHttpHeaders.PID] = pid.value
     }
 
-    private fun setExternalHeaders(headers: HttpHeaders, pid: Pid) {
-        headers.setBearerAuth(EgressAccess.token(EgressService.TP_ORDNING_SERVICE).value)
+    private fun setExternalHeaders(service: EgressService, headers: HttpHeaders, pid: Pid) {
+        headers.setBearerAuth(EgressAccess.token(service).value)
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
         headers[CustomHttpHeaders.PID] = pid.value
     }
