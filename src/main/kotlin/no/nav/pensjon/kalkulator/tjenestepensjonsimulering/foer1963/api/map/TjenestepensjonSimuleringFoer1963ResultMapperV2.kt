@@ -35,7 +35,7 @@ object TjenestepensjonSimuleringFoer1963ResultMapperV2 {
 
         return OffentligTjenestepensjonSimuleringFoer1963ResultV2(
             simuleringsresultatStatus = resultat.feilrespons?.let { if (it.feilkode == Feilkode.TEKNISK_FEIL) SimuleringsresultatStatusV2.TEKNISK_FEIL else SimuleringsresultatStatusV2.OK } ?: SimuleringsresultatStatusV2.OK,
-            muligeTpLeverandoerListe = emptyList(),
+            muligeTpLeverandoerListe = listOfNotNull(resultat.navnOrdning),
             simulertTjenestepensjon = simulert,
             serviceData = null,
             feilkode = resultat.feilrespons?.feilkode
