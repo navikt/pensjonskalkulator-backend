@@ -24,6 +24,8 @@ class EgressServiceSecurityConfiguration {
         @Value("\${proxy.service-id}") proxyServiceId: String,
         @Value("\${omstillingsstoenad.service-id}") omstillingsstoenadServiceId: String,
         @Value("\${sokos.utbetaldata.service-id}") utbetalingDataServiceId: String,
+        @Value("\${livsvarig-afp-offentlig.tilbydere.klp.scope}") klpScope: String,
+        @Value("\${livsvarig-afp-offentlig.tilbydere.spk.scope}") spkScope: String
     ) =
         EgressServiceListsByAudience(
             mapOf(
@@ -37,6 +39,8 @@ class EgressServiceSecurityConfiguration {
                 proxyServiceId to EgressService.servicesAccessibleViaProxy,
                 omstillingsstoenadServiceId to listOf(EgressService.OMSTILLINGSSTOENAD),
                 utbetalingDataServiceId to listOf(EgressService.UTBETALING_DATA),
+                klpScope to listOf(EgressService.KLP),
+                spkScope to listOf(EgressService.SPK)
             )
         )
 
