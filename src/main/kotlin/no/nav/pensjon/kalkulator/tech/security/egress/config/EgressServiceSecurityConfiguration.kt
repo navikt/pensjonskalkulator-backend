@@ -24,8 +24,14 @@ class EgressServiceSecurityConfiguration {
         @Value("\${proxy.service-id}") proxyServiceId: String,
         @Value("\${omstillingsstoenad.service-id}") omstillingsstoenadServiceId: String,
         @Value("\${sokos.utbetaldata.service-id}") utbetalingDataServiceId: String,
+        @Value("\${livsvarig-afp-offentlig.tilbydere.aksio.scope}") aksioScope: String,
+        @Value("\${livsvarig-afp-offentlig.tilbydere.gabler.scope}") gablerScope: String,
+        @Value("\${livsvarig-afp-offentlig.tilbydere.gabler2.scope}") gabler2Scope: String,
         @Value("\${livsvarig-afp-offentlig.tilbydere.klp.scope}") klpScope: String,
-        @Value("\${livsvarig-afp-offentlig.tilbydere.spk.scope}") spkScope: String
+        @Value("\${livsvarig-afp-offentlig.tilbydere.opf.scope}") opfScope: String,
+        @Value("\${livsvarig-afp-offentlig.tilbydere.spk.scope}") spkScope: String,
+        @Value("\${livsvarig-afp-offentlig.tilbydere.storebrand.scope}") storebrandLivsforsikringScope: String,
+        @Value("\${livsvarig-afp-offentlig.tilbydere.storebrand_pen.scope}") storebrandPensjonstjenesterScope: String
     ) =
         EgressServiceListsByAudience(
             mapOf(
@@ -39,8 +45,14 @@ class EgressServiceSecurityConfiguration {
                 proxyServiceId to EgressService.servicesAccessibleViaProxy,
                 omstillingsstoenadServiceId to listOf(EgressService.OMSTILLINGSSTOENAD),
                 utbetalingDataServiceId to listOf(EgressService.UTBETALING_DATA),
+                aksioScope to listOf(EgressService.AKSIO),
+                gablerScope to listOf(EgressService.GABLER),
+                gabler2Scope to listOf(EgressService.GABLER2),
                 klpScope to listOf(EgressService.KLP),
-                spkScope to listOf(EgressService.SPK)
+                opfScope to listOf(EgressService.OPF),
+                spkScope to listOf(EgressService.SPK),
+                storebrandLivsforsikringScope to listOf(EgressService.STOREBRAND_LIVSFORSIKRING),
+                storebrandPensjonstjenesterScope to listOf(EgressService.STOREBRAND_PENSJONSTJENESTER)
             )
         )
 
