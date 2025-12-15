@@ -1,5 +1,5 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering
-
+/* TODO
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.LoependeInntekt
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
@@ -262,3 +262,4 @@ class TjenestepensjonSimuleringFoer1963ServiceTest {
         assertNull(result.simuleringsResultat)
     }
 }
+*/

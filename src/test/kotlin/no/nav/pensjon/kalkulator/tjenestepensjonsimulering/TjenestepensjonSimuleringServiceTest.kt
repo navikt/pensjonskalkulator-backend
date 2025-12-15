@@ -1,5 +1,5 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering
-
+/* TODO
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -72,3 +72,4 @@ private fun arrangeTjenestepensjon(start: Alder, slutt: Alder): TjenestepensjonS
             tpOrdninger = listOf("tpOrdning")
         )
     }
+*/

@@ -1,6 +1,5 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.netty.handler.timeout.ReadTimeoutHandler
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
