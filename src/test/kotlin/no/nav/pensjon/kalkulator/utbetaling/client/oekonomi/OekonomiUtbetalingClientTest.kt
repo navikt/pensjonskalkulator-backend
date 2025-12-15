@@ -9,9 +9,6 @@ import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.testutil.Arrange
 import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
 import no.nav.pensjon.kalkulator.utbetaling.Utbetaling
-import no.nav.pensjon.kalkulator.utbetaling.UtbetalingServiceTest.Companion.MONTH_END
-import no.nav.pensjon.kalkulator.utbetaling.UtbetalingServiceTest.Companion.MONTH_MIDDLE
-import no.nav.pensjon.kalkulator.utbetaling.UtbetalingServiceTest.Companion.MONTH_START
 import no.nav.pensjon.kalkulator.utbetaling.client.oekonomi.SokosResponse.UTBETALINGER_RESPONSE
 import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
@@ -88,6 +85,10 @@ class OekonomiUtbetalingClientTest : FunSpec({
         }
     }
 })
+
+private const val MONTH_START = 1
+private const val MONTH_MIDDLE = 15
+private const val MONTH_END = 31
 
 private object SokosResponse {
 

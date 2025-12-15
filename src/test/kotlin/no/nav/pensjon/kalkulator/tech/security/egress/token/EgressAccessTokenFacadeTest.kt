@@ -1,61 +1,30 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.token
 
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.pensjon.kalkulator.tech.security.egress.AuthType
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.clientcred.ClientCredentialsEgressTokenService
-import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.jwtbearer.JwtBearerEgressTokenService
-import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.tokenexchange.TokenExchangeService
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@ExtendWith(SpringExtension::class)
-class EgressAccessTokenFacadeTest {
+class EgressAccessTokenFacadeTest : ShouldSpec({
 
-    private lateinit var facade: EgressAccessTokenFacade
-
-    @Mock
-    private lateinit var clientCredentialsTokenService: ClientCredentialsEgressTokenService
-
-    @Mock
-    private lateinit var jwtBearerTokenService: JwtBearerEgressTokenService
-
-    @Mock
-    private lateinit var tokenExchangeService: TokenExchangeService
-
-    @BeforeEach
-    fun initialize() {
-        facade = EgressAccessTokenFacade(
-            clientCredentialsTokenService,
-            jwtBearerTokenService,
-            tokenExchangeService
-        )
-    }
-
-    @Test
-    fun `when user type is application then getAccessToken returns access token for application`() {
-        `when`(
-            clientCredentialsTokenService.getEgressToken(
-                ingressToken = null,
-                audience = AUDIENCE,
-                user = ""
-            )
-        ).thenReturn(RawJwt(EGRESS_TOKEN))
-
-        val token: RawJwt = facade.getAccessToken(
+    should("return access token for application when user type is application") {
+        EgressAccessTokenFacade(
+            clientCredentialsTokenService = arrangeToken(),
+            jwtBearerTokenService = mockk(),
+            tokenExchangeService = mockk()
+        ).getAccessToken(
             authType = AuthType.MACHINE_INSIDE_NAV,
-            audience = AUDIENCE,
+            audience = "audience1",
             ingressToken = null
-        )
-
-        assertEquals(EGRESS_TOKEN, token.value)
+        ).value shouldBe "token1"
     }
+})
 
-    companion object {
-        private const val AUDIENCE = "audience1"
-        private const val EGRESS_TOKEN = "token1"
+private fun arrangeToken(): ClientCredentialsEgressTokenService =
+    mockk<ClientCredentialsEgressTokenService>().apply {
+        every {
+            getEgressToken(ingressToken = null, audience = "audience1", user = "")
+        } returns RawJwt(value = "token1")
     }
-}

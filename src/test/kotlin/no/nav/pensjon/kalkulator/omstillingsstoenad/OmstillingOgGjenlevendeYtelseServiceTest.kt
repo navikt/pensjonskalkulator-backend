@@ -1,49 +1,43 @@
 package no.nav.pensjon.kalkulator.omstillingsstoenad
 
-import kotlinx.coroutines.test.runTest
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.omstillingsstoenad.client.OmstillingsstoenadClient
 import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.TimeProvider
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.springframework.test.context.junit.jupiter.SpringExtension
+import java.time.LocalDate
 import java.time.LocalDateTime
 
-@ExtendWith(SpringExtension::class)
-class OmstillingOgGjenlevendeYtelseServiceTest {
+class OmstillingOgGjenlevendeYtelseServiceTest : ShouldSpec({
 
-    private lateinit var service: OmstillingsstoenadService
+    val now = LocalDateTime.now()
 
-    @Mock
-    private lateinit var client: OmstillingsstoenadClient
+    should("return 'true' when omstillingsstønad is received on given date") {
+        val service = OmstillingsstoenadService(
+            client = arrangeOmstillingsstoenad(dato = now.toLocalDate()),
+            pidGetter = arrangePid(),
+            timeProvider = arrangeTime(time = now)
+        )
 
-    @Mock
-    private lateinit var pidGetter: PidGetter
+        service.mottarOmstillingsstoenad() shouldBe true
+    }
+})
 
-    @Mock
-    private lateinit var timeProvider: TimeProvider
-
-    @BeforeEach
-    fun initialize() {
-        `when`(pidGetter.pid()).thenReturn(pid)
-        `when`(timeProvider.time()).thenReturn(now)
-        service = OmstillingsstoenadService(client, pidGetter, timeProvider)
+private fun arrangeOmstillingsstoenad(dato: LocalDate): OmstillingsstoenadClient =
+    mockk<OmstillingsstoenadClient>().apply {
+        coEvery { mottarOmstillingsstoenad(pid, paaDato = dato) } returns true
     }
 
-    @Test
-    fun mottarOmstillingsstoenad() = runTest {
-        `when`(client.mottarOmstillingsstoenad(pid, paaDato)).thenReturn(true)
-        val resultat = service.mottarOmstillingsstoenad()
-        assertTrue(resultat)
+private fun arrangePid(): PidGetter =
+    mockk<PidGetter>().apply {
+        every { pid() } returns pid
     }
 
-    companion object {
-        val now = LocalDateTime.now()
-        val paaDato = now.toLocalDate()
+private fun arrangeTime(time: LocalDateTime): TimeProvider =
+    mockk<TimeProvider>().apply {
+        every { time() } returns time
     }
-}

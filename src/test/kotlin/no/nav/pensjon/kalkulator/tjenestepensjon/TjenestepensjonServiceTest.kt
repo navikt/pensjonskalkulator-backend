@@ -1,141 +1,174 @@
 package no.nav.pensjon.kalkulator.tjenestepensjon
 
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.confirmVerified
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
-import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.TjenestepensjonClient
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito.*
-import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDate
 
-@ExtendWith(SpringExtension::class)
-class TjenestepensjonServiceTest {
+class TjenestepensjonServiceTest : ShouldSpec({
 
-    private lateinit var service: TjenestepensjonService
+    context("erApoteker") {
+        should("returnere 'true' når ekstern tjeneste gir 'true'") {
+            val client = mockk<TjenestepensjonClient>().apply {
+                every { erApoteker(any()) } returns true
+            }
 
-    @Mock
-    private lateinit var client: TjenestepensjonClient
-
-    @Mock
-    private lateinit var pidGetter: PidGetter
-
-    @Mock
-    private lateinit var featureToggleService: FeatureToggleService
-
-    @BeforeEach
-    fun initialize() {
-        `when`(pidGetter.pid()).thenReturn(pid)
-        service = TjenestepensjonService(client, pidGetter, featureToggleService)
+            TjenestepensjonService(
+                tjenestepensjonClient = client,
+                pidGetter = arrangePid(),
+                featureToggleService = mockk(relaxed = true)
+            ).erApoteker() shouldBe true
+        }
     }
 
-    @Test
-    fun `'erApoteker' gir 'true' naar ekstern tjeneste gir 'true'`() {
-        `when`(client.erApoteker(pid)).thenReturn(true)
-        assertTrue(service.erApoteker())
+    context("harTjenestepensjonsforhold") {
+        should("returnere 'true' når ekstern tjeneste gir tjenestepensjonsforhold") {
+            val client = mockk<TjenestepensjonClient>().apply {
+                every { tjenestepensjon(any()) } returns Tjenestepensjon(forholdList = listOf(forhold()))
+            }
+
+            TjenestepensjonService(
+                tjenestepensjonClient = client,
+                pidGetter = arrangePid(),
+                featureToggleService = mockk(relaxed = true)
+            ).harTjenestepensjonsforhold() shouldBe true
+        }
     }
 
-    @Test
-    fun `'harTjenestepensjonsforhold' gir 'true' naar ekstern tjeneste gir tjenestepensjonsforhold`() {
-        `when`(client.tjenestepensjon(pid)).thenReturn(tjenestepensjon())
-        val result = service.harTjenestepensjonsforhold()
-        assertTrue(result)
+    context("hentMedlemskapITjenestepensjonsordninger") {
+        should("returnere liste over alle medlemskap i tjenestepensjonsordninger") {
+            val client = mockk<TjenestepensjonClient>().apply {
+                every { tjenestepensjonsforhold(any()) } returns tjenestepensjonMedMedlemskap()
+            }
+
+            TjenestepensjonService(
+                tjenestepensjonClient = client,
+                pidGetter = arrangePid(),
+                featureToggleService = mockk(relaxed = true)
+            ).hentMedlemskapITjenestepensjonsordninger() shouldBe
+                    listOf("Maritim pensjonskasse", "Statens pensjonskasse", "Kommunal Landspensjonskasse")
+        }
     }
 
-    @Test
-    fun `gir liste over alle medlemskap i tp-ordninger`() {
-        `when`(client.tjenestepensjonsforhold(pid)).thenReturn(tjenestepensjonMedMedlemskap())
-        val result = service.hentMedlemskapITjenestepensjonsordninger()
-        assertEquals(listOf("Maritim pensjonskasse", "Statens pensjonskasse", "Kommunal Landspensjonskasse"), result)
-    }
+    context("hentAfpOffentligLivsvarigDetaljer") {
+        should("returnere korrekte detaljer når personen har en tjenestepensjonsordning") {
+            val tpNr = "3010"
+            val expectedResult = AfpOffentligLivsvarigResult(
+                afpStatus = true,
+                virkningFom = LocalDate.of(2025, 1, 1),
+                maanedligBeloep = 15000,
+                sistBenyttetGrunnbeloep = 123000
+            )
+            val client = mockk<TjenestepensjonClient>().apply {
+                every { afpOffentligLivsvarigTpNummerListe(any()) } returns listOf(tpNr)
+                every { hentAfpOffentligLivsvarigDetaljer(any(), any(), any()) } returns expectedResult
+            }
 
-    @Test
-    fun `hentAfpOffentligLivsvarigDetaljer returnerer korrekte detaljer naar bruker har en ordning`() {
-        val tpNr = "3010"
-        val expectedResult = AfpOffentligLivsvarigResult(
-            afpStatus = true,
-            virkningFom = LocalDate.of(2025, 1, 1),
-            maanedligBeloep = 15000,
-            sistBenyttetGrunnbeloep = 123000
-        )
-        val expectedUttaksdato = LocalDate.now().plusMonths(1).withDayOfMonth(1)
+            val expectedUttaksdato = LocalDate.now().plusMonths(1).withDayOfMonth(1)
 
-        `when`(client.afpOffentligLivsvarigTpNummerListe(pid)).thenReturn(listOf(tpNr))
-        `when`(client.hentAfpOffentligLivsvarigDetaljer(pid, tpNr, expectedUttaksdato)).thenReturn(expectedResult)
+            TjenestepensjonService(
+                tjenestepensjonClient = client,
+                pidGetter = arrangePid(),
+                featureToggleService = mockk(relaxed = true)
+            ).hentAfpOffentligLivsvarigDetaljer() shouldBe expectedResult
 
-        val result = service.hentAfpOffentligLivsvarigDetaljer()
-
-        assertEquals(expectedResult, result)
-        verify(client).afpOffentligLivsvarigTpNummerListe(pid)
-        verify(client).hentAfpOffentligLivsvarigDetaljer(pid, tpNr, expectedUttaksdato)
-    }
-
-    @Test
-    fun `hentAfpOffentligLivsvarigDetaljer kaster exception naar bruker ikke har noen ordninger`() {
-        `when`(client.afpOffentligLivsvarigTpNummerListe(pid)).thenReturn(emptyList())
-
-        val result = service.hentAfpOffentligLivsvarigDetaljer()
-
-        assertEquals(AfpOffentligLivsvarigResult(
-            afpStatus = null,
-            virkningFom = null,
-            maanedligBeloep = null,
-            sistBenyttetGrunnbeloep = null
-        ), result)
-        verify(client).afpOffentligLivsvarigTpNummerListe(pid)
-        verifyNoMoreInteractions(client)
-    }
-
-    @Test
-    fun `hentAfpOffentligLivsvarigDetaljer kaster exception naar bruker har flere ordninger`() {
-        val tpNumre = listOf("3010", "3020", "3030")
-        `when`(client.afpOffentligLivsvarigTpNummerListe(pid)).thenReturn(tpNumre)
-
-        val exception = assertThrows(EgressException::class.java) {
-            service.hentAfpOffentligLivsvarigDetaljer()
+            verify { client.afpOffentligLivsvarigTpNummerListe(pid) }
+            verify { client.hentAfpOffentligLivsvarigDetaljer(pid, tpNr, expectedUttaksdato) }
         }
 
-        assertTrue(exception.message!!.contains("Bruker har flere ordninger for livsvarig offentlig AFP"))
-        assertTrue(exception.message!!.contains("(3)"))
-        verify(client).afpOffentligLivsvarigTpNummerListe(pid)
-        verifyNoMoreInteractions(client)
-    }
+        should("kaste exception når personen ikke har noen tjenestepensjonsordninger") {
+            val client = mockk<TjenestepensjonClient>().apply {
+                every { afpOffentligLivsvarigTpNummerListe(any()) } returns emptyList()
+            }
 
-    @Test
-    fun `hentAfpOffentligLivsvarigDetaljer bruker neste maaned som uttaksdato`() {
-        val tpNr = "3010"
-        val expectedResult = AfpOffentligLivsvarigResult(
-            afpStatus = false,
-            virkningFom = null,
-            maanedligBeloep = null,
-            sistBenyttetGrunnbeloep = null
-        )
-        val expectedUttaksdato = LocalDate.now().plusMonths(1).withDayOfMonth(1)
+            TjenestepensjonService(
+                tjenestepensjonClient = client,
+                pidGetter = arrangePid(),
+                featureToggleService = mockk(relaxed = true)
+            ).hentAfpOffentligLivsvarigDetaljer() shouldBe
+                    AfpOffentligLivsvarigResult(
+                        afpStatus = null,
+                        virkningFom = null,
+                        maanedligBeloep = null,
+                        sistBenyttetGrunnbeloep = null
+                    )
 
-        `when`(client.afpOffentligLivsvarigTpNummerListe(pid)).thenReturn(listOf(tpNr))
-        `when`(client.hentAfpOffentligLivsvarigDetaljer(pid, tpNr, expectedUttaksdato)).thenReturn(expectedResult)
+            verify { client.afpOffentligLivsvarigTpNummerListe(pid) }
+            confirmVerified(client)
+        }
 
-        service.hentAfpOffentligLivsvarigDetaljer()
+        should("kaste exception når personen har flere tjenestepensjonsordninger") {
+            val tpNumre = listOf("3010", "3020", "3030")
+            val client = mockk<TjenestepensjonClient>().apply {
+                every { afpOffentligLivsvarigTpNummerListe(any()) } returns tpNumre
+            }
 
-        verify(client).hentAfpOffentligLivsvarigDetaljer(pid, tpNr, expectedUttaksdato)
-    }
+            val exception = shouldThrow<EgressException> {
+                TjenestepensjonService(
+                    tjenestepensjonClient = client,
+                    pidGetter = arrangePid(),
+                    featureToggleService = mockk(relaxed = true)
+                ).hentAfpOffentligLivsvarigDetaljer()
+            }
 
-    private companion object {
-        private fun tjenestepensjon() = Tjenestepensjon(forholdList = listOf(forhold()))
-        private fun tjenestepensjonMedMedlemskap() = Tjenestepensjonsforhold(
-            tpOrdninger = listOf(
-                "Maritim pensjonskasse",
-                "Statens pensjonskasse",
-                "Kommunal Landspensjonskasse"
+            with(exception.message!!) {
+                contains("Bruker har flere ordninger for livsvarig offentlig AFP") shouldBe true
+                contains("(3)") shouldBe true
+            }
+            verify { client.afpOffentligLivsvarigTpNummerListe(pid) }
+            confirmVerified(client)
+        }
+
+        should("bruke neste måned som uttaksdato") {
+            val tpNr = "3010"
+            val expectedResult = AfpOffentligLivsvarigResult(
+                afpStatus = false,
+                virkningFom = null,
+                maanedligBeloep = null,
+                sistBenyttetGrunnbeloep = null
             )
-        )
+            val expectedUttaksdato = LocalDate.now().plusMonths(1).withDayOfMonth(1)
+            val client = mockk<TjenestepensjonClient>().apply {
+                every { afpOffentligLivsvarigTpNummerListe(any()) } returns listOf(tpNr)
+                every { hentAfpOffentligLivsvarigDetaljer(any(), any(), any()) } returns expectedResult
+            }
 
-        private fun forhold(tpOrdning: String = "") =
-            Forhold(ordning = tpOrdning, ytelser = emptyList(), datoSistOpptjening = null)
+            TjenestepensjonService(
+                tjenestepensjonClient = client,
+                pidGetter = arrangePid(),
+                featureToggleService = mockk(relaxed = true)
+            ).hentAfpOffentligLivsvarigDetaljer()
+
+            verify { client.hentAfpOffentligLivsvarigDetaljer(pid, tpNr, expectedUttaksdato) }
+        }
     }
-}
+})
+
+private fun arrangePid(): PidGetter =
+    mockk<PidGetter>().apply {
+        every { pid() } returns pid
+    }
+
+private fun tjenestepensjonMedMedlemskap() =
+    Tjenestepensjonsforhold(
+        tpOrdninger = listOf(
+            "Maritim pensjonskasse",
+            "Statens pensjonskasse",
+            "Kommunal Landspensjonskasse"
+        )
+    )
+
+private fun forhold(tpOrdning: String = "") =
+    Forhold(
+        ordning = tpOrdning,
+        ytelser = emptyList(),
+        datoSistOpptjening = null
+    )

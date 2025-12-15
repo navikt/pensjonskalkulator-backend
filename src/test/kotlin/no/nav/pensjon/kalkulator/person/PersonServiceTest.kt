@@ -1,6 +1,10 @@
 package no.nav.pensjon.kalkulator.person
 
+import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.PersonFactory
@@ -12,91 +16,97 @@ import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService.Companion
 import no.nav.pensjon.kalkulator.normalder.VerdiStatus
 import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito.*
-import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@ExtendWith(SpringExtension::class)
-class PersonServiceTest {
+class PersonServiceTest : ShouldSpec({
 
-    @Mock
-    private lateinit var client: PersonClient
-
-    @Mock
-    private lateinit var pidGetter: PidGetter
-
-    @Mock
-    private lateinit var aldersgruppeFinder: AldersgruppeFinder
-
-    @Mock
-    private lateinit var normalderService: NormertPensjonsalderService
-
-    @Mock
-    private lateinit var navnRequirement: NavnRequirement
-
-    @Test
-    fun `getPerson returns person when valid foedselsnummer`() {
-        val person = arrangePerson(pid = pid)
-        service().getPerson() shouldBe person
+    should("return person when valid fødselsnummer") {
+        PersonService(
+            client = arrangePerson(),
+            pidGetter = arrangePid(),
+            aldersgruppeFinder = arrangeAldersgruppe(),
+            navnRequirement,
+            normalderService = arrangeNormalder()
+        ).getPerson() shouldBe person().withPensjoneringAldre(defaultAldersgrenser)
     }
 
-    @Test
-    fun `getPerson returns person with normert pensjonsalder`() {
-        arrangePerson(
-            pensjoneringAldre = Aldersgrenser(
-                aarskull = 1964,
-                nedreAlder = Alder(aar = 62, maaneder = 4),
-                normalder = Alder(aar = 67, maaneder = 4),
-                oevreAlder = Alder(aar = 75, maaneder = 4),
-                verdiStatus = VerdiStatus.PROGNOSE
+    should("return person with normert pensjonsalder") {
+        PersonService(
+            client = arrangePerson(),
+            pidGetter = arrangePid(),
+            aldersgruppeFinder = arrangeAldersgruppe(),
+            navnRequirement,
+            normalderService = arrangeNormalder(
+                pensjonsaldre = Aldersgrenser(
+                    aarskull = 1964,
+                    nedreAlder = Alder(aar = 62, maaneder = 4),
+                    normalder = Alder(aar = 67, maaneder = 4),
+                    oevreAlder = Alder(aar = 75, maaneder = 4),
+                    verdiStatus = VerdiStatus.PROGNOSE
+                )
             )
-        )
-
-        service().getPerson().pensjoneringAldre shouldBe Aldersgrenser(
-            aarskull = 1964,
-            nedreAlder = Alder(aar = 62, maaneder = 4),
-            normalder = Alder(aar = 67, maaneder = 4),
-            oevreAlder = Alder(aar = 75, maaneder = 4),
-            verdiStatus = VerdiStatus.PROGNOSE
-        )
+        ).getPerson().pensjoneringAldre shouldBe
+                Aldersgrenser(
+                    aarskull = 1964,
+                    nedreAlder = Alder(aar = 62, maaneder = 4),
+                    normalder = Alder(aar = 67, maaneder = 4),
+                    oevreAlder = Alder(aar = 75, maaneder = 4),
+                    verdiStatus = VerdiStatus.PROGNOSE
+                )
     }
 
-    @Test
-    fun `getPerson uses cache`() {
-        arrangePerson()
-
-        with(service()) {
+    should("use cache") {
+        val client = arrangePerson()
+        with(
+            PersonService(
+                client,
+                pidGetter = arrangePid(),
+                aldersgruppeFinder = arrangeAldersgruppe(),
+                navnRequirement,
+                normalderService = arrangeNormalder()
+            )
+        ) {
             getPerson() // causes person to be cached
             getPerson() // cache used
-            verify(client, times(1)).fetchPerson(pid, fetchFulltNavn = false)
+            verify(exactly = 1) { client.fetchPerson(pid, fetchFulltNavn = false) }
         }
     }
 
-    @Test
-    fun `getPerson throws NotFoundException when invalid foedselsnummer`() {
-        arrangePerson(pid = Pid("bad"))
-        val exception = assertThrows<NotFoundException> { service().getPerson() }
-        assertEquals("person", exception.message)
+    should("throw NotFoundException when invalid fødselsnummer") {
+        assertThrows<NotFoundException> {
+            PersonService(
+                client = arrangePerson(),
+                pidGetter = arrangePid(pid = Pid("bad")),
+                aldersgruppeFinder = arrangeAldersgruppe(),
+                navnRequirement,
+                normalderService = arrangeNormalder()
+            ).getPerson() shouldBe person().withPensjoneringAldre(defaultAldersgrenser)
+        }.message shouldBe "person"
+    }
+})
+
+private val navnRequirement = mockk<NavnRequirement>(relaxed = true)
+
+private fun arrangePid(pid: Pid = PersonFactory.pid): PidGetter =
+    mockk<PidGetter>().apply {
+        every { pid() } returns pid
     }
 
-    private fun service() =
-        PersonService(client, pidGetter, aldersgruppeFinder, navnRequirement, normalderService)
-
-    private fun arrangePerson(
-        pid: Pid = PersonFactory.pid,
-        pensjoneringAldre: Aldersgrenser = defaultAldersgrenser
-    ): Person {
-        with(person().withPensjoneringAldre(pensjoneringAldre)) {
-            `when`(pidGetter.pid()).thenReturn(pid)
-            `when`(client.fetchPerson(pid, fetchFulltNavn = false)).thenReturn(this)
-            `when`(aldersgruppeFinder.aldersgruppe(person = this)).thenReturn("")
-            `when`(navnRequirement.needFulltNavn()).thenReturn(false)
-            `when`(normalderService.aldersgrenser(this.foedselsdato)).thenReturn(pensjoneringAldre)
-            return this
-        }
+private fun arrangeNormalder(pensjonsaldre: Aldersgrenser = defaultAldersgrenser): NormertPensjonsalderService =
+    mockk<NormertPensjonsalderService>().apply {
+        every { aldersgrenser(any()) } returns pensjonsaldre
     }
-}
+
+private fun arrangePerson(
+    pensjoneringAldre: Aldersgrenser = defaultAldersgrenser
+): PersonClient =
+    mockk<PersonClient>().apply {
+        every {
+            fetchPerson(any(), any())
+        } returns person().withPensjoneringAldre(pensjoneringAldre)
+    }
+
+private fun arrangeAldersgruppe(): AldersgruppeFinder =
+    mockk<AldersgruppeFinder>().apply {
+        every { aldersgruppe(any()) } returns ""
+    }

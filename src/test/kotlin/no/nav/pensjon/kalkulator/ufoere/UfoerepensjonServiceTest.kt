@@ -1,62 +1,58 @@
 package no.nav.pensjon.kalkulator.ufoere
 
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.DateFactory.date
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.ufoere.client.UfoeregradClient
 import no.nav.pensjon.kalkulator.ufoere.client.VedtakClient
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito.*
-import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@ExtendWith(SpringExtension::class)
-class UfoerepensjonServiceTest {
+class UfoerepensjonServiceTest : ShouldSpec({
 
-    private lateinit var service: UfoerepensjonService
-
-    @Mock
-    private lateinit var vedtakClient: VedtakClient
-
-    @Mock
-    private lateinit var ufoeregradClient: UfoeregradClient
-
-    @Mock
-    private lateinit var pidGetter: PidGetter
-
-    @BeforeEach
-    fun initialize() {
-        service = UfoerepensjonService(vedtakClient, ufoeregradClient, pidGetter)
+    should("return 'true' when uførepensjonsvedtak exists") {
+        val service = UfoerepensjonService(
+            vedtakClient = arrangeVedtak(Sakstype.UFOEREPENSJON),
+            ufoeregradClient = mockk(),
+            pidGetter = arrangePid()
+        )
+        service.harLoependeUfoerepensjon(date) shouldBe true
     }
 
-    @Test
-    fun `harLoependeUfoerepensjon is true when ufoerepensjonsvedtak exists`() {
-        arrangePidAndResultat(Sakstype.UFOEREPENSJON)
-        val result = service.harLoependeUfoerepensjon(date)
-        assertTrue(result)
+    should("return 'false' when no uførepensjonsvedtak exists") {
+        val service = UfoerepensjonService(
+            vedtakClient = arrangeVedtak(Sakstype.UNKNOWN),
+            ufoeregradClient = mockk(),
+            pidGetter = arrangePid()
+        )
+
+        service.harLoependeUfoerepensjon(date) shouldBe false
     }
 
-    @Test
-    fun `harLoependeUfoerepensjon is false when no ufoerepensjonsvedtak exists`() {
-        arrangePidAndResultat(Sakstype.UNKNOWN)
-        val result = service.harLoependeUfoerepensjon(date)
-        assertFalse(result)
+    should("map existing uføregrad") {
+        val service = UfoerepensjonService(
+            vedtakClient = mockk(),
+            ufoeregradClient = arrangeUfoeregrad60(),
+            pidGetter = arrangePid()
+        )
+
+        service.hentUfoeregrad().uforegrad shouldBe 60
+    }
+})
+
+private fun arrangePid(): PidGetter =
+    mockk<PidGetter>().apply {
+        every { pid() } returns pid
     }
 
-    @Test
-    fun `Existing ufoeregrad is mapped and returned`() {
-        `when`(pidGetter.pid()).thenReturn(pid)
-        `when`(ufoeregradClient.hentUfoeregrad(pid)).thenReturn(Ufoeregrad(60))
-
-        val result = service.hentUfoeregrad()
-        assertEquals(60, result.uforegrad)
+private fun arrangeUfoeregrad60(): UfoeregradClient =
+    mockk<UfoeregradClient>().apply {
+        every { hentUfoeregrad(any()) } returns Ufoeregrad(60)
     }
 
-    private fun arrangePidAndResultat(sakstype: Sakstype) {
-        `when`(pidGetter.pid()).thenReturn(pid)
-        `when`(vedtakClient.bestemGjeldendeVedtak(pid, date)).thenReturn(listOf(Vedtak(sakstype)))
+private fun arrangeVedtak(sakstype: Sakstype) =
+    mockk<VedtakClient>().apply {
+        every { bestemGjeldendeVedtak(pid, date) } returns listOf(Vedtak(sakstype))
     }
-}

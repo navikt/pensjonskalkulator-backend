@@ -7,7 +7,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.util.MultiValueMap
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 import java.nio.charset.StandardCharsets
@@ -33,10 +32,9 @@ class SelfTestController(
         private fun responseEntity(body: String, mediaType: MediaType): ResponseEntity<String> =
             ResponseEntity(body, contentTypeHeaders(mediaType), HttpStatus.OK)
 
-        private fun contentTypeHeaders(mediaType: MediaType): MultiValueMap<String, String> {
-            val headers: MultiValueMap<String, String> = HttpHeaders()
-            headers.add(HttpHeaders.CONTENT_TYPE, mediaType.toString())
-            return headers
-        }
+        private fun contentTypeHeaders(mediaType: MediaType) =
+            HttpHeaders().apply {
+                add(HttpHeaders.CONTENT_TYPE, mediaType.toString())
+            }
     }
 }

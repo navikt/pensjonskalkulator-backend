@@ -31,8 +31,8 @@ class SecurityContextEnricher(
             if (authentication == null) {
                 authentication = anonymousAuthentication()
             } else {
-                authentication = enrich(authentication, request)
-                authentication = applyPotentialFullmakt(authentication, request)
+                authentication = enrich(authentication!!, request)
+                authentication = applyPotentialFullmakt(authentication!!, request)
             }
         }
     }

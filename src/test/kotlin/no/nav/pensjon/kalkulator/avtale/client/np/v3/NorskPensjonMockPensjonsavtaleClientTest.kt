@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.v3
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -9,9 +10,9 @@ import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleC
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.avtaleSpec
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.avtaleMedToUtbetalingsperioder
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.mock.Saml
 import no.nav.pensjon.kalkulator.mock.XmlMapperFactory.xmlMapper
 import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.SamlTokenService
-import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.SamlTokenServiceTest.Companion.SAML_ASSERTION
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.testutil.Arrange
 import no.nav.pensjon.kalkulator.testutil.arrangeOkXmlResponse
@@ -42,14 +43,14 @@ class NorskPensjonMockPensjonsavtaleClientTest : FunSpec({
         Arrange.webClientContextRunner().run {
             val avtaler = NorskPensjonMockPensjonsavtaleClient(
                 baseUrl!!,
-                tokenGetter = mockk<SamlTokenService>().apply { every { assertion() } returns SAML_ASSERTION },
+                tokenGetter = mockk<SamlTokenService>().apply { every { assertion() } returns Saml.ASSERTION },
                 webClientBuilder = it.getBean(WebClient.Builder::class.java),
                 traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" },
                 xmlMapper = xmlMapper(),
                 retryAttempts = "1"
             ).fetchAvtaler(avtaleSpec, pid).avtaler
 
-            avtaler.size shouldBe 1
+            avtaler shouldHaveSize 1
             avtaler[0] shouldBe avtaleMedToUtbetalingsperioder
 
             ByteArrayOutputStream().use {
