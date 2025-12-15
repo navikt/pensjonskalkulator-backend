@@ -4,7 +4,7 @@ import io.netty.channel.ChannelOption
 import io.netty.handler.logging.LogLevel
 import io.netty.handler.timeout.ReadTimeoutHandler
 import io.netty.handler.timeout.WriteTimeoutHandler
-import org.springframework.boot.web.reactive.function.client.WebClientCustomizer
+import org.springframework.boot.webclient.WebClientCustomizer
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -55,8 +55,8 @@ class WebClientConfig : WebClientCustomizer {
 
         /**
          * From https://github.com/reactor/reactor-netty/issues/764:
-         * The idle timeout varies depending on provider, so it's hard to have a good default for this without
-         * making it overly aggressive i.e. setting it < 60 seconds. If too aggressive then new
+         * The idle timeout varies depending on the provider, so it's hard to have a good default for this without
+         * making it overly aggressive i.e. setting it < 60 seconds. If too aggressive, then new
          * connections are established potentially more than needed, i.e. more SSL handshakes etc.
          * -----
          * Values used below are taken from example in:

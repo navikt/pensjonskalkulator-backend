@@ -31,7 +31,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
  */
 @Component
 class GandalfSamlTokenClient(
-    @Value("\${sts.url}") private val baseUrl: String,
+    @param:Value("\${sts.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String
@@ -112,7 +112,7 @@ class GandalfSamlTokenClient(
                 .with(OAuth2ParameterNames.SUBJECT_TOKEN_TYPE, TOKEN_TYPE)
                 .with(OAuth2ParameterNames.SUBJECT_TOKEN, idToken.tokenValue)
 
-        private fun idToken() = SecurityContextHolder.getContext().authentication.credentials as Jwt
+        private fun idToken() = SecurityContextHolder.getContext().authentication!!.credentials as Jwt
 
         private fun emptyDto() =
             SamlTokenDataDto(

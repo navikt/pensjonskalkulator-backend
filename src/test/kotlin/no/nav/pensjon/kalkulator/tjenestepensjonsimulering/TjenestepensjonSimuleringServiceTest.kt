@@ -1,44 +1,19 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering
 
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.LoependeInntekt
-import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
-import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.TjenestepensjonSimuleringClient
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDate
 
-@ExtendWith(SpringExtension::class)
-class TjenestepensjonSimuleringServiceTest {
+class TjenestepensjonSimuleringServiceTest : ShouldSpec({
 
-    private lateinit var service: TjenestepensjonSimuleringService
-
-    @Mock
-    private lateinit var tjenestepensjonSimuleringClient: TjenestepensjonSimuleringClient
-
-    @Mock
-    private lateinit var pidGetter: PidGetter
-
-    @Mock
-    private lateinit var featureToggleService: FeatureToggleService
-
-    @BeforeEach
-    fun initialize() {
-        `when`(pidGetter.pid()).thenReturn(pid)
-        service = TjenestepensjonSimuleringService(pidGetter, tjenestepensjonSimuleringClient)
-    }
-
-    @Test
-    fun `hent PID, map request, og hent simulering fra client`() {
-        val request = SimuleringOffentligTjenestepensjonSpec(
-            foedselsdato = LocalDate.parse("1990-01-01"),
+    should("hente PID, mappe request, og hente simulering fra client") {
+        val spec = SimuleringOffentligTjenestepensjonSpec(
+            foedselsdato = LocalDate.of(1990, 1, 1),
             uttaksdato = LocalDate.of(2053, 3, 1),
             sisteInntekt = 500000,
             fremtidigeInntekter = listOf(
@@ -57,34 +32,43 @@ class TjenestepensjonSimuleringServiceTest {
             eps2G = true,
             erApoteker = false
         )
+        val start = Alder(aar = 62, maaneder = 1)
+        val slutt = Alder(aar = 63, maaneder = 1)
 
-        val start = Alder(62, 1)
-        val slutt = Alder(63, 1)
+        val result = TjenestepensjonSimuleringService(
+            pidGetter = mockk(relaxed = true),
+            tjenestepensjonSimuleringClient = arrangeTjenestepensjon(start, slutt)
+        ).hentTjenestepensjonSimulering(spec)
 
-        `when`(tjenestepensjonSimuleringClient.hentTjenestepensjonSimulering(request, pid)).thenReturn(
-            OffentligTjenestepensjonSimuleringsresultat(
-                simuleringsResultatStatus = SimuleringsResultatStatus(resultatType = ResultatType.OK),
-                simuleringsResultat = SimuleringsResultat(
-                    tpOrdning = "tpOrdning",
-                    tpNummer = "111111",
-                    perioder = listOf(Utbetaling(startAlder = start, sluttAlder = slutt, maanedligBeloep = 1000)),
-                    betingetTjenestepensjonInkludert = true
-                ),
-                tpOrdninger = listOf("tpOrdning")
-            )
-        )
-
-        val result = service.hentTjenestepensjonSimulering(request)
-
-        assertNotNull(result)
-        assertEquals(ResultatType.OK, result.simuleringsResultatStatus.resultatType)
-        assertNotNull(result.simuleringsResultat)
-        assertEquals("tpOrdning", result.simuleringsResultat!!.tpOrdning)
-        assertEquals("111111", result.simuleringsResultat.tpNummer)
-        assertEquals(start, result.simuleringsResultat.perioder.get(0).startAlder)
-        assertEquals(slutt, result.simuleringsResultat.perioder[0].sluttAlder)
-        assertEquals(1000, result.simuleringsResultat.perioder[0].maanedligBeloep)
-        assertTrue(result.simuleringsResultat.betingetTjenestepensjonInkludert)
-        assertEquals("tpOrdning", result.tpOrdninger[0])
+        with(result) {
+            simuleringsResultatStatus.resultatType shouldBe ResultatType.OK
+            tpOrdninger[0] shouldBe "tpOrdning"
+            with(simuleringsResultat!!) {
+                tpOrdning shouldBe "tpOrdning"
+                tpNummer shouldBe "111111"
+                betingetTjenestepensjonInkludert shouldBe true
+                with(perioder[0]) {
+                    startAlder shouldBe start
+                    sluttAlder shouldBe slutt
+                    maanedligBeloep shouldBe 1000
+                }
+            }
+        }
     }
-}
+})
+
+private fun arrangeTjenestepensjon(start: Alder, slutt: Alder): TjenestepensjonSimuleringClient =
+    mockk<TjenestepensjonSimuleringClient>().apply {
+        every {
+            hentTjenestepensjonSimulering(any(), any())
+        } returns OffentligTjenestepensjonSimuleringsresultat(
+            simuleringsResultatStatus = SimuleringsResultatStatus(resultatType = ResultatType.OK),
+            simuleringsResultat = SimuleringsResultat(
+                tpOrdning = "tpOrdning",
+                tpNummer = "111111",
+                perioder = listOf(Utbetaling(startAlder = start, sluttAlder = slutt, maanedligBeloep = 1000)),
+                betingetTjenestepensjonInkludert = true
+            ),
+            tpOrdninger = listOf("tpOrdning")
+        )
+    }

@@ -1,30 +1,26 @@
 package no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming
 
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.client.SkjermingClient
-import org.junit.jupiter.api.Test
 
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.springframework.test.context.junit.jupiter.SpringExtension
+class SkjermingServiceTest : ShouldSpec({
 
-@ExtendWith(SpringExtension::class)
-class SkjermingServiceTest {
-
-    @Mock
-    private lateinit var client: SkjermingClient
-
-    @Test
-    fun `personErTilgjengelig returns false when person er skjermet`() {
-        `when`(client.personErTilgjengelig(pid)).thenReturn(false)
-        assertFalse(SkjermingService(client).personErTilgjengelig(pid))
+    should("return 'false' when person er skjermet") {
+        val client = arrangeClient(erTilgjengelig = false)
+        SkjermingService(client).personErTilgjengelig(pid) shouldBe false
     }
 
-    @Test
-    fun `personErTilgjengelig returns true when person ikke er skjermet`() {
-        `when`(client.personErTilgjengelig(pid)).thenReturn(true)
-        assertTrue(SkjermingService(client).personErTilgjengelig(pid))
+    should("return 'true' when person ikke er skjermet") {
+        val client = arrangeClient(erTilgjengelig = true)
+        SkjermingService(client).personErTilgjengelig(pid) shouldBe true
     }
-}
+})
+
+private fun arrangeClient(erTilgjengelig: Boolean): SkjermingClient =
+    mockk<SkjermingClient>().apply {
+        every { personErTilgjengelig(any()) } returns erTilgjengelig
+    }

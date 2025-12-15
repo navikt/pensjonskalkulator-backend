@@ -1,12 +1,10 @@
 package no.nav.pensjon.kalkulator.utbetaling.client.oekonomi.map
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.utbetaling.Utbetaling
-import no.nav.pensjon.kalkulator.utbetaling.UtbetalingServiceTest.Companion.MONTH_END
-import no.nav.pensjon.kalkulator.utbetaling.UtbetalingServiceTest.Companion.MONTH_MIDDLE
-import no.nav.pensjon.kalkulator.utbetaling.UtbetalingServiceTest.Companion.MONTH_START
 import no.nav.pensjon.kalkulator.utbetaling.client.oekonomi.dto.OekonomiUtbetalingDto
 import no.nav.pensjon.kalkulator.utbetaling.client.oekonomi.dto.Periode
 import no.nav.pensjon.kalkulator.utbetaling.client.oekonomi.dto.Ytelse
@@ -21,7 +19,7 @@ class UtbetalingMapperTest : FunSpec({
             OekonomiUtbetalingDto(
                 utbetalingsdato = LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE),
                 posteringsdato = LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE),
-                utbetalingsstatus = "18", //UTBETALT_AV_BANK
+                utbetalingsstatus = "18", // UTBETALT_AV_BANK
                 forfallsdato = LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE),
                 utbetalingNettobeloep = BigDecimal(750),
                 ytelseListe = listOf(
@@ -46,7 +44,7 @@ class UtbetalingMapperTest : FunSpec({
             OekonomiUtbetalingDto(
                 utbetalingsdato = null,
                 posteringsdato = LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE),
-                utbetalingsstatus = "9", //MOTTAT_FRA_FORSYSTEM
+                utbetalingsstatus = "9", // MOTTAT_FRA_FORSYSTEM
                 forfallsdato = LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE),
                 utbetalingNettobeloep = BigDecimal(750),
                 ytelseListe = listOf(
@@ -64,8 +62,7 @@ class UtbetalingMapperTest : FunSpec({
 
         val result: List<Utbetaling> = UtbetalingMapper.fromDto(dto)
 
-        result.size shouldBe 3
-
+        result shouldHaveSize 3
         with(result[0]) {
             utbetalingsdato shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE)
             posteringsdato shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE)
@@ -75,7 +72,6 @@ class UtbetalingMapperTest : FunSpec({
             fom shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_START)
             tom shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_END)
         }
-
         with(result[1]) {
             utbetalingsdato shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE)
             posteringsdato shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE)
@@ -85,7 +81,6 @@ class UtbetalingMapperTest : FunSpec({
             fom shouldBe LocalDate.of(2021, Month.FEBRUARY, MONTH_START)
             tom shouldBe LocalDate.of(2021, Month.FEBRUARY, 28)
         }
-
         with(result[2]) {
             utbetalingsdato shouldBe null
             posteringsdato shouldBe LocalDate.of(2021, Month.JANUARY, MONTH_MIDDLE)
@@ -97,14 +92,22 @@ class UtbetalingMapperTest : FunSpec({
         }
     }
 
-
     test("toDto oppretter riktig utfylt request") {
-            val result = UtbetalingMapper.toDto(pid)
+        val result = UtbetalingMapper.toDto(pid)
 
-            result.ident shouldBe pid.value
-            result.rolle shouldBe "UTBETALT_TIL"
-            result.periode.fom shouldBe LocalDate.now().minusMonths(1).withDayOfMonth(1)
-            result.periode.tom shouldBe LocalDate.now().withDayOfMonth(1).minusDays(1)
-            result.periodetype shouldBe "YTELSESPERIODE"
+        with(result) {
+            ident shouldBe pid.value
+            rolle shouldBe "UTBETALT_TIL"
+            periodetype shouldBe "YTELSESPERIODE"
+            with(periode) {
+                val now = LocalDate.now()
+                fom shouldBe now.minusMonths(1).withDayOfMonth(1)
+                tom shouldBe now.withDayOfMonth(1).minusDays(1)
+            }
+        }
     }
 })
+
+private const val MONTH_START = 1
+private const val MONTH_MIDDLE = 15
+private const val MONTH_END = 31

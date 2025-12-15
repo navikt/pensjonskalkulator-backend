@@ -1,65 +1,55 @@
 package no.nav.pensjon.kalkulator.tech.json
 
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonDeserializer
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.dataformat.xml.XmlMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.pensjon.kalkulator.tech.time.DateUtil.toLocalDate
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
-import java.time.LocalDate
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
+import tools.jackson.core.JsonGenerator
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.SerializationContext
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.databind.module.SimpleModule
+import tools.jackson.databind.ser.std.StdSerializer
+import tools.jackson.dataformat.xml.XmlMapper
+import java.util.*
 
 /**
- * Configuration of object mapper used for serialization and deserialization of data in JSON and XML format.
+ * Configuration of object mappers used for serialization and deserialization of data in JSON format.
  */
 @Configuration
 class ObjectMapperConfiguration {
 
     @Bean
     @Primary
-    fun objectMapper() =
-        jacksonObjectMapper().apply {
-            enable(SerializationFeature.INDENT_OUTPUT)
-            registerModule(JavaTimeModule())
-            registerModule(localDateModule())
-            enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS) // for Date in call to PEN
-            disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        }
+    fun objectMapper(): JsonMapper =
+        JsonMapper.builder()
+            .addModule(dateSerializerModule())
+            .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .changeDefaultPropertyInclusion { it.withValueInclusion(NON_NULL) }
+            .build()
 
     @Bean
-    fun xmlMapper() =
-        XmlMapper().apply {
-            disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        }
+    fun xmlMapper(): XmlMapper =
+        XmlMapper.builder()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .build()
 
-    private fun localDateModule() =
-        SimpleModule().apply {
-            addDeserializer(LocalDate::class.java, LocalDateDeserializer())
-        }
-
-    /**
-     * Produces date 2024-02-01 both from
-     * "date": "2024-01-31T23:00:00.000Z"
-     * and
-     * "date": "2024-02-01"
-     */
-    class LocalDateDeserializer : JsonDeserializer<LocalDate>() {
-        override fun deserialize(parser: JsonParser, context: DeserializationContext): LocalDate =
-            parser.text.let {
-                try {
-                    LocalDate.parse(it, DateTimeFormatter.ISO_LOCAL_DATE)
-                } catch (e: DateTimeParseException) {
-                    toLocalDate(ZonedDateTime.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME))
-                }
+    companion object {
+        fun dateSerializerModule() =
+            SimpleModule().apply {
+                addSerializer(EpochDateSerializer(handledType = Date::class.java))
             }
+    }
+}
+
+/**
+ * Serializes java.util.Date as epoch milliseconds.
+ * Used for calls to pensjon-regler.
+ */
+class EpochDateSerializer(handledType: Class<Date>) : StdSerializer<Date>(handledType) {
+
+    override fun serialize(value: Date, gen: JsonGenerator, provider: SerializationContext) {
+        gen.writeNumber(value.toInstant().toEpochMilli())
     }
 }

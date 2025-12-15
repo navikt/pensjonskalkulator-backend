@@ -1,69 +1,52 @@
 package no.nav.pensjon.kalkulator.sak
 
+import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.pensjon.kalkulator.sak.client.SakClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@ExtendWith(SpringExtension::class)
-class SakServiceTest {
+class SakServiceTest : ShouldSpec({
 
-    @Mock
-    private lateinit var client: SakClient
-
-    @Mock
-    private lateinit var pidGetter: PidGetter
-
-    private lateinit var sakService: SakService
-
-    @BeforeEach
-    fun initialize() {
-        `when`(pidGetter.pid()).thenReturn(pid)
-        sakService = SakService(client, pidGetter)
+    should("returnere 'true' for løpende uføretrygd") {
+        SakService(
+            sakClient = arrangeSaker(
+                Sak(type = SakType.GENERELL, status = SakStatus.AVSLUTTET),
+                Sak(type = SakType.UFOERETRYGD, status = SakStatus.LOEPENDE)
+            ),
+            pidGetter
+        ).sakStatus() shouldBe RelevantSakStatus(harSak = true, sakType = SakType.UFOERETRYGD)
     }
 
-    @Test
-    fun `'sakStatus' gir 'true' for loepende ufoeretrygd`() {
-        `when`(client.fetchSaker(pid)).thenReturn(
-            listOf(
-                Sak(SakType.GENERELL, SakStatus.AVSLUTTET),
-                Sak(SakType.UFOERETRYGD, SakStatus.LOEPENDE)
-            )
+    should("returnere 'false' for avsluttet gjenlevendeytelse") {
+        SakService(
+            sakClient = arrangeSaker(
+                Sak(type = SakType.GENERELL, status = SakStatus.LOEPENDE),
+                Sak(type = SakType.GJENLEVENDEYTELSE, status = SakStatus.AVSLUTTET)
+            ),
+            pidGetter
+        ).sakStatus() shouldBe RelevantSakStatus(harSak = false, sakType = SakType.NONE)
+    }
+
+    should("returnere 'false' for løpende irrelevante saker") {
+
+        SakService(
+            sakClient = arrangeSaker(
+                Sak(type = SakType.GENERELL, status = SakStatus.LOEPENDE),
+                Sak(type = SakType.ALDERSPENSJON, status = SakStatus.LOEPENDE)
+            ),
+            pidGetter
+        ).sakStatus() shouldBe RelevantSakStatus(
+            harSak = false,
+            sakType = SakType.NONE
         )
-        val expected = RelevantSakStatus(harSak = true, sakType = SakType.UFOERETRYGD)
-
-        sakService.sakStatus() shouldBe expected
     }
+})
 
-    @Test
-    fun `'sakStatus' gir 'false' for avsluttet gjenlevendeytelse`() {
-        `when`(client.fetchSaker(pid)).thenReturn(
-            listOf(
-                Sak(SakType.GENERELL, SakStatus.LOEPENDE),
-                Sak(SakType.GJENLEVENDEYTELSE, SakStatus.AVSLUTTET)
-            )
-        )
-        val expected = RelevantSakStatus(harSak = false, sakType = SakType.NONE)
+private val pidGetter = mockk<PidGetter>(relaxed = true)
 
-        sakService.sakStatus() shouldBe expected
+private fun arrangeSaker(vararg saker: Sak): SakClient =
+    mockk<SakClient>().apply {
+        every { fetchSaker(any()) } returns listOf(*saker)
     }
-
-    @Test
-    fun `'sakStatus' gir 'false' for loepende irrelevante saker`() {
-        `when`(client.fetchSaker(pid)).thenReturn(
-            listOf(
-                Sak(SakType.GENERELL, SakStatus.LOEPENDE),
-                Sak(SakType.ALDERSPENSJON, SakStatus.LOEPENDE)
-            )
-        )
-        val expected = RelevantSakStatus(harSak = false, sakType = SakType.NONE)
-
-        sakService.sakStatus() shouldBe expected
-    }
-}

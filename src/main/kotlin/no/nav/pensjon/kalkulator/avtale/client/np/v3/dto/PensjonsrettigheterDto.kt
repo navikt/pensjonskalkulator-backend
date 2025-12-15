@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.v3.dto
 
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
+import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 
 class PensjonsrettigheterDto {
 
