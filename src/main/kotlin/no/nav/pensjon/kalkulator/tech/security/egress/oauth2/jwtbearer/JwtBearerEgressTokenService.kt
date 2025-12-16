@@ -18,7 +18,7 @@ class JwtBearerEgressTokenService(
         val accessParameter = TokenAccessParameter.jwtBearer(assertionCreator.assertion(audience))
 
         val tokenValue = tokenGetter
-            .getTokenData(accessParameter = accessParameter, scope = audience, user = user)
+            .getTokenData(accessParameter = accessParameter, scope = audience, user = "n/a")
             .accessToken
 
         return RawJwt(tokenValue)
