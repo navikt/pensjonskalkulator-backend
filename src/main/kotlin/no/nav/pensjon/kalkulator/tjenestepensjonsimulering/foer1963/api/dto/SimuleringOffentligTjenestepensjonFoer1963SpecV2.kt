@@ -1,23 +1,24 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.dto
 
+import jakarta.validation.constraints.NotNull
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import java.time.LocalDate
 data class SimuleringOffentligTjenestepensjonFoer1963SpecV2(
-    val simuleringstype: SimuleringType,
-    val foedselsdato: LocalDate,
+    @field:NotNull val simuleringstype: SimuleringType,
+    @field:NotNull val foedselsdato: LocalDate,
     val aarligInntektFoerUttakBeloep: Int?,
     val gradertUttak: PersonligSimuleringGradertUttakSpecV9? = null, // default is helt uttak (100 %)
-    val heltUttak: PersonligSimuleringHeltUttakSpecV9,
+    @field:NotNull val heltUttak: PersonligSimuleringHeltUttakSpecV9,
     val utenlandsperiodeListe: List<PersonligSimuleringUtenlandsperiodeSpecV9>? = null,
     val sivilstand: Sivilstand?,
     val epsHarInntektOver2G: Boolean? = null,
     val epsHarPensjon: Boolean? = null,
     val afpInntektMaanedFoerUttak: Boolean?,
     val afpOrdning: AfpOrdningType? = null,
-    val stillingsprosentOffHeltUttak: String,
+    @field:NotNull val stillingsprosentOffHeltUttak: String,
     val stillingsprosentOffGradertUttak: String?,
 )
 /*
