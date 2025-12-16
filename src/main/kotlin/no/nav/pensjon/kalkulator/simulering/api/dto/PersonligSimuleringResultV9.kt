@@ -1,15 +1,16 @@
 package no.nav.pensjon.kalkulator.simulering.api.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import jakarta.validation.constraints.NotNull
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class PersonligSimuleringResultV9(
-    val alderspensjon: List<PersonligSimuleringAlderspensjonResultV9> = emptyList(),
+    @field:NotNull val alderspensjon: List<PersonligSimuleringAlderspensjonResultV9> = emptyList(),
     val alderspensjonMaanedligVedEndring: PersonligSimuleringMaanedligPensjonResultV9? = null,
     val pre2025OffentligAfp: PersonligSimuleringPre2025OffentligAfpResultV9? = null,
     val afpPrivat: List<PersonligSimuleringAfpPrivatResultV9>? = emptyList(),
     val afpOffentlig: List<PersonligSimuleringAarligPensjonResultV9>? = emptyList(),
-    val vilkaarsproeving: PersonligSimuleringVilkaarsproevingResultV9,
+    @field:NotNull val vilkaarsproeving: PersonligSimuleringVilkaarsproevingResultV9,
     val harForLiteTrygdetid: Boolean? = false,
     val trygdetid: Int? = null,
     val opptjeningGrunnlagListe: List<PersonligSimuleringAarligInntektResultV9>? = null
@@ -18,13 +19,13 @@ data class PersonligSimuleringResultV9(
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class PersonligSimuleringMaanedligPensjonResultV9(
     val gradertUttakMaanedligBeloep: Int? = null,
-    val heltUttakMaanedligBeloep: Int,
+    @field:NotNull val heltUttakMaanedligBeloep: Int,
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class PersonligSimuleringAlderspensjonResultV9(
-    val alder: Int,
-    val beloep: Int,
+    @field:NotNull val alder: Int,
+    @field:NotNull val beloep: Int,
     val inntektspensjonBeloep: Int? = null,
     val garantipensjonBeloep: Int? = null,
     val delingstall: Double? = null,

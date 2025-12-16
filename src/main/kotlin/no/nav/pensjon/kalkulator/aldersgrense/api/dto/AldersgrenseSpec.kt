@@ -1,5 +1,7 @@
 package no.nav.pensjon.kalkulator.aldersgrense.api.dto
 
+import jakarta.validation.constraints.NotNull
+
 data class AldersgrenseSpec(
-    val foedselsdato: Int
+    @field:NotNull val foedselsdato: Int
 )
