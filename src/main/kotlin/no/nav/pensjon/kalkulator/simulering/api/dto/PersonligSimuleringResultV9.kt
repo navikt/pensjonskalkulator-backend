@@ -75,7 +75,7 @@ data class PersonligSimuleringAfpPrivatResultV9(
 data class PersonligSimuleringAarligPensjonResultV9(
     @field:NotNull val alder: Int,
     @field:NotNull val beloep: Int,
-    @field:NotNull val maanedligBeloep: Int?
+    val maanedligBeloep: Int?
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
