@@ -4,6 +4,7 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.GradertUttak
 import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
+import no.nav.pensjon.kalkulator.simulering.InnvilgetLivsvarigOffentligAfpSpec
 import no.nav.pensjon.kalkulator.simulering.Opphold
 import no.nav.pensjon.kalkulator.simulering.PersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.*
@@ -26,7 +27,8 @@ object SimulatorPersonligSimuleringSpecMapper {
             heltUttak = heltUttak(impersonalSpec.heltUttak),
             utenlandsperiodeListe = impersonalSpec.utenlandsopphold.periodeListe.map(::utlandPeriode),
             afpInntektMaanedFoerUttak = impersonalSpec.afpInntektMaanedFoerUttak,
-            afpOrdning = SimulatorAfpOrdningType.fromInternalValue(impersonalSpec.afpOrdning).externalValue
+            afpOrdning = SimulatorAfpOrdningType.fromInternalValue(impersonalSpec.afpOrdning).externalValue,
+            innvilgetLivsvarigOffentligAfp = impersonalSpec.innvilgetLivsvarigOffentligAfp?.let(::afp)
         )
 
     private fun gradertUttak(source: GradertUttak) =
@@ -49,6 +51,13 @@ object SimulatorPersonligSimuleringSpecMapper {
             tom = source.tom,
             land = source.land.name,
             arbeidetUtenlands = source.arbeidet
+        )
+
+    private fun afp(source: InnvilgetLivsvarigOffentligAfpSpec) =
+        SimulatorInnvilgetLivsvarigOffentligAfpSpec(
+            aarligBruttoBeloep = source.aarligBruttoBeloep,
+            uttakFom = source.uttakFom,
+            sistRegulertGrunnbeloep = source.sistRegulertGrunnbeloep
         )
 
     private fun alder(source: Alder) =

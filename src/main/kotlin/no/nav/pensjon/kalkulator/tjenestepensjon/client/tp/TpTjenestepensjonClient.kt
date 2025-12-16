@@ -182,7 +182,7 @@ class TpTjenestepensjonClient(
                 .block()
                 ?.lowercase()
                 ?.also {
-                    log.debug { "TP-ordning for tpNr=$tpNr: $it" }
+                    log.info { "TP-ordning for tpNr=$tpNr: $it" }
                     countCalls(MetricResult.OK)
                 }
         } catch (e: WebClientRequestException) {
@@ -194,7 +194,11 @@ class TpTjenestepensjonClient(
         }
     }
 
-    override fun hentAfpOffentligLivsvarigDetaljer(pid: Pid, tpNr: String, uttaksdato: LocalDate): AfpOffentligLivsvarigResult {
+    override fun hentAfpOffentligLivsvarigDetaljer(
+        pid: Pid,
+        tpNr: String,
+        uttaksdato: LocalDate
+    ): AfpOffentligLivsvarigResult {
         log.debug { "Fetching AFP Offentlig Livsvarig detaljer for tpNr=$tpNr, uttaksdato=$uttaksdato" }
 
         // Sjekker om tpNr er i en leverandør sine overstyrteTpNr liste
@@ -208,34 +212,40 @@ class TpTjenestepensjonClient(
             ?: throw EgressException("Ingen AFP leverandører konfigurert for TP-ordning '$tpOrdning' (tpNr=$tpNr)")
 
         log.debug { "Using provider ${config.name} for tpNr=$tpNr" }
+        val service: EgressService = EgressService.entries.first { it.shortName == tpOrdning }
 
         val url = config.url
             .replace("{tpnr}", tpNr)
             .replace("{fnr}", pid.value)
             .replace("{uttaksdato}", uttaksdato.toString())
 
-        log.debug { "GET from URL: '$url'" }
+        val redactedUrl = config.url
+            .replace("{tpnr}", tpNr)
+            .replace("{fnr}", pid.displayValue)
+            .replace("{uttaksdato}", uttaksdato.toString())
+
+        log.info { "GET from URL: '$redactedUrl'" }
 
         return try {
             val response = webClient
                 .get()
                 .uri(url)
-                .headers { setExternalHeaders(it, pid) }
+                .headers { setExternalHeaders(service, it, pid) }
                 .retrieve()
                 .bodyToMono(TpAfpOffentligLivsvarigDetaljerDto::class.java)
                 .block()
 
             TpTjenestepensjonMapper.fromDto(response)
                 .also {
-                    log.debug { "Successfully retrieved AFP data from ${config.name}" }
+                    log.info { "Successfully retrieved AFP data from ${config.name}: $it" }
                     countCalls(MetricResult.OK)
                 }
         } catch (e: WebClientRequestException) {
-            throw EgressException("${config.name}: Request failed for URL: $url", e)
+            throw EgressException("${config.name}: Request failed for URL: $redactedUrl", e)
         } catch (e: WebClientResponseException) {
-            throw EgressException("${config.name}: Response error ${e.statusCode} for URL: $url", e)
+            throw EgressException("${config.name}: Response error ${e.statusCode} for URL: $redactedUrl", e)
         } catch (e: Exception) {
-            throw EgressException("${config.name}: Unexpected error for URL: $url", e)
+            throw EgressException("${config.name}: Unexpected error for URL: $redactedUrl", e)
         }
     }
 
@@ -281,8 +291,8 @@ class TpTjenestepensjonClient(
         headers[CustomHttpHeaders.PID] = pid.value
     }
 
-    private fun setExternalHeaders(headers: HttpHeaders, pid: Pid) {
-        headers.setBearerAuth(EgressAccess.token(EgressService.TP_ORDNING_SERVICE).value)
+    private fun setExternalHeaders(service: EgressService, headers: HttpHeaders, pid: Pid) {
+        headers.setBearerAuth(EgressAccess.token(service).value)
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
         headers[CustomHttpHeaders.PID] = pid.value
     }

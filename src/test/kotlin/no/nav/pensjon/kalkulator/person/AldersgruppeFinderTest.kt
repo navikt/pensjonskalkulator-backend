@@ -1,39 +1,33 @@
 package no.nav.pensjon.kalkulator.person
 
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.TimeProvider
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-@ExtendWith(SpringExtension::class)
-class AldersgruppeFinderTest {
+class AldersgruppeFinderTest : ShouldSpec({
 
-    @Mock
-    private lateinit var timeProvider: TimeProvider
-
-    @Test
-    fun `aldersgruppe returns person's 10-year aldersgruppe`() {
-        `when`(timeProvider.time()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0))
+    should("return person's 10-year aldersgruppe") {
+        val timeProvider = mockk<TimeProvider>().apply {
+            every { time() } returns LocalDateTime.of(2020, 1, 1, 12, 0, 0)
+        }
 
         val finder = AldersgruppeFinder(timeProvider)
 
-        assertEquals("100-109", finder.aldersgruppe(person(foedselAar = 1918)))
-        assertEquals("60-69", finder.aldersgruppe(person(foedselAar = 1959)))
-        assertEquals("60-69", finder.aldersgruppe(person(foedselAar = 1960)))
-        assertEquals("50-59", finder.aldersgruppe(person(foedselAar = 1961)))
-        assertEquals("10-19", finder.aldersgruppe(person(foedselAar = 2010)))
+        finder.aldersgruppe(person(foedselsaar = 1918)) shouldBe "100-109"
+        finder.aldersgruppe(person(foedselsaar = 1959)) shouldBe "60-69"
+        finder.aldersgruppe(person(foedselsaar = 1960)) shouldBe "60-69"
+        finder.aldersgruppe(person(foedselsaar = 1961)) shouldBe "50-59"
+        finder.aldersgruppe(person(foedselsaar = 2010)) shouldBe "10-19"
     }
+})
 
-    private companion object {
-        private fun person(foedselAar: Int) =
-            Person(
-                navn = "",
-                foedselsdato = LocalDate.of(foedselAar, 1, 1)
-            )
-    }
-}
+private fun person(foedselsaar: Int) =
+    Person(
+        navn = "",
+        fornavn = "",
+        foedselsdato = LocalDate.of(foedselsaar, 1, 1)
+    )

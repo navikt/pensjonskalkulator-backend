@@ -1,9 +1,9 @@
 package no.nav.pensjon.kalkulator.tjenestepensjon.client
 
 import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.tjenestepensjon.Tjenestepensjonsforhold
-import no.nav.pensjon.kalkulator.tjenestepensjon.Tjenestepensjon
 import no.nav.pensjon.kalkulator.tjenestepensjon.AfpOffentligLivsvarigResult
+import no.nav.pensjon.kalkulator.tjenestepensjon.Tjenestepensjon
+import no.nav.pensjon.kalkulator.tjenestepensjon.Tjenestepensjonsforhold
 import java.time.LocalDate
 
 interface TjenestepensjonClient {

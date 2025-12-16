@@ -1,7 +1,6 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.v3
 
 import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleException
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
@@ -31,6 +30,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import tools.jackson.dataformat.xml.XmlMapper
 import java.nio.charset.StandardCharsets
 
 /**
@@ -38,7 +38,7 @@ import java.nio.charset.StandardCharsets
  */
 @Component("norskPensjon")
 class NorskPensjonPensjonsavtaleClient(
-    @Value("\${norsk-pensjon.url}") private val baseUrl: String,
+    @param:Value("\${norsk-pensjon.url}") private val baseUrl: String,
     private val tokenGetter: SamlTokenService,
     webClientBuilder: WebClient.Builder,
     private val xmlMapper: XmlMapper,

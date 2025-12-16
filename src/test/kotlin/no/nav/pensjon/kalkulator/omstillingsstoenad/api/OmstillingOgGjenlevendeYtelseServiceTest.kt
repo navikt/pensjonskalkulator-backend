@@ -1,85 +1,50 @@
 package no.nav.pensjon.kalkulator.omstillingsstoenad.api
 
-import kotlinx.coroutines.test.runTest
-import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.coEvery
+import io.mockk.mockk
 import no.nav.pensjon.kalkulator.omstillingsstoenad.OmstillingOgGjenlevendeYtelseService
 import no.nav.pensjon.kalkulator.omstillingsstoenad.OmstillingsstoenadService
-import no.nav.pensjon.kalkulator.omstillingsstoenad.OmstillingOgGjenlevendeYtelseServiceTest.Companion.now
 import no.nav.pensjon.kalkulator.sak.SakService
-import no.nav.pensjon.kalkulator.sak.SakType
-import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.TimeProvider
-import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
-import no.nav.pensjon.kalkulator.testutil.anyNonNull
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@ExtendWith(SpringExtension::class)
-class OmstillingOgGjenlevendeYtelseServiceTest {
+class OmstillingOgGjenlevendeYtelseServiceTest : ShouldSpec({
 
-    private lateinit var service: OmstillingOgGjenlevendeYtelseService
-
-    @Mock
-    private lateinit var omstillingsstoenadService: OmstillingsstoenadService
-
-    @Mock
-    private lateinit var sakService: SakService
-
-    @Mock
-    private lateinit var pidGetter: PidGetter
-
-    @Mock
-    private lateinit var timeProvider: TimeProvider
-
-    @BeforeEach
-    fun initialize() {
-        Mockito.`when`(pidGetter.pid()).thenReturn(pid)
-        Mockito.`when`(timeProvider.time()).thenReturn(now)
-        service = OmstillingOgGjenlevendeYtelseService(omstillingsstoenadService, sakService)
+    should("returnere 'true' når personen mottar omstillingsstønad og gjenlevendeytelse") {
+        OmstillingOgGjenlevendeYtelseService(
+            omstillingsstoenadService = arrangeOmstillingsstoenad(mottarStoenad = true),
+            sakService = arrangeSak(harSakType = true)
+        ).harLoependeSaker() shouldBe true
     }
 
-    @Test
-    fun `bruker mottar omstillingsstoenad og gjenlevendeYtelse`() = runTest {
-        Mockito.`when`(omstillingsstoenadService.mottarOmstillingsstoenad()).thenReturn(true)
-        Mockito.`when`(sakService.harSakType(anyNonNull<SakType>())).thenReturn(true)
-
-        val result = service.harLoependeSaker()
-
-        assertTrue(result)
+    should("returnere 'false' når personen ikke har noen løpende saker") {
+        OmstillingOgGjenlevendeYtelseService(
+            omstillingsstoenadService = arrangeOmstillingsstoenad(mottarStoenad = false),
+            sakService = arrangeSak(harSakType = false)
+        ).harLoependeSaker() shouldBe false
     }
 
-    @Test
-    fun `bruker har ingen loepende saker`() = runTest {
-        Mockito.`when`(omstillingsstoenadService.mottarOmstillingsstoenad()).thenReturn(false)
-        Mockito.`when`(sakService.harSakType(anyNonNull<SakType>())).thenReturn(false)
-
-        val result = service.harLoependeSaker()
-
-        assertFalse(result)
+    should("returnere 'true' når personen mottar kun omstillingsstønad") {
+        OmstillingOgGjenlevendeYtelseService(
+            omstillingsstoenadService = arrangeOmstillingsstoenad(mottarStoenad = true),
+            sakService = arrangeSak(harSakType = false)
+        ).harLoependeSaker() shouldBe true
     }
 
-    @Test
-    fun `bruker mottar kun omstillingsstoenad`() = runTest {
-        Mockito.`when`(omstillingsstoenadService.mottarOmstillingsstoenad()).thenReturn(true)
-        Mockito.`when`(sakService.harSakType(anyNonNull<SakType>())).thenReturn(false)
+    should("returnere 'true' når personen mottar kun gjenlevendeytelse") {
+        OmstillingOgGjenlevendeYtelseService(
+            omstillingsstoenadService = arrangeOmstillingsstoenad(mottarStoenad = false),
+            sakService = arrangeSak(harSakType = true)
+        ).harLoependeSaker() shouldBe true
+    }
+})
 
-        val result = service.harLoependeSaker()
-
-        assertTrue(result)
+private fun arrangeSak(harSakType: Boolean): SakService =
+    mockk<SakService>(relaxed = true).apply {
+        coEvery { harSakType(any()) } returns harSakType
     }
 
-    @Test
-    fun `bruker mottar kun gjenlevendeYtelse`() = runTest {
-        Mockito.`when`(omstillingsstoenadService.mottarOmstillingsstoenad()).thenReturn(false)
-        Mockito.`when`(sakService.harSakType(anyNonNull<SakType>())).thenReturn(true)
-
-        val result = service.harLoependeSaker()
-
-        assertTrue(result)
+private fun arrangeOmstillingsstoenad(mottarStoenad: Boolean): OmstillingsstoenadService =
+    mockk<OmstillingsstoenadService>().apply {
+        coEvery { mottarOmstillingsstoenad() } returns mottarStoenad
     }
-}

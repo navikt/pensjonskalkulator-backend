@@ -4,9 +4,9 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
-import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultMapperV8.filtrerBortGjeldendeAlderFoerBursdagIInnevaerendeMaaned
 import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultMapperV8.justerAfpPrivatIInnevaerendeAarV8
 import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultMapperV8.justerAlderspensjonIInnevaerendeAarV8
+import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultUtil.filtrerBortGjeldendeAlderFoerBursdagInnevaerendeMaaned
 import java.time.LocalDate
 
 /**
@@ -19,11 +19,11 @@ object PersonligSimuleringExtendedResultMapperV8 {
         PersonligSimuleringResultV8(
             alderspensjon = source.alderspensjon.map(::alderspensjon)
                 .let { justerAlderspensjonIInnevaerendeAarV8(it, foedselsdato) }
-                .let { filtrerBortGjeldendeAlderFoerBursdagIInnevaerendeMaaned(it, foedselsdato, PersonligSimuleringAlderspensjonResultV8::alder) },
+                .let { filtrerBortGjeldendeAlderFoerBursdagInnevaerendeMaaned(it, foedselsdato, PersonligSimuleringAlderspensjonResultV8::alder) },
             alderspensjonMaanedligVedEndring = maanedligPensjon(source.alderspensjonMaanedsbeloep),
             pre2025OffentligAfp = source.pre2025OffentligAfp?.let(::pre2025OffentligAfp),
             afpPrivat = source.afpPrivat.map(::privatAfp).let { justerAfpPrivatIInnevaerendeAarV8(it, foedselsdato) }
-                .let { filtrerBortGjeldendeAlderFoerBursdagIInnevaerendeMaaned(it, foedselsdato, PersonligSimuleringAfpPrivatResultV8::alder) },
+                .let { filtrerBortGjeldendeAlderFoerBursdagInnevaerendeMaaned(it, foedselsdato, PersonligSimuleringAfpPrivatResultV8::alder) },
             afpOffentlig = source.afpOffentlig.map(::livsvarigOffentligAfp),
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving),
             harForLiteTrygdetid = source.harForLiteTrygdetid,

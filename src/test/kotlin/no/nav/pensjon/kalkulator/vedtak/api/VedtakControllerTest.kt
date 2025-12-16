@@ -1,7 +1,13 @@
 package no.nav.pensjon.kalkulator.vedtak.api
 
-import kotlinx.coroutines.test.runTest
+import com.ninjasquad.springmockk.MockkBean
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.coEvery
+import io.mockk.every
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
@@ -10,303 +16,102 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMem
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.vedtak.*
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
-import org.springframework.test.context.bean.override.mockito.MockitoBean
-import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import java.time.LocalDate
 
-@ExtendWith(SpringExtension::class)
 @WebMvcTest(VedtakController::class)
 @Import(MockSecurityConfiguration::class)
-class VedtakControllerTest {
+class VedtakControllerTest : FunSpec() {
 
     @Autowired
     private lateinit var mvc: MockMvc
 
-    @MockitoBean
-    private lateinit var loependeVedtakService: LoependeVedtakService
+    @MockkBean
+    private lateinit var vedtakService: VedtakMedUtbetalingService
 
-    @MockitoBean
-    private lateinit var service: VedtakMedUtbetalingService
-
-    @MockitoBean
+    @MockkBean(relaxed = true)
     private lateinit var traceAid: TraceAid
 
-    @MockitoBean
+    @MockkBean
     private lateinit var pidExtractor: PidExtractor
 
-    @MockitoBean
-    private lateinit var fortroligAdresseService: FortroligAdresseService
+    @MockkBean
+    private lateinit var adresseService: FortroligAdresseService
 
-    @MockitoBean
+    @MockkBean
     private lateinit var groupMembershipService: GroupMembershipService
 
-    @MockitoBean
+    @MockkBean
     private lateinit var auditor: Auditor
 
-    @Test
-    fun `hent loepende vedtak V1`() {
-        `when`(loependeVedtakService.hentLoependeVedtak()).thenReturn(
-            LoependeVedtak(
-                alderspensjon = LoependeAlderspensjonDetaljer(
+    init {
+        beforeSpec {
+            every { traceAid.begin() } returns Unit
+            every { pidExtractor.pid() } returns pid
+            every { adresseService.adressebeskyttelseGradering(any()) } returns AdressebeskyttelseGradering.UGRADERT
+            every { groupMembershipService.innloggetBrukerHarTilgang(any()) } returns true
+            every { auditor.audit(any(), any()) } returns Unit
+        }
+
+        test("hent loepende vedtak V4") {
+            coEvery {
+                vedtakService.hentVedtakMedUtbetaling()
+            } returns VedtakSamling(
+                loependeAlderspensjon = LoependeAlderspensjon(
                     grad = 1,
                     fom = LocalDate.parse("2020-12-01"),
                     uttaksgradFom = LocalDate.of(2021, 1, 1),
                     sivilstand = Sivilstand.GIFT
                 ),
-                fremtidigLoependeVedtakAp = FremtidigAlderspensjonDetaljer(
+                fremtidigAlderspensjon = FremtidigAlderspensjon(
                     grad = 10,
                     fom = LocalDate.parse("2021-12-01"),
                     sivilstand = Sivilstand.SKILT
                 ),
-                ufoeretrygd = LoependeUfoeretrygdDetaljer(
-                    grad = 2,
-                    fom = LocalDate.parse("2021-12-01")
-                ),
-                afpPrivat = LoependeVedtakDetaljer(
-                    fom = LocalDate.parse("2022-12-01")
-                ),
-                afpOffentlig = LoependeVedtakDetaljer(
-                    fom = LocalDate.parse("2023-12-01")
-                )
+                ufoeretrygd = LoependeUfoeretrygd(grad = 2, fom = LocalDate.parse("2021-12-01")),
+                privatAfp = LoependeEntitet(fom = LocalDate.parse("2022-12-01"))
             )
-        )
 
-        val result = mvc.get(URL_V1).andReturn()
+            val result = mvc.get(URL_V4).asyncDispatch().andReturn()
 
-        assertEquals(200, result.response.status)
-        assertEquals(RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V1, result.response.contentAsString)
-    }
+            with(result.response) {
+                status shouldBe 200
+                contentAsString shouldBe RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V4
+            }
+        }
 
-    @Test
-    fun `hent loepende vedtak V1 ingen vedtak`() {
-        `when`(loependeVedtakService.hentLoependeVedtak()).thenReturn(
-            LoependeVedtak(
-                alderspensjon = null,
-                fremtidigLoependeVedtakAp = FremtidigAlderspensjonDetaljer(
-                    grad = 10,
-                    fom = LocalDate.parse("2021-12-01"),
-                    sivilstand = Sivilstand.SKILT
-                ),
+        test("hent loepende vedtak V4 ingen vedtak") {
+            coEvery {
+                vedtakService.hentVedtakMedUtbetaling()
+            } returns VedtakSamling(
+                loependeAlderspensjon = null,
+                fremtidigAlderspensjon = null,
                 ufoeretrygd = null,
-                afpPrivat = null,
-                afpOffentlig = null
+                privatAfp = null
             )
-        )
 
-        val result = mvc.get(URL_V1).andReturn()
+            val result = mvc.get(URL_V4).asyncDispatch().andReturn()
 
-        assertEquals(200, result.response.status)
-        assertEquals(RESPONSE_BODY_INGEN_VEDTAK_V1, result.response.contentAsString)
-    }
-
-    @Test
-    fun `hent loepende vedtak V2`() = runTest {
-        `when`(service.hentVedtakMedUtbetaling()).thenReturn(
-            LoependeVedtak(
-                alderspensjon = LoependeAlderspensjonDetaljer(
-                    grad = 1,
-                    fom = LocalDate.parse("2020-12-01"),
-                    sivilstand = Sivilstand.GIFT
-                ),
-                fremtidigLoependeVedtakAp = FremtidigAlderspensjonDetaljer(
-                    grad = 10,
-                    fom = LocalDate.parse("2021-12-01"),
-                    sivilstand = Sivilstand.SKILT
-                ),
-                ufoeretrygd = LoependeUfoeretrygdDetaljer(
-                    grad = 2,
-                    fom = LocalDate.parse("2021-12-01")
-                ),
-                afpPrivat = LoependeVedtakDetaljer(
-                    fom = LocalDate.parse("2022-12-01")
-                ),
-                afpOffentlig = LoependeVedtakDetaljer(
-                    fom = LocalDate.parse("2023-12-01")
-                )
-            )
-        )
-
-        val result = mvc.get(URL_V2).asyncDispatch().andReturn()
-
-        assertEquals(200, result.response.status)
-        assertEquals(RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V2, result.response.contentAsString)
-    }
-
-    @Test
-    fun `hent loepende vedtak V2 ingen vedtak`() = runTest {
-        `when`(service.hentVedtakMedUtbetaling()).thenReturn(
-            LoependeVedtak(
-                alderspensjon = null,
-                fremtidigLoependeVedtakAp = FremtidigAlderspensjonDetaljer(
-                    grad = 10,
-                    fom = LocalDate.parse("2021-12-01"),
-                    sivilstand = Sivilstand.SKILT
-                ),
-                ufoeretrygd = null,
-                afpPrivat = null,
-                afpOffentlig = null
-            )
-        )
-
-        val result = mvc.get(URL_V2).asyncDispatch().andReturn()
-
-        assertEquals(200, result.response.status)
-        assertEquals(RESPONSE_BODY_INGEN_VEDTAK_V2, result.response.contentAsString)
-    }
-
-    @Test
-    fun `hent loepende vedtak V3`() = runTest {
-        `when`(service.hentVedtakMedUtbetaling()).thenReturn(
-            LoependeVedtak(
-                alderspensjon = LoependeAlderspensjonDetaljer(
-                    grad = 1,
-                    fom = LocalDate.parse("2020-12-01"),
-                    sivilstand = Sivilstand.GIFT
-                ),
-                fremtidigLoependeVedtakAp = FremtidigAlderspensjonDetaljer(
-                    grad = 10,
-                    fom = LocalDate.parse("2021-12-01"),
-                    sivilstand = Sivilstand.SKILT
-                ),
-                ufoeretrygd = LoependeUfoeretrygdDetaljer(
-                    grad = 2,
-                    fom = LocalDate.parse("2021-12-01")
-                ),
-                afpPrivat = LoependeVedtakDetaljer(
-                    fom = LocalDate.parse("2022-12-01")
-                ),
-                afpOffentlig = LoependeVedtakDetaljer(
-                    fom = LocalDate.parse("2023-12-01")
-                )
-            )
-        )
-
-        val result = mvc.get(URL_V3).asyncDispatch().andReturn()
-
-        assertEquals(200, result.response.status)
-        assertEquals(RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V3, result.response.contentAsString)
-    }
-
-    @Test
-    fun `hent loepende vedtak V3 ingen vedtak`() = runTest {
-        `when`(service.hentVedtakMedUtbetaling()).thenReturn(
-            LoependeVedtak(
-                alderspensjon = null,
-                fremtidigLoependeVedtakAp = FremtidigAlderspensjonDetaljer(
-                    grad = 10,
-                    fom = LocalDate.parse("2021-12-01"),
-                    sivilstand = Sivilstand.SKILT
-                ),
-                ufoeretrygd = null,
-                afpPrivat = null,
-                afpOffentlig = null
-            )
-        )
-
-        val result = mvc.get(URL_V3).asyncDispatch().andReturn()
-
-        assertEquals(200, result.response.status)
-        assertEquals(RESPONSE_BODY_INGEN_VEDTAK_V3, result.response.contentAsString)
-    }
-
-
-    @Test
-    fun `hent loepende vedtak V4`() = runTest {
-        `when`(service.hentVedtakMedUtbetaling()).thenReturn(
-            LoependeVedtak(
-                alderspensjon = LoependeAlderspensjonDetaljer(
-                    grad = 1,
-                    fom = LocalDate.parse("2020-12-01"),
-                    uttaksgradFom = LocalDate.of(2021, 1, 1),
-                    sivilstand = Sivilstand.GIFT
-                ),
-                fremtidigLoependeVedtakAp = FremtidigAlderspensjonDetaljer(
-                    grad = 10,
-                    fom = LocalDate.parse("2021-12-01"),
-                    sivilstand = Sivilstand.SKILT
-                ),
-                ufoeretrygd = LoependeUfoeretrygdDetaljer(
-                    grad = 2,
-                    fom = LocalDate.parse("2021-12-01")
-                ),
-                afpPrivat = LoependeVedtakDetaljer(
-                    fom = LocalDate.parse("2022-12-01")
-                ),
-                afpOffentlig = LoependeVedtakDetaljer(
-                    fom = LocalDate.parse("2023-12-01")
-                )
-            )
-        )
-
-        val result = mvc.get(URL_V4).asyncDispatch().andReturn()
-
-        assertEquals(200, result.response.status)
-        assertEquals(RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V4, result.response.contentAsString)
-    }
-
-    @Test
-    fun `hent loepende vedtak V4 ingen vedtak`() = runTest {
-        `when`(service.hentVedtakMedUtbetaling()).thenReturn(
-            LoependeVedtak(
-                alderspensjon = null,
-                fremtidigLoependeVedtakAp = null,
-                ufoeretrygd = null,
-                afpPrivat = null,
-                afpOffentlig = null
-            )
-        )
-
-        val result = mvc.get(URL_V4).asyncDispatch().andReturn()
-
-        assertEquals(200, result.response.status)
-        assertEquals(RESPONSE_BODY_INGEN_VEDTAK_V4, result.response.contentAsString)
+            with(result.response) {
+                status shouldBe 200
+                contentAsString shouldBe RESPONSE_BODY_INGEN_VEDTAK_V4
+            }
+        }
     }
 
     private companion object {
-        private const val URL_V1 = "/api/v1/vedtak/loepende-vedtak"
-        private const val URL_V2 = "/api/v2/vedtak/loepende-vedtak"
-        private const val URL_V3 = "/api/v3/vedtak/loepende-vedtak"
         private const val URL_V4 = "/api/v4/vedtak/loepende-vedtak"
-
-        @Language("json")
-        private const val RESPONSE_BODY_INGEN_VEDTAK_V1 =
-            """{"alderspensjon":{"loepende":false,"grad":0},"ufoeretrygd":{"loepende":false,"grad":0},"afpPrivat":{"loepende":false,"grad":0},"afpOffentlig":{"loepende":false,"grad":0}}"""
-
-        @Language("json")
-        private const val RESPONSE_BODY_INGEN_VEDTAK_V2 =
-            """{"harFremtidigLoependeVedtak":true,"ufoeretrygd":{"grad":0}}"""
-
-        @Language("json")
-        private const val RESPONSE_BODY_INGEN_VEDTAK_V3 =
-            """{"harFremtidigLoependeVedtak":true,"ufoeretrygd":{"grad":0}}"""
 
         @Language("json")
         private const val RESPONSE_BODY_INGEN_VEDTAK_V4 =
             """{"harLoependeVedtak":false,"ufoeretrygd":{"grad":0}}"""
 
         @Language("json")
-        private const val RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V1 =
-            """{"alderspensjon":{"loepende":true,"grad":1,"fom":"2020-12-01"},"ufoeretrygd":{"loepende":true,"grad":2,"fom":"2021-12-01"},"afpPrivat":{"loepende":true,"grad":100,"fom":"2022-12-01"},"afpOffentlig":{"loepende":true,"grad":100,"fom":"2023-12-01"}}"""
-
-        @Language("json")
-        private const val RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V2 =
-            """{"alderspensjon":{"grad":1,"fom":"2020-12-01"},"harFremtidigLoependeVedtak":true,"ufoeretrygd":{"grad":2},"afpPrivat":{"fom":"2022-12-01"},"afpOffentlig":{"fom":"2023-12-01"}}"""
-
-        @Language("json")
-        private const val RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V3 =
-            """{"alderspensjon":{"grad":1,"fom":"2020-12-01","sivilstand":"GIFT"},"harFremtidigLoependeVedtak":true,"ufoeretrygd":{"grad":2},"afpPrivat":{"fom":"2022-12-01"},"afpOffentlig":{"fom":"2023-12-01"}}"""
-
-        @Language("json")
         private const val RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V4 =
-            """{"harLoependeVedtak":false,"alderspensjon":{"grad":1,"fom":"2020-12-01","uttaksgradFom":"2021-01-01","sivilstand":"GIFT"},"fremtidigAlderspensjon":{"grad":10,"fom":"2021-12-01"},"ufoeretrygd":{"grad":2},"afpPrivat":{"fom":"2022-12-01"},"afpOffentlig":{"fom":"2023-12-01"}}"""
+            """{"harLoependeVedtak":true,"alderspensjon":{"grad":1,"fom":"2020-12-01","uttaksgradFom":"2021-01-01","sivilstand":"GIFT"},"fremtidigAlderspensjon":{"grad":10,"fom":"2021-12-01"},"ufoeretrygd":{"grad":2},"afpPrivat":{"fom":"2022-12-01"}}"""
     }
 }

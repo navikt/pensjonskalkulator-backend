@@ -8,7 +8,7 @@ import java.time.LocalDate
 
 /**
  * Specifies impersonal parameters for simulering.
- * 'Impersonal' means parameters that do not require person ID to be known.
+ * 'Impersonal' means parameters that are obtained without knowing the person's identity.
  */
 data class ImpersonalSimuleringSpec(
     val simuleringType: SimuleringType,
@@ -20,13 +20,16 @@ data class ImpersonalSimuleringSpec(
     val utenlandsopphold: Utenlandsopphold,
     val afpInntektMaanedFoerUttak: Boolean? = null,
     val afpOrdning: AfpOrdningType? = null,
+    val innvilgetLivsvarigOffentligAfp: InnvilgetLivsvarigOffentligAfpSpec? = null,
 
     // For 'anonym simulering' only:
     val foedselAar: Int? = null,
     val inntektOver1GAntallAar: Int? = 0
 )
 
-// Ektefelle/partner/samboer
+/**
+ * Ektefelle/partner/samboer.
+ */
 data class Eps (
     val harInntektOver2G: Boolean,
     val harPensjon: Boolean
@@ -42,4 +45,13 @@ data class Opphold (
     val tom: LocalDate?,
     val land: Land,
     val arbeidet: Boolean
+)
+
+/**
+ * Spesifiserer egenskapene til en innvilget livsvarig AFP i offentlig sektor.
+ */
+data class InnvilgetLivsvarigOffentligAfpSpec(
+    val aarligBruttoBeloep: Double,
+    val uttakFom: LocalDate,
+    val sistRegulertGrunnbeloep: Int? = null
 )

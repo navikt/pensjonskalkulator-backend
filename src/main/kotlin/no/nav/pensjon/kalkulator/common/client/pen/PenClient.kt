@@ -31,7 +31,7 @@ abstract class PenClient(
 
     override fun service(): EgressService = service
 
-    protected fun <T> doGet(
+    protected fun <T: Any> doGet(
         elementTypeRef: ParameterizedTypeReference<T>,
         path: String,
         pid: Pid
@@ -55,7 +55,7 @@ abstract class PenClient(
         }
     }
 
-    protected suspend fun <T> doGetAsync(
+    protected suspend fun <T: Any> doGetAsync(
         elementTypeRef: ParameterizedTypeReference<T>,
         path: String,
         pid: Pid
@@ -79,7 +79,7 @@ abstract class PenClient(
         }
     }
 
-    protected fun <Request : Any, Response> doPost(
+    protected fun <Request : Any, Response: Any> doPost(
         path: String,
         requestBody: Request,
         requestClass: Class<Request>,

@@ -12,7 +12,7 @@ import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.LocalDate
 
 @WebMvcTest(TjenestepensjonController::class)
 @Import(MockSecurityConfiguration::class)
@@ -62,7 +63,13 @@ class TjenestepensjonControllerTest {
 
     @Test
     fun hentMedlemskapITjenestepensjonsordninger() {
-        `when`(tjenestepensjonService.hentMedlemskapITjenestepensjonsordninger()).thenReturn(listOf("Maritim pensjonskasse", "Statens pensjonskasse", "Kommunal Landspensjonskasse"))
+        `when`(tjenestepensjonService.hentMedlemskapITjenestepensjonsordninger()).thenReturn(
+            listOf(
+                "Maritim pensjonskasse",
+                "Statens pensjonskasse",
+                "Kommunal Landspensjonskasse"
+            )
+        )
 
         mvc.perform(
             get(URL_V1)
@@ -76,7 +83,14 @@ class TjenestepensjonControllerTest {
     @Test
     fun hentAfpOffentligLivsvarigDetaljer() {
         `when`(tjenestepensjonService.hentAfpOffentligLivsvarigDetaljer())
-            .thenReturn(AfpOffentligLivsvarigResult(afpStatus = true, beloep = 15000))
+            .thenReturn(
+                AfpOffentligLivsvarigResult(
+                    afpStatus = true,
+                    virkningFom = LocalDate.of(2025, 1, 1),
+                    maanedligBeloep = 15000,
+                    sistBenyttetGrunnbeloep = 123000
+                )
+            )
 
         mvc.perform(
             get(URL_AFP_OFFENTLIG_LIVSVARIG)
@@ -106,7 +120,7 @@ class TjenestepensjonControllerTest {
         @Language("json")
         private const val RESPONSE_BODY_AFP_OFFENTLIG_LIVSVARIG = """{
         "afpStatus": true,
-        "beloep": 15000
+        "maanedligBeloep": 15000
     }"""
     }
 }

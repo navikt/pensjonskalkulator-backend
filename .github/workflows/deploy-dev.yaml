@@ -23,7 +23,7 @@ jobs:
       security-events: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: 'sandbox'
       - name: Initialize CodeQL
@@ -48,8 +48,6 @@ jobs:
         with:
           dockerfile: .docker/Dockerfile
           team: pensjonskalkulator
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           image_suffix: sandbox
     outputs:
       image: ${{ steps.image-creation.outputs.image }}
@@ -61,7 +59,7 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Deploy
         uses: nais/deploy/actions/deploy@v2
         env:

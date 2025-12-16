@@ -18,20 +18,26 @@ class TjenestepensjonService(
 
     fun harTjenestepensjonsforhold() = harForhold(tjenestepensjonClient.tjenestepensjon(pidGetter.pid()))
 
-    fun hentMedlemskapITjenestepensjonsordninger() = tjenestepensjonClient.tjenestepensjonsforhold(pidGetter.pid()).tpOrdninger
+    fun hentMedlemskapITjenestepensjonsordninger() =
+        tjenestepensjonClient.tjenestepensjonsforhold(pidGetter.pid()).tpOrdninger
 
     fun hentAfpOffentligLivsvarigDetaljer(): AfpOffentligLivsvarigResult {
         val pid = pidGetter.pid()
         val tpNumre = tjenestepensjonClient.afpOffentligLivsvarigTpNummerListe(pid)
 
         if (tpNumre.isEmpty()) {
-            log.info { "Bruker har ingen AFP offentlig livsvarig ordninger" }
-            throw EgressException("Bruker har ingen AFP offentlig livsvarig ordninger")
+            log.info { "Bruker har ingen livsvarig offentlig AFP-ordning" }
+            return AfpOffentligLivsvarigResult(
+                afpStatus = null,
+                virkningFom = null,
+                maanedligBeloep = null,
+                sistBenyttetGrunnbeloep = null
+            )
         }
 
         if (tpNumre.size > 1) {
-            log.error { "Bruker har flere AFP offentlig livsvarig ordninger: $tpNumre" }
-            throw EgressException("Bruker har flere AFP offentlig livsvarig ordninger (${tpNumre.size}). Dette er ikke støttet.")
+            log.error { "Bruker har flere ordninger for livsvarig offentlig AFP: $tpNumre" }
+            throw EgressException("Bruker har flere ordninger for livsvarig offentlig AFP (${tpNumre.size}). Dette er ikke støttet.")
         }
 
         val tpNr = tpNumre.first()

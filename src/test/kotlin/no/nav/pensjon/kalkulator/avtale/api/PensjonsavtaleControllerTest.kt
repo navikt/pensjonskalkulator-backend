@@ -1,23 +1,30 @@
 package no.nav.pensjon.kalkulator.avtale.api
 
-import no.nav.pensjon.kalkulator.avtale.*
-import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleServiceTest.Companion.avtaleSpecMedTidsbegrensetInntekt
+import com.ninjasquad.springmockk.MockkBean
+import io.kotest.core.spec.style.ShouldSpec
+import io.mockk.every
+import no.nav.pensjon.kalkulator.avtale.InntektSpec
+import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleService
+import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
+import no.nav.pensjon.kalkulator.avtale.UttaksperiodeSpec
+import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtaler
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
+import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Test
-import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
@@ -25,59 +32,66 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(PensjonsavtaleController::class)
 @Import(MockSecurityConfiguration::class)
-class PensjonsavtaleControllerTest {
+class PensjonsavtaleControllerTest : ShouldSpec() {
 
     @Autowired
     private lateinit var mvc: MockMvc
 
-    @MockitoBean
+    @MockkBean
     private lateinit var avtaleService: PensjonsavtaleService
 
-    @MockitoBean
+    @MockkBean(relaxed = true)
     private lateinit var traceAid: TraceAid
 
-    @MockitoBean
+    @MockkBean
     private lateinit var pidExtractor: PidExtractor
 
-    @MockitoBean
-    private lateinit var fortroligAdresseService: FortroligAdresseService
+    @MockkBean
+    private lateinit var adresseService: FortroligAdresseService
 
-    @MockitoBean
+    @MockkBean
     private lateinit var groupMembershipService: GroupMembershipService
 
-    @MockitoBean
+    @MockkBean
     private lateinit var auditor: Auditor
 
-    @Test
-    fun fetchAvtalerV2() {
-        `when`(avtaleService.fetchAvtaler(avtaleSpecMedTidsbegrensetInntekt())).thenReturn(pensjonsavtaler())
+    init {
+        beforeSpec {
+            every { traceAid.begin() } returns Unit
+            every { pidExtractor.pid() } returns pid
+            every { adresseService.adressebeskyttelseGradering(any()) } returns AdressebeskyttelseGradering.UGRADERT
+            every { groupMembershipService.innloggetBrukerHarTilgang(any()) } returns true
+            every { auditor.audit(any(), any()) } returns Unit
+        }
 
-        mvc.perform(
-            post(URL_V2)
-                .with(csrf())
-                .content(REQUEST_BODY_V2)
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY))
-    }
+        should("hente avtaler V2") {
+            every { avtaleService.fetchAvtaler(avtaleSpecMedTidsbegrensetInntekt()) } returns pensjonsavtaler()
 
-    @Test
-    fun fetchAvtalerV3() {
-        `when`(avtaleService.fetchAvtaler(avtaleSpecMedTidsbegrensetInntekt())).thenReturn(pensjonsavtaler())
+            mvc.perform(
+                post(URL_V2)
+                    .with(csrf())
+                    .content(REQUEST_BODY_V2)
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(RESPONSE_BODY))
+        }
 
-        mvc.perform(
-            post(URL_V3)
-                .with(csrf())
-                .content(REQUEST_BODY_V3)
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY))
+        should("hente avtaler V3") {
+            every { avtaleService.fetchAvtaler(avtaleSpecMedTidsbegrensetInntekt()) } returns pensjonsavtaler()
+
+            mvc.perform(
+                post(URL_V3)
+                    .with(csrf())
+                    .content(REQUEST_BODY_V3)
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(RESPONSE_BODY))
+        }
     }
 
     private companion object {
-
         private const val URL_V2 = "/api/v2/pensjonsavtaler"
         private const val URL_V3 = "/api/v3/pensjonsavtaler"
 
@@ -179,5 +193,34 @@ class PensjonsavtaleControllerTest {
 		"heltUtilgjengelig": true
 	}]
 }"""
+
+        private fun avtaleSpecMedTidsbegrensetInntekt() =
+            PensjonsavtaleSpec(
+                aarligInntektFoerUttak = 456000,
+                uttaksperioder = listOf(gradertUttak(), heltUttak()),
+                harEpsPensjon = true,
+                harEpsPensjonsgivendeInntektOver2G = true,
+                sivilstand = Sivilstand.UGIFT
+            )
+
+        private fun gradertUttak() =
+            UttaksperiodeSpec(
+                startAlder = Alder(aar = 67, maaneder = 1),
+                grad = Uttaksgrad.AATTI_PROSENT,
+                aarligInntekt = InntektSpec(
+                    aarligBeloep = 123000,
+                    tomAlder = Alder(aar = 67, maaneder = 1)
+                )
+            )
+
+        private fun heltUttak() =
+            UttaksperiodeSpec(
+                startAlder = Alder(aar = 70, maaneder = 1),
+                grad = Uttaksgrad.HUNDRE_PROSENT,
+                aarligInntekt = InntektSpec(
+                    aarligBeloep = 45000,
+                    tomAlder = Alder(aar = 69, maaneder = 1)
+                )
+            )
     }
 }

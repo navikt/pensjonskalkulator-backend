@@ -1,28 +1,18 @@
 package no.nav.pensjon.kalkulator.tech.toggle
 
-import no.nav.pensjon.kalkulator.person.*
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.pensjon.kalkulator.tech.toggle.client.FeatureToggleClient
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@ExtendWith(SpringExtension::class)
-class FeatureToggleServiceTest {
+class FeatureToggleServiceTest : ShouldSpec({
 
-    @Mock
-    private lateinit var client: FeatureToggleClient
-
-    @Test
-    fun isEnabled() {
-        `when`(client.isEnabled(FEATURE_NAME)).thenReturn(true)
-        val enabled = FeatureToggleService(client).isEnabled(FEATURE_NAME)
-        assertTrue(enabled)
+    should("return 'true' if feature is enabled") {
+        FeatureToggleService(
+            client = mockk<FeatureToggleClient>().apply {
+                every { isEnabled(featureName = "feature1") } returns true
+            }
+        ).isEnabled("feature1") shouldBe true
     }
-
-    private companion object {
-        private const val FEATURE_NAME = "feature1"
-    }
-}
+})

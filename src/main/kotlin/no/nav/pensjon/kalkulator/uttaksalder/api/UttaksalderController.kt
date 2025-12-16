@@ -11,14 +11,14 @@ import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
-import no.nav.pensjon.kalkulator.uttaksalder.api.dto.AlderDto
-import no.nav.pensjon.kalkulator.uttaksalder.api.dto.IngressUttaksalderSpecForHeltUttakV1
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderResultV2
+import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderResultV3
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderSpecV2
-import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderMapperV1.fromIngressSpecForHeltUttakV1
-import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderMapperV1.toDto
+import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderSpecV3
 import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderResultMapperV2.resultV2
+import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderResultMapperV3.resultV3
 import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderSpecMapperV2.fromDtoV2
+import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderSpecMapperV3.fromDtoV3
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -33,11 +33,10 @@ class UttaksalderController(
 
     private val log = KotlinLogging.logger {}
 
-    @PostMapping("v1/tidligste-hel-uttaksalder")
+    @PostMapping("v3/tidligste-hel-uttaksalder")
     @Operation(
-        summary = "Første mulige uttaksalder ved helt uttak",
-        description = "Finn første mulige uttaksalder for innlogget bruker ved helt (100 %) uttak." +
-                " Feltet 'harEps' brukes til å angi om brukeren har ektefelle/partner/samboer eller ei",
+        summary = "Tidligst mulige uttaksalder ved helt uttak",
+        description = "Finn tidligst mulige uttaksalder for innlogget bruker ved helt (100 %) uttak.",
     )
     @ApiResponses(
         value = [
@@ -51,20 +50,19 @@ class UttaksalderController(
             ),
         ]
     )
-    fun finnTidligsteHelUttaksalderV1(@RequestBody spec: IngressUttaksalderSpecForHeltUttakV1): AlderDto? {
+    fun finnTidligsteHelUttaksalderV3(@RequestBody spec: UttaksalderSpecV3): UttaksalderResultV3? {
         traceAid.begin()
-        val version = "V1"
+        val version = "V3"
         log.debug { "Request for hel uttaksalder-søk $version: $spec" }
 
         return try {
-            toDto(
+            resultV3(
                 timed(
-                    service::finnTidligsteUttaksalder,
-                    fromIngressSpecForHeltUttakV1(spec),
-                    "finnTidligsteHelUttaksalderV1"
+                    function = service::finnTidligsteUttaksalder,
+                    argument = fromDtoV3(spec),
+                    functionName = "TMU $version"
                 )
-            )
-                .also { log.debug { "Hel uttaksalder-søk respons $version: $it" } }
+            ).also { log.debug { "Hel uttaksalder-søk respons $version: $it" } }
         } catch (e: EgressException) {
             handleError(e, version)
         } catch (e: BadRequestException) {

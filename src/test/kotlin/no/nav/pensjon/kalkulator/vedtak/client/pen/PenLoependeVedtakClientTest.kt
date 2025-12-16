@@ -57,14 +57,13 @@ class PenLoependeVedtakClientTest : FunSpec({
             val response = client(context = it).hentLoependeVedtak(pid)
 
             with(response) {
-                with(alderspensjon!!) {
+                with(loependeAlderspensjon!!) {
                     grad shouldBe 100
                     fom.toString() shouldBe "2025-10-01"
                     sivilstand shouldBe Sivilstand.UGIFT
                 }
                 ufoeretrygd shouldBe null
-                afpPrivat shouldBe null
-                afpOffentlig shouldBe null
+                privatAfp shouldBe null
             }
         }
     }
@@ -76,13 +75,12 @@ class PenLoependeVedtakClientTest : FunSpec({
             val response = client(context = it).hentLoependeVedtak(pid)
 
             with(response) {
-                alderspensjon shouldBe null
+                loependeAlderspensjon shouldBe null
                 with(ufoeretrygd!!) {
                     grad shouldBe 100
                     fom.toString() shouldBe "2022-07-01"
                 }
-                afpPrivat shouldBe null
-                afpOffentlig shouldBe null
+                privatAfp shouldBe null
             }
         }
     }
@@ -94,7 +92,7 @@ class PenLoependeVedtakClientTest : FunSpec({
             val response = client(context = it).hentLoependeVedtak(pid)
 
             with(response) {
-                with(alderspensjon!!) {
+                with(loependeAlderspensjon!!) {
                     grad shouldBe 100
                     fom.toString() shouldBe "2025-10-01"
                     sivilstand shouldBe Sivilstand.GIFT
@@ -103,8 +101,7 @@ class PenLoependeVedtakClientTest : FunSpec({
                     grad shouldBe 100
                     fom.toString() shouldBe "2022-07-01"
                 }
-                afpPrivat shouldBe null
-                afpOffentlig shouldBe null
+                privatAfp shouldBe null
             }
         }
     }
@@ -116,7 +113,7 @@ class PenLoependeVedtakClientTest : FunSpec({
             val response = client(context = it).hentLoependeVedtak(pid)
 
             with(response) {
-                with(alderspensjon!!) {
+                with(loependeAlderspensjon!!) {
                     grad shouldBe 100
                     fom.toString() shouldBe "2025-10-01"
                     sivilstand shouldBe Sivilstand.SKILT
@@ -125,8 +122,7 @@ class PenLoependeVedtakClientTest : FunSpec({
                     grad shouldBe 100
                     fom.toString() shouldBe "2022-07-01"
                 }
-                afpPrivat?.fom.toString() shouldBe "2022-07-01"
-                afpOffentlig shouldBe null
+                privatAfp?.fom.toString() shouldBe "2022-07-01"
             }
         }
     }
@@ -138,7 +134,7 @@ class PenLoependeVedtakClientTest : FunSpec({
             val response = client(context = it).hentLoependeVedtak(pid)
 
             with(response) {
-                with(alderspensjon!!) {
+                with(loependeAlderspensjon!!) {
                     grad shouldBe 100
                     fom.toString() shouldBe "2025-10-01"
                     sivilstand shouldBe Sivilstand.ENKE_ELLER_ENKEMANN
@@ -147,8 +143,7 @@ class PenLoependeVedtakClientTest : FunSpec({
                     grad shouldBe 100
                     fom.toString() shouldBe "2022-07-01"
                 }
-                afpPrivat?.fom.toString() shouldBe "2022-07-01"
-                afpOffentlig shouldBe null
+                privatAfp?.fom.toString() shouldBe "2022-07-01"
             }
         }
     }
@@ -160,10 +155,9 @@ class PenLoependeVedtakClientTest : FunSpec({
             val response = client(context = it).hentLoependeVedtak(pid)
 
             with(response) {
-                alderspensjon shouldBe null
+                loependeAlderspensjon shouldBe null
                 ufoeretrygd shouldBe null
-                afpPrivat shouldBe null
-                afpOffentlig shouldBe null
+                privatAfp shouldBe null
             }
         }
     }
