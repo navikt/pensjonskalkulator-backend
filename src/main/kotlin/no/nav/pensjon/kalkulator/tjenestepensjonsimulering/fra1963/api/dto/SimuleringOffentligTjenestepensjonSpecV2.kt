@@ -39,7 +39,7 @@ data class SimuleringOffentligTjenestepensjonInntektV2(
     @field:NotNull val sluttAlder: SimuleringOffentligTjenestepensjonAlderV2
 )
 
-data class SimuleringOffentligTjenestepensjonAlderV2(@field:NotNull val aar: Int, @field:NotNull val maaneder: Int) {
+data class SimuleringOffentligTjenestepensjonAlderV2(@field:NotNull val aar: Int,@field:NotNull val maaneder: Int) {
     init {
         require(aar in 0..200) { "0 <= aar <= 200" }
         require(maaneder in 0..11) { "0 <= maaneder <= 11" }
