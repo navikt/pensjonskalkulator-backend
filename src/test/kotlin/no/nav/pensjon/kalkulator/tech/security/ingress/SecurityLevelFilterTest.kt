@@ -1,165 +1,186 @@
 package no.nav.pensjon.kalkulator.tech.security.ingress
 
+import io.kotest.core.spec.style.ShouldSpec
+import io.mockk.Called
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import no.nav.pensjon.kalkulator.mock.MockAuthentication
-import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonTarget
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentertRolle
 import no.nav.pensjon.kalkulator.tech.security.egress.EnrichedAuthentication
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito.never
-import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
 import org.springframework.http.MediaType
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
-import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.io.PrintWriter
 
-@ExtendWith(SpringExtension::class)
-class SecurityLevelFilterTest {
+class SecurityLevelFilterTest : ShouldSpec({
 
-    @Mock
-    private lateinit var request: HttpServletRequest
+    context("strengt fortrolig adresse and insufficient security level") {
+        should("break the filter chain") {
+            arrangeSecurity(securityLevel = "idporten-loa-substantial", rolle = RepresentertRolle.SELV) // insufficient
+            val writer = arrangeWriter()
+            val response = arrangeForbiddenResponse(writer)
+            val chain = mockk<FilterChain>()
 
-    @Mock
-    private lateinit var response: HttpServletResponse
+            SecurityLevelFilter(
+                adresseService = arrangeAdressebeskyttelse(gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG),
+                pidGetter = mockk(relaxed = true)
+            ).doFilter(request = arrangeRequest(), response, chain)
 
-    @Mock
-    private lateinit var chain: FilterChain
-
-    @Mock
-    private lateinit var writer: PrintWriter
-
-    @Mock
-    private lateinit var adresseService: FortroligAdresseService
-
-    @Mock
-    private lateinit var pidGetter: PidGetter
-
-    @Test
-    fun `when strengt fortrolig adresse and insufficient security level then doFilter breaks filter chain`() {
-        arrangeAdresse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
-        arrangeSecurityContext("idporten-loa-substantial", RepresentertRolle.SELV) // insufficient
-        arrangeRequestAndResponse()
-
-        SecurityLevelFilter(adresseService, pidGetter).doFilter(request, response, chain)
-
-        assertFilterChainBroken()
-        verify(response, times(1)).status = 403
-        verify(response, times(1)).contentType = MediaType.APPLICATION_JSON_VALUE
-        verify(writer, times(1)).append("""{ "reason": "INSUFFICIENT_LEVEL_OF_ASSURANCE" }""")
-    }
-
-    @Test
-    fun `when strengt fortrolig adresse and high security level then doFilter continues filter chain`() {
-        arrangeAdresse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
-        arrangeSecurityContext("idporten-loa-high", RepresentertRolle.SELV)
-        arrangeRequest()
-
-        SecurityLevelFilter(adresseService, pidGetter).doFilter(request, response, chain)
-
-        assertFilterChainContinued()
-    }
-
-    @Test
-    fun `when strengt fortrolig adresse and security level 4 then doFilter continues filter chain`() {
-        arrangeAdresse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
-        arrangeSecurityContext("Level4", RepresentertRolle.FULLMAKT_GIVER)
-        arrangeRequest()
-
-        SecurityLevelFilter(adresseService, pidGetter).doFilter(request, response, chain)
-
-        assertFilterChainContinued()
-    }
-
-    @Test
-    fun `when strengt fortrolig adresse and security level 3 then doFilter breaks filter chain`() {
-        arrangeAdresse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
-        arrangeSecurityContext("Level3", RepresentertRolle.FULLMAKT_GIVER)
-        arrangeRequestAndResponse()
-
-        SecurityLevelFilter(adresseService, pidGetter).doFilter(request, response, chain)
-
-        assertFilterChainBroken()
-        verify(response, times(1)).status = 403
-        verify(response, times(1)).contentType = MediaType.APPLICATION_JSON_VALUE
-        verify(writer, times(1)).append("""{ "reason": "INSUFFICIENT_LEVEL_OF_ASSURANCE" }""")
-    }
-
-    @Test
-    fun `when fortrolig adresse and substantial security level then doFilter continues filter chain`() {
-        arrangeAdresse(AdressebeskyttelseGradering.FORTROLIG)
-        arrangeSecurityContext("idporten-loa-substantial", RepresentertRolle.SELV)
-        arrangeRequest()
-
-        SecurityLevelFilter(adresseService, pidGetter).doFilter(request, response, chain)
-
-        assertFilterChainContinued()
-    }
-
-    @Test
-    fun `when veileder innlogget then doFilter continues filter chain`() {
-        arrangeSecurityContext("", RepresentertRolle.UNDER_VEILEDNING)
-        arrangeRequest()
-
-        SecurityLevelFilter(adresseService, pidGetter).doFilter(request, response, chain)
-        assertFilterChainContinued()
-    }
-
-    @Test
-    fun `if 'feature' request then access check is skipped and filter chain continues`() {
-        arrangeRequest("/api/feature/foo")
-        arrangeAdresse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
-        arrangeSecurityContext("Level3", RepresentertRolle.SELV)
-
-        SecurityLevelFilter(adresseService, pidGetter).doFilter(request, response, chain)
-
-        verify(response, never()).status = 403 // i.e. access check is skipped
-        assertFilterChainContinued()
-    }
-
-    private fun arrangeAdresse(gradering: AdressebeskyttelseGradering) {
-        `when`(adresseService.adressebeskyttelseGradering(pid)).thenReturn(gradering)
-        `when`(pidGetter.pid()).thenReturn(pid)
-    }
-
-    private fun arrangeRequest(uri: String = "/api/foo") {
-        `when`(request.requestURI).thenReturn(uri)
-    }
-
-    private fun arrangeRequestAndResponse() {
-        arrangeRequest()
-        `when`(response.writer).thenReturn(writer)
-    }
-
-    private fun assertFilterChainBroken() {
-        verify(chain, never()).doFilter(request, response)
-    }
-
-    private fun assertFilterChainContinued() {
-        verify(chain, times(1)).doFilter(request, response)
-    }
-
-    private companion object {
-        private fun arrangeSecurityContext(securityLevel: String, rolle: RepresentertRolle) {
-            SecurityContextHolder.setContext(
-                SecurityContextImpl(
-                    EnrichedAuthentication(
-                        initialAuth = MockAuthentication("acr", securityLevel),
-                        egressTokenSuppliersByService = EgressTokenSuppliersByService(emptyMap()),
-                        target = RepresentasjonTarget(null, rolle)
-                    )
-                )
-            )
+            verify { chain wasNot Called }
+            verify(exactly = 1) { response.status = 403 }
+            verify(exactly = 1) { response.contentType = MediaType.APPLICATION_JSON_VALUE }
+            verify(exactly = 1) { writer.append("""{ "reason": "INSUFFICIENT_LEVEL_OF_ASSURANCE" }""") }
         }
     }
+
+    context("strengt fortrolig adresse and high security level") {
+        should("continue the filter chain") {
+            arrangeSecurity(securityLevel = "idporten-loa-high", rolle = RepresentertRolle.SELV)
+            val request = arrangeRequest()
+            val response = arrangeResponse()
+            val chain = arrangeFilterChain(request, response)
+
+            SecurityLevelFilter(
+                adresseService = arrangeAdressebeskyttelse(gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG),
+                pidGetter = mockk()
+            ).doFilter(request, response, chain)
+
+            verify(exactly = 1) { chain.doFilter(request, response) }
+        }
+    }
+
+    context("strengt fortrolig adresse and security level 4") {
+        should("continue the filter chain") {
+            arrangeSecurity(securityLevel = "Level4", rolle = RepresentertRolle.FULLMAKT_GIVER)
+            val request = arrangeRequest()
+            val response = arrangeResponse()
+            val chain = arrangeFilterChain(request, response)
+
+            SecurityLevelFilter(
+                adresseService = arrangeAdressebeskyttelse(gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG),
+                pidGetter = mockk()
+            ).doFilter(request, response, chain)
+
+            verify(exactly = 1) { chain.doFilter(request, response) }
+        }
+    }
+
+    context("strengt fortrolig adresse and security level 3") {
+        should("break the filter chain") {
+            arrangeSecurity(securityLevel = "Level3", rolle = RepresentertRolle.FULLMAKT_GIVER)
+            val writer = arrangeWriter()
+            val response = arrangeForbiddenResponse(writer)
+            val chain = mockk<FilterChain>()
+
+            SecurityLevelFilter(
+                adresseService = arrangeAdressebeskyttelse(gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG),
+                pidGetter = mockk(relaxed = true)
+            ).doFilter(request = arrangeRequest(), response, chain)
+
+            verify { chain wasNot Called }
+            verify(exactly = 1) { response.status = 403 }
+            verify(exactly = 1) { response.contentType = MediaType.APPLICATION_JSON_VALUE }
+            verify(exactly = 1) { writer.append("""{ "reason": "INSUFFICIENT_LEVEL_OF_ASSURANCE" }""") }
+        }
+    }
+
+    context("fortrolig adresse and substantial security level") {
+        should("continue the filter chain") {
+            arrangeSecurity(securityLevel = "idporten-loa-substantial", rolle = RepresentertRolle.SELV)
+            val request = arrangeRequest()
+            val response = arrangeResponse()
+            val chain = arrangeFilterChain(request, response)
+
+            SecurityLevelFilter(
+                adresseService = arrangeAdressebeskyttelse(gradering = AdressebeskyttelseGradering.FORTROLIG),
+                pidGetter = mockk(relaxed = true)
+            ).doFilter(request, response, chain)
+
+            verify(exactly = 1) { chain.doFilter(request, response) }
+        }
+    }
+
+    context("veileder innlogget") {
+        should("continue the filter chain") {
+            arrangeSecurity(securityLevel = "", rolle = RepresentertRolle.UNDER_VEILEDNING)
+            val request = arrangeRequest()
+            val response = arrangeResponse()
+            val chain = arrangeFilterChain(request, response)
+
+            SecurityLevelFilter(
+                adresseService = arrangeAdressebeskyttelse(gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG),
+                pidGetter = mockk()
+            ).doFilter(request, response, chain)
+
+            verify(exactly = 1) { chain.doFilter(request, response) }
+        }
+    }
+
+    context("'feature' request") {
+        should("skip the access check and continue the filter chain") {
+            arrangeSecurity(securityLevel = "Level3", rolle = RepresentertRolle.SELV)
+            val request = arrangeRequest("/api/feature/foo")
+            val response = arrangeResponse()
+            val chain = arrangeFilterChain(request, response)
+
+            SecurityLevelFilter(
+                adresseService = arrangeAdressebeskyttelse(gradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG),
+                pidGetter = mockk()
+            ).doFilter(request, response, chain)
+
+            verify(exactly = 0) { response.status = 403 } // i.e., access check is skipped
+            verify(exactly = 1) { chain.doFilter(request, response) }
+        }
+    }
+})
+
+private fun arrangeFilterChain(request: HttpServletRequest, response: HttpServletResponse): FilterChain =
+    mockk<FilterChain>().apply {
+        every { doFilter(request, response) } returns Unit
+    }
+
+private fun arrangeAdressebeskyttelse(gradering: AdressebeskyttelseGradering): FortroligAdresseService =
+    mockk<FortroligAdresseService>().apply {
+        every { adressebeskyttelseGradering(any()) } returns gradering
+    }
+
+private fun arrangeRequest(uri: String = "/api/foo"): HttpServletRequest =
+    mockk<HttpServletRequest>().apply {
+        every { requestURI } returns uri
+    }
+
+private fun arrangeResponse(printWriter: PrintWriter = mockk()): HttpServletResponse =
+    mockk<HttpServletResponse>().apply {
+        every { writer } returns printWriter
+    }
+
+private fun arrangeForbiddenResponse(printWriter: PrintWriter): HttpServletResponse =
+    arrangeResponse(printWriter).apply {
+        every { status = 403 } returns Unit
+        every { contentType = "application/json" } returns Unit
+    }
+
+private fun arrangeWriter(): PrintWriter =
+    mockk<PrintWriter>().apply {
+        every { append("""{ "reason": "INSUFFICIENT_LEVEL_OF_ASSURANCE" }""") } returns this
+    }
+
+private fun arrangeSecurity(securityLevel: String, rolle: RepresentertRolle) {
+    SecurityContextHolder.setContext(
+        SecurityContextImpl(
+            EnrichedAuthentication(
+                initialAuth = MockAuthentication(claimKey = "acr", claimValue = securityLevel),
+                egressTokenSuppliersByService = EgressTokenSuppliersByService(emptyMap()),
+                target = RepresentasjonTarget(pid = null, rolle)
+            )
+        )
+    )
 }

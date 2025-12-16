@@ -3,12 +3,17 @@ package no.nav.pensjon.kalkulator.avtale.api
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.ShouldSpec
 import io.mockk.every
+import no.nav.pensjon.kalkulator.avtale.InntektSpec
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleService
-import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleServiceTest.Companion.avtaleSpecMedTidsbegrensetInntekt
+import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
+import no.nav.pensjon.kalkulator.avtale.UttaksperiodeSpec
+import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtaler
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
+import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
@@ -16,7 +21,7 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMem
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.intellij.lang.annotations.Language
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
@@ -188,5 +193,34 @@ class PensjonsavtaleControllerTest : ShouldSpec() {
 		"heltUtilgjengelig": true
 	}]
 }"""
+
+        private fun avtaleSpecMedTidsbegrensetInntekt() =
+            PensjonsavtaleSpec(
+                aarligInntektFoerUttak = 456000,
+                uttaksperioder = listOf(gradertUttak(), heltUttak()),
+                harEpsPensjon = true,
+                harEpsPensjonsgivendeInntektOver2G = true,
+                sivilstand = Sivilstand.UGIFT
+            )
+
+        private fun gradertUttak() =
+            UttaksperiodeSpec(
+                startAlder = Alder(aar = 67, maaneder = 1),
+                grad = Uttaksgrad.AATTI_PROSENT,
+                aarligInntekt = InntektSpec(
+                    aarligBeloep = 123000,
+                    tomAlder = Alder(aar = 67, maaneder = 1)
+                )
+            )
+
+        private fun heltUttak() =
+            UttaksperiodeSpec(
+                startAlder = Alder(aar = 70, maaneder = 1),
+                grad = Uttaksgrad.HUNDRE_PROSENT,
+                aarligInntekt = InntektSpec(
+                    aarligBeloep = 45000,
+                    tomAlder = Alder(aar = 69, maaneder = 1)
+                )
+            )
     }
 }

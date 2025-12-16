@@ -17,7 +17,7 @@ import org.springframework.security.web.SecurityFilterChain
 @TestComponent
 class MockSecurityConfiguration {
 
-    @Bean
+    //@Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         return http
             .authorizeHttpRequests {
