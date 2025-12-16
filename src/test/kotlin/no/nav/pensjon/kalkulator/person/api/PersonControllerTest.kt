@@ -57,18 +57,6 @@ class PersonControllerTest : FunSpec() {
             every { auditor.audit(any(), any()) } returns Unit
         }
 
-        test("'person' endpoint version 5") {
-            every { personService.getPerson() } returns personWithPensjoneringAldre()
-
-            mvc.perform(
-                get(URL_V5)
-                    .with(csrf())
-                    .content("")
-            )
-                .andExpect(status().isOk())
-                .andExpect(content().json(RESPONSE_BODY_V5))
-        }
-
         test("'person' endpoint version 6") {
             every { personService.getPerson() } returns personWithPensjoneringAldre()
 
@@ -83,29 +71,7 @@ class PersonControllerTest : FunSpec() {
     }
 
     private companion object {
-        private const val URL_V5 = "/api/v5/person"
         private const val URL_V6 = "/api/v6/person"
-
-        @Language("json")
-        private const val RESPONSE_BODY_V5 = """{
-    "navn": "Fornavn1",
-    "foedselsdato": "1963-12-31",
-    "sivilstand": "SKILT",
-    "pensjoneringAldre": {
-        "normertPensjoneringsalder": {
-            "aar": 67,
-            "maaneder": 1
-        },
-        "nedreAldersgrense": {
-            "aar": 62,
-            "maaneder": 1
-        },
-        "oevreAldersgrense": {
-            "aar": 75,
-            "maaneder": 1
-        }
-    }
-}"""
 
         @Language("json")
         private const val RESPONSE_BODY_V6 = """{

@@ -1,3 +1,7 @@
 package no.nav.pensjon.kalkulator.ufoere.api.dto
 
-data class UfoeregradDto(val ufoeregrad: Int)
+import jakarta.validation.constraints.NotNull
+
+data class UfoeregradDto(
+    @field:NotNull val ufoeregrad: Int
+)
