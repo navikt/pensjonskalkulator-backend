@@ -64,19 +64,6 @@ class PensjonsavtaleControllerTest : ShouldSpec() {
             every { auditor.audit(any(), any()) } returns Unit
         }
 
-        should("hente avtaler V2") {
-            every { avtaleService.fetchAvtaler(avtaleSpecMedTidsbegrensetInntekt()) } returns pensjonsavtaler()
-
-            mvc.perform(
-                post(URL_V2)
-                    .with(csrf())
-                    .content(REQUEST_BODY_V2)
-                    .contentType(MediaType.APPLICATION_JSON)
-            )
-                .andExpect(status().isOk())
-                .andExpect(content().json(RESPONSE_BODY))
-        }
-
         should("hente avtaler V3") {
             every { avtaleService.fetchAvtaler(avtaleSpecMedTidsbegrensetInntekt()) } returns pensjonsavtaler()
 
@@ -92,7 +79,6 @@ class PensjonsavtaleControllerTest : ShouldSpec() {
     }
 
     private companion object {
-        private const val URL_V2 = "/api/v2/pensjonsavtaler"
         private const val URL_V3 = "/api/v3/pensjonsavtaler"
 
         @Language("json")
