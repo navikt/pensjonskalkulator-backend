@@ -1,3 +1,8 @@
 package no.nav.pensjon.kalkulator.opptjening.api.dto
 
-data class InntektDto(val beloep: Int, val aar: Int)
+import jakarta.validation.constraints.NotNull
+
+data class InntektDto(
+    @field:NotNull val beloep: Int,
+    @field:NotNull val aar: Int
+)

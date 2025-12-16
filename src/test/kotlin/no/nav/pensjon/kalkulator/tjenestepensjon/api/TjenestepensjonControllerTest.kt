@@ -105,7 +105,7 @@ class TjenestepensjonControllerTest {
 
         private const val URL = "/api/tpo-medlemskap"
         private const val URL_V1 = "/api/v1/tpo-medlemskap"
-        private const val URL_AFP_OFFENTLIG_LIVSVARIG = "/api/v1/tpo-afp-offentlig-livsvarig"
+        private const val URL_AFP_OFFENTLIG_LIVSVARIG = "/api/v2/tpo-livsvarig-offentlig-afp"
 
         @Language("json")
         private const val RESPONSE_BODY = """{

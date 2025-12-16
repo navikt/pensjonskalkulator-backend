@@ -9,9 +9,7 @@ import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.person.PersonService
-import no.nav.pensjon.kalkulator.person.api.dto.PersonResultV5
 import no.nav.pensjon.kalkulator.person.api.dto.PersonResultV6
-import no.nav.pensjon.kalkulator.person.api.map.PersonMapperV5
 import no.nav.pensjon.kalkulator.person.api.map.PersonMapperV6
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -29,44 +27,6 @@ class PersonController(
 ) : ControllerBase(traceAid) {
 
     private val log = KotlinLogging.logger {}
-
-    @GetMapping("v5/person")
-    @Operation(
-        summary = "Hent personinformasjon",
-        description = "Henter informasjon om personen hvis person-ID er angitt enten i bearer-tokenet eller som fnr-header."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(
-                responseCode = "200",
-                description = "Henting av personinformasjon utført."
-            ),
-            ApiResponse(
-                responseCode = "404",
-                description = "Personen ble ikke funnet."
-            ),
-            ApiResponse(
-                responseCode = "503",
-                description = "Henting av personinformasjon kunne ikke utføres av tekniske årsaker.",
-                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
-            ),
-        ]
-    )
-    fun personV5(): PersonResultV5 {
-        traceAid.begin()
-        log.debug { "Request for personinformasjon V5" }
-
-        return try {
-            PersonMapperV5.dtoV5(timed(service::getPerson, "person"))
-                .also { log.debug { "Personinformasjon respons: $it" } }
-        } catch (e: NotFoundException) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, e.message)
-        } catch (e: EgressException) {
-            handleError(e, "V5")!!
-        } finally {
-            traceAid.end()
-        }
-    }
 
     @GetMapping("v6/person")
     @Operation(

@@ -1,3 +1,7 @@
 package no.nav.pensjon.kalkulator.omstillingsstoenad.api.dto
 
-data class BrukerHarLoependeOmstillingsstoenadEllerGjenlevendeYtelse(val harLoependeSak: Boolean)
+import jakarta.validation.constraints.NotNull
+
+data class BrukerHarLoependeOmstillingsstoenadEllerGjenlevendeYtelse(
+    @field:NotNull val harLoependeSak: Boolean
+)

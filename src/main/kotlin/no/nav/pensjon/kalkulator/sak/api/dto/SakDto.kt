@@ -1,3 +1,7 @@
 package no.nav.pensjon.kalkulator.sak.api.dto
 
-data class SakDto(val harUfoeretrygdEllerGjenlevendeytelse: Boolean)
+import jakarta.validation.constraints.NotNull
+
+data class SakDto(
+    @field:NotNull val harUfoeretrygdEllerGjenlevendeytelse: Boolean
+)
