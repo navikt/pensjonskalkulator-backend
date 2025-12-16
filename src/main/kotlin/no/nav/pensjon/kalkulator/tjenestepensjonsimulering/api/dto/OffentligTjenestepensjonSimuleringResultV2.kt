@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import jakarta.validation.constraints.NotNull
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.ResultatType
 
@@ -10,8 +11,8 @@ import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.ResultatType
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class OffentligTjenestepensjonSimuleringResultV2 (
-    val simuleringsresultatStatus: SimuleringsresultatStatusV2 = SimuleringsresultatStatusV2.OK,
-    val muligeTpLeverandoerListe: List<String> = emptyList(),
+    @field:NotNull val simuleringsresultatStatus: SimuleringsresultatStatusV2 = SimuleringsresultatStatusV2.OK,
+    @field:NotNull val muligeTpLeverandoerListe: List<String> = emptyList(),
     val simulertTjenestepensjon: SimulertTjenestepensjonV2? = null,
     var serviceData: List<String>? = null
 )
@@ -29,20 +30,20 @@ enum class SimuleringsresultatStatusV2(val resultatType: ResultatType?) {
 }
 
 data class SimulertTjenestepensjonV2(
-    val tpLeverandoer: String,
-    val tpNummer: String,
-    val simuleringsresultat: SimuleringsresultatV2
+    @field:NotNull val tpLeverandoer: String,
+    @field:NotNull val tpNummer: String,
+    @field:NotNull val simuleringsresultat: SimuleringsresultatV2
 )
 
 data class SimuleringsresultatV2(
-    val utbetalingsperioder: List<UtbetalingsperiodeV2>,
-    val betingetTjenestepensjonErInkludert: Boolean = false
+    @field:NotNull val utbetalingsperioder: List<UtbetalingsperiodeV2>,
+    @field:NotNull val betingetTjenestepensjonErInkludert: Boolean = false
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class UtbetalingsperiodeV2(
-    val startAlder: Alder,
+    @field:NotNull val startAlder: Alder,
     val sluttAlder: Alder?,
-    val aarligUtbetaling: Int,
+    @field:NotNull val aarligUtbetaling: Int,
     val maanedligUtbetaling: Int?
 )
