@@ -8,24 +8,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
-import no.nav.pensjon.kalkulator.simulering.SimuleringException
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderError
-import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderResultV2
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderResultV3
-import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderSpecV2
 import no.nav.pensjon.kalkulator.uttaksalder.api.dto.UttaksalderSpecV3
-import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderResultMapperV2.resultV2
 import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderResultMapperV3.resultV3
-import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderSpecMapperV2.fromDtoV2
 import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderSpecMapperV3.fromDtoV3
-import no.nav.pensjon.kalkulator.uttaksalder.api.map.UttaksalderSpecMapperV3.fromDtoV3
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -80,57 +71,6 @@ class UttaksalderController(
         } finally {
             traceAid.end()
         }
-    }
-
-
-    @PostMapping("v2/tidligste-hel-uttaksalder")
-    @Operation(
-        summary = "Tidligst mulige uttaksalder ved helt uttak",
-        description = "Finn tidligst mulige uttaksalder for innlogget bruker ved helt (100 %) uttak.",
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(
-                responseCode = "200",
-                description = "Søk etter uttaksalder utført. I resultatet er verdi av 'maaneder' 0..11."
-            ),
-            ApiResponse(
-                responseCode = "503", description = "Søk etter uttaksalder kunne ikke utføres av tekniske årsaker",
-                content = [
-                    Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)]),
-                    Content(schema = Schema(implementation = UttaksalderError::class))
-                ]
-            )
-        ]
-    )
-    fun finnTidligsteHelUttaksalderV2(@RequestBody spec: UttaksalderSpecV2): UttaksalderResultV2? {
-        traceAid.begin()
-        val version = "V2"
-        log.debug { "Request for hel uttaksalder-søk $version: $spec" }
-
-        return try {
-            resultV2(
-                timed(
-                    function = service::finnTidligsteUttaksalder,
-                    argument = fromDtoV2(spec),
-                    functionName = "TMU $version"
-                )
-            ).also { log.debug { "Hel uttaksalder-søk respons $version: $it" } }
-        } catch (e: EgressException) {
-            handleError(e, version)
-        } catch (e: BadRequestException) {
-            badRequest(e)!!
-        } catch (e: SimuleringException) {
-            e.status?.let { throw e } ?: handleError(EgressException(e.message ?: "", e), version)
-        } finally {
-            traceAid.end()
-        }
-    }
-
-    @ExceptionHandler(SimuleringException::class)
-    fun handleError(e: SimuleringException): ResponseEntity<UttaksalderError> {
-        log.error(e) { "SimuleringException" }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body( UttaksalderError(e.status!!, e.message))
     }
 
     override fun errorMessage() = ERROR_MESSAGE

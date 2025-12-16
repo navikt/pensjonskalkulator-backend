@@ -1,37 +1,38 @@
 package no.nav.pensjon.kalkulator.simulering.api.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import jakarta.validation.constraints.NotNull
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class AnonymSimuleringResultV1(
-    val alderspensjon: List<AnonymPensjonsberegningV1> = emptyList(),
+    @field:NotNull val alderspensjon: List<AnonymPensjonsberegningV1> = emptyList(),
     val afpPrivat: List<AnonymPensjonsberegningV1>? = emptyList(),
     val afpOffentlig: List<AnonymPensjonsberegningAfpOffentligV1>? = emptyList(),
-    val vilkaarsproeving: AnonymVilkaarsproevingV1
+    @field:NotNull val vilkaarsproeving: AnonymVilkaarsproevingV1
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class AnonymSimuleringErrorV1(
-    val status: String,
-    val message: String,
+    @field:NotNull val status: String,
+    @field:NotNull val message: String,
 )
 
-data class AnonymPensjonsberegningV1(val alder: Int, val beloep: Int)
+data class AnonymPensjonsberegningV1(@field:NotNull val alder: Int, @field:NotNull val beloep: Int)
 
-data class AnonymPensjonsberegningAfpOffentligV1(val alder: Int, val beloep: Int)
+data class AnonymPensjonsberegningAfpOffentligV1(@field:NotNull val alder: Int, @field:NotNull val beloep: Int)
 
 data class AnonymVilkaarsproevingV1(
-    val vilkaarErOppfylt: Boolean,
+    @field:NotNull val vilkaarErOppfylt: Boolean,
     val alternativ: AnonymAlternativV1?
 )
 
 data class AnonymAlternativV1(
     val gradertUttaksalder: AnonymAlderV1?,
     val uttaksgrad: Int?, // null implies 100 %
-    val heltUttaksalder: AnonymAlderV1
+    @field:NotNull val heltUttaksalder: AnonymAlderV1
 )
 
 data class AnonymAlderV1(
-    val aar: Int,
-    val maaneder: Int
+    @field:NotNull val aar: Int,
+    @field:NotNull val maaneder: Int
 )

@@ -1,11 +1,13 @@
 package no.nav.pensjon.kalkulator.aldersgrense.api.dto
 
+import jakarta.validation.constraints.NotNull
+
 data class AldersgrenseResultV1(
-    val normertPensjoneringsalder: PersonAlder,
-    val nedreAldersgrense: PersonAlder
+    @field:NotNull val normertPensjoneringsalder: PersonAlder,
+    @field:NotNull val nedreAldersgrense: PersonAlder
 )
 
 data class PersonAlder(
-    val aar: Int,
-    val maaneder: Int
+    @field:NotNull val aar: Int,
+    @field:NotNull val maaneder: Int
 )

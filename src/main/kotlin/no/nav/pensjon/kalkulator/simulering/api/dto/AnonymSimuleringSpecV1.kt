@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering.api.dto
 
+import jakarta.validation.constraints.NotNull
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 
@@ -23,7 +24,7 @@ import no.nav.pensjon.kalkulator.simulering.SimuleringType
  */
 data class AnonymSimuleringSpecV1(
     val simuleringstype: AnonymSimuleringTypeV1?,
-    val foedselAar: Int,
+    @field:NotNull val foedselAar: Int,
     val sivilstand: AnonymSivilstandV1?,
     val epsHarInntektOver2G: Boolean? = false,
     val epsHarPensjon: Boolean? = false,
@@ -31,26 +32,26 @@ data class AnonymSimuleringSpecV1(
     val inntektOver1GAntallAar: Int? = 0,
     val aarligInntektFoerUttakBeloep: Int? = 0,
     val gradertUttak: AnonymSimuleringGradertUttakV1? = null, // default is helt uttak (100 %)
-    val heltUttak: AnonymSimuleringHeltUttakV1
+    @field:NotNull val heltUttak: AnonymSimuleringHeltUttakV1
 )
 
 data class AnonymSimuleringGradertUttakV1(
-    val grad: Int,
-    val uttaksalder: AnonymSimuleringAlderV1,
+    @field:NotNull val grad: Int,
+    @field:NotNull val uttaksalder: AnonymSimuleringAlderV1,
     val aarligInntektVsaPensjonBeloep: Int?
 )
 
 data class AnonymSimuleringHeltUttakV1(
-    val uttaksalder: AnonymSimuleringAlderV1,
+    @field:NotNull val uttaksalder: AnonymSimuleringAlderV1,
     val aarligInntektVsaPensjon: AnonymSimuleringInntektV1?
 )
 
 data class AnonymSimuleringInntektV1(
-    val beloep: Int = 0,
+    @field:NotNull val beloep: Int = 0,
     val sluttAlder: AnonymSimuleringAlderV1?
 )
 
-data class AnonymSimuleringAlderV1(val aar: Int, val maaneder: Int) {
+data class AnonymSimuleringAlderV1(@field:NotNull val aar: Int, @field:NotNull val maaneder: Int) {
     init {
         require(aar in 0..200) { "0 <= aar <= 200" }
         require(maaneder in 0..11) { "0 <= maaneder <= 11" }

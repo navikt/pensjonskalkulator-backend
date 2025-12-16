@@ -14,9 +14,6 @@ import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import no.nav.pensjon.kalkulator.simulering.api.map.AnonymSimuleringResultMapperV1.errorV1
 import no.nav.pensjon.kalkulator.simulering.api.map.AnonymSimuleringResultMapperV1.resultatV1
 import no.nav.pensjon.kalkulator.simulering.api.map.AnonymSimuleringSpecMapperV1
-import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringExtendedResultMapperV8.extendedResultV8
-import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultMapperV8.resultV8
-import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringSpecMapperV8.fromSpecV8
 import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringExtendedResultMapperV9.extendedResultV9
 import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultMapperV9.resultV9
 import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringSpecMapperV9.fromSpecV9
@@ -98,65 +95,6 @@ class SimuleringController(
         }
     }
 
-    @PostMapping("v8/alderspensjon/simulering")
-    @Operation(
-        summary = "Simuler alderspensjon",
-        description = "Lag en prognose for framtidig alderspensjon med støtte for AFP i offentlig sektor." +
-                " Feltet 'epsHarInntektOver2G' brukes til å angi hvorvidt ektefelle/partner/samboer har inntekt" +
-                " over 2 ganger grunnbeløpet. Dersom simulering med de angitte parametre resulterer i avslag i" +
-                " vilkårsprøvingen, vil responsen inneholde alternative parametre som vil gi et innvilget" +
-                " simuleringsresultat"
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(
-                responseCode = "200",
-                description = "Simulering utført"
-            ),
-            ApiResponse(
-                responseCode = "503", description = "Simulering kunne ikke utføres av tekniske årsaker",
-                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
-            ),
-        ]
-    )
-    fun simulerAlderspensjonV8(@RequestBody spec: PersonligSimuleringSpecV8): PersonligSimuleringResultV8 {
-        traceAid.begin()
-        log.debug { "Request for V8 simulering: $spec" }
-
-        return try {
-            if (feature.isEnabled("utvidet-simuleringsresultat"))
-                extendedResultV8(
-                    timed(
-                        function = service::simulerPersonligAlderspensjon,
-                        argument = fromSpecV8(spec),
-                        functionName = "alderspensjon/simulering"
-                    ),
-                    spec.foedselsdato
-                ).also {
-                    log.debug { "Simulering V8 respons: $it" }
-                    Metrics.countType(eventName = SIMULERING_TYPE_METRIC_NAME, type = spec.simuleringstype.name)
-                }
-            else
-                resultV8(
-                    timed(
-                        function = service::simulerPersonligAlderspensjon,
-                        argument = fromSpecV8(spec),
-                        functionName = "alderspensjon/simulering"
-                    ),
-                    spec.foedselsdato
-                ).also {
-                    log.debug { "Simulering V8 respons: $it" }
-                    Metrics.countType(eventName = SIMULERING_TYPE_METRIC_NAME, type = spec.simuleringstype.name)
-                }
-        } catch (e: BadRequestException) {
-            badRequest(e)!!
-        } catch (e: EgressException) {
-            if (e.isConflict) vilkaarIkkeOppfyltV8() else handleError(e, "V8")!!
-        } finally {
-            traceAid.end()
-        }
-    }
-
     @PostMapping("v1/alderspensjon/anonym-simulering")
     @Operation(
         summary = "Simuler alderspensjon anonymt (ikke innlogget)",
@@ -229,19 +167,6 @@ class SimuleringController(
                 afpPrivat = null,
                 afpOffentlig = null,
                 vilkaarsproeving = PersonligSimuleringVilkaarsproevingResultV9(
-                    vilkaarErOppfylt = false,
-                    alternativ = null
-                ),
-                harForLiteTrygdetid = false
-            )
-
-        private fun vilkaarIkkeOppfyltV8() =
-            PersonligSimuleringResultV8(
-                alderspensjon = emptyList(),
-                pre2025OffentligAfp = null,
-                afpPrivat = null,
-                afpOffentlig = null,
-                vilkaarsproeving = PersonligSimuleringVilkaarsproevingResultV8(
                     vilkaarErOppfylt = false,
                     alternativ = null
                 ),

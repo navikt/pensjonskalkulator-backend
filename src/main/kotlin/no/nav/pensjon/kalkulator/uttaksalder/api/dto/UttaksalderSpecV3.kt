@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.uttaksalder.api.dto
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING
+import jakarta.validation.constraints.NotNull
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import java.time.LocalDate
@@ -12,13 +13,13 @@ data class UttaksalderSpecV3(
     val aarligInntektVsaPensjon: UttaksalderInntektSpecV3?,
     val utenlandsperiodeListe: List<UttaksalderUtenlandsperiodeSpecV3>? = null,
     val sivilstand: Sivilstand?,
-    val epsHarInntektOver2G: Boolean,
-    val epsHarPensjon: Boolean,
+    @field:NotNull val epsHarInntektOver2G: Boolean,
+    @field:NotNull val epsHarPensjon: Boolean,
     val innvilgetLivsvarigOffentligAfp: List<PersonligSimuleringInnvilgetLivsvarigOffentligAfpSpecV3>? = null
 )
 
 data class UttaksalderInntektSpecV3(
-    val beloep: Int,
+    @field:NotNull val beloep: Int,
     val sluttAlder: UttaksalderAlderSpecV3? = null
 ) {
     init {
@@ -28,7 +29,7 @@ data class UttaksalderInntektSpecV3(
     }
 }
 
-data class UttaksalderAlderSpecV3(val aar: Int, val maaneder: Int) {
+data class UttaksalderAlderSpecV3(@field:NotNull val aar: Int, @field:NotNull val maaneder: Int) {
     init {
         require(aar in 0..200) { "0 <= aar <= 200" }
         require(maaneder in 0..11) { "0 <= maaneder <= 11" }
