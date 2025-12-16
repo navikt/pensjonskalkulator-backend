@@ -27,8 +27,8 @@ object TjenestepensjonSimuleringFoer1963ResultMapperV2 {
 
         val simulert = if (resultat.tpnr != null && resultat.navnOrdning != null) {
             SimulertTjenestepensjonFoer1963V2(
-                tpLeverandoer = resultat.navnOrdning!!,
-                tpNummer = resultat.tpnr!!,
+                tpLeverandoer = resultat.navnOrdning,
+                tpNummer = resultat.tpnr,
                 simuleringsresultat = SimuleringsresultatFoer1963V2(utbetalingsperioder = periods)
             )
         } else null

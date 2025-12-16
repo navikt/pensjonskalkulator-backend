@@ -36,14 +36,14 @@ object TjenestepensjonSimuleringFoer1963SpecMapperV2 {
             harPensjon = source.epsHarPensjon ?: false
         )
 
-    private fun gradertUttak(source: PersonligSimuleringGradertUttakSpecV8) =
+    private fun gradertUttak(source: PersonligSimuleringGradertUttakSpecV9) =
         GradertUttak(
             grad = Uttaksgrad.from(source.grad),
             uttakFomAlder = alder(source.uttaksalder),
             aarligInntekt = source.aarligInntektVsaPensjonBeloep ?: 0
         )
 
-    private fun heltUttak(source: PersonligSimuleringHeltUttakSpecV8) =
+    private fun heltUttak(source: PersonligSimuleringHeltUttakSpecV9) =
         HeltUttak(
             uttakFomAlder = alder(source.uttaksalder),
             inntekt = source.aarligInntektVsaPensjon?.let(::inntekt)
@@ -55,7 +55,7 @@ object TjenestepensjonSimuleringFoer1963SpecMapperV2 {
             antallAar = 0 // not relevant when utenlandsperiodeListe used
         )
 
-    private fun opphold(source: PersonligSimuleringUtenlandsperiodeSpecV8) =
+    private fun opphold(source: PersonligSimuleringUtenlandsperiodeSpecV9) =
         Opphold(
             fom = source.fom,
             tom = source.tom,
@@ -63,12 +63,12 @@ object TjenestepensjonSimuleringFoer1963SpecMapperV2 {
             arbeidet = source.arbeidetUtenlands
         )
 
-    private fun inntekt(source: PersonligSimuleringInntektSpecV8) =
+    private fun inntekt(source: PersonligSimuleringInntektSpecV9) =
         Inntekt(
             aarligBeloep = source.beloep,
             tomAlder = source.sluttAlder.let(::alder)
         )
 
-    private fun alder(source: PersonligSimuleringAlderSpecV8) =
+    private fun alder(source: PersonligSimuleringAlderSpecV9) =
         Alder(aar = source.aar, maaneder = source.maaneder)
 }
