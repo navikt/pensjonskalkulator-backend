@@ -7,11 +7,11 @@ import no.nav.pensjon.kalkulator.simulering.Opphold
 import no.nav.pensjon.kalkulator.simulering.Utenlandsopphold
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.SimuleringOffentligTjenestepensjonFoer1963Spec
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.dto.SimuleringOffentligTjenestepensjonFoer1963SpecV2
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.dto.SimuleringOffentligTjenestepensjonFoer1963SpecV1
 
-object TjenestepensjonSimuleringFoer1963SpecMapperV2 {
+object TjenestepensjonSimuleringFoer1963SpecMapperV1 {
 
-    fun fromDtoV2(source: SimuleringOffentligTjenestepensjonFoer1963SpecV2): SimuleringOffentligTjenestepensjonFoer1963Spec {
+    fun fromDtoV2(source: SimuleringOffentligTjenestepensjonFoer1963SpecV1): SimuleringOffentligTjenestepensjonFoer1963Spec {
         return SimuleringOffentligTjenestepensjonFoer1963Spec(
             simuleringType = source.simuleringstype,
             foedselsdato = source.foedselsdato,
@@ -30,7 +30,7 @@ object TjenestepensjonSimuleringFoer1963SpecMapperV2 {
 
     }
 
-    private fun eps(source: SimuleringOffentligTjenestepensjonFoer1963SpecV2) =
+    private fun eps(source: SimuleringOffentligTjenestepensjonFoer1963SpecV1) =
         Eps(
             harInntektOver2G = source.epsHarInntektOver2G ?: false,
             harPensjon = source.epsHarPensjon ?: false
@@ -49,7 +49,7 @@ object TjenestepensjonSimuleringFoer1963SpecMapperV2 {
             inntekt = source.aarligInntektVsaPensjon?.let(::inntekt)
         )
 
-    private fun utenlandsopphold(source: SimuleringOffentligTjenestepensjonFoer1963SpecV2) =
+    private fun utenlandsopphold(source: SimuleringOffentligTjenestepensjonFoer1963SpecV1) =
         Utenlandsopphold(
             periodeListe = source.utenlandsperiodeListe.orEmpty().map(::opphold),
             antallAar = 0 // not relevant when utenlandsperiodeListe used

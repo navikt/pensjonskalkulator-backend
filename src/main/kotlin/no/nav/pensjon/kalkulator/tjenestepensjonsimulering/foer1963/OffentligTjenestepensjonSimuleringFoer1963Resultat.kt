@@ -8,7 +8,7 @@ data class OffentligTjenestepensjonSimuleringFoer1963Resultat(
     val tpnr: String? = null,
     val navnOrdning: String? = null,
     val utbetalingsperioder: List<UtbetalingsperiodeResultat> = emptyList(),
-    val feilrespons: Feilrespons? = null
+    val feilkode: Feilkode? = null
 )
 
 data class UtbetalingsperiodeResultat(
@@ -31,14 +31,11 @@ enum class YtelseskodeFoer1963(val externalValue: YtelsekodeFoer1963Dto) {
     }
 }
 
-data class Feilrespons(
-    val feilkode: Feilkode,
-    val feilmelding: String,
-)
-
 enum class Feilkode(val externalValue: FeilkodeDto) {
     TEKNISK_FEIL(FeilkodeDto.TEKNISK_FEIL),
     BEREGNING_GIR_NULL_UTBETALING(FeilkodeDto.BEREGNING_GIR_NULL_UTBETALING),
+    BRUKER_IKKE_MEDLEM_AV_TP_ORDNING(FeilkodeDto.BRUKER_IKKE_MEDLEM_AV_TP_ORDNING),
+    TP_ORDNING_STOETTES_IKKE(FeilkodeDto.TP_ORDNING_STOETTES_IKKE),
     OPPFYLLER_IKKE_INNGANGSVILKAAR(FeilkodeDto.OPPFYLLER_IKKE_INNGANGSVILKAAR);
 
     companion object {

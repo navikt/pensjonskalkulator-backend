@@ -2,12 +2,7 @@ package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsi
 
 data class SimulerTjenestepensjonFoer1963ResponseDto(
     val simulertPensjonListe: List<SimulertPensjon>,
-    val feilrespons: FeilresponsDto?
-)
-
-data class FeilresponsDto(
-    val errorCode: FeilkodeDto,
-    val errorMessage: String,
+    val feilkode: FeilkodeDto?
 )
 
 data class SimulertPensjon(
@@ -15,11 +10,6 @@ data class SimulertPensjon(
     val navnOrdning: String?,
     val inkluderteOrdninger: List<String>?,
     val leverandorUrl: String?,
-    val inkluderteTpnr: List<String>?,
-    val utelatteTpnr: List<String>?,
-    val status: String?,
-    val feilkode: String?,
-    val feilbeskrivelse: String?,
     val utbetalingsperioder: List<Utbetalingsperiode> = emptyList()
 )
 
@@ -41,5 +31,7 @@ enum class YtelsekodeFoer1963Dto {
 enum class FeilkodeDto {
     TEKNISK_FEIL,
     BEREGNING_GIR_NULL_UTBETALING,
-    OPPFYLLER_IKKE_INNGANGSVILKAAR;
+    OPPFYLLER_IKKE_INNGANGSVILKAAR,
+    BRUKER_IKKE_MEDLEM_AV_TP_ORDNING,
+    TP_ORDNING_STOETTES_IKKE;
 }
