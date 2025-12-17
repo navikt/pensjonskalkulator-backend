@@ -230,7 +230,7 @@ class TpTjenestepensjonClient(
             val response = webClient
                 .get()
                 .uri(url)
-                .headers { setExternalHeaders(service, it, pid) }
+                .headers { setExternalHeaders(service, headers = it) }
                 .retrieve()
                 .bodyToMono(TpAfpOffentligLivsvarigDetaljerDto::class.java)
                 .block()
@@ -291,10 +291,11 @@ class TpTjenestepensjonClient(
         headers[CustomHttpHeaders.PID] = pid.value
     }
 
-    private fun setExternalHeaders(service: EgressService, headers: HttpHeaders, pid: Pid) {
+    private fun setExternalHeaders(service: EgressService, headers: HttpHeaders) {
         headers.setBearerAuth(EgressAccess.token(service).value)
-        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
-        headers[CustomHttpHeaders.PID] = pid.value
+        val callId = traceAid.callId()
+        headers[CustomHttpHeaders.CALL_ID] = callId
+        headers[CustomHttpHeaders.CORRELATION_ID] = callId // using call ID also as correlation ID
     }
 
     private fun setHeadersWithDate(headers: HttpHeaders, pid: Pid) {
