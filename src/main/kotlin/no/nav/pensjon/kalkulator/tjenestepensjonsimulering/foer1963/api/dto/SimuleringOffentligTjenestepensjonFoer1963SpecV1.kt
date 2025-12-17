@@ -6,7 +6,7 @@ import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import java.time.LocalDate
-data class SimuleringOffentligTjenestepensjonFoer1963SpecV2(
+data class SimuleringOffentligTjenestepensjonFoer1963SpecV1(
     @field:NotNull val simuleringstype: SimuleringType,
     @field:NotNull val foedselsdato: LocalDate,
     val aarligInntektFoerUttakBeloep: Int?,

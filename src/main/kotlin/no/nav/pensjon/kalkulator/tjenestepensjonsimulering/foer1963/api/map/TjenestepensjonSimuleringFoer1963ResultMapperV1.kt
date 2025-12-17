@@ -9,7 +9,7 @@ import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.dto.Utbe
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.dto.SimuleringsresultatStatusV2
 import kotlin.math.floor
 
-object TjenestepensjonSimuleringFoer1963ResultMapperV2 {
+object TjenestepensjonSimuleringFoer1963ResultMapperV1 {
 
     fun toDtoV2(resultat: OffentligTjenestepensjonSimuleringFoer1963Resultat): OffentligTjenestepensjonSimuleringFoer1963ResultV2 {
         val periods = resultat.utbetalingsperioder.map { utbetaling ->
@@ -34,11 +34,18 @@ object TjenestepensjonSimuleringFoer1963ResultMapperV2 {
         } else null
 
         return OffentligTjenestepensjonSimuleringFoer1963ResultV2(
-            simuleringsresultatStatus = resultat.feilrespons?.let { if (it.feilkode == Feilkode.TEKNISK_FEIL) SimuleringsresultatStatusV2.TEKNISK_FEIL else SimuleringsresultatStatusV2.OK } ?: SimuleringsresultatStatusV2.OK,
+            simuleringsresultatStatus = resultat.feilkode?.let {
+                when (it) {
+                    Feilkode.BRUKER_IKKE_MEDLEM_AV_TP_ORDNING -> SimuleringsresultatStatusV2.BRUKER_ER_IKKE_MEDLEM_AV_TP_ORDNING
+                    Feilkode.TP_ORDNING_STOETTES_IKKE -> SimuleringsresultatStatusV2.TP_ORDNING_STOETTES_IKKE
+                    Feilkode.TEKNISK_FEIL -> SimuleringsresultatStatusV2.TEKNISK_FEIL
+                    else -> SimuleringsresultatStatusV2.OK
+                }
+            } ?: SimuleringsresultatStatusV2.OK,
             muligeTpLeverandoerListe = listOfNotNull(resultat.navnOrdning),
             simulertTjenestepensjon = simulert,
             serviceData = null,
-            feilkode = resultat.feilrespons?.feilkode
+            feilkode = resultat.feilkode
         )
     }
 }
