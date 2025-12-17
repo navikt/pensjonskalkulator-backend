@@ -9,7 +9,7 @@ object LivsvarigOffentligAfpMapperV2 {
         LivsvarigOffentligAfpResultV2(
             afpStatus = source.afpStatus,
             virkningFom = source.virkningFom,
-            maanedligBeloep = source.maanedligBeloep,
+            maanedligBeloep = source.afpStatus?.let { source.maanedligBeloepListe.lastOrNull()?.beloep },
             sistBenyttetGrunnbeloep = source.sistBenyttetGrunnbeloep
         )
 }

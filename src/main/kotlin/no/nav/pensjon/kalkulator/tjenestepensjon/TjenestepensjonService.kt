@@ -30,7 +30,7 @@ class TjenestepensjonService(
             return AfpOffentligLivsvarigResult(
                 afpStatus = null,
                 virkningFom = null,
-                maanedligBeloep = null,
+                maanedligBeloepListe = emptyList(),
                 sistBenyttetGrunnbeloep = null
             )
         }
