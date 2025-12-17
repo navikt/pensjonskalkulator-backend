@@ -39,7 +39,7 @@ object TpSimuleringFoer1963ClientMapper {
                 },
                 feilkode = dto.feilkode?.let { Feilkode.fromExternalValue(it) }
             )
-        } ?: OffentligTjenestepensjonSimuleringFoer1963Resultat()
+        } ?: OffentligTjenestepensjonSimuleringFoer1963Resultat(feilkode = dto.feilkode?.let { Feilkode.fromExternalValue(dto.feilkode) })
 
     private fun epochMillisToLocalDate(millis: Long): LocalDate =
         Instant.ofEpochMilli(millis).atZone(ZoneId.of("Europe/Oslo")).toLocalDate()
