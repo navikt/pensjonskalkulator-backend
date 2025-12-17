@@ -8,6 +8,7 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMem
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tjenestepensjon.TjenestepensjonService
 import no.nav.pensjon.kalkulator.tjenestepensjon.AfpOffentligLivsvarigResult
+import no.nav.pensjon.kalkulator.tjenestepensjon.MaanedligBeloep
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -82,12 +83,13 @@ class TjenestepensjonControllerTest {
 
     @Test
     fun hentAfpOffentligLivsvarigDetaljer() {
+        val fom =  LocalDate.of(2025, 1, 1)
         `when`(tjenestepensjonService.hentAfpOffentligLivsvarigDetaljer())
             .thenReturn(
                 AfpOffentligLivsvarigResult(
                     afpStatus = true,
-                    virkningFom = LocalDate.of(2025, 1, 1),
-                    maanedligBeloep = 15000,
+                    virkningFom = fom,
+                    maanedligBeloepListe = listOf(MaanedligBeloep(fom, 15000)),
                     sistBenyttetGrunnbeloep = 123000
                 )
             )
