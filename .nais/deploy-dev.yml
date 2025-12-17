@@ -54,10 +54,13 @@ spec:
   tokenx:
     enabled: true
   maskinporten:
-    enabled: true # only in dev
+    enabled: true
     scopes:
       consumes:
-        - name: "nav:pensjonssimulator:simulering"
+        - name: "nav:pensjonssimulator:simulering" # only in dev
+        - name: "nav:pensjon:mock.livsvarig.afp.offentlig"
+        - name: "gabler:nav"
+        - name: "spk:nav"
   accessPolicy:
     inbound:
       rules:
