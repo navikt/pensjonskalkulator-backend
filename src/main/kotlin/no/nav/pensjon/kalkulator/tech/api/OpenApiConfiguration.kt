@@ -59,6 +59,7 @@ class OpenApiConfiguration {
                 "/api/tpo-medlemskap",
                 "/api/v1/tpo-medlemskap",
                 "/api/v2/tpo-livsvarig-offentlig-afp",
+                "/api/v3/tpo-livsvarig-offentlig-afp",
                 "/api/v2/simuler-oftp",
                 "/api/v2/aldersgrense",
                 "/api/v1/aldersgrense",
