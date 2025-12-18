@@ -25,7 +25,7 @@
         <kotlin.compiler.languageVersion>2.1</kotlin.compiler.languageVersion>
         <kotlin.compiler.jvmTarget>21</kotlin.compiler.jvmTarget>
         <kotlin.version>2.2.21</kotlin.version>
-        <logback.version>1.5.21</logback.version>
+        <logback.version>1.5.22</logback.version>
         <okhttp3.version>5.3.2</okhttp3.version>
     </properties>
     <build>
@@ -142,7 +142,7 @@
         <dependency>
             <groupId>io.getunleash</groupId>
             <artifactId>unleash-client-java</artifactId>
-            <version>11.1.1</version>
+            <version>11.2.1</version>
         </dependency>
         <dependency>
             <groupId>io.github.microutils</groupId>
@@ -191,7 +191,7 @@
         <dependency>
             <groupId>io.mockk</groupId>
             <artifactId>mockk-jvm</artifactId>
-            <version>1.14.6</version>
+            <version>1.14.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -232,19 +232,19 @@
         <dependency>
             <groupId>io.kotest</groupId>
             <artifactId>kotest-runner-junit5</artifactId>
-            <version>6.0.5</version>
+            <version>6.0.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.kotest</groupId>
             <artifactId>kotest-extensions-spring</artifactId>
-            <version>6.0.5</version>
+            <version>6.0.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.ninja-squad</groupId>
             <artifactId>springmockk</artifactId>
-            <version>4.0.2</version>
+            <version>5.0.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
