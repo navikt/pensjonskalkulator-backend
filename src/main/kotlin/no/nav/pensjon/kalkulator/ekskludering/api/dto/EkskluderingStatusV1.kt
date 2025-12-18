@@ -1,3 +1,8 @@
 package no.nav.pensjon.kalkulator.ekskludering.api.dto
 
-data class EkskluderingStatusV1(val ekskludert: Boolean, val aarsak: EkskluderingAarsakV1)
+import jakarta.validation.constraints.NotNull
+
+data class EkskluderingStatusV1(
+    @field:NotNull val ekskludert: Boolean,
+    @field:NotNull val aarsak: EkskluderingAarsakV1
+)
