@@ -6,7 +6,7 @@ import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.TjenestepensjonSimuleringFoer1963Service
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.dto.OffentligTjenestepensjonSimuleringFoer1963ResultV2
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.dto.OffentligTjenestepensjonSimuleringFoer1963ResultV1
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.dto.SimuleringOffentligTjenestepensjonFoer1963SpecV1
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.map.TjenestepensjonSimuleringFoer1963ResultMapperV1.toDtoV2
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.map.TjenestepensjonSimuleringFoer1963SpecMapperV1.fromDtoV2
@@ -29,7 +29,7 @@ class TjenestepensjonSimuleringFoer1963Controller(
         summary = "Simuler offentlig tjenestepensjon hos TP-leverandør bruker er medlem av",
         description = "Simulerer offentlig tjenestepensjon hos TP-leverandør som har ansvar for brukers tjenestepensjon"
     )
-    fun simulerOffentligTjenestepensjonFoer1963V1(@RequestBody spec: SimuleringOffentligTjenestepensjonFoer1963SpecV1): OffentligTjenestepensjonSimuleringFoer1963ResultV2 {
+    fun simulerOffentligTjenestepensjonFoer1963V1(@RequestBody spec: SimuleringOffentligTjenestepensjonFoer1963SpecV1): OffentligTjenestepensjonSimuleringFoer1963ResultV1 {
         traceAid.begin()
         log.debug { "Request for simuler offentlig tjenestepensjon V1: $spec" }
 

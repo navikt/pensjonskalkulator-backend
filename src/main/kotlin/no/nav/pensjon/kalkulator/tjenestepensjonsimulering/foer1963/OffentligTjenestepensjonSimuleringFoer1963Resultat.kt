@@ -8,7 +8,8 @@ data class OffentligTjenestepensjonSimuleringFoer1963Resultat(
     val tpnr: String? = null,
     val navnOrdning: String? = null,
     val utbetalingsperioder: List<UtbetalingsperiodeResultat> = emptyList(),
-    val feilkode: Feilkode? = null
+    val feilkode: Feilkode? = null,
+    val relevanteTpOrdninger: List<String>? = emptyList()
 )
 
 data class UtbetalingsperiodeResultat(

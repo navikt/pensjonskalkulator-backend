@@ -39,10 +39,10 @@ object TjenestepensjonSimuleringFoer1963ResultMapperV1 {
                     else -> SimuleringsresultatStatusV2.OK
                 }
             } ?: SimuleringsresultatStatusV2.OK,
-            muligeTpLeverandoerListe = listOfNotNull(resultat.navnOrdning),
+            muligeTpLeverandoerListe = resultat.relevanteTpOrdninger ?: listOfNotNull(resultat.navnOrdning),
             simulertTjenestepensjon = simulert,
             serviceData = null,
-            feilkode = resultat.feilkode
+            feilkode = resultat.feilkode,
         )
     }
 }

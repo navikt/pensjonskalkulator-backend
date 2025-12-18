@@ -1,8 +1,9 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto
 
 data class SimulerTjenestepensjonFoer1963ResponseDto(
-    val simulertPensjonListe: List<SimulertPensjon> = emptyList(),
-    val feilkode: FeilkodeDto?
+    val simulertPensjonListe: List<SimulertPensjon>? = emptyList(),
+    val feilkode: FeilkodeDto?,
+    val relevanteTpOrdninger: List<String>? = emptyList()
 )
 
 data class SimulertPensjon(
