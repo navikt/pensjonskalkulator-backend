@@ -42,7 +42,9 @@ class UttaksalderController(
             ),
             ApiResponse(
                 responseCode = "503", description = "Søk etter uttaksalder kunne ikke utføres av tekniske årsaker",
-                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
+                content = [
+                    Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)]),
+                ]
             ),
         ]
     )
