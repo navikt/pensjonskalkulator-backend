@@ -17,7 +17,7 @@ data class UtbetalingsperiodeResultat(
     val alderTom: Alder? = null,
     val grad: Int? = null,
     val arligUtbetaling: Double? = null,
-    val ytelsekode: YtelseskodeFoer1963? = null,
+    val ytelsekode: YtelseskodeFoer1963,
     val mangelfullSimuleringkode: String? = null
 )
 
