@@ -65,7 +65,8 @@ class TjenestepensjonServiceTest : ShouldSpec({
             val expectedResult = AfpOffentligLivsvarigResult(
                 afpStatus = true,
                 virkningFom = fom,
-                maanedligBeloepListe = listOf(MaanedligBeloep(fom, 15000)),
+                maanedligBeloepListe = listOf(MaanedligBeloep(fom, 15000),
+                    MaanedligBeloep(fom.plusMonths(1), 16000)),
                 sistBenyttetGrunnbeloep = 123000
             )
             val client = mockk<TjenestepensjonClient>().apply {

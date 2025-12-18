@@ -91,7 +91,7 @@ class TjenestepensjonController(
         log.debug { "Request for livsvarig offentlig AFP-detaljer $versjon" }
 
         return try {
-            toDtoV3(timed(service::hentAfpOffentligLivsvarigDetaljer, "hentAfpOffentligLivsvarigDetaljer"))
+            toDtoV3(timed(service::hentAfpOffentligLivsvarigDetaljer, "hentAfpOffentligLivsvarigDetaljer$versjon"))
                 .also { log.debug { "livsvarig offentlig AFP-detaljer respons $versjon: $it" } }
         } catch (e: EgressException) {
             handleError(e, versjon)!!
