@@ -37,7 +37,8 @@ object TpSimuleringFoer1963ClientMapper {
                         mangelfullSimuleringkode = periode.mangelfullSimuleringkode
                     )
                 },
-                feilkode = dto.feilkode?.let { Feilkode.fromExternalValue(it) }
+                feilkode = dto.feilkode?.let { Feilkode.fromExternalValue(it) },
+                relevanteTpOrdninger = dto.relevanteTpOrdninger
             )
         } ?: OffentligTjenestepensjonSimuleringFoer1963Resultat(feilkode = dto.feilkode?.let { Feilkode.fromExternalValue(dto.feilkode) }, relevanteTpOrdninger = dto.relevanteTpOrdninger)
 
