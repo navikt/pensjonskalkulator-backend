@@ -20,7 +20,7 @@ import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsim
 object TpSimuleringFoer1963ClientMapper {
 
     fun fromDto(dto: SimulerTjenestepensjonFoer1963ResponseDto, foedselsdato: LocalDate) =
-        dto.simulertPensjonListe.firstOrNull()?.let { sim ->
+        dto.simulertPensjonListe?.firstOrNull()?.let { sim ->
             OffentligTjenestepensjonSimuleringFoer1963Resultat(
                 tpnr = sim.tpnr,
                 navnOrdning = sim.navnOrdning,
@@ -39,7 +39,7 @@ object TpSimuleringFoer1963ClientMapper {
                 },
                 feilkode = dto.feilkode?.let { Feilkode.fromExternalValue(it) }
             )
-        } ?: OffentligTjenestepensjonSimuleringFoer1963Resultat(feilkode = dto.feilkode?.let { Feilkode.fromExternalValue(dto.feilkode) })
+        } ?: OffentligTjenestepensjonSimuleringFoer1963Resultat(feilkode = dto.feilkode?.let { Feilkode.fromExternalValue(dto.feilkode) }, relevanteTpOrdninger = dto.relevanteTpOrdninger)
 
     private fun epochMillisToLocalDate(millis: Long): LocalDate =
         Instant.ofEpochMilli(millis).atZone(ZoneId.of("Europe/Oslo")).toLocalDate()

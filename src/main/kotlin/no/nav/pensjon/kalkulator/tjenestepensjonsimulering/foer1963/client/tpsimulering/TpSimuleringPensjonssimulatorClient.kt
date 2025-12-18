@@ -46,12 +46,10 @@ class TpSimuleringPensjonssimulatorClient(
         val uri = "/$API_PATH"
         log.debug { "POST to URL: '$uri'" }
 
-        val dto = toDto(request, pid)
-        log.debug { dto }
         return try {
             webClient.post()
                 .uri(uri)
-                .bodyValue(dto)
+                .bodyValue(toDto(request, pid))
                 .headers { setHeaders(it) }
                 .retrieve()
                 .bodyToMono(SimulerTjenestepensjonFoer1963ResponseDto::class.java)
@@ -76,7 +74,7 @@ class TpSimuleringPensjonssimulatorClient(
     override fun service(): EgressService = service
 
     companion object {
-        private const val API_PATH = "api/nav/v2/simuler-oftp/pre-2025"
+        private const val API_PATH = "api/nav/v3/simuler-oftp/pre-2025"
         private val service = EgressService.PENSJONSSIMULATOR
         private const val ON_CONNECTED_READ_TIMEOUT_SECONDS = 45
     }
