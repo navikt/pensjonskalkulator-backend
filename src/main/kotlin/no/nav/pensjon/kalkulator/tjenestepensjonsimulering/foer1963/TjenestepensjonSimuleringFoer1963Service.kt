@@ -1,17 +1,11 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963
 
 import no.nav.pensjon.kalkulator.ekskludering.EkskluderingFacade
-import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClient
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.OffentligTjenestepensjonSimuleringsresultat
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.ResultatType
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringsResultatStatus
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.TjenestepensjonSimuleringClient
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.TjenestepensjonSimuleringFoer1963Client
 import no.nav.pensjon.kalkulator.vedtak.LoependeVedtakService
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class TjenestepensjonSimuleringFoer1963Service(
