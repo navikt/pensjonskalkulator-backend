@@ -28,7 +28,7 @@ class PidEncryptionServiceTest {
         val exception = assertThrows<RuntimeException> { service.encrypt(value = TOO_LONG_BLOCK) }
 
         assertEquals(
-            "Illegal block size for decryption - abc...XYZ - length ${TOO_LONG_BLOCK.length}",
+            "Illegal block size for encryption - abc...XYZ - length ${TOO_LONG_BLOCK.length}",
             exception.message
         )
     }

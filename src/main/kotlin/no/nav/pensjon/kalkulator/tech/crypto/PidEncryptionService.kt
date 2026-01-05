@@ -38,7 +38,7 @@ class PidEncryptionService(
         } catch (e: NoSuchPaddingException) {
             throw RuntimeException("Unsupported encryption padding", e)
         } catch (e: IllegalBlockSizeException) {
-            throw RuntimeException("Illegal block size for decryption - ${displayableValue(value!!)}", e)
+            throw RuntimeException("Illegal block size for encryption - ${displayableValue(value!!)}", e)
         } catch (e: NoSuchAlgorithmException) {
             throw RuntimeException("Unsupported encryption encoding", e)
         } catch (e: BadPaddingException) {
@@ -54,7 +54,7 @@ class PidEncryptionService(
                 throw RuntimeException("Encrypted string is null; expected <key id>.<encrypted string>")
             }
 
-            if (!encrypted.contains(".")) {
+            if (encrypted.contains(".").not()) {
                 throw RuntimeException("Encrypted string is not on the expected format <key id>.<encrypted string>")
             }
 
@@ -85,18 +85,18 @@ class PidEncryptionService(
         }
     }
 
-    private fun encryptionCipher(): Cipher {
-        val cipher = Cipher.getInstance(TRANSFORMATION)
-        cipher.init(Cipher.ENCRYPT_MODE, newKeyPair.publicKey)
-        return cipher
-    }
+    private fun encryptionCipher(): Cipher =
+        Cipher.getInstance(TRANSFORMATION).apply {
+            init(Cipher.ENCRYPT_MODE, newKeyPair.publicKey)
+        }
 
-    private fun decryptionCipher(keyId: String): Cipher {
-        val cipher = Cipher.getInstance(TRANSFORMATION)
-        val keyPair = if (keyId == newKeyPair.keyId) newKeyPair else oldKeyPair
-        cipher.init(Cipher.DECRYPT_MODE, keyPair.privateKey)
-        return cipher
-    }
+    private fun decryptionCipher(keyId: String): Cipher =
+        Cipher.getInstance(TRANSFORMATION).apply {
+            init(Cipher.DECRYPT_MODE, keyPair(keyId).privateKey)
+        }
+
+    private fun keyPair(keyId: String): KeyPair =
+        if (keyId == newKeyPair.keyId) newKeyPair else oldKeyPair
 
     private companion object {
         private const val TRANSFORMATION = "RSA"
@@ -108,7 +108,7 @@ class PidEncryptionService(
             val length = value.length
 
             return if (length > 12)
-                "${value.substring(0, 3)}...${value.substring(length - 3, length)} - length $length"
+                "${value.take(3)}...${value.takeLast(3)} - length $length"
             else
                 "length $length"
         }
