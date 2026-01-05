@@ -63,7 +63,7 @@ class TjenestepensjonServiceTest : ShouldSpec({
             val tpNr = "3010"
             val fom = LocalDate.of(2025, 1, 1)
             val expectedResult = AfpOffentligLivsvarigResult(
-                afpStatus = true,
+                afpInnvilget = true,
                 virkningFom = fom,
                 maanedligBeloepListe = listOf(MaanedligBeloep(fom, 15000),
                     MaanedligBeloep(fom.plusMonths(1), 16000)),
@@ -97,7 +97,7 @@ class TjenestepensjonServiceTest : ShouldSpec({
                 featureToggleService = mockk(relaxed = true)
             ).hentAfpOffentligLivsvarigDetaljer() shouldBe
                     AfpOffentligLivsvarigResult(
-                        afpStatus = null,
+                        afpInnvilget = null,
                         virkningFom = null,
                         maanedligBeloepListe = emptyList(),
                         sistBenyttetGrunnbeloep = null
@@ -132,7 +132,7 @@ class TjenestepensjonServiceTest : ShouldSpec({
         should("bruke neste måned som uttaksdato") {
             val tpNr = "3010"
             val expectedResult = AfpOffentligLivsvarigResult(
-                afpStatus = false,
+                afpInnvilget = false,
                 virkningFom = null,
                 maanedligBeloepListe = emptyList(),
                 sistBenyttetGrunnbeloep = null

@@ -92,7 +92,7 @@ class TjenestepensjonController(
 
         return try {
             toDtoV3(timed(service::hentAfpOffentligLivsvarigDetaljer, "hentAfpOffentligLivsvarigDetaljer$versjon"))
-                .also { log.debug { "livsvarig offentlig AFP-detaljer respons $versjon: $it" } }
+                .also { log.info { "livsvarig offentlig AFP-detaljer respons $versjon: $it" } }
         } catch (e: EgressException) {
             handleError(e, versjon)!!
         } finally {

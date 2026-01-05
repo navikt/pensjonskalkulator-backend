@@ -10,7 +10,7 @@ class LivsvarigOffentligAfpMapperV3Test : ShouldSpec({
 
     should("toDtoV3 mapping går gjennom alle feltene") {
         val source = AfpOffentligLivsvarigResult(
-            afpStatus = true,
+            afpInnvilget = true,
             virkningFom = LocalDate.of(2027, 9, 12),
             maanedligBeloepListe = listOf(
                 MaanedligBeloep(fom = LocalDate.of(2020, 1, 2), beloep = 3),
@@ -23,7 +23,7 @@ class LivsvarigOffentligAfpMapperV3Test : ShouldSpec({
 
         with(dto) {
 
-            afpStatus shouldBe source.afpStatus
+            afpInnvilget shouldBe source.afpInnvilget
             virkningFom shouldBe source.virkningFom
             maanedligBeloepListe.size shouldBe source.maanedligBeloepListe.size
             maanedligBeloepListe[0].virkningFom shouldBe source.maanedligBeloepListe[0].fom

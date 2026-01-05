@@ -87,7 +87,7 @@ class TjenestepensjonControllerTest {
         `when`(tjenestepensjonService.hentAfpOffentligLivsvarigDetaljer())
             .thenReturn(
                 AfpOffentligLivsvarigResult(
-                    afpStatus = true,
+                    afpInnvilget = true,
                     virkningFom = fom,
                     maanedligBeloepListe = listOf(MaanedligBeloep(fom, 15000)),
                     sistBenyttetGrunnbeloep = 123000
@@ -109,7 +109,7 @@ class TjenestepensjonControllerTest {
         `when`(tjenestepensjonService.hentAfpOffentligLivsvarigDetaljer())
             .thenReturn(
                 AfpOffentligLivsvarigResult(
-                    afpStatus = true,
+                    afpInnvilget = true,
                     virkningFom = fom,
                     maanedligBeloepListe = listOf(
                         MaanedligBeloep(fom, 15000),
@@ -153,7 +153,7 @@ class TjenestepensjonControllerTest {
 
         @Language("json")
         private const val RESPONSE_BODY_AFP_OFFENTLIG_LIVSVARIG_V3 = """{
-        "afpStatus": true,
+        "afpInnvilget": true,
         "maanedligBeloepListe": [
             {
             "virkningFom":"2025-10-01",

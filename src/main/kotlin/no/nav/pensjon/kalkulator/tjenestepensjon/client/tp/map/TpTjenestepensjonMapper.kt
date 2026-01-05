@@ -22,28 +22,24 @@ object TpTjenestepensjonMapper {
     fun fromDto(response: TpAfpOffentligLivsvarigDetaljerDto?): AfpOffentligLivsvarigResult {
         if (response == null) {
             return AfpOffentligLivsvarigResult(
-                afpStatus = null,
+                afpInnvilget = null,
                 virkningFom = null,
                 maanedligBeloepListe = emptyList(),
                 sistBenyttetGrunnbeloep = null
             )
         }
 
-        // Map AFP status to boolean (true if INNVILGET)
-        val afpStatus: Boolean = when (response.statusAfp) {
-            TpAfpStatusType.INNVILGET -> true
-            TpAfpStatusType.UKJENT, TpAfpStatusType.IKKE_SOKT, TpAfpStatusType.SOKT, TpAfpStatusType.AVSLAG -> false
-        }
+        val afpInnvilget = response.statusAfp == TpAfpStatusType.INNVILGET
 
-        if (afpStatus && response.belopsListe.isEmpty()) {
+        if (afpInnvilget && response.belopsListe.isEmpty()) {
             log.warn { "Livsvarig offentlig AFP er innvilget, men beløpsliste er tom. Dette kan indikere datakvalitetsproblem." }
         }
 
         return AfpOffentligLivsvarigResult(
-            afpStatus,
-            virkningFom = if (afpStatus) response.virkningsDato else null,
+            afpInnvilget,
+            virkningFom = if (afpInnvilget) response.virkningsDato else null,
             response.belopsListe.map { MaanedligBeloep(it.fomDato, it.belop) },
-            sistBenyttetGrunnbeloep = if (afpStatus) response.sistBenyttetG else null
+            sistBenyttetGrunnbeloep = if (afpInnvilget) response.sistBenyttetG else null
         )
     }
 

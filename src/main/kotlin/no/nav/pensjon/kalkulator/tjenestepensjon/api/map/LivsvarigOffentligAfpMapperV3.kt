@@ -8,7 +8,7 @@ object LivsvarigOffentligAfpMapperV3 {
 
     fun toDtoV3(source: AfpOffentligLivsvarigResult) =
         LivsvarigOffentligAfpResultV3(
-            afpStatus = source.afpStatus,
+            afpInnvilget = source.afpInnvilget,
             virkningFom = source.virkningFom,
             maanedligBeloepListe = source.maanedligBeloepListe.map { MaanedligBeloepV3(it.fom, it.beloep) },
             sistBenyttetGrunnbeloep = source.sistBenyttetGrunnbeloep

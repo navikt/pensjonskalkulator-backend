@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING
 import java.time.LocalDate
 
 data class LivsvarigOffentligAfpResultV3(
-    val afpStatus: Boolean?,
+    val afpInnvilget: Boolean?,
     val maanedligBeloepListe: List<MaanedligBeloepV3>,
     @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val virkningFom: LocalDate?,
     val sistBenyttetGrunnbeloep: Int?
