@@ -28,9 +28,9 @@ class TjenestepensjonService(
         if (tpNumre.isEmpty()) {
             log.info { "Bruker har ingen livsvarig offentlig AFP-ordning" }
             return AfpOffentligLivsvarigResult(
-                afpStatus = null,
+                afpInnvilget = null,
                 virkningFom = null,
-                maanedligBeloep = null,
+                maanedligBeloepListe = emptyList(),
                 sistBenyttetGrunnbeloep = null
             )
         }

@@ -3,8 +3,13 @@ package no.nav.pensjon.kalkulator.tjenestepensjon
 import java.time.LocalDate
 
 data class AfpOffentligLivsvarigResult(
-    val afpStatus: Boolean?,
+    val afpInnvilget: Boolean?,
     val virkningFom: LocalDate?,
-    val maanedligBeloep: Int?,
+    val maanedligBeloepListe: List<MaanedligBeloep>,
     val sistBenyttetGrunnbeloep: Int?
+)
+
+data class MaanedligBeloep(
+    val fom: LocalDate,
+    val beloep: Int,
 )
