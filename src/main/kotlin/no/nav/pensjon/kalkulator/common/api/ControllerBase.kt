@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.common.api
 
 import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.tech.text.TextRedacter.redact
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -35,7 +36,7 @@ abstract class ControllerBase(private val traceAid: TraceAid) {
         return result
     }
 
-    protected fun <T> badRequest(e: BadRequestException): T? {
+    protected fun <T> badRequest(e: BadRequestException): T {
         throw ResponseStatusException(
             HttpStatus.BAD_REQUEST,
             "Call ID: ${traceAid.callId()} | Error: ${errorMessage()} | Details: ${extractMessageRecursively(e)}",
@@ -45,13 +46,13 @@ abstract class ControllerBase(private val traceAid: TraceAid) {
 
     protected fun <T> handleError(e: EgressException, version: String = "V0") =
         if (e.isClientError) // "client" is here the backend server itself (calling other services)
-            handleInternalError<T>(e, version)
+            handleInternalError(e, version)
         else
             handleExternalError<T>(e, version)
 
     abstract fun errorMessage(): String
 
-    private fun <T> handleInternalError(e: EgressException, version: String): T? {
+    private fun <T> handleInternalError(e: EgressException, version: String): T {
         logError(e, "Intern", version)
 
         throw ResponseStatusException(
@@ -66,7 +67,7 @@ abstract class ControllerBase(private val traceAid: TraceAid) {
         return serviceUnavailable(e)
     }
 
-    private fun <T> serviceUnavailable(e: EgressException): T? {
+    private fun <T> serviceUnavailable(e: EgressException): T {
         throw ResponseStatusException(
             HttpStatus.SERVICE_UNAVAILABLE,
             "Call ID: ${traceAid.callId()} | Error: ${errorMessage()} | Details: ${extractMessageRecursively(e)}",
@@ -87,7 +88,7 @@ abstract class ControllerBase(private val traceAid: TraceAid) {
         }
 
         builder.append(" | Cause: ").append(extractMessageRecursively(ex.cause!!))
-        return builder.toString()
+        return redact(text = builder.toString())
     }
 
     protected companion object {
