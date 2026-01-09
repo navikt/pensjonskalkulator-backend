@@ -10,20 +10,25 @@ import no.nav.pensjon.kalkulator.aldersgrense.AldersgrenseService
 import no.nav.pensjon.kalkulator.aldersgrense.api.dto.AldersgrenseResultV1
 import no.nav.pensjon.kalkulator.aldersgrense.api.dto.AldersgrenseResultV2
 import no.nav.pensjon.kalkulator.aldersgrense.api.dto.AldersgrenseSpec
-import no.nav.pensjon.kalkulator.aldersgrense.api.map.AldersgrenseMapperV1
-import no.nav.pensjon.kalkulator.aldersgrense.api.map.AldersgrenseMapperV2
+import no.nav.pensjon.kalkulator.aldersgrense.api.map.AldersgrenseMapperV1.dtoV1
+import no.nav.pensjon.kalkulator.aldersgrense.api.map.AldersgrenseMapperV2.dto
+import no.nav.pensjon.kalkulator.aldersgrense.api.map.AldersgrenseMapperV2.fromDto
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
+
 @RestController
 @RequestMapping("api")
 class AldersgrenseController(
     private val service: AldersgrenseService,
-    private val traceAid: TraceAid,
+    private val traceAid: TraceAid
 ) : ControllerBase(traceAid) {
 
     private val log = KotlinLogging.logger {}
@@ -51,7 +56,7 @@ class AldersgrenseController(
         log.debug { "Request for aldersgrense V1" }
 
         return try {
-            AldersgrenseMapperV1.dtoV1(timed({ service.hentAldersgrenser(spec) }, "hentAldersgrenser"))
+            dtoV1(timed({ service.hentAldersgrenser(fromDto(spec)) }, "hentAldersgrenser"))
                 .also { log.debug { "aldersgrense respons: $it" } }
         } catch (e: NotFoundException) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, e.message)
@@ -85,7 +90,7 @@ class AldersgrenseController(
         log.debug { "Request for aldersgrense V2" }
 
         return try {
-            AldersgrenseMapperV2.dto(timed({ service.hentAldersgrenser(spec) }, "hentAldersgrenser"))
+            dto(timed({ service.hentAldersgrenser(fromDto(spec)) }, "hentAldersgrenser"))
                 .also { log.debug { "aldersgrense respons: $it" } }
         } catch (e: NotFoundException) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, e.message)
