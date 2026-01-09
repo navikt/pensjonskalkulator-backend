@@ -9,4 +9,9 @@ class TextRedacterTest : ShouldSpec({
         TextRedacter.redact("""{:"GET /v1/hentafpstatus/07836349269"}""") shouldBe
                 """{:"GET /v1/hentafpstatus/(!redacted)"}"""
     }
+
+    should("leave unchanged numbers more than 11 digits long") {
+        TextRedacter.redact("""123456789012""") shouldBe
+                """123456789012"""
+    }
 })
