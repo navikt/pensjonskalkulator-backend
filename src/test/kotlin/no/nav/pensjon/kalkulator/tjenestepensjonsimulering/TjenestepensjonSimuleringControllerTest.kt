@@ -1,22 +1,23 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering
 
+import com.ninjasquad.springmockk.MockkBean
+import io.kotest.core.spec.style.FunSpec
+import io.mockk.every
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import no.nav.pensjon.kalkulator.testutil.anyNonNull
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.TjenestepensjonSimuleringController
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.*
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.TjenestepensjonSimuleringController
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Test
-import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
@@ -27,110 +28,114 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(TjenestepensjonSimuleringController::class)
 @Import(MockSecurityConfiguration::class)
-class TjenestepensjonSimuleringControllerTest {
+class TjenestepensjonSimuleringControllerTest : FunSpec() {
 
     @Autowired
     private lateinit var mvc: MockMvc
 
-    @MockitoBean
+    @MockkBean(relaxed = true)
     private lateinit var service: TjenestepensjonSimuleringService
 
-    @MockitoBean
+    @MockkBean(relaxed = true)
     private lateinit var traceAid: TraceAid
 
-    @MockitoBean
+    @MockkBean
     private lateinit var pidExtractor: PidExtractor
 
-    @MockitoBean
-    private lateinit var fortroligAdresseService: FortroligAdresseService
+    @MockkBean
+    private lateinit var adresseService: FortroligAdresseService
 
-    @MockitoBean
+    @MockkBean
     private lateinit var groupMembershipService: GroupMembershipService
 
-    @MockitoBean
+    @MockkBean
     private lateinit var auditor: Auditor
 
-    @Test
-    fun `simuler offentlig tjenestepensjon V2`() {
-        `when`(service.hentTjenestepensjonSimulering(anyNonNull())).thenReturn(RESULTAT_OK_V2)
+    init {
+        beforeSpec {
+            every { traceAid.begin() } returns Unit
+            every { pidExtractor.pid() } returns pid
+            every { adresseService.adressebeskyttelseGradering(any()) } returns AdressebeskyttelseGradering.UGRADERT
+            every { groupMembershipService.innloggetBrukerHarTilgang(any()) } returns true
+            every { auditor.audit(any(), any()) } returns Unit
+        }
 
-        mvc.perform(
-            post(URL_V2)
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(REQUEST_BODY_V2)
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY_OK_V2))
-    }
+        test("simuler offentlig tjenestepensjon V2") {
+            every { service.hentTjenestepensjonSimulering(any()) } returns RESULTAT_OK_V2
 
-    @Test
-    fun `simuler offentlig tjenestepensjon hvor det feiler hos tp-ordning`() {
-        `when`(service.hentTjenestepensjonSimulering(anyNonNull())).thenReturn(RESULTAT_TEKNISK_FEIL_V2)
+            mvc.perform(
+                post(URL_V2)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(REQUEST_BODY_V2)
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(RESPONSE_BODY_OK_V2))
+        }
 
-        mvc.perform(
-            post(URL_V2)
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(REQUEST_BODY_V2)
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY_TEKNISK_FEIL_V2))
-    }
+        test("simuler offentlig tjenestepensjon hvor det feiler hos tp-ordning") {
+            every { service.hentTjenestepensjonSimulering(any()) } returns RESULTAT_TEKNISK_FEIL_V2
 
-    @Test
-    fun `simuler offentlig tjenestepensjon naar bruker ikke er medlem`() {
-        `when`(service.hentTjenestepensjonSimulering(anyNonNull())).thenReturn(RESULTAT_BRUKER_ER_IKKE_MEDLEM_V2)
+            mvc.perform(
+                post(URL_V2)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(REQUEST_BODY_V2)
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(RESPONSE_BODY_TEKNISK_FEIL_V2))
+        }
 
-        mvc.perform(
-            post(URL_V2)
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(REQUEST_BODY_V2)
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY_BRUKER_ER_IKKE_MEDLEM_V2))
-    }
+        test("simuler offentlig tjenestepensjon naar bruker ikke er medlem") {
+            every { service.hentTjenestepensjonSimulering(any()) } returns RESULTAT_BRUKER_ER_IKKE_MEDLEM_V2
 
-    @Test
-    fun `simuler offentlig tjenestepensjon naar bruker er medlem hos TP-ordning som ikke stoettes`() {
-        `when`(service.hentTjenestepensjonSimulering(anyNonNull())).thenReturn(RESULTAT_TP_ORDNING_STOETTES_IKKE_V2)
+            mvc.perform(
+                post(URL_V2)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(REQUEST_BODY_V2)
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(RESPONSE_BODY_BRUKER_ER_IKKE_MEDLEM_V2))
+        }
 
-        mvc.perform(
-            post(URL_V2)
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(REQUEST_BODY_V2)
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY_TP_ORDNING_STOETTES_IKKE_V2))
-    }
+        test("simuler offentlig tjenestepensjon naar bruker er medlem hos TP-ordning som ikke stoettes") {
+            every { service.hentTjenestepensjonSimulering(any()) } returns RESULTAT_TP_ORDNING_STOETTES_IKKE_V2
 
-    @Test
-    fun `simuler offentlig tjenestepensjon naar TP-ordning returnerer tom respons`() {
-        `when`(service.hentTjenestepensjonSimulering(anyNonNull())).thenReturn(RESULTAT_TOM_RESPONS_FRA_TP_ORDNING_V2)
+            mvc.perform(
+                post(URL_V2)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(REQUEST_BODY_V2)
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(RESPONSE_BODY_TP_ORDNING_STOETTES_IKKE_V2))
+        }
 
-        mvc.perform(
-            post(URL_V2)
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(REQUEST_BODY_V2)
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().json(RESPONSE_BODY_TOM_RESPONS_FRA_TP_ORDNING_V2))
-    }
+        test("simuler offentlig tjenestepensjon naar TP-ordning returnerer tom respons") {
+            every { service.hentTjenestepensjonSimulering(any()) } returns RESULTAT_TOM_RESPONS_FRA_TP_ORDNING_V2
 
-    @Test
-    fun `simuler offentlig tjenestepensjon feiler`() {
-        `when`(service.hentTjenestepensjonSimulering(anyNonNull())).thenThrow(EgressException("Pesys tok kvelden"))
+            mvc.perform(
+                post(URL_V2)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(REQUEST_BODY_V2)
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(RESPONSE_BODY_TOM_RESPONS_FRA_TP_ORDNING_V2))
+        }
 
-        mvc.perform(
-            post(URL_V2)
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(REQUEST_BODY_V2)
-        )
-            .andExpect(status().is5xxServerError())
+        test("simuler offentlig tjenestepensjon feiler") {
+            every { service.hentTjenestepensjonSimulering(any()) } throws EgressException("Pesys tok kvelden")
+
+            mvc.perform(
+                post(URL_V2)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(REQUEST_BODY_V2)
+            )
+                .andExpect(status().is5xxServerError())
+        }
     }
 
     private companion object {
