@@ -1,63 +1,52 @@
 package no.nav.pensjon.kalkulator.aldersgrense
 
-import no.nav.pensjon.kalkulator.aldersgrense.api.dto.AldersgrenseSpec
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.normalder.AldersgrenseSpec
 import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
 import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService
 import no.nav.pensjon.kalkulator.normalder.VerdiStatus
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.InjectMocks
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.junit.jupiter.MockitoExtension
 import java.time.LocalDate
 
-@ExtendWith(MockitoExtension::class)
-class AldersgrenseServiceTest {
+class AldersgrenseServiceTest : ShouldSpec({
 
-    @Mock
-    private lateinit var normertPensjonsalderService: NormertPensjonsalderService
+    should("call normalderService with fødselsdato = 1 January of aarskull year and return aldersgrenser") {
+        val spec = AldersgrenseSpec(aarskull = 1963)
+        val foedselsdato = LocalDate.of(1963, 1, 1)
+        val expectedAldersgrenser = aldersgrenser(1963)
 
-    @InjectMocks
-    private lateinit var service: AldersgrenseService
-
-    @Test
-    fun `hentAldersgrenser converts foedselsdato to LocalDate and calls normertPensjonsalderService`() {
-        val spec = AldersgrenseSpec(foedselsdato = 1963)
-        val expectedDate = LocalDate.of(1963, 1, 1)
-        val expectedAldre = Aldersgrenser(
-            aarskull = 1963,
-            normalder = Alder(aar = 67, maaneder = 0),
-            nedreAlder = Alder(aar = 62, maaneder = 0),
-            oevreAlder = Alder(aar = 75, maaneder = 0),
-            verdiStatus = VerdiStatus.FAST
-        )
-
-        `when`(normertPensjonsalderService.aldersgrenser(expectedDate)).thenReturn(expectedAldre)
-
-        val result = service.hentAldersgrenser(spec)
-
-        assertEquals(expectedAldre, result)
+        AldersgrenseService(
+            normalderService = arrangeNormalderService(foedselsdato, expectedAldersgrenser)
+        ).hentAldersgrenser(spec) shouldBe expectedAldersgrenser
     }
 
-    @Test
-    fun `hentAldersgrenser handles different birth years`() {
-        val spec = AldersgrenseSpec(foedselsdato = 1970)
-        val expectedDate = LocalDate.of(1970, 1, 1)
-        val expectedAldre = Aldersgrenser(
-            aarskull = 1970,
-            normalder = Alder(aar = 67, maaneder = 0),
-            nedreAlder = Alder(aar = 62, maaneder = 0),
-            oevreAlder = Alder(aar = 75, maaneder = 0),
-            verdiStatus = VerdiStatus.FAST
-        )
+    should("handle different aarskull") {
+        val spec = AldersgrenseSpec(aarskull = 1970)
+        val foedselsdato = LocalDate.of(1970, 1, 1)
+        val expectedAldersgrenser = aldersgrenser(1970)
 
-        `when`(normertPensjonsalderService.aldersgrenser(expectedDate)).thenReturn(expectedAldre)
-
-        val result = service.hentAldersgrenser(spec)
-
-        assertEquals(expectedAldre, result)
+        AldersgrenseService(
+            normalderService = arrangeNormalderService(foedselsdato, expectedAldersgrenser)
+        ).hentAldersgrenser(spec) shouldBe expectedAldersgrenser
     }
-}
+})
+
+private fun arrangeNormalderService(
+    foedselsdato: LocalDate,
+    expectedAldersgrenser: Aldersgrenser
+): NormertPensjonsalderService =
+    mockk<NormertPensjonsalderService>().apply {
+        every { aldersgrenser(foedselsdato) } returns expectedAldersgrenser
+    }
+
+private fun aldersgrenser(aarskull: Int) =
+    Aldersgrenser(
+        aarskull,
+        normalder = Alder(aar = 67, maaneder = 0),
+        nedreAlder = Alder(aar = 62, maaneder = 0),
+        oevreAlder = Alder(aar = 75, maaneder = 0),
+        verdiStatus = VerdiStatus.FAST
+    )

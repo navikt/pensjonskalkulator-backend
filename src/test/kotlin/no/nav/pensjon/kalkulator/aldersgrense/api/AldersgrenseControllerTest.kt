@@ -4,11 +4,11 @@ import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.FunSpec
 import io.mockk.every
 import no.nav.pensjon.kalkulator.aldersgrense.AldersgrenseService
-import no.nav.pensjon.kalkulator.aldersgrense.api.dto.AldersgrenseSpec
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
+import no.nav.pensjon.kalkulator.normalder.AldersgrenseSpec
 import no.nav.pensjon.kalkulator.normalder.VerdiStatus
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
@@ -62,7 +62,7 @@ class AldersgrenseControllerTest : FunSpec() {
         }
 
         test("'aldersgrense' endpoint version 1 with birth year 1963") {
-            val spec = AldersgrenseSpec(foedselsdato = 1963)
+            val spec = AldersgrenseSpec(aarskull = 1963)
             val aldersgrenser = Aldersgrenser(
                 aarskull = 1963,
                 normalder = Alder(aar = 67, maaneder = 0),
@@ -84,7 +84,7 @@ class AldersgrenseControllerTest : FunSpec() {
         }
 
         test("'aldersgrense' endpoint version 1 with birth year 1970") {
-            val spec = AldersgrenseSpec(foedselsdato = 1970)
+            val spec = AldersgrenseSpec(aarskull = 1970)
             val aldersgrenser = Aldersgrenser(
                 aarskull = 1970,
                 normalder = Alder(aar = 67, maaneder = 0),
@@ -106,7 +106,7 @@ class AldersgrenseControllerTest : FunSpec() {
         }
 
         test("'aldersgrense' endpoint V2 with birth year 1963") {
-            val spec = AldersgrenseSpec(foedselsdato = 1963)
+            val spec = AldersgrenseSpec(aarskull = 1963)
             val aldersgrenser = Aldersgrenser(
                 aarskull = 1963,
                 normalder = Alder(aar = 67, maaneder = 0),
@@ -128,7 +128,7 @@ class AldersgrenseControllerTest : FunSpec() {
         }
 
         test("'aldersgrense' endpoint V2 with birth year 1970") {
-            val spec = AldersgrenseSpec(foedselsdato = 1970)
+            val spec = AldersgrenseSpec(aarskull = 1970)
             val aldersgrenser = Aldersgrenser(
                 aarskull = 1970,
                 normalder = Alder(aar = 67, maaneder = 0),
