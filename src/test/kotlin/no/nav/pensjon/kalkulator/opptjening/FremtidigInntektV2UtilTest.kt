@@ -1,86 +1,93 @@
 package no.nav.pensjon.kalkulator.opptjening
 
-import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import java.math.BigDecimal
 
-class FremtidigInntektV2UtilTest {
+class FremtidigInntektV2UtilTest : ShouldSpec({
 
-    @Test
-    fun `pensjonsgivendeInntekt gir 0 hvis ingen inntekter`() {
-        val grunnlag = Opptjeningsgrunnlag(emptyList())
+    context("pensjonsgivendeInntekt") {
+        should("gi 0 hvis ingen inntekter") {
+            val grunnlag = Opptjeningsgrunnlag(inntekter = emptyList())
 
-        val inntekt = InntektUtil.pensjonsgivendeInntekt(grunnlag, 2020)
+            InntektUtil.pensjonsgivendeInntekt(grunnlag, minimumAar = 2020) shouldBe
+                    Inntekt(
+                        type = Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT,
+                        aar = 2020,
+                        beloep = BigDecimal.ZERO
+                    )
+        }
 
-        assertEquals(BigDecimal.ZERO, inntekt.beloep)
-        assertEquals(2020, inntekt.aar)
-        assertEquals(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, inntekt.type)
-    }
-
-    @Test
-    fun `pensjonsgivendeInntekt gir 0 hvis ingen pensjonsgivende inntekter`() {
-        val grunnlag = Opptjeningsgrunnlag(listOf(Inntekt(Opptjeningstype.OTHER, 2023, BigDecimal.ONE)))
-
-        val inntekt = InntektUtil.pensjonsgivendeInntekt(grunnlag, 2021)
-
-        assertEquals(BigDecimal.ZERO, inntekt.beloep)
-        assertEquals(2021, inntekt.aar)
-        assertEquals(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, inntekt.type)
-    }
-
-    @Test
-    fun `pensjonsgivendeInntekt gir siste nylige inntekt`() {
-        val grunnlag = Opptjeningsgrunnlag(
-            listOf(
-                pensjonsgivendeInntekt(2021, BigDecimal.ONE),
-                pensjonsgivendeInntekt(2023, BigDecimal.TEN), // <--- siste
-                pensjonsgivendeInntekt(2022, BigDecimal("100"))
+        should("gi 0 hvis ingen pensjonsgivende inntekter") {
+            val grunnlag = Opptjeningsgrunnlag(
+                inntekter = listOf(
+                    Inntekt(
+                        type = Opptjeningstype.OTHER, // ikke pensjonsgivende
+                        aar = 2023,
+                        beloep = BigDecimal.ONE
+                    )
+                )
             )
-        )
 
-        val inntekt = InntektUtil.pensjonsgivendeInntekt(grunnlag, 2020)
+            InntektUtil.pensjonsgivendeInntekt(grunnlag, minimumAar = 2021) shouldBe
+                    Inntekt(
+                        type = Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT,
+                        aar = 2021,
+                        beloep = BigDecimal.ZERO
+                    )
+        }
 
-        assertEquals(BigDecimal.TEN, inntekt.beloep)
-        assertEquals(2023, inntekt.aar)
-        assertEquals(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, inntekt.type)
-    }
-
-    @Test
-    fun `pensjonsgivendeInntekt gir siste nylige inntekt, selv om den er 0`() {
-        val grunnlag = Opptjeningsgrunnlag(
-            listOf(
-                pensjonsgivendeInntekt(2023, BigDecimal.ZERO), // <--- siste = 0
-                pensjonsgivendeInntekt(2022, BigDecimal.ONE),
-                pensjonsgivendeInntekt(2021, BigDecimal.TEN)
+        should("gi siste nylige inntekt") {
+            val grunnlag = Opptjeningsgrunnlag(
+                inntekter = listOf(
+                    pensjonsgivendeInntekt(aar = 2021, beloep = BigDecimal.ONE),
+                    pensjonsgivendeInntekt(aar = 2023, beloep = BigDecimal.TEN), // <--- siste
+                    pensjonsgivendeInntekt(aar = 2022, beloep = BigDecimal("100"))
+                )
             )
-        )
 
-        val inntekt = InntektUtil.pensjonsgivendeInntekt(grunnlag, 2021)
+            InntektUtil.pensjonsgivendeInntekt(grunnlag, minimumAar = 2020) shouldBe
+                    Inntekt(
+                        type = Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT,
+                        aar = 2023,
+                        beloep = BigDecimal.TEN
+                    )
+        }
 
-        assertEquals(BigDecimal.ZERO, inntekt.beloep)
-        assertEquals(2023, inntekt.aar)
-        assertEquals(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, inntekt.type)
-    }
-
-    @Test
-    fun `pensjonsgivendeInntekt gir 0 hvis ingen nylige inntekter`() {
-        val grunnlag = Opptjeningsgrunnlag(
-            listOf(
-                pensjonsgivendeInntekt(1950, BigDecimal.ONE),
-                pensjonsgivendeInntekt(1951, BigDecimal.TEN)
+        should("gi siste nylige inntekt, selv om den er 0") {
+            val grunnlag = Opptjeningsgrunnlag(
+                inntekter = listOf(
+                    pensjonsgivendeInntekt(aar = 2023, beloep = BigDecimal.ZERO), // <--- siste = 0
+                    pensjonsgivendeInntekt(aar = 2022, beloep = BigDecimal.ONE),
+                    pensjonsgivendeInntekt(aar = 2021, beloep = BigDecimal.TEN)
+                )
             )
-        )
 
-        val inntekt = InntektUtil.pensjonsgivendeInntekt(grunnlag, 2020)
+            InntektUtil.pensjonsgivendeInntekt(grunnlag, minimumAar = 2021) shouldBe
+                    Inntekt(
+                        type = Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT,
+                        aar = 2023,
+                        beloep = BigDecimal.ZERO
+                    )
+        }
 
-        assertEquals(BigDecimal.ZERO, inntekt.beloep)
-        assertEquals(2020, inntekt.aar)
-        assertEquals(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, inntekt.type)
+        should("gi 0 hvis ingen nylige inntekter") {
+            val grunnlag = Opptjeningsgrunnlag(
+                inntekter = listOf(
+                    pensjonsgivendeInntekt(aar = 1950, beloep = BigDecimal.ONE),
+                    pensjonsgivendeInntekt(aar = 1951, beloep = BigDecimal.TEN)
+                )
+            )
+
+            InntektUtil.pensjonsgivendeInntekt(grunnlag, minimumAar = 2020) shouldBe
+                    Inntekt(
+                        type = Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT,
+                        aar = 2020,
+                        beloep = BigDecimal.ZERO
+                    )
+        }
     }
+})
 
-    companion object {
-        private fun pensjonsgivendeInntekt(aar: Int, beloep: BigDecimal) =
-            Inntekt(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, aar, beloep)
-    }
-}
+private fun pensjonsgivendeInntekt(aar: Int, beloep: BigDecimal) =
+    Inntekt(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, aar, beloep)

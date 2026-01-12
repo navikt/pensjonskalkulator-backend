@@ -1,19 +1,18 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.api.map
 
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import no.nav.pensjon.kalkulator.general.LoependeInntekt
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringOffentligTjenestepensjonSpec
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.dto.*
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.api.map.TjenestepensjonSimuleringSpecMapperV2
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.time.Period
 
-class TjenestepensjonSimuleringSpecMapperV2Test {
+class TjenestepensjonSimuleringSpecMapperV2Test : ShouldSpec({
 
-    @Test
-    fun `map from dto med utenlandsperioder, gradert og helt uttak med inntekter`() {
+    should("map from DTO med utenlandsperioder, gradert og helt uttak med inntekter") {
         val spec = SimuleringOffentligTjenestepensjonSpecV2(
-            foedselsdato = LocalDate.parse("1963-02-24"),
+            foedselsdato = LocalDate.of(1963, 2, 24),
             aarligInntektFoerUttakBeloep = 1,
             gradertUttak = SimuleringOffentligTjenestepensjonGradertUttakV2(
                 uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(63, 0),
@@ -28,12 +27,12 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
             ),
             utenlandsperiodeListe = listOf(
                 UtenlandsoppholdV2(
-                    fom = LocalDate.parse("2020-01-01"),
-                    tom = LocalDate.parse("2021-12-31")
+                    fom = LocalDate.of(2020, 1, 1),
+                    tom = LocalDate.of(2021, 12, 31)
                 ),
                 UtenlandsoppholdV2(
-                    fom = LocalDate.parse("2022-01-01"),
-                    tom = LocalDate.parse("2022-12-31")
+                    fom = LocalDate.of(2022, 1, 1),
+                    tom = LocalDate.of(2022, 12, 31)
                 )
             ),
             epsHarPensjon = true,
@@ -42,39 +41,46 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
             erApoteker = true
         )
 
-        val result: SimuleringOffentligTjenestepensjonSpec = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
-
-        assertEquals(LocalDate.parse("1963-02-24"), result.foedselsdato)
-        assertEquals(LocalDate.parse("2026-03-01"), result.uttaksdato)
-        assertEquals(1, result.sisteInntekt)
-        assertEquals(3, result.fremtidigeInntekter.size)
-        assertEquals(2, result.fremtidigeInntekter[0].beloep)
-        assertEquals(LocalDate.parse("2026-03-01"), result.fremtidigeInntekter[0].fom)
-        assertEquals(3, result.fremtidigeInntekter[1].beloep)
-        assertEquals(LocalDate.parse("2029-02-01"), result.fremtidigeInntekter[1].fom)
-        assertEquals(0, result.fremtidigeInntekter[2].beloep)
-        assertEquals(LocalDate.parse("2033-04-01"), result.fremtidigeInntekter[2].fom)
-        assertEquals(3, result.aarIUtlandetEtter16)
-        assertEquals(true, result.brukerBaOmAfp)
-        assertEquals(true, result.epsPensjon)
-        assertEquals(true, result.eps2G)
-        assertEquals(true, result.erApoteker)
+        TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec) shouldBe
+                SimuleringOffentligTjenestepensjonSpec(
+                    foedselsdato = LocalDate.of(1963, 2, 24),
+                    uttaksdato = LocalDate.of(2026, 3, 1),
+                    sisteInntekt = 1,
+                    fremtidigeInntekter = listOf(
+                        LoependeInntekt(
+                            fom = LocalDate.of(2026, 3, 1),
+                            beloep = 2
+                        ),
+                        LoependeInntekt(
+                            fom = LocalDate.of(2029, 2, 1),
+                            beloep = 3
+                        ),
+                        LoependeInntekt(
+                            fom = LocalDate.of(2033, 4, 1),
+                            beloep = 0
+                        )
+                    ),
+                    aarIUtlandetEtter16 = 3,
+                    brukerBaOmAfp = true,
+                    epsPensjon = true,
+                    eps2G = true,
+                    erApoteker = true
+                )
     }
 
-    @Test
-    fun `map from dto med gradert uttak uten inntekt med helt uttak med inntekt`() {
+    should("map from DTO med gradert uttak uten inntekt med helt uttak med inntekt") {
         val spec = SimuleringOffentligTjenestepensjonSpecV2(
-            foedselsdato = LocalDate.parse("1963-02-24"),
+            foedselsdato = LocalDate.of(1963, 2, 24),
             aarligInntektFoerUttakBeloep = 1,
             gradertUttak = SimuleringOffentligTjenestepensjonGradertUttakV2(
-                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(63, 0),
+                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(aar = 63, maaneder = 0),
                 aarligInntektVsaPensjonBeloep = null
             ),
             heltUttak = SimuleringOffentligTjenestepensjonHeltUttakV2(
-                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(65, 11),
+                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(aar = 65, maaneder = 11),
                 aarligInntektVsaPensjon = SimuleringOffentligTjenestepensjonInntektV2(
-                    3,
-                    SimuleringOffentligTjenestepensjonAlderV2(70, 0)
+                    beloep = 3,
+                    sluttAlder = SimuleringOffentligTjenestepensjonAlderV2(aar = 70, maaneder = 0)
                 )
             ),
             utenlandsperiodeListe = emptyList(),
@@ -84,27 +90,39 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
             erApoteker = false
         )
 
-        val result: SimuleringOffentligTjenestepensjonSpec = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
-
-        assertEquals(2, result.fremtidigeInntekter.size)
-        assertEquals(3, result.fremtidigeInntekter[0].beloep)
-        assertEquals(LocalDate.parse("2029-02-01"), result.fremtidigeInntekter[0].fom)
-        assertEquals(0, result.fremtidigeInntekter[1].beloep)
-        assertEquals(LocalDate.parse("2033-04-01"), result.fremtidigeInntekter[1].fom)
-        assertEquals(false, result.erApoteker)
+        TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec) shouldBe
+                SimuleringOffentligTjenestepensjonSpec(
+                    foedselsdato = LocalDate.of(1963, 2, 24),
+                    uttaksdato = LocalDate.of(2026, 3, 1),
+                    sisteInntekt = 1,
+                    fremtidigeInntekter = listOf(
+                        LoependeInntekt(
+                            fom = LocalDate.of(2029, 2, 1),
+                            beloep = 3
+                        ),
+                        LoependeInntekt(
+                            fom = LocalDate.of(2033, 4, 1),
+                            beloep = 0
+                        )
+                    ),
+                    aarIUtlandetEtter16 = 0,
+                    brukerBaOmAfp = true,
+                    epsPensjon = true,
+                    eps2G = true,
+                    erApoteker = false
+                )
     }
 
-    @Test
-    fun `map from dto med gradert uttak med inntekt og helt uttak uten inntekt`() {
+    should("map from DTO med gradert uttak med inntekt og helt uttak uten inntekt") {
         val spec = SimuleringOffentligTjenestepensjonSpecV2(
-            foedselsdato = LocalDate.parse("1963-02-24"),
+            foedselsdato = LocalDate.of(1963, 2, 24),
             aarligInntektFoerUttakBeloep = 1,
             gradertUttak = SimuleringOffentligTjenestepensjonGradertUttakV2(
-                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(63, 0),
+                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(aar = 63, maaneder = 0),
                 aarligInntektVsaPensjonBeloep = 2
             ),
             heltUttak = SimuleringOffentligTjenestepensjonHeltUttakV2(
-                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(65, 11),
+                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(aar = 65, maaneder = 11),
                 aarligInntektVsaPensjon = null
             ),
             utenlandsperiodeListe = emptyList(),
@@ -114,27 +132,39 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
             erApoteker = null
         )
 
-        val result: SimuleringOffentligTjenestepensjonSpec = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
-
-        assertEquals(2, result.fremtidigeInntekter.size)
-        assertEquals(2, result.fremtidigeInntekter[0].beloep)
-        assertEquals(LocalDate.parse("2026-03-01"), result.fremtidigeInntekter[0].fom)
-        assertEquals(0, result.fremtidigeInntekter[1].beloep)
-        assertEquals(LocalDate.parse("2029-02-01"), result.fremtidigeInntekter[1].fom)
-        assertEquals(false, result.erApoteker)
+        TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec) shouldBe
+                SimuleringOffentligTjenestepensjonSpec(
+                    foedselsdato = LocalDate.of(1963, 2, 24),
+                    uttaksdato = LocalDate.of(2026, 3, 1),
+                    sisteInntekt = 1,
+                    fremtidigeInntekter = listOf(
+                        LoependeInntekt(
+                            fom = LocalDate.of(2026, 3, 1),
+                            beloep = 2
+                        ),
+                        LoependeInntekt(
+                            fom = LocalDate.of(2029, 2, 1),
+                            beloep = 0
+                        )
+                    ),
+                    aarIUtlandetEtter16 = 0,
+                    brukerBaOmAfp = true,
+                    epsPensjon = true,
+                    eps2G = true,
+                    erApoteker = false
+                )
     }
 
-    @Test
-    fun `map from dto med gradert uttak uten inntekt og helt uttak uten inntekt`() {
+    should("map from DTO med gradert uttak uten inntekt og helt uttak uten inntekt") {
         val spec = SimuleringOffentligTjenestepensjonSpecV2(
-            foedselsdato = LocalDate.parse("1963-02-24"),
+            foedselsdato = LocalDate.of(1963, 2, 24),
             aarligInntektFoerUttakBeloep = 1,
             gradertUttak = SimuleringOffentligTjenestepensjonGradertUttakV2(
-                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(63, 0),
+                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(aar = 63, maaneder = 0),
                 aarligInntektVsaPensjonBeloep = null
             ),
             heltUttak = SimuleringOffentligTjenestepensjonHeltUttakV2(
-                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(65, 11),
+                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(aar = 65, maaneder = 11),
                 aarligInntektVsaPensjon = null
             ),
             utenlandsperiodeListe = emptyList(),
@@ -144,47 +174,57 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
             erApoteker = false
         )
 
-        val result: SimuleringOffentligTjenestepensjonSpec = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
-
-        assertEquals(1, result.fremtidigeInntekter.size)
-        assertEquals(0, result.fremtidigeInntekter[0].beloep)
-        assertEquals(LocalDate.parse("2026-03-01"), result.fremtidigeInntekter[0].fom)
-        assertEquals(false, result.erApoteker)
+        TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec) shouldBe
+                SimuleringOffentligTjenestepensjonSpec(
+                    foedselsdato = LocalDate.of(1963, 2, 24),
+                    uttaksdato = LocalDate.of(2026, 3, 1),
+                    sisteInntekt = 1,
+                    fremtidigeInntekter = listOf(
+                        LoependeInntekt(
+                            fom = LocalDate.of(2026, 3, 1),
+                            beloep = 0
+                        )
+                    ),
+                    aarIUtlandetEtter16 = 0,
+                    brukerBaOmAfp = true,
+                    epsPensjon = true,
+                    eps2G = true,
+                    erApoteker = false
+                )
     }
 
-    @Test
-    fun `fromDto haandterer overlappende perioder`() {
+    should("håndtere overlappende perioder") {
         val spec = SimuleringOffentligTjenestepensjonSpecV2(
-            foedselsdato = LocalDate.parse("1963-02-24"),
+            foedselsdato = LocalDate.of(1963, 2, 24),
             aarligInntektFoerUttakBeloep = 1,
             gradertUttak = null,
             heltUttak = SimuleringOffentligTjenestepensjonHeltUttakV2(
-                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(63, 0),
+                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(aar = 63, maaneder = 0),
                 aarligInntektVsaPensjon = SimuleringOffentligTjenestepensjonInntektV2(
-                    3,
-                    SimuleringOffentligTjenestepensjonAlderV2(70, 0)
+                    beloep = 3,
+                    sluttAlder = SimuleringOffentligTjenestepensjonAlderV2(aar = 70, maaneder = 0)
                 )
             ),
             utenlandsperiodeListe = listOf(
                 UtenlandsoppholdV2(
-                    fom = LocalDate.parse("2020-01-01"),
-                    tom = LocalDate.parse("2022-12-31")
+                    fom = LocalDate.of(2020, 1, 1),
+                    tom = LocalDate.of(2022, 12, 31)
                 ),
                 UtenlandsoppholdV2(
-                    fom = LocalDate.parse("2020-01-01"),
-                    tom = LocalDate.parse("2021-12-31")
+                    fom = LocalDate.of(2020, 1, 1),
+                    tom = LocalDate.of(2021, 12, 31)
                 ),
                 UtenlandsoppholdV2(
-                    fom = LocalDate.parse("2020-03-31"),
-                    tom = LocalDate.parse("2021-06-30")
+                    fom = LocalDate.of(2020, 3, 31),
+                    tom = LocalDate.of(2021, 6, 30)
                 ),
                 UtenlandsoppholdV2(
-                    fom = LocalDate.parse("2022-09-30"),
-                    tom = LocalDate.parse("2022-12-30")
+                    fom = LocalDate.of(2022, 9, 30),
+                    tom = LocalDate.of(2022, 12, 30)
                 ),
                 UtenlandsoppholdV2(
-                    fom = LocalDate.parse("2021-01-01"),
-                    tom = LocalDate.parse("2022-12-31")
+                    fom = LocalDate.of(2021, 1, 1),
+                    tom = LocalDate.of(2022, 12, 31)
                 ),
             ),
             epsHarPensjon = true,
@@ -193,56 +233,62 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
             erApoteker = true
         )
 
-        val result = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
-
-        assertEquals(LocalDate.parse("1963-02-24"), result.foedselsdato)
-        assertEquals(LocalDate.parse("2026-03-01"), result.uttaksdato)
-        assertEquals(1, result.sisteInntekt)
-        assertEquals(3, result.aarIUtlandetEtter16)
-        assertEquals(true, result.brukerBaOmAfp)
-        assertEquals(true, result.epsPensjon)
-        assertEquals(true, result.eps2G)
-        assertEquals(true, result.erApoteker)
+        TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec) shouldBe
+                SimuleringOffentligTjenestepensjonSpec(
+                    foedselsdato = LocalDate.of(1963, 2, 24),
+                    uttaksdato = LocalDate.of(2026, 3, 1),
+                    sisteInntekt = 1,
+                    fremtidigeInntekter = listOf(
+                        LoependeInntekt(
+                            fom = LocalDate.of(2026, 3, 1),
+                            beloep = 3
+                        ),
+                        LoependeInntekt(
+                            fom = LocalDate.of(2033, 4, 1),
+                            beloep = 0
+                        )
+                    ),
+                    aarIUtlandetEtter16 = 3,
+                    brukerBaOmAfp = true,
+                    epsPensjon = true,
+                    eps2G = true,
+                    erApoteker = true
+                )
     }
 
-    @Test
-    fun `fromDto haandterer overlappende perioder uten til og med dato`() {
-        val fom = LocalDate.parse("2021-11-29")
-        val foedselsdato = LocalDate.parse("1963-02-24")
-        val uttaksdato = LocalDate.parse("2026-03-01")
-        val antallAar = Period.between(fom, uttaksdato.plusDays(1)).years //fom - inclusive, tom - inclusive too
+    should("håndtere overlappende perioder uten til og med dato") {
         val spec = SimuleringOffentligTjenestepensjonSpecV2(
-            foedselsdato = foedselsdato,
+            foedselsdato = LocalDate.of(1963, 2, 24),
             gradertUttak = null,
             heltUttak = SimuleringOffentligTjenestepensjonHeltUttakV2(
-                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(63, 0), //LocalDate.parse("2026-03-01")
+                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(aar = 63, maaneder = 0),
                 aarligInntektVsaPensjon = SimuleringOffentligTjenestepensjonInntektV2(
-                    3,
-                    SimuleringOffentligTjenestepensjonAlderV2(70, 0)
+                    beloep = 3,
+                    sluttAlder = SimuleringOffentligTjenestepensjonAlderV2(aar = 70, maaneder = 0)
                 )
             ),
             aarligInntektFoerUttakBeloep = 1,
             utenlandsperiodeListe = listOf(
                 UtenlandsoppholdV2(
-                    fom = fom,
-                    tom = LocalDate.parse("2022-02-01")
+                    fom = LocalDate.of(2021, 11, 29),
+                    tom = LocalDate.of(2022, 2, 1)
                 ),
                 UtenlandsoppholdV2(
-                    fom = LocalDate.parse("2022-01-01"),
-                    tom = LocalDate.parse("2022-12-31")
+                    fom = LocalDate.of(2022, 1, 1),
+                    tom = LocalDate.of(2022, 12, 31)
                 ),
                 UtenlandsoppholdV2(
-                    fom = LocalDate.parse("2022-12-01"),
+                    fom = LocalDate.of(2022, 12, 1),
                     tom = null
                 ),
                 UtenlandsoppholdV2(
-                    fom = LocalDate.parse("2023-12-01"),
+                    fom = LocalDate.of(2023, 12, 1),
                     tom = null
                 ),
                 UtenlandsoppholdV2(
-                    fom = LocalDate.parse("2024-12-01"),
+                    fom = LocalDate.of(2024, 12, 1),
                     tom = null
-                ),
+                )
             ),
             epsHarPensjon = true,
             epsHarInntektOver2G = true,
@@ -250,42 +296,53 @@ class TjenestepensjonSimuleringSpecMapperV2Test {
             erApoteker = false
         )
 
-        val result = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
-
-        assertEquals(foedselsdato, result.foedselsdato)
-        assertEquals(uttaksdato, result.uttaksdato)
-        assertEquals(1, result.sisteInntekt)
-        assertEquals(antallAar, result.aarIUtlandetEtter16)
-        assertEquals(true, result.brukerBaOmAfp)
-        assertEquals(true, result.epsPensjon)
-        assertEquals(true, result.eps2G)
-        assertEquals(false, result.erApoteker)
+        TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec) shouldBe
+                SimuleringOffentligTjenestepensjonSpec(
+                    foedselsdato = LocalDate.of(1963, 2, 24),
+                    uttaksdato = LocalDate.of(2026, 3, 1),
+                    sisteInntekt = 1,
+                    fremtidigeInntekter = listOf(
+                        LoependeInntekt(
+                            fom = LocalDate.of(2026, 3, 1),
+                            beloep = 3
+                        ),
+                        LoependeInntekt(
+                            fom = LocalDate.of(2033, 4, 1),
+                            beloep = 0
+                        )
+                    ),
+                    aarIUtlandetEtter16 = 4, // antall år mellom 2021-11-29 og 2026-03-02 (dagen etter uttaksdato)
+                    brukerBaOmAfp = true,
+                    epsPensjon = true,
+                    eps2G = true,
+                    erApoteker = false
+                )
     }
 
-    @Test
-    fun `fromDto haandterer fremtidig varig utenlandsopphold`() {
+    should("håndtere fremtidig varig utenlandsopphold") {
+        val idag = LocalDate.now()
         val spec = SimuleringOffentligTjenestepensjonSpecV2(
-            foedselsdato = LocalDate.now().minusYears(50).minusDays(1),
+            foedselsdato = idag.minusYears(50).minusDays(1),
             gradertUttak = null,
             heltUttak = SimuleringOffentligTjenestepensjonHeltUttakV2(
-                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(63, 0),
+                // starter uttak om 13 år:
+                uttaksalder = SimuleringOffentligTjenestepensjonAlderV2(aar = 63, maaneder = 0),
                 aarligInntektVsaPensjon = null
             ),
             aarligInntektFoerUttakBeloep = 1,
             utenlandsperiodeListe = listOf(
                 UtenlandsoppholdV2(
-                    fom = LocalDate.now().plusYears(10),//flytter til utlandet om 10 år og blir der i 3 år frem til uttak
+                    // flytter til utlandet om 10 år, dvs. 3 år før uttak:
+                    fom = idag.plusYears(10),
                     tom = null
-                ),
+                )
             ),
             epsHarPensjon = false,
             epsHarInntektOver2G = false,
             brukerBaOmAfp = false,
-            erApoteker = false,
+            erApoteker = false
         )
 
-        val result = TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec)
-
-        assertEquals(3, result.aarIUtlandetEtter16)
+        TjenestepensjonSimuleringSpecMapperV2.fromDtoV2(spec).aarIUtlandetEtter16 shouldBe 3
     }
-}
+})

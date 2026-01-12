@@ -1,15 +1,16 @@
 package no.nav.pensjon.kalkulator.aldersgrense.api.map
 
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import no.nav.pensjon.kalkulator.aldersgrense.api.dto.AldersgrenseResultV2
+import no.nav.pensjon.kalkulator.aldersgrense.api.dto.PersonAlderV2
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
 import no.nav.pensjon.kalkulator.normalder.VerdiStatus
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 
-class AldersgrenseMapperV2Test {
+class AldersgrenseMapperV2Test : ShouldSpec({
 
-    @Test
-    fun `dto maps Aldersgrenser to AldersgrenseResultV2`() {
+    should("map aldersgrenser to AldersgrenseResultV2") {
         val aldersgrenser = Aldersgrenser(
             aarskull = 1963,
             normalder = Alder(aar = 67, maaneder = 0),
@@ -18,19 +19,15 @@ class AldersgrenseMapperV2Test {
             verdiStatus = VerdiStatus.FAST
         )
 
-        val result = AldersgrenseMapperV2.dto(aldersgrenser)
-
-        // Verify mapping according to current implementation
-        assertEquals(67, result.normertPensjoneringsalder.aar)
-        assertEquals(0, result.normertPensjoneringsalder.maaneder)
-        assertEquals(62, result.nedreAldersgrense.aar)
-        assertEquals(0, result.nedreAldersgrense.maaneder)
-        assertEquals(75, result.oevreAldersgrense.aar)
-        assertEquals(0, result.oevreAldersgrense.maaneder)
+        AldersgrenseMapperV2.dto(source = aldersgrenser) shouldBe
+                AldersgrenseResultV2(
+                    normertPensjoneringsalder = PersonAlderV2(aar = 67, maaneder = 0),
+                    nedreAldersgrense = PersonAlderV2(aar = 62, maaneder = 0),
+                    oevreAldersgrense = PersonAlderV2(aar = 75, maaneder = 0)
+                )
     }
 
-    @Test
-    fun `dto maps Aldersgrenser with non-zero months to AldersgrenseResultV2`() {
+    should("map aldersgrenser with non-zero months to AldersgrenseResultV2") {
         val aldersgrenser = Aldersgrenser(
             aarskull = 1970,
             normalder = Alder(aar = 67, maaneder = 3),
@@ -39,14 +36,11 @@ class AldersgrenseMapperV2Test {
             verdiStatus = VerdiStatus.FAST
         )
 
-        val result = AldersgrenseMapperV2.dto(aldersgrenser)
-
-        // Verify mapping according to current implementation
-        assertEquals(67, result.normertPensjoneringsalder.aar)
-        assertEquals(3, result.normertPensjoneringsalder.maaneder)
-        assertEquals(62, result.nedreAldersgrense.aar)
-        assertEquals(6, result.nedreAldersgrense.maaneder)
-        assertEquals(75, result.oevreAldersgrense.aar)
-        assertEquals(0, result.oevreAldersgrense.maaneder)
+        AldersgrenseMapperV2.dto(source = aldersgrenser) shouldBe
+                AldersgrenseResultV2(
+                    normertPensjoneringsalder = PersonAlderV2(aar = 67, maaneder = 3),
+                    nedreAldersgrense = PersonAlderV2(aar = 62, maaneder = 6),
+                    oevreAldersgrense = PersonAlderV2(aar = 75, maaneder = 0)
+                )
     }
-}
+})

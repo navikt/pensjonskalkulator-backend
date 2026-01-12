@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.testutil
-
+/*
 import no.nav.pensjon.kalkulator.general.Alder
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.jzunit.jupiter.api.Assertions.assertEquals
 
 object Assertions {
 
@@ -12,3 +12,4 @@ object Assertions {
         }
     }
 }
+*/

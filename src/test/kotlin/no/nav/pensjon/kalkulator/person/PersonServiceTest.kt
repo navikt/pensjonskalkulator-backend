@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.person
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -16,7 +17,6 @@ import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService.Companion
 import no.nav.pensjon.kalkulator.normalder.VerdiStatus
 import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
-import org.junit.jupiter.api.assertThrows
 
 class PersonServiceTest : ShouldSpec({
 
@@ -73,7 +73,7 @@ class PersonServiceTest : ShouldSpec({
     }
 
     should("throw NotFoundException when invalid fødselsnummer") {
-        assertThrows<NotFoundException> {
+        shouldThrow<NotFoundException> {
             PersonService(
                 client = arrangePerson(),
                 pidGetter = arrangePid(pid = Pid("bad")),

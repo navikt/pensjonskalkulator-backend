@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.person.api.map
 
+import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.PersonFactory.foedselsdato
@@ -12,13 +13,11 @@ import no.nav.pensjon.kalkulator.person.api.dto.PersonAlderV6
 import no.nav.pensjon.kalkulator.person.api.dto.PersonPensjonsaldreV6
 import no.nav.pensjon.kalkulator.person.api.dto.PersonResultV6
 import no.nav.pensjon.kalkulator.person.api.dto.PersonSivilstandV6
-import org.junit.jupiter.api.Test
 
-class PersonMapperV6Test {
+class PersonMapperV6Test : ShouldSpec({
 
-    @Test
-    fun `dtoV6 person to data transfer object version 4`() {
-        val dto: PersonResultV6 = PersonMapperV6.dtoV6(
+    should("map person to data transfer object version 6") {
+        PersonMapperV6.dtoV6(
             Person(
                 navn = "Fornavn1 Etternavn1",
                 fornavn = "Fornavn1",
@@ -33,18 +32,17 @@ class PersonMapperV6Test {
                 sivilstand = Sivilstand.GIFT,
                 adressebeskyttelse = AdressebeskyttelseGradering.FORTROLIG
             )
-        )
-
-        dto shouldBe PersonResultV6(
-            navn = "Fornavn1 Etternavn1",
-            fornavn = "Fornavn1",
-            foedselsdato = foedselsdato,
-            pensjoneringAldre = PersonPensjonsaldreV6(
-                normertPensjoneringsalder = PersonAlderV6(67, 2),
-                nedreAldersgrense = PersonAlderV6(62, 2),
-                oevreAldersgrense = PersonAlderV6(76, 2),
-            ),
-            sivilstand = PersonSivilstandV6.GIFT
-        )
+        ) shouldBe
+                PersonResultV6(
+                    navn = "Fornavn1 Etternavn1",
+                    fornavn = "Fornavn1",
+                    foedselsdato = foedselsdato,
+                    pensjoneringAldre = PersonPensjonsaldreV6(
+                        normertPensjoneringsalder = PersonAlderV6(aar = 67, maaneder = 2),
+                        nedreAldersgrense = PersonAlderV6(aar = 62, maaneder = 2),
+                        oevreAldersgrense = PersonAlderV6(aar = 76, maaneder = 2),
+                    ),
+                    sivilstand = PersonSivilstandV6.GIFT
+                )
     }
-}
+})

@@ -1,14 +1,12 @@
 package no.nav.pensjon.kalkulator
 
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.StringSpec
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest
 @ActiveProfiles("test")
-class PensjonskalkulatorBackendApplicationTest {
+class PensjonskalkulatorBackendApplicationTest : StringSpec({
 
-    @Test
-    fun `context loads`() {
-    }
-}
+    "context loads" { }
+})

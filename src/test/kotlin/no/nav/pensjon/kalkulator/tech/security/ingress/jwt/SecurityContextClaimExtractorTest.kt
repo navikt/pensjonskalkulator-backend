@@ -1,17 +1,13 @@
 package no.nav.pensjon.kalkulator.tech.security.ingress.jwt
 
-import no.nav.pensjon.kalkulator.mock.MockAuthentication
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.context.SecurityContextImpl
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import no.nav.pensjon.kalkulator.testutil.Arrange
 
-class SecurityContextClaimExtractorTest {
+class SecurityContextClaimExtractorTest : ShouldSpec({
 
-    @Test
-    fun `claim extracts claim from JWT in security context`() {
-        SecurityContextHolder.setContext(SecurityContextImpl(MockAuthentication("key1", "value1")))
-        val value = SecurityContextClaimExtractor.claim("key1")
-        assertEquals("value1", value)
+    should("extract claim from JWT in security context") {
+        Arrange.authentication(claimKey = "key1", claimValue = "value1")
+        SecurityContextClaimExtractor.claim("key1") shouldBe "value1"
     }
-}
+})

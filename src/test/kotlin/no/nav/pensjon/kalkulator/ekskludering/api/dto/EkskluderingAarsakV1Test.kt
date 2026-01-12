@@ -1,25 +1,22 @@
 package no.nav.pensjon.kalkulator.ekskludering.api.dto
 
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.ekskludering.EkskluderingAarsak
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 
-class EkskluderingAarsakV1Test {
+class EkskluderingAarsakV1Test : ShouldSpec({
 
-    @Test
-    fun `'fromInternalValue' mapper intern ekskludering-aarsak til API-ets ekskludering-aarsak`() {
-        assertEquals(EkskluderingAarsakV1.NONE, EkskluderingAarsakV1.fromInternalValue(EkskluderingAarsak.NONE))
-        assertEquals(
-            EkskluderingAarsakV1.HAR_GJENLEVENDEYTELSE,
-            EkskluderingAarsakV1.fromInternalValue(EkskluderingAarsak.HAR_GJENLEVENDEYTELSE)
-        )
-        assertEquals(
-            EkskluderingAarsakV1.HAR_LOEPENDE_UFOERETRYGD,
-            EkskluderingAarsakV1.fromInternalValue(EkskluderingAarsak.HAR_LOEPENDE_UFOERETRYGD)
-        )
-        assertEquals(
-            EkskluderingAarsakV1.ER_APOTEKER,
-            EkskluderingAarsakV1.fromInternalValue(EkskluderingAarsak.ER_APOTEKER)
-        )
+    should("mappe intern ekskluderingsårsak til API-ets ekskluderingsårsak") {
+        EkskluderingAarsakV1.fromInternalValue(EkskluderingAarsak.NONE) shouldBe
+                EkskluderingAarsakV1.NONE
+
+        EkskluderingAarsakV1.fromInternalValue(EkskluderingAarsak.HAR_GJENLEVENDEYTELSE) shouldBe
+                EkskluderingAarsakV1.HAR_GJENLEVENDEYTELSE
+
+        EkskluderingAarsakV1.fromInternalValue(EkskluderingAarsak.HAR_LOEPENDE_UFOERETRYGD) shouldBe
+                EkskluderingAarsakV1.HAR_LOEPENDE_UFOERETRYGD
+
+        EkskluderingAarsakV1.fromInternalValue(EkskluderingAarsak.ER_APOTEKER) shouldBe
+                EkskluderingAarsakV1.ER_APOTEKER
     }
-}
+})

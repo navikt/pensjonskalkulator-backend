@@ -1,36 +1,31 @@
 package no.nav.pensjon.kalkulator.tech.crypto
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.TestPropertySource
 
 @SpringBootTest
 @TestPropertySource("classpath:application-test.properties")
-class PidEncryptionServiceTest {
+class PidEncryptionServiceTest : ShouldSpec() {
 
     @Autowired
     private lateinit var service: PidEncryptionService
 
-    @Test
-    fun `decrypt encrypted value gives original value`() {
-        val encrypted = service.encrypt("abc")
+    init {
+        should("give original value when decrypting encrypted value") {
+            val encrypted = service.encrypt("abc")
 
-        assertTrue(encrypted.startsWith("e1755645."))
-        assertEquals("abc", service.decrypt(encrypted))
-    }
+            encrypted.startsWith("e1755645.") shouldBe true
+            service.decrypt(encrypted) shouldBe "abc"
+        }
 
-    @Test
-    fun `encrypt gives error message when too long block`() {
-        val exception = assertThrows<RuntimeException> { service.encrypt(value = TOO_LONG_BLOCK) }
-
-        assertEquals(
-            "Illegal block size for encryption - abc...XYZ - length ${TOO_LONG_BLOCK.length}",
-            exception.message
-        )
+        should("give error message when encrypting too long block") {
+            shouldThrow<RuntimeException> { service.encrypt(value = TOO_LONG_BLOCK) }.message shouldBe
+                    "Illegal block size for encryption - abc...XYZ - length ${TOO_LONG_BLOCK.length}"
+        }
     }
 
     private companion object {

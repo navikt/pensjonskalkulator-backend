@@ -1,51 +1,91 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.v3.map
 
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.UtbetalingsperiodeDto
-import org.junit.jupiter.api.Test
 
-import org.junit.jupiter.api.Assertions.*
+class NorskPensjonSluttAlderMapperTest : ShouldSpec({
 
-class NorskPensjonSluttAlderMapperTest {
+    context("sluttAar") {
+        should("be null when avtalens sluttalder is null") {
+            NorskPensjonSluttAlderMapper.sluttAar(sluttAlder = null, perioder = null) shouldBe null
 
-    @Test
-    fun `sluttAar is null when avtalens sluttAlder is null`() {
-        assertNull(NorskPensjonSluttAlderMapper.sluttAar(null, null))
-        assertNull(NorskPensjonSluttAlderMapper.sluttAar(null, listOf(sluttMidtenAvAaret())))
-    }
-
-    @Test
-    fun `sluttAar not adjusted when siste utbetalingsperiode slutter etter maaned 1`() {
-        assertEquals(70, NorskPensjonSluttAlderMapper.sluttAar(70, null))
-        assertEquals(70, NorskPensjonSluttAlderMapper.sluttAar(70, emptyList()))
-        assertEquals(70, NorskPensjonSluttAlderMapper.sluttAar(70, listOf(evig())))
-        assertEquals(70, NorskPensjonSluttAlderMapper.sluttAar(70, listOf(sluttMidtenAvAaret())))
-        assertEquals(70, NorskPensjonSluttAlderMapper.sluttAar(70, listOf(sluttStartenAvAaret(), evig())))
-        assertEquals(70, NorskPensjonSluttAlderMapper.sluttAar(70, listOf(slutt(70, 2))))
-        assertEquals(70, NorskPensjonSluttAlderMapper.sluttAar(70, listOf(slutt(63, 12), slutt(70, 6), slutt(66, 1))))
-        assertEquals(70, NorskPensjonSluttAlderMapper.sluttAar(70, listOf(slutt(70, 12), slutt(70, 1))))
-    }
-
-    @Test
-    fun `sluttAar adjusted when siste utbetalingsperiode slutter i maaned 1`() {
-        assertEquals(69, NorskPensjonSluttAlderMapper.sluttAar(70, listOf(sluttStartenAvAaret())))
-        assertEquals(69, NorskPensjonSluttAlderMapper.sluttAar(70, listOf(slutt(63, 12), slutt(69, 1), slutt(66, 6))))
-        assertEquals(69, NorskPensjonSluttAlderMapper.sluttAar(70, listOf(slutt(70, 1), slutt(70, 1))))
-    }
-
-    @Test
-    fun `default maaned is 1`() {
-        assertEquals(69, NorskPensjonSluttAlderMapper.sluttAar(70, listOf(slutt(70, null))))
-    }
-
-    private fun evig() = slutt(null, null)
-
-    private fun sluttMidtenAvAaret() = slutt(70, 7)
-
-    private fun sluttStartenAvAaret() = slutt(70, 1)
-
-    private fun slutt(alder: Int?, maaned: Int?) =
-        UtbetalingsperiodeDto().apply {
-            sluttAlder = alder
-            sluttMaaned = maaned
+            NorskPensjonSluttAlderMapper.sluttAar(
+                sluttAlder = null,
+                perioder = listOf(sluttMidtenAvAaret())
+            ) shouldBe null
         }
-}
+
+        should("not be adjusted when siste utbetalingsperiode slutter etter måned 1") {
+            NorskPensjonSluttAlderMapper.sluttAar(sluttAlder = 70, perioder = null) shouldBe 70
+            NorskPensjonSluttAlderMapper.sluttAar(sluttAlder = 70, perioder = emptyList()) shouldBe 70
+            NorskPensjonSluttAlderMapper.sluttAar(sluttAlder = 70, perioder = listOf(evig())) shouldBe 70
+            NorskPensjonSluttAlderMapper.sluttAar(sluttAlder = 70, perioder = listOf(sluttMidtenAvAaret())) shouldBe 70
+
+            NorskPensjonSluttAlderMapper.sluttAar(
+                sluttAlder = 70,
+                perioder = listOf(sluttStartenAvAaret(), evig())
+            ) shouldBe 70
+
+            NorskPensjonSluttAlderMapper.sluttAar(
+                sluttAlder = 70,
+                perioder = listOf(slutt(alder = 70, maaned = 2))
+            ) shouldBe 70
+
+            NorskPensjonSluttAlderMapper.sluttAar(
+                sluttAlder = 70,
+                perioder = listOf(
+                    slutt(alder = 63, maaned = 12),
+                    slutt(alder = 70, maaned = 6),
+                    slutt(alder = 66, maaned = 1)
+                )
+            ) shouldBe 70
+
+            NorskPensjonSluttAlderMapper.sluttAar(
+                sluttAlder = 70,
+                perioder = listOf(slutt(alder = 70, maaned = 12), slutt(alder = 70, maaned = 1))
+            ) shouldBe 70
+        }
+
+        should("be adjusted when siste utbetalingsperiode slutter i måned 1") {
+            NorskPensjonSluttAlderMapper.sluttAar(sluttAlder = 70, perioder = listOf(sluttStartenAvAaret())) shouldBe 69
+
+            NorskPensjonSluttAlderMapper.sluttAar(
+                sluttAlder = 70,
+                perioder = listOf(
+                    slutt(alder = 63, maaned = 12),
+                    slutt(alder = 69, maaned = 1),
+                    slutt(alder = 66, maaned = 6)
+                )
+            ) shouldBe 69
+
+            NorskPensjonSluttAlderMapper.sluttAar(
+                sluttAlder = 70,
+                perioder = listOf(slutt(alder = 70, maaned = 1), slutt(alder = 70, maaned = 1))
+            ) shouldBe 69
+        }
+
+        should("use 1 as default måned") {
+            NorskPensjonSluttAlderMapper.sluttAar(
+                sluttAlder = 70,
+                perioder = listOf(slutt(alder = 70, maaned = null))
+            ) shouldBe 69
+        }
+    }
+})
+
+private fun evig() =
+    slutt(alder = null, maaned = null)
+
+private fun sluttMidtenAvAaret() =
+    slutt(alder = 70, maaned = 7)
+
+private fun sluttStartenAvAaret() =
+    slutt(alder = 70, maaned = 1)
+
+private fun slutt(alder: Int?, maaned: Int?) =
+    UtbetalingsperiodeDto().apply {
+        sluttAlder = alder
+        sluttMaaned = maaned
+    }
+
