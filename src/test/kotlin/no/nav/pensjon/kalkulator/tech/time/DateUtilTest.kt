@@ -1,35 +1,30 @@
 package no.nav.pensjon.kalkulator.tech.time
 
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.mock.DateFactory
-import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
-class DateUtilTest {
+class DateUtilTest : ShouldSpec({
 
-    @Test
-    fun `toDate converts LocalDate in summer to Date`() {
-        assertEquals(date(Calendar.JULY), DateUtil.toDate(LocalDate.of(YEAR, 7, 1)))
+    should("convert LocalDate in summer to Date") {
+        DateUtil.toDate(LocalDate.of(YEAR, 7, 1)) shouldBe date(Calendar.JULY)
     }
 
-    @Test
-    fun `toDate converts LocalDate in winter to Date`() {
-        assertEquals(date(Calendar.FEBRUARY), DateUtil.toDate(LocalDate.of(YEAR, 2, 1)))
+    should("convert LocalDate in winter to Date") {
+        DateUtil.toDate(LocalDate.of(YEAR, 2, 1)) shouldBe date(Calendar.FEBRUARY)
     }
 
-    @Test
-    fun `toLocalDate converts UTC date-time to local date`() {
+    should("convert UTC date-time to local date") {
         val utcDateTime = ZonedDateTime.of(YEAR, 1, 31, 23, 0, 0, 0, ZoneId.of("UTC"))
-        assertEquals(LocalDate.of(YEAR, 2, 1), DateUtil.toLocalDate(utcDateTime))
+        DateUtil.toLocalDate(utcDateTime) shouldBe LocalDate.of(YEAR, 2, 1)
     }
+})
 
-    companion object {
-        private const val YEAR = 2023
+private const val YEAR = 2023
 
-        private fun date(month: Int): Date = DateFactory.date(YEAR, month)
-    }
-}
+private fun date(month: Int): Date =
+    DateFactory.date(YEAR, month)

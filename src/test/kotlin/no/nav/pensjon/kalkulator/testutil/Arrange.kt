@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.testutil
 
 import no.nav.pensjon.kalkulator.WebClientTestConfig
+import no.nav.pensjon.kalkulator.mock.MockAuthentication
 import no.nav.pensjon.kalkulator.mock.TestObjects.jwt
 import no.nav.pensjon.kalkulator.mock.TestObjects.pid1
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonTarget
@@ -16,8 +17,15 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.context.SecurityContextImpl
 
 object Arrange {
+    fun authentication(claimKey: String, claimValue: Any) {
+        SecurityContextHolder.setContext(
+            SecurityContextImpl(MockAuthentication(claimKey, claimValue))
+        )
+    }
+
     fun security() {
         SecurityContextHolder.setContext(SecurityContextHolder.createEmptyContext())
 

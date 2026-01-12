@@ -1,24 +1,25 @@
 package no.nav.pensjon.kalkulator.simulering
 
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.general.Alder
-import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import java.time.LocalDate
 
-class PensjonUtilTest {
+class PensjonUtilTest : ShouldSpec({
 
-    @Test
-    fun `uttakDato is first in month after uttaksalder`() {
-        val foedselDato = LocalDate.of(1963, 2, 1)
-        val uttakDato = PensjonUtil.uttakDato(foedselDato, Alder(67, 0))
-        assertEquals(LocalDate.of(2030, 3, 1), uttakDato)
-    }
+    context("uttakDato") {
+        should("be first in month after uttaksalder") {
+            PensjonUtil.uttakDato(
+                foedselDato = LocalDate.of(1963, 2, 1),
+                uttakAlder = Alder(aar = 67, maaneder = 0)
+            ) shouldBe LocalDate.of(2030, 3, 1)
+        }
 
-    @Test
-    fun `uttakDato includes uttaksmaaned in calculation`() {
-        val foedselDato = LocalDate.of(1963, 3, 31)
-        val uttakDato = PensjonUtil.uttakDato(foedselDato, Alder(67, 11))
-        assertEquals(LocalDate.of(2031, 3, 1), uttakDato)
+        should("include uttaksmåned in calculation") {
+            PensjonUtil.uttakDato(
+                foedselDato = LocalDate.of(1963, 3, 31),
+                uttakAlder = Alder(aar = 67, maaneder = 11)
+            ) shouldBe LocalDate.of(2031, 3, 1)
+        }
     }
-}
+})

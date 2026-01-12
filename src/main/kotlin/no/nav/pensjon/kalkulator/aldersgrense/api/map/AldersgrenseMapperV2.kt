@@ -11,7 +11,7 @@ object AldersgrenseMapperV2 {
     fun fromDto(source: AldersgrenseSpecV1V2) =
         AldersgrenseSpec(aarskull = source.foedselsdato)
 
-    fun dto(source: Aldersgrenser): AldersgrenseResultV2 =
+    fun dto(source: Aldersgrenser) =
         AldersgrenseResultV2(
             normertPensjoneringsalder = PersonAlderV2(source.normalder.aar, source.normalder.maaneder),
             nedreAldersgrense = PersonAlderV2(source.nedreAlder.aar, source.nedreAlder.maaneder),

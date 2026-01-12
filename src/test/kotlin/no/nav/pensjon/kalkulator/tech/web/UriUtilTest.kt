@@ -1,19 +1,17 @@
 package no.nav.pensjon.kalkulator.tech.web
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 
-class UriUtilTest {
+class UriUtilTest : ShouldSpec({
 
-    @Test
-    fun `formatAsUri produces a URI given scheme, authority, path`() {
-        val uri = UriUtil.formatAsUri("scheme1", "authority1", "path1")
-        assertEquals("scheme1://authority1/path1", uri)
+    should("formatAsUri produces a URI given scheme, authority, path") {
+        UriUtil.formatAsUri(scheme = "scheme1", authority = "authority1", path = "path1") shouldBe
+                "scheme1://authority1/path1"
     }
 
-    @Test
-    fun `formatAsUri produces a URI given scheme, authority, but no path`() {
-        val uri = UriUtil.formatAsUri("scheme1", "authority1", "")
-        assertEquals("scheme1://authority1", uri)
+    should("formatAsUri produces a URI given scheme, authority, but no path") {
+        UriUtil.formatAsUri(scheme = "scheme1", authority = "authority1", path = "") shouldBe
+                "scheme1://authority1"
     }
-}
+})

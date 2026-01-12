@@ -1,22 +1,18 @@
 package no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit
 
-import no.nav.pensjon.kalkulator.mock.MockAuthentication
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.context.SecurityContextImpl
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import no.nav.pensjon.kalkulator.testutil.Arrange
 
-class SecurityContextNavIdExtractorTest {
+class SecurityContextNavIdExtractorTest : ShouldSpec({
 
-    @Test
-    fun `id returns Nav identifier if found in JWT 'NAVident' claim`() {
-        SecurityContextHolder.setContext(SecurityContextImpl(MockAuthentication("NAVident", "X123456")))
-        assertEquals("X123456", SecurityContextNavIdExtractor().id())
+    should("id returns Nav identifier if found in JWT 'NAVident' claim") {
+        Arrange.authentication(claimKey = "NAVident", claimValue = "X123456")
+        SecurityContextNavIdExtractor().id() shouldBe "X123456"
     }
 
-    @Test
-    fun `id returns empty string if no 'NAVident' claim in JWT`() {
-        SecurityContextHolder.setContext(SecurityContextImpl(MockAuthentication("other-ident", "id1")))
-        assertEquals("", SecurityContextNavIdExtractor().id())
+    should("id returns empty string if no 'NAVident' claim in JWT") {
+        Arrange.authentication(claimKey = "other-ident", claimValue = "id1")
+        SecurityContextNavIdExtractor().id() shouldBe ""
     }
-}
+})

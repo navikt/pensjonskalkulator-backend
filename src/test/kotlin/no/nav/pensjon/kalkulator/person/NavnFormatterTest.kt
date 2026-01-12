@@ -1,68 +1,57 @@
 package no.nav.pensjon.kalkulator.person
 
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 
-class NavnFormatterTest {
+class NavnFormatterTest : ShouldSpec({
 
-    @Test
-    fun `test fornavn`() {
-        assertEquals("Cruella", NavnFormatter.formatNavn("CruElla", null, null))
-        assertEquals("Cruella-D", NavnFormatter.formatNavn("CruElla-d", null, ""))
-        assertEquals("Cruella-", NavnFormatter.formatNavn("CRuElla-", "", null))
-        assertEquals("Cruella-De", NavnFormatter.formatNavn("CruElla-DE", "", " "))
-        assertEquals("Cruella De", NavnFormatter.formatNavn("CruElla dE", " ", " "))
+    should("formattere fornavn") {
+        NavnFormatter.formatNavn("CruElla", null, null) shouldBe "Cruella"
+        NavnFormatter.formatNavn("CruElla-d", null, "") shouldBe "Cruella-D"
+        NavnFormatter.formatNavn("CRuElla-", "", null) shouldBe "Cruella-"
+        NavnFormatter.formatNavn("CruElla-DE", "", " ") shouldBe "Cruella-De"
+        NavnFormatter.formatNavn("CruElla dE", " ", " ") shouldBe "Cruella De"
     }
 
-    @Test
-    fun `test mellomnavn`() {
-        assertEquals("De", NavnFormatter.formatNavn("", "dE", null))
-        assertEquals("Cruella", NavnFormatter.formatNavn(null, "CruEllA", ""))
+    should("formattere mellomnavn") {
+        NavnFormatter.formatNavn("", "dE", null) shouldBe "De"
+        NavnFormatter.formatNavn(null, "CruEllA", "") shouldBe "Cruella"
     }
 
-    @Test
-    fun `test etternavn`() {
-        assertEquals("Vil", NavnFormatter.formatNavn("", "", "ViL"))
-        assertEquals("Cruella", NavnFormatter.formatNavn("", "", "CruEllA"))
+    should("formattere etternavn") {
+        NavnFormatter.formatNavn("", "", "ViL") shouldBe "Vil"
+        NavnFormatter.formatNavn("", "", "CruEllA") shouldBe "Cruella"
     }
 
-    @Test
-    fun `test fullt navn`() {
-        assertEquals("Cruella De Vil", NavnFormatter.formatNavn("Cruella", "De", "VIl"))
+    should("formattere fullt navn") {
+        NavnFormatter.formatNavn("Cruella", "De", "VIl") shouldBe "Cruella De Vil"
     }
 
-    @Test
-    fun `test for- og etternavn`() {
-        assertEquals("Cruella Vil", NavnFormatter.formatNavn("CRUELLA", null, "ViL"))
+    should("formattere for- og etternavn") {
+        NavnFormatter.formatNavn("CRUELLA", null, "ViL") shouldBe "Cruella Vil"
     }
 
-    @Test
-    fun `test for- og mellomnavn`() {
-        assertEquals("Cruella De", NavnFormatter.formatNavn("Cruella", "DE", ""))
+    should("formattere for- og mellomnavn") {
+        NavnFormatter.formatNavn("Cruella", "DE", "") shouldBe "Cruella De"
     }
 
-    @Test
-    fun `formatName returns each navn part with capitalized first letter`() {
-        assertEquals("Marve Almar Fleksnes", NavnFormatter.formatNavn("marve", "ALMAR", "FleksneS"))
+    should("return each navn part with capitalized first letter") {
+        NavnFormatter.formatNavn("marve", "ALMAR", "FleksneS") shouldBe "Marve Almar Fleksnes"
     }
 
-    @Test
-    fun `formatName handles compund etternavn`() {
-        assertEquals("Kari Hansen-Jensen", NavnFormatter.formatNavn("KARI", "", "hansen-JENSEN"))
+    should("handle compund etternavn") {
+        NavnFormatter.formatNavn("KARI", "", "hansen-JENSEN") shouldBe "Kari Hansen-Jensen"
     }
 
-    @Test
-    fun `formatName handles compund mellomnavn`() {
-        assertEquals("Mellom Navn Hansen", NavnFormatter.formatNavn(null, "mellom NAVN", "hansen"))
+    should("handle compund mellomnavn") {
+        NavnFormatter.formatNavn(null, "mellom NAVN", "hansen") shouldBe "Mellom Navn Hansen"
     }
 
-    @Test
-    fun `formatName handles compund fornavn`() {
-        assertEquals("Per Kari-Ola Mellom", NavnFormatter.formatNavn("per kari-OLA", "meLLom", null))
+    should("handle compund fornavn") {
+        NavnFormatter.formatNavn("per kari-OLA", "meLLom", null) shouldBe "Per Kari-Ola Mellom"
     }
 
-    @Test
-    fun `formatName handles nulls`() {
-        assertEquals("", NavnFormatter.formatNavn(null, null, null))
+    should("handle nulls") {
+        NavnFormatter.formatNavn(null, null, null) shouldBe ""
     }
-}
+})

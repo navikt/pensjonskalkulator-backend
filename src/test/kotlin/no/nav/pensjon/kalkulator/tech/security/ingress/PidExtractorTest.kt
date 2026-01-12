@@ -1,17 +1,16 @@
 package no.nav.pensjon.kalkulator.tech.security.ingress
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.mockk
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertThrows
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
 
-class PidExtractorTest : ShouldSpec( {
+class PidExtractorTest : ShouldSpec({
 
     should("throw informative RuntimeException if no PID in security context") {
         SecurityContextHolder.setContext(SecurityContextImpl(mockk()))
-        val exception = assertThrows(RuntimeException::class.java) { PidExtractor().pid() }
-        assertEquals("No PID found", exception.message)
+        shouldThrow<RuntimeException> { PidExtractor().pid() }.message shouldBe "No PID found"
     }
 })

@@ -1,18 +1,17 @@
 package no.nav.pensjon.kalkulator.avtale.api.map
 
+import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.avtale.*
 import no.nav.pensjon.kalkulator.avtale.api.dto.*
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
-import org.junit.jupiter.api.Test
 
-class PensjonsavtaleResultMapperV3Test {
+class PensjonsavtaleResultMapperV3Test : ShouldSpec({
 
-    @Test
-    fun `toDtoV3 maps from domain object to version 2 of data transfer object`() {
+    should("map from domain object to data transfer object") {
         PensjonsavtaleResultMapperV3.toDtoV3(
-            Pensjonsavtaler(
+            source = Pensjonsavtaler(
                 avtaler = listOf(
                     Pensjonsavtale(
                         produktbetegnelse = "p1",
@@ -47,10 +46,9 @@ class PensjonsavtaleResultMapperV3Test {
                                     grad = 80
                                 )
                             )
-
                         )
                     ),
                     utilgjengeligeSelskap = listOf(SelskapV3(navn = "n1", heltUtilgjengelig = true))
                 )
     }
-}
+})
