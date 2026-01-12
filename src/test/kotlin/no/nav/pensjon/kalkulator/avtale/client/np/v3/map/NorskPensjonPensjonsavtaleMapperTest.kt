@@ -22,10 +22,11 @@ class NorskPensjonPensjonsavtaleMapperTest : ShouldSpec({
     context("toDto") {
         should("map domain object to data transfer object") {
             NorskPensjonPensjonsavtaleMapper.toDto(
-                PensjonsavtaleSpec(
+                spec = PensjonsavtaleSpec(
                     aarligInntektFoerUttak = 1,
                     uttaksperioder = emptyList()
-                ), pid
+                ),
+                pid
             ) shouldBe
                     NorskPensjonPensjonsavtaleSpecDto(
                         pid = pid,
@@ -40,7 +41,7 @@ class NorskPensjonPensjonsavtaleMapperTest : ShouldSpec({
          * However, using 14 makes Norsk Pensjon return the error "No signature in message!".
          * As a workoround 13 is used instead (although this represents "13 years" instead of "livsvarig").
          */
-        should("limit antallInntektsaarEtterUttak to 'livsvarig value' 13") {
+        should("begrense antall inntektsår etter uttak til 'livsvarig verdi' 13") {
             val antallInntektsaarEtterUttak = 20 // more than max. value of 13
             val startAlderAar = 62
             val domainObject = PensjonsavtaleSpec(
@@ -71,7 +72,7 @@ class NorskPensjonPensjonsavtaleMapperTest : ShouldSpec({
             ).antallInntektsaarEtterUttak shouldBe 13 // max. is 13 (which represents 'livsvarig')
         }
 
-        should("give antall inntektsår etter uttak = 0 when årlig inntekt is null") {
+        should("gi antall inntektsår etter uttak = 0 når årlig inntekt er udefinert") {
             val domainObject = PensjonsavtaleSpec(
                 aarligInntektFoerUttak = 20_000,
                 uttaksperioder = listOf(
@@ -91,9 +92,11 @@ class NorskPensjonPensjonsavtaleMapperTest : ShouldSpec({
     }
 })
 
-private fun envelope() = EnvelopeDto().apply { body = body() }
+private fun envelope() =
+    EnvelopeDto().apply { body = body() }
 
-private fun body() = BodyDto().apply { pensjonsrettigheter = pensjonsrettigheter() }
+private fun body() =
+    BodyDto().apply { pensjonsrettigheter = pensjonsrettigheter() }
 
 private fun pensjonsrettigheter() =
     PensjonsrettigheterDto().apply {
