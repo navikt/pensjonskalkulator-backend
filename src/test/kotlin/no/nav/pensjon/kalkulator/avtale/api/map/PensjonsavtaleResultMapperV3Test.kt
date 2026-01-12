@@ -9,7 +9,7 @@ import no.nav.pensjon.kalkulator.general.Uttaksgrad
 
 class PensjonsavtaleResultMapperV3Test : ShouldSpec({
 
-    should("map from domain object to version 2 of data transfer object") {
+    should("map from domain object to data transfer object") {
         PensjonsavtaleResultMapperV3.toDtoV3(
             source = Pensjonsavtaler(
                 avtaler = listOf(
