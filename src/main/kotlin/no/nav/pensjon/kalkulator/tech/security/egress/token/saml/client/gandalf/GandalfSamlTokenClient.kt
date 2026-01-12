@@ -93,7 +93,6 @@ class GandalfSamlTokenClient(
         headers.setBearerAuth(EgressAccess.token(service).value)
         headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_FORM_URLENCODED_VALUE
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
-            headers["Service-User-Id"] = "3"
     }
 
     private fun setPingHeaders(headers: HttpHeaders) {
