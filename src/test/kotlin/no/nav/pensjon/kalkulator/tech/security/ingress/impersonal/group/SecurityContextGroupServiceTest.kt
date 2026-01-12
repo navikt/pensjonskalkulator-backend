@@ -1,21 +1,19 @@
 package no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group
 
-import no.nav.pensjon.kalkulator.mock.MockAuthentication
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.context.SecurityContextImpl
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.shouldBe
+import no.nav.pensjon.kalkulator.testutil.Arrange
 
-class SecurityContextGroupServiceTest {
+class SecurityContextGroupServiceTest : ShouldSpec({
 
-    @Test
-    fun `groups extracts groups from JWT in security context`() {
-        SecurityContextHolder.setContext(SecurityContextImpl(MockAuthentication("groups", listOf("group1", "group2"))))
+    should("extract groups from JWT in security context") {
+        Arrange.authentication(claimKey = "groups", claimValue = listOf("group1", "group2"))
 
         val groups = SecurityContextGroupService().groups()
 
-        assertEquals(2, groups.size)
-        assertEquals("group1", groups[0])
-        assertEquals("group2", groups[1])
+        groups shouldHaveSize 2
+        groups[0] shouldBe "group1"
+        groups[1] shouldBe "group2"
     }
-}
+})

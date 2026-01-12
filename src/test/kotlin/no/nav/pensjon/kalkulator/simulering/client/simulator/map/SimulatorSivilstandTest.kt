@@ -1,27 +1,25 @@
 package no.nav.pensjon.kalkulator.simulering.client.simulator.map
 
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Test
 
-class SimulatorSivilstandTest {
+class SimulatorSivilstandTest : ShouldSpec({
 
-    @Test
-    fun `fromInternalValue maps from sivilstand to PEN's equivalent sivilstand`() {
-        assertEquals(SimulatorSivilstand.GIFT, SimulatorSivilstand.fromInternalValue(Sivilstand.GIFT))
+    should("map from sivilstand to PEN's equivalent sivilstand") {
+        SimulatorSivilstand.fromInternalValue(Sivilstand.GIFT) shouldBe
+                SimulatorSivilstand.GIFT
 
-        assertEquals(SimulatorSivilstand.UGIFT, SimulatorSivilstand.fromInternalValue(Sivilstand.UGIFT))
+        SimulatorSivilstand.fromInternalValue(Sivilstand.UGIFT) shouldBe
+                SimulatorSivilstand.UGIFT
 
-        assertEquals(
-            SimulatorSivilstand.REGISTRERT_PARTNER,
-            SimulatorSivilstand.fromInternalValue(Sivilstand.REGISTRERT_PARTNER)
-        )
+        SimulatorSivilstand.fromInternalValue(Sivilstand.REGISTRERT_PARTNER) shouldBe
+                SimulatorSivilstand.REGISTRERT_PARTNER
 
-        assertEquals(
-            SimulatorSivilstand.ENKE_ELLER_ENKEMANN,
-            SimulatorSivilstand.fromInternalValue(Sivilstand.ENKE_ELLER_ENKEMANN)
-        )
+        SimulatorSivilstand.fromInternalValue(Sivilstand.ENKE_ELLER_ENKEMANN) shouldBe
+                SimulatorSivilstand.ENKE_ELLER_ENKEMANN
 
-        assertEquals(SimulatorSivilstand.UDEFINERT, SimulatorSivilstand.fromInternalValue(Sivilstand.UOPPGITT))
+        SimulatorSivilstand.fromInternalValue(Sivilstand.UOPPGITT) shouldBe
+                SimulatorSivilstand.UDEFINERT
     }
-}
+})

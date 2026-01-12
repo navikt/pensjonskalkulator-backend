@@ -1,16 +1,17 @@
 package no.nav.pensjon.kalkulator.uttaksalder
 
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.general.Alder
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertThrows
-import org.junit.jupiter.api.Test
 
-class AlderTest {
+class AlderTest : ShouldSpec({
 
-    @Test
-    fun `constructor validates maaneder`() {
-        val exception = assertThrows(IllegalArgumentException::class.java) { Alder(62, 12) }
-        assertEquals("0 <= maaneder <= 11", exception.message)
-        assertThrows(IllegalArgumentException::class.java) { Alder(62, -1) }
+    should("validate måneder") {
+        shouldThrow<IllegalArgumentException> {
+            Alder(aar = 62, maaneder = 12)
+        }.message shouldBe "0 <= maaneder <= 11"
+
+        shouldThrow<IllegalArgumentException> { Alder(aar = 62, maaneder = -1) }
     }
-}
+})

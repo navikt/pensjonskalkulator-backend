@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.avtale.api.map
 
+import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.avtale.InntektSpec
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
@@ -8,12 +9,10 @@ import no.nav.pensjon.kalkulator.avtale.api.dto.*
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import org.junit.jupiter.api.Test
 
-class PensjonsavtaleSpecMapperV3Test {
+class PensjonsavtaleSpecMapperV3Test : ShouldSpec({
 
-    @Test
-    fun `'fromDtoV3' maps version 3 of data transfer object to domain object (pensjonsavtale specification)`() {
+    should("map version 3 of data transfer object to domain object (pensjonsavtale specification)") {
         PensjonsavtaleSpecMapperV3.fromDtoV3(
             PensjonsavtaleSpecV3(
                 aarligInntektFoerUttakBeloep = 234000,
@@ -51,8 +50,7 @@ class PensjonsavtaleSpecMapperV3Test {
                 )
     }
 
-    @Test
-    fun `'fromDtoV3' maps utenlandsperioder to aar`() {
+    should("map utenlandsperioder to år") {
         PensjonsavtaleSpecMapperV3.fromDtoV3(
             PensjonsavtaleSpecV3(
                 aarligInntektFoerUttakBeloep = -1,
@@ -69,4 +67,4 @@ class PensjonsavtaleSpecMapperV3Test {
                     sivilstand = null
                 )
     }
-}
+})

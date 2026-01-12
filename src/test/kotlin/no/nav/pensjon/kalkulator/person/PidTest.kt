@@ -1,96 +1,90 @@
 package no.nav.pensjon.kalkulator.person
 
-import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import java.time.LocalDate
 
 /**
  * Alle fødselsnumre og D-numre brukt her er syntetiske/fiktive.
  */
-class PidTest {
+class PidTest : ShouldSpec({
 
-    @Test
-    fun `getValue returns 'invalid' for invalid value`() {
-        assertEquals("invalid", Pid("bad value").value)
+    context("value") {
+        should("return 'invalid' for invalid value") {
+            Pid("bad value").value shouldBe "invalid"
+        }
+
+        should("return PID value for valid value") {
+            Pid("04925398980").value shouldBe "04925398980"
+        }
     }
 
-    @Test
-    fun `getValue returns PID value for valid value`() {
-        assertEquals("04925398980", Pid("04925398980").value)
+    context("displayValue") {
+        should("return 'invalid' for invalid value") {
+            Pid("bad value").displayValue shouldBe "invalid"
+        }
+
+        should("return redacted value for valid value") {
+            Pid("04925398980").displayValue shouldBe "049253*****"
+        }
     }
 
-    @Test
-    fun `getDisplayValue returns 'invalid' for invalid value`() {
-        assertEquals("invalid", Pid("bad value").displayValue)
+    context("toString") {
+        should("return 'invalid' for invalid value") {
+            Pid("bad value").toString() shouldBe "invalid"
+        }
+
+        should("return redacted value for valid value") {
+            Pid("04925398980").toString() shouldBe "049253*****"
+        }
     }
 
-    @Test
-    fun `getDisplayValue returns redacted value for valid value`() {
-        assertEquals("049253*****", Pid("04925398980").displayValue)
+    context("equals") {
+        should("be true when string values are equal") {
+            (Pid("04925398980") == Pid("04925398980")) shouldBe true
+        }
+
+        should("be false when string values are not equal") {
+            (Pid("04925398980") == Pid("12906498357")) shouldBe false
+        }
+
+        should("be false when values are not both PID") {
+            (Pid("04925398980").equals("04925398980")) shouldBe false
+        }
+
+        should("be false when value is null") {
+            Pid("04925398980").equals(null) shouldBe false
+        }
     }
 
-    @Test
-    fun `toString returns 'invalid' for invalid value`() {
-        assertEquals("invalid", Pid("bad value").toString())
-    }
+    context("dato") {
+        /**
+         * Fødselsnummer fra Test-Norge har +80 i månedsverdi.
+         */
+        should("gi datodel som LocalDate for fødselsnummer fra Test-Norge") {
+            Pid("04925398980").dato() shouldBe LocalDate.of(1953, 12, 4)
+        }
 
-    @Test
-    fun `toString returns redacted value for valid value`() {
-        assertEquals("049253*****", Pid("04925398980").toString())
-    }
+        /**
+         * D-nummer har +40 i dagsverdi.
+         */
+        should("gi datodel som LocalDate for D-nummer") {
+            Pid("41018512345").dato() shouldBe LocalDate.of(1985, 1, 1)
+        }
 
-    @Test
-    fun `equals is true when string values are equal`() {
-        assertTrue(Pid("04925398980") == Pid("04925398980"))
-    }
+        /**
+         * Dolly-nummer har +40 i månedsverdi.
+         */
+        should("gi datodel som LocalDate for Dolly-nummer") {
+            Pid("01416637578").dato() shouldBe LocalDate.of(1966, 1, 1)
+        }
 
-    @Test
-    fun `equals is false when string values are not equal`() {
-        assertFalse(Pid("04925398980") == Pid("12906498357"))
-    }
+        should("gi 1901-01-01 hvis ugyldig PID") {
+            Pid("0492539898").dato() shouldBe LocalDate.of(1901, 1, 1)
+        }
 
-    @Test
-    fun `equals is false when values are not both PID`() {
-        assertFalse(Pid("04925398980").equals("04925398980"))
+        should("gi 1902-02-02 hvis ugyldig datodel") {
+            Pid("99416637578").dato() shouldBe LocalDate.of(1902, 2, 2)
+        }
     }
-
-    @Test
-    fun `equals is false when value is null`() {
-        assertFalse(Pid("04925398980").equals(null))
-    }
-
-    /**
-     * Fødselsnummer fra Test-Norge har +80 i månedsverdi.
-     */
-    @Test
-    fun `dato gir datodel som LocalDate for foedselsnummer fra Test-Norge`() {
-        assertEquals(LocalDate.of(1953, 12, 4), Pid("04925398980").dato())
-    }
-
-    /**
-     * D-nummer har +40 i dagsverdi.
-     */
-    @Test
-    fun `dato gir datodel som LocalDate for D-nummer`() {
-        assertEquals(LocalDate.of(1985, 1, 1), Pid("41018512345").dato())
-    }
-
-    /**
-     * Dolly-nummer har +40 i månedsverdi.
-     */
-    @Test
-    fun `dato gir datodel som LocalDate for Dolly-nummer`() {
-        assertEquals(LocalDate.of(1966, 1, 1), Pid("01416637578").dato())
-    }
-
-    @Test
-    fun `dato gir 1901-01-01 hvis ugyldig PID`() {
-        assertEquals(LocalDate.of(1901, 1, 1), Pid("0492539898").dato())
-    }
-
-    @Test
-    fun `dato gir 1902-02-02 hvis ugyldig datodel`() {
-        assertEquals(LocalDate.of(1902, 2, 2), Pid("99416637578").dato())
-    }
-}
+})

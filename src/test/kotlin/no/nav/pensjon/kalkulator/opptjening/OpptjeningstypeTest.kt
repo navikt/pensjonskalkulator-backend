@@ -1,18 +1,17 @@
 package no.nav.pensjon.kalkulator.opptjening
 
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 
-import org.junit.jupiter.api.Assertions.*
+class OpptjeningstypeTest : ShouldSpec({
 
-class OpptjeningstypeTest {
+    context("forCode") {
+        should("return 'Sum pensjonsgivende inntekt' when code is 'SUM_PI'") {
+            Opptjeningstype.forCode("SUM_PI") shouldBe Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT
+        }
 
-    @Test
-    fun `forCode returns 'Sum pensjonsgivende inntekt' when code is 'SUM_PI'`() {
-        assertEquals(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT, Opptjeningstype.forCode("SUM_PI"))
+        should("return 'Other' when code is unknown") {
+            Opptjeningstype.forCode("unknown") shouldBe Opptjeningstype.OTHER
+        }
     }
-
-    @Test
-    fun `forCode returns 'Other' when code is unknown`() {
-        assertEquals(Opptjeningstype.OTHER, Opptjeningstype.forCode("unknown"))
-    }
-}
+})
