@@ -17,6 +17,7 @@ import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService.Companion
 import no.nav.pensjon.kalkulator.normalder.VerdiStatus
 import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
+import java.time.LocalDate
 
 class PersonServiceTest : ShouldSpec({
 
@@ -27,7 +28,7 @@ class PersonServiceTest : ShouldSpec({
             aldersgruppeFinder = arrangeAldersgruppe(),
             navnRequirement,
             normalderService = arrangeNormalder()
-        ).getPerson() shouldBe person().withPensjoneringAldre(defaultAldersgrenser)
+        ).getPerson() shouldBe person().withPensjoneringAldre(pensjoneringAldre = defaultAldersgrenser)
     }
 
     should("return person with normert pensjonsalder") {
@@ -72,7 +73,7 @@ class PersonServiceTest : ShouldSpec({
         }
     }
 
-    should("throw NotFoundException when invalid fødselsnummer") {
+    should("throw 'not found' exception when invalid fødselsnummer") {
         shouldThrow<NotFoundException> {
             PersonService(
                 client = arrangePerson(),
@@ -80,7 +81,7 @@ class PersonServiceTest : ShouldSpec({
                 aldersgruppeFinder = arrangeAldersgruppe(),
                 navnRequirement,
                 normalderService = arrangeNormalder()
-            ).getPerson() shouldBe person().withPensjoneringAldre(defaultAldersgrenser)
+            ).getPerson() shouldBe person().withPensjoneringAldre(pensjoneringAldre = defaultAldersgrenser)
         }.message shouldBe "person"
     }
 })
@@ -94,7 +95,7 @@ private fun arrangePid(pid: Pid = PersonFactory.pid): PidGetter =
 
 private fun arrangeNormalder(pensjonsaldre: Aldersgrenser = defaultAldersgrenser): NormertPensjonsalderService =
     mockk<NormertPensjonsalderService>().apply {
-        every { aldersgrenser(any()) } returns pensjonsaldre
+        every { aldersgrenser(any<LocalDate>()) } returns pensjonsaldre
     }
 
 private fun arrangePerson(
