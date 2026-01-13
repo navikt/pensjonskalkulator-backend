@@ -1,14 +1,14 @@
-package no.nav.pensjon.kalkulator.aldersgrense.api
+package no.nav.pensjon.kalkulator.normalder.api
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.FunSpec
 import io.mockk.every
-import no.nav.pensjon.kalkulator.aldersgrense.AldersgrenseService
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
 import no.nav.pensjon.kalkulator.normalder.AldersgrenseSpec
+import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
+import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService
 import no.nav.pensjon.kalkulator.normalder.VerdiStatus
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
@@ -27,15 +27,15 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@WebMvcTest(AldersgrenseController::class)
+@WebMvcTest(NormertPensjonsalderController::class)
 @Import(MockSecurityConfiguration::class)
-class AldersgrenseControllerTest : FunSpec() {
+class NormertPensjonsalderControllerTest : FunSpec() {
 
     @Autowired
     private lateinit var mvc: MockMvc
 
     @MockkBean
-    private lateinit var service: AldersgrenseService
+    private lateinit var service: NormertPensjonsalderService
 
     @MockkBean(relaxed = true)
     private lateinit var traceAid: TraceAid
@@ -71,7 +71,7 @@ class AldersgrenseControllerTest : FunSpec() {
                 verdiStatus = VerdiStatus.FAST
             )
 
-            every { service.hentAldersgrenser(spec) } returns aldersgrenser
+            every { service.aldersgrenser(spec) } returns aldersgrenser
 
             mvc.perform(
                 post(URL_V1)
@@ -93,7 +93,7 @@ class AldersgrenseControllerTest : FunSpec() {
                 verdiStatus = VerdiStatus.FAST
             )
 
-            every { service.hentAldersgrenser(spec) } returns aldersgrenser
+            every { service.aldersgrenser(spec) } returns aldersgrenser
 
             mvc.perform(
                 post(URL_V1)
@@ -115,7 +115,7 @@ class AldersgrenseControllerTest : FunSpec() {
                 verdiStatus = VerdiStatus.FAST
             )
 
-            every { service.hentAldersgrenser(spec) } returns aldersgrenser
+            every { service.aldersgrenser(spec) } returns aldersgrenser
 
             mvc.perform(
                 post(URL_V2)
@@ -137,7 +137,7 @@ class AldersgrenseControllerTest : FunSpec() {
                 verdiStatus = VerdiStatus.FAST
             )
 
-            every { service.hentAldersgrenser(spec) } returns aldersgrenser
+            every { service.aldersgrenser(spec) } returns aldersgrenser
 
             mvc.perform(
                 post(URL_V2)

@@ -16,6 +16,11 @@ import java.time.LocalDate
 @Service
 class NormertPensjonsalderService(private val normalderClient: NormertPensjonsalderClient) {
 
+    fun aldersgrenser(spec: AldersgrenseSpec): Aldersgrenser =
+        aldersgrenser(
+            foedselsdato = LocalDate.of(spec.aarskull, 1, 1)
+        )
+
     fun aldersgrenser(foedselsdato: LocalDate): Aldersgrenser =
         if (System.getenv("NAIS_CLUSTER_NAME") == "dev-gcp")
             testAldersgrenser(foedselsdato)

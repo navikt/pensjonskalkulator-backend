@@ -1,16 +1,16 @@
-package no.nav.pensjon.kalkulator.aldersgrense.api.map
+package no.nav.pensjon.kalkulator.normalder.api.map
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import no.nav.pensjon.kalkulator.aldersgrense.api.dto.AldersgrenseResultV2
-import no.nav.pensjon.kalkulator.aldersgrense.api.dto.PersonAlderV2
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
 import no.nav.pensjon.kalkulator.normalder.VerdiStatus
+import no.nav.pensjon.kalkulator.normalder.api.dto.AldersgrenseResultV2
+import no.nav.pensjon.kalkulator.normalder.api.dto.PersonAlderV2
 
 class AldersgrenseMapperV2Test : ShouldSpec({
 
-    should("map aldersgrenser to AldersgrenseResultV2") {
+    should("map aldersgrenser to data transfer object representing version 2 of the result") {
         val aldersgrenser = Aldersgrenser(
             aarskull = 1963,
             normalder = Alder(aar = 67, maaneder = 0),
@@ -27,7 +27,7 @@ class AldersgrenseMapperV2Test : ShouldSpec({
                 )
     }
 
-    should("map aldersgrenser with non-zero months to AldersgrenseResultV2") {
+    should("map aldersgrenser with non-zero months") {
         val aldersgrenser = Aldersgrenser(
             aarskull = 1970,
             normalder = Alder(aar = 67, maaneder = 3),
