@@ -1,10 +1,10 @@
-package no.nav.pensjon.kalkulator.aldersgrense.api.map
+package no.nav.pensjon.kalkulator.normalder.api.map
 
-import no.nav.pensjon.kalkulator.aldersgrense.api.dto.AldersgrenseSpec as AldersgrenseSpecV1V2
-import no.nav.pensjon.kalkulator.aldersgrense.api.dto.AldersgrenseResultV2
-import no.nav.pensjon.kalkulator.aldersgrense.api.dto.PersonAlderV2
-import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
 import no.nav.pensjon.kalkulator.normalder.AldersgrenseSpec
+import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
+import no.nav.pensjon.kalkulator.normalder.api.dto.AldersgrenseResultV2
+import no.nav.pensjon.kalkulator.normalder.api.dto.PersonAlderV2
+import no.nav.pensjon.kalkulator.normalder.api.dto.AldersgrenseSpec as AldersgrenseSpecV1V2
 
 object AldersgrenseMapperV2 {
 

@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.aldersgrense.api.dto
+package no.nav.pensjon.kalkulator.normalder.api.dto
 
 import jakarta.validation.constraints.NotNull
 
