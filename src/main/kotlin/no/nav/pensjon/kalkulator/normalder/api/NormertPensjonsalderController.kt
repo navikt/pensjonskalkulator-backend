@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.aldersgrense.api
+package no.nav.pensjon.kalkulator.normalder.api
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -6,15 +6,15 @@ import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
-import no.nav.pensjon.kalkulator.aldersgrense.AldersgrenseService
-import no.nav.pensjon.kalkulator.aldersgrense.api.dto.AldersgrenseResultV1
-import no.nav.pensjon.kalkulator.aldersgrense.api.dto.AldersgrenseResultV2
-import no.nav.pensjon.kalkulator.aldersgrense.api.dto.AldersgrenseSpec
-import no.nav.pensjon.kalkulator.aldersgrense.api.map.AldersgrenseMapperV1.dtoV1
-import no.nav.pensjon.kalkulator.aldersgrense.api.map.AldersgrenseMapperV2.dto
-import no.nav.pensjon.kalkulator.aldersgrense.api.map.AldersgrenseMapperV2.fromDto
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
+import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService
+import no.nav.pensjon.kalkulator.normalder.api.dto.AldersgrenseResultV1
+import no.nav.pensjon.kalkulator.normalder.api.dto.AldersgrenseResultV2
+import no.nav.pensjon.kalkulator.normalder.api.dto.AldersgrenseSpec
+import no.nav.pensjon.kalkulator.normalder.api.map.AldersgrenseMapperV1.dtoV1
+import no.nav.pensjon.kalkulator.normalder.api.map.AldersgrenseMapperV2.dto
+import no.nav.pensjon.kalkulator.normalder.api.map.AldersgrenseMapperV2.fromDto
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.http.HttpStatus
@@ -26,8 +26,8 @@ import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("api")
-class AldersgrenseController(
-    private val service: AldersgrenseService,
+class NormertPensjonsalderController(
+    private val service: NormertPensjonsalderService,
     private val traceAid: TraceAid
 ) : ControllerBase(traceAid) {
 
@@ -56,7 +56,7 @@ class AldersgrenseController(
         log.debug { "Request for aldersgrense V1" }
 
         return try {
-            dtoV1(timed({ service.hentAldersgrenser(fromDto(spec)) }, "hentAldersgrenser"))
+            dtoV1(timed({ service.aldersgrenser(fromDto(spec)) }, "hentAldersgrenser"))
                 .also { log.debug { "aldersgrense respons: $it" } }
         } catch (e: NotFoundException) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, e.message)
@@ -90,7 +90,7 @@ class AldersgrenseController(
         log.debug { "Request for aldersgrense V2" }
 
         return try {
-            dto(timed({ service.hentAldersgrenser(fromDto(spec)) }, "hentAldersgrenser"))
+            dto(timed({ service.aldersgrenser(fromDto(spec)) }, "hentAldersgrenser"))
                 .also { log.debug { "aldersgrense respons: $it" } }
         } catch (e: NotFoundException) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, e.message)

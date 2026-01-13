@@ -10,30 +10,43 @@ import java.time.LocalDate
 
 class NormertPensjonsalderServiceTest : ShouldSpec({
 
-    context("aldersgrenser") {
-        should("return aldersgrenser for årskull") {
+    context("aldersgrenser for spesifikasjon") {
+        should("gi aldersgrenser for årskull") {
+            service.aldersgrenser(spec = AldersgrenseSpec(aarskull = 1964)) shouldBe
+                    Aldersgrenser(
+                        aarskull = 1964,
+                        normalder = Alder(aar = 67, maaneder = 0),
+                        nedreAlder = Alder(aar = 62, maaneder = 0),
+                        oevreAlder = Alder(aar = 75, maaneder = 0),
+                        verdiStatus = VerdiStatus.PROGNOSE
+                    )
+        }
+    }
+
+    context("aldersgrenser for fødselsdato") {
+        should("gi aldersgrenser for årskull") {
             service.aldersgrenser(foedselsdato = LocalDate.of(1965, 1, 1)) shouldBe
                     Aldersgrenser(
                         aarskull = 1965,
-                        normalder = Alder(67, 1),
-                        nedreAlder = Alder(62, 1),
-                        oevreAlder = Alder(75, 1),
+                        normalder = Alder(aar = 67, maaneder = 1),
+                        nedreAlder = Alder(aar = 62, maaneder = 1),
+                        oevreAlder = Alder(aar = 75, maaneder = 1),
                         verdiStatus = VerdiStatus.PROGNOSE
                     )
         }
     }
 
     context("nedreAlder") {
-        should("return nedre aldersgrense for årskull") {
+        should("gi nedre aldersgrense for årskull") {
             service.nedreAlder(foedselsdato = LocalDate.of(1975, 6, 15)) shouldBe
-                    Alder(63, 11)
+                    Alder(aar = 63, maaneder = 11)
         }
     }
 
     context("normalder") {
-        should("return normert pensjonsalder for årskull") {
+        should("gi normert pensjonsalder for årskull") {
             service.normalder(foedselsdato = LocalDate.of(1964, 12, 31)) shouldBe
-                    Alder(67, 0)
+                    Alder(aar = 67, maaneder = 0)
         }
     }
 })
