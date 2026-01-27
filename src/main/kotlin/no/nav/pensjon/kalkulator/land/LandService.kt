@@ -11,7 +11,7 @@ class LandService {
 
         private val landListe: List<LandInfo> =
             Land.entries
-                .filter { it != Land.NOR && it.erHistorisk.not() } // only 'utland' needed
+                .filter { it.erEkskludert.not() && it.erHistorisk.not() }
                 .map {
                     LandInfo(
                         landkode = it.name,

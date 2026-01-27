@@ -13,9 +13,12 @@ class LandServiceTest : ShouldSpec({
 
     should("ekskludere historiske land") {
         landListe.filter { it.landkode == Land.SUN.name } shouldBe emptyList()
+        landListe.filter { it.landkode == Land.YUG.name } shouldBe emptyList()
     }
 
-    should("ekskludere Norge") {
+    should("ekskludere Norge, Quebec, Åland") {
         landListe.filter { it.landkode == Land.NOR.name } shouldBe emptyList()
+        landListe.filter { it.landkode == Land.QEB.name } shouldBe emptyList()
+        landListe.filter { it.landkode == Land.ALA.name } shouldBe emptyList()
     }
 })

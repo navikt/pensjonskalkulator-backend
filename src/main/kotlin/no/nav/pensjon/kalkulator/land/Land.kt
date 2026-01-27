@@ -16,6 +16,7 @@ enum class Land(
     val erAvtaleland: Boolean = false,
     val kravOmArbeid: Boolean? = null, // only relevant if erAvtaleland = true
     val erHistorisk: Boolean = false,
+    val erEkskludert: Boolean = false,
     val bokmaalNavn: String,
     val engelskNavn: String
 ) {
@@ -164,15 +165,16 @@ enum class Land(
     CAN(
         erAvtaleland = true,
         kravOmArbeid = true,
-        bokmaalNavn = "Canada (utenom Quebec)",
-        engelskNavn = "Canada (except Quebec)"
+        bokmaalNavn = "Canada",
+        engelskNavn = "Canada"
     ),
     QEB(
         erAvtaleland = true,
         kravOmArbeid = true,
+        erEkskludert = true, // provinsen Quebec har egen trygdeavtale, men dette støttes ikke av pensjon-regler
         bokmaalNavn = "Canada (Quebec)",
         engelskNavn = "Canada (Quebec)"
-    ), // provinsen Quebec har egen trygdeavtale med Norge
+    ),
     CYM(
         bokmaalNavn = "Caymanøyene",
         engelskNavn = "Cayman Islands"
@@ -298,8 +300,8 @@ enum class Land(
     FIN(
         erAvtaleland = true,
         kravOmArbeid = false,
-        bokmaalNavn = "Finland",
-        engelskNavn = "Finland"
+        bokmaalNavn = "Finland (inkl. Åland)",
+        engelskNavn = "Finland (incl. Åland)"
     ),
     FRA(
         erAvtaleland = true,
@@ -744,6 +746,7 @@ enum class Land(
     NOR(
         erAvtaleland = true,
         kravOmArbeid = false,
+        erEkskludert = true, // kun "utlandet" er relevant
         bokmaalNavn = "Norge",
         engelskNavn = "Norway"
     ),
@@ -1127,6 +1130,7 @@ enum class Land(
     ALA(
         erAvtaleland = true, // NB: ikke avtaleland i PEN (pr. september 2024)
         kravOmArbeid = false,
+        erEkskludert = true, // Åland har trygdeavtale, men dette støttes ikke av pensjon-regler
         bokmaalNavn = "Åland",
         engelskNavn = "Åland"
     ),
