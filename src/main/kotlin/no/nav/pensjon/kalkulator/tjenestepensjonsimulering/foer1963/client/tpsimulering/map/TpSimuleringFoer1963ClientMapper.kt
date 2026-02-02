@@ -30,7 +30,7 @@ object TpSimuleringFoer1963ClientMapper {
                             foedselsdato,
                             periode.datoFom.let(::epochMillisToLocalDate),
                         ),
-                        alderTom = periode.datoTom?.let(::epochMillisToLocalDate)?.let { Alder.from(foedselsdato, it) },
+                        alderTom = periode.datoTom?.let(::epochMillisToLocalDate)?.let { Alder.from(foedselsdato, it).plussMaaneder(-1) },
                         grad = periode.grad,
                         arligUtbetaling = periode.arligUtbetaling,
                         ytelsekode = YtelseskodeFoer1963.fromExternalValue(periode.ytelsekode!!),
