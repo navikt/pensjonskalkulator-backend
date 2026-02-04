@@ -30,7 +30,7 @@ object TpSimuleringFoer1963ClientMapper {
                             foedselsdato,
                             periode.datoFom.let(::epochMillisToLocalDate),
                         ),
-                        alderTom = periode.datoTom?.let(::epochMillisToLocalDate)?.let { Alder.from(foedselsdato, it.minusMonths(1)) },
+                        alderTom = calculateAlderTom(periode, foedselsdato),
                         grad = periode.grad,
                         arligUtbetaling = periode.arligUtbetaling,
                         ytelsekode = YtelseskodeFoer1963.fromExternalValue(periode.ytelsekode!!),
@@ -44,6 +44,19 @@ object TpSimuleringFoer1963ClientMapper {
 
     private fun epochMillisToLocalDate(millis: Long): LocalDate =
         Instant.ofEpochMilli(millis).atZone(ZoneId.of("Europe/Oslo")).toLocalDate()
+
+    private fun calculateAlderTom(periode: no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.Utbetalingsperiode, foedselsdato: LocalDate): Alder? {
+        val datoTom = periode.datoTom?.let(::epochMillisToLocalDate) ?: return null
+        val ytelsekode = YtelseskodeFoer1963.fromExternalValue(periode.ytelsekode!!)
+
+        val adjustedDate = if (ytelsekode == YtelseskodeFoer1963.AP) {
+            datoTom.minusMonths(1)
+        } else {
+            datoTom
+        }
+
+        return Alder.from(foedselsdato, adjustedDate)
+    }
 
     fun toDto(spec: SimuleringOffentligTjenestepensjonFoer1963Spec, pid: Pid): SimulerOffentligTjenestepensjonFoer1963Dto {
         val gradertUttakFom: LocalDate? =
