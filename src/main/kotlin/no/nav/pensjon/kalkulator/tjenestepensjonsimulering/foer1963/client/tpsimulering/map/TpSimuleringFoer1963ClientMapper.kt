@@ -1,21 +1,19 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.map
 
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.simulering.Opphold
 import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.SimulatorAlderSpec
-import no.nav.pensjon.kalkulator.simulering.client.simulator.map.*
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.SimulerOffentligTjenestepensjonFoer1963Dto
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.SimuleringEtter2011Dto
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.UtenlandsperiodeForSimuleringDto
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.SimulerTjenestepensjonFoer1963ResponseDto
-import java.time.LocalDate
-import java.time.Instant
-import java.time.ZoneId
-import no.nav.pensjon.kalkulator.general.Uttaksgrad
+import no.nav.pensjon.kalkulator.simulering.client.simulator.map.SimulatorAfpOrdningType
+import no.nav.pensjon.kalkulator.simulering.client.simulator.map.SimulatorAnonymAlderDato
+import no.nav.pensjon.kalkulator.simulering.client.simulator.map.SimulatorSimuleringType
+import no.nav.pensjon.kalkulator.simulering.client.simulator.map.SimulatorSivilstand
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.*
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.Fnr
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.FremtidigInntektDto
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.*
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 
 object TpSimuleringFoer1963ClientMapper {
 
@@ -40,25 +38,30 @@ object TpSimuleringFoer1963ClientMapper {
                 feilkode = dto.feilkode?.let { Feilkode.fromExternalValue(it) },
                 relevanteTpOrdninger = dto.relevanteTpOrdninger
             )
-        } ?: OffentligTjenestepensjonSimuleringFoer1963Resultat(feilkode = dto.feilkode?.let { Feilkode.fromExternalValue(dto.feilkode) }, relevanteTpOrdninger = dto.relevanteTpOrdninger)
+        } ?: OffentligTjenestepensjonSimuleringFoer1963Resultat(feilkode = dto.feilkode?.let {
+            Feilkode.fromExternalValue(
+                dto.feilkode
+            )
+        }, relevanteTpOrdninger = dto.relevanteTpOrdninger)
 
     private fun epochMillisToLocalDate(millis: Long): LocalDate =
         Instant.ofEpochMilli(millis).atZone(ZoneId.of("Europe/Oslo")).toLocalDate()
 
-    private fun calculateAlderTom(periode: no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.Utbetalingsperiode, foedselsdato: LocalDate): Alder? {
+    private fun calculateAlderTom(periode: Utbetalingsperiode, foedselsdato: LocalDate): Alder? {
         val datoTom = periode.datoTom?.let(::epochMillisToLocalDate) ?: return null
-        val ytelsekode = YtelseskodeFoer1963.fromExternalValue(periode.ytelsekode!!)
-
-        val adjustedDate = if (ytelsekode == YtelseskodeFoer1963.AP) {
-            datoTom.minusMonths(1)
+        val alder = Alder.from(foedselsdato, datoTom)
+        return if (datoTom.dayOfMonth > foedselsdato.dayOfMonth) {
+            alder.plussMaaneder(-1)
         } else {
-            datoTom
+            alder
         }
-
-        return Alder.from(foedselsdato, adjustedDate)
     }
 
-    fun toDto(spec: SimuleringOffentligTjenestepensjonFoer1963Spec, pid: Pid): SimulerOffentligTjenestepensjonFoer1963Dto {
+
+    fun toDto(
+        spec: SimuleringOffentligTjenestepensjonFoer1963Spec,
+        pid: Pid
+    ): SimulerOffentligTjenestepensjonFoer1963Dto {
         val gradertUttakFom: LocalDate? =
             spec.gradertUttak?.uttakFomAlder?.let {
                 SimulatorAnonymAlderDato(alder(it), spec.foedselsdato).dato
@@ -93,7 +96,8 @@ object TpSimuleringFoer1963ClientMapper {
                 antallArInntektEtterHeltUttak = inntektTom.year - heltUttakFom.year,
                 fnrAvdod = null,
                 samtykke = true,
-                utg = spec.gradertUttak?.grad?.prosentsats?.toString() ?: Uttaksgrad.HUNDRE_PROSENT.prosentsats.toString(),
+                utg = spec.gradertUttak?.grad?.prosentsats?.toString()
+                    ?: Uttaksgrad.HUNDRE_PROSENT.prosentsats.toString(),
                 utenlandsopphold = spec.utenlandsopphold.antallAar ?: 0,
                 flyktning = false,
                 dodsdato = null,
