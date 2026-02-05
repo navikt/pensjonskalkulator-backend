@@ -84,7 +84,13 @@ enum class EgressService(
         authType = AuthType.MACHINE_OUTSIDE_NAV
     ),
     UTBETALING_DATA("Oekonomi utbetalingsdata", "Sokos", "Finne siste maaneds utbetaling"),
-    OMSTILLINGSSTOENAD("Omstillingsstoenad", "OS", "Finne om bruker mottar omstillingsstoenad");
+    OMSTILLINGSSTOENAD("Omstillingsstoenad", "OS", "Finne om bruker mottar omstillingsstoenad"),
+    TILGANGSMASKINEN(
+        description = "Tilgangsmaskinen",
+        shortName = "Tilgangsmaskinen",
+        purpose = "Sjekk av veileders tilgang til person",
+        authType = AuthType.PERSON_ON_BEHALF
+    );
 
     companion object {
         val servicesAccessibleViaProxy = entries.filter { it.gatewayUsage == GatewayUsage.INTERNAL }
