@@ -82,6 +82,8 @@ spec:
           namespace: pensjonselvbetjening
           cluster: prod-fss
         - application: pensjonssimulator
+        - application: populasjonstilgangskontroll
+          namespace: tilgangsmaskin
         - application: skjermede-personer-pip
           namespace: nom
         - application: tp
@@ -145,6 +147,10 @@ spec:
       value: https://sokos-utbetaldata.prod-fss-pub.nais.io
     - name: STS_URL
       value: https://pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
+    - name: TILGANGSMASKINEN_SERVICE_ID
+      value: prod-gcp:tilgangsmaskin:populasjonstilgangskontroll
+    - name: TILGANGSMASKINEN_TILGANG_URL
+      value: http://populasjonstilgangskontroll.tilgangsmaskin
     - name: TJENESTEPENSJON_SERVICE_ID
       value: prod-fss:pensjonsamhandling:tp
     - name: TJENESTEPENSJON_URL

@@ -15,6 +15,7 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.TilgangService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.intellij.lang.annotations.Language
 import org.springframework.beans.factory.annotation.Autowired
@@ -48,6 +49,9 @@ class NormertPensjonsalderControllerTest : FunSpec() {
 
     @MockkBean
     private lateinit var groupMembershipService: GroupMembershipService
+
+    @MockkBean
+    private lateinit var tilgangService: TilgangService
 
     @MockkBean
     private lateinit var auditor: Auditor

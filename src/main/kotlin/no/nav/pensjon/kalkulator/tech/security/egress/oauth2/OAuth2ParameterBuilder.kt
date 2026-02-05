@@ -58,6 +58,17 @@ class OAuth2ParameterBuilder {
         return map
     }
 
+    fun buildOnBehalfOfTokenRequestMap(): MultiValueMap<String, String> {
+        val map: MultiValueMap<String, String> = LinkedMultiValueMap()
+        map.add(GRANT_TYPE, accessParameter.getGrantTypeName())
+        map.add(accessParameter.getParameterName(), accessParameter.value)
+        map.add(CLIENT_ID, clientId)
+        map.add(CLIENT_SECRET, clientSecret)
+        map.add(SCOPE, tokenAudience)
+        map.add("requested_token_use", "on_behalf_of")
+        return map
+    }
+
     fun tokenExchangeRequestMap(): MultiValueMap<String, String> {
         val map: MultiValueMap<String, String> = LinkedMultiValueMap()
         map.add(GRANT_TYPE, accessParameter.getGrantTypeName())

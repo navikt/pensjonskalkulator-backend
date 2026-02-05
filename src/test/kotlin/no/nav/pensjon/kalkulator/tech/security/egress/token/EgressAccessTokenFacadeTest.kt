@@ -13,7 +13,8 @@ class EgressAccessTokenFacadeTest : ShouldSpec({
         EgressAccessTokenFacade(
             clientCredentialsTokenService = arrangeToken(),
             jwtBearerTokenService = mockk(),
-            tokenExchangeService = mockk()
+            tokenExchangeService = mockk(),
+            azureAdOnBehalfOfTokenService = mockk()
         ).getAccessToken(
             authType = AuthType.MACHINE_INSIDE_NAV,
             audience = "audience1",
