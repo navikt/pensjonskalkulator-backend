@@ -67,6 +67,7 @@ spec:
         - application: pensjonskalkulator-frontend
         - application: pensjonskalkulator-frontend-intern
         - application: pensjonskalkulator-frontend-ekstern
+        - application: pensjonskalkulator-frontend-ekstern-staging
         - application: pensjonskalkulator-veiledning-frontend
         - application: pensjonskalkulator-frontend-catbox
         - application: pensjonskalkulator-veiledning-frontend-catbox
