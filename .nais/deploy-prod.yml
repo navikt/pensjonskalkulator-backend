@@ -82,7 +82,8 @@ spec:
           namespace: pensjonselvbetjening
           cluster: prod-fss
         - application: pensjonssimulator
-        - application: pensjon-tilgang
+        - application: populasjonstilgangskontroll
+          namespace: tilgangsmaskin
         - application: skjermede-personer-pip
           namespace: nom
         - application: tp
