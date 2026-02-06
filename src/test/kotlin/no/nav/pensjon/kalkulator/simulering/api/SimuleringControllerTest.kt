@@ -374,7 +374,8 @@ class SimuleringControllerTest : ShouldSpec() {
 
         private fun simuleringsresultat(simuleringType: SimuleringType, heltUttak: Boolean = true) =
             when (simuleringType) {
-                SimuleringType.ALDERSPENSJON -> SimuleringResult(
+                SimuleringType.ALDERSPENSJON,
+                SimuleringType.ALDERSPENSJON_MED_GJENLEVENDERETT -> SimuleringResult(
                     alderspensjon = listOf(alderspensjon()),
                     alderspensjonMaanedsbeloep = maanedsbeloep(heltUttak),
                     afpPrivat = emptyList(),
@@ -418,7 +419,8 @@ class SimuleringControllerTest : ShouldSpec() {
                     opptjeningGrunnlagListe = emptyList()
                 )
 
-                SimuleringType.ENDRING_ALDERSPENSJON -> SimuleringResult(
+                SimuleringType.ENDRING_ALDERSPENSJON,
+                SimuleringType.ENDRING_ALDERSPENSJON_MED_GJENLEVENDERETT -> SimuleringResult(
                     alderspensjon = listOf(alderspensjon()),
                     alderspensjonMaanedsbeloep = maanedsbeloep(heltUttak),
                     afpPrivat = emptyList(),
