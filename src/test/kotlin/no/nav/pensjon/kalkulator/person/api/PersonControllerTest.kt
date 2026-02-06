@@ -12,6 +12,7 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.SecurityContextNavIdExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.TilgangService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.intellij.lang.annotations.Language
@@ -48,6 +49,9 @@ class PersonControllerTest : FunSpec() {
 
     @MockkBean
     private lateinit var tilgangService: TilgangService
+
+    @MockkBean
+    private lateinit var navIdExtractor: SecurityContextNavIdExtractor
 
     @MockkBean
     private lateinit var auditor: Auditor

@@ -12,6 +12,7 @@ import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.ImpersonalAccessFilter
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.SecurityContextNavIdExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.TilgangService
 
@@ -26,7 +27,8 @@ class ImpersonalAccessFilterTest : ShouldSpec({
             pidGetter = mockk(),
             groupMembershipService = mockk(),
             auditor = mockk(),
-            tilgangService = mockk(relaxed = true)
+            tilgangService = mockk(relaxed = true),
+            navIdExtractor = arrangeNavIdExtractor()
         ).doFilter(request, response, chain)
 
         verify(exactly = 1) { chain.doFilter(request, response) }
@@ -41,7 +43,8 @@ class ImpersonalAccessFilterTest : ShouldSpec({
             pidGetter = arrangePid(),
             groupMembershipService = arrangeTilgang(false),
             auditor = mockk(),
-            tilgangService = mockk(relaxed = true)
+            tilgangService = mockk(relaxed = true),
+            navIdExtractor = arrangeNavIdExtractor()
         ).doFilter(request, response, chain)
 
         verify(exactly = 1) { response.sendError(403, "Adgang nektet pga. manglende gruppemedlemskap") }
@@ -57,7 +60,8 @@ class ImpersonalAccessFilterTest : ShouldSpec({
             pidGetter = arrangePid(),
             groupMembershipService = arrangeMissingPerson(),
             auditor = mockk(),
-            tilgangService = mockk(relaxed = true)
+            tilgangService = mockk(relaxed = true),
+            navIdExtractor = arrangeNavIdExtractor()
         ).doFilter(request, response, chain)
 
         verify(exactly = 1) { response.sendError(404, "Person ikke funnet") }
@@ -74,7 +78,8 @@ class ImpersonalAccessFilterTest : ShouldSpec({
             pidGetter = arrangePid(),
             groupMembershipService = arrangeTilgang(true),
             auditor,
-            tilgangService = mockk(relaxed = true)
+            tilgangService = mockk(relaxed = true),
+            navIdExtractor = arrangeNavIdExtractor()
         ).doFilter(request, response, chain)
 
         verify(exactly = 1) { auditor.audit(pid, "/foo") }
@@ -91,7 +96,8 @@ class ImpersonalAccessFilterTest : ShouldSpec({
             pidGetter = pidExtractor,
             groupMembershipService = mockk(),
             auditor = mockk(),
-            tilgangService = mockk(relaxed = true)
+            tilgangService = mockk(relaxed = true),
+            navIdExtractor = arrangeNavIdExtractor()
         ).doFilter(request, response, chain)
 
         verify(exactly = 0) { pidExtractor.pid() }
@@ -110,7 +116,8 @@ class ImpersonalAccessFilterTest : ShouldSpec({
             pidGetter = arrangePid(),
             groupMembershipService = arrangeTilgang(true),
             auditor,
-            tilgangService
+            tilgangService,
+            navIdExtractor = arrangeNavIdExtractor()
         ).doFilter(request, response, chain)
 
         verify(exactly = 1) { auditor.audit(pid, "/foo") }
@@ -137,5 +144,10 @@ private fun arrangeTilgang(harTilgang: Boolean): GroupMembershipService =
 private fun arrangeMissingPerson(): GroupMembershipService =
     mockk<GroupMembershipService>().apply {
         every { innloggetBrukerHarTilgang(pid) } throws NotFoundException("person")
+    }
+
+private fun arrangeNavIdExtractor(): SecurityContextNavIdExtractor =
+    mockk<SecurityContextNavIdExtractor>().apply {
+        every { id() } returns "Z123456"
     }
 
