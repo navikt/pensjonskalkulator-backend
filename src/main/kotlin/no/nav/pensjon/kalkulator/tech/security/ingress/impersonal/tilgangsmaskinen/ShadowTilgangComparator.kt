@@ -38,9 +38,11 @@ class ShadowTilgangComparator(
         scope.launch(securityContext) {
             try {
                 val navIdent = navIdExtractor.id()
+                val key = "$navIdent:${pid.value}"
 
-                val result = tilgangCache.get("$navIdent:${pid.value}") {
+                val result = tilgangCache.get(key) {
                     scope.async(securityContext) {
+                        log.warn { "Shadow checking $key" }
                         tilgangService.sjekkTilgang(pid)
                     }
                 }.await()
