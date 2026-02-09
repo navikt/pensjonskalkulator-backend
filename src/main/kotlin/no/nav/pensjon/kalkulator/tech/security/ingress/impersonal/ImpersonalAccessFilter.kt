@@ -14,11 +14,9 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMem
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.ShadowTilgangComparator
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import org.springframework.http.HttpStatus
-import org.springframework.stereotype.Component
 import org.springframework.util.StringUtils.hasLength
 import org.springframework.web.filter.GenericFilterBean
 
-@Component
 class ImpersonalAccessFilter(
     private val pidGetter: PidExtractor,
     private val groupMembershipService: GroupMembershipService,
