@@ -16,7 +16,6 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Security
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.client.TilgangResult
 import org.springframework.beans.factory.DisposableBean
 import org.springframework.stereotype.Component
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 @Component
@@ -27,11 +26,10 @@ class ShadowTilgangComparator(
 
     private val log = KotlinLogging.logger {}
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val tilgangCache: Cache<String, TilgangResult> = Caffeine.newBuilder()
+    private val tilgangCache: Cache<String, Deferred<TilgangResult>> = Caffeine.newBuilder()
         .expireAfterWrite(1, TimeUnit.MINUTES)
         .maximumSize(1000)
         .build()
-    private val inFlightRequests = ConcurrentHashMap<String, Deferred<TilgangResult>>()
 
     fun compareAsync(pid: Pid, groupMembershipResult: Boolean) {
         // Capture security context on request thread before launching
@@ -40,28 +38,13 @@ class ShadowTilgangComparator(
         scope.launch(securityContext) {
             try {
                 val navIdent = navIdExtractor.id()
-                val key = "$navIdent:${pid.value}"
 
-                // Check cache first
-                tilgangCache.getIfPresent(key)?.let { cached ->
-                    logIfMismatch(pid, groupMembershipResult, cached)
-                    return@launch
-                }
-
-                // Get existing in-flight request or start new one (atomically)
-                val deferred = inFlightRequests.computeIfAbsent(key) {
+                val result = tilgangCache.get("$navIdent:${pid.value}") {
                     scope.async(securityContext) {
-                        try {
-                            tilgangService.sjekkTilgang(pid).also { result ->
-                                tilgangCache.put(key, result)
-                            }
-                        } finally {
-                            inFlightRequests.remove(key)
-                        }
+                        tilgangService.sjekkTilgang(pid)
                     }
-                }
+                }.await()
 
-                val result = deferred.await()
                 logIfMismatch(pid, groupMembershipResult, result)
             } catch (e: Exception) {
                 log.warn { "Shadow tilgang check failed: ${e.message}" }
