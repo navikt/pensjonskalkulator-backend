@@ -27,6 +27,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoders
 import org.springframework.security.oauth2.jwt.JwtValidators
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider
+import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
@@ -133,6 +134,18 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
             }
             .build()
     }
+
+    @Bean
+    fun impersonalAccessFilterRegistration(
+        filter: ImpersonalAccessFilter
+    ): FilterRegistrationBean<ImpersonalAccessFilter> =
+        FilterRegistrationBean(filter).apply { isEnabled = false }
+
+    @Bean
+    fun securityLevelFilterRegistration(
+        filter: SecurityLevelFilter
+    ): FilterRegistrationBean<SecurityLevelFilter> =
+        FilterRegistrationBean(filter).apply { isEnabled = false }
 
     /**
      * "Impersonal" means that the logged-in user acts on behalf of another person.
