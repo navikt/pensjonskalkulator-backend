@@ -27,6 +27,12 @@ import org.springframework.security.oauth2.jwt.JwtDecoders
 import org.springframework.security.oauth2.jwt.JwtValidators
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider
+import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
+import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.ShadowTilgangComparator
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
@@ -133,6 +139,20 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
             }
             .build()
     }
+
+    @Bean
+    fun impersonalAccessFilter(
+        pidGetter: PidExtractor,
+        groupMembershipService: GroupMembershipService,
+        auditor: Auditor,
+        shadowTilgangComparator: ShadowTilgangComparator
+    ) = ImpersonalAccessFilter(pidGetter, groupMembershipService, auditor, shadowTilgangComparator)
+
+    @Bean
+    fun securityLevelFilter(
+        adresseService: FortroligAdresseService,
+        pidGetter: PidGetter
+    ) = SecurityLevelFilter(adresseService, pidGetter)
 
     /**
      * "Impersonal" means that the logged-in user acts on behalf of another person.

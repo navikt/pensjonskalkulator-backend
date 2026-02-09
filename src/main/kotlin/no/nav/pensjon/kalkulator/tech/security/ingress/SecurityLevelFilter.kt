@@ -15,13 +15,11 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.Responder.respondForbidde
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.stereotype.Component
 import org.springframework.web.filter.GenericFilterBean
 
 /**
  * Sjekker om bruker har logget inn med tilstrekkelig sikkerhetsnivå.
  */
-@Component
 class SecurityLevelFilter(
     private val adresseService: FortroligAdresseService,
     private val pidGetter: PidGetter
