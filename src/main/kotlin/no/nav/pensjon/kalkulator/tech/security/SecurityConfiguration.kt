@@ -98,8 +98,12 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
     fun filterChain(
         http: HttpSecurity,
         securityContextEnricher: SecurityContextEnricher,
-        impersonalAccessFilter: ImpersonalAccessFilter,
-        securityLevelFilter: SecurityLevelFilter,
+        pidExtractor: PidExtractor,
+        pidGetter: PidGetter,
+        auditor: Auditor,
+        adresseService: FortroligAdresseService,
+        groupMembershipService: GroupMembershipService,
+        shadowTilgangComparator: ShadowTilgangComparator,
         authResolver: AuthenticationManagerResolver<HttpServletRequest>,
         authenticationEntryPoint: LoggingAuthenticationEntryPoint,
         @Value("\${pkb.request-matcher.internal}") internalRequestMatcher: String
@@ -108,8 +112,14 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
             AuthenticationEnricherFilter(securityContextEnricher),
             BasicAuthenticationFilter::class.java
         )
-            .addFilterAfter(impersonalAccessFilter, AuthenticationEnricherFilter::class.java)
-            .addFilterAfter(securityLevelFilter, ImpersonalAccessFilter::class.java)
+            .addFilterAfter(
+                ImpersonalAccessFilter(pidExtractor, groupMembershipService, auditor, shadowTilgangComparator),
+                AuthenticationEnricherFilter::class.java
+            )
+            .addFilterAfter(
+                SecurityLevelFilter(adresseService, pidGetter),
+                ImpersonalAccessFilter::class.java
+            )
 
         return http.csrf {
             it.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -139,20 +149,6 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
             }
             .build()
     }
-
-    @Bean
-    fun impersonalAccessFilter(
-        pidGetter: PidExtractor,
-        groupMembershipService: GroupMembershipService,
-        auditor: Auditor,
-        shadowTilgangComparator: ShadowTilgangComparator
-    ) = ImpersonalAccessFilter(pidGetter, groupMembershipService, auditor, shadowTilgangComparator)
-
-    @Bean
-    fun securityLevelFilter(
-        adresseService: FortroligAdresseService,
-        pidGetter: PidGetter
-    ) = SecurityLevelFilter(adresseService, pidGetter)
 
     /**
      * "Impersonal" means that the logged-in user acts on behalf of another person.
