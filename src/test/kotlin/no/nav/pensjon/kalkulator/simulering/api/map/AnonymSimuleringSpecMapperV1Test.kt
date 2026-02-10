@@ -4,8 +4,9 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.simulering.Eps
+import no.nav.pensjon.kalkulator.simulering.EpsSpec
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
+import no.nav.pensjon.kalkulator.simulering.LevendeEps
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.simulering.Utenlandsopphold
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
@@ -29,17 +30,14 @@ class AnonymSimuleringSpecMapperV1Test : ShouldSpec({
             ),
             heltUttak = AnonymSimuleringHeltUttakV1(
                 uttaksalder = AnonymSimuleringAlderV1(aar = 70, maaneder = 0),
-                aarligInntektVsaPensjon = AnonymSimuleringInntektV1(
-                    beloep = 0,
-                    sluttAlder = null
-                )
+                aarligInntektVsaPensjon = AnonymSimuleringInntektV1(beloep = 0, sluttAlder = null)
             )
         )
 
         AnonymSimuleringSpecMapperV1.fromAnonymSimuleringSpecV1(dto) shouldBe
                 ImpersonalSimuleringSpec(
                     simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
-                    eps = Eps(harInntektOver2G = true, harPensjon = false),
+                    eps = EpsSpec(levende = LevendeEps(harInntektOver2G = true, harPensjon = false)),
                     forventetAarligInntektFoerUttak = 400000,
                     sivilstand = Sivilstand.SAMBOER,
                     gradertUttak = GradertUttak(
@@ -54,10 +52,7 @@ class AnonymSimuleringSpecMapperV1Test : ShouldSpec({
                             tomAlder = HeltUttak.defaultHeltUttakInntektTomAlder
                         )
                     ),
-                    utenlandsopphold = Utenlandsopphold(
-                        periodeListe = emptyList(),
-                        antallAar = 5
-                    ),
+                    utenlandsopphold = Utenlandsopphold(periodeListe = emptyList(), antallAar = 5),
                     foedselAar = 1980,
                     inntektOver1GAntallAar = 30
                 )

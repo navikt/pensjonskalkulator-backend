@@ -273,7 +273,7 @@ private fun simuleringSpec(
 ) = ImpersonalSimuleringSpec(
     simuleringType = spec.simuleringType,
     sivilstand = person?.sivilstand ?: spec.sivilstand,
-    eps = Eps(harInntektOver2G = epsHarInntektOver2G, harPensjon = false),
+    eps = EpsSpec(levende = LevendeEps(harInntektOver2G = epsHarInntektOver2G, harPensjon = false)),
     forventetAarligInntektFoerUttak = spec.aarligInntektFoerUttak
         ?: (angittInntekt ?: inntekt).beloep.intValueExact(),
     gradertUttak = null,

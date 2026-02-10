@@ -4,8 +4,9 @@ import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.general.HeltUttak.Companion.defaultHeltUttakInntekt
 import no.nav.pensjon.kalkulator.general.HeltUttak.Companion.defaultHeltUttakInntektTomAlder
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.simulering.Eps
+import no.nav.pensjon.kalkulator.simulering.EpsSpec
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
+import no.nav.pensjon.kalkulator.simulering.LevendeEps
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.simulering.Utenlandsopphold
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
@@ -30,9 +31,11 @@ object AnonymSimuleringSpecMapperV1 {
         )
 
     private fun eps(dto: AnonymSimuleringSpecV1) =
-        Eps(
-            harInntektOver2G = dto.epsHarInntektOver2G ?: false,
-            harPensjon = dto.epsHarPensjon ?: false
+        EpsSpec(
+            levende = LevendeEps(
+                harInntektOver2G = dto.epsHarInntektOver2G == true,
+                harPensjon = dto.epsHarPensjon == true
+            )
         )
 
     private fun gradertUttak(dto: AnonymSimuleringGradertUttakV1) =
@@ -60,5 +63,6 @@ object AnonymSimuleringSpecMapperV1 {
             antallAar = dto.utenlandsAntallAar
         )
 
-    private fun alder(dto: AnonymSimuleringAlderV1) = Alder(dto.aar, dto.maaneder)
+    private fun alder(dto: AnonymSimuleringAlderV1) =
+        Alder(dto.aar, dto.maaneder)
 }

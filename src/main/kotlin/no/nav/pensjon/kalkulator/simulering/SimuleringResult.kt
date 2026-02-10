@@ -1,5 +1,7 @@
 package no.nav.pensjon.kalkulator.simulering
 
+import no.nav.pensjon.kalkulator.validity.Problem
+
 data class SimuleringResult(
     val alderspensjon: List<SimulertAlderspensjon>,
     val alderspensjonMaanedsbeloep: AlderspensjonMaanedsbeloep? = null,
@@ -9,7 +11,8 @@ data class SimuleringResult(
     val vilkaarsproeving: Vilkaarsproeving,
     val harForLiteTrygdetid: Boolean,
     val trygdetid: Int,
-    val opptjeningGrunnlagListe: List<SimulertOpptjeningGrunnlag>
+    val opptjeningGrunnlagListe: List<SimulertOpptjeningGrunnlag>,
+    val problem: Problem? = null
 )
 
 data class SimulertOpptjeningGrunnlag(

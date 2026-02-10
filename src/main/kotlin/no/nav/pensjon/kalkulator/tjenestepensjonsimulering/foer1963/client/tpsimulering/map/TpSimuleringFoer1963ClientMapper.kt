@@ -81,8 +81,8 @@ object TpSimuleringFoer1963ClientMapper {
                 simuleringType = SimulatorSimuleringType.fromInternalValue(spec.simuleringType).externalValue,
                 fnr = Fnr(pid.value),
                 sivilstatus = SimulatorSivilstand.fromInternalValue(spec.sivilstand).externalValue,
-                eps2G = spec.eps.harInntektOver2G,
-                epsPensjon = spec.eps.harPensjon,
+                eps2G = spec.eps.levende?.harInntektOver2G,
+                epsPensjon = spec.eps.levende?.harPensjon,
                 forventetInntekt = spec.forventetAarligInntektFoerUttak,
                 inntektUnderGradertUttak = spec.gradertUttak?.aarligInntekt,
                 inntektEtterHeltUttak = spec.heltUttak.inntekt?.aarligBeloep ?: 0,
@@ -125,7 +125,7 @@ object TpSimuleringFoer1963ClientMapper {
 
         val today = LocalDate.now()
 
-        // Only create entries if first withdrawal is in the future
+        // Only create entries if the first withdrawal is in the future
         return if (forsteUttakDato.isAfter(today)) {
             listOf(
                 FremtidigInntektDto(

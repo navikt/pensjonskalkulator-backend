@@ -12,13 +12,6 @@ import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.*
-import no.nav.pensjon.kalkulator.simulering.client.simulator.PensjonssimulatorSimuleringClientTestObjects.ALTERNATIV_PENSJON
-import no.nav.pensjon.kalkulator.simulering.client.simulator.PensjonssimulatorSimuleringClientTestObjects.EXPECTED_GRADERT_UTTAK_REQUEST_BODY
-import no.nav.pensjon.kalkulator.simulering.client.simulator.PensjonssimulatorSimuleringClientTestObjects.PENSJON_MED_LIVSVARIG_OFFENTLIG_AFP
-import no.nav.pensjon.kalkulator.simulering.client.simulator.PensjonssimulatorSimuleringClientTestObjects.VILKAAR_IKKE_OPPFYLT_BODY
-import no.nav.pensjon.kalkulator.simulering.client.simulator.PensjonssimulatorSimuleringClientTestObjects.impersonalGradertUttakSpec
-import no.nav.pensjon.kalkulator.simulering.client.simulator.PensjonssimulatorSimuleringClientTestObjects.impersonalSpec
-import no.nav.pensjon.kalkulator.simulering.client.simulator.PensjonssimulatorSimuleringClientTestObjects.personalSpec
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.testutil.Arrange
 import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
@@ -93,9 +86,9 @@ class PensjonssimulatorSimuleringClientTest : FunSpec({
                 vilkaarsproeving = Vilkaarsproeving(
                     innvilget = false,
                     alternativ = Alternativ(
-                        gradertUttakAlder = Alder(63, 10),
+                        gradertUttakAlder = Alder(aar = 63, maaneder = 10),
                         uttakGrad = Uttaksgrad.FOERTI_PROSENT,
-                        heltUttakAlder = Alder(65, 6)
+                        heltUttakAlder = Alder(aar = 65, maaneder = 6)
                     )
                 ),
                 harForLiteTrygdetid = false,
@@ -106,7 +99,7 @@ class PensjonssimulatorSimuleringClientTest : FunSpec({
     }
 
     test("simulerPersonligAlderspensjon sends request body with gradert uttak when specified") {
-        server!!.arrangeOkJsonResponse(ALTERNATIV_PENSJON)
+        server?.arrangeOkJsonResponse(body = ALTERNATIV_PENSJON)
 
         Arrange.webClientContextRunner().run {
             client(context = it).simulerPersonligAlderspensjon(
@@ -114,10 +107,7 @@ class PensjonssimulatorSimuleringClientTest : FunSpec({
                 personalSpec = personalSpec(Sivilstand.ENKE_ELLER_ENKEMANN)
             )
 
-            ByteArrayOutputStream().use {
-                server.takeRequest().body.copyTo(it)
-                it.toString(StandardCharsets.UTF_8) shouldBe EXPECTED_GRADERT_UTTAK_REQUEST_BODY
-            }
+            server?.let(::assertGradertUttakRequestBody)
         }
     }
 
@@ -154,48 +144,19 @@ class PensjonssimulatorSimuleringClientTest : FunSpec({
         server?.arrangeOkJsonResponse(PENSJON_MED_LIVSVARIG_OFFENTLIG_AFP)
 
         Arrange.webClientContextRunner().run {
-            val result: SimuleringResult =
-                client(context = it).simulerPersonligAlderspensjon(
-                    impersonalSpec = impersonalGradertUttakSpec(),
-                    personalSpec = personalSpec(Sivilstand.UGIFT)
-                )
-
-            result shouldBe SimuleringResult(
-                alderspensjon = listOf(
-                    alderspensjon(alder = 62, beloep = 222612),
-                    alderspensjon(alder = 63, beloep = 222612),
-                    alderspensjon(alder = 64, beloep = 222612),
-                    alderspensjon(alder = 65, beloep = 222612),
-                    alderspensjon(alder = 66, beloep = 222612),
-                    alderspensjon(alder = 67, beloep = 222612),
-                    alderspensjon(alder = 68, beloep = 222612),
-                    alderspensjon(alder = 69, beloep = 222612),
-                    alderspensjon(alder = 70, beloep = 222612),
-                    alderspensjon(alder = 71, beloep = 222612),
-                    alderspensjon(alder = 72, beloep = 222612),
-                    alderspensjon(alder = 73, beloep = 222612),
-                    alderspensjon(alder = 74, beloep = 222612),
-                    alderspensjon(alder = 75, beloep = 222612)
-                ),
+            client(context = it).simulerPersonligAlderspensjon(
+                impersonalSpec = impersonalGradertUttakSpec(),
+                personalSpec = personalSpec(Sivilstand.UGIFT)
+            ) shouldBe SimuleringResult(
+                alderspensjon = IntRange(62, 75).map(::alderspensjon),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 13000, heltUttak = 26000),
                 pre2025OffentligAfp = null,
                 afpPrivat = emptyList(),
                 afpOffentlig = listOf(
-                    SimulertAfpOffentlig(
-                        alder = 62,
-                        beloep = 55000,
-                        maanedligBeloep = 0
-                    ),
-                    SimulertAfpOffentlig(
-                        alder = 63,
-                        beloep = 65000,
-                        maanedligBeloep = 0
-                    )
+                    SimulertAfpOffentlig(alder = 62, beloep = 55000, maanedligBeloep = 0),
+                    SimulertAfpOffentlig(alder = 63, beloep = 65000, maanedligBeloep = 0)
                 ),
-                vilkaarsproeving = Vilkaarsproeving(
-                    innvilget = true,
-                    alternativ = null
-                ),
+                vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                 harForLiteTrygdetid = false,
                 trygdetid = 0,
                 opptjeningGrunnlagListe = emptyList()
@@ -204,7 +165,7 @@ class PensjonssimulatorSimuleringClientTest : FunSpec({
     }
 })
 
-private fun alderspensjon(alder: Int, beloep: Int) =
+private fun alderspensjon(alder: Int, beloep: Int = 222612) =
     SimulertAlderspensjon(
         alder,
         beloep,
@@ -227,10 +188,8 @@ private fun alderspensjon(alder: Int, beloep: Int) =
         kapittel19Gjenlevendetillegg = 0
     )
 
-private object PensjonssimulatorSimuleringClientTestObjects {
-
-    @Language("json")
-    const val VILKAAR_IKKE_OPPFYLT_BODY = """{
+@Language("json")
+const val VILKAAR_IKKE_OPPFYLT_BODY = """{
     "alderspensjonListe": [],
     "privatAfpListe": [],
     "livsvarigOffentligAfpListe": [],
@@ -248,11 +207,12 @@ private object PensjonssimulatorSimuleringClientTestObjects {
     "opptjeningGrunnlagListe": []
 }"""
 
-    @Language("json")
-    const val EXPECTED_GRADERT_UTTAK_REQUEST_BODY = """{"simuleringstype":"ALDER","pid":"12906498357","sivilstand":"ENKE","epsHarPensjon":false,"epsHarInntektOver2G":true,"sisteInntekt":123000,"uttaksar":1,"gradertUttak":{"grad":"P_50","uttakFomAlder":{"aar":64,"maaneder":2},"aarligInntekt":12000},"heltUttak":{"uttakFomAlder":{"aar":67,"maaneder":1},"aarligInntekt":0,"inntektTomAlder":{"aar":67,"maaneder":1}},"utenlandsperiodeListe":[{"fom":"1990-01-02","tom":"1999-11-30","land":"AUS","arbeidetUtenlands":true}],"afpOrdning":"AFPKOM"}"""
+@Language("json")
+const val EXPECTED_GRADERT_UTTAK_REQUEST_BODY =
+    """{"simuleringstype":"ALDER","pid":"12906498357","sivilstand":"ENKE","epsHarPensjon":false,"epsHarInntektOver2G":true,"sisteInntekt":123000,"uttaksar":1,"gradertUttak":{"grad":"P_50","uttakFomAlder":{"aar":64,"maaneder":2},"aarligInntekt":12000},"heltUttak":{"uttakFomAlder":{"aar":67,"maaneder":1},"aarligInntekt":0,"inntektTomAlder":{"aar":67,"maaneder":1}},"utenlandsperiodeListe":[{"fom":"1990-01-02","tom":"1999-11-30","land":"AUS","arbeidetUtenlands":true}],"afpOrdning":"AFPKOM"}"""
 
-    @Language("json")
-    const val ALTERNATIV_PENSJON = """{
+@Language("json")
+const val ALTERNATIV_PENSJON = """{
     "alderspensjonListe": [
         {
             "alderAar": 63,
@@ -337,8 +297,8 @@ private object PensjonssimulatorSimuleringClientTestObjects {
     }
 }"""
 
-    @Language("json")
-    const val PENSJON_MED_LIVSVARIG_OFFENTLIG_AFP = """{
+@Language("json")
+const val PENSJON_MED_LIVSVARIG_OFFENTLIG_AFP = """{
     "alderspensjonListe": [
         {
             "alderAar": 62,
@@ -418,59 +378,65 @@ private object PensjonssimulatorSimuleringClientTestObjects {
     }
 }"""
 
-    fun impersonalSpec() =
-        ImpersonalSimuleringSpec(
-            simuleringType = SimuleringType.ALDERSPENSJON,
-            sivilstand = null,
-            eps = Eps(harInntektOver2G = true, harPensjon = false),
-            forventetAarligInntektFoerUttak = null,
-            heltUttak = HeltUttak(
-                uttakFomAlder = Alder(aar = 67, maaneder = 1),
-                inntekt = null
-            ),
-            utenlandsopphold = Utenlandsopphold(
-                periodeListe = listOf(
-                    Opphold(
-                        fom = LocalDate.of(1990, 1, 2),
-                        tom = LocalDate.of(1999, 11, 30),
-                        land = Land.AUS,
-                        arbeidet = true
-                    )
+fun impersonalSpec() =
+    ImpersonalSimuleringSpec(
+        simuleringType = SimuleringType.ALDERSPENSJON,
+        sivilstand = null,
+        eps = EpsSpec(levende = LevendeEps(harInntektOver2G = true, harPensjon = false)),
+        forventetAarligInntektFoerUttak = null,
+        heltUttak = HeltUttak(
+            uttakFomAlder = Alder(aar = 67, maaneder = 1),
+            inntekt = null
+        ),
+        utenlandsopphold = Utenlandsopphold(
+            periodeListe = listOf(
+                Opphold(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = Land.AUS,
+                    arbeidet = true
                 )
             )
         )
+    )
 
-    fun impersonalGradertUttakSpec() =
-        ImpersonalSimuleringSpec(
-            simuleringType = SimuleringType.ALDERSPENSJON,
-            sivilstand = null,
-            eps = Eps(harInntektOver2G = true, harPensjon = false),
-            forventetAarligInntektFoerUttak = null,
-            gradertUttak = GradertUttak(
-                grad = Uttaksgrad.FEMTI_PROSENT,
-                uttakFomAlder = Alder(aar = 64, maaneder = 2),
-                aarligInntekt = 12_000
-            ),
-            heltUttak = HeltUttak(
-                uttakFomAlder = Alder(aar = 67, maaneder = 1),
-                inntekt = null
-            ),
-            utenlandsopphold = Utenlandsopphold(
-                periodeListe = listOf(
-                    Opphold(
-                        fom = LocalDate.of(1990, 1, 2),
-                        tom = LocalDate.of(1999, 11, 30),
-                        land = Land.AUS,
-                        arbeidet = true
-                    )
+fun impersonalGradertUttakSpec() =
+    ImpersonalSimuleringSpec(
+        simuleringType = SimuleringType.ALDERSPENSJON,
+        sivilstand = null,
+        eps = EpsSpec(levende = LevendeEps(harInntektOver2G = true, harPensjon = false)),
+        forventetAarligInntektFoerUttak = null,
+        gradertUttak = GradertUttak(
+            grad = Uttaksgrad.FEMTI_PROSENT,
+            uttakFomAlder = Alder(aar = 64, maaneder = 2),
+            aarligInntekt = 12_000
+        ),
+        heltUttak = HeltUttak(
+            uttakFomAlder = Alder(aar = 67, maaneder = 1),
+            inntekt = null
+        ),
+        utenlandsopphold = Utenlandsopphold(
+            periodeListe = listOf(
+                Opphold(
+                    fom = LocalDate.of(1990, 1, 2),
+                    tom = LocalDate.of(1999, 11, 30),
+                    land = Land.AUS,
+                    arbeidet = true
                 )
             )
         )
+    )
 
-    fun personalSpec(sivilstand: Sivilstand) =
-        PersonalSimuleringSpec(
-            pid = pid,
-            aarligInntektFoerUttak = 123000,
-            sivilstand = sivilstand
-        )
+fun personalSpec(sivilstand: Sivilstand) =
+    PersonalSimuleringSpec(
+        pid = pid,
+        aarligInntektFoerUttak = 123000,
+        sivilstand = sivilstand
+    )
+
+fun assertGradertUttakRequestBody(server: MockWebServer) {
+    ByteArrayOutputStream().use {
+        server.takeRequest().body.copyTo(it)
+        it.toString(StandardCharsets.UTF_8) shouldBe EXPECTED_GRADERT_UTTAK_REQUEST_BODY
+    }
 }
