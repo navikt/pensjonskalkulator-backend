@@ -14,30 +14,24 @@ import java.time.LocalDate
  */
 data class SimuleringSpecDto(
     @field:NotNull val simuleringstype: SimuleringstypeSpecDto,
-    @field:NotNull val foedselsdato: LocalDate,
     val aarligInntektFoerUttakBeloep: Int?,
     val gradertUttak: GradertUttakSpecDto? = null, // default is helt uttak (100 %)
     @field:NotNull val heltUttak: HeltUttakSpecDto,
     val utenlandsperiodeListe: List<UtenlandsperiodeSpecDto>? = null,
-    val sivilstatus: SivilstatusSpecDto?,
+    val sivilstatus: SivilstatusSpecDto? = null,
     val eps: EpsSpecDto? = null,
     val offentligAfp: OffentligAfpSpecDto? = null
-)
-
-data class EpsSpecDto(
-    @field:NotNull val harInntektOver2G: Boolean,
-    @field:NotNull val harPensjon: Boolean
 )
 
 data class GradertUttakSpecDto(
     @field:NotNull val grad: Int,
     @field:NotNull val uttaksalder: AlderSpecDto,
-    val aarligInntektVsaPensjonBeloep: Int?
+    val aarligInntektVsaPensjonBeloep: Int? = null // Vsa = ved siden av
 )
 
 data class HeltUttakSpecDto(
     @field:NotNull val uttaksalder: AlderSpecDto,
-    val aarligInntektVsaPensjon: InntektSpecDto?
+    val aarligInntektVsaPensjon: InntektSpecDto? = null
 )
 
 data class InntektSpecDto(
@@ -47,9 +41,34 @@ data class InntektSpecDto(
 
 data class UtenlandsperiodeSpecDto(
     @field:NotNull val fom: LocalDate,
-    val tom: LocalDate?,
+    val tom: LocalDate? = null,
     @field:NotNull val landkode: String,
     @field:NotNull val arbeidetUtenlands: Boolean
+)
+
+/**
+ * Informasjon om ektefelle/partner/samboer (EPS).
+ */
+data class EpsSpecDto(
+    @field:NotNull val levende: LevendeEpsDto? = null,
+    @field:NotNull val avdoed: AvdoedEpsDto? = null
+)
+
+data class LevendeEpsDto(
+    @field:NotNull val harInntektOver2G: Boolean, // 2G = 2 ganger grunnbeløpet
+    @field:NotNull val harPensjon: Boolean
+)
+
+/**
+ * Informasjon om avdød ektefelle/partner/samboer (EPS) er relevant for pensjon med gjenlevenderett.
+ */
+data class AvdoedEpsDto(
+    @field:NotNull val pid: String,
+    @field:NotNull val doedsdato: LocalDate,
+    val medlemAvFolketrygden: Boolean? = false,
+    val inntektFoerDoedBeloep: Int? = 0,
+    val inntektErOverGrunnbeloepet: Boolean? = false,
+    val antallAarUtenlands: Int? = 0
 )
 
 data class OffentligAfpSpecDto(

@@ -54,14 +54,14 @@ class SimulatorPersonligSimuleringSpecMapperTest : ShouldSpec({
 private fun impersonalSpec() =
     ImpersonalSimuleringSpec(
         simuleringType = SimuleringType.ALDERSPENSJON,
-        eps = Eps(harInntektOver2G = true, harPensjon = false),
+        eps = EpsSpec(levende = LevendeEps(harInntektOver2G = true, harPensjon = false)),
         gradertUttak = GradertUttak(
             grad = Uttaksgrad.AATTI_PROSENT,
             uttakFomAlder = Alder(aar = 67, maaneder = 1),
             aarligInntekt = 12_000
         ),
         heltUttak = HeltUttak(
-            uttakFomAlder = Alder(68, 11),
+            uttakFomAlder = Alder(aar = 68, maaneder = 11),
             inntekt = Inntekt(
                 aarligBeloep = 6_000,
                 tomAlder = Alder(aar = 70, maaneder = 3)

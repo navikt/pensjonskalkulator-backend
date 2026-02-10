@@ -188,7 +188,7 @@ class SimuleringControllerTest : ShouldSpec() {
                 .andExpect(content().json(responseBodyForGradertUttakV9()))
         }
 
-        should("simulere endring av alderspensjon med offentlig livsvarig AFP V9") {
+        should("simulere endring av alderspensjon med livsvarig offentlig AFP V9") {
             val spec = impersonalGradertUttakSpec(SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG)
             every {
                 simuleringService.simulerPersonligAlderspensjon(spec)
@@ -260,7 +260,7 @@ class SimuleringControllerTest : ShouldSpec() {
         private fun impersonalHeltUttakSpec(simuleringType: SimuleringType) =
             ImpersonalSimuleringSpec(
                 simuleringType = simuleringType,
-                eps = Eps(harInntektOver2G = true, harPensjon = false),
+                eps = EpsSpec(levende = LevendeEps(harInntektOver2G = true, harPensjon = false)),
                 forventetAarligInntektFoerUttak = 100_000,
                 sivilstand = Sivilstand.UGIFT,
                 heltUttak = HeltUttak(
@@ -282,7 +282,7 @@ class SimuleringControllerTest : ShouldSpec() {
         private fun impersonalGradertUttakSpec(simuleringType: SimuleringType = SimuleringType.ALDERSPENSJON) =
             ImpersonalSimuleringSpec(
                 simuleringType = simuleringType,
-                eps = Eps(harInntektOver2G = true, harPensjon = false),
+                eps = EpsSpec(levende = LevendeEps(harInntektOver2G = true, harPensjon = false)),
                 forventetAarligInntektFoerUttak = 100_000,
                 sivilstand = Sivilstand.SAMBOER,
                 gradertUttak = GradertUttak(

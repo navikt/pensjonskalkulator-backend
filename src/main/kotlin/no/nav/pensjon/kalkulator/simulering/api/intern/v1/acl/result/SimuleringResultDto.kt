@@ -9,13 +9,12 @@ import org.springframework.http.HttpStatus
 @JsonInclude(NON_NULL)
 data class SimuleringResultDto(
     @field:NotNull val alderspensjon: List<AlderspensjonDto>,
-    val maanedligAlderspensjonVedEndring: MaanedligPensjonDto?,
-    val livsvarigOffentligAfp: List<AarligPensjonDto>?,
+    val livsvarigOffentligAfp: List<AldersbestemtUtbetalingDto>?,
     val tidsbegrensetOffentligAfp: TidsbegrensetOffentligAfpDto?,
     val privatAfp: List<PrivatAfpDto>?,
     @field:NotNull val vilkaarsproevingsresultat: VilkaarsproevingsresultatDto,
     val trygdetid: TrygdetidDto?,
-    val opptjeningsgrunnlagListe: List<AarligInntektDto>?,
+    val opptjeningsgrunnlagListe: List<PensjonsgivendeInntektDto>?,
     val problem: ProblemDto?
 )
 
@@ -28,12 +27,12 @@ data class AlderspensjonDto(
 
 @JsonInclude(NON_NULL)
 data class MaanedligPensjonDto(
-    val gradertUttakMaanedligBeloep: Int?,
-    @field:NotNull val heltUttakMaanedligBeloep: Int
+    val gradertUttakBeloep: Int?,
+    @field:NotNull val heltUttakBeloep: Int
 )
 
 @JsonInclude(NON_NULL)
-data class AarligPensjonDto(
+data class AldersbestemtUtbetalingDto(
     @field:NotNull val alderAar: Int,
     @field:NotNull val aarligBeloep: Int,
     val maanedligBeloep: Int?
@@ -69,12 +68,12 @@ data class PrivatAfpDto(
 @JsonInclude(NON_NULL)
 data class VilkaarsproevingsresultatDto(
     @field:NotNull val erInnvilget: Boolean,
-    val alternativ: AlternativDto?
+    val alternativ: UttaksparametreDto?
 )
 
-data class AarligInntektDto(
+data class PensjonsgivendeInntektDto(
     @field:NotNull val aarstall: Int,
-    @field:NotNull val pensjonsgivendeInntektBeloep: Int
+    @field:NotNull val beloep: Int
 )
 
 data class TrygdetidDto(
@@ -83,7 +82,7 @@ data class TrygdetidDto(
 )
 
 @JsonInclude(NON_NULL)
-data class AlternativDto(
+data class UttaksparametreDto(
     val gradertUttakAlder: AlderDto?,
     val uttaksgrad: Int?, // null implies 100 %
     @field:NotNull val heltUttakAlder: AlderDto

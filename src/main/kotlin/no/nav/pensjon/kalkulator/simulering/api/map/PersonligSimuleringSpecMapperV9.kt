@@ -25,10 +25,12 @@ object PersonligSimuleringSpecMapperV9 {
             innvilgetLivsvarigOffentligAfp = source.innvilgetLivsvarigOffentligAfp?.firstOrNull()?.let(::afp)
         )
 
-    private fun eps(source: PersonligSimuleringSpecV9) =
-        Eps(
-            harInntektOver2G = source.epsHarInntektOver2G ?: false,
-            harPensjon = source.epsHarPensjon ?: false
+    private fun eps(dto: PersonligSimuleringSpecV9) =
+        EpsSpec(
+            levende = LevendeEps(
+                harInntektOver2G = dto.epsHarInntektOver2G == true,
+                harPensjon = dto.epsHarPensjon == true
+            )
         )
 
     private fun gradertUttak(source: PersonligSimuleringGradertUttakSpecV9) =

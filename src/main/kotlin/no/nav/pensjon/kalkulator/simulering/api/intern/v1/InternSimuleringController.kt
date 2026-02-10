@@ -70,8 +70,7 @@ class InternSimuleringController(
 
         return try {
             val result: SimuleringResultDto = toDto(
-                source = service.simulerPensjon(providedSpec = fromDto(spec)),
-                foedselsdato = spec.foedselsdato
+                source = service.simulerPensjon(providedSpec = fromDto(spec))
             ).also {
                 log.debug { "Simulering respons ${jsonMapper.writeValueAsRedactedString(it)}" }
                 Metrics.countType(eventName = SIMULERINGSTYPE_METRIC_NAME, type = spec.simuleringstype.name)
@@ -99,7 +98,6 @@ class InternSimuleringController(
         private fun problem(e: Exception) =
             SimuleringResultDto(
                 alderspensjon = emptyList(),
-                maanedligAlderspensjonVedEndring = null,
                 tidsbegrensetOffentligAfp = null,
                 privatAfp = null,
                 livsvarigOffentligAfp = null,

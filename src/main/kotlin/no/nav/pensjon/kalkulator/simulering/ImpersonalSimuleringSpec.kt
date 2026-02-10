@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.simulering
 import no.nav.pensjon.kalkulator.general.GradertUttak
 import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.land.Land
+import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import java.time.LocalDate
 
@@ -13,7 +14,7 @@ import java.time.LocalDate
 data class ImpersonalSimuleringSpec(
     val simuleringType: SimuleringType,
     val sivilstand: Sivilstand? = null,
-    val eps: Eps,
+    val eps: EpsSpec,
     val forventetAarligInntektFoerUttak: Int? = null,
     val gradertUttak: GradertUttak? = null,
     val heltUttak: HeltUttak,
@@ -28,12 +29,30 @@ data class ImpersonalSimuleringSpec(
 )
 
 /**
- * Ektefelle/partner/samboer.
+ * Informasjon om ektefelle/partner/samboer (EPS).
  */
-data class Eps (
-    val harInntektOver2G: Boolean,
+data class EpsSpec(
+    val levende: LevendeEps? = null,
+    val avdoed: AvdoedEps? = null
+)
+
+data class LevendeEps(
+    val harInntektOver2G: Boolean, // 2G = 2 ganger grunnbeløpet
     val harPensjon: Boolean
 )
+
+/**
+ * Informasjon om avdød ektefelle/partner/samboer (EPS) er relevant for pensjon med gjenlevenderett.
+ */
+data class AvdoedEps(
+    val pid: Pid,
+    val doedsdato: LocalDate,
+    val medlemAvFolketrygden: Boolean,
+    val inntektFoerDoedBeloep: Int,
+    val inntektErOverGrunnbeloepet: Boolean,
+    val antallAarUtenlands: Int
+)
+
 
 data class Utenlandsopphold (
     val periodeListe: List<Opphold>,

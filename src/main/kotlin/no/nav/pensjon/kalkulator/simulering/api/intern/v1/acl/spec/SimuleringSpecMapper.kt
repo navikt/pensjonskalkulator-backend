@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.simulering.api.intern.v1.acl.spec
 
 import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.land.Land
+import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.simulering.*
 
 /**
@@ -10,10 +11,16 @@ import no.nav.pensjon.kalkulator.simulering.*
  */
 object SimuleringSpecMapper {
 
+    private val defaultEpsSpec =
+        EpsSpec(
+            levende = LevendeEps(harInntektOver2G = false, harPensjon = false),
+            avdoed = null
+        )
+
     fun fromDto(source: SimuleringSpecDto) =
         ImpersonalSimuleringSpec(
             simuleringType = source.simuleringstype.internalValue,
-            eps = source.eps?.let(::eps) ?: defaultEps(),
+            eps = source.eps?.let(::epsSpec) ?: defaultEpsSpec,
             forventetAarligInntektFoerUttak = source.aarligInntektFoerUttakBeloep,
             sivilstand = source.sivilstatus?.internalValue,
             gradertUttak = source.gradertUttak?.let(::gradertUttak),
@@ -24,10 +31,10 @@ object SimuleringSpecMapper {
             innvilgetLivsvarigOffentligAfp = source.offentligAfp?.innvilgetLivsvarigAfpListe?.firstOrNull()?.let(::afp)
         )
 
-    private fun eps(source: EpsSpecDto) =
-        Eps(
-            harInntektOver2G = source.harInntektOver2G,
-            harPensjon = source.harPensjon
+    private fun epsSpec(source: EpsSpecDto) =
+        EpsSpec(
+            levende = source.levende?.let(::levendeEps),
+            avdoed = source.avdoed?.let(::avdoedEps)
         )
 
     private fun gradertUttak(source: GradertUttakSpecDto) =
@@ -76,9 +83,19 @@ object SimuleringSpecMapper {
             maaneder = source.maaneder
         )
 
-    private fun defaultEps() =
-        Eps(
-            harInntektOver2G = false,
-            harPensjon = false
+    private fun levendeEps(source: LevendeEpsDto) =
+        LevendeEps(
+            harInntektOver2G = source.harInntektOver2G,
+            harPensjon = source.harPensjon
+        )
+
+    private fun avdoedEps(source: AvdoedEpsDto) =
+        AvdoedEps(
+            pid = Pid(source.pid),
+            doedsdato = source.doedsdato,
+            medlemAvFolketrygden = source.medlemAvFolketrygden == true,
+            inntektFoerDoedBeloep = source.inntektFoerDoedBeloep ?: 0,
+            inntektErOverGrunnbeloepet = source.inntektErOverGrunnbeloepet == true,
+            antallAarUtenlands = source.antallAarUtenlands ?: 0
         )
 }
