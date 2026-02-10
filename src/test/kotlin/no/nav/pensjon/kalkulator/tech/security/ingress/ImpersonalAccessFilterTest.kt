@@ -13,6 +13,7 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.ImpersonalAccessFilter
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.ShadowTilgangComparator
 
 class ImpersonalAccessFilterTest : ShouldSpec({
 
@@ -24,7 +25,8 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         ImpersonalAccessFilter(
             pidGetter = mockk(),
             groupMembershipService = mockk(),
-            auditor = mockk()
+            auditor = mockk(),
+            shadowTilgangComparator = mockk(relaxed = true)
         ).doFilter(request, response, chain)
 
         verify(exactly = 1) { chain.doFilter(request, response) }
@@ -38,7 +40,8 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         ImpersonalAccessFilter(
             pidGetter = arrangePid(),
             groupMembershipService = arrangeTilgang(false),
-            auditor = mockk()
+            auditor = mockk(),
+            shadowTilgangComparator = mockk(relaxed = true)
         ).doFilter(request, response, chain)
 
         verify(exactly = 1) { response.sendError(403, "Adgang nektet pga. manglende gruppemedlemskap") }
@@ -53,7 +56,8 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         ImpersonalAccessFilter(
             pidGetter = arrangePid(),
             groupMembershipService = arrangeMissingPerson(),
-            auditor = mockk()
+            auditor = mockk(),
+            shadowTilgangComparator = mockk(relaxed = true)
         ).doFilter(request, response, chain)
 
         verify(exactly = 1) { response.sendError(404, "Person ikke funnet") }
@@ -69,7 +73,8 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         ImpersonalAccessFilter(
             pidGetter = arrangePid(),
             groupMembershipService = arrangeTilgang(true),
-            auditor
+            auditor,
+            shadowTilgangComparator = mockk(relaxed = true)
         ).doFilter(request, response, chain)
 
         verify(exactly = 1) { auditor.audit(pid, "/foo") }
@@ -85,11 +90,45 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         ImpersonalAccessFilter(
             pidGetter = pidExtractor,
             groupMembershipService = mockk(),
-            auditor = mockk()
+            auditor = mockk(),
+            shadowTilgangComparator = mockk(relaxed = true)
         ).doFilter(request, response, chain)
 
         verify(exactly = 0) { pidExtractor.pid() }
         verify(exactly = 1) { chain.doFilter(request, response) }
+    }
+
+    should("call shadow tilgang comparator when user has access") {
+        val chain = mockk<FilterChain>(relaxed = true)
+        val auditor = mockk<Auditor>(relaxed = true)
+        val request = arrangeRequest(pid = pid.value, uri = "/foo")
+        val response = mockk<HttpServletResponse>(relaxed = true)
+        val shadowComparator = mockk<ShadowTilgangComparator>(relaxed = true)
+
+        ImpersonalAccessFilter(
+            pidGetter = arrangePid(),
+            groupMembershipService = arrangeTilgang(true),
+            auditor,
+            shadowTilgangComparator = shadowComparator
+        ).doFilter(request, response, chain)
+
+        verify(exactly = 1) { shadowComparator.compareAsync(pid, true) }
+    }
+
+    should("call shadow tilgang comparator when user is denied access") {
+        val chain = mockk<FilterChain>(relaxed = true)
+        val request = arrangeRequest(pid = pid.value, uri = "/foo")
+        val response = mockk<HttpServletResponse>(relaxed = true)
+        val shadowComparator = mockk<ShadowTilgangComparator>(relaxed = true)
+
+        ImpersonalAccessFilter(
+            pidGetter = arrangePid(),
+            groupMembershipService = arrangeTilgang(false),
+            auditor = mockk(),
+            shadowTilgangComparator = shadowComparator
+        ).doFilter(request, response, chain)
+
+        verify(exactly = 1) { shadowComparator.compareAsync(pid, false) }
     }
 })
 
@@ -113,4 +152,3 @@ private fun arrangeMissingPerson(): GroupMembershipService =
     mockk<GroupMembershipService>().apply {
         every { innloggetBrukerHarTilgang(pid) } throws NotFoundException("person")
     }
-

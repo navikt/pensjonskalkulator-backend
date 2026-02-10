@@ -11,17 +11,17 @@ import no.nav.pensjon.kalkulator.tech.security.SecurityConfiguration.Companion.F
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.ShadowTilgangComparator
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import org.springframework.http.HttpStatus
-import org.springframework.stereotype.Component
 import org.springframework.util.StringUtils.hasLength
 import org.springframework.web.filter.GenericFilterBean
 
-@Component
 class ImpersonalAccessFilter(
     private val pidGetter: PidExtractor,
     private val groupMembershipService: GroupMembershipService,
-    private val auditor: Auditor
+    private val auditor: Auditor,
+    private val shadowTilgangComparator: ShadowTilgangComparator
 ) : GenericFilterBean() {
 
     private val log = KotlinLogging.logger {}
@@ -35,9 +35,13 @@ class ImpersonalAccessFilter(
 
         if (hasPid(request)) {
             val pid = pidGetter.pid()
+            val groupResult: Boolean
 
             try {
-                if (!groupMembershipService.innloggetBrukerHarTilgang(pid)) {
+                groupResult = groupMembershipService.innloggetBrukerHarTilgang(pid)
+                shadowTilgangComparator.compareAsync(pid, groupResult)
+
+                if (!groupResult) {
                     forbidden(response as HttpServletResponse)
                     return
                 }

@@ -18,5 +18,10 @@ enum class AuthorizationGrantCombo(val value: String, val parameterName: String)
     TOKEN_EXCHANGE(
         value = AuthorizationGrantType.TOKEN_EXCHANGE.value,
         parameterName = SUBJECT_TOKEN
+    ),
+
+    ON_BEHALF_OF(
+        value = AuthorizationGrantType.JWT_BEARER.value,
+        parameterName = ASSERTION
     )
 }
