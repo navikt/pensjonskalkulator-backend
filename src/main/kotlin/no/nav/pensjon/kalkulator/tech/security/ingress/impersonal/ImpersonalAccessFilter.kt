@@ -38,7 +38,6 @@ class ImpersonalAccessFilter(
             val groupResult: Boolean
 
             try {
-                log.warn { "sjekker tilganger for bruker ${pid.displayValue}" }
                 groupResult = groupMembershipService.innloggetBrukerHarTilgang(pid)
                 shadowTilgangComparator.compareAsync(pid, groupResult)
 
