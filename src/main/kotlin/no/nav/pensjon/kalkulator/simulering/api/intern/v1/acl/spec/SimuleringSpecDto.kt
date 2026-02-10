@@ -14,7 +14,7 @@ import java.time.LocalDate
  */
 data class SimuleringSpecDto(
     @field:NotNull val simuleringstype: SimuleringstypeSpecDto,
-    val aarligInntektFoerUttakBeloep: Int?,
+    val aarligInntektFoerUttakBeloep: Int? = null,
     val gradertUttak: GradertUttakSpecDto? = null, // default is helt uttak (100 %)
     @field:NotNull val heltUttak: HeltUttakSpecDto,
     val utenlandsperiodeListe: List<UtenlandsperiodeSpecDto>? = null,
@@ -50,8 +50,8 @@ data class UtenlandsperiodeSpecDto(
  * Informasjon om ektefelle/partner/samboer (EPS).
  */
 data class EpsSpecDto(
-    @field:NotNull val levende: LevendeEpsDto? = null,
-    @field:NotNull val avdoed: AvdoedEpsDto? = null
+    val levende: LevendeEpsDto? = null,
+    val avdoed: AvdoedEpsDto? = null
 )
 
 data class LevendeEpsDto(
@@ -65,10 +65,10 @@ data class LevendeEpsDto(
 data class AvdoedEpsDto(
     @field:NotNull val pid: String,
     @field:NotNull val doedsdato: LocalDate,
-    val medlemAvFolketrygden: Boolean? = false,
-    val inntektFoerDoedBeloep: Int? = 0,
-    val inntektErOverGrunnbeloepet: Boolean? = false,
-    val antallAarUtenlands: Int? = 0
+    val medlemAvFolketrygden: Boolean? = null,
+    val inntektFoerDoedBeloep: Int? = null,
+    val inntektErOverGrunnbeloepet: Boolean? = null,
+    val antallAarUtenlands: Int? = null
 )
 
 data class OffentligAfpSpecDto(
