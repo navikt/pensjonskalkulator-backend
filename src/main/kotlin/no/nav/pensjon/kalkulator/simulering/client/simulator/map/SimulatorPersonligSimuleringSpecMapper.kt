@@ -19,8 +19,8 @@ object SimulatorPersonligSimuleringSpecMapper {
             simuleringstype = SimulatorSimuleringType.fromInternalValue(impersonalSpec.simuleringType).externalValue,
             pid = personalSpec.pid.value,
             sivilstand = SimulatorSivilstand.fromInternalValue(personalSpec.sivilstand).externalValue,
-            epsHarInntektOver2G = impersonalSpec.eps.harInntektOver2G,
-            epsHarPensjon = impersonalSpec.eps.harPensjon,
+            epsHarInntektOver2G = impersonalSpec.eps.levende?.harInntektOver2G == true,
+            epsHarPensjon = impersonalSpec.eps.levende?.harPensjon == true,
             sisteInntekt = personalSpec.aarligInntektFoerUttak,
             uttaksar = 1,
             gradertUttak = impersonalSpec.gradertUttak?.let(::gradertUttak),
@@ -40,7 +40,7 @@ object SimulatorPersonligSimuleringSpecMapper {
 
     private fun heltUttak(source: HeltUttak) =
         SimulatorHeltUttakSpec(
-            uttakFomAlder = alder(source.uttakFomAlder!!), // mandatory in context of simulering
+            uttakFomAlder = alder(source.uttakFomAlder!!), // mandatory in the context of simulering
             aarligInntekt = source.inntekt?.aarligBeloep ?: 0,
             inntektTomAlder = source.inntekt?.let { alder(it.tomAlder) } ?: alder(source.uttakFomAlder)
         )

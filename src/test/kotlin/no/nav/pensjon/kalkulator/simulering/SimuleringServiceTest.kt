@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering
 
-import io.kotest.core.spec.style.FunSpec
+import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.Called
 import io.mockk.every
@@ -20,11 +20,11 @@ import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import java.time.LocalDate
 
-class SimuleringServiceTest : FunSpec({
+class SimuleringServiceTest : ShouldSpec({
 
     val pidGetter = mockk<PidGetter>().apply { every { pid() } returns pid }
 
-    test("simulerAlderspensjon uses specified inntekt and sivilstand") {
+    should("use specified inntekt and sivilstand") {
         val incomingSpec = impersonalSimuleringSpec(REGISTRERT_INNTEKT, Sivilstand.UOPPGITT)
         val simuleringClient = arrangeSimuleringClient(incomingSpec)
         val inntektService = mockk<InntektService>()
@@ -39,7 +39,7 @@ class SimuleringServiceTest : FunSpec({
 
     }
 
-    test("simulerAlderspensjon obtains registrert inntekt and sivilstand when not specified") {
+    should("obtain registrert inntekt and sivilstand when not specified") {
         val incomingSpec = impersonalSimuleringSpec(forventetInntekt = null, sivilstand = null)
         val simuleringClient = arrangeSimuleringClient(incomingSpec)
         val inntektService = arrangeInntekt()
@@ -105,7 +105,7 @@ private fun impersonalSimuleringSpec(forventetInntekt: Int?, sivilstand: Sivilst
     ImpersonalSimuleringSpec(
         simuleringType = SimuleringType.ALDERSPENSJON,
         sivilstand = sivilstand,
-        eps = Eps(harInntektOver2G = false, harPensjon = false),
+        eps = EpsSpec(levende = LevendeEps(harInntektOver2G = false, harPensjon = false)),
         forventetAarligInntektFoerUttak = forventetInntekt,
         heltUttak = HeltUttak(
             uttakFomAlder = Alder(67, 1),

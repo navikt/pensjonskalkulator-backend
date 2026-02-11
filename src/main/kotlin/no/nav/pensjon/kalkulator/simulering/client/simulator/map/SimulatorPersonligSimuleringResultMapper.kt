@@ -4,6 +4,8 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.*
+import no.nav.pensjon.kalkulator.validity.Problem
+import no.nav.pensjon.kalkulator.validity.ProblemType
 
 object SimulatorPersonligSimuleringResultMapper {
 
@@ -11,13 +13,14 @@ object SimulatorPersonligSimuleringResultMapper {
         SimuleringResult(
             alderspensjon = dto.alderspensjonListe.map(::alderspensjon),
             alderspensjonMaanedsbeloep = dto.alderspensjonMaanedsbeloep?.let(::alderspensjonMaanedsbeloep),
-            pre2025OffentligAfp = dto.pre2025OffentligAfp?.let(::pre2025OffentligAfp),
+            pre2025OffentligAfp = dto.pre2025OffentligAfp?.let(::tidsbegrensetOffentligAfp),
             afpPrivat = dto.privatAfpListe.map(::privatAfp),
             afpOffentlig = dto.livsvarigOffentligAfpListe.map(::livsvarigOffentligAfp),
             vilkaarsproeving = dto.vilkaarsproeving?.let(::vilkaarsproeving) ?: Vilkaarsproeving(innvilget = true),
             harForLiteTrygdetid = dto.tilstrekkeligTrygdetidForGarantipensjon == false,
             trygdetid = dto.trygdetid ?: 0,
-            opptjeningGrunnlagListe = dto.opptjeningGrunnlagListe.orEmpty().map(::opptjeningGrunnlag)
+            opptjeningGrunnlagListe = dto.opptjeningGrunnlagListe.orEmpty().map(::opptjeningGrunnlag),
+            problem = dto.error?.let(::problem)
         )
 
     private fun alderspensjon(dto: SimulatorPersonligPensjon) =
@@ -43,7 +46,14 @@ object SimulatorPersonligSimuleringResultMapper {
             kapittel19Gjenlevendetillegg = dto.kapittel19Gjenlevendetillegg ?: 0
         )
 
-    private fun pre2025OffentligAfp(dto: SimulatorPre2025OffentligAfp) =
+    private fun livsvarigOffentligAfp(dto: SimulatorPersonligLivsvarigOffentligAfp) =
+        SimulertAfpOffentlig(
+            alder = dto.alderAar,
+            beloep = dto.beloep,
+            maanedligBeloep = dto.maanedligBeloep
+        )
+
+    private fun tidsbegrensetOffentligAfp(dto: SimulatorPre2025OffentligAfp) =
         SimulertPre2025OffentligAfp(
             alderAar = dto.alderAar,
             totaltAfpBeloep = dto.totaltAfpBeloep,
@@ -62,10 +72,14 @@ object SimulatorPersonligSimuleringResultMapper {
         )
 
     private fun privatAfp(dto: SimulatorPersonligPrivatAfp) =
-        SimulertAfpPrivat(dto.alderAar, dto.beloep, dto.kompensasjonstillegg, dto.kronetillegg, dto.livsvarig, dto.maanedligBeloep ?: 0)
-
-    private fun livsvarigOffentligAfp(dto: SimulatorPersonligLivsvarigOffentligAfp) =
-        SimulertAfpOffentlig(dto.alderAar, dto.beloep, dto.maanedligBeloep)
+        SimulertAfpPrivat(
+            alder = dto.alderAar,
+            beloep = dto.beloep,
+            kompensasjonstillegg = dto.kompensasjonstillegg,
+            kronetillegg = dto.kronetillegg,
+            livsvarig = dto.livsvarig,
+            maanedligBeloep = dto.maanedligBeloep ?: 0
+        )
 
     private fun vilkaarsproeving(dto: SimulatorPersonligVilkaarsproeving) =
         Vilkaarsproeving(
@@ -87,11 +101,37 @@ object SimulatorPersonligSimuleringResultMapper {
         )
 
     private fun alder(dto: SimulatorPersonligAlder) =
-        Alder(dto.aar, dto.maaneder)
+        Alder(aar = dto.aar, maaneder = dto.maaneder)
 
     private fun alderspensjonMaanedsbeloep(dto: SimulatorPersonligMaanedsbeloep) =
         AlderspensjonMaanedsbeloep(
             gradertUttak = dto.gradertUttakBeloep,
             heltUttak = dto.heltUttakBeloep
         )
+
+    private fun problem(dto: SimulatorPersonligSimuleringError) =
+        Problem(
+            type = problemType(dto),
+            beskrivelse = "${dto.message} (${dto.exception})"
+        )
+
+    private fun problemType(dto: SimulatorPersonligSimuleringError): ProblemType =
+        when (dto.exception) {
+            "FeilISimuleringsgrunnlagetException" -> ProblemType.ANNEN_KLIENTFEIL
+            "ImplementationUnrecoverableException" -> ProblemType.ANNEN_KLIENTFEIL
+            "IllegalArgumentException" -> ProblemType.ANNEN_KLIENTFEIL
+            "InvalidArgumentException" -> ProblemType.ANNEN_KLIENTFEIL
+            "KanIkkeBeregnesException" -> ProblemType.ANNEN_KLIENTFEIL
+            "KonsistensenIGrunnlagetErFeilException" -> ProblemType.ANNEN_KLIENTFEIL
+            "PersonForGammelException" -> ProblemType.PERSON_FOR_HOEY_ALDER
+            "PersonForUngException" -> ProblemType.ANNEN_KLIENTFEIL
+            "Pre2025OffentligAfpAvslaattException" -> ProblemType.ANNEN_KLIENTFEIL
+            "RegelmotorValideringException" -> ProblemType.ANNEN_KLIENTFEIL
+            "UtilstrekkeligOpptjeningException" -> ProblemType.UTILSTREKKELIG_OPPTJENING
+            "UtilstrekkeligTrygdetidException" -> ProblemType.UTILSTREKKELIG_TRYGDETID
+            "EgressException" -> ProblemType.SERVERFEIL // feil i simulatoren
+            "BadRequestException" -> ProblemType.ANNEN_KLIENTFEIL
+            "InvalidEnumValueException" -> ProblemType.SERVERFEIL // feil i denne backend
+            else -> ProblemType.SERVERFEIL
+        }
 }

@@ -2,7 +2,8 @@ package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.api.map
 
 import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.land.Land
-import no.nav.pensjon.kalkulator.simulering.Eps
+import no.nav.pensjon.kalkulator.simulering.EpsSpec
+import no.nav.pensjon.kalkulator.simulering.LevendeEps
 import no.nav.pensjon.kalkulator.simulering.Opphold
 import no.nav.pensjon.kalkulator.simulering.Utenlandsopphold
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
@@ -31,9 +32,11 @@ object TjenestepensjonSimuleringFoer1963SpecMapperV1 {
     }
 
     private fun eps(source: SimuleringOffentligTjenestepensjonFoer1963SpecV1) =
-        Eps(
-            harInntektOver2G = source.epsHarInntektOver2G ?: false,
-            harPensjon = source.epsHarPensjon ?: false
+        EpsSpec(
+            levende = LevendeEps(
+                harInntektOver2G = source.epsHarInntektOver2G == true,
+                harPensjon = source.epsHarPensjon == true
+            )
         )
 
     private fun gradertUttak(source: PersonligSimuleringGradertUttakSpecV9) =
