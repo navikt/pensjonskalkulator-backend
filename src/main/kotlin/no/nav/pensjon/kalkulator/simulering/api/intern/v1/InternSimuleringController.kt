@@ -97,16 +97,16 @@ class InternSimuleringController(
 
         private fun problem(e: Exception) =
             SimuleringResultDto(
-                alderspensjon = emptyList(),
+                alderspensjonListe = emptyList(),
                 tidsbegrensetOffentligAfp = null,
-                privatAfp = null,
-                livsvarigOffentligAfp = null,
+                privatAfpListe = null,
+                livsvarigOffentligAfpListe = null,
                 vilkaarsproevingsresultat = VilkaarsproevingsresultatDto(
                     erInnvilget = false,
                     alternativ = null
                 ),
                 trygdetid = null,
-                opptjeningsgrunnlagListe = null,
+                pensjonsgivendeInntektListe = null,
                 problem = ProblemDto(
                     kode = ProblemTypeDto.SERVERFEIL,
                     beskrivelse = e.message ?: e.javaClass.simpleName
