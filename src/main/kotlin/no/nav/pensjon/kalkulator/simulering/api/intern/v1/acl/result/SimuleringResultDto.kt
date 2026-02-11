@@ -8,13 +8,13 @@ import org.springframework.http.HttpStatus
 
 @JsonInclude(NON_NULL)
 data class SimuleringResultDto(
-    @field:NotNull val alderspensjon: List<AlderspensjonDto>,
-    val livsvarigOffentligAfp: List<AldersbestemtUtbetalingDto>?,
+    @field:NotNull val alderspensjonListe: List<AlderspensjonDto>,
+    val livsvarigOffentligAfpListe: List<AldersbestemtUtbetalingDto>?,
     val tidsbegrensetOffentligAfp: TidsbegrensetOffentligAfpDto?,
-    val privatAfp: List<PrivatAfpDto>?,
+    val privatAfpListe: List<PrivatAfpDto>?,
     @field:NotNull val vilkaarsproevingsresultat: VilkaarsproevingsresultatDto,
     val trygdetid: TrygdetidDto?,
-    val opptjeningsgrunnlagListe: List<PensjonsgivendeInntektDto>?,
+    val pensjonsgivendeInntektListe: List<AarligBeloepDto>?,
     val problem: ProblemDto?
 )
 
@@ -23,12 +23,6 @@ data class AlderspensjonDto(
     @field:NotNull val alderAar: Int,
     @field:NotNull val beloep: Int,
     val gjenlevendetillegg: Int?
-)
-
-@JsonInclude(NON_NULL)
-data class MaanedligPensjonDto(
-    val gradertUttakBeloep: Int?,
-    @field:NotNull val heltUttakBeloep: Int
 )
 
 @JsonInclude(NON_NULL)
@@ -71,7 +65,7 @@ data class VilkaarsproevingsresultatDto(
     val alternativ: UttaksparametreDto?
 )
 
-data class PensjonsgivendeInntektDto(
+data class AarligBeloepDto(
     @field:NotNull val aarstall: Int,
     @field:NotNull val beloep: Int
 )

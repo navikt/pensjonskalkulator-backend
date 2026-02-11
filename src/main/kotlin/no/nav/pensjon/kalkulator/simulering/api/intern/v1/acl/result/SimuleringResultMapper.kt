@@ -13,13 +13,13 @@ object SimuleringResultMapper {
 
     fun toDto(source: SimuleringResult) =
         SimuleringResultDto(
-            alderspensjon = source.alderspensjon.map(::alderspensjon),
+            alderspensjonListe = source.alderspensjon.map(::alderspensjon),
             tidsbegrensetOffentligAfp = source.pre2025OffentligAfp?.let(::tidsbegrensetOffentligAfp),
-            privatAfp = source.afpPrivat.map(::privatAfp),
-            livsvarigOffentligAfp = source.afpOffentlig.map(::livsvarigOffentligAfp),
+            privatAfpListe = source.afpPrivat.map(::privatAfp),
+            livsvarigOffentligAfpListe = source.afpOffentlig.map(::livsvarigOffentligAfp),
             vilkaarsproevingsresultat = vilkaarsproevingsresultat(source.vilkaarsproeving),
             trygdetid = TrygdetidDto(antallAar = source.trygdetid, erUtilstrekkelig = source.harForLiteTrygdetid),
-            opptjeningsgrunnlagListe = source.opptjeningGrunnlagListe.map(::inntekt),
+            pensjonsgivendeInntektListe = source.opptjeningGrunnlagListe.map(::inntekt),
             problem = source.problem?.let(::problem)
         )
 
@@ -72,7 +72,7 @@ object SimuleringResultMapper {
         )
 
     private fun inntekt(source: SimulertOpptjeningGrunnlag) =
-        PensjonsgivendeInntektDto(
+        AarligBeloepDto(
             aarstall = source.aar,
             beloep = source.pensjonsgivendeInntektBeloep
         )
