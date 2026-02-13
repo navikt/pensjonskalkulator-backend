@@ -193,10 +193,10 @@ const val VILKAAR_IKKE_OPPFYLT_BODY = """{
     "alderspensjonListe": [],
     "privatAfpListe": [],
     "livsvarigOffentligAfpListe": [],
-    "vilkaarsproeving": {
-        "vilkaarErOppfylt": false,
+    "vilkaarsproevingsresultat": {
+        "erInnvilget": false,
         "alternativ": {
-            "uttaksgrad": 100,
+            "uttaksgrad": "HUNDRE_PROSENT",
             "heltUttakAlder": {
                 "aar": 67,
                 "maaneder": 0
@@ -204,12 +204,12 @@ const val VILKAAR_IKKE_OPPFYLT_BODY = """{
         }
     },
     "trygdetid": 0,
-    "opptjeningGrunnlagListe": []
+    "pensjonsgivendeInntektListe": []
 }"""
 
 @Language("json")
 const val EXPECTED_GRADERT_UTTAK_REQUEST_BODY =
-    """{"simuleringstype":"ALDER","pid":"12906498357","sivilstand":"ENKE","epsHarPensjon":false,"epsHarInntektOver2G":true,"sisteInntekt":123000,"uttaksar":1,"gradertUttak":{"grad":"P_50","uttakFomAlder":{"aar":64,"maaneder":2},"aarligInntekt":12000},"heltUttak":{"uttakFomAlder":{"aar":67,"maaneder":1},"aarligInntekt":0,"inntektTomAlder":{"aar":67,"maaneder":1}},"utenlandsperiodeListe":[{"fom":"1990-01-02","tom":"1999-11-30","land":"AUS","arbeidetUtenlands":true}],"afpOrdning":"AFPKOM"}"""
+    """{"pid":"12906498357","sivilstatus":"ENKE_ELLER_ENKEMANN","sisteInntekt":123000,"simuleringstype":"ALDERSPENSJON","gradertUttak":{"grad":"FEMTI_PROSENT","uttakFomAlder":{"aar":64,"maaneder":2},"aarligInntekt":12000},"heltUttak":{"uttakFomAlder":{"aar":67,"maaneder":1},"aarligInntekt":0,"inntektTomAlder":{"aar":67,"maaneder":1}},"aarUtenlandsEtter16Aar":null,"fremtidigInntektListe":null,"utenlandsperiodeListe":[{"fom":"1990-01-02","tom":"1999-11-30","land":"AUS","arbeidetUtenlands":true}],"eps":{"levende":{"harInntektOver2G":true,"harPensjon":false},"avdoed":null},"offentligAfp":{"harInntektMaanedenFoerUttak":null,"afpOrdning":null,"innvilgetLivsvarigAfp":null}}"""
 
 @Language("json")
 const val ALTERNATIV_PENSJON = """{
@@ -280,15 +280,16 @@ const val ALTERNATIV_PENSJON = """{
         "heltUttakBeloep": 26000
     },
     "privatAfpListe": [],
+    "pensjonsgivendeInntektListe": [],
     "livsvarigOffentligAfpListe": [],
-    "vilkaarsproeving": {
-        "vilkaarErOppfylt": false,
+    "vilkaarsproevingsresultat": {
+        "erInnvilget": false,
         "alternativ": {
             "gradertUttakAlder": {
                 "aar": 63,
                 "maaneder": 10
             },
-            "uttaksgrad": 40,
+            "uttaksgrad": "FOERTI_PROSENT",
             "heltUttakAlder": {
                 "aar": 65,
                 "maaneder": 6
@@ -361,6 +362,7 @@ const val PENSJON_MED_LIVSVARIG_OFFENTLIG_AFP = """{
         "gradertUttakBeloep": 13000,
         "heltUttakBeloep": 26000
     },
+    "pensjonsgivendeInntektListe": [],
     "privatAfpListe": [],
     "livsvarigOffentligAfpListe": [
       {
@@ -372,8 +374,8 @@ const val PENSJON_MED_LIVSVARIG_OFFENTLIG_AFP = """{
             "beloep": 65000
         }
     ],
-    "vilkaarsproeving": {
-        "vilkaarErOppfylt": true,
+    "vilkaarsproevingsresultat": {
+        "erInnvilget": true,
         "alternativ": null
     }
 }"""
