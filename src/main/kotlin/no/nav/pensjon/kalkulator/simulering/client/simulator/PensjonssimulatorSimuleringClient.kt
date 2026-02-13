@@ -8,7 +8,7 @@ import no.nav.pensjon.kalkulator.simulering.SimuleringResult
 import no.nav.pensjon.kalkulator.simulering.Vilkaarsproeving
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
 import no.nav.pensjon.kalkulator.simulering.client.simulator.acl.result.PersonligSimuleringResultMapper
-import no.nav.pensjon.kalkulator.simulering.client.simulator.acl.result.SimuleringResultDto
+import no.nav.pensjon.kalkulator.simulering.client.simulator.acl.result.PersonligSimuleringResultDto
 import no.nav.pensjon.kalkulator.simulering.client.simulator.acl.spec.PersonligSimuleringSpecMapper
 import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.SimulatorAnonymSimuleringResultEnvelope
 import no.nav.pensjon.kalkulator.simulering.client.simulator.map.SimulatorAnonymSimuleringResultMapper
@@ -72,7 +72,7 @@ class PensjonssimulatorSimuleringClient(
         val spec = PersonligSimuleringSpecMapper.toDto(impersonalSpec, personalSpec)
 
         return try {
-            val result: SimuleringResultDto? =
+            val result: PersonligSimuleringResultDto? =
                 webClient
                     .post()
                     .uri(url)
@@ -81,7 +81,7 @@ class PensjonssimulatorSimuleringClient(
                     .headers(::setHeaders)
                     .bodyValue(spec)
                     .retrieve()
-                    .bodyToMono(SimuleringResultDto::class.java)
+                    .bodyToMono(PersonligSimuleringResultDto::class.java)
                     .retryWhen(retryBackoffSpec(url))
                     .block()
 

@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.simulering.client.simulator.acl.result
 
 import jakarta.validation.constraints.NotNull
 
-data class SimuleringResultDto(
+data class PersonligSimuleringResultDto(
     @field:NotNull val alderspensjonListe: List<AlderspensjonDto>,
     val alderspensjonMaanedsbeloep: UttaksbeloepDto?,
     @field:NotNull val livsvarigOffentligAfpListe: List<AldersbestemtUtbetalingDto>,
