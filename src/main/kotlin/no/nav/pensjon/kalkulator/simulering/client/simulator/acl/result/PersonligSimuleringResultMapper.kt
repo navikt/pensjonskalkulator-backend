@@ -7,7 +7,7 @@ import no.nav.pensjon.kalkulator.validity.Problem
 
 object PersonligSimuleringResultMapper {
 
-    fun fromDto(dto: SimuleringResultDto) =
+    fun fromDto(dto: PersonligSimuleringResultDto) =
         SimuleringResult(
             alderspensjon = dto.alderspensjonListe.map(::alderspensjon),
             alderspensjonMaanedsbeloep = dto.alderspensjonMaanedsbeloep?.let(::alderspensjonMaanedsbeloep),
