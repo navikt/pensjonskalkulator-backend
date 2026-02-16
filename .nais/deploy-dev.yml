@@ -66,6 +66,7 @@ spec:
       rules:
         - application: pensjonskalkulator-frontend
         - application: pensjonskalkulator-frontend-intern
+        - application: pensjonskalkulator-frontend-intern-staging
         - application: pensjonskalkulator-frontend-ekstern
         - application: pensjonskalkulator-frontend-ekstern-staging
         - application: pensjonskalkulator-veiledning-frontend
