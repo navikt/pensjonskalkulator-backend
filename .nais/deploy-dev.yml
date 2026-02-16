@@ -81,6 +81,11 @@ spec:
         - application: pensjonskalkulator-veiledning-frontend-magicbox
         - application: pensjonskalkulator-frontend-sandbox
         - application: pensjonskalkulator-veiledning-frontend-sandbox
+        - application: pensjonskalkulator-frontend-ekstern-catbox
+        - application: pensjonskalkulator-frontend-ekstern-dreambox
+        - application: pensjonskalkulator-frontend-ekstern-magicbox
+        - application: pensjonskalkulator-frontend-ekstern-sandbox
+        - application: pensjonskalkulator-frontend-ekstern-codebox
         - application: pensjonskalkulator-uinnlogget-catbox
         - application: pensjonskalkulator-uinnlogget-dev
         - application: pensjonskalkulator-uinnlogget-dreambox
