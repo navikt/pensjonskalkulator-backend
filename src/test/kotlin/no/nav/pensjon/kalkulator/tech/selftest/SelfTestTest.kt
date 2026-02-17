@@ -11,7 +11,6 @@ import no.nav.pensjon.kalkulator.person.client.pdl.PdlPersonClient
 import no.nav.pensjon.kalkulator.tech.representasjon.client.pensjon.PensjonRepresentasjonClient
 import no.nav.pensjon.kalkulator.tech.security.egress.azuread.AzureAdOAuth2MetadataClient
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.client.nom.NomSkjermingClient
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClient
 import org.intellij.lang.annotations.Language
 import java.time.LocalTime
@@ -73,7 +72,6 @@ private fun selfTest(status: ServiceStatus) =
         penClient = arrangePen(status),
         personClient = arrangePdl(status),
         representasjonClient = arrangePensjonRepresentasjon(status),
-        skjermingClient = arrangeNomSkjerming(status),
         tjenestepensjonClient = arrangeTp(status)
     )
 
@@ -137,16 +135,6 @@ private fun arrangePensjonRepresentasjon(status: ServiceStatus): PensjonRepresen
         )
     }
 
-private fun arrangeNomSkjerming(status: ServiceStatus): NomSkjermingClient =
-    mockk<NomSkjermingClient>().apply {
-        every { ping() } returns PingResult(
-            service = EgressService.SKJERMEDE_PERSONER,
-            status = status,
-            endpoint = "nom-endpoint",
-            message = "nom-message"
-        )
-    }
-
 private fun arrangeTp(status: ServiceStatus): TpTjenestepensjonClient =
     mockk<TpTjenestepensjonClient>().apply {
         every { ping() } returns PingResult(
@@ -164,7 +152,6 @@ private class TestClass(
     penClient: PenPingClient,
     personClient: PdlPersonClient,
     representasjonClient: PensjonRepresentasjonClient,
-    skjermingClient: NomSkjermingClient,
     tjenestepensjonClient: TpTjenestepensjonClient
 ) :
     SelfTest(
@@ -174,7 +161,6 @@ private class TestClass(
         penClient,
         personClient,
         representasjonClient,
-        skjermingClient,
         tjenestepensjonClient
     ) {
 
@@ -190,7 +176,6 @@ private const val UP_CHECKS: String = "[" +
         "{\"endpoint\":\"pen-endpoint\",\"description\":\"Pensjonsfaglig kjerne\",\"result\":0}, " +
         "{\"endpoint\":\"pdl-endpoint\",\"description\":\"Persondataløsningen\",\"result\":0}, " +
         "{\"endpoint\":\"repr-endpoint\",\"description\":\"Pensjon-representasjon\",\"result\":0}, " +
-        "{\"endpoint\":\"nom-endpoint\",\"description\":\"Skjermede personer\",\"result\":0}, " +
         "{\"endpoint\":\"tp-endpoint\",\"description\":\"Tjenestepensjon\",\"result\":0}" +
         "]"
 
@@ -202,7 +187,6 @@ private const val DOWN_CHECKS: String = "[" +
         "{\"endpoint\":\"pen-endpoint\",\"description\":\"Pensjonsfaglig kjerne\",\"errorMessage\":\"pen-message\",\"result\":1}, " +
         "{\"endpoint\":\"pdl-endpoint\",\"description\":\"Persondataløsningen\",\"errorMessage\":\"pdl-message\",\"result\":1}, " +
         "{\"endpoint\":\"repr-endpoint\",\"description\":\"Pensjon-representasjon\",\"errorMessage\":\"repr-message\",\"result\":1}, " +
-        "{\"endpoint\":\"nom-endpoint\",\"description\":\"Skjermede personer\",\"errorMessage\":\"nom-message\",\"result\":1}, " +
         "{\"endpoint\":\"tp-endpoint\",\"description\":\"Tjenestepensjon\",\"errorMessage\":\"tp-message\",\"result\":1}" +
         "]"
 
@@ -214,6 +198,5 @@ private const val TABLE_BODY: String = "<tbody>" +
         "<tr><td>Pensjonsfaglig kjerne</td><td style=\"background-color:green;text-align:center;\">UP</td><td>pen-message</td><td>pen-endpoint</td><td>Simulering, pensjonsdata</td></tr>" +
         "<tr><td>Persondataløsningen</td><td style=\"background-color:green;text-align:center;\">UP</td><td>pdl-message</td><td>pdl-endpoint</td><td>Persondata</td></tr>" +
         "<tr><td>Pensjon-representasjon</td><td style=\"background-color:green;text-align:center;\">UP</td><td>repr-message</td><td>repr-endpoint</td><td>Representasjonsforhold (fullmakt m.m.)</td></tr>" +
-        "<tr><td>Skjermede personer</td><td style=\"background-color:green;text-align:center;\">UP</td><td>nom-message</td><td>nom-endpoint</td><td>Skjerming</td></tr>" +
         "<tr><td>Tjenestepensjon</td><td style=\"background-color:green;text-align:center;\">UP</td><td>tp-message</td><td>tp-endpoint</td><td>Tjenestepensjonsforhold</td></tr>" +
         "</tbody>"

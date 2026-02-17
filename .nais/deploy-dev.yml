@@ -159,10 +159,6 @@ spec:
       value: dev-fss:pensjonopptjening:pensjon-popp-q2
     - name: POPP_URL
       value: https://pensjon-popp-q2.dev-fss-pub.nais.io
-    - name: SKJERMEDE_PERSONER_SERVICE_ID
-      value: dev-gcp:nom:skjermede-personer-pip
-    - name: SKJERMEDE_PERSONER_URL
-      value: https://skjermede-personer-pip.intern.dev.nav.no
     - name: SOKOS_UTBETALDATA_SERVICE_ID
       value: dev-fss:okonomi:sokos-utbetaldata
     - name: SOKOS_UTBETALDATA_URL

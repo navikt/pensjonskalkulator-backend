@@ -9,8 +9,6 @@ import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.ShadowTilgangComparator
 import org.intellij.lang.annotations.Language
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
@@ -36,19 +34,12 @@ class StatusControllerTest : ShouldSpec() {
     private lateinit var adresseService: FortroligAdresseService
 
     @MockkBean
-    private lateinit var groupMembershipService: GroupMembershipService
-
-    @MockkBean(relaxed = true)
-    private lateinit var shadowTilgangComparator: ShadowTilgangComparator
-
-    @MockkBean
     private lateinit var auditor: Auditor
 
     init {
         beforeSpec {
             every { pidExtractor.pid() } returns pid
             every { adresseService.adressebeskyttelseGradering(any()) } returns AdressebeskyttelseGradering.UGRADERT
-            every { groupMembershipService.innloggetBrukerHarTilgang(any()) } returns true
             every { auditor.audit(any(), any()) } returns Unit
         }
 

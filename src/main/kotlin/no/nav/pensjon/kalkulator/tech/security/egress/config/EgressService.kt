@@ -27,7 +27,6 @@ enum class EgressService(
     PENSJONSFAGLIG_KJERNE("Pensjonsfaglig kjerne", "PEN", "Simulering, pensjonsdata"),
     PENSJONSOPPTJENING("Pensjonsopptjening", "POPP", "Pensjonsopptjeningsdata"),
     PERSONDATALOESNINGEN("Persondataløsningen", "PDL", "Persondata"),
-    SKJERMEDE_PERSONER("Skjermede personer", "SP", "Skjerming"),
     PENSJONSSIMULATOR(
         description = "Pensjonssimulator",
         shortName = "PS",
