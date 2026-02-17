@@ -21,37 +21,6 @@ class CryptoController(
 
     private val log = KotlinLogging.logger {}
 
-    @GetMapping("v1/crypto/public-key")
-    @Operation(
-        summary = "Hent offentlig nøkkel for kryptering",
-        description = "Henter offentlig nøkkel for kryptering (f.eks. for å skjule fødselsnummer)."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(
-                responseCode = "200",
-                description = "Henting av nøkkel utført."
-            ),
-            ApiResponse(
-                responseCode = "503",
-                description = "Henting av nøkkel kunne ikke utføres av tekniske årsaker.",
-                content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
-            ),
-        ]
-    )
-    fun publicKey(): String {
-        traceAid.begin()
-        log.debug { "Request for public key" }
-
-        return try {
-            timed(service::publicKey, "publicKey")
-        } catch (e: EgressException) {
-            handleError(e, "V1")!!
-        } finally {
-            traceAid.end()
-        }
-    }
-
     @PostMapping("v1/encrypt")
     @Operation(
         summary = "Krypter tekst",
