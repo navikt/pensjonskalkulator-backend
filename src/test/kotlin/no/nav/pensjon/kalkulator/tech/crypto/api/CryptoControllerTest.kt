@@ -6,7 +6,7 @@ import io.mockk.every
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
-import no.nav.pensjon.kalkulator.tech.crypto.PidEncryptionService
+import no.nav.pensjon.kalkulator.tech.crypto.CryptoService
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
@@ -31,7 +31,7 @@ class CryptoControllerTest : ShouldSpec() {
     private lateinit var mvc: MockMvc
 
     @MockkBean
-    private lateinit var pidEncryptionService: PidEncryptionService
+    private lateinit var cryptoService: CryptoService
 
     @MockkBean(relaxed = true)
     private lateinit var traceAid: TraceAid
@@ -61,7 +61,7 @@ class CryptoControllerTest : ShouldSpec() {
         }
 
         should("encrypt") {
-            every { pidEncryptionService.encrypt("abc") } returns "xyz"
+            every { cryptoService.encrypt("abc") } returns "xyz"
 
             mvc.perform(
                 post(URL_V1)

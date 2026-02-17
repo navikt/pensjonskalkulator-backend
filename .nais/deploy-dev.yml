@@ -106,6 +106,11 @@ spec:
         - application: pdl-api
           namespace: pdl
           cluster: dev-fss
+        - application: pensjon-pid-encryption
+          namespace: pensjon-person
+        - application: pensjon-popp-q2
+          namespace: pensjonopptjening
+          cluster: dev-fss
         - application: pensjon-representasjon-q2
           namespace: pensjon-person
           cluster: dev-fss
@@ -148,6 +153,10 @@ spec:
       value: dev-fss:pensjon-q2:pensjon-pen-q2
     - name: PEN_URL
       value: https://pensjon-pen-q2.dev-fss-pub.nais.io
+    - name: PENSJON_PID_ENCRYPTION_SERVICE_ID
+      value: dev-gcp:pensjon-person:pensjon-pid-encryption
+    - name: PENSJON_PID_ENCRYPTION_URL
+      value: https://pensjon-pid-encryption.intern.dev.nav.no
     - name: PENSJON_REPRESENTASJON_SERVICE_ID
       value: dev-fss:pensjon-person:pensjon-representasjon-q2
     - name: PENSJON_REPRESENTASJON_URL
