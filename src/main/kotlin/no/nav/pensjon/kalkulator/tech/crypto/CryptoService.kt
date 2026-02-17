@@ -1,124 +1,14 @@
 package no.nav.pensjon.kalkulator.tech.crypto
 
 import no.nav.pensjon.kalkulator.tech.crypto.client.CryptoClient
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import java.nio.charset.StandardCharsets
-import java.security.InvalidKeyException
-import java.security.NoSuchAlgorithmException
-import java.util.*
-import javax.crypto.BadPaddingException
-import javax.crypto.Cipher
-import javax.crypto.IllegalBlockSizeException
-import javax.crypto.NoSuchPaddingException
 
-/**
- * Based on https://github.com/navikt/pid-encryption/
- */
 @Service
-class CryptoService(
-    @Value($$"${pid.encryption.key.new}") newKey: String,
-    @Value($$"${pid.encryption.key.old}") oldKey: String,
-    private val cryptoClient: CryptoClient
-) {
-    private val newKeyPair = KeyPair.fromString(newKey)
-    private val oldKeyPair = KeyPair.fromString(oldKey)
-
-    val publicKey: String
-        get() = newKeyPair.exportablePublicKey
+class CryptoService(private val cryptoClient: CryptoClient) {
 
     fun encrypt(value: String?): String =
         value?.let(cryptoClient::encrypt) ?: ""
 
     fun decrypt(value: String?): String =
         value?.let(cryptoClient::decrypt) ?: ""
-
-    fun legacyEncrypt(value: String?): String {
-        try {
-            if (value.isNullOrEmpty()) {
-                throw RuntimeException("String is null or empty")
-            }
-
-            val encryptedBytes = encryptionCipher().doFinal(value.toByteArray(StandardCharsets.UTF_8))
-
-            // Prepend the key ID, so when we later try to decrypt the string, we know which decryption key to use:
-            return newKeyPair.keyId + "." + base64(encryptedBytes)
-        } catch (e: NoSuchPaddingException) {
-            throw RuntimeException("Unsupported encryption padding", e)
-        } catch (e: IllegalBlockSizeException) {
-            throw RuntimeException("Illegal block size for encryption - ${displayableValue(value!!)}", e)
-        } catch (e: NoSuchAlgorithmException) {
-            throw RuntimeException("Unsupported encryption encoding", e)
-        } catch (e: BadPaddingException) {
-            throw RuntimeException("Bad encryption padding", e)
-        } catch (e: InvalidKeyException) {
-            throw RuntimeException("Invalid public key for encryption", e)
-        }
-    }
-
-    fun legacyDecrypt(encrypted: String?): String {
-        try {
-            if (encrypted == null) {
-                throw RuntimeException("Encrypted string is null; expected <key id>.<encrypted string>")
-            }
-
-            if (encrypted.contains(".").not()) {
-                throw RuntimeException("Encrypted string is not on the expected format <key id>.<encrypted string>")
-            }
-
-            val parts = encrypted.split("\\.".toRegex(), limit = 2).toTypedArray()
-            val keyId = parts[0]
-            val encryptedBase64 = parts[1]
-
-            if (keyId.isEmpty()) {
-                throw RuntimeException("Key ID in encrypted string is null or empty. Expected a string on the format <key id>.<encrypted string>")
-            }
-
-            if (encryptedBase64.isEmpty()) {
-                throw RuntimeException("Encrypted string is null or empty. Expected a string on the format <key id>.<encrypted string>")
-            }
-
-            val decryptedBytes = decryptionCipher(keyId).doFinal(Base64.getUrlDecoder().decode(encryptedBase64))
-            return String(decryptedBytes, StandardCharsets.UTF_8)
-        } catch (e: NoSuchPaddingException) {
-            throw RuntimeException("Unsupported encryption padding", e)
-        } catch (e: IllegalBlockSizeException) {
-            throw RuntimeException("Illegal block size for decryption (too long encrypted string?)", e)
-        } catch (e: NoSuchAlgorithmException) {
-            throw RuntimeException("Unsupported encryption encoding", e)
-        } catch (e: BadPaddingException) {
-            throw RuntimeException("Bad encryption padding", e)
-        } catch (e: InvalidKeyException) {
-            throw RuntimeException("The private key for decryption is invalid", e)
-        }
-    }
-
-    private fun encryptionCipher(): Cipher =
-        Cipher.getInstance(TRANSFORMATION).apply {
-            init(Cipher.ENCRYPT_MODE, newKeyPair.publicKey)
-        }
-
-    private fun decryptionCipher(keyId: String): Cipher =
-        Cipher.getInstance(TRANSFORMATION).apply {
-            init(Cipher.DECRYPT_MODE, keyPair(keyId).privateKey)
-        }
-
-    private fun keyPair(keyId: String): KeyPair =
-        if (keyId == newKeyPair.keyId) newKeyPair else oldKeyPair
-
-    private companion object {
-        private const val TRANSFORMATION = "RSA"
-
-        private fun base64(bytes: ByteArray?): String =
-            Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
-
-        private fun displayableValue(value: String): String {
-            val length = value.length
-
-            return if (length > 12)
-                "${value.take(3)}...${value.takeLast(3)} - length $length"
-            else
-                "length $length"
-        }
-    }
 }

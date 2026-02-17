@@ -7,14 +7,14 @@ import io.mockk.mockk
 import no.nav.pensjon.kalkulator.tech.crypto.client.CryptoClient
 
 class CryptoServiceTest : ShouldSpec({
-/* TODO enable tests
+
     should("invoke client for encryption") {
-        CryptoService("", "", arrangeClient()).encrypt("abc") shouldBe "xyz"
+        CryptoService(cryptoClient = arrangeClient()).encrypt("abc") shouldBe "xyz"
     }
 
     should("invoke client for decryption") {
-        CryptoService("", "", arrangeClient()).encrypt("xyz") shouldBe "abc"
-    }*/
+        CryptoService(cryptoClient = arrangeClient()).decrypt("xyz") shouldBe "abc"
+    }
 })
 
 private fun arrangeClient(): CryptoClient =
