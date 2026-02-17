@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.crypto
 
+import no.nav.pensjon.kalkulator.tech.crypto.client.CryptoClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.nio.charset.StandardCharsets
@@ -15,9 +16,10 @@ import javax.crypto.NoSuchPaddingException
  * Based on https://github.com/navikt/pid-encryption/
  */
 @Service
-class PidEncryptionService(
-    @Value("\${pid.encryption.key.new}") newKey: String,
-    @Value("\${pid.encryption.key.old}") oldKey: String
+class CryptoService(
+    @Value($$"${pid.encryption.key.new}") newKey: String,
+    @Value($$"${pid.encryption.key.old}") oldKey: String,
+    private val cryptoClient: CryptoClient
 ) {
     private val newKeyPair = KeyPair.fromString(newKey)
     private val oldKeyPair = KeyPair.fromString(oldKey)
@@ -25,7 +27,13 @@ class PidEncryptionService(
     val publicKey: String
         get() = newKeyPair.exportablePublicKey
 
-    fun encrypt(value: String?): String {
+    fun encrypt(value: String?): String =
+        value?.let(cryptoClient::encrypt) ?: ""
+
+    fun decrypt(value: String?): String =
+        value?.let(cryptoClient::decrypt) ?: ""
+
+    fun legacyEncrypt(value: String?): String {
         try {
             if (value.isNullOrEmpty()) {
                 throw RuntimeException("String is null or empty")
@@ -48,7 +56,7 @@ class PidEncryptionService(
         }
     }
 
-    fun decrypt(encrypted: String?): String {
+    fun legacyDecrypt(encrypted: String?): String {
         try {
             if (encrypted == null) {
                 throw RuntimeException("Encrypted string is null; expected <key id>.<encrypted string>")

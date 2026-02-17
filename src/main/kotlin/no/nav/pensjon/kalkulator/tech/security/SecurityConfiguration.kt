@@ -165,6 +165,7 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
      */
     private fun isUniversal(request: HttpServletRequest): Boolean =
         request.requestURI == ENCRYPTION_URI ||
+                request.requestURI == DECRYPTION_URI ||
                 request.requestURI.startsWith(FEATURE_URI)
 
     private fun hasAnsattIdClaim(request: HttpServletRequest): Boolean =
@@ -176,6 +177,7 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
         private const val ALDERSGRENSE_URI = "/api/v1/aldersgrense"
         private const val ANSATT_ID_URI = "/api/v1/ansatt-id"
         private const val ENCRYPTION_URI = "/api/v1/encrypt"
+        private const val DECRYPTION_URI = "/api/v1/decrypt"
 
         private fun hasPidHeader(request: HttpServletRequest): Boolean =
             hasLength(request.getHeader(CustomHttpHeaders.PID))
