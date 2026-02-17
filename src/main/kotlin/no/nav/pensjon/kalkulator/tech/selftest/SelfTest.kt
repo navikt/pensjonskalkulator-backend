@@ -6,7 +6,6 @@ import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningsgrunnlagC
 import no.nav.pensjon.kalkulator.person.client.pdl.PdlPersonClient
 import no.nav.pensjon.kalkulator.tech.representasjon.client.pensjon.PensjonRepresentasjonClient
 import no.nav.pensjon.kalkulator.tech.security.egress.azuread.AzureAdOAuth2MetadataClient
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.skjerming.client.nom.NomSkjermingClient
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.TpTjenestepensjonClient
 import org.springframework.stereotype.Component
 import java.time.LocalTime
@@ -19,7 +18,6 @@ class SelfTest(
     penClient: PenPingClient,
     personClient: PdlPersonClient,
     representasjonClient: PensjonRepresentasjonClient,
-    skjermingClient: NomSkjermingClient,
     tjenestepensjonClient: TpTjenestepensjonClient
 ) {
 
@@ -30,7 +28,6 @@ class SelfTest(
         penClient,
         personClient,
         representasjonClient,
-        skjermingClient,
         tjenestepensjonClient)
 
     /**

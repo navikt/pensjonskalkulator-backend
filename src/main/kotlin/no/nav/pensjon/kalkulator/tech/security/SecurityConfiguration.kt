@@ -31,8 +31,7 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.ShadowTilgangComparator
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.TilgangService
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
@@ -102,8 +101,8 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
         pidGetter: PidGetter,
         auditor: Auditor,
         adresseService: FortroligAdresseService,
-        groupMembershipService: GroupMembershipService,
-        shadowTilgangComparator: ShadowTilgangComparator,
+        navIdExtractor: SecurityContextNavIdExtractor,
+        tilgangService: TilgangService,
         authResolver: AuthenticationManagerResolver<HttpServletRequest>,
         authenticationEntryPoint: LoggingAuthenticationEntryPoint,
         @Value("\${pkb.request-matcher.internal}") internalRequestMatcher: String
@@ -113,7 +112,7 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
             BasicAuthenticationFilter::class.java
         )
             .addFilterAfter(
-                ImpersonalAccessFilter(pidExtractor, groupMembershipService, auditor, shadowTilgangComparator),
+                ImpersonalAccessFilter(pidExtractor, navIdExtractor, tilgangService, auditor),
                 AuthenticationEnricherFilter::class.java
             )
             .addFilterAfter(
