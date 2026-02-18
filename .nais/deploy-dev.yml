@@ -71,7 +71,6 @@ spec:
         - application: pensjonskalkulator-frontend-ekstern-staging
         - application: pensjonskalkulator-veiledning-frontend
         - application: pensjonskalkulator-frontend-catbox
-        - application: pensjonskalkulator-veiledning-frontend-catbox
         - application: pensjonskalkulator-frontend-codebox
         - application: pensjonskalkulator-veiledning-frontend-codebox
         - application: pensjonskalkulator-frontend-coffeebox
@@ -82,6 +81,9 @@ spec:
         - application: pensjonskalkulator-veiledning-frontend-magicbox
         - application: pensjonskalkulator-frontend-sandbox
         - application: pensjonskalkulator-veiledning-frontend-sandbox
+        - application: pensjonskalkulator-veiledning-frontend-dreambox
+        - application: pensjonskalkulator-veiledning-frontend-catbox
+        - application: pensjonskalkulator-veiledning-frontend-staging
         - application: pensjonskalkulator-frontend-ekstern-catbox
         - application: pensjonskalkulator-frontend-ekstern-dreambox
         - application: pensjonskalkulator-frontend-ekstern-magicbox
