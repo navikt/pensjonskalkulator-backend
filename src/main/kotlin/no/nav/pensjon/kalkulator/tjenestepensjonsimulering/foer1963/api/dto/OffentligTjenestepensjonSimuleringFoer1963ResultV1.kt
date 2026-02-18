@@ -31,6 +31,8 @@ data class SimuleringsresultatFoer1963V1(
 data class UtbetalingsperiodeFoer1963V1(
     @field:NotNull val startAlder: Alder,
     val sluttAlder: Alder?,
+    @field:NotNull val startAlderIPeriode: Alder,
+    val sluttAlderIPeriode: Alder?,
     @field:NotNull val aarligUtbetaling: Int,
     val grad: Int?,
     @field:NotNull val ytelsekode: YtelseskodeFoer1963,

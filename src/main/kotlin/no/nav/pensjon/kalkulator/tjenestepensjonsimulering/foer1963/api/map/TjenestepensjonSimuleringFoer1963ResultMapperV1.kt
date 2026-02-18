@@ -14,6 +14,8 @@ object TjenestepensjonSimuleringFoer1963ResultMapperV1 {
             UtbetalingsperiodeFoer1963V1(
                 startAlder = utbetaling.alderFom,
                 sluttAlder = utbetaling.alderTom,
+                startAlderIPeriode = utbetaling.alderIPeriodeFom,
+                sluttAlderIPeriode = utbetaling.alderIPeriodeTom,
                 aarligUtbetaling = utbetaling.arligUtbetaling?.let { floor(it).toInt() } ?: 0,
                 grad = utbetaling.grad,
                 ytelsekode = utbetaling.ytelsekode,

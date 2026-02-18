@@ -23,12 +23,13 @@ object TpSimuleringFoer1963ClientMapper {
                 tpnr = sim.tpnr,
                 navnOrdning = sim.navnOrdning,
                 utbetalingsperioder = sim.utbetalingsperioder.map { periode ->
+                    val datoFom = periode.datoFom.let(::epochMillisToLocalDate)
+                    val datoTom = periode.datoTom?.let(::epochMillisToLocalDate)
                     UtbetalingsperiodeResultat(
-                        alderFom = Alder.from(
-                            foedselsdato,
-                            periode.datoFom.let(::epochMillisToLocalDate),
-                        ),
-                        alderTom = calculateAlderTom(periode, foedselsdato),
+                        alderFom = Alder.from(foedselsdato, datoFom),
+                        alderTom = datoTom?.let { Alder.from(foedselsdato, it) },
+                        alderIPeriodeFom = calculateAlderIPeriode(datoFom, foedselsdato),
+                        alderIPeriodeTom = datoTom?.let { calculateAlderIPeriode(it, foedselsdato) },
                         grad = periode.grad,
                         arligUtbetaling = periode.arligUtbetaling,
                         ytelsekode = YtelseskodeFoer1963.fromExternalValue(periode.ytelsekode!!),
@@ -47,10 +48,9 @@ object TpSimuleringFoer1963ClientMapper {
     private fun epochMillisToLocalDate(millis: Long): LocalDate =
         Instant.ofEpochMilli(millis).atZone(ZoneId.of("Europe/Oslo")).toLocalDate()
 
-    private fun calculateAlderTom(periode: Utbetalingsperiode, foedselsdato: LocalDate): Alder? {
-        val datoTom = periode.datoTom?.let(::epochMillisToLocalDate) ?: return null
-        val alder = Alder.from(foedselsdato, datoTom)
-        return if (datoTom.dayOfMonth > foedselsdato.dayOfMonth) {
+    private fun calculateAlderIPeriode(dato: LocalDate, foedselsdato: LocalDate): Alder {
+        val alder = Alder.from(foedselsdato, dato)
+        return if (dato.dayOfMonth > foedselsdato.dayOfMonth) {
             alder.plussMaaneder(-1)
         } else {
             alder
