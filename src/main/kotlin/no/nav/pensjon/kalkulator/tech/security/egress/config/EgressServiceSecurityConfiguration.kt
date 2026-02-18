@@ -16,6 +16,7 @@ class EgressServiceSecurityConfiguration {
     fun egressServiceListsByAudience(
         @Value("\${pen.service-id}") pensjonsfagligKjerneServiceId: String,
         @Value("\${popp.service-id}") pensjonsopptjeningServiceId: String,
+        @Value("\${pensjon-pid-encryption.service-id}") pensjonPidEncryptionServiceId: String,
         @Value("\${pensjon-representasjon.service-id}") pensjonRepresentasjonServiceId: String,
         @Value("\${pensjonssimulator.service-id}") pensjonssimulatorServiceId: String,
         @Value("\${persondata.service-id}") persondataServiceId: String,
@@ -38,6 +39,7 @@ class EgressServiceSecurityConfiguration {
             mapOf(
                 pensjonsfagligKjerneServiceId to listOf(EgressService.PENSJONSFAGLIG_KJERNE),
                 pensjonsopptjeningServiceId to listOf(EgressService.PENSJONSOPPTJENING),
+                pensjonPidEncryptionServiceId to listOf(EgressService.PENSJON_PID_ENCRYPTION),
                 pensjonRepresentasjonServiceId to listOf(EgressService.PENSJON_REPRESENTASJON),
                 pensjonssimulatorServiceId to listOf(EgressService.PENSJONSSIMULATOR),
                 persondataServiceId to listOf(EgressService.PERSONDATALOESNINGEN),
