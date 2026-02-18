@@ -38,16 +38,17 @@ class ImpersonalAccessFilter(
 
 
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
+        log.warn { "ImpersonalAccessFilter:doFilter" }
         // Request for state of feature toggle requires no authentication or access check:
         if ((request as HttpServletRequest).requestURI.startsWith(FEATURE_URI)) {
             chain.doFilter(request, response)
             return
         }
-
         if (hasPid(request)) {
             val pid = pidGetter.pid()
             val navIdent = navIdExtractor.id()
             val cacheKey = "$navIdent:${pid.value}"
+            log.warn { "ImpersonalAccessFilter:assessing $cacheKey" }
             val securityContext = SecurityCoroutineContext()
             try {
                 val deferred = tilgangCache.get(cacheKey) {
