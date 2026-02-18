@@ -15,6 +15,8 @@ data class OffentligTjenestepensjonSimuleringFoer1963Resultat(
 data class UtbetalingsperiodeResultat(
     val alderFom: Alder,
     val alderTom: Alder? = null,
+    val alderIPeriodeFom: Alder,
+    val alderIPeriodeTom: Alder? = null,
     val grad: Int? = null,
     val arligUtbetaling: Double? = null,
     val ytelsekode: YtelseskodeFoer1963,
