@@ -38,7 +38,6 @@ class ImpersonalAccessFilter(
 
 
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
-        log.warn { "ImpersonalAccessFilter:doFilter" }
         // Request for state of feature toggle requires no authentication or access check:
         if ((request as HttpServletRequest).requestURI.startsWith(FEATURE_URI)) {
             chain.doFilter(request, response)
@@ -48,7 +47,6 @@ class ImpersonalAccessFilter(
             val pid = pidGetter.pid()
             val navIdent = navIdExtractor.id()
             val cacheKey = "$navIdent:${pid.value}"
-            log.warn { "ImpersonalAccessFilter:assessing $cacheKey" }
             val securityContext = SecurityCoroutineContext()
             try {
                 val deferred = tilgangCache.get(cacheKey) {
@@ -64,7 +62,10 @@ class ImpersonalAccessFilter(
                     return
                 }
             } catch (e: Exception) {
-                log.warn { "Tilgangsmaskin sjekk feilet: ${e.message}" }
+                val msg = "Feil fra tilgangsmaskin"
+                log.error(e) { "$msg: ${e.message}" }
+                forbidden(response as HttpServletResponse, msg)
+                return
             }
             auditor.audit(pid, request.requestURI)
         }
@@ -76,7 +77,11 @@ class ImpersonalAccessFilter(
         hasLength(request.getHeader(CustomHttpHeaders.PID))
 
     private fun forbidden(response: HttpServletResponse, nektetTilgangDetaljer: TilgangResult) {
-        "Adgang nektet pga. ${nektetTilgangDetaljer.avvisningAarsak}:${nektetTilgangDetaljer.begrunnelse}".let {
+        forbidden(response, "${nektetTilgangDetaljer.avvisningAarsak}:${nektetTilgangDetaljer.begrunnelse}")
+    }
+
+    private fun forbidden(response: HttpServletResponse, msg: String) {
+        "Adgang nektet pga. $msg".let {
             log.warn { it }
             response.sendError(HttpStatus.FORBIDDEN.value(), it)
         }
