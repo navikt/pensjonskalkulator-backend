@@ -83,7 +83,7 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         verify(exactly = 1) { chain.doFilter(request, response) }
     }
 
-    should("continue filter chain and log warning when tilgangService throws exception") {
+    should("interrupt filter chain and log error when tilgangService throws exception") {
         val chain = mockk<FilterChain>(relaxed = true)
         val auditor = mockk<Auditor>(relaxed = true)
         val request = arrangeRequest(pid = pid.value, uri = "/foo")
@@ -96,8 +96,8 @@ class ImpersonalAccessFilterTest : ShouldSpec({
             auditor = auditor,
         ).doFilter(request, response, chain)
 
-        verify(exactly = 1) { auditor.audit(pid, "/foo") }
-        verify(exactly = 1) { chain.doFilter(request, response) }
+        verify(exactly = 0) { auditor.audit(pid, "/foo") }
+        verify(exactly = 0) { chain.doFilter(request, response) }
     }
 })
 

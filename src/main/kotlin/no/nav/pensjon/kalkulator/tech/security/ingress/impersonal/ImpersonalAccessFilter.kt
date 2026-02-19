@@ -63,7 +63,10 @@ class ImpersonalAccessFilter(
                     return
                 }
             } catch (e: Exception) {
-                log.warn { "Tilgangsmaskin sjekk feilet: ${e.message}" }
+                val msg = "Feil fra tilgangsmaskin"
+                log.error(e) { "$msg: ${e.message}" }
+                forbidden(response as HttpServletResponse, msg)
+                return
             }
             auditor.audit(pid, request.requestURI)
         }
@@ -75,7 +78,11 @@ class ImpersonalAccessFilter(
         hasLength(request.getHeader(CustomHttpHeaders.PID))
 
     private fun forbidden(response: HttpServletResponse, nektetTilgangDetaljer: TilgangResult) {
-        "Adgang nektet pga. ${nektetTilgangDetaljer.avvisningAarsak}:${nektetTilgangDetaljer.begrunnelse}".let {
+        forbidden(response, "${nektetTilgangDetaljer.avvisningAarsak}:${nektetTilgangDetaljer.begrunnelse}")
+    }
+
+    private fun forbidden(response: HttpServletResponse, msg: String) {
+        "Adgang nektet pga. $msg".let {
             log.warn { it }
             response.sendError(HttpStatus.FORBIDDEN.value(), it)
         }
