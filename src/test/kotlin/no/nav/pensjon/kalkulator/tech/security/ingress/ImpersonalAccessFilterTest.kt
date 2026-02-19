@@ -8,12 +8,13 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletResponse
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.ImpersonalAccessFilter
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.ShadowTilgangComparator
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.SecurityContextNavIdExtractor
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.TilgangService
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.client.AvvisningAarsak
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.client.TilgangResult
 
 class ImpersonalAccessFilterTest : ShouldSpec({
 
@@ -24,47 +25,31 @@ class ImpersonalAccessFilterTest : ShouldSpec({
 
         ImpersonalAccessFilter(
             pidGetter = mockk(),
-            groupMembershipService = mockk(),
+            navIdExtractor = mockk(),
+            tilgangService = mockk(),
             auditor = mockk(),
-            shadowTilgangComparator = mockk(relaxed = true)
         ).doFilter(request, response, chain)
 
         verify(exactly = 1) { chain.doFilter(request, response) }
     }
 
-    should("report 'forbidden' and break filter chain when innlogget bruker mangler gruppemedlemskap") {
+    should("report 'forbidden' and break filter chain when tilgangService avviser") {
         val chain = mockk<FilterChain>(relaxed = true)
         val request = arrangeRequest(pid = pid.value, uri = "/api/foo")
         val response = mockk<HttpServletResponse>(relaxed = true)
 
         ImpersonalAccessFilter(
             pidGetter = arrangePid(),
-            groupMembershipService = arrangeTilgang(false),
+            navIdExtractor = arrangeNavIdExtractor(),
+            tilgangService = arrangeTilgangService(avvist()),
             auditor = mockk(),
-            shadowTilgangComparator = mockk(relaxed = true)
         ).doFilter(request, response, chain)
 
-        verify(exactly = 1) { response.sendError(403, "Adgang nektet pga. manglende gruppemedlemskap") }
+        verify(exactly = 1) { response.sendError(403, "Adgang nektet pga. ${AvvisningAarsak.GEOGRAFISK}:some reason") }
         verify(exactly = 0) { chain.doFilter(request, response) }
     }
 
-    should("report 'not found' and break filter chain when person not found") {
-        val chain = mockk<FilterChain>(relaxed = true)
-        val request = arrangeRequest(pid = pid.value, uri = "/api/foo")
-        val response = mockk<HttpServletResponse>(relaxed = true)
-
-        ImpersonalAccessFilter(
-            pidGetter = arrangePid(),
-            groupMembershipService = arrangeMissingPerson(),
-            auditor = mockk(),
-            shadowTilgangComparator = mockk(relaxed = true)
-        ).doFilter(request, response, chain)
-
-        verify(exactly = 1) { response.sendError(404, "Person ikke funnet") }
-        verify(exactly = 0) { chain.doFilter(request, response) }
-    }
-
-    should("log audit info and continue filter chain when innlogget bruker har tilgang") {
+    should("log audit info and continue filter chain when tilgangService innvilger") {
         val chain = mockk<FilterChain>(relaxed = true)
         val auditor = mockk<Auditor>(relaxed = true)
         val request = arrangeRequest(pid = pid.value, uri = "/foo")
@@ -72,9 +57,9 @@ class ImpersonalAccessFilterTest : ShouldSpec({
 
         ImpersonalAccessFilter(
             pidGetter = arrangePid(),
-            groupMembershipService = arrangeTilgang(true),
-            auditor,
-            shadowTilgangComparator = mockk(relaxed = true)
+            navIdExtractor = arrangeNavIdExtractor(),
+            tilgangService = arrangeTilgangService(innvilget()),
+            auditor = auditor,
         ).doFilter(request, response, chain)
 
         verify(exactly = 1) { auditor.audit(pid, "/foo") }
@@ -89,46 +74,30 @@ class ImpersonalAccessFilterTest : ShouldSpec({
 
         ImpersonalAccessFilter(
             pidGetter = pidExtractor,
-            groupMembershipService = mockk(),
+            navIdExtractor = mockk(),
+            tilgangService = mockk(),
             auditor = mockk(),
-            shadowTilgangComparator = mockk(relaxed = true)
         ).doFilter(request, response, chain)
 
         verify(exactly = 0) { pidExtractor.pid() }
         verify(exactly = 1) { chain.doFilter(request, response) }
     }
 
-    should("call shadow tilgang comparator when user has access") {
+    should("interrupt filter chain and log error when tilgangService throws exception") {
         val chain = mockk<FilterChain>(relaxed = true)
         val auditor = mockk<Auditor>(relaxed = true)
         val request = arrangeRequest(pid = pid.value, uri = "/foo")
         val response = mockk<HttpServletResponse>(relaxed = true)
-        val shadowComparator = mockk<ShadowTilgangComparator>(relaxed = true)
 
         ImpersonalAccessFilter(
             pidGetter = arrangePid(),
-            groupMembershipService = arrangeTilgang(true),
-            auditor,
-            shadowTilgangComparator = shadowComparator
+            navIdExtractor = arrangeNavIdExtractor(),
+            tilgangService = arrangeTilgangServiceFailing(),
+            auditor = auditor,
         ).doFilter(request, response, chain)
 
-        verify(exactly = 1) { shadowComparator.compareAsync(pid, true) }
-    }
-
-    should("call shadow tilgang comparator when user is denied access") {
-        val chain = mockk<FilterChain>(relaxed = true)
-        val request = arrangeRequest(pid = pid.value, uri = "/foo")
-        val response = mockk<HttpServletResponse>(relaxed = true)
-        val shadowComparator = mockk<ShadowTilgangComparator>(relaxed = true)
-
-        ImpersonalAccessFilter(
-            pidGetter = arrangePid(),
-            groupMembershipService = arrangeTilgang(false),
-            auditor = mockk(),
-            shadowTilgangComparator = shadowComparator
-        ).doFilter(request, response, chain)
-
-        verify(exactly = 1) { shadowComparator.compareAsync(pid, false) }
+        verify(exactly = 0) { auditor.audit(pid, "/foo") }
+        verify(exactly = 0) { chain.doFilter(request, response) }
     }
 })
 
@@ -137,18 +106,37 @@ private fun arrangePid(): PidExtractor =
         every { pid() } returns pid
     }
 
+private fun arrangeNavIdExtractor(): SecurityContextNavIdExtractor =
+    mockk<SecurityContextNavIdExtractor>().apply {
+        every { id() } returns "Z123456"
+    }
+
 private fun arrangeRequest(pid: String?, uri: String): HttpServletRequest =
     mockk<HttpServletRequest>().apply {
         every { getHeader("fnr") } returns pid
         every { requestURI } returns uri
     }
 
-private fun arrangeTilgang(harTilgang: Boolean): GroupMembershipService =
-    mockk<GroupMembershipService>().apply {
-        every { innloggetBrukerHarTilgang(pid) } returns harTilgang
+private fun arrangeTilgangService(result: TilgangResult): TilgangService =
+    mockk<TilgangService>().apply {
+        every { sjekkTilgang(pid) } returns result
     }
 
-private fun arrangeMissingPerson(): GroupMembershipService =
-    mockk<GroupMembershipService>().apply {
-        every { innloggetBrukerHarTilgang(pid) } throws NotFoundException("person")
+private fun arrangeTilgangServiceFailing(): TilgangService =
+    mockk<TilgangService>().apply {
+        every { sjekkTilgang(pid) } throws RuntimeException("connection failed")
     }
+
+private fun innvilget() = TilgangResult(
+    innvilget = true,
+    avvisningAarsak = null,
+    begrunnelse = null,
+    traceId = null
+)
+
+private fun avvist() = TilgangResult(
+    innvilget = false,
+    avvisningAarsak = AvvisningAarsak.GEOGRAFISK,
+    begrunnelse = "some reason",
+    traceId = null
+)
