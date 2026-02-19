@@ -37,6 +37,19 @@ class SecurityContextEnricher(
         }
     }
 
+    /**
+     * Enrich authentication initially to be able to call service for decrypting PID.
+     */
+    private fun enrichTemporarily(auth: Authentication) =
+        EnrichedAuthentication(
+            initialAuth = auth,
+            egressTokenSuppliersByService = tokenSuppliers,
+            target = selv()
+        )
+
+    /**
+     * Final enrichment of authentication.
+     */
     private fun enrich(auth: Authentication, request: HttpServletRequest) =
         EnrichedAuthentication(
             initialAuth = auth,
@@ -86,7 +99,12 @@ class SecurityContextEnricher(
         request.getHeader(CustomHttpHeaders.PID)?.let {
             when {
                 hasLength(it).not() -> null
-                else -> if (it.contains(ENCRYPTION_MARK)) pidDecrypter.decrypt(it) else it
+                else -> if (it.contains(ENCRYPTION_MARK)) {
+                    with(SecurityContextHolder.getContext()) {
+                        authentication = authentication?.let(::enrichTemporarily)
+                        pidDecrypter.decrypt(it)
+                    }
+                } else it
             }
         }?.let(::Pid)
 
