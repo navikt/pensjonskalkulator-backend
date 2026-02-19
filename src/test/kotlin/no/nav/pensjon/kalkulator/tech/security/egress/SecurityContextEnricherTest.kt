@@ -66,7 +66,7 @@ class SecurityContextEnricherTest : ShouldSpec({
 
         SecurityContextEnricher(
             tokenSuppliers,
-            securityContextPidExtractor = mockk(),
+            securityContextPidExtractor = mockk(relaxed = true),
             pidDecrypter = arrangeDecryption(),
             representasjonService = mockk()
         ).enrichAuthentication(
