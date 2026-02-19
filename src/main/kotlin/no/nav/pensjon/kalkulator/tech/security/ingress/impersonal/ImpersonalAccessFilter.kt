@@ -38,7 +38,6 @@ class ImpersonalAccessFilter(
 
 
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
-        log.warn { "ImpersonalAccessFilter:doFilter" }
         // Request for state of feature toggle requires no authentication or access check:
         if ((request as HttpServletRequest).requestURI.startsWith(FEATURE_URI)) {
             chain.doFilter(request, response)
