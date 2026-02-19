@@ -13,6 +13,7 @@ import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.*
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.*
 import java.time.Instant
 import java.time.LocalDate
+import java.time.Period
 import java.time.ZoneId
 
 object TpSimuleringFoer1963ClientMapper {
@@ -23,12 +24,13 @@ object TpSimuleringFoer1963ClientMapper {
                 tpnr = sim.tpnr,
                 navnOrdning = sim.navnOrdning,
                 utbetalingsperioder = sim.utbetalingsperioder.map { periode ->
+                    val datoFom = periode.datoFom.let(::epochMillisToLocalDate)
+                    val alderFom = Alder.from(foedselsdato, datoFom)
                     UtbetalingsperiodeResultat(
-                        alderFom = Alder.from(
-                            foedselsdato,
-                            periode.datoFom.let(::epochMillisToLocalDate),
-                        ),
-                        alderTom = calculateAlderTom(periode, foedselsdato),
+                        alderFom = alderFom,
+                        alderTom = periode.datoTom?.let(::epochMillisToLocalDate)?.let {
+                            alderFom.plussMaaneder(Period.between(datoFom, it).toTotalMonths().toInt())
+                        },
                         grad = periode.grad,
                         arligUtbetaling = periode.arligUtbetaling,
                         ytelsekode = YtelseskodeFoer1963.fromExternalValue(periode.ytelsekode!!),
@@ -46,16 +48,6 @@ object TpSimuleringFoer1963ClientMapper {
 
     private fun epochMillisToLocalDate(millis: Long): LocalDate =
         Instant.ofEpochMilli(millis).atZone(ZoneId.of("Europe/Oslo")).toLocalDate()
-
-    private fun calculateAlderTom(periode: Utbetalingsperiode, foedselsdato: LocalDate): Alder? {
-        val datoTom = periode.datoTom?.let(::epochMillisToLocalDate) ?: return null
-        val alder = Alder.from(foedselsdato, datoTom)
-        return if (datoTom.dayOfMonth > foedselsdato.dayOfMonth) {
-            alder.plussMaaneder(-1)
-        } else {
-            alder
-        }
-    }
 
 
     fun toDto(
