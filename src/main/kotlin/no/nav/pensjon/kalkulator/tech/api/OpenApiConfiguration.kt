@@ -48,6 +48,7 @@ class OpenApiConfiguration {
                 "/api/v1/er-apoteker",
                 "/api/v1/land-liste",
                 "/api/v6/person",
+                "/api/v1/nyligste-eps",
                 "/api/v1/ansatt-id",
                 "/api/v1/encrypt",
                 "/api/v1/decrypt",

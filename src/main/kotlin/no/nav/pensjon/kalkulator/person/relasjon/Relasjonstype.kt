@@ -1,0 +1,21 @@
+package no.nav.pensjon.kalkulator.person.relasjon
+
+enum class Relasjonstype {
+    EKTEFELLE,
+    REGISTRERT_PARTNER,
+    FRASKILT_EKTEFELLE,
+    FRASKILT_PARTNER,
+    FRASEPARERT_EKTEFELLE,
+    FRASEPARERT_PARTNER,
+    AVDOED_EKTEFELLE,
+    AVDOED_PARTNER,
+    SAMBOER,
+    BARN,
+    FAR,
+    MEDMOR,
+    MOR,
+    HELSOESKEN,
+    HALVSOESKEN_FELLES_MOR,
+    HALVSOESKEN_FELLES_FAR_MEDMOR,
+    UKJENT
+}

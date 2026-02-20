@@ -77,6 +77,9 @@ spec:
         - application: pdl-api
           namespace: pdl
           cluster: prod-fss
+        - application: pensjon-persondata
+          namespace: pensjon-person
+          cluster: prod-fss
         - application: pensjon-pid-encryption
           namespace: pensjon-person
         - application: pensjon-popp
@@ -99,6 +102,7 @@ spec:
       external:
         - host: pdl-api.prod-fss-pub.nais.io
         - host: pensjon-pen.prod-fss-pub.nais.io
+        - host: pensjon-persondata.prod-fss-pub.nais.io
         - host: pensjon-popp.prod-fss-pub.nais.io
         - host: pensjon-representasjon.prod-fss-pub.nais.io
         - host: pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
@@ -128,6 +132,10 @@ spec:
       value: prod-fss:pensjondeployer:pensjon-pen
     - name: PEN_URL
       value: https://pensjon-pen.prod-fss-pub.nais.io
+    - name: PENSJON_PERSONDATA_SERVICE_ID
+      value: prod-fss:pensjon-person:pensjon-persondata
+    - name: PENSJON_PERSONDATA_URL
+      value: https://pensjon-persondata.prod-fss-pub.nais.io
     - name: PENSJON_PID_ENCRYPTION_SERVICE_ID
       value: prod-gcp:pensjon-person:pensjon-pid-encryption
     - name: PENSJON_PID_ENCRYPTION_URL

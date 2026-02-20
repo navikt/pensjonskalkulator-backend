@@ -25,7 +25,7 @@ class PidTest : ShouldSpec({
         }
 
         should("return redacted value for valid value") {
-            Pid("04925398980").displayValue shouldBe "049253*****"
+            Pid("04925398980").displayValue shouldBe "**9253*****"
         }
     }
 
@@ -35,7 +35,7 @@ class PidTest : ShouldSpec({
         }
 
         should("return redacted value for valid value") {
-            Pid("04925398980").toString() shouldBe "049253*****"
+            Pid("04925398980").toString() shouldBe "**9253*****"
         }
     }
 
