@@ -29,7 +29,7 @@ object TpSimuleringFoer1963ClientMapper {
                     UtbetalingsperiodeResultat(
                         alderFom = alderFom,
                         alderTom = periode.datoTom?.let(::epochMillisToLocalDate)?.let {
-                            alderFom.plussMaaneder(Period.between(datoFom, it).toTotalMonths().toInt())
+                            alderFom.plussMaaneder(Period.between(datoFom, it.plusDays(1)).toTotalMonths().toInt())
                         },
                         grad = periode.grad,
                         arligUtbetaling = periode.arligUtbetaling,
