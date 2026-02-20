@@ -42,7 +42,7 @@ spec:
   azure:
     application:
       enabled: true
-      claims: # only for testing impersonal access control
+      claims:
         groups:
           - id: "8bb9b8d1-f46a-4ade-8ee8-5895eccdf8cf" # 0000-GA-PENSJON_SAKSBEHANDLER
           - id: "a3f91493-1ab8-4b64-a544-0a77cbba9240" # 0000-GA-Pensjon_VEILEDER
@@ -71,7 +71,6 @@ spec:
         - application: pensjonskalkulator-frontend-ekstern-staging
         - application: pensjonskalkulator-veiledning-frontend
         - application: pensjonskalkulator-frontend-catbox
-        - application: pensjonskalkulator-veiledning-frontend-catbox
         - application: pensjonskalkulator-frontend-codebox
         - application: pensjonskalkulator-veiledning-frontend-codebox
         - application: pensjonskalkulator-frontend-coffeebox
@@ -82,6 +81,14 @@ spec:
         - application: pensjonskalkulator-veiledning-frontend-magicbox
         - application: pensjonskalkulator-frontend-sandbox
         - application: pensjonskalkulator-veiledning-frontend-sandbox
+        - application: pensjonskalkulator-veiledning-frontend-dreambox
+        - application: pensjonskalkulator-veiledning-frontend-catbox
+        - application: pensjonskalkulator-veiledning-frontend-staging
+        - application: pensjonskalkulator-frontend-ekstern-catbox
+        - application: pensjonskalkulator-frontend-ekstern-dreambox
+        - application: pensjonskalkulator-frontend-ekstern-magicbox
+        - application: pensjonskalkulator-frontend-ekstern-sandbox
+        - application: pensjonskalkulator-frontend-ekstern-codebox
         - application: pensjonskalkulator-uinnlogget-catbox
         - application: pensjonskalkulator-uinnlogget-dev
         - application: pensjonskalkulator-uinnlogget-dreambox
@@ -176,10 +183,6 @@ spec:
       value: dev-fss:pensjonopptjening:pensjon-popp-q2
     - name: POPP_URL
       value: https://pensjon-popp-q2.dev-fss-pub.nais.io
-    - name: SKJERMEDE_PERSONER_SERVICE_ID
-      value: dev-gcp:nom:skjermede-personer-pip
-    - name: SKJERMEDE_PERSONER_URL
-      value: https://skjermede-personer-pip.intern.dev.nav.no
     - name: SOKOS_UTBETALDATA_SERVICE_ID
       value: dev-fss:okonomi:sokos-utbetaldata
     - name: SOKOS_UTBETALDATA_URL
