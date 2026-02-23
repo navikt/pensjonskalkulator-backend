@@ -4,7 +4,6 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
-import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultUtil.filtrerBortGjeldendeAlderFoerBursdagInnevaerendeMaaned
 import java.time.LocalDate
 
 /**
@@ -16,25 +15,11 @@ object PersonligSimuleringResultMapperV9 {
     fun resultV9(source: SimuleringResult, foedselsdato: LocalDate) =
         PersonligSimuleringResultV9(
             alderspensjon = source.alderspensjon.map(::alderspensjon)
-                .let { justerAlderspensjonInnevaerendeAar(it, foedselsdato) }
-                .let {
-                    filtrerBortGjeldendeAlderFoerBursdagInnevaerendeMaaned(
-                        it,
-                        foedselsdato,
-                        PersonligSimuleringAlderspensjonResultV9::alder
-                    )
-                },
+                .let { justerAlderspensjonInnevaerendeAar(it, foedselsdato) },
             alderspensjonMaanedligVedEndring = maanedligPensjon(source.alderspensjonMaanedsbeloep),
             pre2025OffentligAfp = source.pre2025OffentligAfp?.let(::pre2025OffentligAfp),
             afpPrivat = source.afpPrivat.map(::privatAfp)
-                .let { justerPrivatAfpInnevaerendeAar(it, foedselsdato) }
-                .let {
-                    filtrerBortGjeldendeAlderFoerBursdagInnevaerendeMaaned(
-                        it,
-                        foedselsdato,
-                        PersonligSimuleringAfpPrivatResultV9::alder
-                    )
-                },
+                .let { justerPrivatAfpInnevaerendeAar(it, foedselsdato) },
             afpOffentlig = source.afpOffentlig.map(::offentligAfp),
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving),
             harForLiteTrygdetid = source.harForLiteTrygdetid,
