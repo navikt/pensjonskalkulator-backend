@@ -35,7 +35,7 @@ class Pid(argument: String) {
         }
     }
 
-    val displayValue = if (isValid) "$datoDel*****" else value
+    val displayValue = if (isValid) redact(value) else value
 
     override fun toString(): String = displayValue
 
@@ -49,12 +49,7 @@ class Pid(argument: String) {
         private const val PERSONNUMMER_START_INDEX = 6
 
         fun redact(pid: String?): String =
-            pid?.let {
-                if (it.length == FOEDSELSNUMMER_LENGTH)
-                    datoDel(it) + "*****"
-                else
-                    "?(${it.length})?"
-            } ?: "<null>"
+            pid?.let(FoedselsnummerUtil::redact) ?: "<null>"
 
         /**
          * Fødselsdatoen eller dagen og måneden fødselsnummeret ble utstedt.
