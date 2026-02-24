@@ -34,6 +34,9 @@ class OpenApiConfiguration {
         return GroupedOpenApi.builder()
             .group("current")
             .pathsToMatch(
+                "/api/intern/v1/eps",
+                "/api/intern/v1/pensjon/simulering",
+                "/api/intern/v1/sivilstatus",
                 "/api/v9/alderspensjon/simulering",
                 "/api/v8/alderspensjon/simulering", // deprecated
                 "/api/v7/alderspensjon/simulering", // deprecated
@@ -48,7 +51,6 @@ class OpenApiConfiguration {
                 "/api/v1/er-apoteker",
                 "/api/v1/land-liste",
                 "/api/v6/person",
-                "/api/v1/nyligste-eps",
                 "/api/v1/ansatt-id",
                 "/api/v1/encrypt",
                 "/api/v1/decrypt",
@@ -57,7 +59,6 @@ class OpenApiConfiguration {
                 "/api/v1/ufoeregrad",
                 "/api/feature/**",
                 "/api/inntekt",
-                "/api/intern/v1/pensjon/simulering",
                 "/api/sak-status",
                 "/api/tpo-medlemskap",
                 "/api/v1/tpo-medlemskap",
