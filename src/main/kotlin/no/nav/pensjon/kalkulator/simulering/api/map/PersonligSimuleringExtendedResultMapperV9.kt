@@ -6,7 +6,6 @@ import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultMapperV9.justerPrivatAfpInnevaerendeAar
 import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultMapperV9.justerAlderspensjonInnevaerendeAar
-import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultUtil.filtrerBortGjeldendeAlderFoerBursdagInnevaerendeMaaned
 import java.time.LocalDate
 
 /**
@@ -18,25 +17,11 @@ object PersonligSimuleringExtendedResultMapperV9 {
     fun extendedResultV9(source: SimuleringResult, foedselsdato: LocalDate) =
         PersonligSimuleringResultV9(
             alderspensjon = source.alderspensjon.map(::alderspensjon)
-                .let { justerAlderspensjonInnevaerendeAar(alderspensjonList = it, foedselsdato) }
-                .let {
-                    filtrerBortGjeldendeAlderFoerBursdagInnevaerendeMaaned(
-                        list = it,
-                        foedselsdato,
-                        alderExtractor = PersonligSimuleringAlderspensjonResultV9::alder
-                    )
-                },
+                .let { justerAlderspensjonInnevaerendeAar(alderspensjonList = it, foedselsdato) },
             alderspensjonMaanedligVedEndring = maanedligPensjon(source.alderspensjonMaanedsbeloep),
             pre2025OffentligAfp = source.pre2025OffentligAfp?.let(::pre2025OffentligAfp),
             afpPrivat = source.afpPrivat.map(::privatAfp)
-                .let { justerPrivatAfpInnevaerendeAar(afpListe = it, foedselsdato) }
-                .let {
-                    filtrerBortGjeldendeAlderFoerBursdagInnevaerendeMaaned(
-                        list = it,
-                        foedselsdato,
-                        alderExtractor = PersonligSimuleringAfpPrivatResultV9::alder
-                    )
-                },
+                .let { justerPrivatAfpInnevaerendeAar(afpListe = it, foedselsdato) },
             afpOffentlig = source.afpOffentlig.map(::livsvarigOffentligAfp),
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving),
             harForLiteTrygdetid = source.harForLiteTrygdetid,
