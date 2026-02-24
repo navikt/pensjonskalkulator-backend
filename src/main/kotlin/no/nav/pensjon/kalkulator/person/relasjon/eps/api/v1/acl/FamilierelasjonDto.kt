@@ -1,13 +1,15 @@
 package no.nav.pensjon.kalkulator.person.relasjon.eps.api.v1.acl
 
+import jakarta.validation.constraints.NotNull
 import no.nav.pensjon.kalkulator.person.Tilgangsbegrensning
 import no.nav.pensjon.kalkulator.person.relasjon.Relasjonstype
+import no.nav.pensjon.kalkulator.person.relasjon.eps.api.v1.acl.EnumUtil.missingExternalValue
 import java.time.LocalDate
 
 data class FamilierelasjonDto(
     val pid: String?,
     val fom: LocalDate?,
-    val relasjonstype: RelasjonstypeDto,
+    @field:NotNull val relasjonstype: RelasjonstypeDto,
     val relasjonPersondata: RelasjonPersondataDto?
 )
 
@@ -32,8 +34,7 @@ enum class RelasjonstypeDto(val internalValue: Relasjonstype) {
 
     companion object {
         fun fromInternalValue(value: Relasjonstype?): RelasjonstypeDto =
-            entries.firstOrNull { it.internalValue == value }
-                ?: throw IllegalArgumentException("Ingen ekstern verdi for relasjonstype $value")
+            entries.firstOrNull { it.internalValue == value } ?: missingExternalValue(type = "relasjonstype", value)
     }
 }
 
@@ -46,6 +47,6 @@ enum class TilgangsbegrensningDto(val internalValue: Tilgangsbegrensning) {
     companion object {
         fun fromInternalValue(value: Tilgangsbegrensning?) =
             entries.firstOrNull { it.internalValue == value }
-                ?: throw IllegalArgumentException("Ingen ekstern verdi for tilgangsbegrensning $value")
+                ?: missingExternalValue(type = "tilgangsbegrensning", value)
     }
 }
