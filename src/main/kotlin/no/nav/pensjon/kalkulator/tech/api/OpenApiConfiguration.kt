@@ -36,6 +36,7 @@ class OpenApiConfiguration {
             .pathsToMatch(
                 "/api/intern/v1/eps",
                 "/api/intern/v1/pensjon/simulering",
+                "/api/intern/v1/person",
                 "/api/intern/v1/sivilstatus",
                 "/api/v9/alderspensjon/simulering",
                 "/api/v8/alderspensjon/simulering", // deprecated
