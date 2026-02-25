@@ -58,6 +58,7 @@ class ImpersonalAccessFilter(
                 val tilgang = runBlocking { deferred.await() }
 
                 if (!tilgang.innvilget) {
+                    log.debug { "Tilgang avvist for: $cacheKey" }
                     forbidden(response as HttpServletResponse, tilgang)
                     return
                 }
