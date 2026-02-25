@@ -7,4 +7,6 @@ interface SakClient {
     fun fetchSaker(pid: Pid): List<Sak>
 
     suspend fun fetchSakerAsync(pid: Pid): List<Sak>
+
+    fun opprettAlderspensjonSak(pid: Pid): Sak
 }
