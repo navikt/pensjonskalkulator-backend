@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.person.PersonFacade
-import no.nav.pensjon.kalkulator.person.api.intern.v1.acl.PersonDto
+import no.nav.pensjon.kalkulator.person.api.intern.v1.acl.PersonInternV1Person
 import no.nav.pensjon.kalkulator.person.api.intern.v1.acl.PersonMapper.toDto
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -47,7 +47,7 @@ class PersonInternController(
             ),
         ]
     )
-    fun personV1(): PersonDto {
+    fun personV1(): PersonInternV1Person {
         traceAid.begin()
 
         return try {

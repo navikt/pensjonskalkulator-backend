@@ -37,11 +37,11 @@ class EpsController(
             )
         ]
     )
-    fun naavaerendeSivilstatus(): SivilstatusResultDto {
+    fun naavaerendeSivilstatus(): EpsV1SivilstatusResult {
         traceAid.begin()
 
         return try {
-            SivilstatusResultDto(sivilstatus = SivilstatusDto.fromInternalValue(service.naavaerendeSivilstatus()))
+            EpsV1SivilstatusResult(sivilstatus = EpsV1Sivilstatus.fromInternalValue(service.naavaerendeSivilstatus()))
         } catch (e: EgressException) {
             handleError(e, "V1")!!
         } finally {
@@ -67,7 +67,7 @@ class EpsController(
             )
         ]
     )
-    fun nyligsteEps(@RequestBody spec: EpsSpecDto): FamilierelasjonDto {
+    fun nyligsteEps(@RequestBody spec: EpsV1EpsSpec): EpsV1Familierelasjon {
         traceAid.begin()
 
         return try {
