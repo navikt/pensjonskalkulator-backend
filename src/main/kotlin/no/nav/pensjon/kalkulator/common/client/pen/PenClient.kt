@@ -83,7 +83,9 @@ abstract class PenClient(
         path: String,
         requestBody: Request,
         requestClass: Class<Request>,
-        responseClass: Class<Response>
+        responseClass: Class<Response>,
+        pid: Pid?,
+        queryParams: Map<String, String> = emptyMap(),
     ): Response? {
         val uri = "/$BASE_PATH/$path"
         log.debug { "POST to URI: '$uri'" }
@@ -91,8 +93,12 @@ abstract class PenClient(
         try {
             return webClient
                 .post()
-                .uri(uri)
-                .headers(::setHeaders)
+                .uri { uriBuilder ->
+                    uriBuilder.path(uri)
+                        .also { queryParams.forEach { (key, value) -> uriBuilder.queryParam(key, value) } }
+                        .build()
+                }
+                .headers { setHeaders(it, pid) }
                 .body(Mono.just(requestBody), requestClass)
                 .retrieve()
                 .bodyToMono(responseClass)

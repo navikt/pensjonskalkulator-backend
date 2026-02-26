@@ -7,6 +7,7 @@ import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.sak.SakStatus
 import no.nav.pensjon.kalkulator.sak.SakType
+import no.nav.pensjon.kalkulator.sak.client.pen.PenSakClientTestObjects.OPPRETTET_SAK
 import no.nav.pensjon.kalkulator.sak.client.pen.PenSakClientTestObjects.PEN_ERROR
 import no.nav.pensjon.kalkulator.sak.client.pen.PenSakClientTestObjects.PEN_SAK
 import no.nav.pensjon.kalkulator.sak.client.pen.PenSakClientTestObjects.PERSON_NOT_FOUND
@@ -82,7 +83,48 @@ class PenSakClientTest : FunSpec({
             val exception = shouldThrow<EgressException> { client(context = it).fetchSaker(pid) }
 
             with(exception) {
-                message shouldBe "Failed calling /api/sak/sammendrag"
+                message shouldBe "Failed calling /api/sak/sammendrag/v2"
+                isClientError shouldBe false
+            }
+        }
+    }
+
+    test("opprettAlderspensjonSak returns created sak") {
+        server?.arrangeOkJsonResponse(OPPRETTET_SAK)
+
+        Arrange.webClientContextRunner().run {
+            val response = client(context = it).opprettAlderspensjonSak(pid)
+
+            with(response) {
+                sakId shouldBe 12345678
+                type shouldBe SakType.ALDERSPENSJON
+                status shouldBe SakStatus.OPPRETTET
+            }
+        }
+    }
+
+    test("opprettAlderspensjonSak sends sakType as query parameter") {
+        server?.arrangeOkJsonResponse(OPPRETTET_SAK)
+
+        Arrange.webClientContextRunner().run {
+            client(context = it).opprettAlderspensjonSak(pid)
+
+            server?.takeRequest()?.apply {
+                requestUrl?.queryParameter("sakType") shouldBe "ALDER"
+                path shouldBe "/api/sak?sakType=ALDER"
+            }
+        }
+    }
+
+    test("opprettAlderspensjonSak should throw EgressException when response is 'Internal Server Error'") {
+        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, PEN_ERROR)
+        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, PEN_ERROR) // for retry
+
+        Arrange.webClientContextRunner().run {
+            val exception = shouldThrow<EgressException> { client(context = it).opprettAlderspensjonSak(pid) }
+
+            with(exception) {
+                message shouldBe "Failed calling /api/sak"
                 isClientError shouldBe false
             }
         }
@@ -105,6 +147,13 @@ private object PenSakClientTestObjects {
 ]"""
 
     @Language("json")
+    const val OPPRETTET_SAK = """{
+    "sakId": 12345678,
+    "sakType": "ALDER",
+    "sakStatus": "OPPRETTET"
+}"""
+
+    @Language("json")
     const val PERSON_NOT_FOUND = """{
     "feilmelding": "Personen med fødselsnummer 12906498357 finnes ikke i den lokale oversikten over personer. (PEN029)",
     "merknader": []
@@ -115,6 +164,6 @@ private object PenSakClientTestObjects {
     "timestamp": "2023-10-13T10:38:43+0200",
     "status": 500,
     "error": "Internal Server Error",
-    "path": "/api/sak/sammendrag"
+    "path": "/api/sak/sammendrag/v2"
 }"""
 }
