@@ -1,9 +1,15 @@
-package no.nav.pensjon.kalkulator.person.api.intern.v1.acl
+package no.nav.pensjon.kalkulator.person.relasjon.eps.api.v1.acl
 
 import no.nav.pensjon.kalkulator.person.Sivilstatus
-import no.nav.pensjon.kalkulator.person.api.intern.v1.acl.EnumUtil.missingExternalValue
+import no.nav.pensjon.kalkulator.person.relasjon.eps.api.v1.acl.EnumUtil.missingExternalValue
 
-enum class SivilstatusDto(val internalValue: Sivilstatus) {
+/**
+ * Using the prefix 'EpsV1' to avoid name clash with other DTOs (which causes problems in the generated Swagger API
+ * documentation).
+ * An alternative is to use 'springdoc.use-fqn=true', but this causes problems for the frontend's type checker (which
+ * cannot handle DTO names with dots).
+ */
+enum class EpsV1Sivilstatus(val internalValue: Sivilstatus) {
     UNKNOWN(internalValue = Sivilstatus.UNKNOWN),
     UOPPGITT(internalValue = Sivilstatus.UOPPGITT),
     UGIFT(internalValue = Sivilstatus.UGIFT),
@@ -18,7 +24,7 @@ enum class SivilstatusDto(val internalValue: Sivilstatus) {
     SAMBOER(internalValue = Sivilstatus.SAMBOER);
 
     companion object {
-        fun fromInternalValue(value: Sivilstatus): SivilstatusDto =
+        fun fromInternalValue(value: Sivilstatus): EpsV1Sivilstatus =
             entries.singleOrNull { it.internalValue == value } ?: missingExternalValue(type = "sivilstatus", value)
     }
 }

@@ -7,20 +7,20 @@ import no.nav.pensjon.kalkulator.person.Person
 object PersonMapper {
 
     fun toDto(source: Person) =
-        PersonDto(
+        PersonInternV1Person(
             navn = source.navn,
             foedselsdato = source.foedselsdato,
-            sivilstatus = SivilstatusDto.fromInternalValue(source.sivilstatus),
+            sivilstatus = PersonInternV1Sivilstatus.fromInternalValue(source.sivilstatus),
             pensjoneringAldre = source.pensjoneringAldre.let(::pensjonsaldre)
         )
 
     private fun pensjonsaldre(source: Aldersgrenser) =
-        PensjonsaldreDto(
+        PersonInternV1Pensjonsaldre(
             normertPensjoneringsalder = alder(source.normalder),
             nedreAldersgrense = alder(source.nedreAlder),
             oevreAldersgrense = alder(source.oevreAlder),
         )
 
     private fun alder(source: Alder) =
-        AlderDto(source.aar, source.maaneder)
+        PersonInternV1Alder(source.aar, source.maaneder)
 }
