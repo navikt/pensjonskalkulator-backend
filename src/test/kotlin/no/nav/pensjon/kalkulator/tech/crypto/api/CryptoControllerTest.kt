@@ -6,12 +6,10 @@ import io.mockk.every
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
-import no.nav.pensjon.kalkulator.tech.crypto.PidEncryptionService
+import no.nav.pensjon.kalkulator.tech.crypto.CryptoService
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.ShadowTilgangComparator
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
@@ -31,7 +29,7 @@ class CryptoControllerTest : ShouldSpec() {
     private lateinit var mvc: MockMvc
 
     @MockkBean
-    private lateinit var pidEncryptionService: PidEncryptionService
+    private lateinit var cryptoService: CryptoService
 
     @MockkBean(relaxed = true)
     private lateinit var traceAid: TraceAid
@@ -43,12 +41,6 @@ class CryptoControllerTest : ShouldSpec() {
     private lateinit var adresseService: FortroligAdresseService
 
     @MockkBean
-    private lateinit var groupMembershipService: GroupMembershipService
-
-    @MockkBean(relaxed = true)
-    private lateinit var shadowTilgangComparator: ShadowTilgangComparator
-
-    @MockkBean
     private lateinit var auditor: Auditor
 
     init {
@@ -56,12 +48,11 @@ class CryptoControllerTest : ShouldSpec() {
             every { traceAid.begin() } returns Unit
             every { pidExtractor.pid() } returns pid
             every { adresseService.adressebeskyttelseGradering(any()) } returns AdressebeskyttelseGradering.UGRADERT
-            every { groupMembershipService.innloggetBrukerHarTilgang(any()) } returns true
             every { auditor.audit(any(), any()) } returns Unit
         }
 
         should("encrypt") {
-            every { pidEncryptionService.encrypt("abc") } returns "xyz"
+            every { cryptoService.encrypt("abc") } returns "xyz"
 
             mvc.perform(
                 post(URL_V1)

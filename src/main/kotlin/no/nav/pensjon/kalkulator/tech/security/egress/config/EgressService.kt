@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.tech.security.egress.config
 import no.nav.pensjon.kalkulator.tech.security.egress.AuthType
 
 /**
- * Specifies the services that is accessed by pensjonskalkulator-backend, and their characteristics.
+ * Specifies the services that are accessed by pensjonskalkulator-backend, and their characteristics.
  */
 enum class EgressService(
     val description: String,
@@ -18,6 +18,18 @@ enum class EgressService(
     MICROSOFT_ENTRA_ID("Microsoft Entra ID", "MEID", "OAuth2 configuration data"),
     NORSK_PENSJON("Norsk Pensjon", "NP", "Private pensjonsavtaler", GatewayUsage.INTERNAL),
     OAUTH2_TOKEN("OAuth2 token", "OA2", "OAuth2 access token"),
+    PENSJON_PERSONDATA(
+        description = "Pensjonsrelaterte persondata",
+        shortName = "PPD",
+        purpose = "Hente persondata relatert til pensjon",
+        authType = AuthType.MACHINE_INSIDE_NAV
+    ),
+    PENSJON_PID_ENCRYPTION(
+        description = "PID-kryptering for pensjon",
+        shortName = "PPE",
+        purpose = "Kryptering av person-ID for pensjonsapplikasjoner",
+        authType = AuthType.MACHINE_INSIDE_NAV
+    ),
     PENSJON_REPRESENTASJON(
         description = "Pensjon-representasjon",
         shortName = "Rep",
@@ -27,7 +39,6 @@ enum class EgressService(
     PENSJONSFAGLIG_KJERNE("Pensjonsfaglig kjerne", "PEN", "Simulering, pensjonsdata"),
     PENSJONSOPPTJENING("Pensjonsopptjening", "POPP", "Pensjonsopptjeningsdata"),
     PERSONDATALOESNINGEN("Persondataløsningen", "PDL", "Persondata"),
-    SKJERMEDE_PERSONER("Skjermede personer", "SP", "Skjerming"),
     PENSJONSSIMULATOR(
         description = "Pensjonssimulator",
         shortName = "PS",

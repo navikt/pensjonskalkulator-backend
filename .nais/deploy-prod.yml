@@ -66,6 +66,8 @@ spec:
     inbound:
       rules:
         - application: pensjonskalkulator-frontend
+        - application: pensjonskalkulator-frontend-ekstern
+        - application: pensjonskalkulator-frontend-intern
         - application: pensjonskalkulator-uinnlogget-frontend
         - application: pensjonskalkulator-veiledning-frontend
     outbound:
@@ -74,6 +76,14 @@ spec:
           namespace: etterlatte
         - application: pdl-api
           namespace: pdl
+          cluster: prod-fss
+        - application: pensjon-persondata
+          namespace: pensjon-person
+          cluster: prod-fss
+        - application: pensjon-pid-encryption
+          namespace: pensjon-person
+        - application: pensjon-popp
+          namespace: pensjonopptjening
           cluster: prod-fss
         - application: pensjon-representasjon
           namespace: pensjon-person
@@ -92,6 +102,7 @@ spec:
       external:
         - host: pdl-api.prod-fss-pub.nais.io
         - host: pensjon-pen.prod-fss-pub.nais.io
+        - host: pensjon-persondata.prod-fss-pub.nais.io
         - host: pensjon-popp.prod-fss-pub.nais.io
         - host: pensjon-representasjon.prod-fss-pub.nais.io
         - host: pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
@@ -121,6 +132,14 @@ spec:
       value: prod-fss:pensjondeployer:pensjon-pen
     - name: PEN_URL
       value: https://pensjon-pen.prod-fss-pub.nais.io
+    - name: PENSJON_PERSONDATA_SERVICE_ID
+      value: prod-fss:pensjon-person:pensjon-persondata
+    - name: PENSJON_PERSONDATA_URL
+      value: https://pensjon-persondata.prod-fss-pub.nais.io
+    - name: PENSJON_PID_ENCRYPTION_SERVICE_ID
+      value: prod-gcp:pensjon-person:pensjon-pid-encryption
+    - name: PENSJON_PID_ENCRYPTION_URL
+      value: https://pensjon-pid-encryption.intern.nav.no
     - name: PENSJON_REPRESENTASJON_SERVICE_ID
       value: prod-fss:pensjon-person:pensjon-representasjon
     - name: PENSJON_REPRESENTASJON_URL
@@ -137,10 +156,6 @@ spec:
       value: prod-fss:pensjonopptjening:pensjon-popp
     - name: POPP_URL
       value: https://pensjon-popp.prod-fss-pub.nais.io
-    - name: SKJERMEDE_PERSONER_SERVICE_ID
-      value: prod-gcp:nom:skjermede-personer-pip
-    - name: SKJERMEDE_PERSONER_URL
-      value: https://skjermede-personer-pip.intern.nav.no
     - name: SOKOS_UTBETALDATA_SERVICE_ID
       value: prod-fss:okonomi:sokos-utbetaldata
     - name: SOKOS_UTBETALDATA_URL

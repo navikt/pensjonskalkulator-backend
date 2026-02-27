@@ -20,7 +20,7 @@ class OpenApiConfiguration {
                 Info()
                     .title("pensjonskalkulator API")
                     .description("Tjenester for estimering av pensjonsutbetaling og innhenting av grunnlagsdata")
-                    .version("v1.7.0")
+                    .version("v1.8.0")
             )
             .externalDocs(
                 ExternalDocumentation()
@@ -48,8 +48,10 @@ class OpenApiConfiguration {
                 "/api/v1/er-apoteker",
                 "/api/v1/land-liste",
                 "/api/v6/person",
+                "/api/v1/nyligste-eps",
                 "/api/v1/ansatt-id",
                 "/api/v1/encrypt",
+                "/api/v1/decrypt",
                 "/api/v3/tidligste-hel-uttaksalder",
                 "/api/v2/tidligste-hel-uttaksalder", // deprecated
                 "/api/v1/ufoeregrad",

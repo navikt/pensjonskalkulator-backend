@@ -373,7 +373,8 @@ class PersonligSimuleringResultMapperV9Test : ShouldSpec({
                     alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
                     afpPrivat = listOf(
                         privatAfp(alder = 62, beloep = 12000),
-                        privatAfp(alder = 63, beloep = 12000), privatAfp(alder = 64, beloep = 12000)
+                        privatAfp(alder = 63, beloep = 12000),
+                        privatAfp(alder = 64, beloep = 12000)
                     ),
                     afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
                     vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
@@ -387,6 +388,14 @@ class PersonligSimuleringResultMapperV9Test : ShouldSpec({
                 foedselsdato = foedselsdato
             ) shouldBe PersonligSimuleringResultV9(
                 alderspensjon = listOf(
+                    PersonligSimuleringAlderspensjonResultV9(
+                        alder = 62,
+                        beloep = 1,
+                        inntektspensjonBeloep = null,
+                        garantipensjonBeloep = null,
+                        delingstall = null,
+                        pensjonBeholdningFoerUttakBeloep = null
+                    ),
                     PersonligSimuleringAlderspensjonResultV9(
                         alder = 63,
                         beloep = 2,
@@ -409,6 +418,14 @@ class PersonligSimuleringResultMapperV9Test : ShouldSpec({
                     heltUttakMaanedligBeloep = 7
                 ),
                 afpPrivat = listOf(
+                    PersonligSimuleringAfpPrivatResultV9(
+                        alder = 62,
+                        beloep = 12000,
+                        kompensasjonstillegg = 123,
+                        kronetillegg = 69,
+                        livsvarig = 321,
+                        maanedligBeloep = 1000
+                    ),
                     PersonligSimuleringAfpPrivatResultV9(
                         alder = 63,
                         beloep = 12000,

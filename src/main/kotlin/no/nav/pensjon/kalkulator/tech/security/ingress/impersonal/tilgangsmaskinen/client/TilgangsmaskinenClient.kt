@@ -66,13 +66,13 @@ class TilgangsmaskinenClient(
                 )
                 countCalls(MetricResult.OK)
                 TilgangResultMapper.fromDto(TilgangResultDto.Avvist(problemDetail))
-            } catch (parseException: Exception) {
+            } catch (_: Exception) {
                 log.warn { "Failed to parse 403 response body: ${e.message}" }
                 countCalls(MetricResult.BAD_SERVER)
                 feilResultat()
             }
         }
-        log.warn { "Unexpected error from tilgangsmaskinen: ${e.message}" }
+        log.error(e) { "Unexpected error from tilgangsmaskinen: ${e.message}" }
         countCalls(MetricResult.BAD_SERVER)
         return feilResultat()
     }

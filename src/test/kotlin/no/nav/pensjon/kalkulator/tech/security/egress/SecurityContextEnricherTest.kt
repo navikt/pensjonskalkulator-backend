@@ -1,7 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.security.egress
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.FunSpec
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.Called
@@ -12,7 +11,7 @@ import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.tech.crypto.PidEncryptionService
+import no.nav.pensjon.kalkulator.tech.crypto.CryptoService
 import no.nav.pensjon.kalkulator.tech.representasjon.Representasjon
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonService
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
@@ -67,7 +66,7 @@ class SecurityContextEnricherTest : ShouldSpec({
 
         SecurityContextEnricher(
             tokenSuppliers,
-            securityContextPidExtractor = mockk(),
+            securityContextPidExtractor = mockk(relaxed = true),
             pidDecrypter = arrangeDecryption(),
             representasjonService = mockk()
         ).enrichAuthentication(
@@ -152,7 +151,7 @@ private fun arrange(representasjon: Representasjon) =
     }
 
 private fun arrangeDecryption() =
-    mockk<PidEncryptionService>().apply {
+    mockk<CryptoService>().apply {
         every { decrypt("encrypted.string.containing.dot") } returns "12906498357"
     }
 
