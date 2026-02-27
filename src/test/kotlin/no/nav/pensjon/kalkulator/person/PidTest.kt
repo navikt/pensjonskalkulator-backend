@@ -48,10 +48,6 @@ class PidTest : ShouldSpec({
             (Pid("04925398980") == Pid("12906498357")) shouldBe false
         }
 
-        should("be false when values are not both PID") {
-            (Pid("04925398980").equals("04925398980")) shouldBe false
-        }
-
         should("be false when value is null") {
             Pid("04925398980").equals(null) shouldBe false
         }

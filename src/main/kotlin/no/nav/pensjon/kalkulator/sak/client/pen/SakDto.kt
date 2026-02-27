@@ -5,7 +5,7 @@ import no.nav.pensjon.kalkulator.sak.SakStatus
 import no.nav.pensjon.kalkulator.sak.SakType
 import org.springframework.util.StringUtils.hasLength
 
-data class SakDto(val sakType: String, val sakStatus: String)
+data class SakDto(val sakId: Long, val sakType: String, val sakStatus: String)
 
 enum class PenSakType(val externalValue: String, val internalValue: SakType) {
     NONE("", SakType.NONE),
