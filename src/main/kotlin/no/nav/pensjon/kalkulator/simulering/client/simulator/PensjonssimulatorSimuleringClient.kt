@@ -7,12 +7,12 @@ import no.nav.pensjon.kalkulator.simulering.PersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.SimuleringResult
 import no.nav.pensjon.kalkulator.simulering.Vilkaarsproeving
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
+import no.nav.pensjon.kalkulator.simulering.client.simulator.acl.result.PersonligSimuleringResultMapper
+import no.nav.pensjon.kalkulator.simulering.client.simulator.acl.result.PersonligSimuleringResultDto
+import no.nav.pensjon.kalkulator.simulering.client.simulator.acl.spec.PersonligSimuleringSpecMapper
 import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.SimulatorAnonymSimuleringResultEnvelope
-import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.SimulatorPersonligSimuleringResult
 import no.nav.pensjon.kalkulator.simulering.client.simulator.map.SimulatorAnonymSimuleringResultMapper
 import no.nav.pensjon.kalkulator.simulering.client.simulator.map.SimulatorAnonymSimuleringSpecMapper
-import no.nav.pensjon.kalkulator.simulering.client.simulator.map.SimulatorPersonligSimuleringResultMapper
-import no.nav.pensjon.kalkulator.simulering.client.simulator.map.SimulatorPersonligSimuleringSpecMapper
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.selftest.PingResult
@@ -69,10 +69,10 @@ class PensjonssimulatorSimuleringClient(
         personalSpec: PersonalSimuleringSpec
     ): SimuleringResult {
         val url = "$baseUrl/$SIMULER_ALDERSPENSJON_PERSONLIG_RESOURCE"
-        val spec = SimulatorPersonligSimuleringSpecMapper.toDto(impersonalSpec, personalSpec)
+        val spec = PersonligSimuleringSpecMapper.toDto(impersonalSpec, personalSpec)
 
         return try {
-            val result: SimulatorPersonligSimuleringResult? =
+            val result: PersonligSimuleringResultDto? =
                 webClient
                     .post()
                     .uri(url)
@@ -81,12 +81,12 @@ class PensjonssimulatorSimuleringClient(
                     .headers(::setHeaders)
                     .bodyValue(spec)
                     .retrieve()
-                    .bodyToMono(SimulatorPersonligSimuleringResult::class.java)
+                    .bodyToMono(PersonligSimuleringResultDto::class.java)
                     .retryWhen(retryBackoffSpec(url))
                     .block()
 
-            result?.error?.let { log.warn { "Error from simulator - $it - spec $spec" } }
-            result?.let(SimulatorPersonligSimuleringResultMapper::fromDto) ?: emptyResult()
+            result?.problem?.let { log.warn { "Error from simulator - $it - spec $spec" } }
+            result?.let(PersonligSimuleringResultMapper::fromDto) ?: emptyResult()
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
@@ -109,7 +109,7 @@ class PensjonssimulatorSimuleringClient(
 
     private companion object {
         private const val SIMULER_ALDERSPENSJON_ANONYM_RESOURCE = "api/anonym/v1/simuler-alderspensjon"
-        private const val SIMULER_ALDERSPENSJON_PERSONLIG_RESOURCE = "api/nav/v3/simuler-alderspensjon"
+        private const val SIMULER_ALDERSPENSJON_PERSONLIG_RESOURCE = "api/nav/v1/simuler-pensjon"
         private val service = EgressService.PENSJONSSIMULATOR
 
         private fun emptyResult() =
