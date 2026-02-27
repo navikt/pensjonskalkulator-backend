@@ -10,6 +10,7 @@ data class Person(
     val foedselsdato: LocalDate,
     val pensjoneringAldre: Aldersgrenser = defaultAldersgrenser,
     val sivilstand: Sivilstand = Sivilstand.UOPPGITT,
+    val sivilstatus: Sivilstatus = sivilstand.sivilstatus,
     val adressebeskyttelse: AdressebeskyttelseGradering = AdressebeskyttelseGradering.UGRADERT
 ) {
     val harFoedselsdato = foedselsdato >= minimumFoedselsdato
@@ -21,6 +22,18 @@ data class Person(
             foedselsdato,
             pensjoneringAldre,
             sivilstand,
+            sivilstatus,
+            adressebeskyttelse
+        )
+
+    fun withSivilstatus(sivilstatus: Sivilstatus) =
+        Person(
+            navn,
+            fornavn,
+            foedselsdato,
+            pensjoneringAldre,
+            sivilstand,
+            sivilstatus,
             adressebeskyttelse
         )
 
