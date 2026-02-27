@@ -16,15 +16,16 @@
     <description>Backend for pensjonskalkulator</description>
     <packaging>jar</packaging>
     <properties>
-        <java.version>21</java.version>
+        <java.version>25</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
         <kotlin.code.style>official</kotlin.code.style>
-        <kotlin.compiler.jvmTarget>21</kotlin.compiler.jvmTarget>
+        <kotlin.compiler.jvmTarget>25</kotlin.compiler.jvmTarget>
         <kotlin.version>2.3.10</kotlin.version>
         <logback.version>1.5.32</logback.version>
         <okhttp3.version>5.3.2</okhttp3.version>
+        <kotest.version>6.1.4</kotest.version>
     </properties>
     <build>
         <finalName>pensjonskalkulator-backend</finalName>
@@ -236,13 +237,13 @@
         <dependency>
             <groupId>io.kotest</groupId>
             <artifactId>kotest-runner-junit5</artifactId>
-            <version>6.1.4</version>
+            <version>${kotest.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.kotest</groupId>
             <artifactId>kotest-extensions-spring</artifactId>
-            <version>6.1.4</version>
+            <version>${kotest.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
