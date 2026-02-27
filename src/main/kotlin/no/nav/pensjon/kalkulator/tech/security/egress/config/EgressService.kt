@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.tech.security.egress.config
 import no.nav.pensjon.kalkulator.tech.security.egress.AuthType
 
 /**
- * Specifies the services that is accessed by pensjonskalkulator-backend, and their characteristics.
+ * Specifies the services that are accessed by pensjonskalkulator-backend, and their characteristics.
  */
 enum class EgressService(
     val description: String,
@@ -18,6 +18,18 @@ enum class EgressService(
     MICROSOFT_ENTRA_ID("Microsoft Entra ID", "MEID", "OAuth2 configuration data"),
     NORSK_PENSJON("Norsk Pensjon", "NP", "Private pensjonsavtaler", GatewayUsage.INTERNAL),
     OAUTH2_TOKEN("OAuth2 token", "OA2", "OAuth2 access token"),
+    PENSJON_PERSONDATA(
+        description = "Pensjonsrelaterte persondata",
+        shortName = "PPD",
+        purpose = "Hente persondata relatert til pensjon",
+        authType = AuthType.MACHINE_INSIDE_NAV
+    ),
+    PENSJON_PID_ENCRYPTION(
+        description = "PID-kryptering for pensjon",
+        shortName = "PPE",
+        purpose = "Kryptering av person-ID for pensjonsapplikasjoner",
+        authType = AuthType.MACHINE_INSIDE_NAV
+    ),
     PENSJON_REPRESENTASJON(
         description = "Pensjon-representasjon",
         shortName = "Rep",
@@ -27,7 +39,6 @@ enum class EgressService(
     PENSJONSFAGLIG_KJERNE("Pensjonsfaglig kjerne", "PEN", "Simulering, pensjonsdata"),
     PENSJONSOPPTJENING("Pensjonsopptjening", "POPP", "Pensjonsopptjeningsdata"),
     PERSONDATALOESNINGEN("Persondataløsningen", "PDL", "Persondata"),
-    SKJERMEDE_PERSONER("Skjermede personer", "SP", "Skjerming"),
     PENSJONSSIMULATOR(
         description = "Pensjonssimulator",
         shortName = "PS",
@@ -35,9 +46,62 @@ enum class EgressService(
         authType = AuthType.MACHINE_INSIDE_NAV
     ),
     TJENESTEPENSJON("Tjenestepensjon", "TP", "Tjenestepensjonsforhold"),
-    TJENESTEPENSJON_SIMULERING("Tjenestepensjon simulering", "TpS", "Hente simulering av OFTP fra eksterne"),
+    AKSIO(
+        description = "Aksio",
+        shortName = "aksio",
+        purpose = "Hente løpende livsvarig offentlig AFP fra Aksio",
+        authType = AuthType.MACHINE_OUTSIDE_NAV
+    ),
+    GABLER(
+        description = "Gabler",
+        shortName = "gabler",
+        purpose = "Hente løpende livsvarig offentlig AFP fra Gabler",
+        authType = AuthType.MACHINE_OUTSIDE_NAV
+    ),
+    GABLER2(
+        description = "Gabler2",
+        shortName = "gabler2",
+        purpose = "Hente løpende livsvarig offentlig AFP fra Gabler2",
+        authType = AuthType.MACHINE_OUTSIDE_NAV
+    ),
+    KLP(
+        description = "KLP",
+        shortName = "klp",
+        purpose = "Hente løpende livsvarig offentlig AFP fra KLP",
+        authType = AuthType.MACHINE_OUTSIDE_NAV
+    ),
+    OPF(
+        description = "OPF",
+        shortName = "opf",
+        purpose = "Hente løpende livsvarig offentlig AFP fra OPF",
+        authType = AuthType.MACHINE_OUTSIDE_NAV
+    ),
+    SPK(
+        description = "SPK",
+        shortName = "spk",
+        purpose = "Hente løpende livsvarig offentlig AFP fra KLP",
+        authType = AuthType.MACHINE_OUTSIDE_NAV
+    ),
+    STOREBRAND_LIVSFORSIKRING(
+        description = "Storebrand Livsforsikring",
+        shortName = "storebrand",
+        purpose = "Hente løpende livsvarig offentlig AFP fra Storebrand Livsforsikring",
+        authType = AuthType.MACHINE_OUTSIDE_NAV
+    ),
+    STOREBRAND_PENSJONSTJENESTER(
+        description = "Storebrand Pensjonstjenester",
+        shortName = "storebrand_pen",
+        purpose = "Hente løpende livsvarig offentlig AFP fra Storebrand Pensjonstjenester",
+        authType = AuthType.MACHINE_OUTSIDE_NAV
+    ),
     UTBETALING_DATA("Oekonomi utbetalingsdata", "Sokos", "Finne siste maaneds utbetaling"),
-    OMSTILLINGSSTOENAD("Omstillingsstoenad", "OS", "Finne om bruker mottar omstillingsstoenad");
+    OMSTILLINGSSTOENAD("Omstillingsstoenad", "OS", "Finne om bruker mottar omstillingsstoenad"),
+    TILGANGSMASKINEN(
+        description = "Tilgangsmaskinen",
+        shortName = "Tilgangsmaskinen",
+        purpose = "Sjekk av veileders tilgang til person",
+        authType = AuthType.PERSON_ON_BEHALF
+    );
 
     companion object {
         val servicesAccessibleViaProxy = entries.filter { it.gatewayUsage == GatewayUsage.INTERNAL }

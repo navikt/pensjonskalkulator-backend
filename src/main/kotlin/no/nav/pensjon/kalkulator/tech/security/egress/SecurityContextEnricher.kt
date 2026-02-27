@@ -4,7 +4,7 @@ import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.tech.crypto.PidEncryptionService
+import no.nav.pensjon.kalkulator.tech.crypto.CryptoService
 import no.nav.pensjon.kalkulator.tech.metric.Metrics
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonService
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonTarget
@@ -23,7 +23,7 @@ import org.springframework.util.StringUtils.hasLength
 class SecurityContextEnricher(
     val tokenSuppliers: EgressTokenSuppliersByService,
     private val securityContextPidExtractor: SecurityContextPidExtractor,
-    private val pidDecrypter: PidEncryptionService,
+    private val pidDecrypter: CryptoService,
     private val representasjonService: RepresentasjonService
 ) {
     fun enrichAuthentication(request: HttpServletRequest, response: HttpServletResponse) {
@@ -31,12 +31,25 @@ class SecurityContextEnricher(
             if (authentication == null) {
                 authentication = anonymousAuthentication()
             } else {
-                authentication = enrich(authentication, request)
-                authentication = applyPotentialFullmakt(authentication, request)
+                authentication = enrich(authentication!!, request)
+                authentication = applyPotentialFullmakt(authentication!!, request)
             }
         }
     }
 
+    /**
+     * Enrich authentication initially to be able to call service for decrypting PID.
+     */
+    private fun enrichTemporarily(auth: Authentication) =
+        EnrichedAuthentication(
+            initialAuth = auth,
+            egressTokenSuppliersByService = tokenSuppliers,
+            target = selv()
+        )
+
+    /**
+     * Final enrichment of authentication.
+     */
     private fun enrich(auth: Authentication, request: HttpServletRequest) =
         EnrichedAuthentication(
             initialAuth = auth,
@@ -86,7 +99,12 @@ class SecurityContextEnricher(
         request.getHeader(CustomHttpHeaders.PID)?.let {
             when {
                 hasLength(it).not() -> null
-                else -> if (it.contains(ENCRYPTION_MARK)) pidDecrypter.decrypt(it) else it
+                else -> if (it.contains(ENCRYPTION_MARK)) {
+                    with(SecurityContextHolder.getContext()) {
+                        authentication = authentication?.let(::enrichTemporarily)
+                        pidDecrypter.decrypt(it)
+                    }
+                } else it
             }
         }?.let(::Pid)
 

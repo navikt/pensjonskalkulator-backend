@@ -4,6 +4,8 @@ import no.nav.pensjon.kalkulator.tjenestepensjon.api.dto.MedlemskapITjenestepens
 import no.nav.pensjon.kalkulator.tjenestepensjon.api.dto.TjenestepensjonsforholdDto
 
 object TjenestepensjonMapper {
+
     fun toDto(harForhold: Boolean) = TjenestepensjonsforholdDto(harForhold)
+
     fun toDto(tpLeverandoerer: List<String>) = MedlemskapITjenestepensjonsordningDto(tpLeverandoerer)
 }

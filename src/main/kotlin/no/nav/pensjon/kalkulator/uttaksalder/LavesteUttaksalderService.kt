@@ -6,8 +6,9 @@ import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.general.UttaksalderGradertUttak
 import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService
 import no.nav.pensjon.kalkulator.person.PersonService
-import no.nav.pensjon.kalkulator.simulering.Eps
+import no.nav.pensjon.kalkulator.simulering.EpsSpec
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
+import no.nav.pensjon.kalkulator.simulering.LevendeEps
 import no.nav.pensjon.kalkulator.simulering.Utenlandsopphold
 import no.nav.pensjon.kalkulator.tech.time.DateProvider
 import org.springframework.stereotype.Service
@@ -27,9 +28,11 @@ class LavesteUttaksalderService(
         ImpersonalSimuleringSpec(
             simuleringType = impersonalSpec.simuleringType,
             sivilstand = personalSpec.sivilstand,
-            eps = Eps(
-                harInntektOver2G = harEps, // antagelse: de fleste ektefeller/partnere/samboere har inntekt over 2G
-                harPensjon = false
+            eps = EpsSpec(
+                LevendeEps(
+                    harInntektOver2G = harEps, // antagelse: de fleste ektefeller/partnere/samboere har inntekt over 2G
+                    harPensjon = false
+                )
             ),
             forventetAarligInntektFoerUttak = personalSpec.aarligInntektFoerUttak,
             gradertUttak = impersonalSpec.gradertUttak?.let(::simuleringGradertUttak),
@@ -37,7 +40,8 @@ class LavesteUttaksalderService(
             utenlandsopphold = Utenlandsopphold(
                 periodeListe = impersonalSpec.utenlandsperiodeListe,
                 antallAar = null
-            )
+            ),
+            innvilgetLivsvarigOffentligAfp = impersonalSpec.innvilgetLivsvarigOffentligAfp
         )
 
     private fun foedselsdato(): LocalDate =

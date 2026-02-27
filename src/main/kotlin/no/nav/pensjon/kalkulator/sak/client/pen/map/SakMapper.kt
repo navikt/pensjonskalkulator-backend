@@ -7,11 +7,11 @@ import no.nav.pensjon.kalkulator.sak.client.pen.SakDto
 
 object SakMapper {
 
-    fun fromDto(dto: List<SakDto>): List<Sak> =
-        dto.map {
-            Sak(
-                PenSakType.fromExternalValue(it.sakType).internalValue,
-                PenSakStatus.fromExternalValue(it.sakStatus).internalValue
-            )
-        }
+    fun fromDto(dto: List<SakDto>): List<Sak> = dto.map { fromDto(it) }
+
+    fun fromDto(dto: SakDto): Sak = Sak(
+        dto.sakId,
+        PenSakType.fromExternalValue(dto.sakType).internalValue,
+        PenSakStatus.fromExternalValue(dto.sakStatus).internalValue
+    )
 }

@@ -1,20 +1,21 @@
 package no.nav.pensjon.kalkulator.tech.crypto.api
 
+import com.ninjasquad.springmockk.MockkBean
+import io.kotest.core.spec.style.ShouldSpec
+import io.mockk.every
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
-import no.nav.pensjon.kalkulator.tech.crypto.PidEncryptionService
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
+import no.nav.pensjon.kalkulator.tech.crypto.CryptoService
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
-import org.junit.jupiter.api.Test
-import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
@@ -22,41 +23,46 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(CryptoController::class)
 @Import(MockSecurityConfiguration::class)
-class CryptoControllerTest {
+class CryptoControllerTest : ShouldSpec() {
 
     @Autowired
     private lateinit var mvc: MockMvc
 
-    @MockitoBean
-    private lateinit var pidEncryptionService: PidEncryptionService
+    @MockkBean
+    private lateinit var cryptoService: CryptoService
 
-    @MockitoBean
+    @MockkBean(relaxed = true)
     private lateinit var traceAid: TraceAid
 
-    @MockitoBean
+    @MockkBean
     private lateinit var pidExtractor: PidExtractor
 
-    @MockitoBean
-    private lateinit var fortroligAdresseService: FortroligAdresseService
+    @MockkBean
+    private lateinit var adresseService: FortroligAdresseService
 
-    @MockitoBean
-    private lateinit var groupMembershipService: GroupMembershipService
-
-    @MockitoBean
+    @MockkBean
     private lateinit var auditor: Auditor
 
-    @Test
-    fun encrypt() {
-        `when`(pidEncryptionService.encrypt("abc")).thenReturn("xyz")
+    init {
+        beforeSpec {
+            every { traceAid.begin() } returns Unit
+            every { pidExtractor.pid() } returns pid
+            every { adresseService.adressebeskyttelseGradering(any()) } returns AdressebeskyttelseGradering.UGRADERT
+            every { auditor.audit(any(), any()) } returns Unit
+        }
 
-        mvc.perform(
-            post(URL_V1)
-                .with(csrf())
-                .content("abc")
-                .contentType(MediaType.TEXT_PLAIN)
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().string("xyz"))
+        should("encrypt") {
+            every { cryptoService.encrypt("abc") } returns "xyz"
+
+            mvc.perform(
+                post(URL_V1)
+                    .with(csrf())
+                    .content("abc")
+                    .contentType(MediaType.TEXT_PLAIN)
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().string("xyz"))
+        }
     }
 
     private companion object {

@@ -1,27 +1,28 @@
 package no.nav.pensjon.kalkulator.simulering.api
 
+import com.ninjasquad.springmockk.MockkBean
+import io.kotest.core.spec.style.ShouldSpec
+import io.mockk.every
 import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Test
-import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
@@ -30,177 +31,187 @@ import java.time.LocalDate
 
 @WebMvcTest(SimuleringController::class)
 @Import(MockSecurityConfiguration::class)
-class SimuleringControllerTest {
+class SimuleringControllerTest : ShouldSpec() {
 
     @Autowired
     private lateinit var mvc: MockMvc
 
-    @MockitoBean
+    @MockkBean
     private lateinit var simuleringService: SimuleringService
 
-    @MockitoBean
+    @MockkBean
     private lateinit var feature: FeatureToggleService
 
-    @MockitoBean
+    @MockkBean(relaxed = true)
     private lateinit var traceAid: TraceAid
 
-    @MockitoBean
+    @MockkBean
     private lateinit var pidExtractor: PidExtractor
 
-    @MockitoBean
-    private lateinit var fortroligAdresseService: FortroligAdresseService
+    @MockkBean
+    private lateinit var adresseService: FortroligAdresseService
 
-    @MockitoBean
-    private lateinit var groupMembershipService: GroupMembershipService
-
-    @MockitoBean
+    @MockkBean
     private lateinit var auditor: Auditor
 
-    @Test
-    fun `simulerer hel alderspensjon V8`() {
-        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON)
-        `when`(simuleringService.simulerPersonligAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
-        enableUtvidetResult()
+    init {
+        beforeSpec {
+            every { traceAid.begin() } returns Unit
+            every { pidExtractor.pid() } returns pid
+            every { adresseService.adressebeskyttelseGradering(any()) } returns AdressebeskyttelseGradering.UGRADERT
+            every { auditor.audit(any(), any()) } returns Unit
+        }
 
-        mvc.perform(
-            post(URL_V8)
-                .with(csrf())
-                .content(heltUttakRequestBodyV8(SimuleringType.ALDERSPENSJON))
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().json(responseBodyForHeltUttakV8()))
-    }
+        should("simulere hel alderspensjon V9") {
+            val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON)
+            every {
+                simuleringService.simulerPersonligAlderspensjon(spec)
+            } returns simuleringsresultat(spec.simuleringType)
+            enableUtvidetResult()
 
-    @Test
-    fun `simulerer alderspensjon med gradert uttak V8`() {
-        val spec = impersonalGradertUttakSpec()
-        `when`(simuleringService.simulerPersonligAlderspensjon(spec))
-            .thenReturn(simuleringsresultat(spec.simuleringType, heltUttak = false))
-        enableUtvidetResult()
+            mvc.perform(
+                post(URL_V9)
+                    .with(csrf())
+                    .content(heltUttakRequestBodyV9(SimuleringType.ALDERSPENSJON))
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(responseBodyForHeltUttakV9()))
+        }
 
-        mvc.perform(
-            post(URL_V8)
-                .with(csrf())
-                .content(gradertUttakRequestBody())
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().json(responseBodyForGradertUttakV8()))
-    }
+        should("simulere alderspensjon med gradert uttak V9") {
+            val spec = impersonalGradertUttakSpec()
+            every {
+                simuleringService.simulerPersonligAlderspensjon(spec)
+            } returns simuleringsresultat(spec.simuleringType, heltUttak = false)
+            enableUtvidetResult()
 
-    @Test
-    fun `simulerer alderspensjon med privat AFP V8`() {
-        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
-        `when`(simuleringService.simulerPersonligAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
-        enableUtvidetResult()
+            mvc.perform(
+                post(URL_V9)
+                    .with(csrf())
+                    .content(gradertUttakRequestBody())
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(responseBodyForGradertUttakV9()))
+        }
 
-        mvc.perform(
-            post(URL_V8)
-                .with(csrf())
-                .content(heltUttakRequestBodyV8(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT))
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().json(responseBodyMedPrivatAfpV8()))
-    }
+        should("simulere alderspensjon med privat AFP V9") {
+            val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
+            every {
+                simuleringService.simulerPersonligAlderspensjon(spec)
+            } returns simuleringsresultat(spec.simuleringType)
+            enableUtvidetResult()
 
-    @Test
-    fun `simulerer alderspensjon med livsvarig offentlig AFP V8`() {
-        val spec = impersonalHeltUttakSpec(
-            SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG
-        )
-        `when`(simuleringService.simulerPersonligAlderspensjon(spec)).thenReturn(simuleringsresultat(spec.simuleringType))
-        enableUtvidetResult()
+            mvc.perform(
+                post(URL_V9)
+                    .with(csrf())
+                    .content(heltUttakRequestBodyV9(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT))
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(responseBodyMedPrivatAfpV9()))
+        }
 
-        mvc.perform(
-            post(URL_V8)
-                .with(csrf())
-                .content(heltUttakRequestBodyV8(SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG))
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().json(responseBodyMedLivsvarigOffentligAfpV8()))
-    }
+        should("simulere alderspensjon med livsvarig offentlig AFP V9") {
+            val spec = impersonalHeltUttakSpec(
+                SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG
+            )
+            every {
+                simuleringService.simulerPersonligAlderspensjon(spec)
+            } returns simuleringsresultat(spec.simuleringType)
+            enableUtvidetResult()
 
-    @Test
-    fun `simulering responds 'vilkaar ikke oppfylt' when Conflict V8`() {
-        val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
-        `when`(simuleringService.simulerPersonligAlderspensjon(spec)).thenThrow(conflict())
-        enableUtvidetResult()
+            mvc.perform(
+                post(URL_V9)
+                    .with(csrf())
+                    .content(heltUttakRequestBodyV9(SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG))
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(responseBodyMedLivsvarigOffentligAfpV9()))
+        }
 
-        mvc.perform(
-            post(URL_V8)
-                .with(csrf())
-                .content(heltUttakRequestBodyV8(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT))
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().json(VILKAAR_IKKE_OPPFYLT_RESPONSE_BODY))
-    }
+        should("respondere med 'vilkaar ikke oppfylt' ved konflikt V9") {
+            val spec = impersonalHeltUttakSpec(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT)
+            every {
+                simuleringService.simulerPersonligAlderspensjon(spec)
+            } throws conflict()
+            enableUtvidetResult()
 
-    @Test
-    fun `simulerer endring av alderspensjon V8`() {
-        val spec = impersonalGradertUttakSpec(SimuleringType.ENDRING_ALDERSPENSJON)
-        `when`(simuleringService.simulerPersonligAlderspensjon(spec))
-            .thenReturn(simuleringsresultat(spec.simuleringType, heltUttak = false))
-        enableUtvidetResult()
+            mvc.perform(
+                post(URL_V9)
+                    .with(csrf())
+                    .content(heltUttakRequestBodyV9(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT))
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(VILKAAR_IKKE_OPPFYLT_RESPONSE_BODY))
+        }
 
-        mvc.perform(
-            post(URL_V8)
-                .with(csrf())
-                .content(gradertUttakRequestBody(SimuleringType.ENDRING_ALDERSPENSJON))
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().json(responseBodyForGradertUttakV8()))
-    }
+        should("simulere endring av alderspensjon V9") {
+            val spec = impersonalGradertUttakSpec(SimuleringType.ENDRING_ALDERSPENSJON)
+            every {
+                simuleringService.simulerPersonligAlderspensjon(spec)
+            } returns simuleringsresultat(spec.simuleringType, heltUttak = false)
+            enableUtvidetResult()
 
-    @Test
-    fun `simulerer endring av alderspensjon med privat AFP V8`() {
-        val spec = impersonalGradertUttakSpec(SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT)
-        `when`(simuleringService.simulerPersonligAlderspensjon(spec))
-            .thenReturn(simuleringsresultat(spec.simuleringType, heltUttak = false))
-        enableUtvidetResult()
+            mvc.perform(
+                post(URL_V9)
+                    .with(csrf())
+                    .content(gradertUttakRequestBody(SimuleringType.ENDRING_ALDERSPENSJON))
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(responseBodyForGradertUttakV9()))
+        }
 
-        mvc.perform(
-            post(URL_V8)
-                .with(csrf())
-                .content(gradertUttakRequestBody(SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT))
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().json(responseBodyForGradertUttakV8()))
-    }
+        should("simulere endring av alderspensjon med privat AFP V9") {
+            val spec = impersonalGradertUttakSpec(SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT)
+            every {
+                simuleringService.simulerPersonligAlderspensjon(spec)
+            } returns simuleringsresultat(spec.simuleringType, heltUttak = false)
+            enableUtvidetResult()
 
-    @Test
-    fun `simulerer endring av alderspensjon med offentlig livsvarig AFP V8`() {
-        val spec = impersonalGradertUttakSpec(SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG)
-        `when`(simuleringService.simulerPersonligAlderspensjon(spec))
-            .thenReturn(simuleringsresultat(spec.simuleringType, heltUttak = false))
-        enableUtvidetResult()
+            mvc.perform(
+                post(URL_V9)
+                    .with(csrf())
+                    .content(gradertUttakRequestBody(SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT))
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(responseBodyForGradertUttakV9()))
+        }
 
-        mvc.perform(
-            post(URL_V8)
-                .with(csrf())
-                .content(gradertUttakRequestBody(SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG))
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(status().isOk())
-            .andExpect(content().json(responseBodyMedLivsvarigOffentligAfpV8()))
+        should("simulere endring av alderspensjon med livsvarig offentlig AFP V9") {
+            val spec = impersonalGradertUttakSpec(SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG)
+            every {
+                simuleringService.simulerPersonligAlderspensjon(spec)
+            } returns simuleringsresultat(spec.simuleringType, heltUttak = false)
+            enableUtvidetResult()
+
+            mvc.perform(
+                post(URL_V9)
+                    .with(csrf())
+                    .content(gradertUttakRequestBody(SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG))
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(responseBodyMedLivsvarigOffentligAfpV9()))
+        }
     }
 
     private fun enableUtvidetResult() {
-        `when`(feature.isEnabled("utvidet-simuleringsresultat")).thenReturn(true)
+        every { feature.isEnabled("utvidet-simuleringsresultat") } returns true
     }
 
     private companion object {
 
-        private const val URL_V8 = "/api/v8/alderspensjon/simulering"
+        private const val URL_V9 = "/api/v9/alderspensjon/simulering"
         private const val PENSJONSBELOEP = 123456
 
         @Language("json")
-        private fun heltUttakRequestBodyV8(simuleringType: SimuleringType) = """{
+        private fun heltUttakRequestBodyV9(simuleringType: SimuleringType) = """{
             "simuleringstype": "$simuleringType",
             "foedselsdato": "1963-12-31",
             "aarligInntektFoerUttakBeloep": 100000,
@@ -244,7 +255,7 @@ class SimuleringControllerTest {
         private fun impersonalHeltUttakSpec(simuleringType: SimuleringType) =
             ImpersonalSimuleringSpec(
                 simuleringType = simuleringType,
-                eps = Eps(harInntektOver2G = true, harPensjon = false),
+                eps = EpsSpec(levende = LevendeEps(harInntektOver2G = true, harPensjon = false)),
                 forventetAarligInntektFoerUttak = 100_000,
                 sivilstand = Sivilstand.UGIFT,
                 heltUttak = HeltUttak(
@@ -266,7 +277,7 @@ class SimuleringControllerTest {
         private fun impersonalGradertUttakSpec(simuleringType: SimuleringType = SimuleringType.ALDERSPENSJON) =
             ImpersonalSimuleringSpec(
                 simuleringType = simuleringType,
-                eps = Eps(harInntektOver2G = true, harPensjon = false),
+                eps = EpsSpec(levende = LevendeEps(harInntektOver2G = true, harPensjon = false)),
                 forventetAarligInntektFoerUttak = 100_000,
                 sivilstand = Sivilstand.SAMBOER,
                 gradertUttak = GradertUttak(
@@ -282,7 +293,7 @@ class SimuleringControllerTest {
             )
 
         @Language("json")
-        private fun responseBodyForHeltUttakV8() = """{
+        private fun responseBodyForHeltUttakV9() = """{
             "alderspensjon": [
               {
                 "beloep": $PENSJONSBELOEP,
@@ -296,7 +307,7 @@ class SimuleringControllerTest {
             }""".trimIndent()
 
         @Language("json")
-        private fun responseBodyForGradertUttakV8() = """{
+        private fun responseBodyForGradertUttakV9() = """{
             "alderspensjon": [
               {
                 "beloep": $PENSJONSBELOEP,
@@ -311,7 +322,7 @@ class SimuleringControllerTest {
             }""".trimIndent()
 
         @Language("json")
-        private fun responseBodyMedPrivatAfpV8() = """{
+        private fun responseBodyMedPrivatAfpV9() = """{
             "alderspensjon": [
               {
                 "beloep": $PENSJONSBELOEP,
@@ -332,7 +343,7 @@ class SimuleringControllerTest {
             }""".trimIndent()
 
         @Language("json")
-        private fun responseBodyMedLivsvarigOffentligAfpV8() = """{
+        private fun responseBodyMedLivsvarigOffentligAfpV9() = """{
             "alderspensjon": [
               {
                 "beloep": $PENSJONSBELOEP,
@@ -358,7 +369,8 @@ class SimuleringControllerTest {
 
         private fun simuleringsresultat(simuleringType: SimuleringType, heltUttak: Boolean = true) =
             when (simuleringType) {
-                SimuleringType.ALDERSPENSJON -> SimuleringResult(
+                SimuleringType.ALDERSPENSJON,
+                SimuleringType.ALDERSPENSJON_MED_GJENLEVENDERETT -> SimuleringResult(
                     alderspensjon = listOf(alderspensjon()),
                     alderspensjonMaanedsbeloep = maanedsbeloep(heltUttak),
                     afpPrivat = emptyList(),
@@ -402,7 +414,8 @@ class SimuleringControllerTest {
                     opptjeningGrunnlagListe = emptyList()
                 )
 
-                SimuleringType.ENDRING_ALDERSPENSJON -> SimuleringResult(
+                SimuleringType.ENDRING_ALDERSPENSJON,
+                SimuleringType.ENDRING_ALDERSPENSJON_MED_GJENLEVENDERETT -> SimuleringResult(
                     alderspensjon = listOf(alderspensjon()),
                     alderspensjonMaanedsbeloep = maanedsbeloep(heltUttak),
                     afpPrivat = emptyList(),

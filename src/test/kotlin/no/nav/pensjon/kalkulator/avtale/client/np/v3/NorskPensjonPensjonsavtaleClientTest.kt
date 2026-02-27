@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.avtale.client.np.v3
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -21,9 +22,9 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.avtaleMedToUtbetalingsperioder
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.mock.Saml
 import no.nav.pensjon.kalkulator.mock.XmlMapperFactory.xmlMapper
 import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.SamlTokenService
-import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.SamlTokenServiceTest.Companion.SAML_ASSERTION
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.testutil.Arrange
@@ -43,7 +44,7 @@ class NorskPensjonPensjonsavtaleClientTest : FunSpec({
     var baseUrl: String? = null
     val xmlMapper = xmlMapper()
     val traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" }
-    val tokenGetter = mockk<SamlTokenService>().apply { every { assertion() } returns SAML_ASSERTION }
+    val tokenGetter = mockk<SamlTokenService>().apply { every { assertion() } returns Saml.ASSERTION }
 
     fun pensjonsavtaleClient(context: AssertableApplicationContext) =
         NorskPensjonPensjonsavtaleClient(
@@ -71,7 +72,7 @@ class NorskPensjonPensjonsavtaleClientTest : FunSpec({
         Arrange.webClientContextRunner().run {
             val avtaler = pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid).avtaler
 
-            avtaler.size shouldBe 1
+            avtaler shouldHaveSize 1
             avtaler[0] shouldBe avtaleMedToUtbetalingsperioder
 
             ByteArrayOutputStream().use {
@@ -87,7 +88,7 @@ class NorskPensjonPensjonsavtaleClientTest : FunSpec({
         Arrange.webClientContextRunner().run {
             val avtaler = pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid).avtaler
 
-            avtaler.size shouldBe 2
+            avtaler shouldHaveSize 2
             avtaler[0] shouldBe avtaleMedEnUtbetalingsperiode
             avtaler[1] shouldBe avtaleUtenUtbetalingsperioder
         }
@@ -107,7 +108,7 @@ class NorskPensjonPensjonsavtaleClientTest : FunSpec({
         Arrange.webClientContextRunner().run {
             val selskaper = pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid).utilgjengeligeSelskap
 
-            selskaper.size shouldBe 2
+            selskaper shouldHaveSize 2
             selskaper[0] shouldBe Selskap("Selskap1", true, 1, AvtaleKategori.PRIVAT_AFP, "Feil1")
             selskaper[1] shouldBe Selskap("Selskap2", false)
         }
@@ -253,7 +254,7 @@ object NorskPensjonPensjonsavtaleClientTestObjects {
     const val EXPECTED_REQUEST_BODY = """<?xml version="1.0" ?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:typ="http://norskpensjon.no/api/pensjonskalkulator/v3/typer">
     <S:Header>
-        $SAML_ASSERTION
+        ${Saml.ASSERTION}
     </S:Header>
     <S:Body>
         <typ:kalkulatorForespoersel>

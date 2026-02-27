@@ -7,6 +7,9 @@ import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tjenestepensjon.TjenestepensjonService
 import no.nav.pensjon.kalkulator.tjenestepensjon.api.dto.*
+import no.nav.pensjon.kalkulator.tjenestepensjon.api.dto.v3.LivsvarigOffentligAfpResultV3
+import no.nav.pensjon.kalkulator.tjenestepensjon.api.map.LivsvarigOffentligAfpMapperV2.toDtoV2
+import no.nav.pensjon.kalkulator.tjenestepensjon.api.map.LivsvarigOffentligAfpMapperV3.toDtoV3
 import no.nav.pensjon.kalkulator.tjenestepensjon.api.map.TjenestepensjonMapper.toDto
 import org.springframework.web.bind.annotation.*
 
@@ -52,6 +55,46 @@ class TjenestepensjonController(
                 .also { log.debug { "Medlemskap i tjenestepensjonsordninger respons: $it" } }
         } catch (e: EgressException) {
             handleError(e)!!
+        } finally {
+            traceAid.end()
+        }
+    }
+
+    @GetMapping("v2/tpo-livsvarig-offentlig-afp")
+    @Operation(
+        summary = "Hent løpende livsvarig offentlig AFP",
+        description = "Henter detaljer om løpende livsvarig AFP i offentlig sektor for brukeren"
+    )
+    fun hentLivsvarigOffentligAfpDetaljer(): LivsvarigOffentligAfpResultV2 {
+        val versjon = "V2"
+        traceAid.begin()
+        log.debug { "Request for livsvarig offentlig AFP-detaljer $versjon" }
+
+        return try {
+            toDtoV2(timed(service::hentAfpOffentligLivsvarigDetaljer, "hentAfpOffentligLivsvarigDetaljer"))
+                .also { log.debug { "livsvarig offentlig AFP-detaljer respons $versjon: $it" } }
+        } catch (e: EgressException) {
+            handleError(e, versjon)!!
+        } finally {
+            traceAid.end()
+        }
+    }
+
+    @GetMapping("v3/tpo-livsvarig-offentlig-afp")
+    @Operation(
+        summary = "Hent løpende livsvarig offentlig AFP",
+        description = "Henter detaljer om løpende livsvarig AFP i offentlig sektor for brukeren"
+    )
+    fun hentLivsvarigOffentligAfpDetaljerV3(): LivsvarigOffentligAfpResultV3 {
+        val versjon = "V3"
+        traceAid.begin()
+        log.debug { "Request for livsvarig offentlig AFP-detaljer $versjon" }
+
+        return try {
+            toDtoV3(timed(service::hentAfpOffentligLivsvarigDetaljer, "hentAfpOffentligLivsvarigDetaljer$versjon"))
+                .also { log.info { "livsvarig offentlig AFP-detaljer respons $versjon: $it" } }
+        } catch (e: EgressException) {
+            handleError(e, versjon)!!
         } finally {
             traceAid.end()
         }

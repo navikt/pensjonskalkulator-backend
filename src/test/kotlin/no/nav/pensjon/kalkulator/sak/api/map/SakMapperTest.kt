@@ -1,14 +1,13 @@
 package no.nav.pensjon.kalkulator.sak.api.map
 
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.sak.api.dto.SakDto
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 
-class SakMapperTest {
+class SakMapperTest : ShouldSpec({
 
-    @Test
-    fun `toDto maps harSak to harUfoeretrygdEllerGjenlevendeytelse`() {
-        assertEquals(SakDto(harUfoeretrygdEllerGjenlevendeytelse = false), SakMapper.toDto(harSak = false))
-        assertEquals(SakDto(harUfoeretrygdEllerGjenlevendeytelse = true), SakMapper.toDto(harSak = true))
+    should("map harSak to harUfoeretrygdEllerGjenlevendeytelse") {
+        SakMapper.toDto(harSak = false) shouldBe SakDto(harUfoeretrygdEllerGjenlevendeytelse = false)
+        SakMapper.toDto(harSak = true) shouldBe SakDto(harUfoeretrygdEllerGjenlevendeytelse = true)
     }
-}
+})

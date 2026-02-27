@@ -1,24 +1,31 @@
 package no.nav.pensjon.kalkulator.opptjening.api.map
 
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.opptjening.Inntekt
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
+import no.nav.pensjon.kalkulator.opptjening.api.dto.InntektDto
 import java.math.BigDecimal
 
-class FremtidigInntektV2MapperTest {
+class FremtidigInntektV2MapperTest : ShouldSpec({
 
-    @Test
-    fun `toDto maps aar and beloep`() {
-        val dto = InntektMapper.toDto(Inntekt(Opptjeningstype.OTHER, 2023, BigDecimal.TEN))
-
-        assertEquals(2023, dto.aar)
-        assertEquals(10, dto.beloep)
+    should("map år and beløp") {
+        InntektMapper.toDto(
+            Inntekt(
+                type = Opptjeningstype.OTHER,
+                aar = 2023,
+                beloep = BigDecimal.TEN
+            )
+        ) shouldBe InntektDto(aar = 2023, beloep = 10)
     }
 
-    @Test
-    fun `toDto maps decimal beloep to integer, rounding down`() {
-        val dto = InntektMapper.toDto(Inntekt(Opptjeningstype.OTHER, 2023, BigDecimal("67.89")))
-        assertEquals(67, dto.beloep)
+    should("map decimal beløp to integer, rounding down") {
+        InntektMapper.toDto(
+            Inntekt(
+                type = Opptjeningstype.OTHER,
+                aar = 2023,
+                beloep = BigDecimal("67.89")
+            )
+        ).beloep shouldBe 67
     }
-}
+})

@@ -1,121 +1,79 @@
 package no.nav.pensjon.kalkulator.uttaksalder.api
 
+import com.ninjasquad.springmockk.MockkBean
+import io.kotest.core.spec.style.ShouldSpec
+import io.mockk.every
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.simulering.Opphold
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
-import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
 import no.nav.pensjon.kalkulator.uttaksalder.UttaksalderService
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.Test
-import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.time.LocalDate
 
 @WebMvcTest(UttaksalderController::class)
 @Import(MockSecurityConfiguration::class)
-internal class UttaksalderControllerTest {
+internal class UttaksalderControllerTest : ShouldSpec() {
 
     @Autowired
     private lateinit var mvc: MockMvc
 
-    @MockitoBean
+    @MockkBean
     private lateinit var uttaksalderService: UttaksalderService
 
-    @MockitoBean
+    @MockkBean(relaxed = true)
     private lateinit var traceAid: TraceAid
 
-    @MockitoBean
+    @MockkBean
     private lateinit var pidExtractor: PidExtractor
 
-    @MockitoBean
-    private lateinit var fortroligAdresseService: FortroligAdresseService
+    @MockkBean
+    private lateinit var adresseService: FortroligAdresseService
 
-    @MockitoBean
-    private lateinit var groupMembershipService: GroupMembershipService
-
-    @MockitoBean
+    @MockkBean
     private lateinit var auditor: Auditor
 
-    @Test
-    fun `finnTidligsteHelUttaksalderV1 returns response`() {
-        val spec = ImpersonalUttaksalderSpec(
-            simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
-            sivilstand = Sivilstand.UGIFT,
-            harEps = true,
-            aarligInntektFoerUttak = 100_000,
-            heltUttak = null,
-            utenlandsperiodeListe = listOf(
-                Opphold(
-                    fom = LocalDate.of(1990, 1, 2),
-                    tom = LocalDate.of(1999, 11, 30),
-                    land = Land.AUS,
-                    arbeidet = true
-                )
+    init {
+        beforeSpec {
+            every { traceAid.begin() } returns Unit
+            every { pidExtractor.pid() } returns pid
+            every { adresseService.adressebeskyttelseGradering(any()) } returns AdressebeskyttelseGradering.UGRADERT
+            every { auditor.audit(any(), any()) } returns Unit
+        }
+
+        should("normalt returnere tidligste hel uttaksalder V3") {
+            every { uttaksalderService.finnTidligsteUttaksalder(any()) } returns uttaksalder
+
+            mvc.perform(
+                post("/api/v3/tidligste-hel-uttaksalder")
+                    .with(csrf())
+                    .content(requestBodyV3())
+                    .contentType(MediaType.APPLICATION_JSON)
             )
-        )
-        `when`(uttaksalderService.finnTidligsteUttaksalder(spec)).thenReturn(uttaksalder)
-
-        mvc.perform(
-            post("/api/v1/tidligste-hel-uttaksalder")
-                .with(csrf())
-                .content(requestBodyV1())
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(status().isOk)
-            .andExpect(content().json(responseBody()))
-    }
-
-    @Test
-    fun `finnTidligsteHelUttaksalderV2 returns response`() {
-        val spec = ImpersonalUttaksalderSpec(
-            simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
-            sivilstand = Sivilstand.UGIFT,
-            harEps = true,
-            aarligInntektFoerUttak = 100_000,
-            heltUttak = null,
-            utenlandsperiodeListe = listOf(
-                Opphold(
-                    fom = LocalDate.of(1990, 1, 2),
-                    tom = LocalDate.of(1999, 11, 30),
-                    land = Land.AUS,
-                    arbeidet = true
-                )
-            )
-        )
-        `when`(uttaksalderService.finnTidligsteUttaksalder(spec)).thenReturn(uttaksalder)
-
-        mvc.perform(
-            post("/api/v2/tidligste-hel-uttaksalder")
-                .with(csrf())
-                .content(requestBodyV2())
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(status().isOk)
-            .andExpect(content().json(responseBody()))
+                .andExpect(status().isOk)
+                .andExpect(content().json(responseBody()))
+        }
     }
 
     private companion object {
         private val uttaksalder = Alder(aar = 67, maaneder = 10)
 
         @Language("json")
-        private fun requestBodyV1(
+        private fun requestBodyV3(
             sivilstand: Sivilstand = Sivilstand.UGIFT,
             harEps: Boolean = true,
             sisteInntekt: Int = 100_000,
@@ -123,37 +81,18 @@ internal class UttaksalderControllerTest {
         ): String = """
             {
               "simuleringstype": "${simuleringType.name}",
-              "sivilstand": "$sivilstand",
-              "harEps": $harEps,
               "aarligInntektFoerUttakBeloep": $sisteInntekt,
+              "aarligInntektVsaPensjon": null,
+              "sivilstand": "$sivilstand",
+              "epsHarInntektOver2G": $harEps,
+              "epsHarPensjon": $harEps,
+              "innvilgetLivsvarigOffentligAfp": null,
               "utenlandsperiodeListe": [{
                 "fom": "1990-01-02",
                 "tom": "1999-11-30",
                 "landkode": "AUS",
                 "arbeidetUtenlands": true
               }]
-            }
-        """.trimIndent()
-
-        @Language("json")
-        private fun requestBodyV2(
-            sivilstand: Sivilstand = Sivilstand.UGIFT,
-            harEps: Boolean = true,
-            sisteInntekt: Int = 100_000,
-            simuleringType: SimuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT
-        ): String = """
-            {
-              "simuleringstype": "${simuleringType.name}",
-              "aarligInntektFoerUttakBeloep": $sisteInntekt,
-              "utenlandsperiodeListe": [{
-                "fom": "1990-01-02",
-                "tom": "1999-11-30",
-                "landkode": "AUS",
-                "arbeidetUtenlands": true
-              }],
-              "sivilstand": "$sivilstand",
-              "epsHarInntektOver2G": $harEps,
-              "epsHarPensjon": $harEps
             }
         """.trimIndent()
 

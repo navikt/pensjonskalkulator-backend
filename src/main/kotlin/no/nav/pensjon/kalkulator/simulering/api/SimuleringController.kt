@@ -14,9 +14,9 @@ import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import no.nav.pensjon.kalkulator.simulering.api.map.AnonymSimuleringResultMapperV1.errorV1
 import no.nav.pensjon.kalkulator.simulering.api.map.AnonymSimuleringResultMapperV1.resultatV1
 import no.nav.pensjon.kalkulator.simulering.api.map.AnonymSimuleringSpecMapperV1
-import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringExtendedResultMapperV8.extendedResultV8
-import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultMapperV8.resultV8
-import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringSpecMapperV8.fromSpecV8
+import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringExtendedResultMapperV9.extendedResultV9
+import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultMapperV9.resultV9
+import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringSpecMapperV9.fromSpecV9
 import no.nav.pensjon.kalkulator.tech.metric.Metrics
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
@@ -36,7 +36,7 @@ class SimuleringController(
 
     private val log = KotlinLogging.logger {}
 
-    @PostMapping("v8/alderspensjon/simulering")
+    @PostMapping("v9/alderspensjon/simulering")
     @Operation(
         summary = "Simuler alderspensjon",
         description = "Lag en prognose for framtidig alderspensjon med støtte for AFP i offentlig sektor." +
@@ -57,39 +57,39 @@ class SimuleringController(
             ),
         ]
     )
-    fun simulerAlderspensjonV8(@RequestBody spec: PersonligSimuleringSpecV8): PersonligSimuleringResultV8 {
+    fun simulerAlderspensjonV9(@RequestBody spec: PersonligSimuleringSpecV9): PersonligSimuleringResultV9 {
         traceAid.begin()
-        log.debug { "Request for V8 simulering: $spec" }
+        log.debug { "Request for V9 simulering: $spec" }
 
         return try {
             if (feature.isEnabled("utvidet-simuleringsresultat"))
-                extendedResultV8(
+                extendedResultV9(
                     timed(
                         function = service::simulerPersonligAlderspensjon,
-                        argument = fromSpecV8(spec),
+                        argument = fromSpecV9(spec),
                         functionName = "alderspensjon/simulering"
                     ),
                     spec.foedselsdato
                 ).also {
-                    log.debug { "Simulering V8 respons: $it" }
+                    log.debug { "Simulering V9 respons: $it" }
                     Metrics.countType(eventName = SIMULERING_TYPE_METRIC_NAME, type = spec.simuleringstype.name)
                 }
             else
-                resultV8(
+                resultV9(
                     timed(
                         function = service::simulerPersonligAlderspensjon,
-                        argument = fromSpecV8(spec),
+                        argument = fromSpecV9(spec),
                         functionName = "alderspensjon/simulering"
                     ),
                     spec.foedselsdato
                 ).also {
-                    log.debug { "Simulering V8 respons: $it" }
+                    log.debug { "Simulering V9 respons: $it" }
                     Metrics.countType(eventName = SIMULERING_TYPE_METRIC_NAME, type = spec.simuleringstype.name)
                 }
         } catch (e: BadRequestException) {
             badRequest(e)!!
         } catch (e: EgressException) {
-            if (e.isConflict) vilkaarIkkeOppfyltV8() else handleError(e, "V8")!!
+            if (e.isConflict) vilkaarIkkeOppfyltV9() else handleError(e, "V9")!!
         } finally {
             traceAid.end()
         }
@@ -160,13 +160,13 @@ class SimuleringController(
         private const val ERROR_MESSAGE = "feil ved simulering"
         private const val SIMULERING_TYPE_METRIC_NAME = "simulering_type"
 
-        private fun vilkaarIkkeOppfyltV8() =
-            PersonligSimuleringResultV8(
+        private fun vilkaarIkkeOppfyltV9() =
+            PersonligSimuleringResultV9(
                 alderspensjon = emptyList(),
                 pre2025OffentligAfp = null,
                 afpPrivat = null,
                 afpOffentlig = null,
-                vilkaarsproeving = PersonligSimuleringVilkaarsproevingResultV8(
+                vilkaarsproeving = PersonligSimuleringVilkaarsproevingResultV9(
                     vilkaarErOppfylt = false,
                     alternativ = null
                 ),

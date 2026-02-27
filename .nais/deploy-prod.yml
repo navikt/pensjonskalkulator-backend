@@ -51,10 +51,23 @@ spec:
           - id: "ad7b87a6-9180-467c-affc-20a566b0fec0" # 0000-GA-Strengt_Fortrolig_Adresse
   tokenx:
     enabled: true
+  maskinporten:
+    enabled: true
+    scopes:
+      consumes:
+        - name: "aksio:afpstatus"
+        - name: "gabler:nav"
+        - name: "klp:ofa/nav"
+        - name: "opf:nav"
+        - name: "spk:nav"
+        - name: "stbsbl:nav"
+        - name: "stbsbp:nav"
   accessPolicy:
     inbound:
       rules:
         - application: pensjonskalkulator-frontend
+        - application: pensjonskalkulator-frontend-ekstern
+        - application: pensjonskalkulator-frontend-intern
         - application: pensjonskalkulator-uinnlogget-frontend
         - application: pensjonskalkulator-veiledning-frontend
     outbound:
@@ -64,6 +77,14 @@ spec:
         - application: pdl-api
           namespace: pdl
           cluster: prod-fss
+        - application: pensjon-persondata
+          namespace: pensjon-person
+          cluster: prod-fss
+        - application: pensjon-pid-encryption
+          namespace: pensjon-person
+        - application: pensjon-popp
+          namespace: pensjonopptjening
+          cluster: prod-fss
         - application: pensjon-representasjon
           namespace: pensjon-person
           cluster: prod-fss
@@ -71,15 +92,17 @@ spec:
           namespace: pensjonselvbetjening
           cluster: prod-fss
         - application: pensjonssimulator
+        - application: populasjonstilgangskontroll
+          namespace: tilgangsmaskin
         - application: skjermede-personer-pip
           namespace: nom
-        - application: tjenestepensjon-simulering
         - application: tp
           namespace: pensjonsamhandling
           cluster: prod-fss
       external:
         - host: pdl-api.prod-fss-pub.nais.io
         - host: pensjon-pen.prod-fss-pub.nais.io
+        - host: pensjon-persondata.prod-fss-pub.nais.io
         - host: pensjon-popp.prod-fss-pub.nais.io
         - host: pensjon-representasjon.prod-fss-pub.nais.io
         - host: pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
@@ -87,6 +110,13 @@ spec:
         - host: skjermede-personer-pip.intern.nav.no
         - host: sokos-utbetaldata.prod-fss-pub.nais.io
         - host: tp-api.prod-fss-pub.nais.io
+        - host: api.klp.no
+        - host: api.ofa.storebrand.no
+        - host: api.opf.no
+        - host: api.prod.spk.no
+        - host: ofa.opensjon.no
+        - host: ofa.api.gabler.no
+        - host: ofa.gabler.no
   env:
     - name: FSS_GATEWAY_SERVICE_ID
       value: prod-fss:pensjonselvbetjening:pensjon-selvbetjening-fss-gateway
@@ -102,6 +132,14 @@ spec:
       value: prod-fss:pensjondeployer:pensjon-pen
     - name: PEN_URL
       value: https://pensjon-pen.prod-fss-pub.nais.io
+    - name: PENSJON_PERSONDATA_SERVICE_ID
+      value: prod-fss:pensjon-person:pensjon-persondata
+    - name: PENSJON_PERSONDATA_URL
+      value: https://pensjon-persondata.prod-fss-pub.nais.io
+    - name: PENSJON_PID_ENCRYPTION_SERVICE_ID
+      value: prod-gcp:pensjon-person:pensjon-pid-encryption
+    - name: PENSJON_PID_ENCRYPTION_URL
+      value: https://pensjon-pid-encryption.intern.nav.no
     - name: PENSJON_REPRESENTASJON_SERVICE_ID
       value: prod-fss:pensjon-person:pensjon-representasjon
     - name: PENSJON_REPRESENTASJON_URL
@@ -118,24 +156,20 @@ spec:
       value: prod-fss:pensjonopptjening:pensjon-popp
     - name: POPP_URL
       value: https://pensjon-popp.prod-fss-pub.nais.io
-    - name: SKJERMEDE_PERSONER_SERVICE_ID
-      value: prod-gcp:nom:skjermede-personer-pip
-    - name: SKJERMEDE_PERSONER_URL
-      value: https://skjermede-personer-pip.intern.nav.no
     - name: SOKOS_UTBETALDATA_SERVICE_ID
       value: prod-fss:okonomi:sokos-utbetaldata
     - name: SOKOS_UTBETALDATA_URL
       value: https://sokos-utbetaldata.prod-fss-pub.nais.io
     - name: STS_URL
       value: https://pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
+    - name: TILGANGSMASKINEN_SERVICE_ID
+      value: prod-gcp:tilgangsmaskin:populasjonstilgangskontroll
+    - name: TILGANGSMASKINEN_TILGANG_URL
+      value: http://populasjonstilgangskontroll.tilgangsmaskin
     - name: TJENESTEPENSJON_SERVICE_ID
       value: prod-fss:pensjonsamhandling:tp
     - name: TJENESTEPENSJON_URL
       value: https://tp-api.prod-fss-pub.nais.io
-    - name: TJENESTEPENSJON_SIMULERING_SERVICE_ID
-      value: prod-gcp:pensjonskalkulator:tjenestepensjon-simulering
-    - name: TJENESTEPENSJON_SIMULERING_URL
-      value: http://tjenestepensjon-simulering
     - name: PKB_GROUP_ID_SAKSBEHANDLER
       value: 0af3955f-df85-4eb0-b5b2-45bf2c8aeb9e
     - name: PKB_GROUP_ID_EGNE_ANSATTE
@@ -152,6 +186,34 @@ spec:
       value: JSON
     - name: PKB_LOGGING_LEVEL
       value: INFO
+    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_AKSIO_URL
+      value: https://ofa.opensjon.no/{tpnr}/ofa/v1/hentafpstatus/{fnr}?uttaksdato={uttaksdato}
+    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_AKSIO_SCOPE
+      value: aksio:afpstatus
+    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_SPK_URL
+      value: https://api.prod.spk.no/nav/hentAfpStatus/{fnr}/ordning/{tpnr}?uttaksdato={uttaksdato}
+    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_GABLER_URL
+      value: https://ofa.api.gabler.no/{tpnr}/ofa/v1/hentAfpStatus/{fnr}?uttaksdato={uttaksdato}
+    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_GABLER_SCOPE
+      value: gabler:nav
+    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_GABLER2_URL
+      value: https://ofa.gabler.no/{tpnr}/ofa/v1/hentAfpStatus/{fnr}?uttaksdato={uttaksdato}
+    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_KLP_URL
+      value: https://api.klp.no/ofa-api-gateway/inbound/tpnr/{tpnr}/ofa/v1/hentAfpStatus/{fnr}?uttaksdato={uttaksdato}
+    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_KLP_SCOPE
+      value: klp:ofa/nav
+    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_OPF_URL
+      value: https://api.opf.no/{tpnr}/ofa/v1/hentafpstatus/{fnr}?uttaksdato={uttaksdato}
+    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_OPF_SCOPE
+      value: opf:nav
+    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_STOREBRAND_URL
+      value: https://api.ofa.storebrand.no/sbl/ofa/v1/hentAfpStatus/{fnr}?uttaksdato={uttaksdato}
+    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_STOREBRAND_SCOPE
+      value: stbsbl:nav
+    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_STOREBRAND_PEN_URL
+      value: https://api.ofa.storebrand.no/sbp/{tpnr}/ofa/v1/hentAfpStatus/{fnr}?uttaksdato={uttaksdato}
+    - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_STOREBRAND_PEN_SCOPE
+      value: stbsbp:nav
   envFrom:
     - secret: pensjonskalkulator-backend-unleash-api-token
     - secret: pkb-pid-encryption

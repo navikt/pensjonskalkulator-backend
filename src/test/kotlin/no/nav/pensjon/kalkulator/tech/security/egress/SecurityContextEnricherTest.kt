@@ -1,8 +1,7 @@
 package no.nav.pensjon.kalkulator.tech.security.egress
 
-import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.FunSpec
+import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.Called
 import io.mockk.every
@@ -12,7 +11,7 @@ import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.tech.crypto.PidEncryptionService
+import no.nav.pensjon.kalkulator.tech.crypto.CryptoService
 import no.nav.pensjon.kalkulator.tech.representasjon.Representasjon
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonService
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
@@ -21,62 +20,53 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
 
-class SecurityContextEnricherTest : FunSpec({
+class SecurityContextEnricherTest : ShouldSpec({
 
     val tokenSuppliers = EgressTokenSuppliersByService(emptyMap())
 
-    test("enrichAuthentication tolerates null authentication") {
-        setSecurityContext(authentication = null)
+    context("if PID in request header") {
+        should("not get PID from security context") {
+            val securityContextPidExtractor = mockk<SecurityContextPidExtractor>()
 
-        shouldNotThrowAny {
             SecurityContextEnricher(
                 tokenSuppliers,
-                securityContextPidExtractor = mockk(),
+                securityContextPidExtractor,
                 pidDecrypter = mockk(),
                 representasjonService = mockk()
-            ).enrichAuthentication(request = mockk(), response = mockk())
+            ).enrichAuthentication(
+                request = arrangeFoedselsnummer(pid.value), // => PID in the request header
+                response = mockk()
+            )
+
+            verify { securityContextPidExtractor wasNot Called }
         }
     }
 
-    test("if PID in request header then enrichAuthentication does not get PID from security context") {
-        val securityContextPidExtractor = mockk<SecurityContextPidExtractor>()
+    context("if no PID in request header") {
+        should("get PID from security context") {
+            setSecurityContext(authentication = mockk())
+            val securityContextPidExtractor = mockk<SecurityContextPidExtractor>(relaxed = true)
 
-        SecurityContextEnricher(
-            tokenSuppliers,
-            securityContextPidExtractor,
-            pidDecrypter = mockk(),
-            representasjonService = mockk()
-        ).enrichAuthentication(
-            request = arrangeFoedselsnummer(pid.value), // => PID in the request header
-            response = mockk()
-        )
+            SecurityContextEnricher(
+                tokenSuppliers,
+                securityContextPidExtractor,
+                pidDecrypter = mockk(),
+                representasjonService = mockk()
+            ).enrichAuthentication(
+                request = arrangeFoedselsnummer(value = null), // => no PID in the request header
+                response = mockk()
+            )
 
-        verify { securityContextPidExtractor wasNot Called }
+            verify(exactly = 1) { securityContextPidExtractor.pid() }
+        }
     }
 
-    test("if no PID in request header then enrichAuthentication gets PID from security context") {
-        setSecurityContext(authentication = mockk())
-        val securityContextPidExtractor = mockk<SecurityContextPidExtractor>(relaxed = true)
-
-        SecurityContextEnricher(
-            tokenSuppliers,
-            securityContextPidExtractor,
-            pidDecrypter = mockk(),
-            representasjonService = mockk()
-        ).enrichAuthentication(
-            request = arrangeFoedselsnummer(value = null), // => no PID in the request header
-            response = mockk()
-        )
-
-        verify(exactly = 1) { securityContextPidExtractor.pid() }
-    }
-
-    test("enrichAuthentication decrypts encrypted PID") {
+    should("decrypt encrypted PID") {
         setSecurityContext(authentication = mockk())
 
         SecurityContextEnricher(
             tokenSuppliers,
-            securityContextPidExtractor = mockk(),
+            securityContextPidExtractor = mockk(relaxed = true),
             pidDecrypter = arrangeDecryption(),
             representasjonService = mockk()
         ).enrichAuthentication(
@@ -87,7 +77,7 @@ class SecurityContextEnricherTest : FunSpec({
         securityContextTargetPid()?.value shouldBe "12906498357"
     }
 
-    test("enrichAuthentication uses plaintext PID if not encrypted") {
+    should("use plaintext PID if not encrypted") {
         setSecurityContext(authentication = mockk())
 
         SecurityContextEnricher(
@@ -103,7 +93,7 @@ class SecurityContextEnricherTest : FunSpec({
         securityContextTargetPid()?.value shouldBe "12906498357"
     }
 
-    test("enrichAuthentication sets target PID from OBO cookie if valid representasjon") {
+    should("set target PID from OBO cookie if valid representasjon") {
         setSecurityContext(authentication = mockk())
 
         SecurityContextEnricher(
@@ -119,7 +109,7 @@ class SecurityContextEnricherTest : FunSpec({
         securityContextTargetPid()?.value shouldBe "12906498357"
     }
 
-    test("enrichAuthentication throws AccessDeniedException if invalid representasjon") {
+    should("throw AccessDeniedException if invalid representasjon") {
         setSecurityContext(authentication = mockk())
 
         shouldThrow<org.springframework.security.access.AccessDeniedException> {
@@ -138,7 +128,7 @@ class SecurityContextEnricherTest : FunSpec({
     }
 })
 
-private fun setSecurityContext(authentication: Authentication?) {
+private fun setSecurityContext(authentication: Authentication) {
     SecurityContextHolder.setContext(SecurityContextImpl(authentication))
 }
 
@@ -161,7 +151,7 @@ private fun arrange(representasjon: Representasjon) =
     }
 
 private fun arrangeDecryption() =
-    mockk<PidEncryptionService>().apply {
+    mockk<CryptoService>().apply {
         every { decrypt("encrypted.string.containing.dot") } returns "12906498357"
     }
 

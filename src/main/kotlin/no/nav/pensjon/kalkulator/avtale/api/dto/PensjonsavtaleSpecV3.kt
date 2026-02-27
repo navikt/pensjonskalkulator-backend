@@ -1,30 +1,31 @@
 package no.nav.pensjon.kalkulator.avtale.api.dto
 
+import jakarta.validation.constraints.NotNull
 import no.nav.pensjon.kalkulator.person.Sivilstand
 
 data class PensjonsavtaleSpecV3(
-    val aarligInntektFoerUttakBeloep: Int,
-    val uttaksperioder: List<PensjonsavtaleUttaksperiodeSpecV3>,
+    @field:NotNull val aarligInntektFoerUttakBeloep: Int,
+    @field:NotNull val uttaksperioder: List<PensjonsavtaleUttaksperiodeSpecV3>,
     val harAfp: Boolean? = false,
     val sivilstand: PensjonsavtaleSivilstandSpecV3? = null,
-    val epsHarInntektOver2G: Boolean,
-    val epsHarPensjon: Boolean
+    @field:NotNull val epsHarInntektOver2G: Boolean,
+    @field:NotNull val epsHarPensjon: Boolean
 )
 
 data class PensjonsavtaleUttaksperiodeSpecV3(
-    val startAlder: PensjonsavtaleAlderSpecV3,
-    val grad: Int,
+    @field:NotNull val startAlder: PensjonsavtaleAlderSpecV3,
+    @field:NotNull val grad: Int,
     val aarligInntektVsaPensjon: PensjonsavtaleInntektSpecV3?
 )
 
 data class PensjonsavtaleInntektSpecV3(
-    val beloep: Int,
+    @field:NotNull val beloep: Int,
     val sluttAlder: PensjonsavtaleAlderSpecV3? = null
 )
 
 data class PensjonsavtaleAlderSpecV3(
-    val aar: Int,
-    val maaneder: Int
+    @field:NotNull val aar: Int,
+    @field:NotNull val maaneder: Int
 )
 
 enum class PensjonsavtaleSivilstandSpecV3(val internalValue: Sivilstand) {

@@ -22,4 +22,11 @@ class SakService(
             .firstOrNull { it.type.relevant && it.status.relevant }
             ?.let { RelevantSakStatus(harSak = true, sakType = it.type) }
             ?: RelevantSakStatus(harSak = false, sakType = SakType.NONE)
+
+    fun hentEllerOpprettAlderspensjonSak(): Long {
+        val sak = sakClient.fetchSaker(pidGetter.pid())
+            .firstOrNull { it.type == SakType.ALDERSPENSJON }
+            ?: sakClient.opprettAlderspensjonSak(pidGetter.pid())
+        return sak.sakId
+    }
 }

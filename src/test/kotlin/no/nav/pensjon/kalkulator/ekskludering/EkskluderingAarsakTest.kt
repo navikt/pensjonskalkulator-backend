@@ -1,17 +1,15 @@
 package no.nav.pensjon.kalkulator.ekskludering
 
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.sak.SakType
-import org.junit.jupiter.api.Test
 
-import org.junit.jupiter.api.Assertions.*
+class EkskluderingAarsakTest : ShouldSpec({
 
-class EkskluderingAarsakTest {
-
-    @Test
-    fun `'from' mapper sak-type til ekskludering-aarsak`() {
-        assertEquals(EkskluderingAarsak.NONE, EkskluderingAarsak.from(SakType.NONE))
-        assertEquals(EkskluderingAarsak.HAR_GJENLEVENDEYTELSE, EkskluderingAarsak.from(SakType.GJENLEVENDEYTELSE))
-        assertEquals(EkskluderingAarsak.HAR_LOEPENDE_UFOERETRYGD, EkskluderingAarsak.from(SakType.UFOERETRYGD))
-        assertEquals(EkskluderingAarsak.NONE, EkskluderingAarsak.from(SakType.GENERELL))
+    should("mappe sakstype til ekskluderingsårsak") {
+        EkskluderingAarsak.from(SakType.NONE) shouldBe EkskluderingAarsak.NONE
+        EkskluderingAarsak.from(SakType.GJENLEVENDEYTELSE) shouldBe EkskluderingAarsak.HAR_GJENLEVENDEYTELSE
+        EkskluderingAarsak.from(SakType.UFOERETRYGD) shouldBe EkskluderingAarsak.HAR_LOEPENDE_UFOERETRYGD
+        EkskluderingAarsak.from(SakType.GENERELL) shouldBe EkskluderingAarsak.NONE
     }
-}
+})

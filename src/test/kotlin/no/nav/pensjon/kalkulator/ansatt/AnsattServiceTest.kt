@@ -1,22 +1,16 @@
 package no.nav.pensjon.kalkulator.ansatt
 
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.SecurityContextNavIdExtractor
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@ExtendWith(SpringExtension::class)
-class AnsattServiceTest {
+class AnsattServiceTest : ShouldSpec({
 
-    @Mock
-    private lateinit var ansattIdExtractor: SecurityContextNavIdExtractor
-
-    @Test
-    fun getAnsattId() {
-        `when`(ansattIdExtractor.id()).thenReturn("id1")
-        assertEquals("id1", AnsattService(ansattIdExtractor).getAnsattId())
+    should("return ansatt-ID from security context") {
+        AnsattService(
+            ansattIdExtractor = mockk<SecurityContextNavIdExtractor>().apply { every { id() } returns "id1" }
+        ).getAnsattId() shouldBe "id1"
     }
-}
+})

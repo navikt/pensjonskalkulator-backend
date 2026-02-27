@@ -1,73 +1,75 @@
 package no.nav.pensjon.kalkulator.omstillingsstoenad.api
 
-import kotlinx.coroutines.test.runTest
+import com.ninjasquad.springmockk.MockkBean
+import io.kotest.core.spec.style.FunSpec
+import io.mockk.coEvery
+import io.mockk.every
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.omstillingsstoenad.OmstillingOgGjenlevendeYtelseService
+import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.group.GroupMembershipService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
-import org.springframework.test.context.bean.override.mockito.MockitoBean
-import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@ExtendWith(SpringExtension::class)
 @WebMvcTest(OmstillingsstoenadOgGjenlevendeYtelseController::class)
 @Import(MockSecurityConfiguration::class)
-class OmstillingsstoenadOgGjenlevendeYtelseControllerTest {
+class OmstillingsstoenadOgGjenlevendeYtelseControllerTest : FunSpec() {
 
     @Autowired
     private lateinit var mvc: MockMvc
 
-    @MockitoBean
+    @MockkBean
     private lateinit var service: OmstillingOgGjenlevendeYtelseService
 
-    @MockitoBean
+    @MockkBean(relaxed = true)
     private lateinit var traceAid: TraceAid
 
-    @MockitoBean
+    @MockkBean
     private lateinit var pidExtractor: PidExtractor
 
-    @MockitoBean
-    private lateinit var fortroligAdresseService: FortroligAdresseService
+    @MockkBean
+    private lateinit var adresseService: FortroligAdresseService
 
-    @MockitoBean
-    private lateinit var groupMembershipService: GroupMembershipService
-
-    @MockitoBean
+    @MockkBean
     private lateinit var auditor: Auditor
 
-    @Test
-    fun `bruker mottar enten omstillingsstoenad eller gjenlevende ytelse`() = runTest {
-        `when`(service.harLoependeSaker()).thenReturn(true)
+    init {
+        beforeSpec {
+            every { traceAid.begin() } returns Unit
+            every { pidExtractor.pid() } returns pid
+            every { adresseService.adressebeskyttelseGradering(any()) } returns AdressebeskyttelseGradering.UGRADERT
+            every { auditor.audit(any(), any()) } returns Unit
+        }
 
-        val res = mvc.get(URL).asyncDispatch()
-            .andExpect { status().isOk() }
-            .andReturn()
+        test("bruker mottar enten omstillingsstønad eller gjenlevendeytelse") {
+            coEvery { service.harLoependeSaker() } returns true
 
-        assertEquals(RESPONSE_BODY_MOTTAR, res.response.contentAsString)
-    }
+            val res = mvc.get(URL).asyncDispatch()
+                .andExpect { status().isOk() }
+                .andReturn()
 
-    @Test
-    fun `bruker mottar verken omstillingsstoenad eller gjenlevende ytelsee`() = runTest {
-        `when`(service.harLoependeSaker()).thenReturn(false)
+            assertEquals(RESPONSE_BODY_MOTTAR, res.response.contentAsString)
+        }
 
-        val res = mvc.get(URL).asyncDispatch()
-            .andExpect { status().isOk() }
-            .andReturn()
+        test("bruker mottar verken omstillingsstønad eller gjenlevendeytelse") {
+            coEvery { service.harLoependeSaker() } returns false
 
-        assertEquals(RESPONSE_BODY_MOTTAR_IKKE, res.response.contentAsString)
+            val res = mvc.get(URL).asyncDispatch()
+                .andExpect { status().isOk() }
+                .andReturn()
+
+            assertEquals(RESPONSE_BODY_MOTTAR_IKKE, res.response.contentAsString)
+        }
     }
 
     private companion object {

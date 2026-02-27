@@ -1,20 +1,17 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.map
 
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.OffentligTjenestepensjonSimuleringsresultat
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.ResultatType
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.SimuleringOffentligTjenestepensjonSpec
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.dto.*
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.*
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.dto.*
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.map.TpSimuleringClientMapper
 import java.time.LocalDate
 
-class TpSimuleringClientMapperTest {
+class TpSimuleringClientMapperTest : ShouldSpec({
 
-    @Test
-    fun `map all fields from dto`() {
+    should("map 'simuler tjenestepensjon response' DTO to domain object") {
         val dto = SimulerTjenestepensjonResponseDto(
             simuleringsResultatStatus = SimuleringsResultatStatusDto(
                 resultatType = ResultatTypeDto.SUCCESS,
@@ -25,8 +22,8 @@ class TpSimuleringClientMapperTest {
                 tpNummer = "1",
                 utbetalingsperioder = listOf(
                     UtbetalingPerAlder(
-                        startAlder = Alder(62, 0),
-                        sluttAlder = Alder(63, 0),
+                        startAlder = Alder(aar = 62, maaneder = 0),
+                        sluttAlder = Alder(aar = 63, maaneder = 0),
                         maanedligBeloep = 100
                     )
                 ),
@@ -35,23 +32,33 @@ class TpSimuleringClientMapperTest {
             relevanteTpOrdninger = listOf("tpOrdningY")
         )
 
-        val result: OffentligTjenestepensjonSimuleringsresultat = TpSimuleringClientMapper.fromDto(dto)
-
-        assertEquals(ResultatType.OK, result.simuleringsResultatStatus.resultatType)
-        assertEquals("tpOrdningY", result.tpOrdninger[0])
-        assertEquals("tpOrdningX", result.simuleringsResultat?.tpOrdning)
-        assertEquals("1", result.simuleringsResultat?.tpNummer)
-        assertEquals(dto.simuleringsResultat!!.utbetalingsperioder[0].startAlder, result.simuleringsResultat?.perioder?.get(0)?.startAlder)
-        assertEquals(dto.simuleringsResultat.utbetalingsperioder[0].sluttAlder, result.simuleringsResultat?.perioder?.get(0)?.sluttAlder)
-        assertEquals(100, result.simuleringsResultat?.perioder?.get(0)?.maanedligBeloep)
-        assertTrue(result.simuleringsResultat?.betingetTjenestepensjonInkludert!!)
+        TpSimuleringClientMapper.fromDto(dto) shouldBe
+                OffentligTjenestepensjonSimuleringsresultat(
+                    simuleringsResultatStatus = SimuleringsResultatStatus(
+                        resultatType = ResultatType.OK,
+                        feilmelding = "feilmelding"
+                    ),
+                    simuleringsResultat = SimuleringsResultat(
+                        tpOrdning = "tpOrdningX",
+                        tpNummer = "1",
+                        perioder = listOf(
+                            Utbetaling(
+                                startAlder = Alder(aar = 62, maaneder = 0),
+                                sluttAlder = Alder(aar = 63, maaneder = 0),
+                                maanedligBeloep = 100
+                            )
+                        ),
+                        betingetTjenestepensjonInkludert = true
+                    ),
+                    tpOrdninger = listOf("tpOrdningY"),
+                    serviceData = listOf()
+                )
     }
 
-    @Test
-    fun `map to dto v2`() {
+    should("map 'simulering offentlig tjenestepensjon' specification to DTO") {
         val spec = SimuleringOffentligTjenestepensjonSpec(
-            foedselsdato = LocalDate.parse("1963-02-24"),
-            uttaksdato = LocalDate.parse("2026-03-01"),
+            foedselsdato = LocalDate.of(1963, 2, 24),
+            uttaksdato = LocalDate.of(2026, 3, 1),
             sisteInntekt = 1,
             fremtidigeInntekter = emptyList(),
             aarIUtlandetEtter16 = 3,
@@ -61,16 +68,18 @@ class TpSimuleringClientMapperTest {
             erApoteker = true
         )
 
-        val result: SimuleringOFTPSpecDto = TpSimuleringClientMapper.toDto(spec, pid)
-
-        assertEquals(pid.value, result.pid)
-        assertEquals(LocalDate.parse("1963-02-24"), result.foedselsdato)
-        assertEquals(LocalDate.parse("2026-03-01"), result.uttaksdato)
-        assertEquals(1, result.sisteInntekt)
-        assertEquals(3, result.aarIUtlandetEtter16)
-        assertEquals(true, result.brukerBaOmAfp)
-        assertEquals(true, result.epsPensjon)
-        assertEquals(true, result.eps2G)
-        assertEquals(true, result.erApoteker)
+        TpSimuleringClientMapper.toDto(spec, pid) shouldBe
+                SimuleringOFTPSpecDto(
+                    pid = pid.value,
+                    foedselsdato = LocalDate.of(1963, 2, 24),
+                    uttaksdato = LocalDate.of(2026, 3, 1),
+                    sisteInntekt = 1,
+                    aarIUtlandetEtter16 = 3,
+                    brukerBaOmAfp = true,
+                    epsPensjon = true,
+                    eps2G = true,
+                    fremtidigeInntekter = emptyList(),
+                    erApoteker = true
+                )
     }
-}
+})

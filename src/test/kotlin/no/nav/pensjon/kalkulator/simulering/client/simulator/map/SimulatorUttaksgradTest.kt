@@ -1,32 +1,20 @@
 package no.nav.pensjon.kalkulator.simulering.client.simulator.map
 
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Test
 
-class SimulatorUttaksgradTest {
-    @Test
-    fun `fromInternalValue maps from uttaksgrad to PEN's equivalent uttaksgrad`() {
-        assertEquals(SimulatorUttaksgrad.NULL, SimulatorUttaksgrad.fromInternalValue(Uttaksgrad.NULL))
+class SimulatorUttaksgradTest : ShouldSpec({
 
-        assertEquals(SimulatorUttaksgrad.TJUE_PROSENT, SimulatorUttaksgrad.fromInternalValue(Uttaksgrad.TJUE_PROSENT))
-
-        assertEquals(
-            SimulatorUttaksgrad.FOERTI_PROSENT,
-            SimulatorUttaksgrad.fromInternalValue(Uttaksgrad.FOERTI_PROSENT)
-        )
-
-        assertEquals(SimulatorUttaksgrad.FEMTI_PROSENT, SimulatorUttaksgrad.fromInternalValue(Uttaksgrad.FEMTI_PROSENT))
-
-        assertEquals(
-            SimulatorUttaksgrad.SEKSTI_PROSENT,
-            SimulatorUttaksgrad.fromInternalValue(Uttaksgrad.SEKSTI_PROSENT)
-        )
-        assertEquals(SimulatorUttaksgrad.AATTI_PROSENT, SimulatorUttaksgrad.fromInternalValue(Uttaksgrad.AATTI_PROSENT))
-
-        assertEquals(
-            SimulatorUttaksgrad.HUNDRE_PROSENT,
-            SimulatorUttaksgrad.fromInternalValue(Uttaksgrad.HUNDRE_PROSENT)
-        )
+    context("fromInternalValue") {
+        should("map from uttaksgrad to PEN's equivalent uttaksgrad") {
+            SimulatorUttaksgrad.fromInternalValue(Uttaksgrad.NULL) shouldBe SimulatorUttaksgrad.NULL
+            SimulatorUttaksgrad.fromInternalValue(Uttaksgrad.TJUE_PROSENT) shouldBe SimulatorUttaksgrad.TJUE_PROSENT
+            SimulatorUttaksgrad.fromInternalValue(Uttaksgrad.FOERTI_PROSENT) shouldBe SimulatorUttaksgrad.FOERTI_PROSENT
+            SimulatorUttaksgrad.fromInternalValue(Uttaksgrad.FEMTI_PROSENT) shouldBe SimulatorUttaksgrad.FEMTI_PROSENT
+            SimulatorUttaksgrad.fromInternalValue(Uttaksgrad.SEKSTI_PROSENT) shouldBe SimulatorUttaksgrad.SEKSTI_PROSENT
+            SimulatorUttaksgrad.fromInternalValue(Uttaksgrad.AATTI_PROSENT) shouldBe SimulatorUttaksgrad.AATTI_PROSENT
+            SimulatorUttaksgrad.fromInternalValue(Uttaksgrad.HUNDRE_PROSENT) shouldBe SimulatorUttaksgrad.HUNDRE_PROSENT
+        }
     }
-}
+})

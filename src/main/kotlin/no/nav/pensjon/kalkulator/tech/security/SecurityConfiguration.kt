@@ -27,6 +27,11 @@ import org.springframework.security.oauth2.jwt.JwtDecoders
 import org.springframework.security.oauth2.jwt.JwtValidators
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider
+import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
+import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.TilgangService
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
@@ -92,8 +97,12 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
     fun filterChain(
         http: HttpSecurity,
         securityContextEnricher: SecurityContextEnricher,
-        impersonalAccessFilter: ImpersonalAccessFilter,
-        securityLevelFilter: SecurityLevelFilter,
+        pidExtractor: PidExtractor,
+        pidGetter: PidGetter,
+        auditor: Auditor,
+        adresseService: FortroligAdresseService,
+        navIdExtractor: SecurityContextNavIdExtractor,
+        tilgangService: TilgangService,
         authResolver: AuthenticationManagerResolver<HttpServletRequest>,
         authenticationEntryPoint: LoggingAuthenticationEntryPoint,
         @Value("\${pkb.request-matcher.internal}") internalRequestMatcher: String
@@ -102,8 +111,14 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
             AuthenticationEnricherFilter(securityContextEnricher),
             BasicAuthenticationFilter::class.java
         )
-            .addFilterAfter(impersonalAccessFilter, AuthenticationEnricherFilter::class.java)
-            .addFilterAfter(securityLevelFilter, ImpersonalAccessFilter::class.java)
+            .addFilterAfter(
+                ImpersonalAccessFilter(pidExtractor, navIdExtractor, tilgangService, auditor),
+                AuthenticationEnricherFilter::class.java
+            )
+            .addFilterAfter(
+                SecurityLevelFilter(adresseService, pidGetter),
+                ImpersonalAccessFilter::class.java
+            )
 
         return http.csrf {
             it.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -149,6 +164,7 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
      */
     private fun isUniversal(request: HttpServletRequest): Boolean =
         request.requestURI == ENCRYPTION_URI ||
+                request.requestURI == DECRYPTION_URI ||
                 request.requestURI.startsWith(FEATURE_URI)
 
     private fun hasAnsattIdClaim(request: HttpServletRequest): Boolean =
@@ -160,6 +176,7 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
         private const val ALDERSGRENSE_URI = "/api/v1/aldersgrense"
         private const val ANSATT_ID_URI = "/api/v1/ansatt-id"
         private const val ENCRYPTION_URI = "/api/v1/encrypt"
+        private const val DECRYPTION_URI = "/api/v1/decrypt"
 
         private fun hasPidHeader(request: HttpServletRequest): Boolean =
             hasLength(request.getHeader(CustomHttpHeaders.PID))

@@ -16,8 +16,12 @@ import no.nav.pensjon.kalkulator.tjenestepensjon.client.TjenestepensjonClient
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpApotekerDto
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpTjenestepensjonStatusDto
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpTjenestepensjonDto
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpAfpOffentligLivsvarigDetaljerDto
+import no.nav.pensjon.kalkulator.tjenestepensjon.AfpOffentligLivsvarigResult
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.map.TpTjenestepensjonMapper
+import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.config.AfpOffentligLivsvarigProperties
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
@@ -35,7 +39,8 @@ class TpTjenestepensjonClient(
     @Value("\${tjenestepensjon.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
-    @Value("\${web-client.retry-attempts}") retryAttempts: String
+    @Value("\${web-client.retry-attempts}") retryAttempts: String,
+    private val afpOffentligLivsvarigProperties: AfpOffentligLivsvarigProperties
 ) : PingableServiceClient(baseUrl, webClientBuilder, retryAttempts),
     TjenestepensjonClient {
 
@@ -124,7 +129,7 @@ class TpTjenestepensjonClient(
         return try {
             webClient
                 .get()
-                .uri("/$API_TP_FORHOLD/")
+                .uri("/$API_TP_FORHOLD")
                 .headers { setHeaders(it, pid) }
                 .retrieve()
                 .bodyToMono(FinnTjenestepensjonsforholdResponsDto::class.java)
@@ -138,6 +143,129 @@ class TpTjenestepensjonClient(
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }
+    }
+
+    override fun afpOffentligLivsvarigTpNummerListe(pid: Pid): List<String> {
+        val url = "$baseUrl/$AFP_OFFENTLIG_LIVSVARIG_PATH"
+        log.debug { "GET from URL: '$url'" }
+        return try {
+            webClient
+                .get()
+                .uri("/$AFP_OFFENTLIG_LIVSVARIG_PATH")
+                .headers { setHeadersWithDate(it, pid) }
+                .retrieve()
+                .bodyToMono(object : ParameterizedTypeReference<List<String>>() {})
+                .retryWhen(retryBackoffSpec(url))
+                .block()
+                ?.also { log.info { "Parsed tpNr list: $it" } }
+                .also { countCalls(MetricResult.OK) }
+                ?: emptyList()
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $url", e)
+        } catch (e: WebClientResponseException) {
+            throw EgressException(e.responseBodyAsString, e)
+        }
+    }
+
+    private fun hentTpOrdning(tpNr: String): String? {
+        val url = "$baseUrl/$TP_ORDNING_PATH/$tpNr"
+        log.debug { "GET from URL: '$url'" }
+
+        return try {
+            webClient
+                .get()
+                .uri("/$TP_ORDNING_PATH/$tpNr")
+                .headers { headers -> headers[CustomHttpHeaders.CALL_ID] = traceAid.callId() }
+                .retrieve()
+                .bodyToMono(String::class.java)
+                .retryWhen(retryBackoffSpec(url))
+                .block()
+                ?.lowercase()
+                ?.also {
+                    log.info { "TP-ordning for tpNr=$tpNr: $it" }
+                    countCalls(MetricResult.OK)
+                }
+        } catch (e: WebClientRequestException) {
+            log.warn(e) { "Failed to get TP-ordning for tpNr=$tpNr" }
+            null
+        } catch (e: WebClientResponseException) {
+            log.warn(e) { "Failed to get TP-ordning for tpNr=$tpNr: ${e.responseBodyAsString}" }
+            null
+        }
+    }
+
+    override fun hentAfpOffentligLivsvarigDetaljer(
+        pid: Pid,
+        tpNr: String,
+        uttaksdato: LocalDate
+    ): AfpOffentligLivsvarigResult {
+        log.debug { "Fetching AFP Offentlig Livsvarig detaljer for tpNr=$tpNr, uttaksdato=$uttaksdato" }
+
+        // Sjekker om tpNr er i en leverandør sine overstyrteTpNr liste
+        val tpOrdning = findTpOrdningFromOverstyrteTpNr(tpNr)
+            ?: hentTpOrdning(tpNr)
+            ?: throw EgressException("Kunne ikke hente TP-ordning for tpNr=$tpNr")
+
+        log.info { "Successfully retrieved TP-ordning='$tpOrdning' for tpNr=$tpNr" }
+
+        val config = afpOffentligLivsvarigProperties.tilbydere[tpOrdning]
+            ?: throw EgressException("Ingen AFP leverandører konfigurert for TP-ordning '$tpOrdning' (tpNr=$tpNr)")
+
+        log.debug { "Using provider ${config.name} for tpNr=$tpNr" }
+        val service: EgressService = EgressService.entries.first { it.shortName == tpOrdning }
+
+        val url = config.url
+            .replace("{tpnr}", tpNr)
+            .replace("{fnr}", pid.value)
+            .replace("{uttaksdato}", uttaksdato.toString())
+
+        val redactedUrl = config.url
+            .replace("{tpnr}", tpNr)
+            .replace("{fnr}", pid.displayValue)
+            .replace("{uttaksdato}", uttaksdato.toString())
+
+        log.info { "GET from URL: '$redactedUrl'" }
+
+        return try {
+            val response = webClient
+                .get()
+                .uri(url)
+                .headers { setExternalHeaders(service, headers = it) }
+                .retrieve()
+                .bodyToMono(TpAfpOffentligLivsvarigDetaljerDto::class.java)
+                .block()
+
+            TpTjenestepensjonMapper.fromDto(response)
+                .also {
+                    log.info { "Successfully retrieved AFP data from ${config.name}: $it" }
+                    countCalls(MetricResult.OK)
+                }
+        } catch (e: WebClientRequestException) {
+            throw EgressException("${config.name}: Request failed for URL: $redactedUrl", e)
+        } catch (e: WebClientResponseException) {
+            throw EgressException("${config.name}: Response error ${e.statusCode} for URL: $redactedUrl", e)
+        } catch (e: Exception) {
+            throw EgressException("${config.name}: Unexpected error for URL: $redactedUrl", e)
+        }
+    }
+
+    /**
+     * Finds the TP-ordning key by checking if the tpNr exists in any provider's overstyrteTpNr list.
+     * Returns the ordning key (e.g., "aksio", "klp") if found, null otherwise.
+     */
+    private fun findTpOrdningFromOverstyrteTpNr(tpNr: String): String? {
+        return afpOffentligLivsvarigProperties.tilbydere.entries.firstOrNull { (ordning, config) ->
+            val overstyrteTpNrList = config.overstyrteTpNr
+                .split(",")
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
+
+            val found = overstyrteTpNrList.contains(tpNr)
+            if (found) {
+                log.info { "Found tpNr=$tpNr in overstyrteTpNr for ordning=$ordning, skipping hentTpOrdning call" }
+            }
+            found
+        }?.key
     }
 
     override fun setPingHeaders(headers: HttpHeaders) {
@@ -163,6 +291,18 @@ class TpTjenestepensjonClient(
         headers[CustomHttpHeaders.PID] = pid.value
     }
 
+    private fun setExternalHeaders(service: EgressService, headers: HttpHeaders) {
+        headers.setBearerAuth(EgressAccess.token(service).value)
+        val callId = traceAid.callId()
+        headers[CustomHttpHeaders.CALL_ID] = callId
+        headers[CustomHttpHeaders.CORRELATION_ID] = callId // using call ID also as correlation ID
+    }
+
+    private fun setHeadersWithDate(headers: HttpHeaders, pid: Pid) {
+        setHeaders(headers, pid)
+        headers[CustomHttpHeaders.DATE] = LocalDate.now().toString()
+    }
+
     private fun handle(e: EgressException, pid: Pid): Boolean? =
         e.message?.let {
             if (e.statusCode == HttpStatus.NOT_FOUND && it.contains("Person ikke funnet"))
@@ -181,6 +321,8 @@ class TpTjenestepensjonClient(
         // https://github.com/navikt/tp/blob/main/tp-api/src/main/kotlin/no/nav/samhandling/tp/controller/TjenestepensjonController.kt
         private const val YTELSE_RESOURCE = "haveYtelse"
         private const val YTELSE_PATH = "$API_PATH/$YTELSE_RESOURCE"
+        private const val AFP_OFFENTLIG_LIVSVARIG_PATH = "$API_PATH/getAfpOffentligLivsvarigOrdninger"
+        private const val TP_ORDNING_PATH = "api/tpconfig/tpleverandoer"
 
         private val service = EgressService.TJENESTEPENSJON
     }
