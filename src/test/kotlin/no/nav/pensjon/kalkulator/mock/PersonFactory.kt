@@ -14,23 +14,28 @@ object PersonFactory {
     val foedselsdato = LocalDate.of(1963, 12, 31)
 
     fun person(sivilstand: Sivilstand) =
-        Person(navn = "Fornavn1 Etternavn1", fornavn = "Fornavn1", foedselsdato, sivilstand = sivilstand)
+        Person(
+            navn = "Fornavn1 Etternavn1",
+            fornavn = "Fornavn1",
+            foedselsdato,
+            sivilstand = sivilstand
+        )
 
     fun person() = person(Sivilstand.UOPPGITT)
 
     fun personWithPensjoneringAldre() =
         Person(
-        navn = "Fornavn1 Etternavn1",
-        fornavn = "Fornavn1",
-        foedselsdato = foedselsdato,
-        sivilstand = Sivilstand.SKILT,
-        sivilstatus = Sivilstatus.SAMBOER,
-        pensjoneringAldre = Aldersgrenser(
-            aarskull = 1963,
-            nedreAlder = Alder(62, 1),
-            normalder = Alder(67, 1),
-            oevreAlder = Alder(75, 1),
-            verdiStatus = VerdiStatus.PROGNOSE
+            navn = "Fornavn1 Etternavn1",
+            fornavn = "Fornavn1",
+            foedselsdato = foedselsdato,
+            sivilstand = Sivilstand.SKILT,
+            sivilstatus = Sivilstatus.SAMBOER,
+            pensjoneringAldre = Aldersgrenser(
+                aarskull = 1963,
+                nedreAlder = Alder(aar = 62, maaneder = 1),
+                normalder = Alder(aar = 67, maaneder = 1),
+                oevreAlder = Alder(aar = 75, maaneder = 1),
+                verdiStatus = VerdiStatus.PROGNOSE
+            )
         )
-    )
 }

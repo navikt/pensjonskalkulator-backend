@@ -28,17 +28,16 @@ class PersonV7ResultMapperTest : ShouldSpec({
                 sivilstand = Sivilstand.GIFT,
                 adressebeskyttelse = AdressebeskyttelseGradering.FORTROLIG
             )
-        ) shouldBe
-                PersonV7Result(
-                    navn = "Fornavn1 Etternavn1",
-                    fornavn = "Fornavn1",
-                    foedselsdato = foedselsdato,
-                    sivilstatus = PersonV7Sivilstatus.GIFT,
-                    pensjoneringAldre = PersonV7Pensjonsaldre(
-                        normertPensjoneringsalder = PersonV7Alder(aar = 67, maaneder = 2),
-                        nedreAldersgrense = PersonV7Alder(aar = 62, maaneder = 2),
-                        oevreAldersgrense = PersonV7Alder(aar = 76, maaneder = 2),
-                    )
-                )
+        ) shouldBe PersonV7Result(
+            navn = "Fornavn1 Etternavn1",
+            fornavn = "Fornavn1",
+            foedselsdato = foedselsdato,
+            sivilstatus = PersonV7Sivilstatus.GIFT,
+            pensjoneringAldre = PersonV7Pensjonsaldre(
+                normertPensjoneringsalder = PersonV7Alder(aar = 67, maaneder = 2),
+                nedreAldersgrense = PersonV7Alder(aar = 62, maaneder = 2),
+                oevreAldersgrense = PersonV7Alder(aar = 76, maaneder = 2)
+            )
+        )
     }
 })
