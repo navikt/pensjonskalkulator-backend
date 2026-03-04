@@ -29,7 +29,10 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.util.DefaultUriBuilderFactory
+import reactor.core.publisher.Mono
+import java.time.Duration
 import java.time.LocalDate
+import java.util.concurrent.TimeoutException
 
 /**
  * Client for accessing the 'tp' service (see https://github.com/navikt/tp)
@@ -38,6 +41,7 @@ import java.time.LocalDate
 class TpTjenestepensjonClient(
     @Value("\${tjenestepensjon.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
+    val timeoutSeconds: Long = 3,
     private val traceAid: TraceAid,
     @Value("\${web-client.retry-attempts}") retryAttempts: String,
     private val afpOffentligLivsvarigProperties: AfpOffentligLivsvarigProperties
@@ -62,6 +66,7 @@ class TpTjenestepensjonClient(
                 .retrieve()
                 .bodyToMono(TpApotekerDto::class.java)
                 .retryWhen(retryBackoffSpec(url))
+                .withTimeout()
                 .block()
                 ?.let(TpTjenestepensjonMapper::fromDto)
                 .also { countCalls(MetricResult.OK) }
@@ -70,6 +75,8 @@ class TpTjenestepensjonClient(
             throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
+        } catch (e: TimeoutException) {
+            throw EgressException("Timeout calling $url", e)
         } catch (e: EgressException) {
             handle(e, pid) ?: throw e
         }
@@ -88,6 +95,7 @@ class TpTjenestepensjonClient(
                 .retrieve()
                 .bodyToMono(TpTjenestepensjonStatusDto::class.java)
                 .retryWhen(retryBackoffSpec(url))
+                .withTimeout()
                 .block()
                 ?.let(TpTjenestepensjonMapper::fromDto)
                 .also { countCalls(MetricResult.OK) }
@@ -96,6 +104,8 @@ class TpTjenestepensjonClient(
             throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
+        } catch (e: TimeoutException) {
+            throw EgressException("Timeout calling $url", e)
         }
     }
 
@@ -111,6 +121,7 @@ class TpTjenestepensjonClient(
                 .retrieve()
                 .bodyToMono(TpTjenestepensjonDto::class.java)
                 .retryWhen(retryBackoffSpec(url))
+                .withTimeout()
                 .block()
                 ?.let(TpTjenestepensjonMapper::fromDto)
                 .also { countCalls(MetricResult.OK) }
@@ -119,6 +130,8 @@ class TpTjenestepensjonClient(
             throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
+        } catch (e: TimeoutException) {
+            throw EgressException("Timeout calling $url", e)
         }
     }
 
@@ -134,6 +147,7 @@ class TpTjenestepensjonClient(
                 .retrieve()
                 .bodyToMono(FinnTjenestepensjonsforholdResponsDto::class.java)
                 .retryWhen(retryBackoffSpec(url))
+                .withTimeout()
                 .block()
                 ?.let(TpTjenestepensjonMapper::fromDto)
                 .also { countCalls(MetricResult.OK) }
@@ -142,6 +156,8 @@ class TpTjenestepensjonClient(
             throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
+        } catch (e: TimeoutException) {
+            throw EgressException("Timeout calling $url", e)
         }
     }
 
@@ -156,6 +172,7 @@ class TpTjenestepensjonClient(
                 .retrieve()
                 .bodyToMono(object : ParameterizedTypeReference<List<String>>() {})
                 .retryWhen(retryBackoffSpec(url))
+                .withTimeout()
                 .block()
                 ?.also { log.info { "Parsed tpNr list: $it" } }
                 .also { countCalls(MetricResult.OK) }
@@ -164,6 +181,8 @@ class TpTjenestepensjonClient(
             throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
+        } catch (e: TimeoutException) {
+            throw EgressException("Timeout calling $url", e)
         }
     }
 
@@ -179,6 +198,7 @@ class TpTjenestepensjonClient(
                 .retrieve()
                 .bodyToMono(String::class.java)
                 .retryWhen(retryBackoffSpec(url))
+                .withTimeout()
                 .block()
                 ?.lowercase()
                 ?.also {
@@ -190,6 +210,9 @@ class TpTjenestepensjonClient(
             null
         } catch (e: WebClientResponseException) {
             log.warn(e) { "Failed to get TP-ordning for tpNr=$tpNr: ${e.responseBodyAsString}" }
+            null
+        } catch (e: TimeoutException) {
+            log.warn(e) { "Timeout getting TP-ordning for tpNr=$tpNr" }
             null
         }
     }
@@ -233,6 +256,7 @@ class TpTjenestepensjonClient(
                 .headers { setExternalHeaders(service, headers = it) }
                 .retrieve()
                 .bodyToMono(TpAfpOffentligLivsvarigDetaljerDto::class.java)
+                .withTimeout()
                 .block()
 
             TpTjenestepensjonMapper.fromDto(response)
@@ -310,6 +334,8 @@ class TpTjenestepensjonClient(
             else
                 null
         }
+
+    private fun <T : Any> Mono<T>.withTimeout(): Mono<T> = timeout(Duration.ofSeconds(timeoutSeconds))
 
     companion object {
         private const val API_PATH = "api/tjenestepensjon"

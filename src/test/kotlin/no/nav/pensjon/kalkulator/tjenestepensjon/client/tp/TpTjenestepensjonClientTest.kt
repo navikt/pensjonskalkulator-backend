@@ -38,7 +38,8 @@ class TpTjenestepensjonClientTest : FunSpec({
         TpTjenestepensjonClient(
             baseUrl!!,
             webClientBuilder = context.getBean(WebClient.Builder::class.java),
-            traceAid,
+            timeoutSeconds = 2,
+            traceAid = traceAid,
             retryAttempts = "1",
             afpOffentligLivsvarigProperties = afpOffentligLivsvarigProperties
         )
