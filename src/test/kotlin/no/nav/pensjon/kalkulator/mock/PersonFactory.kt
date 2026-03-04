@@ -6,6 +6,7 @@ import no.nav.pensjon.kalkulator.normalder.VerdiStatus
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import java.time.LocalDate
 
 object PersonFactory {
@@ -17,20 +18,19 @@ object PersonFactory {
 
     fun person() = person(Sivilstand.UOPPGITT)
 
-    fun skiltPerson() = person(Sivilstand.SKILT)
-
-    fun personWithPensjoneringAldre() = Person(
+    fun personWithPensjoneringAldre() =
+        Person(
         navn = "Fornavn1 Etternavn1",
         fornavn = "Fornavn1",
         foedselsdato = foedselsdato,
         sivilstand = Sivilstand.SKILT,
+        sivilstatus = Sivilstatus.SAMBOER,
         pensjoneringAldre = Aldersgrenser(
             aarskull = 1963,
             nedreAlder = Alder(62, 1),
             normalder = Alder(67, 1),
             oevreAlder = Alder(75, 1),
-            verdiStatus = VerdiStatus.PROGNOSE,
+            verdiStatus = VerdiStatus.PROGNOSE
         )
-
     )
 }
