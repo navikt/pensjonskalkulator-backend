@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.person.relasjon.eps.client.ppd.acl
 
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.person.PersonaliaType
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.person.Tilgangsbegrensning
 import no.nav.pensjon.kalkulator.person.relasjon.Relasjonstype
 import org.springframework.util.StringUtils.hasLength
@@ -20,33 +20,33 @@ data class FamilierelasjonDto(
  */
 enum class RelasjonstypeDto(
     val internalValue: Relasjonstype,
-    val correspondingSivilstatusListe: List<Sivilstand>
+    val correspondingSivilstatusListe: List<Sivilstatus>
 ) {
     EKTEFELLE(
         internalValue = Relasjonstype.EKTEFELLE,
         correspondingSivilstatusListe = listOf(
-            Sivilstand.GIFT,
-            Sivilstand.SEPARERT,
-            Sivilstand.SKILT,
-            Sivilstand.ENKE_ELLER_ENKEMANN
+            Sivilstatus.GIFT,
+            Sivilstatus.SEPARERT,
+            Sivilstatus.SKILT,
+            Sivilstatus.ENKE_ELLER_ENKEMANN
         )
     ),
     REGISTRERT_PARTNER(
         internalValue = Relasjonstype.REGISTRERT_PARTNER,
         correspondingSivilstatusListe = listOf(
-            Sivilstand.REGISTRERT_PARTNER,
-            Sivilstand.SEPARERT_PARTNER,
-            Sivilstand.SKILT_PARTNER,
-            Sivilstand.GJENLEVENDE_PARTNER
+            Sivilstatus.REGISTRERT_PARTNER,
+            Sivilstatus.SEPARERT_PARTNER,
+            Sivilstatus.SKILT_PARTNER,
+            Sivilstatus.GJENLEVENDE_PARTNER
         )
     ),
     SAMBOER(
         internalValue = Relasjonstype.SAMBOER,
         correspondingSivilstatusListe = listOf(
-            Sivilstand.SAMBOER,
-            Sivilstand.UNKNOWN,
-            Sivilstand.UOPPGITT,
-            Sivilstand.UGIFT
+            Sivilstatus.SAMBOER,
+            Sivilstatus.UNKNOWN,
+            Sivilstatus.UOPPGITT,
+            Sivilstatus.UGIFT
         )
     );
 
@@ -55,7 +55,7 @@ enum class RelasjonstypeDto(
             entries.firstOrNull { it.internalValue == value }
                 ?: throw IllegalArgumentException("Ingen ekstern verdi for relasjonstype $value")
 
-        fun fromSivilstatus(value: Sivilstand?): RelasjonstypeDto =
+        fun fromSivilstatus(value: Sivilstatus?): RelasjonstypeDto =
             entries.firstOrNull { it.correspondingSivilstatusListe.contains(value) } ?: SAMBOER
     }
 }

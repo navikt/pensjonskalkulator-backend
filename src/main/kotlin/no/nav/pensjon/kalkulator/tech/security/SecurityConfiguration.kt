@@ -155,6 +155,7 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
     private fun isImpersonal(request: HttpServletRequest): Boolean =
         request.requestURI == ANONYM_SIMULERING_URI
                 || request.requestURI == ALDERSGRENSE_URI
+                || request.requestURI.startsWith(INTERN_API_URI)
                 || request.requestURI == ANSATT_ID_URI && hasAnsattIdClaim(request)
                 || hasPidHeader(request)
 
@@ -177,6 +178,7 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
         private const val ANSATT_ID_URI = "/api/v1/ansatt-id"
         private const val ENCRYPTION_URI = "/api/v1/encrypt"
         private const val DECRYPTION_URI = "/api/v1/decrypt"
+        private const val INTERN_API_URI = "/api/intern/"
 
         private fun hasPidHeader(request: HttpServletRequest): Boolean =
             hasLength(request.getHeader(CustomHttpHeaders.PID))

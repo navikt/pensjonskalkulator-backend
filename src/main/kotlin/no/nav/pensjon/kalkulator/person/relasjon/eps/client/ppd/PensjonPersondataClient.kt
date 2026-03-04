@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.person.relasjon.eps.client.ppd
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.person.PersonaliaType
 import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.person.relasjon.Familierelasjon
 import no.nav.pensjon.kalkulator.person.relasjon.Relasjonstype
 import no.nav.pensjon.kalkulator.person.relasjon.eps.client.EpsClient
@@ -44,9 +44,36 @@ class PensjonPersondataClient(
 
     override fun service() = service
 
+    override fun fetchNaavaerendeEps(
+        soekerPid: Pid,
+        personaliaSpec: List<PersonaliaType>
+    ): Familierelasjon {
+        val uri = "/$NAAVAERENDE_EPS_PATH"
+        val url = "${baseUrl}uri"
+        val body: List<String> = personaliaSpec.map(PersonaliaTypeDto::externalValue)
+
+        return try {
+            webClient
+                .post()
+                .uri(uri)
+                .headers { setHeaders(headers = it, soekerPid) }
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono<FamilierelasjonDto>()
+                .retryWhen(retryBackoffSpec(url))
+                .block()?.let(FamilierelasjonMapper::fromDto)
+                .also { countCalls(MetricResult.OK) }
+                ?: emptyFamilierelasjon
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $url", e)
+        } catch (e: WebClientResponseException) {
+            throw EgressException(e.responseBodyAsString, e)
+        }
+    }
+
     override fun fetchNyligsteEps(
         soekerPid: Pid,
-        sivilstatus: Sivilstand,
+        sivilstatus: Sivilstatus,
         personaliaSpec: List<PersonaliaType>
     ): Familierelasjon {
         val relasjonstype = RelasjonstypeDto.fromSivilstatus(sivilstatus)
@@ -111,6 +138,7 @@ class PensjonPersondataClient(
     }
 
     companion object {
+        private const val NAAVAERENDE_EPS_PATH = "api/familierelasjoner/currentEps"
         private const val NYLIGSTE_EPS_PATH = "api/familierelasjoner/mostRecentEps"
         private const val PING_PATH = "TBD" //TODO
         private val service = EgressService.PENSJON_PERSONDATA

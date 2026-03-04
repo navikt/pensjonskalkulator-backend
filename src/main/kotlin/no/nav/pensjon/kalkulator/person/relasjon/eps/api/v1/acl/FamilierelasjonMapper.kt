@@ -7,16 +7,16 @@ import no.nav.pensjon.kalkulator.person.relasjon.RelasjonPersondata
 object FamilierelasjonMapper {
 
     fun toDto(source: Familierelasjon) =
-        FamilierelasjonDto(
+        EpsV1Familierelasjon(
             pid = source.pid?.value,
             fom = source.fom,
-            relasjonstype = RelasjonstypeDto.fromInternalValue(source.relasjonstype),
+            relasjonstype = EpsV1Relasjonstype.fromInternalValue(source.relasjonstype),
             relasjonPersondata = source.relasjonPersondata?.let(::relasjonPersondata)
         )
 
     private fun relasjonPersondata(source: RelasjonPersondata) =
-        RelasjonPersondataDto(
-            tilgangsbegrensning = TilgangsbegrensningDto.fromInternalValue(source.tilgangsbegrensning),
+        EpsV1RelasjonPersondata(
+            tilgangsbegrensning = EpsV1Tilgangsbegrensning.fromInternalValue(source.tilgangsbegrensning),
             navn = source.navn?.let(::navn),
             foedselsdato = source.foedselsdato,
             doedsdato = source.doedsdato,
@@ -24,7 +24,7 @@ object FamilierelasjonMapper {
         )
 
     private fun navn(source: Navn) =
-        NavnDto(
+        EpsV1Navn(
             fornavn = source.fornavn,
             mellomnavn = source.mellomnavn,
             etternavn = source.etternavn
