@@ -25,7 +25,7 @@ enum class PersonV7Sivilstatus(val internalValue: Sivilstatus) {
     SAMBOER(Sivilstatus.SAMBOER);
 
     companion object {
-        fun fromInternalValue(value: Sivilstatus?) =
+        fun fromInternalValue(value: Sivilstatus) =
             entries.singleOrNull { it.internalValue == value } ?: missingExternalValue(type = "sivilstatus", value)
     }
 }
