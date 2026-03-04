@@ -89,9 +89,6 @@ spec:
         - application: pensjonskalkulator-frontend-ekstern-magicbox
         - application: pensjonskalkulator-frontend-ekstern-sandbox
         - application: pensjonskalkulator-frontend-ekstern-codebox
-        - application: pensjonskalkulator-uinnlogget-catbox
-        - application: pensjonskalkulator-uinnlogget-dev
-        - application: pensjonskalkulator-uinnlogget-dreambox
         - application: pensjonskalkulator-uinnlogget-magicbox
         - application: pensjonskalkulator-uinnlogget-sandbox
         - application: '*'
