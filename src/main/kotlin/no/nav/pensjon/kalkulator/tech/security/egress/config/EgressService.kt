@@ -106,7 +106,7 @@ enum class EgressService(
         description = "Skribenten",
         shortName = "Skribenten",
         purpose = "Lagring av simulering",
-        authType = AuthType.MACHINE_INSIDE_NAV
+        authType = AuthType.PERSON_ON_BEHALF
     );
 
     companion object {
