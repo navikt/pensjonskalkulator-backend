@@ -58,6 +58,7 @@ class OpenApiConfiguration {
                 "/api/feature/**",
                 "/api/inntekt",
                 "/api/intern/v1/pensjon/simulering",
+                "/api/intern/v1/lagre-simulering",
                 "/api/sak-status",
                 "/api/tpo-medlemskap",
                 "/api/v1/tpo-medlemskap",
