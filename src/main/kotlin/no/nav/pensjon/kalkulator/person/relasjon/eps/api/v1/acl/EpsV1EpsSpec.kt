@@ -7,5 +7,6 @@ package no.nav.pensjon.kalkulator.person.relasjon.eps.api.v1.acl
  * cannot handle DTO names with dots).
  */
 data class EpsV1EpsSpec(
-    val sivilstatus: EpsV1Sivilstatus
+    val sivilstatus: EpsV1Sivilstatus,
+    val bakgrunn: String? = null
 )
