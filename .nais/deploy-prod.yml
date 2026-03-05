@@ -91,6 +91,9 @@ spec:
         - application: pensjon-selvbetjening-fss-gateway
           namespace: pensjonselvbetjening
           cluster: prod-fss
+        - application: skribenten-backend
+          namespace: pensjonsbrev
+          cluster: prod-gcp
         - application: pensjonssimulator
         - application: populasjonstilgangskontroll
           namespace: tilgangsmaskin
