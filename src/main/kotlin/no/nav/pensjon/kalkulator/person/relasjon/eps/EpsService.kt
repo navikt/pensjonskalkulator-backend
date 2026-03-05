@@ -8,6 +8,8 @@ import no.nav.pensjon.kalkulator.person.relasjon.Familierelasjon
 import no.nav.pensjon.kalkulator.person.relasjon.Relasjonstype
 import no.nav.pensjon.kalkulator.person.relasjon.eps.client.EpsClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
+import no.nav.pensjon.kalkulator.tech.web.EgressException
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 
 @Service
@@ -36,7 +38,13 @@ class EpsService(
         )
 
     private fun relasjonstype(): Relasjonstype =
-        client.fetchNaavaerendeEps(soekerPid = pidGetter.pid(), personaliaSpec).relasjonstype
+        try {
+            client.fetchNaavaerendeEps(soekerPid = pidGetter.pid(), personaliaSpec).relasjonstype
+        } catch (e: EgressException) {
+            if (e.statusCode == HttpStatus.NOT_FOUND)
+                Relasjonstype.UKJENT
+            else throw e
+        }
 
     private companion object {
         private val personaliaSpec: List<PersonaliaType> = listOf(
