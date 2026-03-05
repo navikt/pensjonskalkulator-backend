@@ -3,9 +3,16 @@ package no.nav.pensjon.kalkulator.lagring.api.map
 import no.nav.pensjon.kalkulator.lagring.*
 import no.nav.pensjon.kalkulator.lagring.api.dto.*
 
-object LagreSimuleringMapper {
+object LagreSimuleringMapperV1 {
 
-    fun fromDto(source: LagreSimuleringSpecDto) =
+    fun toDto(source: LagreSimuleringResponse) =
+        LagreSimuleringResponseDtoV1(
+            brevId = source.brevId,
+            sakId = source.sakId,
+            brevDevQ2Url = "https://pensjon-skribenten-web-q2.intern.dev.nav.no/saksnummer/${source.sakId}/brev/${source.brevId}",
+        )
+
+    fun fromDto(source: LagreSimuleringSpecDtoV1) =
         LagreSimulering(
             alderspensjonListe = source.alderspensjonListe.map(::alderspensjon),
             livsvarigOffentligAfpListe = source.livsvarigOffentligAfpListe.orEmpty().map(::afpOffentlig),
@@ -13,7 +20,8 @@ object LagreSimuleringMapper {
             privatAfpListe = source.privatAfpListe.orEmpty().map(::afpPrivat),
             vilkaarsproevingsresultat = vilkaarsproevingsresultat(source.vilkaarsproevingsresultat),
             trygdetid = source.trygdetid?.let(::trygdetid),
-            pensjonsgivendeInntektListe = source.pensjonsgivendeInntektListe.orEmpty().map(::aarligBeloep)
+            pensjonsgivendeInntektListe = source.pensjonsgivendeInntektListe.orEmpty().map(::aarligBeloep),
+            enhetsId = source.navEnhetId ?: "4817", //pensjon-pen: SendStandardBrevServiceImpl.NAV_PENSJON_TKNR = arrayOf("4803", "4808", "4815", "4817")
         )
 
     private fun alderspensjon(source: LagreAlderspensjonDto) =

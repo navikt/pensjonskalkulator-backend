@@ -6,8 +6,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.lagring.LagreSimuleringService
-import no.nav.pensjon.kalkulator.lagring.api.dto.LagreSimuleringSpecDto
-import no.nav.pensjon.kalkulator.lagring.api.map.LagreSimuleringMapper.fromDto
+import no.nav.pensjon.kalkulator.lagring.api.dto.LagreSimuleringResponseDtoV1
+import no.nav.pensjon.kalkulator.lagring.api.dto.LagreSimuleringSpecDtoV1
+import no.nav.pensjon.kalkulator.lagring.api.map.LagreSimuleringMapperV1.fromDto
+import no.nav.pensjon.kalkulator.lagring.api.map.LagreSimuleringMapperV1.toDto
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.web.bind.annotation.*
@@ -21,7 +23,7 @@ class LagreSimuleringController(
 
     private val log = KotlinLogging.logger {}
 
-    @PostMapping("lagre-simulering")
+    @PostMapping("/v1/lagre-simulering")
     @Operation(
         summary = "Lagre simuleringsresultat",
         description = "Lagrer et simuleringsresultat via Skribenten-tjenesten."
@@ -38,14 +40,14 @@ class LagreSimuleringController(
             )
         ]
     )
-    fun lagreSimulering(@RequestBody spec: LagreSimuleringSpecDto) {
+    fun lagreSimuleringV1(@RequestBody spec: LagreSimuleringSpecDtoV1): LagreSimuleringResponseDtoV1 {
         traceAid.begin()
         log.debug { "Request for lagre-simulering" }
 
-        try {
-            timed({ service.lagreSimulering(fromDto(spec)) }, "lagreSimulering")
+        return try {
+            timed({ toDto(service.lagreSimulering(fromDto(spec))) }, "lagreSimulering")
         } catch (e: EgressException) {
-            handleError(e)!!
+            handleError(e, "V1")!!
         } finally {
             traceAid.end()
         }

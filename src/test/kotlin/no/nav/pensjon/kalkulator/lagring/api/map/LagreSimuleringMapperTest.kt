@@ -7,9 +7,22 @@ import no.nav.pensjon.kalkulator.lagring.api.dto.*
 
 class LagreSimuleringMapperTest : ShouldSpec({
 
+    should("map LagreSimuleringResponse to DTO") {
+        LagreSimuleringMapperV1.toDto(
+            LagreSimuleringResponse(
+                brevId = "brev-123",
+                sakId = "sak-456",
+            )
+        ) shouldBe LagreSimuleringResponseDtoV1(
+            brevId = "brev-123",
+            sakId = "sak-456",
+            brevDevQ2Url = "https://pensjon-skribenten-web-q2.intern.dev.nav.no/saksnummer/sak-456/brev/brev-123",
+        )
+    }
+
     should("map all fields from DTO to domain object") {
-        LagreSimuleringMapper.fromDto(
-            LagreSimuleringSpecDto(
+        LagreSimuleringMapperV1.fromDto(
+            LagreSimuleringSpecDtoV1(
                 alderspensjonListe = listOf(
                     LagreAlderspensjonDto(alderAar = 67, beloep = 250000, gjenlevendetillegg = null)
                 ),
@@ -38,7 +51,8 @@ class LagreSimuleringMapperTest : ShouldSpec({
                 trygdetid = LagreTrygdetidDto(antallAar = 40, erUtilstrekkelig = false),
                 pensjonsgivendeInntektListe = listOf(
                     LagreAarligBeloepDto(aarstall = 2024, beloep = 600000)
-                )
+                ),
+                navEnhetId = null
             )
         ) shouldBe LagreSimulering(
             alderspensjonListe = listOf(
@@ -69,13 +83,14 @@ class LagreSimuleringMapperTest : ShouldSpec({
             trygdetid = LagreTrygdetid(antallAar = 40, erUtilstrekkelig = false),
             pensjonsgivendeInntektListe = listOf(
                 LagreAarligBeloep(aarstall = 2024, beloep = 600000)
-            )
+            ),
+            enhetsId = "4817"
         )
     }
 
     should("map with nullable fields as null") {
-        LagreSimuleringMapper.fromDto(
-            LagreSimuleringSpecDto(
+        LagreSimuleringMapperV1.fromDto(
+            LagreSimuleringSpecDtoV1(
                 alderspensjonListe = emptyList(),
                 livsvarigOffentligAfpListe = null,
                 tidsbegrensetOffentligAfp = null,
@@ -85,7 +100,8 @@ class LagreSimuleringMapperTest : ShouldSpec({
                     alternativ = null
                 ),
                 trygdetid = null,
-                pensjonsgivendeInntektListe = null
+                pensjonsgivendeInntektListe = null,
+                navEnhetId = null
             )
         ) shouldBe LagreSimulering(
             alderspensjonListe = emptyList(),
@@ -97,7 +113,8 @@ class LagreSimuleringMapperTest : ShouldSpec({
                 alternativ = null
             ),
             trygdetid = null,
-            pensjonsgivendeInntektListe = emptyList()
+            pensjonsgivendeInntektListe = emptyList(),
+            enhetsId = "4817"
         )
     }
 })
