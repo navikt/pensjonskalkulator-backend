@@ -2,14 +2,15 @@ package no.nav.pensjon.kalkulator.lagring.api.dto
 
 import jakarta.validation.constraints.NotNull
 
-data class LagreSimuleringSpecDto(
+data class LagreSimuleringSpecDtoV1(
     @field:NotNull val alderspensjonListe: List<LagreAlderspensjonDto>,
     val livsvarigOffentligAfpListe: List<LagreAldersbestemtUtbetalingDto>?,
     val tidsbegrensetOffentligAfp: LagreTidsbegrensetOffentligAfpDto?,
     val privatAfpListe: List<LagrePrivatAfpDto>?,
     @field:NotNull val vilkaarsproevingsresultat: LagreVilkaarsproevingsresultatDto,
     val trygdetid: LagreTrygdetidDto?,
-    val pensjonsgivendeInntektListe: List<LagreAarligBeloepDto>?
+    val pensjonsgivendeInntektListe: List<LagreAarligBeloepDto>?,
+    val navEnhetId: String?,
 )
 
 data class LagreAlderspensjonDto(
