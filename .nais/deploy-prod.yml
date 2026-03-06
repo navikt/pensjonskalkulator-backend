@@ -91,6 +91,9 @@ spec:
         - application: pensjon-selvbetjening-fss-gateway
           namespace: pensjonselvbetjening
           cluster: prod-fss
+        - application: skribenten-backend
+          namespace: pensjonsbrev
+          cluster: prod-gcp
         - application: pensjonssimulator
         - application: populasjonstilgangskontroll
           namespace: tilgangsmaskin
@@ -156,6 +159,10 @@ spec:
       value: prod-fss:pensjonopptjening:pensjon-popp
     - name: POPP_URL
       value: https://pensjon-popp.prod-fss-pub.nais.io
+    - name: SKRIBENTEN_SERVICE_ID
+      value: prod-gcp:pensjonsbrev:skribenten-backend
+    - name: SKRIBENTEN_URL
+      value: http://skribenten-backend.pensjonsbrev
     - name: SOKOS_UTBETALDATA_SERVICE_ID
       value: prod-fss:okonomi:sokos-utbetaldata
     - name: SOKOS_UTBETALDATA_URL

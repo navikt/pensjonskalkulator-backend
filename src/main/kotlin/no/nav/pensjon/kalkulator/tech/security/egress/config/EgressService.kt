@@ -101,6 +101,12 @@ enum class EgressService(
         shortName = "Tilgangsmaskinen",
         purpose = "Sjekk av veileders tilgang til person",
         authType = AuthType.PERSON_ON_BEHALF
+    ),
+    SKRIBENTEN(
+        description = "Skribenten",
+        shortName = "Skribenten",
+        purpose = "Lagring av simulering",
+        authType = AuthType.PERSON_ON_BEHALF
     );
 
     companion object {

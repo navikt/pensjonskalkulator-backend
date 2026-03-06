@@ -33,7 +33,8 @@ class EgressServiceSecurityConfiguration {
         @Value("\${livsvarig-afp-offentlig.tilbydere.spk.scope}") spkScope: String,
         @Value("\${livsvarig-afp-offentlig.tilbydere.storebrand.scope}") storebrandLivsforsikringScope: String,
         @Value("\${livsvarig-afp-offentlig.tilbydere.storebrand_pen.scope}") storebrandPensjonstjenesterScope: String,
-        @Value("\${tilgangsmaskinen.service-id}") tilgangsmaskinenServiceId: String
+        @Value("\${tilgangsmaskinen.service-id}") tilgangsmaskinenServiceId: String,
+        @Value("\${skribenten.service-id}") skribentenServiceId: String,
     ) =
         EgressServiceListsByAudience(
             mapOf(
@@ -56,7 +57,8 @@ class EgressServiceSecurityConfiguration {
                 spkScope to listOf(EgressService.SPK),
                 storebrandLivsforsikringScope to listOf(EgressService.STOREBRAND_LIVSFORSIKRING),
                 storebrandPensjonstjenesterScope to listOf(EgressService.STOREBRAND_PENSJONSTJENESTER),
-                tilgangsmaskinenServiceId to listOf(EgressService.TILGANGSMASKINEN)
+                tilgangsmaskinenServiceId to listOf(EgressService.TILGANGSMASKINEN),
+                skribentenServiceId to listOf(EgressService.SKRIBENTEN),
             )
         )
 
