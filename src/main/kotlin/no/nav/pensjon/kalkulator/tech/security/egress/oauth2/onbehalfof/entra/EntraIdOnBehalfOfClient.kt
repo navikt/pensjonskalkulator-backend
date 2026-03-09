@@ -1,9 +1,10 @@
-package no.nav.pensjon.kalkulator.tech.security.egress.oauth2.onbehalfof
+package no.nav.pensjon.kalkulator.tech.security.egress.oauth2.onbehalfof.entra
 
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.OAuth2ParameterBuilder
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.clientcred.ClientCredentials
 import no.nav.pensjon.kalkulator.tech.security.egress.token.CacheAwareTokenClient
 import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenAccessParameter
+import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenDataGetter
 import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.ExpirationChecker
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -13,7 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient
 
 @Component
 @Qualifier("on-behalf-of")
-class AzureAdOnBehalfOfClient(
+class EntraIdOnBehalfOfClient(
     @Value("\${azure.openid-config.token-endpoint}") tokenEndpoint: String,
     webClientBuilder: WebClient.Builder,
     expirationChecker: ExpirationChecker,
@@ -23,7 +24,7 @@ class AzureAdOnBehalfOfClient(
     webClientBuilder.baseUrl(tokenEndpoint).build(),
     expirationChecker,
     retryAttempts
-) {
+), TokenDataGetter {
 
     override fun prepareTokenRequestBody(
         accessParameter: TokenAccessParameter,

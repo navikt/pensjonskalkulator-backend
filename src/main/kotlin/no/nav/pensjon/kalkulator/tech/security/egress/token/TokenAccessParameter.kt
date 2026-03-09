@@ -18,8 +18,5 @@ class TokenAccessParameter(private val type: AuthorizationGrantCombo, val value:
 
         fun tokenExchange(subjectToken: String) =
             TokenAccessParameter(AuthorizationGrantCombo.TOKEN_EXCHANGE, subjectToken)
-
-        fun onBehalfOf(assertion: String) =
-            TokenAccessParameter(AuthorizationGrantCombo.ON_BEHALF_OF, assertion)
     }
 }

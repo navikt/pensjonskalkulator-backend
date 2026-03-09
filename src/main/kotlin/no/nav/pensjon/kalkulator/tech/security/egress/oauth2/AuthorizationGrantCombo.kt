@@ -3,6 +3,9 @@ package no.nav.pensjon.kalkulator.tech.security.egress.oauth2
 import org.springframework.security.oauth2.core.AuthorizationGrantType
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.*
 
+/**
+ * Combines grant type and parameter name for the various authorization types.
+ */
 enum class AuthorizationGrantCombo(val value: String, val parameterName: String) {
 
     CLIENT_CREDENTIALS(
@@ -18,10 +21,5 @@ enum class AuthorizationGrantCombo(val value: String, val parameterName: String)
     TOKEN_EXCHANGE(
         value = AuthorizationGrantType.TOKEN_EXCHANGE.value,
         parameterName = SUBJECT_TOKEN
-    ),
-
-    ON_BEHALF_OF(
-        value = AuthorizationGrantType.JWT_BEARER.value,
-        parameterName = ASSERTION
     )
 }

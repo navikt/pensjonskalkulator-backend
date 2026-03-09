@@ -4,12 +4,16 @@ import no.nav.pensjon.kalkulator.tech.security.egress.azuread.AzureAdUtil.getDef
 import no.nav.pensjon.kalkulator.tech.security.egress.token.EgressTokenGetter
 import no.nav.pensjon.kalkulator.tech.security.egress.token.RawJwt
 import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenAccessParameter
+import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenDataGetter
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 
 @Service
-class ClientCredentialsEgressTokenService(val tokenGetter: ClientCredentialsTokenRequestClient) : EgressTokenGetter {
+class ClientCredentialsEgressTokenService(
+    @param:Qualifier("client-credentials") val tokenGetter: TokenDataGetter
+) : EgressTokenGetter {
 
-    override fun getEgressToken(ingressToken: String?, audience: String, user: String): RawJwt {
+    override fun getEgressToken(ingressToken: String?, audience: String): RawJwt {
         val scope = getDefaultScope(audience)
         val accessParameter = TokenAccessParameter.clientCredentials(scope)
         val tokenValue = tokenGetter.getTokenData(accessParameter, scope, USER).accessToken
