@@ -6,8 +6,11 @@ import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
+import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.relasjon.eps.EpsService
 import no.nav.pensjon.kalkulator.person.relasjon.eps.api.v1.acl.*
+import no.nav.pensjon.kalkulator.person.relasjon.eps.api.v1.acl.FamilierelasjonMapper.toDto
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.web.bind.annotation.*
@@ -16,7 +19,8 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("api/intern")
 class EpsController(
     private val service: EpsService,
-    private val traceAid: TraceAid
+    private val traceAid: TraceAid,
+    private val auditor: Auditor
 ) : ControllerBase(traceAid) {
 
     @GetMapping("v1/sivilstatus")
@@ -71,16 +75,22 @@ class EpsController(
         traceAid.begin()
 
         return try {
-            FamilierelasjonMapper.toDto(
-                source = service.nyligsteRelasjon(
-                    sivilstatus = spec.sivilstatus.internalValue
-                )
-            )
+            val relasjon = service.nyligsteRelasjon(sivilstatus = spec.sivilstatus.internalValue)
+            relasjon.pid?.let { audit(pid = it, bakgrunn = spec.bakgrunn) }
+            toDto(source = relasjon)
         } catch (e: EgressException) {
             handleError(e, "V1")!!
         } finally {
             traceAid.end()
         }
+    }
+
+    private fun audit(pid: Pid, bakgrunn: String?) {
+        auditor.audit(
+            onBehalfOfPid = pid,
+            requestUri = "intern/v1/eps",
+            message = bakgrunn
+        )
     }
 
     override fun errorMessage() = ERROR_MESSAGE
