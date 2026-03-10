@@ -16,17 +16,27 @@ class Auditor(private val ansattIdExtractor: SecurityContextNavIdExtractor) {
 
     private val log = KotlinLogging.logger("AUDIT_LOGGER")
 
-    fun audit(onBehalfOfPid: Pid, requestUri: String) {
-        log.info { cefEntry(ansattIdExtractor.id(), onBehalfOfPid, requestUri).format() }
+    fun audit(onBehalfOfPid: Pid, requestUri: String, message: String? = null) {
+        log.info {
+            cefEntry(
+                ansattId = ansattIdExtractor.id(),
+                onBehalfOfPid = onBehalfOfPid,
+                message = message ?: "$USER_TYPE kaller $requestUri"
+            ).format()
+        }
     }
 
-    private fun cefEntry(ansattId: String, onBehalfOfPid: Pid, requestUri: String) =
+    private fun cefEntry(
+        ansattId: String,
+        onBehalfOfPid: Pid,
+        message: String
+    ) =
         CefEntry(
             timestamp = now(),
             level = Level.INFO,
             deviceEventClassId = DEVICE_EVENT_CLASS_ID,
             name = "Datahenting paa vegne av",
-            message = "$USER_TYPE kaller $requestUri",
+            message,
             sourceUserId = ansattId,
             destinationUserId = onBehalfOfPid.value
         )
@@ -35,6 +45,7 @@ class Auditor(private val ansattIdExtractor: SecurityContextNavIdExtractor) {
         private const val DEVICE_EVENT_CLASS_ID = "audit:read"
         private const val USER_TYPE = "Nav-ansatt"
 
-        private fun now() = ZonedDateTime.now().toInstant().toEpochMilli()
+        private fun now(): Long =
+            ZonedDateTime.now().toInstant().toEpochMilli()
     }
 }
