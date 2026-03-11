@@ -14,7 +14,7 @@ class EgressAccessTokenFacadeTest : ShouldSpec({
             clientCredentialsTokenService = arrangeToken(),
             jwtBearerTokenService = mockk(),
             tokenExchangeService = mockk(),
-            azureAdOnBehalfOfTokenService = mockk()
+            onBehalfOfTokenService = mockk()
         ).getAccessToken(
             authType = AuthType.MACHINE_INSIDE_NAV,
             audience = "audience1",
@@ -26,6 +26,6 @@ class EgressAccessTokenFacadeTest : ShouldSpec({
 private fun arrangeToken(): ClientCredentialsEgressTokenService =
     mockk<ClientCredentialsEgressTokenService>().apply {
         every {
-            getEgressToken(ingressToken = null, audience = "audience1", user = "")
+            getEgressToken(ingressToken = null, audience = "audience1")
         } returns RawJwt(value = "token1")
     }

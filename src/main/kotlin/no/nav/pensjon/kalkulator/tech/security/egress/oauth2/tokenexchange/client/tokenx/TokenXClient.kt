@@ -8,21 +8,19 @@ import no.nav.pensjon.kalkulator.tech.security.egress.token.CacheAwareTokenClien
 import no.nav.pensjon.kalkulator.tech.security.egress.token.CacheKey
 import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenAccessParameter
 import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.ExpirationChecker
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.util.MultiValueMap
 import org.springframework.web.reactive.function.client.WebClient
 
 @Component
-@Qualifier("token-x")
 class TokenXClient(
-    @Value("\${token.x.token.endpoint}") private val tokenEndpoint: String,
-    @Value("\${pensjon-representasjon.service-id}") private val tokenAudience: String,
+    @param:Value($$"${token.x.token.endpoint}") private val tokenEndpoint: String,
+    @param:Value($$"${pensjon-representasjon.service-id}") private val tokenAudience: String,
     webClientBuilder: WebClient.Builder,
     expirationChecker: ExpirationChecker,
     private val credentials: TokenExchangeCredentials,
-    @Value("\${web-client.retry-attempts}") retryAttempts: String
+    @Value($$"${web-client.retry-attempts}") retryAttempts: String
 ) : CacheAwareTokenClient(
     webClientBuilder.baseUrl(tokenEndpoint).build(),
     expirationChecker,

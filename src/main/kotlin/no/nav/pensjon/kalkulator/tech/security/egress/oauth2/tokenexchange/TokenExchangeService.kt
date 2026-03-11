@@ -11,18 +11,18 @@ import org.springframework.stereotype.Service
 
 @Service
 class TokenExchangeService(
-    val client: TokenExchangeClient,
+    val exchanger: TokenExchangeClient,
     private val loggedInPidProvider: SecurityContextPidExtractor
 ) : EgressTokenGetter {
 
-    override fun getEgressToken(ingressToken: String?, audience: String, user: String): RawJwt {
-        val scope = getDefaultScope(audience)
+    override fun getEgressToken(ingressToken: String?, audience: String): RawJwt {
+        val scope = getDefaultScope(fullyQualifiedApplicationName = audience)
 
         val accessParameter = ingressToken?.let(TokenAccessParameter::tokenExchange)
             ?: throw IllegalArgumentException("Missing ingressToken")
 
         val tokenValue = loggedInPidProvider.pid()?.let {
-            client.exchange(accessParameter, CacheKey(scope, it)).accessToken
+            exchanger.exchange(accessParameter, CacheKey(scope, pid = it)).accessToken
         } ?: throw IllegalStateException("Missing PID of logged in user")
 
         return RawJwt(tokenValue)
