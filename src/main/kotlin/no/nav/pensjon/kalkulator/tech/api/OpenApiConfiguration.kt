@@ -53,6 +53,7 @@ class OpenApiConfiguration {
                 "/api/intern/v1/pensjon/simulering",
                 "/api/intern/v1/person",
                 "/api/intern/v1/sivilstatus",
+                "/api/ekstern/v1/pensjon/simulering",
                 "/api/v9/alderspensjon/simulering",
                 "/api/v8/alderspensjon/simulering", // deprecated
                 "/api/v7/alderspensjon/simulering", // deprecated
@@ -72,7 +73,6 @@ class OpenApiConfiguration {
                 "/api/v1/encrypt",
                 "/api/v1/decrypt",
                 "/api/v3/tidligste-hel-uttaksalder",
-                "/api/v2/tidligste-hel-uttaksalder", // deprecated
                 "/api/v1/ufoeregrad",
                 "/api/feature/**",
                 "/api/inntekt",

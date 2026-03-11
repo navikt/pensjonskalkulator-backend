@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.simulering.api.intern.v1.acl.spec
+package no.nav.pensjon.kalkulator.simulering.api.v1.acl.spec
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING
@@ -10,36 +10,36 @@ import java.time.LocalDate
 
 /**
  * DTO (data transfer object) som representerer spesifikasjon ("spec")
- * for simulering av pensjon i Nav-intern kontekst.
+ * for simulering av pensjon.
  */
-data class SimuleringSpecDto(
-    @field:NotNull val simuleringstype: SimuleringstypeSpecDto,
+data class SimuleringV1Spec(
+    @field:NotNull val simuleringstype: SimuleringV1SimuleringstypeSpec,
     val aarligInntektFoerUttakBeloep: Int? = null,
-    val gradertUttak: GradertUttakSpecDto? = null, // default is helt uttak (100 %)
-    @field:NotNull val heltUttak: HeltUttakSpecDto,
-    val utenlandsperiodeListe: List<UtenlandsperiodeSpecDto>? = null,
-    val sivilstatus: SivilstatusSpecDto? = null,
-    val eps: EpsSpecDto? = null,
-    val offentligAfp: OffentligAfpSpecDto? = null
+    val gradertUttak: SimuleringV1GradertUttakSpec? = null, // default is helt uttak (100 %)
+    @field:NotNull val heltUttak: SimuleringV1HeltUttakSpec,
+    val utenlandsperiodeListe: List<SimuleringV1UtenlandsperiodeSpec>? = null,
+    val sivilstatus: SimuleringV1SivilstatusSpec? = null,
+    val eps: SimuleringV1EpsSpec? = null,
+    val offentligAfp: SimuleringV1OffentligAfpSpec? = null
 )
 
-data class GradertUttakSpecDto(
+data class SimuleringV1GradertUttakSpec(
     @field:NotNull val grad: Int,
-    @field:NotNull val uttaksalder: AlderSpecDto,
+    @field:NotNull val uttaksalder: SimuleringV1AlderSpec,
     val aarligInntektVsaPensjonBeloep: Int? = null // Vsa = ved siden av
 )
 
-data class HeltUttakSpecDto(
-    @field:NotNull val uttaksalder: AlderSpecDto,
-    val aarligInntektVsaPensjon: InntektSpecDto? = null
+data class SimuleringV1HeltUttakSpec(
+    @field:NotNull val uttaksalder: SimuleringV1AlderSpec,
+    val aarligInntektVsaPensjon: SimuleringV1InntektSpec? = null
 )
 
-data class InntektSpecDto(
+data class SimuleringV1InntektSpec(
     @field:NotNull val beloep: Int,
-    @field:NotNull val sluttAlder: AlderSpecDto
+    @field:NotNull val sluttAlder: SimuleringV1AlderSpec
 )
 
-data class UtenlandsperiodeSpecDto(
+data class SimuleringV1UtenlandsperiodeSpec(
     @field:NotNull val fom: LocalDate,
     val tom: LocalDate? = null,
     @field:NotNull val landkode: String,
@@ -49,12 +49,12 @@ data class UtenlandsperiodeSpecDto(
 /**
  * Informasjon om ektefelle/partner/samboer (EPS).
  */
-data class EpsSpecDto(
-    val levende: LevendeEpsDto? = null,
-    val avdoed: AvdoedEpsDto? = null
+data class SimuleringV1EpsSpec(
+    val levende: SimuleringV1LevendeEps? = null,
+    val avdoed: SimuleringV1AvdoedEps? = null
 )
 
-data class LevendeEpsDto(
+data class SimuleringV1LevendeEps(
     @field:NotNull val harInntektOver2G: Boolean, // 2G = 2 ganger grunnbeløpet
     @field:NotNull val harPensjon: Boolean
 )
@@ -62,7 +62,7 @@ data class LevendeEpsDto(
 /**
  * Informasjon om avdød ektefelle/partner/samboer (EPS) er relevant for pensjon med gjenlevenderett.
  */
-data class AvdoedEpsDto(
+data class SimuleringV1AvdoedEps(
     @field:NotNull val pid: String,
     @field:NotNull val doedsdato: LocalDate,
     val medlemAvFolketrygden: Boolean? = null,
@@ -71,32 +71,27 @@ data class AvdoedEpsDto(
     val antallAarUtenlands: Int? = null
 )
 
-data class OffentligAfpSpecDto(
+data class SimuleringV1OffentligAfpSpec(
     val harInntektMaanedenFoerUttak: Boolean? = null,
-    val afpOrdning: AfpOrdningTypeSpecDto? = null,
-    val innvilgetLivsvarigAfpListe: List<InnvilgetLivsvarigOffentligAfpSpecDto>? = null
+    val afpOrdning: SimuleringV1AfpOrdningTypeSpec? = null,
+    val innvilgetLivsvarigAfpListe: List<SimuleringV1InnvilgetLivsvarigOffentligAfpSpec>? = null
 )
 
 /**
  * Spesifiserer egenskapene til en løpende livsvarig AFP i offentlig sektor.
  */
-data class InnvilgetLivsvarigOffentligAfpSpecDto(
+data class SimuleringV1InnvilgetLivsvarigOffentligAfpSpec(
     @field:NotNull val aarligBruttoBeloep: Double,
     @field:NotNull @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val uttakFom: LocalDate,
     val sistRegulertGrunnbeloep: Int? = null
 )
 
-data class AlderSpecDto(
+data class SimuleringV1AlderSpec(
     @field:NotNull val aar: Int,
     @field:NotNull val maaneder: Int
-) {
-    init {
-        require(aar in 0..200) { "0 <= aar <= 200" }
-        require(maaneder in 0..11) { "0 <= maaneder <= 11" }
-    }
-}
+)
 
-enum class AfpOrdningTypeSpecDto(val internalValue: AfpOrdningType) {
+enum class SimuleringV1AfpOrdningTypeSpec(val internalValue: AfpOrdningType) {
     KOMMUNAL(internalValue = AfpOrdningType.AFPKOM),
     STATLIG(internalValue = AfpOrdningType.AFPSTAT),
     FINANSNAERINGEN(internalValue = AfpOrdningType.FINANS),
@@ -106,7 +101,7 @@ enum class AfpOrdningTypeSpecDto(val internalValue: AfpOrdningType) {
     SPEKTER(internalValue = AfpOrdningType.NAVO),
 }
 
-enum class SimuleringstypeSpecDto(val internalValue: SimuleringType) {
+enum class SimuleringV1SimuleringstypeSpec(val internalValue: SimuleringType) {
     ALDERSPENSJON(internalValue = SimuleringType.ALDERSPENSJON),
     ALDERSPENSJON_MED_TIDSBEGRENSET_OFFENTLIG_AFP(internalValue = SimuleringType.PRE2025_OFFENTLIG_AFP_ETTERFULGT_AV_ALDERSPENSJON),
     ALDERSPENSJON_MED_LIVSVARIG_OFFENTLIG_AFP(internalValue = SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG),
@@ -119,7 +114,7 @@ enum class SimuleringstypeSpecDto(val internalValue: SimuleringType) {
     // ALDERSPENSJON_MED_TIDSBEGRENSET_OFFENTLIG_AFP har ingen tilsvarende type for endring (støttes ikke)
 }
 
-enum class SivilstatusSpecDto(val internalValue: Sivilstand = Sivilstand.UOPPGITT) {
+enum class SimuleringV1SivilstatusSpec(val internalValue: Sivilstand = Sivilstand.UOPPGITT) {
     UOPPGITT,
     UGIFT(internalValue = Sivilstand.UGIFT),
     GIFT(internalValue = Sivilstand.GIFT),

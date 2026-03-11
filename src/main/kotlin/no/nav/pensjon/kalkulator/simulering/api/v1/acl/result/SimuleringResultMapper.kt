@@ -1,44 +1,69 @@
-package no.nav.pensjon.kalkulator.simulering.api.intern.v1.acl.result
+package no.nav.pensjon.kalkulator.simulering.api.v1.acl.result
 
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.simulering.*
+import no.nav.pensjon.kalkulator.simulering.api.v1.acl.result.SimuleringResultAdjuster.justerAlderspensjonListe
+import no.nav.pensjon.kalkulator.simulering.api.v1.acl.result.SimuleringResultAdjuster.justerPrivatAfpListe
 import no.nav.pensjon.kalkulator.validity.Problem
 
 /**
- * Maps domain objects to data transfer objects (DTOs).
- * The domain objects represent the result of a 'pensjonssimulering'.
+ * Maps a simulering result from domain representation to DTOs.
+ * DTO = data transfer object
  */
 object SimuleringResultMapper {
 
-    fun toDto(source: SimuleringResult) =
-        SimuleringResultDto(
-            alderspensjonListe = source.alderspensjon.map(::alderspensjon),
+    fun toDto(source: SimuleringResult, naavaerendeAlderAar: Int, mode: MappingMode) =
+        SimuleringV1Result(
+            alderspensjonListe = source.alderspensjon.map { alderspensjon(source = it, mode) }
+                .let { justerAlderspensjonListe(pensjonListe = it, naavaerendeAlderAar) },
             tidsbegrensetOffentligAfp = source.pre2025OffentligAfp?.let(::tidsbegrensetOffentligAfp),
-            privatAfpListe = source.afpPrivat.map(::privatAfp),
+            privatAfpListe = source.afpPrivat.map(::privatAfp)
+                .let { justerPrivatAfpListe(pensjonListe = it, naavaerendeAlderAar) },
             livsvarigOffentligAfpListe = source.afpOffentlig.map(::livsvarigOffentligAfp),
             vilkaarsproevingsresultat = vilkaarsproevingsresultat(source.vilkaarsproeving),
-            trygdetid = TrygdetidDto(antallAar = source.trygdetid, erUtilstrekkelig = source.harForLiteTrygdetid),
+            trygdetid = trygdetid(source),
             pensjonsgivendeInntektListe = source.opptjeningGrunnlagListe.map(::inntekt),
             problem = source.problem?.let(::problem)
         )
 
-    private fun alderspensjon(source: SimulertAlderspensjon) =
-        AlderspensjonDto(
+    private fun alderspensjon(source: SimulertAlderspensjon, mode: MappingMode) =
+        SimuleringV1Alderspensjon(
             alderAar = source.alder,
             beloep = source.beloep,
-            gjenlevendetillegg = source.kapittel19Gjenlevendetillegg
+            gjenlevendetillegg = if (mode.mapGjenlevendetillegg) source.kapittel19Gjenlevendetillegg else null,
+            extension = if (mode.extended) alderspensjonExtension(source) else null
+        )
+
+    private fun alderspensjonExtension(source: SimulertAlderspensjon) =
+        SimuleringV1AlderspensjonExtension(
+            inntektspensjonBeloep = source.inntektspensjonBeloep,
+            garantipensjonBeloep = source.garantipensjonBeloep,
+            delingstall = source.delingstall,
+            pensjonBeholdningFoerUttakBeloep = source.pensjonBeholdningFoerUttak,
+            andelsbroekKap19 = source.andelsbroekKap19,
+            andelsbroekKap20 = source.andelsbroekKap20,
+            sluttpoengtall = source.sluttpoengtall,
+            trygdetidKap19 = source.trygdetidKap19,
+            trygdetidKap20 = source.trygdetidKap20,
+            poengaarFoer92 = source.poengaarFoer92,
+            poengaarEtter91 = source.poengaarEtter91,
+            forholdstall = source.forholdstall,
+            grunnpensjon = source.grunnpensjon,
+            tilleggspensjon = source.tilleggspensjon,
+            pensjonstillegg = source.pensjonstillegg,
+            skjermingstillegg = source.skjermingstillegg
         )
 
     private fun livsvarigOffentligAfp(source: SimulertAfpOffentlig) =
-        AldersbestemtUtbetalingDto(
+        SimuleringV1AldersbestemtUtbetaling(
             alderAar = source.alder,
             aarligBeloep = source.beloep,
             maanedligBeloep = source.maanedligBeloep
         )
 
     private fun tidsbegrensetOffentligAfp(source: SimulertPre2025OffentligAfp) =
-        TidsbegrensetOffentligAfpDto(
+        SimuleringV1TidsbegrensetOffentligAfp(
             alderAar = source.alderAar,
             totaltAfpBeloep = source.totaltAfpBeloep,
             tidligereArbeidsinntekt = source.tidligereArbeidsinntekt,
@@ -56,7 +81,7 @@ object SimuleringResultMapper {
         )
 
     private fun privatAfp(source: SimulertAfpPrivat) =
-        PrivatAfpDto(
+        SimuleringV1PrivatAfp(
             alderAar = source.alder,
             aarligBeloep = source.beloep,
             kompensasjonstillegg = source.kompensasjonstillegg,
@@ -66,19 +91,25 @@ object SimuleringResultMapper {
         )
 
     private fun vilkaarsproevingsresultat(source: Vilkaarsproeving) =
-        VilkaarsproevingsresultatDto(
+        SimuleringV1Vilkaarsproevingsresultat(
             erInnvilget = source.innvilget,
             alternativ = source.alternativ?.let(::alternativ)
         )
 
+    private fun trygdetid(source: SimuleringResult) =
+        SimuleringV1Trygdetid(
+            antallAar = source.trygdetid,
+            erUtilstrekkelig = source.harForLiteTrygdetid
+        )
+
     private fun inntekt(source: SimulertOpptjeningGrunnlag) =
-        AarligBeloepDto(
+        SimuleringV1AarligBeloep(
             aarstall = source.aar,
             beloep = source.pensjonsgivendeInntektBeloep
         )
 
     private fun alternativ(source: Alternativ) =
-        UttaksparametreDto(
+        SimuleringV1Uttaksparametre(
             gradertUttakAlder = source.gradertUttakAlder?.let(::alder),
             uttaksgrad = prosentsats(source.uttakGrad),
             heltUttakAlder = alder(source.heltUttakAlder)
@@ -90,14 +121,15 @@ object SimuleringResultMapper {
         }
 
     private fun alder(source: Alder) =
-        AlderDto(
+        SimuleringV1Alder(
             aar = source.aar,
             maaneder = source.maaneder
         )
 
     private fun problem(source: Problem) =
-        ProblemDto(
-            kode = ProblemTypeDto.entries.firstOrNull { it.internalValue == source.type } ?: ProblemTypeDto.SERVERFEIL,
+        SimuleringV1Problem(
+            kode = SimuleringV1ProblemType.entries.firstOrNull { it.internalValue == source.type }
+                ?: SimuleringV1ProblemType.SERVERFEIL,
             beskrivelse = source.beskrivelse
         )
 }
