@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service
 
 @Service
 class JwtBearerEgressTokenService(
-    @Qualifier("jwt-bearer") val tokenGetter: CacheAwareTokenClient,
+    @param:Qualifier("jwt-bearer") val tokenGetter: CacheAwareTokenClient,
     val assertionCreator: JwtBearerAssertionCreator
 ) : EgressTokenGetter {
 
-    override fun getEgressToken(ingressToken: String?, audience: String, user: String): RawJwt {
+    override fun getEgressToken(ingressToken: String?, audience: String): RawJwt {
         // audience = scope, e.g. "nav:pensjonssimulator:simulering"
         val accessParameter = TokenAccessParameter.jwtBearer(assertionCreator.assertion(audience))
 

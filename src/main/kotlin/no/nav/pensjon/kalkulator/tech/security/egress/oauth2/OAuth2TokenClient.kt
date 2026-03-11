@@ -6,7 +6,6 @@ import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenAccessParameter
 import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenData
-import no.nav.pensjon.kalkulator.tech.security.egress.token.TokenDataGetter
 import no.nav.pensjon.kalkulator.tech.security.egress.token.validation.ExpirationChecker
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.http.MediaType
@@ -14,18 +13,17 @@ import org.springframework.util.MultiValueMap
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import org.springframework.web.reactive.function.client.bodyToMono
 
 abstract class OAuth2TokenClient(
     private val webClient: WebClient,
     private val expirationChecker: ExpirationChecker,
     retryAttempts: String
-) : ExternalServiceClient(retryAttempts), TokenDataGetter {
+) : ExternalServiceClient(retryAttempts) {
 
     private val log = KotlinLogging.logger {}
 
-    override fun service() = service
-
-    override fun getTokenData(accessParameter: TokenAccessParameter, audience: String): TokenData {
+    fun getTokenData(accessParameter: TokenAccessParameter, audience: String): TokenData {
         log.debug { "Fetching token for audience '$audience'" }
 
         return try {
@@ -35,7 +33,7 @@ abstract class OAuth2TokenClient(
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(prepareTokenRequestBody(accessParameter, audience))
                 .retrieve()
-                .bodyToMono(OAuth2TokenDto::class.java)
+                .bodyToMono<OAuth2TokenDto>()
                 .retryWhen(retryBackoffSpec(""))
                 .block()!!
                 .also { countCalls(MetricResult.OK) }
@@ -50,6 +48,8 @@ abstract class OAuth2TokenClient(
             throw EgressException(e.responseBodyAsString, e)
         }
     }
+
+    override fun service() = service
 
     override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
 
