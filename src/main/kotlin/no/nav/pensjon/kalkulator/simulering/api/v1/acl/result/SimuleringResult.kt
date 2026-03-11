@@ -9,17 +9,33 @@ import org.springframework.http.HttpStatus
 
 @JsonInclude(NON_NULL)
 data class SimuleringV1Result(
-    @field:NotNull val alderspensjonListe: List<SimuleringV1Alderspensjon>,
+    @field:Schema(description = "Alderspensjon for hvert år")
+    @field:NotNull
+    val alderspensjonListe: List<SimuleringV1Alderspensjon>,
+
+    @field:Schema(description = "Månedlig alderspensjon ved endring av uttaksgrad")
+    val maanedligAlderspensjonVedUttaksendring: SimuleringV1Uttaksbeloep?,
+
+    @field:Schema(description = "Livsvarig AFP i offentlig sektor for hvert år")
     val livsvarigOffentligAfpListe: List<SimuleringV1AldersbestemtUtbetaling>?,
+
+    @field:Schema(description = "Tidsbegrenset AFP i offentlig sektor ('gammel ordning') for hvert år")
     val tidsbegrensetOffentligAfp: SimuleringV1TidsbegrensetOffentligAfp?,
+
+    @field:Schema(description = "AFP i privat sektor for hvert år")
     val privatAfpListe: List<SimuleringV1PrivatAfp>?,
 
     @field:Schema(description = "Resultatet av vilkårsprøvingen")
     @field:NotNull
     val vilkaarsproevingsresultat: SimuleringV1Vilkaarsproevingsresultat,
 
+    @field:Schema(description = "Personens trygdetid")
     val trygdetid: SimuleringV1Trygdetid?,
+
+    @field:Schema(description = "Pensjonsgivende inntekter for hvert år")
     val pensjonsgivendeInntektListe: List<SimuleringV1AarligBeloep>?,
+
+    @field:Schema(description = "Eventelt problem som oppstod under simuleringen")
     val problem: SimuleringV1Problem?
 )
 
@@ -58,6 +74,16 @@ data class SimuleringV1AlderspensjonExtension(
     val tilleggspensjon: Int? = null,
     val pensjonstillegg: Int? = null,
     val skjermingstillegg: Int? = null
+)
+
+@JsonInclude(NON_NULL)
+data class SimuleringV1Uttaksbeloep(
+    @field:Schema(description = "Månedlig pensjonsbeløp ved start av gradert uttak")
+    val gradertUttakMaanedligBeloep: Int? = null,
+
+    @field:Schema(description = "Månedlig pensjonsbeløp ved start av helt uttak")
+    @field:NotNull
+    val heltUttakMaanedligBeloep: Int,
 )
 
 @JsonInclude(NON_NULL)

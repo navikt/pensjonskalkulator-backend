@@ -125,6 +125,7 @@ class EksternSimuleringController(
         private fun problem(e: Exception) =
             SimuleringV1Result(
                 alderspensjonListe = emptyList(),
+                maanedligAlderspensjonVedUttaksendring = null,
                 tidsbegrensetOffentligAfp = null,
                 privatAfpListe = null,
                 livsvarigOffentligAfpListe = null,
