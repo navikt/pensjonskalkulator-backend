@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.simulering.api.v1.acl.result
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
+import no.nav.pensjon.kalkulator.simulering.AlderspensjonMaanedsbeloep
 import no.nav.pensjon.kalkulator.simulering.SimuleringResult
 import no.nav.pensjon.kalkulator.simulering.SimulertAlderspensjon
 import no.nav.pensjon.kalkulator.simulering.Vilkaarsproeving
@@ -35,7 +36,10 @@ class SimuleringResultMapperTest : ShouldSpec({
                             kapittel19Gjenlevendetillegg = 18
                         )
                     ),
-                    alderspensjonMaanedsbeloep = null,
+                    alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(
+                        gradertUttak = 100,
+                        heltUttak = 101
+                    ),
                     pre2025OffentligAfp = null,
                     afpPrivat = emptyList(),
                     afpOffentlig = emptyList(),
@@ -58,6 +62,10 @@ class SimuleringResultMapperTest : ShouldSpec({
                         gjenlevendetillegg = null,
                         extension = null
                     )
+                ),
+                maanedligAlderspensjonVedUttaksendring = SimuleringV1Uttaksbeloep(
+                    gradertUttakMaanedligBeloep = 100,
+                    heltUttakMaanedligBeloep = 101
                 ),
                 livsvarigOffentligAfpListe = emptyList(),
                 tidsbegrensetOffentligAfp = null,

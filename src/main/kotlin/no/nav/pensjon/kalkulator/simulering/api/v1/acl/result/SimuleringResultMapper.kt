@@ -17,6 +17,7 @@ object SimuleringResultMapper {
         SimuleringV1Result(
             alderspensjonListe = source.alderspensjon.map { alderspensjon(source = it, mode) }
                 .let { justerAlderspensjonListe(pensjonListe = it, naavaerendeAlderAar) },
+            maanedligAlderspensjonVedUttaksendring = source.alderspensjonMaanedsbeloep?.let(::maanedligPensjon),
             tidsbegrensetOffentligAfp = source.pre2025OffentligAfp?.let(::tidsbegrensetOffentligAfp),
             privatAfpListe = source.afpPrivat.map(::privatAfp)
                 .let { justerPrivatAfpListe(pensjonListe = it, naavaerendeAlderAar) },
@@ -53,6 +54,12 @@ object SimuleringResultMapper {
             tilleggspensjon = source.tilleggspensjon,
             pensjonstillegg = source.pensjonstillegg,
             skjermingstillegg = source.skjermingstillegg
+        )
+
+    private fun maanedligPensjon(source: AlderspensjonMaanedsbeloep) =
+        SimuleringV1Uttaksbeloep(
+            gradertUttakMaanedligBeloep = source.gradertUttak,
+            heltUttakMaanedligBeloep = source.heltUttak
         )
 
     private fun livsvarigOffentligAfp(source: SimulertAfpOffentlig) =
