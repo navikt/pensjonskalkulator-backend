@@ -35,11 +35,11 @@ class TilgangsmaskinClient(
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
     private val log = KotlinLogging.logger {}
 
-    override fun sjekkTilgang(pid: Pid): TilgangResult {
-        val uri = "/$API_RESOURCE"
-        log.debug { "POST to URI: '$uri'" }
+    override fun sjekkTilgang(pid: Pid): TilgangResult =
+        try {
+            val uri = "/$API_RESOURCE"
+            log.debug { "POST to URI: '$uri'" }
 
-        return try {
             webClient
                 .post()
                 .uri(uri)
@@ -49,43 +49,18 @@ class TilgangsmaskinClient(
                 .toBodilessEntity()
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
+
             countCalls(MetricResult.OK)
             TilgangResultMapper.fromDto(TilgangResultDto.Innvilget)
         } catch (e: WebClientRequestException) {
-            log.warn { "Request to tilgangsmaskinen failed: ${e.message}" }
-            countCalls(MetricResult.BAD_SERVER)
-            feilResultat(begrunnelse = e.message)
+            handle(e, summary = "Kall til Tilgangsmaskin feilet")
         } catch (e: EgressException) {
-            handleErrorResponse(e)
+            handle(e)
         }
-    }
 
-    private fun handleErrorResponse(e: EgressException): TilgangResult {
-        if (e.statusCode == HttpStatus.FORBIDDEN) {
-            return try {
-                val problemDetail = jsonMapper.readValue(
-                    e.message ?: "",
-                    ProblemDetailResponseDto::class.java
-                )
-                countCalls(MetricResult.OK)
-                TilgangResultMapper.fromDto(TilgangResultDto.Avvist(problemDetail))
-            } catch (e: Exception) {
-                log.warn { "Failed to parse 403 response body: ${e.message}" }
-                countCalls(MetricResult.BAD_SERVER)
-                feilResultat(begrunnelse = e.message)
-            }
-        }
-        log.error(e) { "Unexpected error from tilgangsmaskinen: ${e.message}" }
-        countCalls(MetricResult.BAD_SERVER)
-        return feilResultat(begrunnelse = e.message)
-    }
+    override fun service(): EgressService = service
 
-    private fun feilResultat(begrunnelse: String?) = TilgangResult(
-        innvilget = false,
-        avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEILET,
-        begrunnelse,
-        traceId = null
-    )
+    override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
 
     private fun setHeaders(headers: HttpHeaders) {
         headers.setBearerAuth(EgressAccess.token(service).value)
@@ -93,12 +68,37 @@ class TilgangsmaskinClient(
         headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_JSON_VALUE
     }
 
-    override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
+    private fun handle(e: EgressException): TilgangResult =
+        if (e.statusCode == HttpStatus.FORBIDDEN)
+            avvist(e.message ?: "")
+        else
+            handle(e, summary = "Unexpected error from Tilgangsmaskin")
 
-    override fun service(): EgressService = service
+    private fun avvist(message: String): TilgangResult =
+        try {
+            countCalls(MetricResult.OK)
+            val problemDetail = jsonMapper.readValue(message, ProblemDetailResponseDto::class.java)
+            TilgangResultMapper.fromDto(TilgangResultDto.Avvist(problemDetail))
+        } catch (e: Exception) {
+            handle(e, summary = "Failed to parse Tilgangsmaskin avvist response - $message")
+        }
+
+    private fun handle(e: Exception, summary: String): TilgangResult {
+        log.error(e) { "$summary - ${e.message}" }
+        countCalls(MetricResult.BAD_SERVER)
+        return feilResultat(begrunnelse = "$summary - se logg for detaljer")
+    }
 
     companion object {
         private const val API_RESOURCE = "api/v1/komplett"
         private val service = EgressService.TILGANGSMASKINEN
+
+        private fun feilResultat(begrunnelse: String?) =
+            TilgangResult(
+                innvilget = false,
+                avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEILET,
+                begrunnelse,
+                traceId = null
+            )
     }
 }

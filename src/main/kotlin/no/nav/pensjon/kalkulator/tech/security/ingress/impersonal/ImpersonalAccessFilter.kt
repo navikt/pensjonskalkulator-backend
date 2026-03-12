@@ -66,8 +66,8 @@ class ImpersonalAccessFilter(
     
     private fun eventuellPopulasjonstilgangsnektAarsak(): String? =
         with(populasjonstilgang(pid = pidGetter.pid())) {
-            if (this.innvilget) null
-            else this.avvisningsinfo
+            if (innvilget) null
+            else avvisningsinfo
         }
 
     private fun populasjonstilgang(pid: Pid): TilgangResult {

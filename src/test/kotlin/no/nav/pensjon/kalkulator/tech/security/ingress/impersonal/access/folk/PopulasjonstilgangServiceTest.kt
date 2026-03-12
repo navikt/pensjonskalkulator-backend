@@ -39,15 +39,20 @@ class PopulasjonstilgangServiceTest : ShouldSpec({
         ).sjekkTilgang(pid) shouldBe result
     }
 
-    should("gi 'tilgang avvist' når klienten feiler")
-    PopulasjonstilgangService(
-        client = mockk<PopulasjonstilgangClient>().apply {
-            every { sjekkTilgang(any()) } throws IllegalStateException("feil")
-        }
-    ).sjekkTilgang(pid) shouldBe TilgangResult(
-        innvilget = false,
-        avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEILET,
-        begrunnelse = "feil",
-        traceId = null
-    )
+    /**
+     * Ved feil (exception) skal feildetaljen logges, men ikke brukes som begrunnelse i resultatet,
+     * da denne informasjonen kan være sensitiv og har begrenset verdi for konsumenten.
+     */
+    should("gi 'tilgang avvist' når klienten feiler, og henvise til logg i begrunnelsen") {
+        PopulasjonstilgangService(
+            client = mockk<PopulasjonstilgangClient>().apply {
+                every { sjekkTilgang(any()) } throws IllegalStateException("feil")
+            }
+        ).sjekkTilgang(pid) shouldBe TilgangResult(
+            innvilget = false,
+            avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEILET,
+            begrunnelse = "Populasjonstilgangssjekk feilet - se logg for detaljer",
+            traceId = null
+        )
+    }
 })

@@ -14,13 +14,15 @@ class PopulasjonstilgangService(private val client: PopulasjonstilgangClient) {
             client.sjekkTilgang(pid)
         } catch (e: Exception) {
             // Enhver feil skal gi 'tilgang avvist'
-            log.error(e) { "Populasjonstilgangssjekk feilet - ${e.message}" }
+            "Populasjonstilgangssjekk feilet".let {
+                log.error(e) { "$it - ${e.message}" }
 
-            TilgangResult(
-                innvilget = false,
-                avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEILET,
-                begrunnelse = e.message,
-                traceId = null
-            )
+                TilgangResult(
+                    innvilget = false,
+                    avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEILET,
+                    begrunnelse = "$it - se logg for detaljer",
+                    traceId = null
+                )
+            }
         }
 }
