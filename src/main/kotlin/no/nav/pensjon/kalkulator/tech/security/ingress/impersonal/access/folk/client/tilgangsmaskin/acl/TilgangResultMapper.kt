@@ -1,9 +1,7 @@
-package no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.client.map
+package no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.client.tilgangsmaskin.acl
 
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.client.AvvisningAarsak
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.client.TilgangResult
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.client.dto.AvvisningsKodeDto
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.client.dto.TilgangResultDto
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.AvvisningAarsak
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.TilgangResult
 
 object TilgangResultMapper {
 

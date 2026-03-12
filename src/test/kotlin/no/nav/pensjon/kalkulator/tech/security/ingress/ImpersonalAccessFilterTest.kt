@@ -12,13 +12,14 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.ImpersonalAccessFilter
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.SecurityContextNavIdExtractor
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.TilgangService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.client.AvvisningAarsak
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.client.TilgangResult
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.fag.FagtilgangService
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.AvvisningAarsak
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.PopulasjonstilgangService
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.TilgangResult
 
 class ImpersonalAccessFilterTest : ShouldSpec({
 
-    should("continue filter chain when no fnr in header") {
+    should("continue filter chain when no fødselsnummer (fnr) in header") {
         val chain = mockk<FilterChain>(relaxed = true)
         val request = arrangeRequest(pid = null, uri = "/api/foo")
         val response = mockk<ServletResponse>()
@@ -26,43 +27,11 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         ImpersonalAccessFilter(
             pidGetter = mockk(),
             navIdExtractor = mockk(),
-            tilgangService = mockk(),
+            fagtilgangService = mockk(),
+            populasjonstilgangService = mockk(),
             auditor = mockk(),
         ).doFilter(request, response, chain)
 
-        verify(exactly = 1) { chain.doFilter(request, response) }
-    }
-
-    should("report 'forbidden' and break filter chain when tilgangService avviser") {
-        val chain = mockk<FilterChain>(relaxed = true)
-        val request = arrangeRequest(pid = pid.value, uri = "/api/foo")
-        val response = mockk<HttpServletResponse>(relaxed = true)
-
-        ImpersonalAccessFilter(
-            pidGetter = arrangePid(),
-            navIdExtractor = arrangeNavIdExtractor(),
-            tilgangService = arrangeTilgangService(avvist()),
-            auditor = mockk(),
-        ).doFilter(request, response, chain)
-
-        verify(exactly = 1) { response.sendError(403, "Adgang nektet pga. ${AvvisningAarsak.GEOGRAFISK}:some reason") }
-        verify(exactly = 0) { chain.doFilter(request, response) }
-    }
-
-    should("log audit info and continue filter chain when tilgangService innvilger") {
-        val chain = mockk<FilterChain>(relaxed = true)
-        val auditor = mockk<Auditor>(relaxed = true)
-        val request = arrangeRequest(pid = pid.value, uri = "/foo")
-        val response = mockk<HttpServletResponse>(relaxed = true)
-
-        ImpersonalAccessFilter(
-            pidGetter = arrangePid(),
-            navIdExtractor = arrangeNavIdExtractor(),
-            tilgangService = arrangeTilgangService(innvilget()),
-            auditor = auditor,
-        ).doFilter(request, response, chain)
-
-        verify(exactly = 1) { auditor.audit(pid, "/foo") }
         verify(exactly = 1) { chain.doFilter(request, response) }
     }
 
@@ -75,7 +44,8 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         ImpersonalAccessFilter(
             pidGetter = pidExtractor,
             navIdExtractor = mockk(),
-            tilgangService = mockk(),
+            fagtilgangService = mockk(),
+            populasjonstilgangService = mockk(),
             auditor = mockk(),
         ).doFilter(request, response, chain)
 
@@ -83,7 +53,41 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         verify(exactly = 1) { chain.doFilter(request, response) }
     }
 
-    should("interrupt filter chain and log error when tilgangService throws exception") {
+    should("report 'forbidden' and break filter chain when 'fagtilgang avvist'") {
+        val chain = mockk<FilterChain>(relaxed = true)
+        val request = arrangeRequest(pid = pid.value, uri = "/api/foo")
+        val response = mockk<HttpServletResponse>(relaxed = true)
+
+        ImpersonalAccessFilter(
+            pidGetter = arrangePid(),
+            navIdExtractor = arrangeNavIdExtractor(),
+            fagtilgangService = arrangeFagtilgang(innvilget = false),
+            populasjonstilgangService = arrangePopulasjonstilgang(innvilget()),
+            auditor = mockk(),
+        ).doFilter(request, response, chain)
+
+        verify(exactly = 1) { response.sendError(403, "Adgang nektet pga. manglende faggruppemedlemskap") }
+        verify(exactly = 0) { chain.doFilter(request, response) }
+    }
+
+    should("report 'forbidden' and break filter chain when 'populasjonstilgang avvist'") {
+        val chain = mockk<FilterChain>(relaxed = true)
+        val request = arrangeRequest(pid = pid.value, uri = "/api/foo")
+        val response = mockk<HttpServletResponse>(relaxed = true)
+
+        ImpersonalAccessFilter(
+            pidGetter = arrangePid(),
+            navIdExtractor = arrangeNavIdExtractor(),
+            fagtilgangService = arrangeFagtilgang(innvilget = true),
+            populasjonstilgangService = arrangePopulasjonstilgang(result = avvist()),
+            auditor = mockk(),
+        ).doFilter(request, response, chain)
+
+        verify(exactly = 1) { response.sendError(403, "Adgang nektet pga. GEOGRAFISK: some reason") }
+        verify(exactly = 0) { chain.doFilter(request, response) }
+    }
+
+    should("log audit info and continue filter chain when 'fagtilgang og populasjonstilgang innvilget'") {
         val chain = mockk<FilterChain>(relaxed = true)
         val auditor = mockk<Auditor>(relaxed = true)
         val request = arrangeRequest(pid = pid.value, uri = "/foo")
@@ -92,11 +96,30 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         ImpersonalAccessFilter(
             pidGetter = arrangePid(),
             navIdExtractor = arrangeNavIdExtractor(),
-            tilgangService = arrangeTilgangServiceFailing(),
+            fagtilgangService = arrangeFagtilgang(innvilget = true),
+            populasjonstilgangService = arrangePopulasjonstilgang(result = innvilget()),
             auditor = auditor,
         ).doFilter(request, response, chain)
 
-        verify(exactly = 0) { auditor.audit(pid, "/foo") }
+        verify(exactly = 1) { auditor.audit(onBehalfOfPid = pid, requestUri = "/foo") }
+        verify(exactly = 1) { chain.doFilter(request, response) }
+    }
+
+    should("interrupt filter chain when 'populasjonstilgangssjekk feiler'") {
+        val chain = mockk<FilterChain>(relaxed = true)
+        val auditor = mockk<Auditor>(relaxed = true)
+        val request = arrangeRequest(pid = pid.value, uri = "/foo")
+        val response = mockk<HttpServletResponse>(relaxed = true)
+
+        ImpersonalAccessFilter(
+            pidGetter = arrangePid(),
+            navIdExtractor = arrangeNavIdExtractor(),
+            fagtilgangService = arrangeFagtilgang(innvilget = true),
+            populasjonstilgangService = arrangePopulasjonstilgangError(),
+            auditor = auditor,
+        ).doFilter(request, response, chain)
+
+        verify(exactly = 0) { auditor.audit(onBehalfOfPid = pid, requestUri = "/foo") }
         verify(exactly = 0) { chain.doFilter(request, response) }
     }
 })
@@ -117,26 +140,41 @@ private fun arrangeRequest(pid: String?, uri: String): HttpServletRequest =
         every { requestURI } returns uri
     }
 
-private fun arrangeTilgangService(result: TilgangResult): TilgangService =
-    mockk<TilgangService>().apply {
+private fun arrangeFagtilgang(innvilget: Boolean): FagtilgangService =
+    mockk<FagtilgangService>().apply {
+        every { tilgangInnvilget() } returns innvilget
+    }
+
+private fun arrangePopulasjonstilgang(result: TilgangResult): PopulasjonstilgangService =
+    mockk<PopulasjonstilgangService>().apply {
         every { sjekkTilgang(pid) } returns result
     }
 
-private fun arrangeTilgangServiceFailing(): TilgangService =
-    mockk<TilgangService>().apply {
-        every { sjekkTilgang(pid) } throws RuntimeException("connection failed")
+private fun arrangePopulasjonstilgangError(): PopulasjonstilgangService =
+    mockk<PopulasjonstilgangService>().apply {
+        every { sjekkTilgang(pid) } returns feil()
     }
 
-private fun innvilget() = TilgangResult(
-    innvilget = true,
-    avvisningAarsak = null,
-    begrunnelse = null,
-    traceId = null
-)
+private fun innvilget() =
+    TilgangResult(
+        innvilget = true,
+        avvisningAarsak = null,
+        begrunnelse = null,
+        traceId = null
+    )
 
-private fun avvist() = TilgangResult(
-    innvilget = false,
-    avvisningAarsak = AvvisningAarsak.GEOGRAFISK,
-    begrunnelse = "some reason",
-    traceId = null
-)
+private fun avvist() =
+    TilgangResult(
+        innvilget = false,
+        avvisningAarsak = AvvisningAarsak.GEOGRAFISK,
+        begrunnelse = "some reason",
+        traceId = null
+    )
+
+private fun feil() =
+    TilgangResult(
+        innvilget = false,
+        avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEILET,
+        begrunnelse = "feil",
+        traceId = null
+    )
