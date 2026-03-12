@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.client
+package no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.client.tilgangsmaskin
 
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
@@ -6,9 +6,12 @@ import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.client.dto.ProblemDetailResponseDto
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.client.dto.TilgangResultDto
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.client.map.TilgangResultMapper
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.AvvisningAarsak
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.TilgangResult
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.client.PopulasjonstilgangClient
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.client.tilgangsmaskin.acl.ProblemDetailResponseDto
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.client.tilgangsmaskin.acl.TilgangResultDto
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.client.tilgangsmaskin.acl.TilgangResultMapper
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -22,13 +25,13 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 import tools.jackson.databind.json.JsonMapper
 
 @Component
-class TilgangsmaskinenClient(
-    @param:Value("\${tilgangsmaskinen.url}") private val baseUrl: String,
+class TilgangsmaskinClient(
+    @param:Value($$"${tilgangsmaskinen.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
     private val jsonMapper: JsonMapper,
-    @Value("\${web-client.retry-attempts}") retryAttempts: String
-) : ExternalServiceClient(retryAttempts), TilgangClient {
+    @Value($$"${web-client.retry-attempts}") retryAttempts: String
+) : ExternalServiceClient(retryAttempts), PopulasjonstilgangClient {
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
     private val log = KotlinLogging.logger {}
 
@@ -51,7 +54,7 @@ class TilgangsmaskinenClient(
         } catch (e: WebClientRequestException) {
             log.warn { "Request to tilgangsmaskinen failed: ${e.message}" }
             countCalls(MetricResult.BAD_SERVER)
-            feilResultat()
+            feilResultat(begrunnelse = e.message)
         } catch (e: EgressException) {
             handleErrorResponse(e)
         }
@@ -66,21 +69,21 @@ class TilgangsmaskinenClient(
                 )
                 countCalls(MetricResult.OK)
                 TilgangResultMapper.fromDto(TilgangResultDto.Avvist(problemDetail))
-            } catch (_: Exception) {
+            } catch (e: Exception) {
                 log.warn { "Failed to parse 403 response body: ${e.message}" }
                 countCalls(MetricResult.BAD_SERVER)
-                feilResultat()
+                feilResultat(begrunnelse = e.message)
             }
         }
         log.error(e) { "Unexpected error from tilgangsmaskinen: ${e.message}" }
         countCalls(MetricResult.BAD_SERVER)
-        return feilResultat()
+        return feilResultat(begrunnelse = e.message)
     }
 
-    private fun feilResultat() = TilgangResult(
+    private fun feilResultat(begrunnelse: String?) = TilgangResult(
         innvilget = false,
-        avvisningAarsak = AvvisningAarsak.FEIL_MOT_TILGANGSMASKINEN,
-        begrunnelse = null,
+        avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEILET,
+        begrunnelse,
         traceId = null
     )
 

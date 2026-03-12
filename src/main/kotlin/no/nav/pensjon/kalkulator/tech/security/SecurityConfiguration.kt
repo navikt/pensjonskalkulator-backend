@@ -2,12 +2,13 @@ package no.nav.pensjon.kalkulator.tech.security
 
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.pensjon.kalkulator.tech.security.egress.SecurityContextEnricher
-import no.nav.pensjon.kalkulator.tech.security.ingress.AudienceValidator
-import no.nav.pensjon.kalkulator.tech.security.ingress.AuthenticationEnricherFilter
-import no.nav.pensjon.kalkulator.tech.security.ingress.LoggingAuthenticationEntryPoint
-import no.nav.pensjon.kalkulator.tech.security.ingress.SecurityLevelFilter
+import no.nav.pensjon.kalkulator.tech.security.ingress.*
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.ImpersonalAccessFilter
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.fag.FagtilgangService
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.PopulasjonstilgangService
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.SecurityContextNavIdExtractor
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
 import no.nav.pensjon.kalkulator.tech.security.ingress.jwt.RequestClaimExtractor
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import org.springframework.beans.factory.annotation.Qualifier
@@ -27,11 +28,6 @@ import org.springframework.security.oauth2.jwt.JwtDecoders
 import org.springframework.security.oauth2.jwt.JwtValidators
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider
-import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
-import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.TilgangService
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
@@ -102,7 +98,8 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
         auditor: Auditor,
         adresseService: FortroligAdresseService,
         navIdExtractor: SecurityContextNavIdExtractor,
-        tilgangService: TilgangService,
+        fagtilgangService: FagtilgangService,
+        populasjonstilgangService: PopulasjonstilgangService,
         authResolver: AuthenticationManagerResolver<HttpServletRequest>,
         authenticationEntryPoint: LoggingAuthenticationEntryPoint,
         @Value("\${pkb.request-matcher.internal}") internalRequestMatcher: String
@@ -112,7 +109,7 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
             BasicAuthenticationFilter::class.java
         )
             .addFilterAfter(
-                ImpersonalAccessFilter(pidExtractor, navIdExtractor, tilgangService, auditor),
+                ImpersonalAccessFilter(pidExtractor, navIdExtractor, fagtilgangService, populasjonstilgangService, auditor),
                 AuthenticationEnricherFilter::class.java
             )
             .addFilterAfter(
