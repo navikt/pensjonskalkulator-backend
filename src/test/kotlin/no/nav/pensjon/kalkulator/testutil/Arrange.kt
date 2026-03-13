@@ -42,22 +42,39 @@ object Arrange {
         )
 }
 
-fun MockWebServer.arrangeOkJsonResponse(body: String) {
+fun MockWebServer.arrangeNoContentResponse() {
+    this.enqueue(
+        MockResponse()
+            .setResponseCode(HttpStatus.NO_CONTENT.value())
+    )
+}
+
+fun MockWebServer.arrangeJsonResponse(status: HttpStatus, body: String) {
     this.enqueue(
         MockResponse()
             .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .setResponseCode(HttpStatus.OK.value()).setBody(body)
+            .setResponseCode(status.value())
+            .setBody(body)
     )
+}
+
+fun MockWebServer.arrangeOkJsonResponse(body: String) {
+    this.arrangeJsonResponse(status = HttpStatus.OK, body)
 }
 
 fun MockWebServer.arrangeOkXmlResponse(body: String) {
     this.enqueue(
         MockResponse()
             .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
-            .setResponseCode(HttpStatus.OK.value()).setBody(body)
+            .setResponseCode(HttpStatus.OK.value())
+            .setBody(body)
     )
 }
 
 fun MockWebServer.arrangeResponse(status: HttpStatus, body: String) {
-    this.enqueue(MockResponse().setResponseCode(status.value()).setBody(body))
+    this.enqueue(
+        MockResponse()
+            .setResponseCode(status.value())
+            .setBody(body)
+    )
 }

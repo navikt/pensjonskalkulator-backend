@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.tilgangsmaskinen.client.dto
+package no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.client.tilgangsmaskin.acl
 
 data class ProblemDetailResponseDto(
     val type: String = "",
