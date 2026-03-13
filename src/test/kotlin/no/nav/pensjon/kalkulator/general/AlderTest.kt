@@ -44,6 +44,15 @@ class AlderTest : ShouldSpec({
         }
     }
 
+    context("minusMaaneder") {
+        should("subtract the given number of måneder from alder") {
+            Alder(66, 11) minusMaaneder 1 shouldBe Alder(66, 10)
+            Alder(66, 5) minusMaaneder 6 shouldBe Alder(65, 11)
+            Alder(66, 8) minusMaaneder -6 shouldBe Alder(67, 2)
+            Alder(66, 8) minusMaaneder 28 shouldBe Alder(64, 4)
+        }
+    }
+
     context("plussMaaneder") {
         should("add given number of måneder to alder") {
             Alder(aar = 99, maaneder = 11) plussMaaneder 0 shouldBe Alder(aar = 99, maaneder = 11)
@@ -51,6 +60,7 @@ class AlderTest : ShouldSpec({
             Alder(aar = 1, maaneder = 5) plussMaaneder 2 shouldBe Alder(aar = 1, maaneder = 7)
             Alder(aar = 3, maaneder = 0) plussMaaneder 12 shouldBe Alder(aar = 4, maaneder = 0)
             Alder(aar = 4, maaneder = 10) plussMaaneder -11 shouldBe Alder(aar = 3, maaneder = 11)
+            Alder(66, 6) plussMaaneder 28 shouldBe Alder(68, 10)
         }
     }
 
