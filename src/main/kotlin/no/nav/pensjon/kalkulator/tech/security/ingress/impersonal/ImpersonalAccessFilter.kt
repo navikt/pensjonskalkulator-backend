@@ -40,13 +40,13 @@ class ImpersonalAccessFilter(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
-        try {
-            // Request for state of feature toggle requires no authentication or access check:
-            if ((request as HttpServletRequest).requestURI.startsWith(FEATURE_URI)) {
-                chain.doFilter(request, response)
-                return
-            }
+        // Request for state of feature toggle requires no authentication or access check:
+        if ((request as HttpServletRequest).requestURI.startsWith(FEATURE_URI)) {
+            chain.doFilter(request, response)
+            return
+        }
 
+        try {
             if (hasPid(request)) {
                 eventuellTilgangsnektAarsak()?.let {
                     forbidden(response, aarsak = it)
@@ -55,12 +55,13 @@ class ImpersonalAccessFilter(
 
                 auditor.audit(onBehalfOfPid = pidGetter.pid(), requestUri = request.requestURI)
             }
-
-            chain.doFilter(request, response)
         } catch (e: Exception) {
             // Enhver feil skal gi 'tilgang avvist'
             forbidden(response, aarsak = "feil i tilgangssjekk", e)
+            return
         }
+
+        chain.doFilter(request, response)
     }
 
     private fun eventuellTilgangsnektAarsak(): String? =
