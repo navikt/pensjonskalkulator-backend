@@ -66,7 +66,7 @@ class ImpersonalAccessFilterTest : ShouldSpec({
             auditor = mockk(),
         ).doFilter(request, response, chain)
 
-        verify(exactly = 1) { response.sendError(403, "Adgang nektet pga. manglende faggruppemedlemskap") }
+        verify(exactly = 1) { response.sendError(403, "Tilgang nektet pga. manglende faggruppemedlemskap") }
         verify(exactly = 0) { chain.doFilter(request, response) }
     }
 
@@ -83,7 +83,29 @@ class ImpersonalAccessFilterTest : ShouldSpec({
             auditor = mockk(),
         ).doFilter(request, response, chain)
 
-        verify(exactly = 1) { response.sendError(403, "Adgang nektet pga. GEOGRAFISK: some reason") }
+        verify(exactly = 1) { response.sendError(403, "Tilgang nektet pga. GEOGRAFISK: some reason") }
+        verify(exactly = 0) { chain.doFilter(request, response) }
+    }
+
+    should("report 'forbidden' and break filter chain when 'tilgangssjekk feilet'") {
+        val chain = mockk<FilterChain>(relaxed = true)
+        val request = arrangeRequest(pid = pid.value, uri = "/api/foo")
+        val response = mockk<HttpServletResponse>(relaxed = true)
+
+        ImpersonalAccessFilter(
+            pidGetter = arrangePidError(),
+            navIdExtractor = arrangeNavIdExtractor(),
+            fagtilgangService = arrangeFagtilgang(innvilget = true),
+            populasjonstilgangService = arrangePopulasjonstilgang(innvilget()),
+            auditor = mockk(),
+        ).doFilter(request, response, chain)
+
+        verify(exactly = 1) {
+            response.sendError(
+                403,
+                "Tilgang nektet pga. feil i tilgangssjekk - se logg for detaljer"
+            )
+        }
         verify(exactly = 0) { chain.doFilter(request, response) }
     }
 
@@ -127,6 +149,11 @@ class ImpersonalAccessFilterTest : ShouldSpec({
 private fun arrangePid(): PidExtractor =
     mockk<PidExtractor>().apply {
         every { pid() } returns pid
+    }
+
+private fun arrangePidError(): PidExtractor =
+    mockk<PidExtractor>().apply {
+        every { pid() } throws RuntimeException("feil")
     }
 
 private fun arrangeNavIdExtractor(): SecurityContextNavIdExtractor =
