@@ -14,10 +14,11 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.opptjening.Inntekt
 import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
+import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.person.client.PersonClient
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
+import no.nav.pensjon.kalkulator.tech.time.TodayProvider
 import java.time.LocalDate
 
 class SimuleringServiceTest : ShouldSpec({
@@ -28,29 +29,53 @@ class SimuleringServiceTest : ShouldSpec({
         val incomingSpec = impersonalSimuleringSpec(REGISTRERT_INNTEKT, Sivilstand.UOPPGITT)
         val simuleringClient = arrangeSimuleringClient(incomingSpec)
         val inntektService = mockk<InntektService>()
-        val personClient = mockk<PersonClient>()
-        val service = SimuleringService(simuleringClient, inntektService, personClient, pidGetter)
+        val personService = mockk<PersonService>().apply {
+            every { getPerson() } returns person(sivilstand = Sivilstand.SKILT)
+        }
+
+        val service =
+            SimuleringService(
+                simuleringClient,
+                inntektService,
+                personService,
+                pidGetter = pidGetter,
+                time = arrangeTime()
+            )
 
         val response = service.simulerPersonligAlderspensjon(incomingSpec)
 
         response.alderspensjon[0].beloep shouldBe 123456
         verify { inntektService wasNot Called }
-        verify { personClient wasNot Called }
+        verify(exactly = 1) { personService.getPerson() } // for fødselsdato (not sivilstand)
 
+        verify {
+            simuleringClient.simulerPersonligAlderspensjon(
+                impersonalSpec = any(),
+                personalSpec = match { it.sivilstand == Sivilstand.UOPPGITT }, // specified sivilstand
+            )
+        }
     }
 
     should("obtain registrert inntekt and sivilstand when not specified") {
         val incomingSpec = impersonalSimuleringSpec(forventetInntekt = null, sivilstand = null)
         val simuleringClient = arrangeSimuleringClient(incomingSpec)
         val inntektService = arrangeInntekt()
-        val personClient = arrangePerson()
-        val service = SimuleringService(simuleringClient, inntektService, personClient, pidGetter)
+        val personService = arrangePerson()
+
+        val service =
+            SimuleringService(
+                simuleringClient,
+                inntektService,
+                personService,
+                pidGetter,
+                time = arrangeTime()
+            )
 
         val response = service.simulerPersonligAlderspensjon(incomingSpec)
 
         response.alderspensjon[0].beloep shouldBe PENSJONSBELOEP
         verify(exactly = 1) { inntektService.sistePensjonsgivendeInntekt() }
-        verify(exactly = 1) { personClient.fetchPerson(pid, fetchFulltNavn = false) }
+        verify(exactly = 2) { personService.getPerson() } // for sivilstand and fødselsdato
     }
 })
 
@@ -128,12 +153,17 @@ private fun arrangeInntekt(): InntektService =
         every { sistePensjonsgivendeInntekt() } returns inntekt
     }
 
-private fun arrangePerson(): PersonClient =
-    mockk<PersonClient>().apply {
-        every { fetchPerson(pid, fetchFulltNavn = false) } returns person()
+private fun arrangePerson(): PersonService =
+    mockk<PersonService>().apply {
+        every { getPerson() } returns person()
     }
 
 private fun arrangeSimuleringClient(incomingSpec: ImpersonalSimuleringSpec): SimuleringClient =
     mockk<SimuleringClient>().apply {
         every { simulerPersonligAlderspensjon(incomingSpec, personalSpec) } returns simuleringResult
+    }
+
+private fun arrangeTime(): TodayProvider =
+    mockk<TodayProvider>().apply {
+        every { date() } returns LocalDate.of(2026, 1, 1)
     }
