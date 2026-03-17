@@ -21,7 +21,7 @@ object VedtakResultMapper {
             fom = source.fom,
             uttaksgradFom = source.uttaksgradFom ?: source.fom,
             sisteUtbetaling = source.utbetalingSisteMaaned?.let(::utbetaling),
-            sivilstatus = VedtakV1Sivilstatus.fromInternalValue(source.sivilstand)
+            sivilstatus = VedtakV1Sivilstatus.fromInternalValue(source.sivilstatus)
         )
 
     private fun fremtidigAlderspensjon(source: FremtidigAlderspensjon) =

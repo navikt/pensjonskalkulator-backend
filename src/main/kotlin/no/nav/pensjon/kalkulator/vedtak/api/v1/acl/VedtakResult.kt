@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotNull
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -78,28 +79,28 @@ data class VedtakV1Utbetaling(
     val utbetalingsdato: LocalDate
 )
 
-enum class VedtakV1Sivilstatus(val internalValue: Sivilstand) {
+enum class VedtakV1Sivilstatus(val internalValue: Sivilstatus) {
 
-    UNKNOWN(Sivilstand.UNKNOWN),
-    UOPPGITT(Sivilstand.UOPPGITT),
-    UGIFT(Sivilstand.UGIFT),
-    GIFT(Sivilstand.GIFT),
-    ENKE_ELLER_ENKEMANN(Sivilstand.ENKE_ELLER_ENKEMANN),
-    SKILT(Sivilstand.SKILT),
-    SEPARERT(Sivilstand.SEPARERT),
-    REGISTRERT_PARTNER(Sivilstand.REGISTRERT_PARTNER),
-    SEPARERT_PARTNER(Sivilstand.SEPARERT_PARTNER),
-    SKILT_PARTNER(Sivilstand.SKILT_PARTNER),
-    GJENLEVENDE_PARTNER(Sivilstand.GJENLEVENDE_PARTNER),
-    SAMBOER(Sivilstand.SAMBOER);
+    UNKNOWN(Sivilstatus.UNKNOWN),
+    UOPPGITT(Sivilstatus.UOPPGITT),
+    UGIFT(Sivilstatus.UGIFT),
+    GIFT(Sivilstatus.GIFT),
+    ENKE_ELLER_ENKEMANN(Sivilstatus.ENKE_ELLER_ENKEMANN),
+    SKILT(Sivilstatus.SKILT),
+    SEPARERT(Sivilstatus.SEPARERT),
+    REGISTRERT_PARTNER(Sivilstatus.REGISTRERT_PARTNER),
+    SEPARERT_PARTNER(Sivilstatus.SEPARERT_PARTNER),
+    SKILT_PARTNER(Sivilstatus.SKILT_PARTNER),
+    GJENLEVENDE_PARTNER(Sivilstatus.GJENLEVENDE_PARTNER),
+    SAMBOER(Sivilstatus.SAMBOER);
 
     companion object {
         private val log = KotlinLogging.logger {}
 
-        fun fromInternalValue(value: Sivilstand?) =
+        fun fromInternalValue(value: Sivilstatus?) =
             entries.singleOrNull { it.internalValue == value } ?: default(value)
 
-        private fun default(internalValue: Sivilstand?): VedtakV1Sivilstatus =
+        private fun default(internalValue: Sivilstatus?): VedtakV1Sivilstatus =
             internalValue?.let {
                 log.warn { "Unknown sivilstatus '$it'" }
                 UNKNOWN

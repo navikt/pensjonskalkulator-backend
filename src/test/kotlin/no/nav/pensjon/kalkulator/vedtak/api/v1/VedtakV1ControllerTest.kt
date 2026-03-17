@@ -8,7 +8,7 @@ import io.mockk.every
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
@@ -60,12 +60,12 @@ class VedtakV1ControllerTest : FunSpec() {
                     grad = 1,
                     fom = LocalDate.of(2020, 12, 1),
                     uttaksgradFom = LocalDate.of(2021, 1, 1),
-                    sivilstand = Sivilstand.GIFT
+                    sivilstatus = Sivilstatus.GIFT
                 ),
                 fremtidigAlderspensjon = FremtidigAlderspensjon(
                     grad = 10,
                     fom = LocalDate.of(2021, 12, 1),
-                    sivilstand = Sivilstand.SKILT
+                    sivilstatus = Sivilstatus.SKILT
                 ),
                 ufoeretrygd = LoependeUfoeretrygd(grad = 2, fom = LocalDate.of(2021, 12, 1)),
                 privatAfp = LoependeEntitet(fom = LocalDate.of(2022, 12, 1))
