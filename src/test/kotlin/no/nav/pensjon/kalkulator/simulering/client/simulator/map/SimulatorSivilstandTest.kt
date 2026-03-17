@@ -6,20 +6,20 @@ import no.nav.pensjon.kalkulator.person.Sivilstatus
 
 class SimulatorSivilstandTest : ShouldSpec({
 
-    should("map from sivilstand to PEN's equivalent sivilstand") {
-        SimulatorSivilstand.fromInternalValue(Sivilstatus.GIFT) shouldBe
-                SimulatorSivilstand.GIFT
+    should("map from sivilstatus to PEN's equivalent") {
+        SimulatorSivilstatus.fromInternalValue(Sivilstatus.GIFT) shouldBe
+                SimulatorSivilstatus.GIFT
 
-        SimulatorSivilstand.fromInternalValue(Sivilstatus.UGIFT) shouldBe
-                SimulatorSivilstand.UGIFT
+        SimulatorSivilstatus.fromInternalValue(Sivilstatus.UGIFT) shouldBe
+                SimulatorSivilstatus.UGIFT
 
-        SimulatorSivilstand.fromInternalValue(Sivilstatus.REGISTRERT_PARTNER) shouldBe
-                SimulatorSivilstand.REGISTRERT_PARTNER
+        SimulatorSivilstatus.fromInternalValue(Sivilstatus.REGISTRERT_PARTNER) shouldBe
+                SimulatorSivilstatus.REGISTRERT_PARTNER
 
-        SimulatorSivilstand.fromInternalValue(Sivilstatus.ENKE_ELLER_ENKEMANN) shouldBe
-                SimulatorSivilstand.ENKE_ELLER_ENKEMANN
+        SimulatorSivilstatus.fromInternalValue(Sivilstatus.ENKE_ELLER_ENKEMANN) shouldBe
+                SimulatorSivilstatus.ENKE_ELLER_ENKEMANN
 
-        SimulatorSivilstand.fromInternalValue(Sivilstatus.UOPPGITT) shouldBe
-                SimulatorSivilstand.UDEFINERT
+        SimulatorSivilstatus.fromInternalValue(Sivilstatus.UOPPGITT) shouldBe
+                SimulatorSivilstatus.UDEFINERT
     }
 })
