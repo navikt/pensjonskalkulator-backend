@@ -5,21 +5,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
-import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.simulering.SimuleringResult
 import no.nav.pensjon.kalkulator.simulering.SimuleringService
-import no.nav.pensjon.kalkulator.simulering.api.v1.acl.result.MappingMode
+import no.nav.pensjon.kalkulator.simulering.api.v1.acl.result.*
 import no.nav.pensjon.kalkulator.simulering.api.v1.acl.result.SimuleringResultMapper.toDto
-import no.nav.pensjon.kalkulator.simulering.api.v1.acl.result.SimuleringV1Problem
-import no.nav.pensjon.kalkulator.simulering.api.v1.acl.result.SimuleringV1ProblemType
-import no.nav.pensjon.kalkulator.simulering.api.v1.acl.result.SimuleringV1Result
-import no.nav.pensjon.kalkulator.simulering.api.v1.acl.result.SimuleringV1Vilkaarsproevingsresultat
 import no.nav.pensjon.kalkulator.simulering.api.v1.acl.spec.SimuleringSpecMapper.fromDto
 import no.nav.pensjon.kalkulator.simulering.api.v1.acl.spec.SimuleringV1Spec
 import no.nav.pensjon.kalkulator.tech.json.writeValueAsRedactedString
 import no.nav.pensjon.kalkulator.tech.metric.Metrics
-import no.nav.pensjon.kalkulator.tech.time.TodayProvider
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.springframework.http.HttpStatus
@@ -32,8 +25,6 @@ import tools.jackson.databind.json.JsonMapper
 class EksternSimuleringController(
     private val service: SimuleringService,
     private val feature: FeatureToggleService,
-    private val personService: PersonService,
-    private val time: TodayProvider,
     private val traceAid: TraceAid,
     private val jsonMapper: JsonMapper
 ) : ControllerBase(traceAid) {
@@ -86,13 +77,13 @@ class EksternSimuleringController(
                 if (feature.isEnabled("utvidet-simuleringsresultat"))
                     toDto(
                         source = result,
-                        naavaerendeAlderAar = alder().aar,
+                        naavaerendeAlderAar = result.alderAar!!,
                         mode = MappingMode.EXTENDED_EXTERNAL
                     )
                 else
                     toDto(
                         source = result,
-                        naavaerendeAlderAar = alder().aar,
+                        naavaerendeAlderAar = result.alderAar!!,
                         mode = MappingMode.NORMAL_EXTERNAL
                     )
 
@@ -105,12 +96,6 @@ class EksternSimuleringController(
             traceAid.end()
         }
     }
-
-    private fun alder() =
-        Alder.from(
-            foedselDato = personService.getPerson().foedselsdato,
-            dato = time.date()
-        )
 
     @ExceptionHandler(value = [Exception::class])
     private fun internalError(e: Exception): ResponseEntity<SimuleringV1Result> =
