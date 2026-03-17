@@ -29,7 +29,7 @@ class VedtakV1Controller(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "Henting av vedtak utført"
+                description = "Henting av vedtak utført."
             ),
             ApiResponse(
                 responseCode = "400",

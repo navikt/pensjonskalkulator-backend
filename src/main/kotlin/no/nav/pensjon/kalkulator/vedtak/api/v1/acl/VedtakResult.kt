@@ -29,7 +29,7 @@ data class VedtakV1Samling(
     @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val privatAfpFom: LocalDate?,
 
-    @field:Schema(description = "Startdato (fra og med) for tidsbegrenset AFP i offentlig sektor ('gemmel ordning')")
+    @field:Schema(description = "Startdato (fra og med) for tidsbegrenset AFP i offentlig sektor ('gammel ordning')")
     @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val tidsbegrensetOffentligAfpFom: LocalDate? = null
 )

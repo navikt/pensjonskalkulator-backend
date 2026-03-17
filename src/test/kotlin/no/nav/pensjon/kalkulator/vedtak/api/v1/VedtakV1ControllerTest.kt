@@ -58,17 +58,17 @@ class VedtakV1ControllerTest : FunSpec() {
             } returns VedtakSamling(
                 loependeAlderspensjon = LoependeAlderspensjon(
                     grad = 1,
-                    fom = LocalDate.parse("2020-12-01"),
+                    fom = LocalDate.of(2020, 12, 1),
                     uttaksgradFom = LocalDate.of(2021, 1, 1),
                     sivilstand = Sivilstand.GIFT
                 ),
                 fremtidigAlderspensjon = FremtidigAlderspensjon(
                     grad = 10,
-                    fom = LocalDate.parse("2021-12-01"),
+                    fom = LocalDate.of(2021, 12, 1),
                     sivilstand = Sivilstand.SKILT
                 ),
-                ufoeretrygd = LoependeUfoeretrygd(grad = 2, fom = LocalDate.parse("2021-12-01")),
-                privatAfp = LoependeEntitet(fom = LocalDate.parse("2022-12-01"))
+                ufoeretrygd = LoependeUfoeretrygd(grad = 2, fom = LocalDate.of(2021, 12, 1)),
+                privatAfp = LoependeEntitet(fom = LocalDate.of(2022, 12, 1))
             )
 
             val result = mvc.get(URL).asyncDispatch().andReturn()
