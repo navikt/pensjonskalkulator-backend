@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.avtale.api.dto
 
 import jakarta.validation.constraints.NotNull
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 
 data class PensjonsavtaleSpecV3(
     @field:NotNull val aarligInntektFoerUttakBeloep: Int,
@@ -28,17 +28,17 @@ data class PensjonsavtaleAlderSpecV3(
     @field:NotNull val maaneder: Int
 )
 
-enum class PensjonsavtaleSivilstandSpecV3(val internalValue: Sivilstand) {
-    UNKNOWN(internalValue = Sivilstand.UNKNOWN),
-    UOPPGITT(internalValue = Sivilstand.UOPPGITT),
-    UGIFT(internalValue = Sivilstand.UGIFT),
-    GIFT(internalValue = Sivilstand.GIFT),
-    ENKE_ELLER_ENKEMANN(internalValue = Sivilstand.ENKE_ELLER_ENKEMANN),
-    SKILT(internalValue = Sivilstand.SKILT),
-    SEPARERT(internalValue = Sivilstand.SEPARERT),
-    REGISTRERT_PARTNER(internalValue = Sivilstand.REGISTRERT_PARTNER),
-    SEPARERT_PARTNER(internalValue = Sivilstand.SEPARERT_PARTNER),
-    SKILT_PARTNER(internalValue = Sivilstand.SKILT_PARTNER),
-    GJENLEVENDE_PARTNER(internalValue = Sivilstand.GJENLEVENDE_PARTNER),
-    SAMBOER(internalValue = Sivilstand.SAMBOER);
+enum class PensjonsavtaleSivilstandSpecV3(val internalValue: Sivilstatus) {
+    UNKNOWN(internalValue = Sivilstatus.UNKNOWN),
+    UOPPGITT(internalValue = Sivilstatus.UOPPGITT),
+    UGIFT(internalValue = Sivilstatus.UGIFT),
+    GIFT(internalValue = Sivilstatus.GIFT),
+    ENKE_ELLER_ENKEMANN(internalValue = Sivilstatus.ENKE_ELLER_ENKEMANN),
+    SKILT(internalValue = Sivilstatus.SKILT),
+    SEPARERT(internalValue = Sivilstatus.SEPARERT),
+    REGISTRERT_PARTNER(internalValue = Sivilstatus.REGISTRERT_PARTNER),
+    SEPARERT_PARTNER(internalValue = Sivilstatus.SEPARERT_PARTNER),
+    SKILT_PARTNER(internalValue = Sivilstatus.SKILT_PARTNER),
+    GJENLEVENDE_PARTNER(internalValue = Sivilstatus.GJENLEVENDE_PARTNER),
+    SAMBOER(internalValue = Sivilstatus.SAMBOER)
 }

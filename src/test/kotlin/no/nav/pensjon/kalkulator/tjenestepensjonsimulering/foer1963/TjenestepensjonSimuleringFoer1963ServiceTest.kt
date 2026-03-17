@@ -12,7 +12,7 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.general.Inntekt
 import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.EpsSpec
 import no.nav.pensjon.kalkulator.simulering.LevendeEps
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
@@ -232,7 +232,7 @@ class TjenestepensjonSimuleringFoer1963ServiceTest : ShouldSpec({
 private fun createSpec(foedselsdato: LocalDate) =
     SimuleringOffentligTjenestepensjonFoer1963Spec(
         simuleringType = SimuleringType.ALDERSPENSJON,
-        sivilstand = Sivilstand.UGIFT,
+        sivilstatus = Sivilstatus.UGIFT,
         foedselsdato = foedselsdato,
         eps = EpsSpec(levende = LevendeEps(harInntektOver2G = false, harPensjon = false)),
         forventetAarligInntektFoerUttak = 500000,

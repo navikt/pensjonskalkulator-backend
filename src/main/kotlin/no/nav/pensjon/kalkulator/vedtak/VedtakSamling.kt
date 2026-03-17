@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.vedtak
 
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -33,7 +33,7 @@ data class LoependeAlderspensjon(
     val fom: LocalDate,
     val uttaksgradFom: LocalDate? = null,
     val utbetalingSisteMaaned: Utbetaling? = null,
-    val sivilstand: Sivilstand
+    val sivilstatus: Sivilstatus
 ) {
     fun withUtbetalingSisteMaaned(utbetaling: Utbetaling) =
         LoependeAlderspensjon(
@@ -41,14 +41,14 @@ data class LoependeAlderspensjon(
             fom = fom,
             uttaksgradFom = uttaksgradFom,
             utbetalingSisteMaaned = utbetaling,
-            sivilstand = sivilstand
+            sivilstatus = sivilstatus
         )
 }
 
 data class FremtidigAlderspensjon(
     val grad: Int,
     val fom: LocalDate,
-    val sivilstand: Sivilstand
+    val sivilstatus: Sivilstatus
 )
 
 data class LoependeUfoeretrygd(

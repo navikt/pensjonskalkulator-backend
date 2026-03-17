@@ -51,7 +51,7 @@ object NorskPensjonPensjonsavtaleMapper {
             harEpsPensjonsgivendeInntektOver2G = spec.harEpsPensjonsgivendeInntektOver2G
                 ?: DEFAULT_HAR_EPS_PENSJONSGIVENDE_INNTEKT_OVER_2G,
             antallAarIUtlandetEtter16 = 0, // only relevant if oenskesSimuleringAvFolketrygd = true
-            sivilstatus = Sivilstatus.fromInternalValue(spec.sivilstand),
+            sivilstatus = Sivilstatus.fromInternalValue(spec.sivilstatus),
             oenskesSimuleringAvFolketrygd = false
         )
 

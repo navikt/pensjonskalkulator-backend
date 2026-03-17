@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.person.api.v7.acl
 
+import no.nav.pensjon.kalkulator.common.api.acl.CommonV1Sivilstatus
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
 import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService.Companion.defaultAldersgrenser
@@ -16,7 +17,7 @@ object PersonResultMapper {
             navn = source.navn,
             fornavn = source.fornavn,
             foedselsdato = source.foedselsdato,
-            sivilstatus = PersonV7Sivilstatus.fromInternalValue(source.sivilstatus),
+            sivilstatus = CommonV1Sivilstatus.fromInternalValue(source.sivilstatus),
             pensjoneringAldre = source.pensjoneringAldre.let(::pensjonsaldre)
         )
 
@@ -25,7 +26,7 @@ object PersonResultMapper {
             navn = "",
             fornavn = "",
             foedselsdato = LocalDate.MIN,
-            sivilstatus = PersonV7Sivilstatus.UOPPGITT,
+            sivilstatus = CommonV1Sivilstatus.UOPPGITT,
             pensjoneringAldre = defaultAldersgrenser.let(::pensjonsaldre)
         )
 

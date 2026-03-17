@@ -10,7 +10,7 @@ import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtalerV3
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 
 class PensjonsavtaleServiceTest : ShouldSpec({
@@ -113,7 +113,7 @@ private fun avtaleSpecMedLivsvarigInntekt() =
         uttaksperioder = listOf(gradertUttak(), heltUttak()),
         harEpsPensjon = true,
         harEpsPensjonsgivendeInntektOver2G = true,
-        sivilstand = Sivilstand.UGIFT
+        sivilstatus = Sivilstatus.UGIFT
     )
 
 private fun gradertUttak() =

@@ -6,6 +6,7 @@ import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService
 import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.SimuleringService
 import no.nav.pensjon.kalkulator.tech.metric.Metrics
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
@@ -29,12 +30,13 @@ class UttaksalderService(
      */
     fun finnTidligsteUttaksalder(impersonalSpec: ImpersonalUttaksalderSpec): Alder? {
         validate(impersonalSpec)
-        val sivilstand = impersonalSpec.sivilstand ?: sivilstand()
-        val harEps = impersonalSpec.harEps ?: sivilstand.harEps
+        val sivilstatus: Sivilstatus = impersonalSpec.sivilstatus ?: sivilstand().sivilstatus
+        val harEps = impersonalSpec.harEps ?: sivilstatus.harEps
 
         val personalSpec = PersonalUttaksalderSpec(
             pid = pidGetter.pid(),
-            sivilstand, harEps,
+            sivilstatus,
+            harEps,
             aarligInntektFoerUttak = impersonalSpec.aarligInntektFoerUttak ?: sisteInntekt()
         )
 

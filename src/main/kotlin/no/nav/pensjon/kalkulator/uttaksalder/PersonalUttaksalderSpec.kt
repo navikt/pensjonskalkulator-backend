@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.uttaksalder
 
 import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 
 /**
  * Specifies personal parameters for finding første mulige uttaksalder.
@@ -9,7 +9,7 @@ import no.nav.pensjon.kalkulator.person.Sivilstand
  */
 data class PersonalUttaksalderSpec(
     val pid: Pid,
-    val sivilstand: Sivilstand,
+    val sivilstatus: Sivilstatus,
     val harEps: Boolean, // EPS = ektefelle/partner/samboer
     val aarligInntektFoerUttak: Int
 )
