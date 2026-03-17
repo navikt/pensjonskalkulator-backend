@@ -31,7 +31,7 @@ class SimuleringService(
     fun simulerPersonligAlderspensjon(impersonalSpec: ImpersonalSimuleringSpec): SimuleringResult {
         val personalSpec = PersonalSimuleringSpec(
             pid = pidGetter.pid(),
-            sivilstand = impersonalSpec.sivilstand ?: sivilstand(),
+            sivilstatus = impersonalSpec.sivilstatus ?: sivilstatus(),
             aarligInntektFoerUttak = impersonalSpec.forventetAarligInntektFoerUttak
                 ?: inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact()
         )
@@ -49,7 +49,7 @@ class SimuleringService(
         try {
             val registeredSpec = PersonalSimuleringSpec(
                 pid = pidGetter.pid(),
-                sivilstand = providedSpec.sivilstand ?: sivilstand(),
+                sivilstatus = providedSpec.sivilstatus ?: sivilstatus(),
                 aarligInntektFoerUttak = providedSpec.forventetAarligInntektFoerUttak
                     ?: inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact()
             )
@@ -69,8 +69,8 @@ class SimuleringService(
             problem(e, type = ProblemType.SERVERFEIL)
         }
 
-    private fun sivilstand() =
-        personService.getPerson().sivilstand
+    private fun sivilstatus() =
+        personService.getPerson().sivilstand.sivilstatus
 
     private fun naavaerendeAlder() =
         Alder.from(

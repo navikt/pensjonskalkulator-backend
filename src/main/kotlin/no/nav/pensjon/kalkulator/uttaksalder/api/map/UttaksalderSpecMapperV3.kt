@@ -19,7 +19,7 @@ object UttaksalderSpecMapperV3 {
 
     fun fromDtoV3(source: UttaksalderSpecV3) =
         ImpersonalUttaksalderSpec(
-            sivilstand = source.sivilstand,
+            sivilstatus = source.sivilstand?.sivilstatus,
             harEps = source.epsHarInntektOver2G || source.epsHarPensjon,
             aarligInntektFoerUttak = source.aarligInntektFoerUttakBeloep,
             simuleringType = source.simuleringstype ?: SimuleringType.ALDERSPENSJON,

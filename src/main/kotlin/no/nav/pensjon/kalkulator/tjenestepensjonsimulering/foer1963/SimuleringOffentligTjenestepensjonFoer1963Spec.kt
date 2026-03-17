@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963
 
 import no.nav.pensjon.kalkulator.general.GradertUttak
 import no.nav.pensjon.kalkulator.general.HeltUttak
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
 import no.nav.pensjon.kalkulator.simulering.EpsSpec
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
@@ -11,7 +11,7 @@ import java.time.LocalDate
 
 data class SimuleringOffentligTjenestepensjonFoer1963Spec(
     val simuleringType: SimuleringType,
-    val sivilstand: Sivilstand? = null,
+    val sivilstatus: Sivilstatus? = null,
     val foedselsdato: LocalDate,
     val eps: EpsSpec,
     val forventetAarligInntektFoerUttak: Int? = null,

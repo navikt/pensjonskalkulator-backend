@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.simulering.api.dto
 
 import jakarta.validation.constraints.NotNull
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 
 /**
@@ -51,20 +51,23 @@ data class AnonymSimuleringInntektV1(
     val sluttAlder: AnonymSimuleringAlderV1?
 )
 
-data class AnonymSimuleringAlderV1(@field:NotNull val aar: Int, @field:NotNull val maaneder: Int) {
+data class AnonymSimuleringAlderV1(
+    @field:NotNull val aar: Int,
+    @field:NotNull val maaneder: Int
+) {
     init {
         require(aar in 0..200) { "0 <= aar <= 200" }
         require(maaneder in 0..11) { "0 <= maaneder <= 11" }
     }
 }
 
-enum class AnonymSimuleringTypeV1(val externalValue: SimuleringType) {
-    ALDERSPENSJON(SimuleringType.ALDERSPENSJON),
-    ALDERSPENSJON_MED_AFP_PRIVAT(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT);
+enum class AnonymSimuleringTypeV1(val internalValue: SimuleringType) {
+    ALDERSPENSJON(internalValue = SimuleringType.ALDERSPENSJON),
+    ALDERSPENSJON_MED_AFP_PRIVAT(internalValue = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT);
 }
 
-enum class AnonymSivilstandV1(val externalValue: Sivilstand) {
-    UGIFT(Sivilstand.UGIFT),
-    GIFT(Sivilstand.GIFT),
-    SAMBOER(Sivilstand.SAMBOER);
+enum class AnonymSivilstandV1(val internalValue: Sivilstatus) {
+    UGIFT(internalValue = Sivilstatus.UGIFT),
+    GIFT(internalValue = Sivilstatus.GIFT),
+    SAMBOER(internalValue = Sivilstatus.SAMBOER)
 }

@@ -10,7 +10,7 @@ import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.testutil.Arrange
@@ -58,7 +58,7 @@ class PensjonssimulatorSimuleringClientTest : FunSpec({
             val response: SimuleringResult =
                 client(context = it).simulerPersonligAlderspensjon(
                     impersonalSpec(),
-                    personalSpec(Sivilstand.ENKE_ELLER_ENKEMANN)
+                    personalSpec(Sivilstatus.ENKE_ELLER_ENKEMANN)
                 )
 
             response shouldBe SimuleringResult(
@@ -104,7 +104,7 @@ class PensjonssimulatorSimuleringClientTest : FunSpec({
         Arrange.webClientContextRunner().run {
             client(context = it).simulerPersonligAlderspensjon(
                 impersonalSpec = impersonalGradertUttakSpec(),
-                personalSpec = personalSpec(Sivilstand.ENKE_ELLER_ENKEMANN)
+                personalSpec = personalSpec(Sivilstatus.ENKE_ELLER_ENKEMANN)
             )
 
             server?.let(::assertGradertUttakRequestBody)
@@ -117,7 +117,7 @@ class PensjonssimulatorSimuleringClientTest : FunSpec({
         Arrange.webClientContextRunner().run {
             val result = client(context = it).simulerPersonligAlderspensjon(
                 impersonalSpec = impersonalGradertUttakSpec(),
-                personalSpec = personalSpec(Sivilstand.UGIFT)
+                personalSpec = personalSpec(Sivilstatus.UGIFT)
             )
 
             result shouldBe SimuleringResult(
@@ -146,7 +146,7 @@ class PensjonssimulatorSimuleringClientTest : FunSpec({
         Arrange.webClientContextRunner().run {
             client(context = it).simulerPersonligAlderspensjon(
                 impersonalSpec = impersonalGradertUttakSpec(),
-                personalSpec = personalSpec(Sivilstand.UGIFT)
+                personalSpec = personalSpec(Sivilstatus.UGIFT)
             ) shouldBe SimuleringResult(
                 alderspensjon = IntRange(62, 75).map(::alderspensjon),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 13000, heltUttak = 26000),
@@ -383,7 +383,7 @@ const val PENSJON_MED_LIVSVARIG_OFFENTLIG_AFP = """{
 fun impersonalSpec() =
     ImpersonalSimuleringSpec(
         simuleringType = SimuleringType.ALDERSPENSJON,
-        sivilstand = null,
+        sivilstatus = null,
         eps = EpsSpec(levende = LevendeEps(harInntektOver2G = true, harPensjon = false)),
         forventetAarligInntektFoerUttak = null,
         heltUttak = HeltUttak(
@@ -405,7 +405,7 @@ fun impersonalSpec() =
 fun impersonalGradertUttakSpec() =
     ImpersonalSimuleringSpec(
         simuleringType = SimuleringType.ALDERSPENSJON,
-        sivilstand = null,
+        sivilstatus = null,
         eps = EpsSpec(levende = LevendeEps(harInntektOver2G = true, harPensjon = false)),
         forventetAarligInntektFoerUttak = null,
         gradertUttak = GradertUttak(
@@ -429,11 +429,11 @@ fun impersonalGradertUttakSpec() =
         )
     )
 
-fun personalSpec(sivilstand: Sivilstand) =
+fun personalSpec(sivilstatus: Sivilstatus) =
     PersonalSimuleringSpec(
         pid = pid,
         aarligInntektFoerUttak = 123000,
-        sivilstand = sivilstand
+        sivilstatus = sivilstatus
     )
 
 fun assertGradertUttakRequestBody(server: MockWebServer) {

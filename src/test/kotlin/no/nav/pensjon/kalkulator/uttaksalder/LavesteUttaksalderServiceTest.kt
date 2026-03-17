@@ -8,12 +8,11 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.general.UttaksalderGradertUttak
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
-import no.nav.pensjon.kalkulator.mock.PersonFactory.person
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.PersonService
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import java.time.LocalDate
 
@@ -21,7 +20,7 @@ class LavesteUttaksalderServiceTest : ShouldSpec({
 
     val personalSpec = PersonalUttaksalderSpec(
         pid = pid,
-        sivilstand = Sivilstand.UGIFT,
+        sivilstatus = Sivilstatus.UGIFT,
         harEps = false,
         aarligInntektFoerUttak = 90_000
     )
@@ -138,7 +137,7 @@ private fun arrangePerson(foedselsdato: LocalDate): PersonService =
 private fun impersonalSpec(foedselsdato: LocalDate, angiGradertUttak: Boolean) =
     ImpersonalUttaksalderSpec(
         simuleringType = SimuleringType.ALDERSPENSJON,
-        sivilstand = Sivilstand.GIFT,
+        sivilstatus = Sivilstatus.GIFT,
         harEps = true,
         aarligInntektFoerUttak = 100_000,
         gradertUttak = if (angiGradertUttak)

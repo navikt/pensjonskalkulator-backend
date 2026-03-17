@@ -22,7 +22,7 @@ object LoependeVedtakMapperV4 {
             fom = source.fom,
             uttaksgradFom = source.uttaksgradFom ?: source.fom,
             sisteUtbetaling = source.utbetalingSisteMaaned?.let(::utbetaling),
-            sivilstand = SivilstandV4.fromInternalValue(source.sivilstand)
+            sivilstand = SivilstandV4.fromInternalValue(source.sivilstatus)
         )
 
     private fun fremtidigAlderspensjon(source: FremtidigAlderspensjon) =

@@ -13,7 +13,7 @@ import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtaler
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
@@ -181,7 +181,7 @@ class PensjonsavtaleControllerTest : ShouldSpec() {
                 uttaksperioder = listOf(gradertUttak(), heltUttak()),
                 harEpsPensjon = true,
                 harEpsPensjonsgivendeInntektOver2G = true,
-                sivilstand = Sivilstand.UGIFT
+                sivilstatus = Sivilstatus.UGIFT
             )
 
         private fun gradertUttak() =

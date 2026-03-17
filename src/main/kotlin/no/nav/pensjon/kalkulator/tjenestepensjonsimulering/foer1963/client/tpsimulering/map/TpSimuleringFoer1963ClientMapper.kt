@@ -72,7 +72,7 @@ object TpSimuleringFoer1963ClientMapper {
             SimuleringEtter2011Dto(
                 simuleringType = SimulatorSimuleringType.fromInternalValue(spec.simuleringType).externalValue,
                 fnr = Fnr(pid.value),
-                sivilstatus = SimulatorSivilstand.fromInternalValue(spec.sivilstand).externalValue,
+                sivilstatus = SimulatorSivilstand.fromInternalValue(spec.sivilstatus).externalValue,
                 eps2G = spec.eps.levende?.harInntektOver2G,
                 epsPensjon = spec.eps.levende?.harPensjon,
                 forventetInntekt = spec.forventetAarligInntektFoerUttak,

@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.person.api.v7.acl
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING
 import jakarta.validation.constraints.NotNull
+import no.nav.pensjon.kalkulator.common.api.acl.CommonV1Sivilstatus
 import java.time.LocalDate
 
 /**
@@ -15,7 +16,7 @@ data class PersonV7Result(
     @field:NotNull val navn: String,
     @field:NotNull val fornavn: String,
     @field:NotNull @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val foedselsdato: LocalDate,
-    @field:NotNull val sivilstatus: PersonV7Sivilstatus,
+    @field:NotNull val sivilstatus: CommonV1Sivilstatus,
     @field:NotNull val pensjoneringAldre: PersonV7Pensjonsaldre
 )
 
