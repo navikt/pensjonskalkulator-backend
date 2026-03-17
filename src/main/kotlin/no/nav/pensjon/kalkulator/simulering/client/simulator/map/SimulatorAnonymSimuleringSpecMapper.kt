@@ -30,7 +30,7 @@ object SimulatorAnonymSimuleringSpecMapper {
         return SimulatorAnonymSimuleringSpec(
             simuleringType = SimulatorSimuleringType.fromInternalValue(spec.simuleringType).externalValue,
             fodselsar = spec.foedselAar,
-            sivilstatus = SimulatorSivilstand.fromInternalValue(spec.sivilstatus).externalValue,
+            sivilstatus = SimulatorSivilstatus.fromInternalValue(spec.sivilstatus).externalValue,
             eps2G = spec.eps.levende?.harInntektOver2G == true,
             epsPensjon = spec.eps.levende?.harPensjon == true,
             utenlandsopphold = spec.utenlandsopphold.antallAar ?: 0,

@@ -26,7 +26,7 @@ class SimuleringServiceTest : ShouldSpec({
 
     val pidGetter = mockk<PidGetter>().apply { every { pid() } returns pid }
 
-    should("use specified inntekt and sivilstand") {
+    should("use specified inntekt and sivilstatus") {
         val incomingSpec = impersonalSimuleringSpec(
             forventetInntekt = REGISTRERT_INNTEKT,
             sivilstatus = Sivilstatus.UOPPGITT
@@ -50,17 +50,17 @@ class SimuleringServiceTest : ShouldSpec({
 
         response.alderspensjon[0].beloep shouldBe 123456
         verify { inntektService wasNot Called }
-        verify(exactly = 1) { personService.getPerson() } // for fødselsdato (not sivilstand)
+        verify(exactly = 1) { personService.getPerson() } // for fødselsdato (not sivilstatus)
 
         verify {
             simuleringClient.simulerPersonligAlderspensjon(
                 impersonalSpec = any(),
-                personalSpec = match { it.sivilstatus == Sivilstatus.UOPPGITT }, // specified sivilstand
+                personalSpec = match { it.sivilstatus == Sivilstatus.UOPPGITT }, // specified sivilstatus
             )
         }
     }
 
-    should("obtain registrert inntekt and sivilstand when not specified") {
+    should("obtain registrert inntekt and sivilstatus when not specified") {
         val incomingSpec = impersonalSimuleringSpec(forventetInntekt = null, sivilstatus = null)
         val simuleringClient = arrangeSimuleringClient(incomingSpec)
         val inntektService = arrangeInntekt()
@@ -79,7 +79,7 @@ class SimuleringServiceTest : ShouldSpec({
 
         response.alderspensjon[0].beloep shouldBe PENSJONSBELOEP
         verify(exactly = 1) { inntektService.sistePensjonsgivendeInntekt() }
-        verify(exactly = 2) { personService.getPerson() } // for sivilstand and fødselsdato
+        verify(exactly = 2) { personService.getPerson() } // for sivilstatus and fødselsdato
     }
 })
 
@@ -142,7 +142,7 @@ private fun impersonalSimuleringSpec(forventetInntekt: Int?, sivilstatus: Sivils
         eps = EpsSpec(levende = LevendeEps(harInntektOver2G = false, harPensjon = false)),
         forventetAarligInntektFoerUttak = forventetInntekt,
         heltUttak = HeltUttak(
-            uttakFomAlder = Alder(67, 1),
+            uttakFomAlder = Alder(aar = 67, maaneder = 1),
             inntekt = null
         ),
         utenlandsopphold = Utenlandsopphold(

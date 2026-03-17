@@ -1,11 +1,5 @@
 package no.nav.pensjon.kalkulator.uttaksalder
 
-/*
-no answer found for LavesteUttaksalderService(#10).lavesteUttaksalderSimuleringSpec(
-ImpersonalUttaksalderSpec(simuleringType=ALDERSPENSJON, sivilstatus=null, harEps=false, aarligInntektFoerUttak=null, gradertUttak=null, heltUttak=HeltUttak(uttakFomAlder=Alder(aar=67, maaneder=0), inntekt=null), utenlandsperiodeListe=[Opphold(fom=1990-01-02, tom=1999-11-30, land=AUS, arbeidet=true)], innvilgetLivsvarigOffentligAfp=null), PersonalUttaksalderSpec(pid=Pid(child of #7#12), sivilstatus=GIFT, harEps=true, aarligInntektFoerUttak=543210), true)
-ImpersonalUttaksalderSpec(simuleringType=ALDERSPENSJON, sivilstatus=null, harEps=false, aarligInntektFoerUttak=null, gradertUttak=null, heltUttak=HeltUttak(uttakFomAlder=Alder(aar=67, maaneder=0), inntekt=null), utenlandsperiodeListe=[Opphold(fom=1990-01-02, tom=1999-11-30, land=AUS, arbeidet=true)], innvilgetLivsvarigOffentligAfp=null)), any<PersonalUttaksalderSpec>(), eq(false))))
-
- */
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.GradertUttak
 import no.nav.pensjon.kalkulator.general.HeltUttak

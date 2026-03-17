@@ -3,10 +3,10 @@ package no.nav.pensjon.kalkulator.simulering.client.simulator.map
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 
 /**
- * The 'externalValue' is sivilstand values used by pensjonssimulator.
+ * The 'externalValue' is sivilstatus values used by pensjonssimulator.
  * pensjonssimulator supports the concept of 'samboer' (unlike Folkeregisteret/PDL).
  */
-enum class SimulatorSivilstand(val externalValue: String, val internalValue: Sivilstatus) {
+enum class SimulatorSivilstatus(val externalValue: String, val internalValue: Sivilstatus) {
 
     ENKE_ELLER_ENKEMANN(externalValue = "ENKE", internalValue = Sivilstatus.ENKE_ELLER_ENKEMANN),
     GIFT(externalValue = "GIFT", internalValue = Sivilstatus.GIFT),
@@ -25,12 +25,12 @@ enum class SimulatorSivilstand(val externalValue: String, val internalValue: Siv
     UDEFINERT(externalValue = "NULL", internalValue = Sivilstatus.UOPPGITT);
 
     companion object {
-        fun fromInternalValue(sivilstand: Sivilstatus?): SimulatorSivilstand =
-            when (sivilstand) {
+        fun fromInternalValue(sivilstatus: Sivilstatus?): SimulatorSivilstatus =
+            when (sivilstatus) {
                 Sivilstatus.UOPPGITT -> UDEFINERT // ambiguous UDEFINERT/GJENLEVENDE_*
                 Sivilstatus.GIFT -> GIFT // ambiguous GIFT/-_LEVER_ADSKILT
                 Sivilstatus.REGISTRERT_PARTNER -> REGISTRERT_PARTNER // ambiguous REGISTRERT_PARTNER/-_LEVER_ADSKILT
-                else -> entries.firstOrNull { it.internalValue == sivilstand } ?: UDEFINERT
+                else -> entries.firstOrNull { it.internalValue == sivilstatus } ?: UDEFINERT
             }
     }
 }

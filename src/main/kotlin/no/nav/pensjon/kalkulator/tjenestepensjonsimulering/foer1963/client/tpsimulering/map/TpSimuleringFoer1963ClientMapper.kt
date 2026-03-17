@@ -8,7 +8,7 @@ import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.SimulatorAlderS
 import no.nav.pensjon.kalkulator.simulering.client.simulator.map.SimulatorAfpOrdningType
 import no.nav.pensjon.kalkulator.simulering.client.simulator.map.SimulatorAnonymAlderDato
 import no.nav.pensjon.kalkulator.simulering.client.simulator.map.SimulatorSimuleringType
-import no.nav.pensjon.kalkulator.simulering.client.simulator.map.SimulatorSivilstand
+import no.nav.pensjon.kalkulator.simulering.client.simulator.map.SimulatorSivilstatus
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.*
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.*
 import java.time.Instant
@@ -72,7 +72,7 @@ object TpSimuleringFoer1963ClientMapper {
             SimuleringEtter2011Dto(
                 simuleringType = SimulatorSimuleringType.fromInternalValue(spec.simuleringType).externalValue,
                 fnr = Fnr(pid.value),
-                sivilstatus = SimulatorSivilstand.fromInternalValue(spec.sivilstatus).externalValue,
+                sivilstatus = SimulatorSivilstatus.fromInternalValue(spec.sivilstatus).externalValue,
                 eps2G = spec.eps.levende?.harInntektOver2G,
                 epsPensjon = spec.eps.levende?.harPensjon,
                 forventetInntekt = spec.forventetAarligInntektFoerUttak,
