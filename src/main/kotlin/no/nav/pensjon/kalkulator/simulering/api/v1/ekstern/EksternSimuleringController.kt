@@ -1,20 +1,19 @@
-package no.nav.pensjon.kalkulator.simulering.api.intern.v1
+package no.nav.pensjon.kalkulator.simulering.api.v1.ekstern
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
+import no.nav.pensjon.kalkulator.simulering.SimuleringResult
 import no.nav.pensjon.kalkulator.simulering.SimuleringService
-import no.nav.pensjon.kalkulator.simulering.api.intern.v1.acl.result.ProblemDto
-import no.nav.pensjon.kalkulator.simulering.api.intern.v1.acl.result.ProblemTypeDto
-import no.nav.pensjon.kalkulator.simulering.api.intern.v1.acl.result.SimuleringResultDto
-import no.nav.pensjon.kalkulator.simulering.api.intern.v1.acl.result.SimuleringResultMapper.toDto
-import no.nav.pensjon.kalkulator.simulering.api.intern.v1.acl.result.VilkaarsproevingsresultatDto
-import no.nav.pensjon.kalkulator.simulering.api.intern.v1.acl.spec.SimuleringSpecDto
-import no.nav.pensjon.kalkulator.simulering.api.intern.v1.acl.spec.SimuleringSpecMapper.fromDto
+import no.nav.pensjon.kalkulator.simulering.api.v1.acl.result.*
+import no.nav.pensjon.kalkulator.simulering.api.v1.acl.result.SimuleringResultMapper.toDto
+import no.nav.pensjon.kalkulator.simulering.api.v1.acl.spec.SimuleringSpecMapper.fromDto
+import no.nav.pensjon.kalkulator.simulering.api.v1.acl.spec.SimuleringV1Spec
 import no.nav.pensjon.kalkulator.tech.json.writeValueAsRedactedString
 import no.nav.pensjon.kalkulator.tech.metric.Metrics
+import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -22,19 +21,23 @@ import org.springframework.web.bind.annotation.*
 import tools.jackson.databind.json.JsonMapper
 
 @RestController
-@RequestMapping("api/intern/v1")
-class InternSimuleringController(
+@RequestMapping("api/ekstern")
+class EksternSimuleringController(
     private val service: SimuleringService,
+    private val feature: FeatureToggleService,
     private val traceAid: TraceAid,
     private val jsonMapper: JsonMapper
 ) : ControllerBase(traceAid) {
 
     private val log = KotlinLogging.logger {}
 
-    @PostMapping("pensjon/simulering")
+    @PostMapping("v1/pensjon/simulering")
     @Operation(
         summary = "Simuler pensjon",
-        description = "Lager en prognose for framtidig alderspensjon med støtte for AFP."
+        description = "Lag en prognose for framtidig alderspensjon med støtte for AFP." +
+                " Dersom simulering med de angitte parametre resulterer i avslag i" +
+                " vilkårsprøvingen, vil responsen inneholde alternative parametre som vil gi et innvilget" +
+                " simuleringsresultat"
     )
     @ApiResponses(
         value = [
@@ -64,19 +67,28 @@ class InternSimuleringController(
             )
         ]
     )
-    fun simulerPensjon(@RequestBody spec: SimuleringSpecDto): ResponseEntity<SimuleringResultDto> {
+    fun simulerPensjon(@RequestBody spec: SimuleringV1Spec): ResponseEntity<SimuleringV1Result> {
         traceAid.begin()
-        log.debug { "Simulering request ${jsonMapper.writeValueAsRedactedString(spec)}" }
 
         return try {
-            val result: SimuleringResultDto = toDto(
-                source = service.simulerPensjon(providedSpec = fromDto(spec))
-            ).also {
-                log.debug { "Simulering respons ${jsonMapper.writeValueAsRedactedString(it)}" }
-                Metrics.countType(eventName = SIMULERINGSTYPE_METRIC_NAME, type = spec.simuleringstype.name)
-            }
+            val result: SimuleringResult = service.simulerPersonligAlderspensjon(fromDto(spec))
 
-            ResponseEntity.status(result.problem?.kode?.httpStatus ?: HttpStatus.OK).body(result)
+            val resultDto: SimuleringV1Result =
+                if (feature.isEnabled("utvidet-simuleringsresultat"))
+                    toDto(
+                        source = result,
+                        naavaerendeAlderAar = result.alderAar!!,
+                        mode = MappingMode.EXTENDED_EXTERNAL
+                    )
+                else
+                    toDto(
+                        source = result,
+                        naavaerendeAlderAar = result.alderAar!!,
+                        mode = MappingMode.NORMAL_EXTERNAL
+                    )
+
+            Metrics.countType(eventName = SIMULERING_TYPE_METRIC_NAME, type = spec.simuleringstype.name)
+            ResponseEntity.status(resultDto.problem?.kode?.httpStatus ?: HttpStatus.OK).body(resultDto)
         } catch (e: Exception) {
             log.error(e) { "Intern feil for spec ${jsonMapper.writeValueAsRedactedString(spec)}" }
             throw e
@@ -86,29 +98,30 @@ class InternSimuleringController(
     }
 
     @ExceptionHandler(value = [Exception::class])
-    private fun internalError(e: Exception): ResponseEntity<SimuleringResultDto> =
+    private fun internalError(e: Exception): ResponseEntity<SimuleringV1Result> =
         ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem(e))
 
     override fun errorMessage() = ERROR_MESSAGE
 
     companion object {
         private const val ERROR_MESSAGE = "feil ved simulering"
-        private const val SIMULERINGSTYPE_METRIC_NAME = "simulering_type"
+        private const val SIMULERING_TYPE_METRIC_NAME = "simulering_type"
 
         private fun problem(e: Exception) =
-            SimuleringResultDto(
+            SimuleringV1Result(
                 alderspensjonListe = emptyList(),
+                maanedligAlderspensjonVedUttaksendring = null,
                 tidsbegrensetOffentligAfp = null,
                 privatAfpListe = null,
                 livsvarigOffentligAfpListe = null,
-                vilkaarsproevingsresultat = VilkaarsproevingsresultatDto(
+                vilkaarsproevingsresultat = SimuleringV1Vilkaarsproevingsresultat(
                     erInnvilget = false,
                     alternativ = null
                 ),
                 trygdetid = null,
                 pensjonsgivendeInntektListe = null,
-                problem = ProblemDto(
-                    kode = ProblemTypeDto.SERVERFEIL,
+                problem = SimuleringV1Problem(
+                    kode = SimuleringV1ProblemType.SERVERFEIL,
                     beskrivelse = e.message ?: e.javaClass.simpleName
                 )
             )

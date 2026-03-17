@@ -1,12 +1,13 @@
 package no.nav.pensjon.kalkulator.simulering
 
 import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.common.exception.NotFoundException
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.opptjening.InntektService
-import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.person.client.PersonClient
+import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
+import no.nav.pensjon.kalkulator.tech.time.TodayProvider
 import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.validity.Problem
@@ -18,8 +19,9 @@ import java.time.format.DateTimeParseException
 class SimuleringService(
     private val simuleringClient: SimuleringClient,
     private val inntektService: InntektService,
-    private val personClient: PersonClient,
-    private val pidGetter: PidGetter
+    private val personService: PersonService,
+    private val pidGetter: PidGetter,
+    private val time: TodayProvider
 ) {
     private val log = KotlinLogging.logger {}
 
@@ -27,17 +29,17 @@ class SimuleringService(
         simuleringClient.simulerAnonymAlderspensjon(spec)
 
     fun simulerPersonligAlderspensjon(impersonalSpec: ImpersonalSimuleringSpec): SimuleringResult {
-        val pid = pidGetter.pid()
-
         val personalSpec = PersonalSimuleringSpec(
-            pid = pid,
-            sivilstand = impersonalSpec.sivilstand ?: sivilstand(pid),
+            pid = pidGetter.pid(),
+            sivilstand = impersonalSpec.sivilstand ?: sivilstand(),
             aarligInntektFoerUttak = impersonalSpec.forventetAarligInntektFoerUttak
                 ?: inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact()
         )
 
         log.debug { "Simulerer med parametre $impersonalSpec og $personalSpec" }
-        return simuleringClient.simulerPersonligAlderspensjon(impersonalSpec, personalSpec)
+        return simuleringClient
+            .simulerPersonligAlderspensjon(impersonalSpec, personalSpec)
+            .withAlderAar(naavaerendeAlder().aar)
     }
 
     /**
@@ -45,27 +47,36 @@ class SimuleringService(
      */
     fun simulerPensjon(providedSpec: ImpersonalSimuleringSpec): SimuleringResult =
         try {
-            val pid = pidGetter.pid()
-
             val registeredSpec = PersonalSimuleringSpec(
-                pid = pid,
-                sivilstand = providedSpec.sivilstand ?: sivilstand(pid),
+                pid = pidGetter.pid(),
+                sivilstand = providedSpec.sivilstand ?: sivilstand(),
                 aarligInntektFoerUttak = providedSpec.forventetAarligInntektFoerUttak
                     ?: inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact()
             )
 
             log.debug { "Simulerer med parametre $providedSpec og $registeredSpec" }
-            simuleringClient.simulerPersonligAlderspensjon(providedSpec, registeredSpec)
+
+            simuleringClient
+                .simulerPersonligAlderspensjon(providedSpec, registeredSpec)
+                .withAlderAar(naavaerendeAlder().aar)
         } catch (e: BadRequestException) {
             problem(e, type = ProblemType.ANNEN_KLIENTFEIL)
         } catch (e: DateTimeParseException) {
             problem(e, type = ProblemType.ANNEN_KLIENTFEIL)
+        } catch (e: NotFoundException) {
+            problem(e, type = ProblemType.PERSON_IKKE_FUNNET)
         } catch (e: EgressException) {
             problem(e, type = ProblemType.SERVERFEIL)
         }
 
-    private fun sivilstand(pid: Pid) =
-        personClient.fetchPerson(pid = pid, fetchFulltNavn = false)?.sivilstand ?: Sivilstand.UOPPGITT
+    private fun sivilstand() =
+        personService.getPerson().sivilstand
+
+    private fun naavaerendeAlder() =
+        Alder.from(
+            foedselDato = personService.getPerson().foedselsdato,
+            dato = time.date()
+        )
 
     private companion object {
         private fun problem(e: RuntimeException, type: ProblemType) =

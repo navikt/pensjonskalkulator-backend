@@ -12,8 +12,12 @@ data class SimuleringResult(
     val harForLiteTrygdetid: Boolean,
     val trygdetid: Int,
     val opptjeningGrunnlagListe: List<SimulertOpptjeningGrunnlag>,
+    val alderAar: Int? = null,
     val problem: Problem? = null
-)
+) {
+    fun withAlderAar(alderAar: Int) =
+        copy(alderAar = alderAar)
+}
 
 data class SimulertOpptjeningGrunnlag(
     val aar: Int,
