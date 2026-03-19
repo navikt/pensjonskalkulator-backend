@@ -22,7 +22,7 @@ object SimuleringSpecMapper {
             simuleringType = source.simuleringstype.internalValue,
             eps = source.eps?.let(::epsSpec) ?: defaultEpsSpec,
             forventetAarligInntektFoerUttak = source.aarligInntektFoerUttakBeloep,
-            sivilstand = source.sivilstatus?.internalValue,
+            sivilstatus = source.sivilstatus?.internalValue,
             gradertUttak = source.gradertUttak?.let(::gradertUttak),
             heltUttak = heltUttak(source.heltUttak),
             utenlandsopphold = utenlandsopphold(source),

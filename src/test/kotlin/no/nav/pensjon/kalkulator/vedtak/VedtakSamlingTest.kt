@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.vedtak
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import java.time.LocalDate
 
 class VedtakSamlingTest : ShouldSpec({
@@ -24,7 +24,7 @@ class VedtakSamlingTest : ShouldSpec({
                 fom = LocalDate.of(2024, 1, 1),
                 uttaksgradFom = LocalDate.of(2025, 1, 1),
                 utbetalingSisteMaaned = null,
-                sivilstand = Sivilstand.SAMBOER
+                sivilstatus = Sivilstatus.SAMBOER
             ),
             fremtidigAlderspensjon = null,
             ufoeretrygd = null,

@@ -5,7 +5,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.utbetaling.SamletUtbetaling
 import no.nav.pensjon.kalkulator.utbetaling.UtbetalingService
 import java.math.BigDecimal
@@ -23,7 +23,7 @@ class VedtakMedUtbetalingServiceTest : ShouldSpec({
             with(loependeAlderspensjon!!) {
                 grad shouldBe 1
                 fom shouldBe LocalDate.of(2024, 8, 1)
-                sivilstand shouldBe Sivilstand.GIFT
+                sivilstatus shouldBe Sivilstatus.GIFT
                 with(utbetalingSisteMaaned!!) {
                     posteringsdato shouldBe LocalDate.of(2024, 1, 1)
                     beloep shouldBe BigDecimal.TEN
@@ -32,7 +32,7 @@ class VedtakMedUtbetalingServiceTest : ShouldSpec({
             with(fremtidigAlderspensjon!!) {
                 grad shouldBe 1
                 fom shouldBe LocalDate.of(2025, 4, 1)
-                sivilstand shouldBe Sivilstand.SEPARERT
+                sivilstatus shouldBe Sivilstatus.SEPARERT
             }
             with(ufoeretrygd!!) {
                 grad shouldBe 2
@@ -51,12 +51,12 @@ private fun arrangeVedtak(): LoependeVedtakService =
             loependeAlderspensjon = LoependeAlderspensjon(
                 grad = 1,
                 fom = LocalDate.of(2024, 8, 1),
-                sivilstand = Sivilstand.GIFT
+                sivilstatus = Sivilstatus.GIFT
             ),
             fremtidigAlderspensjon = FremtidigAlderspensjon(
                 grad = 1,
                 fom = LocalDate.of(2025, 4, 1),
-                sivilstand = Sivilstand.SEPARERT
+                sivilstatus = Sivilstatus.SEPARERT
             ),
             ufoeretrygd = LoependeUfoeretrygd(grad = 2, fom = LocalDate.of(2022, 1, 1)),
             privatAfp = LoependeEntitet(fom = LocalDate.of(2023, 1, 1))

@@ -16,6 +16,7 @@ import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.time.TodayProvider
@@ -25,8 +26,11 @@ class SimuleringServiceTest : ShouldSpec({
 
     val pidGetter = mockk<PidGetter>().apply { every { pid() } returns pid }
 
-    should("use specified inntekt and sivilstand") {
-        val incomingSpec = impersonalSimuleringSpec(REGISTRERT_INNTEKT, Sivilstand.UOPPGITT)
+    should("use specified inntekt and sivilstatus") {
+        val incomingSpec = impersonalSimuleringSpec(
+            forventetInntekt = REGISTRERT_INNTEKT,
+            sivilstatus = Sivilstatus.UOPPGITT
+        )
         val simuleringClient = arrangeSimuleringClient(incomingSpec)
         val inntektService = mockk<InntektService>()
         val personService = mockk<PersonService>().apply {
@@ -46,18 +50,18 @@ class SimuleringServiceTest : ShouldSpec({
 
         response.alderspensjon[0].beloep shouldBe 123456
         verify { inntektService wasNot Called }
-        verify(exactly = 1) { personService.getPerson() } // for fødselsdato (not sivilstand)
+        verify(exactly = 1) { personService.getPerson() } // for fødselsdato (not sivilstatus)
 
         verify {
             simuleringClient.simulerPersonligAlderspensjon(
                 impersonalSpec = any(),
-                personalSpec = match { it.sivilstand == Sivilstand.UOPPGITT }, // specified sivilstand
+                personalSpec = match { it.sivilstatus == Sivilstatus.UOPPGITT }, // specified sivilstatus
             )
         }
     }
 
-    should("obtain registrert inntekt and sivilstand when not specified") {
-        val incomingSpec = impersonalSimuleringSpec(forventetInntekt = null, sivilstand = null)
+    should("obtain registrert inntekt and sivilstatus when not specified") {
+        val incomingSpec = impersonalSimuleringSpec(forventetInntekt = null, sivilstatus = null)
         val simuleringClient = arrangeSimuleringClient(incomingSpec)
         val inntektService = arrangeInntekt()
         val personService = arrangePerson()
@@ -75,13 +79,18 @@ class SimuleringServiceTest : ShouldSpec({
 
         response.alderspensjon[0].beloep shouldBe PENSJONSBELOEP
         verify(exactly = 1) { inntektService.sistePensjonsgivendeInntekt() }
-        verify(exactly = 2) { personService.getPerson() } // for sivilstand and fødselsdato
+        verify(exactly = 2) { personService.getPerson() } // for sivilstatus and fødselsdato
     }
 })
 
 private const val REGISTRERT_INNTEKT = 543210
 private const val PENSJONSBELOEP = 123456
-private val personalSpec = PersonalSimuleringSpec(pid, Sivilstand.UOPPGITT, REGISTRERT_INNTEKT)
+
+private val personalSpec = PersonalSimuleringSpec(
+    pid,
+    sivilstatus = Sivilstatus.UOPPGITT,
+    aarligInntektFoerUttak = REGISTRERT_INNTEKT
+)
 
 private val inntekt = Inntekt(
     type = Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT,
@@ -126,14 +135,14 @@ private val simuleringResult =
         opptjeningGrunnlagListe = emptyList()
     )
 
-private fun impersonalSimuleringSpec(forventetInntekt: Int?, sivilstand: Sivilstand?) =
+private fun impersonalSimuleringSpec(forventetInntekt: Int?, sivilstatus: Sivilstatus?) =
     ImpersonalSimuleringSpec(
         simuleringType = SimuleringType.ALDERSPENSJON,
-        sivilstand = sivilstand,
+        sivilstatus = sivilstatus,
         eps = EpsSpec(levende = LevendeEps(harInntektOver2G = false, harPensjon = false)),
         forventetAarligInntektFoerUttak = forventetInntekt,
         heltUttak = HeltUttak(
-            uttakFomAlder = Alder(67, 1),
+            uttakFomAlder = Alder(aar = 67, maaneder = 1),
             inntekt = null
         ),
         utenlandsopphold = Utenlandsopphold(

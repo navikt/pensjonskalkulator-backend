@@ -33,7 +33,7 @@ object PenLoependeVedtakMapper {
             grad = source.grad,
             fom = source.fraOgMed,
             uttaksgradFom = uttaksgradFom ?: source.fraOgMed,
-            sivilstand = PenSivilstand.toInternalValue(source.sivilstatus)
+            sivilstatus = PenSivilstand.toInternalValue(source.sivilstatus)
         )
 
     private fun fremtidigUttakgradsendring(source: PenLoependeVedtakDto) =

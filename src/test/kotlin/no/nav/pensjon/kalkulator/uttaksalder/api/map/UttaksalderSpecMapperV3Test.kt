@@ -7,6 +7,7 @@ import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.general.Inntekt
 import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.Opphold
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import no.nav.pensjon.kalkulator.uttaksalder.ImpersonalUttaksalderSpec
@@ -42,7 +43,7 @@ class UttaksalderSpecMapperV3Test : ShouldSpec({
         ) shouldBe
                 ImpersonalUttaksalderSpec(
                     simuleringType = SimuleringType.ALDERSPENSJON,
-                    sivilstand = Sivilstand.GJENLEVENDE_PARTNER,
+                    sivilstatus = Sivilstatus.GJENLEVENDE_PARTNER,
                     harEps = true,
                     aarligInntektFoerUttak = 123,
                     gradertUttak = null,

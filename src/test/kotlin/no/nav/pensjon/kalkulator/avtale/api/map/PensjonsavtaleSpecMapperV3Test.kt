@@ -8,7 +8,7 @@ import no.nav.pensjon.kalkulator.avtale.UttaksperiodeSpec
 import no.nav.pensjon.kalkulator.avtale.api.dto.*
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 
 class PensjonsavtaleSpecMapperV3Test : ShouldSpec({
 
@@ -46,7 +46,7 @@ class PensjonsavtaleSpecMapperV3Test : ShouldSpec({
                     ),
                     harEpsPensjon = true,
                     harEpsPensjonsgivendeInntektOver2G = true,
-                    sivilstand = Sivilstand.SEPARERT_PARTNER
+                    sivilstatus = Sivilstatus.SEPARERT_PARTNER
                 )
     }
 
@@ -64,7 +64,7 @@ class PensjonsavtaleSpecMapperV3Test : ShouldSpec({
                     uttaksperioder = emptyList(),
                     harEpsPensjon = false,
                     harEpsPensjonsgivendeInntektOver2G = false,
-                    sivilstand = null
+                    sivilstatus = null
                 )
     }
 })

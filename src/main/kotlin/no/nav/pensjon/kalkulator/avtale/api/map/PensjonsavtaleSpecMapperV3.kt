@@ -15,7 +15,7 @@ object PensjonsavtaleSpecMapperV3 {
             uttaksperioder = source.uttaksperioder.map(this::uttaksperiodeSpec),
             harEpsPensjon = source.epsHarPensjon,
             harEpsPensjonsgivendeInntektOver2G = source.epsHarInntektOver2G,
-            sivilstand = source.sivilstand?.internalValue
+            sivilstatus = source.sivilstand?.internalValue
         )
 
     private fun uttaksperiodeSpec(source: PensjonsavtaleUttaksperiodeSpecV3) =

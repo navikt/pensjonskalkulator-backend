@@ -27,7 +27,7 @@ class LavesteUttaksalderService(
     ) =
         ImpersonalSimuleringSpec(
             simuleringType = impersonalSpec.simuleringType,
-            sivilstand = personalSpec.sivilstand,
+            sivilstatus = personalSpec.sivilstatus,
             eps = EpsSpec(
                 LevendeEps(
                     harInntektOver2G = harEps, // antagelse: de fleste ektefeller/partnere/samboere har inntekt over 2G

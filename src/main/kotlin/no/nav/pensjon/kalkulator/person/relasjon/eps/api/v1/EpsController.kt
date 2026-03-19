@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
+import no.nav.pensjon.kalkulator.common.api.acl.CommonV1Sivilstatus
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.relasjon.eps.EpsService
 import no.nav.pensjon.kalkulator.person.relasjon.eps.api.v1.acl.*
@@ -45,7 +46,7 @@ class EpsController(
         traceAid.begin()
 
         return try {
-            EpsV1SivilstatusResult(sivilstatus = EpsV1Sivilstatus.fromInternalValue(service.naavaerendeSivilstatus()))
+            EpsV1SivilstatusResult(sivilstatus = CommonV1Sivilstatus.fromInternalValue(service.naavaerendeSivilstatus()))
         } catch (e: EgressException) {
             handleError(e, "V1")!!
         } finally {

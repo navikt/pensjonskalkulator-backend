@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import jakarta.validation.constraints.NotNull
 import mu.KotlinLogging
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -24,20 +24,20 @@ data class LoependeVedtakV4(
 @JsonInclude(NON_NULL)
 data class AlderspensjonDetaljerV4(
     @field:NotNull val grad: Int = 0,
-    @field:NotNull @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val fom: LocalDate,
-    @field:NotNull @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val uttaksgradFom: LocalDate,
+    @field:NotNull @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val fom: LocalDate,
+    @field:NotNull @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val uttaksgradFom: LocalDate,
     val sisteUtbetaling: UtbetalingV4? = null,
     @field:NotNull val sivilstand: SivilstandV4
 )
 
 data class FremtidigAlderspensjonDetaljerV4(
     @field:NotNull val grad: Int = 0,
-    @field:NotNull @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val fom: LocalDate
+    @field:NotNull @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val fom: LocalDate
 )
 
 data class UtbetalingV4(
     @field:NotNull val beloep: BigDecimal,
-    @field:NotNull @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val utbetalingsdato: LocalDate
+    @field:NotNull @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val utbetalingsdato: LocalDate
 )
 
 data class UfoeretrygdDetaljerV4(
@@ -45,32 +45,32 @@ data class UfoeretrygdDetaljerV4(
 )
 
 data class LoependeFraV4(
-    @field:NotNull @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val fom: LocalDate
+    @field:NotNull @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val fom: LocalDate
 )
 
-enum class SivilstandV4(val internalValue: Sivilstand) {
+enum class SivilstandV4(val internalValue: Sivilstatus) {
 
-    UNKNOWN(Sivilstand.UNKNOWN),
-    UOPPGITT(Sivilstand.UOPPGITT),
-    UGIFT(Sivilstand.UGIFT),
-    GIFT(Sivilstand.GIFT),
-    ENKE_ELLER_ENKEMANN(Sivilstand.ENKE_ELLER_ENKEMANN),
-    SKILT(Sivilstand.SKILT),
-    SEPARERT(Sivilstand.SEPARERT),
-    REGISTRERT_PARTNER(Sivilstand.REGISTRERT_PARTNER),
-    SEPARERT_PARTNER(Sivilstand.SEPARERT_PARTNER),
-    SKILT_PARTNER(Sivilstand.SKILT_PARTNER),
-    GJENLEVENDE_PARTNER(Sivilstand.GJENLEVENDE_PARTNER),
-    SAMBOER(Sivilstand.SAMBOER);
+    UNKNOWN(Sivilstatus.UNKNOWN),
+    UOPPGITT(Sivilstatus.UOPPGITT),
+    UGIFT(Sivilstatus.UGIFT),
+    GIFT(Sivilstatus.GIFT),
+    ENKE_ELLER_ENKEMANN(Sivilstatus.ENKE_ELLER_ENKEMANN),
+    SKILT(Sivilstatus.SKILT),
+    SEPARERT(Sivilstatus.SEPARERT),
+    REGISTRERT_PARTNER(Sivilstatus.REGISTRERT_PARTNER),
+    SEPARERT_PARTNER(Sivilstatus.SEPARERT_PARTNER),
+    SKILT_PARTNER(Sivilstatus.SKILT_PARTNER),
+    GJENLEVENDE_PARTNER(Sivilstatus.GJENLEVENDE_PARTNER),
+    SAMBOER(Sivilstatus.SAMBOER);
 
     companion object {
         private val values = entries.toTypedArray()
         private val log = KotlinLogging.logger {}
 
-        fun fromInternalValue(value: Sivilstand?) =
+        fun fromInternalValue(value: Sivilstatus?) =
             values.singleOrNull { it.internalValue == value } ?: default(value)
 
-        private fun default(internalValue: Sivilstand?): SivilstandV4 =
+        private fun default(internalValue: Sivilstatus?): SivilstandV4 =
             internalValue?.let {
                 log.warn { "Unknown sivilstand '$it'" }
                 UNKNOWN

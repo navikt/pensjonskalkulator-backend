@@ -16,7 +16,7 @@ object PersonligSimuleringSpecMapperV9 {
             simuleringType = source.simuleringstype,
             eps = eps(source),
             forventetAarligInntektFoerUttak = source.aarligInntektFoerUttakBeloep,
-            sivilstand = source.sivilstand,
+            sivilstatus = source.sivilstand?.sivilstatus,
             gradertUttak = source.gradertUttak?.let(::gradertUttak),
             heltUttak = heltUttak(source.heltUttak),
             utenlandsopphold = utenlandsopphold(source),

@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.vedtak.api.map
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.vedtak.*
 import no.nav.pensjon.kalkulator.vedtak.api.dto.*
 import java.math.BigDecimal
@@ -20,12 +20,12 @@ class LoependeVedtakMapperV4Test : FunSpec({
                     beloep = BigDecimal("100"),
                     posteringsdato = LocalDate.of(2025, 1, 1)
                 ),
-                sivilstand = Sivilstand.GIFT
+                sivilstatus = Sivilstatus.GIFT
             ),
             fremtidigAlderspensjon = FremtidigAlderspensjon(
                 grad = 10,
                 fom = LocalDate.of(2021, 12, 1),
-                sivilstand = Sivilstand.SKILT
+                sivilstatus = Sivilstatus.SKILT
             ),
             ufoeretrygd = LoependeUfoeretrygd(
                 grad = 50,

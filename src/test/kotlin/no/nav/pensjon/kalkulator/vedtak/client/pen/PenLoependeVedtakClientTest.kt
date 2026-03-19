@@ -6,7 +6,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.testutil.Arrange
@@ -23,6 +23,7 @@ import no.nav.pensjon.kalkulator.vedtak.client.pen.PenLoependeVedtakClientTestOb
 import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
 import org.springframework.beans.factory.BeanFactory
+import org.springframework.beans.factory.getBean
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.WebClient
 
@@ -35,7 +36,7 @@ class PenLoependeVedtakClientTest : FunSpec({
     fun client(context: BeanFactory) =
         PenLoependeVedtakClient(
             baseUrl!!,
-            webClientBuilder = context.getBean(WebClient.Builder::class.java),
+            webClientBuilder = context.getBean<WebClient.Builder>(),
             traceAid,
             retryAttempts = "1"
         )
@@ -60,7 +61,7 @@ class PenLoependeVedtakClientTest : FunSpec({
                 with(loependeAlderspensjon!!) {
                     grad shouldBe 100
                     fom.toString() shouldBe "2025-10-01"
-                    sivilstand shouldBe Sivilstand.UGIFT
+                    sivilstatus shouldBe Sivilstatus.UGIFT
                 }
                 ufoeretrygd shouldBe null
                 privatAfp shouldBe null
@@ -95,7 +96,7 @@ class PenLoependeVedtakClientTest : FunSpec({
                 with(loependeAlderspensjon!!) {
                     grad shouldBe 100
                     fom.toString() shouldBe "2025-10-01"
-                    sivilstand shouldBe Sivilstand.GIFT
+                    sivilstatus shouldBe Sivilstatus.GIFT
                 }
                 with(ufoeretrygd!!) {
                     grad shouldBe 100
@@ -116,7 +117,7 @@ class PenLoependeVedtakClientTest : FunSpec({
                 with(loependeAlderspensjon!!) {
                     grad shouldBe 100
                     fom.toString() shouldBe "2025-10-01"
-                    sivilstand shouldBe Sivilstand.SKILT
+                    sivilstatus shouldBe Sivilstatus.SKILT
                 }
                 with(ufoeretrygd!!) {
                     grad shouldBe 100
@@ -137,7 +138,7 @@ class PenLoependeVedtakClientTest : FunSpec({
                 with(loependeAlderspensjon!!) {
                     grad shouldBe 100
                     fom.toString() shouldBe "2025-10-01"
-                    sivilstand shouldBe Sivilstand.ENKE_ELLER_ENKEMANN
+                    sivilstatus shouldBe Sivilstatus.ENKE_ELLER_ENKEMANN
                 }
                 with(ufoeretrygd!!) {
                     grad shouldBe 100

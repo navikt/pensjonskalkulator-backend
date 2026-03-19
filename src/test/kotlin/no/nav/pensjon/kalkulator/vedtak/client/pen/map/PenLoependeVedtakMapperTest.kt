@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.vedtak.client.pen.map
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenGjeldendeUfoeregradDto
 import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenGjeldendeVedtakApDto
 import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenGjeldendeVedtakDto
@@ -38,7 +38,7 @@ class PenLoependeVedtakMapperTest : ShouldSpec({
             with(loependeAlderspensjon!!) {
                 grad shouldBe 1
                 fom shouldBe LocalDate.of(2021, 1, 1)
-                sivilstand shouldBe Sivilstand.SAMBOER
+                sivilstatus shouldBe Sivilstatus.SAMBOER
             }
 
             with(ufoeretrygd!!) {
@@ -49,7 +49,7 @@ class PenLoependeVedtakMapperTest : ShouldSpec({
             with(fremtidigAlderspensjon!!) {
                 grad shouldBe 3
                 fom shouldBe LocalDate.of(2022, 2, 2)
-                sivilstand shouldBe Sivilstand.GIFT
+                sivilstatus shouldBe Sivilstatus.GIFT
             }
         }
     }
@@ -77,7 +77,7 @@ class PenLoependeVedtakMapperTest : ShouldSpec({
         with(result.loependeAlderspensjon!!) {
             grad shouldBe 1
             fom shouldBe LocalDate.of(2021, 1, 1)
-            sivilstand shouldBe Sivilstand.SAMBOER
+            sivilstatus shouldBe Sivilstatus.SAMBOER
         }
     }
 })

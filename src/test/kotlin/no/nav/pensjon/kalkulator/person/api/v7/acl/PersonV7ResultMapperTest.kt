@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.person.api.v7.acl
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
+import no.nav.pensjon.kalkulator.common.api.acl.CommonV1Sivilstatus
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.mock.PersonFactory.foedselsdato
 import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
@@ -32,7 +33,7 @@ class PersonV7ResultMapperTest : ShouldSpec({
             navn = "Fornavn1 Etternavn1",
             fornavn = "Fornavn1",
             foedselsdato = foedselsdato,
-            sivilstatus = PersonV7Sivilstatus.GIFT,
+            sivilstatus = CommonV1Sivilstatus.GIFT,
             pensjoneringAldre = PersonV7Pensjonsaldre(
                 normertPensjoneringsalder = PersonV7Alder(aar = 67, maaneder = 2),
                 nedreAldersgrense = PersonV7Alder(aar = 62, maaneder = 2),
