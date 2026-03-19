@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.vedtak.api.v1.acl
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
+import no.nav.pensjon.kalkulator.common.api.acl.CommonV1Sivilstatus
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.vedtak.*
 import java.math.BigDecimal
@@ -44,7 +45,7 @@ class VedtakResultMapperTest : ShouldSpec({
                     beloep = BigDecimal("100"),
                     utbetalingsdato = LocalDate.of(2025, 1, 1)
                 ),
-                sivilstatus = VedtakV1Sivilstatus.GIFT
+                sivilstatus = CommonV1Sivilstatus.GIFT
             ),
             fremtidigAlderspensjon = VedtakV1Alderspensjonsuttak(
                 grad = 10,

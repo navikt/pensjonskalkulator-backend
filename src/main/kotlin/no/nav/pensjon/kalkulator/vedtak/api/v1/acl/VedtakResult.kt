@@ -6,15 +6,13 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotNull
-import mu.KotlinLogging
-import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.person.Sivilstatus
+import no.nav.pensjon.kalkulator.common.api.acl.CommonV1Sivilstatus
 import java.math.BigDecimal
 import java.time.LocalDate
 
 @JsonInclude(NON_NULL)
 data class VedtakV1Samling(
-    @field:Schema(description = "Om personen har løpende vedtak")
+    @field:Schema(description = "Om personen har løpende eller fremtidig vedtak")
     @field:NotNull val harVedtak: Boolean,
 
     @field:Schema(description = "Løpende alderspensjon")
@@ -56,7 +54,7 @@ data class VedtakV1LoependeAlderspensjon(
 
     @field:Schema(description = "Sivilstatus")
     @field:NotNull
-    val sivilstatus: VedtakV1Sivilstatus
+    val sivilstatus: CommonV1Sivilstatus
 )
 
 data class VedtakV1Alderspensjonsuttak(
@@ -78,32 +76,3 @@ data class VedtakV1Utbetaling(
     @field:NotNull @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val utbetalingsdato: LocalDate
 )
-
-enum class VedtakV1Sivilstatus(val internalValue: Sivilstatus) {
-
-    UNKNOWN(Sivilstatus.UNKNOWN),
-    UOPPGITT(Sivilstatus.UOPPGITT),
-    UGIFT(Sivilstatus.UGIFT),
-    GIFT(Sivilstatus.GIFT),
-    ENKE_ELLER_ENKEMANN(Sivilstatus.ENKE_ELLER_ENKEMANN),
-    SKILT(Sivilstatus.SKILT),
-    SEPARERT(Sivilstatus.SEPARERT),
-    REGISTRERT_PARTNER(Sivilstatus.REGISTRERT_PARTNER),
-    SEPARERT_PARTNER(Sivilstatus.SEPARERT_PARTNER),
-    SKILT_PARTNER(Sivilstatus.SKILT_PARTNER),
-    GJENLEVENDE_PARTNER(Sivilstatus.GJENLEVENDE_PARTNER),
-    SAMBOER(Sivilstatus.SAMBOER);
-
-    companion object {
-        private val log = KotlinLogging.logger {}
-
-        fun fromInternalValue(value: Sivilstatus?) =
-            entries.singleOrNull { it.internalValue == value } ?: default(value)
-
-        private fun default(internalValue: Sivilstatus?): VedtakV1Sivilstatus =
-            internalValue?.let {
-                log.warn { "Unknown sivilstatus '$it'" }
-                UNKNOWN
-            } ?: UOPPGITT
-    }
-}
