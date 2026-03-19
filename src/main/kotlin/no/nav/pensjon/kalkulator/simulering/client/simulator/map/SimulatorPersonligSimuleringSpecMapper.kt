@@ -18,7 +18,7 @@ object SimulatorPersonligSimuleringSpecMapper {
         SimulatorSimuleringSpec(
             simuleringstype = SimulatorSimuleringType.fromInternalValue(impersonalSpec.simuleringType).externalValue,
             pid = personalSpec.pid.value,
-            sivilstand = SimulatorSivilstand.fromInternalValue(personalSpec.sivilstand).externalValue,
+            sivilstand = SimulatorSivilstatus.fromInternalValue(personalSpec.sivilstatus).externalValue,
             epsHarInntektOver2G = impersonalSpec.eps.levende?.harInntektOver2G == true,
             epsHarPensjon = impersonalSpec.eps.levende?.harPensjon == true,
             sisteInntekt = personalSpec.aarligInntektFoerUttak,

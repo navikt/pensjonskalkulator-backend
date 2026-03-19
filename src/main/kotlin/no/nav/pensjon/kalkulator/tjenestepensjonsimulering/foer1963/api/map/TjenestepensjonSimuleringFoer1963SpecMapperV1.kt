@@ -18,7 +18,7 @@ object TjenestepensjonSimuleringFoer1963SpecMapperV1 {
             foedselsdato = source.foedselsdato,
             eps = eps(source),
             forventetAarligInntektFoerUttak = source.aarligInntektFoerUttakBeloep,
-            sivilstand = source.sivilstand,
+            sivilstatus = source.sivilstand?.sivilstatus,
             gradertUttak = source.gradertUttak?.let(::gradertUttak),
             heltUttak = heltUttak(source.heltUttak),
             utenlandsopphold = utenlandsopphold(source),

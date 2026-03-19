@@ -20,7 +20,7 @@ object PersonligSimuleringSpecMapper {
     ) =
         PersonligSimuleringSpecDto(
             pid = personalSpec.pid.value,
-            sivilstatus = SivilstatusSpecDto.fromInternalValue(personalSpec.sivilstand),
+            sivilstatus = SivilstatusSpecDto.fromInternalValue(personalSpec.sivilstatus),
             simuleringstype = SimuleringstypeSpecDto.fromInternalValue(impersonalSpec.simuleringType),
             sisteInntekt = personalSpec.aarligInntektFoerUttak,
             gradertUttak = impersonalSpec.gradertUttak?.let(::gradertUttak),

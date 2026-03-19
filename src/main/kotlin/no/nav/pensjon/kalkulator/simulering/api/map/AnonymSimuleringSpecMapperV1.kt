@@ -3,12 +3,8 @@ package no.nav.pensjon.kalkulator.simulering.api.map
 import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.general.HeltUttak.Companion.defaultHeltUttakInntekt
 import no.nav.pensjon.kalkulator.general.HeltUttak.Companion.defaultHeltUttakInntektTomAlder
-import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.simulering.EpsSpec
-import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
-import no.nav.pensjon.kalkulator.simulering.LevendeEps
-import no.nav.pensjon.kalkulator.simulering.SimuleringType
-import no.nav.pensjon.kalkulator.simulering.Utenlandsopphold
+import no.nav.pensjon.kalkulator.person.Sivilstatus
+import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 
 /**
@@ -19,10 +15,10 @@ object AnonymSimuleringSpecMapperV1 {
 
     fun fromAnonymSimuleringSpecV1(dto: AnonymSimuleringSpecV1) =
         ImpersonalSimuleringSpec(
-            simuleringType = dto.simuleringstype?.externalValue ?: SimuleringType.ALDERSPENSJON,
+            simuleringType = dto.simuleringstype?.internalValue ?: SimuleringType.ALDERSPENSJON,
             eps = eps(dto),
             forventetAarligInntektFoerUttak = dto.aarligInntektFoerUttakBeloep,
-            sivilstand = dto.sivilstand?.externalValue ?: Sivilstand.UGIFT,
+            sivilstatus = dto.sivilstand?.internalValue ?: Sivilstatus.UGIFT,
             gradertUttak = dto.gradertUttak?.let(::gradertUttak),
             heltUttak = heltUttak(dto.heltUttak),
             utenlandsopphold = utenlandsopphold(dto),
@@ -64,5 +60,8 @@ object AnonymSimuleringSpecMapperV1 {
         )
 
     private fun alder(dto: AnonymSimuleringAlderV1) =
-        Alder(dto.aar, dto.maaneder)
+        Alder(
+            aar = dto.aar,
+            maaneder = dto.maaneder
+        )
 }

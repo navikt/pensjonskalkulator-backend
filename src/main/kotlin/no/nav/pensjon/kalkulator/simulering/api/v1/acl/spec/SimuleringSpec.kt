@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.simulering.api.v1.acl.spec
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING
 import jakarta.validation.constraints.NotNull
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.common.api.acl.CommonV1Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
 import no.nav.pensjon.kalkulator.simulering.SimuleringType
 import java.time.LocalDate
@@ -18,7 +18,7 @@ data class SimuleringV1Spec(
     val gradertUttak: SimuleringV1GradertUttakSpec? = null, // default is helt uttak (100 %)
     @field:NotNull val heltUttak: SimuleringV1HeltUttakSpec,
     val utenlandsperiodeListe: List<SimuleringV1UtenlandsperiodeSpec>? = null,
-    val sivilstatus: SimuleringV1SivilstatusSpec? = null,
+    val sivilstatus: CommonV1Sivilstatus? = null,
     val eps: SimuleringV1EpsSpec? = null,
     val offentligAfp: SimuleringV1OffentligAfpSpec? = null
 )
@@ -112,18 +112,4 @@ enum class SimuleringV1SimuleringstypeSpec(val internalValue: SimuleringType) {
     ENDRING_ALDERSPENSJON_MED_PRIVAT_AFP(internalValue = SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT),
     ENDRING_ALDERSPENSJON_MED_GJENLEVENDERETT(internalValue = SimuleringType.ENDRING_ALDERSPENSJON_MED_GJENLEVENDERETT)
     // ALDERSPENSJON_MED_TIDSBEGRENSET_OFFENTLIG_AFP har ingen tilsvarende type for endring (støttes ikke)
-}
-
-enum class SimuleringV1SivilstatusSpec(val internalValue: Sivilstand = Sivilstand.UOPPGITT) {
-    UOPPGITT,
-    UGIFT(internalValue = Sivilstand.UGIFT),
-    GIFT(internalValue = Sivilstand.GIFT),
-    ENKE_ELLER_ENKEMANN(internalValue = Sivilstand.ENKE_ELLER_ENKEMANN),
-    SKILT(internalValue = Sivilstand.SKILT),
-    SEPARERT(internalValue = Sivilstand.SEPARERT),
-    REGISTRERT_PARTNER(internalValue = Sivilstand.REGISTRERT_PARTNER),
-    SEPARERT_PARTNER(internalValue = Sivilstand.SEPARERT_PARTNER),
-    SKILT_PARTNER(internalValue = Sivilstand.SKILT_PARTNER),
-    GJENLEVENDE_PARTNER(internalValue = Sivilstand.GJENLEVENDE_PARTNER),
-    SAMBOER(internalValue = Sivilstand.SAMBOER)
 }

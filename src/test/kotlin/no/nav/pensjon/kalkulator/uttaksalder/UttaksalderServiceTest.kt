@@ -16,6 +16,7 @@ import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.*
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -25,7 +26,7 @@ class UttaksalderServiceTest : ShouldSpec({
     should("use inntekt from impersonal specification") {
         val impersonalSpec = ImpersonalUttaksalderSpec(
             simuleringType = SimuleringType.ALDERSPENSJON,
-            sivilstand = Sivilstand.GIFT,
+            sivilstatus = Sivilstatus.GIFT,
             harEps = true,
             aarligInntektFoerUttak = 100_000,
             heltUttak = HeltUttak(uttakFomAlder = Alder(aar = 67, maaneder = 0), inntekt = null),
@@ -61,7 +62,7 @@ class UttaksalderServiceTest : ShouldSpec({
         val person = person()
         val impersonalSpec = ImpersonalUttaksalderSpec(
             simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
-            sivilstand = null, // sivilstand not specified
+            sivilstatus = null, // sivilstand not specified
             harEps = null,
             aarligInntektFoerUttak = null, // inntekt not specified
             heltUttak = HeltUttak(Alder(67, 0), null),
@@ -97,10 +98,10 @@ class UttaksalderServiceTest : ShouldSpec({
 
     context("'har EPS' and sivilstand not specified") {
         should("deduce 'har EPS' from person's sivilstand") {
-            val person = person(Sivilstand.SAMBOER) // 'har EPS' is true for samboer
+            val person = person(Sivilstand.GIFT) // 'har EPS' is true for gifte
             val impersonalSpec = ImpersonalUttaksalderSpec(
                 simuleringType = SimuleringType.ALDERSPENSJON,
-                sivilstand = null, // sivilstand not specified
+                sivilstatus = null, // sivilstand not specified
                 harEps = null, // 'har EPS' not specified
                 aarligInntektFoerUttak = 1,
                 heltUttak = HeltUttak(Alder(67, 0), null),
@@ -137,7 +138,7 @@ class UttaksalderServiceTest : ShouldSpec({
         should("deduce 'har EPS' from specified sivilstand") {
             val uttakSpec = ImpersonalUttaksalderSpec(
                 simuleringType = SimuleringType.ALDERSPENSJON,
-                sivilstand = Sivilstand.REGISTRERT_PARTNER, // sivilstand specified
+                sivilstatus = Sivilstatus.REGISTRERT_PARTNER, // sivilstatus specified
                 harEps = null, // 'har EPS' not specified
                 aarligInntektFoerUttak = 1,
                 heltUttak = HeltUttak(uttakFomAlder = Alder(aar = 67, maaneder = 0), inntekt = null),
@@ -174,7 +175,7 @@ class UttaksalderServiceTest : ShouldSpec({
         should("not override 'har EPS' based on sivilstand") {
             val impersonalSpec = ImpersonalUttaksalderSpec(
                 simuleringType = SimuleringType.ALDERSPENSJON,
-                sivilstand = null,
+                sivilstatus = null,
                 harEps = false, // 'har EPS' specified (i.e., not null)
                 aarligInntektFoerUttak = null,
                 heltUttak = HeltUttak(uttakFomAlder = Alder(aar = 67, maaneder = 0), inntekt = null),
@@ -272,7 +273,7 @@ private fun simuleringSpec(
     angittInntekt: Inntekt? = null
 ) = ImpersonalSimuleringSpec(
     simuleringType = spec.simuleringType,
-    sivilstand = person?.sivilstand ?: spec.sivilstand,
+    sivilstatus = person?.sivilstand?.sivilstatus ?: spec.sivilstatus,
     eps = EpsSpec(levende = LevendeEps(harInntektOver2G = epsHarInntektOver2G, harPensjon = false)),
     forventetAarligInntektFoerUttak = spec.aarligInntektFoerUttak
         ?: (angittInntekt ?: inntekt).beloep.intValueExact(),

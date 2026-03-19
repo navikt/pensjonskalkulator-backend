@@ -5,13 +5,9 @@ import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.*
-import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.SimulatorAlderSpec
-import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.SimulatorGradertUttakSpec
-import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.SimulatorHeltUttakSpec
-import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.SimulatorSimuleringSpec
-import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.SimulatorUtlandPeriodeSpec
+import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.*
 import java.time.LocalDate
 
 class SimulatorPersonligSimuleringSpecMapperTest : ShouldSpec({
@@ -83,5 +79,5 @@ private fun personalSpec() =
     PersonalSimuleringSpec(
         pid = pid,
         aarligInntektFoerUttak = 100_000,
-        sivilstand = Sivilstand.UGIFT
+        sivilstatus = Sivilstatus.UGIFT
     )

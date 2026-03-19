@@ -1,14 +1,12 @@
-package no.nav.pensjon.kalkulator.common.client.pen
+package no.nav.pensjon.kalkulator.simulering.client.simulator.map
 
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 
 /**
- * The 'externalValue' is sivilstand values used by PEN (pensjonsfaglig kjerne).
- * PEN supports the concept of 'samboer' (unlike Folkeregisteret/PDL).
- * The source of PEN's sivilstand values is:
- * https://github.com/navikt/pesys/blob/main/pen/domain/nav-domain-pensjon-pen-api/src/main/java/no/nav/domain/pensjon/kjerne/kodetabeller/SivilstandTypeCode.java
+ * The 'externalValue' is sivilstatus values used by pensjonssimulator.
+ * pensjonssimulator supports the concept of 'samboer' (unlike Folkeregisteret/PDL).
  */
-enum class PenSivilstand(val externalValue: String, val internalValue: Sivilstatus) {
+enum class SimulatorSivilstatus(val externalValue: String, val internalValue: Sivilstatus) {
 
     ENKE_ELLER_ENKEMANN(externalValue = "ENKE", internalValue = Sivilstatus.ENKE_ELLER_ENKEMANN),
     GIFT(externalValue = "GIFT", internalValue = Sivilstatus.GIFT),
@@ -27,15 +25,12 @@ enum class PenSivilstand(val externalValue: String, val internalValue: Sivilstat
     UDEFINERT(externalValue = "NULL", internalValue = Sivilstatus.UOPPGITT);
 
     companion object {
-        fun fromInternalValue(sivilstatus: Sivilstatus?): PenSivilstand =
+        fun fromInternalValue(sivilstatus: Sivilstatus?): SimulatorSivilstatus =
             when (sivilstatus) {
                 Sivilstatus.UOPPGITT -> UDEFINERT // ambiguous UDEFINERT/GJENLEVENDE_*
                 Sivilstatus.GIFT -> GIFT // ambiguous GIFT/-_LEVER_ADSKILT
                 Sivilstatus.REGISTRERT_PARTNER -> REGISTRERT_PARTNER // ambiguous REGISTRERT_PARTNER/-_LEVER_ADSKILT
                 else -> entries.firstOrNull { it.internalValue == sivilstatus } ?: UDEFINERT
             }
-
-        fun toInternalValue(value: String): Sivilstatus =
-            entries.firstOrNull { it.externalValue == value }?.internalValue ?: Sivilstatus.UOPPGITT
     }
 }

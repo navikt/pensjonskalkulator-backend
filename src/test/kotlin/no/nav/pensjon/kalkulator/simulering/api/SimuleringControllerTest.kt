@@ -8,7 +8,7 @@ import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
@@ -257,7 +257,7 @@ class SimuleringControllerTest : ShouldSpec() {
                 simuleringType = simuleringType,
                 eps = EpsSpec(levende = LevendeEps(harInntektOver2G = true, harPensjon = false)),
                 forventetAarligInntektFoerUttak = 100_000,
-                sivilstand = Sivilstand.UGIFT,
+                sivilstatus = Sivilstatus.UGIFT,
                 heltUttak = HeltUttak(
                     uttakFomAlder = Alder(67, 1),
                     inntekt = Inntekt(50_000, Alder(75, 0))
@@ -279,7 +279,7 @@ class SimuleringControllerTest : ShouldSpec() {
                 simuleringType = simuleringType,
                 eps = EpsSpec(levende = LevendeEps(harInntektOver2G = true, harPensjon = false)),
                 forventetAarligInntektFoerUttak = 100_000,
-                sivilstand = Sivilstand.SAMBOER,
+                sivilstatus = Sivilstatus.SAMBOER,
                 gradertUttak = GradertUttak(
                     grad = Uttaksgrad.FOERTI_PROSENT,
                     uttakFomAlder = Alder(62, 9),

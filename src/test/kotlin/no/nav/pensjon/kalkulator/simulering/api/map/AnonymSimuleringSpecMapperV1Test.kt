@@ -3,12 +3,8 @@ package no.nav.pensjon.kalkulator.simulering.api.map
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.general.*
-import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.simulering.EpsSpec
-import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
-import no.nav.pensjon.kalkulator.simulering.LevendeEps
-import no.nav.pensjon.kalkulator.simulering.SimuleringType
-import no.nav.pensjon.kalkulator.simulering.Utenlandsopphold
+import no.nav.pensjon.kalkulator.person.Sivilstatus
+import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 
 class AnonymSimuleringSpecMapperV1Test : ShouldSpec({
@@ -39,7 +35,7 @@ class AnonymSimuleringSpecMapperV1Test : ShouldSpec({
                     simuleringType = SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
                     eps = EpsSpec(levende = LevendeEps(harInntektOver2G = true, harPensjon = false)),
                     forventetAarligInntektFoerUttak = 400000,
-                    sivilstand = Sivilstand.SAMBOER,
+                    sivilstatus = Sivilstatus.SAMBOER,
                     gradertUttak = GradertUttak(
                         grad = Uttaksgrad.FEMTI_PROSENT,
                         uttakFomAlder = Alder(aar = 67, maaneder = 0),

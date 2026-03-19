@@ -2,14 +2,14 @@ package no.nav.pensjon.kalkulator.avtale
 
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 
 data class PensjonsavtaleSpec(
     val aarligInntektFoerUttak: Int,
     val uttaksperioder: List<UttaksperiodeSpec>,
     val harEpsPensjon: Boolean? = null,
     val harEpsPensjonsgivendeInntektOver2G: Boolean? = null,
-    val sivilstand: Sivilstand? = null
+    val sivilstatus: Sivilstatus? = null
 )
 
 data class UttaksperiodeSpec(

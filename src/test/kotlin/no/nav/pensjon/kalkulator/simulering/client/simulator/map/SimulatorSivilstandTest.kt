@@ -2,24 +2,24 @@ package no.nav.pensjon.kalkulator.simulering.client.simulator.map
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 
 class SimulatorSivilstandTest : ShouldSpec({
 
-    should("map from sivilstand to PEN's equivalent sivilstand") {
-        SimulatorSivilstand.fromInternalValue(Sivilstand.GIFT) shouldBe
-                SimulatorSivilstand.GIFT
+    should("map from sivilstatus to PEN's equivalent") {
+        SimulatorSivilstatus.fromInternalValue(Sivilstatus.GIFT) shouldBe
+                SimulatorSivilstatus.GIFT
 
-        SimulatorSivilstand.fromInternalValue(Sivilstand.UGIFT) shouldBe
-                SimulatorSivilstand.UGIFT
+        SimulatorSivilstatus.fromInternalValue(Sivilstatus.UGIFT) shouldBe
+                SimulatorSivilstatus.UGIFT
 
-        SimulatorSivilstand.fromInternalValue(Sivilstand.REGISTRERT_PARTNER) shouldBe
-                SimulatorSivilstand.REGISTRERT_PARTNER
+        SimulatorSivilstatus.fromInternalValue(Sivilstatus.REGISTRERT_PARTNER) shouldBe
+                SimulatorSivilstatus.REGISTRERT_PARTNER
 
-        SimulatorSivilstand.fromInternalValue(Sivilstand.ENKE_ELLER_ENKEMANN) shouldBe
-                SimulatorSivilstand.ENKE_ELLER_ENKEMANN
+        SimulatorSivilstatus.fromInternalValue(Sivilstatus.ENKE_ELLER_ENKEMANN) shouldBe
+                SimulatorSivilstatus.ENKE_ELLER_ENKEMANN
 
-        SimulatorSivilstand.fromInternalValue(Sivilstand.UOPPGITT) shouldBe
-                SimulatorSivilstand.UDEFINERT
+        SimulatorSivilstatus.fromInternalValue(Sivilstatus.UOPPGITT) shouldBe
+                SimulatorSivilstatus.UDEFINERT
     }
 })

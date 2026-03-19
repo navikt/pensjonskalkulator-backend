@@ -1,25 +1,24 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.v3.dto
 
 import mu.KotlinLogging
-import no.nav.pensjon.kalkulator.person.Sivilstand
 import org.springframework.util.StringUtils.hasLength
+import no.nav.pensjon.kalkulator.person.Sivilstatus as InternalSivilstatus
 
-enum class Sivilstatus(val externalValue: String, val internalValue: Sivilstand) {
-    NONE("", Sivilstand.UOPPGITT),
-    UNKNOWN("?", Sivilstand.UNKNOWN),
-    GIFT("gift", Sivilstand.GIFT),
-    UGIFT("ugift", Sivilstand.UGIFT);
+enum class Sivilstatus(val externalValue: String, val internalValue: InternalSivilstatus) {
+    NONE(externalValue = "", internalValue = InternalSivilstatus.UOPPGITT),
+    UNKNOWN(externalValue = "?", internalValue = InternalSivilstatus.UNKNOWN),
+    GIFT(externalValue = "gift", internalValue = InternalSivilstatus.GIFT),
+    UGIFT(externalValue = "ugift", internalValue = InternalSivilstatus.UGIFT);
 
     companion object {
-        private val values = entries.toTypedArray()
         private val defaultValue = GIFT // Norsk Pensjon default
         private val log = KotlinLogging.logger {}
 
         fun fromExternalValue(value: String?) =
-            values.singleOrNull { it.externalValue.equals(value, true) } ?: default(value)
+            entries.singleOrNull { it.externalValue.equals(value, true) } ?: default(value)
 
-        fun fromInternalValue(value: Sivilstand?) =
-            values.singleOrNull { it.internalValue == value } ?: defaultValue
+        fun fromInternalValue(value: InternalSivilstatus?) =
+            entries.singleOrNull { it.internalValue == value } ?: defaultValue
 
         private fun default(externalValue: String?) =
             if (hasLength(externalValue))

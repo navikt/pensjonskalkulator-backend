@@ -4,7 +4,7 @@ import no.nav.pensjon.kalkulator.general.GradertUttak
 import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import java.time.LocalDate
 
 /**
@@ -13,7 +13,7 @@ import java.time.LocalDate
  */
 data class ImpersonalSimuleringSpec(
     val simuleringType: SimuleringType,
-    val sivilstand: Sivilstand? = null,
+    val sivilstatus: Sivilstatus? = null,
     val eps: EpsSpec,
     val forventetAarligInntektFoerUttak: Int? = null,
     val gradertUttak: GradertUttak? = null,
