@@ -41,7 +41,13 @@ object SimuleringResultAdjuster {
             SimuleringV1Alderspensjon(
                 alderAar,
                 beloep = pensjonForAlder0.beloep,
+                basispensjonBeloep = pensjonForAlder0.basispensjonBeloep,
+                garantipensjonBeloep = pensjonForAlder0.garantipensjonBeloep,
+                garantipensjonSats = pensjonForAlder0.garantipensjonSats,
+                garantitilleggBeloep = pensjonForAlder0.garantitilleggBeloep,
+                restpensjonBeloep = pensjonForAlder0.restpensjonBeloep,
                 gjenlevendetillegg = pensjonForAlder0.gjenlevendetillegg,
+                minstePensjonsnivaaSats = pensjonForAlder0.minstePensjonsnivaaSats,
                 extension = pensjonForAlder0.extension
             )
         )

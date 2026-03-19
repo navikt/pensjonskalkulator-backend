@@ -29,24 +29,43 @@ object SimuleringResultMapper {
         )
 
     private fun alderspensjon(source: SimulertAlderspensjon, mode: MappingMode) =
-        SimuleringV1Alderspensjon(
-            alderAar = source.alder,
-            beloep = source.beloep,
-            gjenlevendetillegg = if (mode.mapGjenlevendetillegg) source.kapittel19Gjenlevendetillegg else null,
-            extension = if (mode.extended) alderspensjonExtension(source) else null
-        )
+        if (mode.reduced)
+            SimuleringV1Alderspensjon(
+                alderAar = source.alder,
+                beloep = source.beloep,
+                basispensjonBeloep = null,
+                garantipensjonBeloep = null,
+                garantipensjonSats = null,
+                garantitilleggBeloep = null,
+                restpensjonBeloep = null,
+                gjenlevendetillegg = null,
+                minstePensjonsnivaaSats = null,
+                extension = null
+            )
+        else
+            SimuleringV1Alderspensjon(
+                alderAar = source.alder,
+                beloep = source.beloep,
+                basispensjonBeloep = source.kapittel19Pensjon?.basispensjon,
+                garantipensjonBeloep = source.kapittel20Pensjon?.garantipensjon?.aarligBeloep,
+                garantipensjonSats = source.kapittel20Pensjon?.garantipensjon?.sats,
+                garantitilleggBeloep = source.kapittel20Pensjon?.garantitillegg,
+                restpensjonBeloep = source.kapittel19Pensjon?.restpensjon,
+                gjenlevendetillegg = source.kapittel19Pensjon?.gjenlevendetillegg,
+                minstePensjonsnivaaSats = source.kapittel19Pensjon?.minstePensjonsnivaaSats,
+                extension = if (mode.extended) alderspensjonExtension(source) else null
+            )
 
     private fun alderspensjonExtension(source: SimulertAlderspensjon) =
         SimuleringV1AlderspensjonExtension(
             inntektspensjonBeloep = source.inntektspensjonBeloep,
-            garantipensjonBeloep = source.garantipensjonBeloep,
             delingstall = source.delingstall,
             pensjonBeholdningFoerUttakBeloep = source.pensjonBeholdningFoerUttak,
-            andelsbroekKap19 = source.andelsbroekKap19,
-            andelsbroekKap20 = source.andelsbroekKap20,
+            andelsbroekKap19 = source.kapittel19Pensjon?.andelsbroek,
+            andelsbroekKap20 = source.kapittel20Pensjon?.andelsbroek,
             sluttpoengtall = source.sluttpoengtall,
-            trygdetidKap19 = source.trygdetidKap19,
-            trygdetidKap20 = source.trygdetidKap20,
+            trygdetidKap19 = source.kapittel19Pensjon?.trygdetidAntallAar,
+            trygdetidKap20 = source.kapittel20Pensjon?.trygdetidAntallAar,
             poengaarFoer92 = source.poengaarFoer92,
             poengaarEtter91 = source.poengaarEtter91,
             forholdstall = source.forholdstall,

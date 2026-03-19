@@ -49,8 +49,26 @@ data class SimuleringV1Alderspensjon(
     @field:NotNull
     val beloep: Int,
 
-    @field:Schema(description = "Informasjon om gjenlevendetillegg er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    @field:Schema(description = "Årlig beløp for basispensjon; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val basispensjonBeloep: Int?,
+
+    @field:Schema(description = "Årlig beløp for garantipensjon; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val garantipensjonBeloep: Int?,
+
+    @field:Schema(description = "Sats for garantipensjon; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val garantipensjonSats: Double?,
+
+    @field:Schema(description = "Årlig beløp for garantitillegg; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val garantitilleggBeloep: Int?,
+
+    @field:Schema(description = "Årlig beløp for restpensjon; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val restpensjonBeloep: Int?,
+
+    @field:Schema(description = "Årlig beløp for gjenlevendetillegg; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
     val gjenlevendetillegg: Int?,
+
+    @field:Schema(description = "Minste pensjonsnivå-sats; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val minstePensjonsnivaaSats: Double?,
 
     @field:Schema(description = "Utvidet informasjon om alderspensjonen; kun inkludert i eksternvariant og kun når funksjonsbryter 'utvidet-simuleringsresultat' er 'på'")
     val extension: SimuleringV1AlderspensjonExtension?
@@ -59,7 +77,6 @@ data class SimuleringV1Alderspensjon(
 @JsonInclude(NON_NULL)
 data class SimuleringV1AlderspensjonExtension(
     val inntektspensjonBeloep: Int? = null,
-    val garantipensjonBeloep: Int? = null,
     val delingstall: Double? = null,
     val pensjonBeholdningFoerUttakBeloep: Int? = null,
     val andelsbroekKap19: Double? = null,

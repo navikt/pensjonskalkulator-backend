@@ -454,14 +454,9 @@ class SimuleringControllerTest : ShouldSpec() {
                 alder = 67,
                 beloep = PENSJONSBELOEP,
                 inntektspensjonBeloep = 0,
-                garantipensjonBeloep = 0,
                 delingstall = 0.0,
                 pensjonBeholdningFoerUttak = 0,
-                andelsbroekKap19 = 0.0,
-                andelsbroekKap20 = 0.0,
                 sluttpoengtall = 0.0,
-                trygdetidKap19 = 0,
-                trygdetidKap20 = 0,
                 poengaarFoer92 = 0,
                 poengaarEtter91 = 0,
                 forholdstall = 0.0,
@@ -469,7 +464,8 @@ class SimuleringControllerTest : ShouldSpec() {
                 tilleggspensjon = 0,
                 pensjonstillegg = 0,
                 skjermingstillegg = 0,
-                kapittel19Gjenlevendetillegg = 0
+                kapittel19Pensjon = null,
+                kapittel20Pensjon = null
             )
 
         private fun maanedsbeloep(heltUttak: Boolean) =

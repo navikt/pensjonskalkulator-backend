@@ -2,12 +2,8 @@ package no.nav.pensjon.kalkulator.simulering.api.v1.acl.result
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import no.nav.pensjon.kalkulator.simulering.AlderspensjonMaanedsbeloep
-import no.nav.pensjon.kalkulator.simulering.SimuleringResult
-import no.nav.pensjon.kalkulator.simulering.SimulertAfpPrivat
-import no.nav.pensjon.kalkulator.simulering.SimulertAlderspensjon
-import no.nav.pensjon.kalkulator.simulering.SimulertOpptjeningGrunnlag
-import no.nav.pensjon.kalkulator.simulering.Vilkaarsproeving
+import no.nav.pensjon.kalkulator.mock.TestObjects
+import no.nav.pensjon.kalkulator.simulering.*
 
 class SimuleringResultMapperTest : ShouldSpec({
 
@@ -83,12 +79,7 @@ class SimuleringResultMapperTest : ShouldSpec({
                 naavaerendeAlderAar = 65,
                 mode = MappingMode.NORMAL_EXTERNAL
             ) shouldBe SimuleringV1Result(
-                alderspensjonListe = listOf(
-                    expectedAlderspensjon(
-                        gjenlevendetillegg = null, // not mapped
-                        extension = null // not mapped
-                    )
-                ),
+                alderspensjonListe = listOf(expectedAlderspensjonForReducedMapping()),
                 maanedligAlderspensjonVedUttaksendring = expectedUttaksbeloep(),
                 livsvarigOffentligAfpListe = emptyList(),
                 tidsbegrensetOffentligAfp = null,
@@ -125,22 +116,21 @@ class SimuleringResultMapperTest : ShouldSpec({
                     expectedAlderspensjon(
                         gjenlevendetillegg = 700, // mapped
                         extension = SimuleringV1AlderspensjonExtension( // mapped
-                            inntektspensjonBeloep = 2,
-                            garantipensjonBeloep = 3,
-                            delingstall = 4.4,
+                            inntektspensjonBeloep = 1,
+                            delingstall = 3.4,
                             pensjonBeholdningFoerUttakBeloep = 5,
-                            andelsbroekKap19 = 6.6,
-                            andelsbroekKap20 = 7.7,
-                            sluttpoengtall = 8.8,
-                            trygdetidKap19 = 9,
-                            trygdetidKap20 = 10,
-                            poengaarFoer92 = 11,
-                            poengaarEtter91 = 12,
-                            forholdstall = 13.13,
-                            grunnpensjon = 14,
-                            tilleggspensjon = 15,
-                            pensjonstillegg = 16,
-                            skjermingstillegg = 17
+                            andelsbroekKap19 = 0.6,
+                            andelsbroekKap20 = 0.4,
+                            sluttpoengtall = 5.11,
+                            trygdetidKap19 = 40,
+                            trygdetidKap20 = 39,
+                            poengaarFoer92 = 13,
+                            poengaarEtter91 = 27,
+                            forholdstall = 0.971,
+                            grunnpensjon = 55810,
+                            tilleggspensjon = 134641,
+                            pensjonstillegg = -70243,
+                            skjermingstillegg = 14
                         )
                     )
                 ),
@@ -160,33 +150,33 @@ class SimuleringResultMapperTest : ShouldSpec({
 })
 
 private fun alderspensjon(gjenlevendetillegg: Int) =
-    SimulertAlderspensjon(
-        alder = 65,
+    TestObjects.alderspensjon(gjenlevendetillegg = gjenlevendetillegg, alderAar = 65, beloep = 1)
+
+private fun expectedAlderspensjonForReducedMapping() =
+    SimuleringV1Alderspensjon(
+        alderAar = 65,
         beloep = 1,
-        inntektspensjonBeloep = 2,
-        garantipensjonBeloep = 3,
-        delingstall = 4.4,
-        pensjonBeholdningFoerUttak = 5,
-        andelsbroekKap19 = 6.6,
-        andelsbroekKap20 = 7.7,
-        sluttpoengtall = 8.8,
-        trygdetidKap19 = 9,
-        trygdetidKap20 = 10,
-        poengaarFoer92 = 11,
-        poengaarEtter91 = 12,
-        forholdstall = 13.13,
-        grunnpensjon = 14,
-        tilleggspensjon = 15,
-        pensjonstillegg = 16,
-        skjermingstillegg = 17,
-        kapittel19Gjenlevendetillegg = gjenlevendetillegg
+        basispensjonBeloep = null,
+        garantipensjonBeloep = null,
+        garantipensjonSats = null,
+        garantitilleggBeloep = null,
+        restpensjonBeloep = null,
+        gjenlevendetillegg = null,
+        minstePensjonsnivaaSats = null,
+        extension = null
     )
 
 private fun expectedAlderspensjon(gjenlevendetillegg: Int?, extension: SimuleringV1AlderspensjonExtension?) =
     SimuleringV1Alderspensjon(
         alderAar = 65,
         beloep = 1,
+        basispensjonBeloep = 100,
+        garantipensjonBeloep = 2,
+        garantipensjonSats = 2.34,
+        garantitilleggBeloep = 201,
+        restpensjonBeloep = 101,
         gjenlevendetillegg,
+        minstePensjonsnivaaSats = 1.23,
         extension
     )
 

@@ -18,7 +18,6 @@ data class AlderspensjonDto(
     @field:NotNull val alderAar: Int,
     @field:NotNull val beloep: Int,
     val inntektspensjon: Int?,
-    val garantipensjon: Int?,
     val delingstall: Double?,
     val pensjonsbeholdningFoerUttak: Int?,
     val sluttpoengtall: Double?,
@@ -36,12 +35,17 @@ data class AlderspensjonDto(
 data class Kapittel19PensjonDto(
     val andelsbroek: Double?,
     val trygdetidAntallAar: Int?,
-    val gjenlevendetillegg: Int?
+    val basispensjon: Int?,
+    val restpensjon: Int?,
+    val gjenlevendetillegg: Int?,
+    val minstePensjonsnivaaSats: Double?
 )
 
 data class Kapittel20PensjonDto(
     val andelsbroek: Double?,
-    val trygdetidAntallAar: Int?
+    val trygdetidAntallAar: Int?,
+    val garantipensjon: GarantipensjonDto?,
+    val garantitillegg: Int?
 )
 
 data class UttaksbeloepDto(
@@ -105,6 +109,11 @@ data class UttaksparametreDto(
     val gradertUttakAlder: AlderDto?,
     @field:NotNull val uttaksgrad: String, // UttaksgradDto
     @field:NotNull val heltUttakAlder: AlderDto
+)
+
+data class GarantipensjonDto(
+    @field:NotNull val aarligBeloep: Int,
+    @field:NotNull val sats: Double
 )
 
 data class AlderDto(
