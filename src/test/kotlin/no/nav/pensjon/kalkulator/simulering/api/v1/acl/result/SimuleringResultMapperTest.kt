@@ -2,12 +2,8 @@ package no.nav.pensjon.kalkulator.simulering.api.v1.acl.result
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import no.nav.pensjon.kalkulator.simulering.AlderspensjonMaanedsbeloep
-import no.nav.pensjon.kalkulator.simulering.SimuleringResult
-import no.nav.pensjon.kalkulator.simulering.SimulertAfpPrivat
-import no.nav.pensjon.kalkulator.simulering.SimulertAlderspensjon
-import no.nav.pensjon.kalkulator.simulering.SimulertOpptjeningGrunnlag
-import no.nav.pensjon.kalkulator.simulering.Vilkaarsproeving
+import no.nav.pensjon.kalkulator.mock.TestObjects
+import no.nav.pensjon.kalkulator.simulering.*
 
 class SimuleringResultMapperTest : ShouldSpec({
 
@@ -40,8 +36,7 @@ class SimuleringResultMapperTest : ShouldSpec({
             ) shouldBe SimuleringV1Result(
                 alderspensjonListe = listOf(
                     expectedAlderspensjon(
-                        gjenlevendetillegg = 500, // mapped
-                        extension = null // not mapped
+                        gjenlevendetillegg = 500 // mapped
                     )
                 ),
                 maanedligAlderspensjonVedUttaksendring = expectedUttaksbeloep(),
@@ -83,12 +78,7 @@ class SimuleringResultMapperTest : ShouldSpec({
                 naavaerendeAlderAar = 65,
                 mode = MappingMode.NORMAL_EXTERNAL
             ) shouldBe SimuleringV1Result(
-                alderspensjonListe = listOf(
-                    expectedAlderspensjon(
-                        gjenlevendetillegg = null, // not mapped
-                        extension = null // not mapped
-                    )
-                ),
+                alderspensjonListe = listOf(expectedAlderspensjonForReducedMapping()),
                 maanedligAlderspensjonVedUttaksendring = expectedUttaksbeloep(),
                 livsvarigOffentligAfpListe = emptyList(),
                 tidsbegrensetOffentligAfp = null,
@@ -124,24 +114,7 @@ class SimuleringResultMapperTest : ShouldSpec({
                 alderspensjonListe = listOf(
                     expectedAlderspensjon(
                         gjenlevendetillegg = 700, // mapped
-                        extension = SimuleringV1AlderspensjonExtension( // mapped
-                            inntektspensjonBeloep = 2,
-                            garantipensjonBeloep = 3,
-                            delingstall = 4.4,
-                            pensjonBeholdningFoerUttakBeloep = 5,
-                            andelsbroekKap19 = 6.6,
-                            andelsbroekKap20 = 7.7,
-                            sluttpoengtall = 8.8,
-                            trygdetidKap19 = 9,
-                            trygdetidKap20 = 10,
-                            poengaarFoer92 = 11,
-                            poengaarEtter91 = 12,
-                            forholdstall = 13.13,
-                            grunnpensjon = 14,
-                            tilleggspensjon = 15,
-                            pensjonstillegg = 16,
-                            skjermingstillegg = 17
-                        )
+
                     )
                 ),
                 maanedligAlderspensjonVedUttaksendring = expectedUttaksbeloep(),
@@ -160,34 +133,62 @@ class SimuleringResultMapperTest : ShouldSpec({
 })
 
 private fun alderspensjon(gjenlevendetillegg: Int) =
-    SimulertAlderspensjon(
-        alder = 65,
-        beloep = 1,
-        inntektspensjonBeloep = 2,
-        garantipensjonBeloep = 3,
-        delingstall = 4.4,
-        pensjonBeholdningFoerUttak = 5,
-        andelsbroekKap19 = 6.6,
-        andelsbroekKap20 = 7.7,
-        sluttpoengtall = 8.8,
-        trygdetidKap19 = 9,
-        trygdetidKap20 = 10,
-        poengaarFoer92 = 11,
-        poengaarEtter91 = 12,
-        forholdstall = 13.13,
-        grunnpensjon = 14,
-        tilleggspensjon = 15,
-        pensjonstillegg = 16,
-        skjermingstillegg = 17,
-        kapittel19Gjenlevendetillegg = gjenlevendetillegg
-    )
+    TestObjects.alderspensjon(gjenlevendetillegg = gjenlevendetillegg, alderAar = 65, beloep = 1)
 
-private fun expectedAlderspensjon(gjenlevendetillegg: Int?, extension: SimuleringV1AlderspensjonExtension?) =
+private fun expectedAlderspensjonForReducedMapping() =
     SimuleringV1Alderspensjon(
         alderAar = 65,
         beloep = 1,
-        gjenlevendetillegg,
-        extension
+        inntektspensjonBeloep = null,
+        basispensjonBeloep = null,
+        garantipensjonBeloep = null,
+        garantipensjonSats = null,
+        garantitilleggBeloep = null,
+        restpensjonBeloep = null,
+        grunnpensjonBeloep = null,
+        tilleggspensjonBeloep = null,
+        pensjonstillegg = null,
+        skjermingstillegg = null,
+        gjenlevendetillegg = null,
+        minstePensjonsnivaaSats = null,
+        delingstall = null,
+        forholdstall = null,
+        pensjonsbeholdningFoerUttakBeloep = null,
+        kapittel19Andel = null,
+        kapittel20Andel = null,
+        sluttpoengtall = null,
+        kapittel19Trygdetid = null,
+        kapittel20Trygdetid = null,
+        poengaarTom1991 = null,
+        poengaarFom1992 = null
+    )
+
+private fun expectedAlderspensjon(gjenlevendetillegg: Int?) =
+    SimuleringV1Alderspensjon(
+        alderAar = 65,
+        beloep = 1,
+        inntektspensjonBeloep = 1,
+        basispensjonBeloep = 100,
+        garantipensjonBeloep = 2,
+        garantipensjonSats = 2.34,
+        garantitilleggBeloep = 201,
+        restpensjonBeloep = 101,
+        grunnpensjonBeloep = 55810,
+        tilleggspensjonBeloep = 134641,
+        pensjonstillegg = -70243,
+        skjermingstillegg = 14,
+        gjenlevendetillegg = gjenlevendetillegg,
+        minstePensjonsnivaaSats = 1.23,
+        delingstall = 3.4,
+        forholdstall = 0.971,
+        pensjonsbeholdningFoerUttakBeloep = 5,
+        kapittel19Andel = 0.6,
+        kapittel20Andel = 0.4,
+        sluttpoengtall = 5.11,
+        kapittel19Trygdetid = 40,
+        kapittel20Trygdetid = 39,
+        poengaarTom1991 = 13,
+        poengaarFom1992 = 27
     )
 
 private fun uttaksbeloep() =

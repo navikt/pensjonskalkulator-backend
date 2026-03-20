@@ -27,13 +27,14 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import org.springframework.web.reactive.function.client.bodyToMono
 
 @Component
 class PensjonssimulatorSimuleringClient(
-    @Value("\${pensjonssimulator.url}") val baseUrl: String,
+    @param:Value($$"${pensjonssimulator.url}") val baseUrl: String,
     val webClientBuilder: WebClient.Builder,
     val traceAid: TraceAid,
-    @Value("\${web-client.retry-attempts}") private val retryAttempts: String
+    @param:Value($$"${web-client.retry-attempts}") private val retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), SimuleringClient, Pingable {
 
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
@@ -52,7 +53,7 @@ class PensjonssimulatorSimuleringClient(
                 .headers(::setHeaders)
                 .bodyValue(SimulatorAnonymSimuleringSpecMapper.toDto(spec))
                 .retrieve()
-                .bodyToMono(SimulatorAnonymSimuleringResultEnvelope::class.java)
+                .bodyToMono<SimulatorAnonymSimuleringResultEnvelope>()
                 .retryWhen(retryBackoffSpec(url))
                 .block()
                 ?.let(SimulatorAnonymSimuleringResultMapper::fromDto)
@@ -81,7 +82,7 @@ class PensjonssimulatorSimuleringClient(
                     .headers(::setHeaders)
                     .bodyValue(spec)
                     .retrieve()
-                    .bodyToMono(PersonligSimuleringResultDto::class.java)
+                    .bodyToMono<PersonligSimuleringResultDto>()
                     .retryWhen(retryBackoffSpec(url))
                     .block()
 
@@ -109,7 +110,7 @@ class PensjonssimulatorSimuleringClient(
 
     private companion object {
         private const val SIMULER_ALDERSPENSJON_ANONYM_RESOURCE = "api/anonym/v1/simuler-alderspensjon"
-        private const val SIMULER_ALDERSPENSJON_PERSONLIG_RESOURCE = "api/nav/v1/simuler-pensjon"
+        private const val SIMULER_ALDERSPENSJON_PERSONLIG_RESOURCE = "api/nav/v2/simuler-pensjon"
         private val service = EgressService.PENSJONSSIMULATOR
 
         private fun emptyResult() =

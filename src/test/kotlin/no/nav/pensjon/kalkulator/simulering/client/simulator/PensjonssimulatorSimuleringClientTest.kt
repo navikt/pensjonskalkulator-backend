@@ -18,6 +18,7 @@ import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
 import org.springframework.beans.factory.BeanFactory
+import org.springframework.beans.factory.getBean
 import org.springframework.web.reactive.function.client.WebClient
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
@@ -32,7 +33,7 @@ class PensjonssimulatorSimuleringClientTest : FunSpec({
     fun client(context: BeanFactory) =
         PensjonssimulatorSimuleringClient(
             baseUrl!!,
-            webClientBuilder = context.getBean(WebClient.Builder::class.java),
+            webClientBuilder = context.getBean<WebClient.Builder>(),
             traceAid,
             retryAttempts = "1"
         )
@@ -170,14 +171,9 @@ private fun alderspensjon(alder: Int, beloep: Int = 222612) =
         alder,
         beloep,
         inntektspensjonBeloep = 0,
-        garantipensjonBeloep = 0,
         delingstall = 0.0,
         pensjonBeholdningFoerUttak = 0,
-        andelsbroekKap19 = 0.0,
-        andelsbroekKap20 = 0.0,
         sluttpoengtall = 0.0,
-        trygdetidKap19 = 0,
-        trygdetidKap20 = 0,
         poengaarFoer92 = 0,
         poengaarEtter91 = 0,
         forholdstall = 0.0,
@@ -185,7 +181,8 @@ private fun alderspensjon(alder: Int, beloep: Int = 222612) =
         tilleggspensjon = 0,
         pensjonstillegg = 0,
         skjermingstillegg = 0,
-        kapittel19Gjenlevendetillegg = 0
+        kapittel19Pensjon = null,
+        kapittel20Pensjon = null
     )
 
 @Language("json")
