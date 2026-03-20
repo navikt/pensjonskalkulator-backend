@@ -36,8 +36,7 @@ class SimuleringResultMapperTest : ShouldSpec({
             ) shouldBe SimuleringV1Result(
                 alderspensjonListe = listOf(
                     expectedAlderspensjon(
-                        gjenlevendetillegg = 500, // mapped
-                        extension = null // not mapped
+                        gjenlevendetillegg = 500 // mapped
                     )
                 ),
                 maanedligAlderspensjonVedUttaksendring = expectedUttaksbeloep(),
@@ -115,23 +114,7 @@ class SimuleringResultMapperTest : ShouldSpec({
                 alderspensjonListe = listOf(
                     expectedAlderspensjon(
                         gjenlevendetillegg = 700, // mapped
-                        extension = SimuleringV1AlderspensjonExtension( // mapped
-                            inntektspensjonBeloep = 1,
-                            delingstall = 3.4,
-                            pensjonBeholdningFoerUttakBeloep = 5,
-                            andelsbroekKap19 = 0.6,
-                            andelsbroekKap20 = 0.4,
-                            sluttpoengtall = 5.11,
-                            trygdetidKap19 = 40,
-                            trygdetidKap20 = 39,
-                            poengaarFoer92 = 13,
-                            poengaarEtter91 = 27,
-                            forholdstall = 0.971,
-                            grunnpensjon = 55810,
-                            tilleggspensjon = 134641,
-                            pensjonstillegg = -70243,
-                            skjermingstillegg = 14
-                        )
+
                     )
                 ),
                 maanedligAlderspensjonVedUttaksendring = expectedUttaksbeloep(),
@@ -156,28 +139,56 @@ private fun expectedAlderspensjonForReducedMapping() =
     SimuleringV1Alderspensjon(
         alderAar = 65,
         beloep = 1,
+        inntektspensjonBeloep = null,
         basispensjonBeloep = null,
         garantipensjonBeloep = null,
         garantipensjonSats = null,
         garantitilleggBeloep = null,
         restpensjonBeloep = null,
+        grunnpensjonBeloep = null,
+        tilleggspensjonBeloep = null,
+        pensjonstillegg = null,
+        skjermingstillegg = null,
         gjenlevendetillegg = null,
         minstePensjonsnivaaSats = null,
-        extension = null
+        delingstall = null,
+        forholdstall = null,
+        pensjonsbeholdningFoerUttakBeloep = null,
+        kapittel19Andel = null,
+        kapittel20Andel = null,
+        sluttpoengtall = null,
+        kapittel19Trygdetid = null,
+        kapittel20Trygdetid = null,
+        poengaarTom1991 = null,
+        poengaarFom1992 = null
     )
 
-private fun expectedAlderspensjon(gjenlevendetillegg: Int?, extension: SimuleringV1AlderspensjonExtension?) =
+private fun expectedAlderspensjon(gjenlevendetillegg: Int?) =
     SimuleringV1Alderspensjon(
         alderAar = 65,
         beloep = 1,
+        inntektspensjonBeloep = 1,
         basispensjonBeloep = 100,
         garantipensjonBeloep = 2,
         garantipensjonSats = 2.34,
         garantitilleggBeloep = 201,
         restpensjonBeloep = 101,
-        gjenlevendetillegg,
+        grunnpensjonBeloep = 55810,
+        tilleggspensjonBeloep = 134641,
+        pensjonstillegg = -70243,
+        skjermingstillegg = 14,
+        gjenlevendetillegg = gjenlevendetillegg,
         minstePensjonsnivaaSats = 1.23,
-        extension
+        delingstall = 3.4,
+        forholdstall = 0.971,
+        pensjonsbeholdningFoerUttakBeloep = 5,
+        kapittel19Andel = 0.6,
+        kapittel20Andel = 0.4,
+        sluttpoengtall = 5.11,
+        kapittel19Trygdetid = 40,
+        kapittel20Trygdetid = 39,
+        poengaarTom1991 = 13,
+        poengaarFom1992 = 27
     )
 
 private fun uttaksbeloep() =

@@ -41,14 +41,28 @@ object SimuleringResultAdjuster {
             SimuleringV1Alderspensjon(
                 alderAar,
                 beloep = pensjonForAlder0.beloep,
+                inntektspensjonBeloep = pensjonForAlder0.inntektspensjonBeloep,
                 basispensjonBeloep = pensjonForAlder0.basispensjonBeloep,
                 garantipensjonBeloep = pensjonForAlder0.garantipensjonBeloep,
                 garantipensjonSats = pensjonForAlder0.garantipensjonSats,
                 garantitilleggBeloep = pensjonForAlder0.garantitilleggBeloep,
                 restpensjonBeloep = pensjonForAlder0.restpensjonBeloep,
+                grunnpensjonBeloep = pensjonForAlder0.grunnpensjonBeloep,
+                tilleggspensjonBeloep = pensjonForAlder0.tilleggspensjonBeloep,
+                pensjonstillegg = pensjonForAlder0.pensjonstillegg,
+                skjermingstillegg = pensjonForAlder0.skjermingstillegg,
                 gjenlevendetillegg = pensjonForAlder0.gjenlevendetillegg,
                 minstePensjonsnivaaSats = pensjonForAlder0.minstePensjonsnivaaSats,
-                extension = pensjonForAlder0.extension
+                delingstall = pensjonForAlder0.delingstall,
+                forholdstall = pensjonForAlder0.forholdstall,
+                pensjonsbeholdningFoerUttakBeloep = pensjonForAlder0.pensjonsbeholdningFoerUttakBeloep,
+                kapittel19Andel = pensjonForAlder0.kapittel19Andel,
+                kapittel20Andel = pensjonForAlder0.kapittel20Andel,
+                sluttpoengtall = pensjonForAlder0.sluttpoengtall,
+                kapittel19Trygdetid = pensjonForAlder0.kapittel19Trygdetid,
+                kapittel20Trygdetid = pensjonForAlder0.kapittel20Trygdetid,
+                poengaarTom1991 = pensjonForAlder0.poengaarTom1991,
+                poengaarFom1992 = pensjonForAlder0.poengaarFom1992
             )
         )
 
