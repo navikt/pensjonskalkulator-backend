@@ -34,14 +34,14 @@ object PersonligSimuleringExtendedResultMapperV9 {
             alder = source.alder,
             beloep = source.beloep,
             inntektspensjonBeloep = source.inntektspensjonBeloep,
-            garantipensjonBeloep = source.garantipensjonBeloep,
+            garantipensjonBeloep = source.kapittel20Pensjon?.garantipensjon?.aarligBeloep,
             delingstall = source.delingstall,
             pensjonBeholdningFoerUttakBeloep = source.pensjonBeholdningFoerUttak,
-            andelsbroekKap19 = source.andelsbroekKap19,
-            andelsbroekKap20 = source.andelsbroekKap20,
+            andelsbroekKap19 = source.kapittel19Pensjon?.andelsbroek,
+            andelsbroekKap20 = source.kapittel20Pensjon?.andelsbroek,
             sluttpoengtall = source.sluttpoengtall,
-            trygdetidKap19 = source.trygdetidKap19,
-            trygdetidKap20 = source.trygdetidKap20,
+            trygdetidKap19 = source.kapittel19Pensjon?.trygdetidAntallAar,
+            trygdetidKap20 = source.kapittel20Pensjon?.trygdetidAntallAar,
             poengaarFoer92 = source.poengaarFoer92,
             poengaarEtter91 = source.poengaarEtter91,
             forholdstall = source.forholdstall,
@@ -49,7 +49,7 @@ object PersonligSimuleringExtendedResultMapperV9 {
             tilleggspensjon = source.tilleggspensjon,
             pensjonstillegg = source.pensjonstillegg,
             skjermingstillegg = source.skjermingstillegg,
-            kapittel19Gjenlevendetillegg = source.kapittel19Gjenlevendetillegg
+            kapittel19Gjenlevendetillegg = source.kapittel19Pensjon?.gjenlevendetillegg
         )
 
     private fun maanedligPensjon(source: AlderspensjonMaanedsbeloep?) =

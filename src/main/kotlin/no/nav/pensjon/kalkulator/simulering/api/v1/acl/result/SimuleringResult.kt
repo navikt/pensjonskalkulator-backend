@@ -49,31 +49,71 @@ data class SimuleringV1Alderspensjon(
     @field:NotNull
     val beloep: Int,
 
-    @field:Schema(description = "Informasjon om gjenlevendetillegg er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    @field:Schema(description = "Årlig beløp for inntektspensjon; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val inntektspensjonBeloep: Int?,
+
+    @field:Schema(description = "Årlig beløp for basispensjon; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val basispensjonBeloep: Int?,
+
+    @field:Schema(description = "Årlig beløp for garantipensjon; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val garantipensjonBeloep: Int?,
+
+    @field:Schema(description = "Sats for garantipensjon; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val garantipensjonSats: Double?,
+
+    @field:Schema(description = "Årlig beløp for garantitillegg; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val garantitilleggBeloep: Int?,
+
+    @field:Schema(description = "Årlig beløp for restpensjon; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val restpensjonBeloep: Int?,
+
+    @field:Schema(description = "Grunnpensjon; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val grunnpensjonBeloep: Int? = null,
+
+    @field:Schema(description = "Tilleggspensjon; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val tilleggspensjonBeloep: Int? = null,
+
+    @field:Schema(description = "Pensjonstillegg; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val pensjonstillegg: Int? = null,
+
+    @field:Schema(description = "Skjermingstillegg; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val skjermingstillegg: Int? = null,
+
+    @field:Schema(description = "Årlig beløp for gjenlevendetillegg; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
     val gjenlevendetillegg: Int?,
 
-    @field:Schema(description = "Utvidet informasjon om alderspensjonen; kun inkludert i eksternvariant og kun når funksjonsbryter 'utvidet-simuleringsresultat' er 'på'")
-    val extension: SimuleringV1AlderspensjonExtension?
-)
+    @field:Schema(description = "Minste pensjonsnivå-sats; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val minstePensjonsnivaaSats: Double?,
 
-@JsonInclude(NON_NULL)
-data class SimuleringV1AlderspensjonExtension(
-    val inntektspensjonBeloep: Int? = null,
-    val garantipensjonBeloep: Int? = null,
-    val delingstall: Double? = null,
-    val pensjonBeholdningFoerUttakBeloep: Int? = null,
-    val andelsbroekKap19: Double? = null,
-    val andelsbroekKap20: Double? = null,
-    val sluttpoengtall: Double? = null,
-    val trygdetidKap19: Int? = null,
-    val trygdetidKap20: Int? = null,
-    val poengaarFoer92: Int? = null,
-    val poengaarEtter91: Int? = null,
-    val forholdstall: Double? = null,
-    val grunnpensjon: Int? = null,
-    val tilleggspensjon: Int? = null,
-    val pensjonstillegg: Int? = null,
-    val skjermingstillegg: Int? = null
+    @field:Schema(description = "Delingstall; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val delingstall: Double?,
+
+    @field:Schema(description = "Forholdstall; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val forholdstall: Double?,
+
+    @field:Schema(description = "Beløp for pensjonsbeholdning før uttak; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val pensjonsbeholdningFoerUttakBeloep: Int?,
+
+    @field:Schema(description = "Andel (0..1) av pensjonen beregnet i.h.t. kapittel 19; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val kapittel19Andel: Double?,
+
+    @field:Schema(description = "Andel (0..1) av pensjonen beregnet i.h.t. kapittel 20; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val kapittel20Andel: Double?,
+
+    @field:Schema(description = "Sluttpoengtall; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val sluttpoengtall: Double?,
+
+    @field:Schema(description = "Antall år trygdetid i.h.t. kapittel 19; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val kapittel19Trygdetid: Int?,
+
+    @field:Schema(description = "Antall år trygdetid i.h.t. kapittel 20; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val kapittel20Trygdetid: Int?,
+
+    @field:Schema(description = "Antall poengår til og med 1991; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val poengaarTom1991: Int?,
+
+    @field:Schema(description = "Antall poengår fra og med 1992; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val poengaarFom1992: Int?
 )
 
 @JsonInclude(NON_NULL)
@@ -92,6 +132,7 @@ data class SimuleringV1AldersbestemtUtbetaling(
     @field:NotNull
     val alderAar: Int,
 
+    @field:Schema(description = "Årlig beløp")
     @field:NotNull val aarligBeloep: Int,
     val maanedligBeloep: Int?
 )
@@ -101,18 +142,43 @@ data class SimuleringV1TidsbegrensetOffentligAfp(
     @field:NotNull
     val alderAar: Int,
 
+    @field:Schema(description = "Totalt årlig AFP-beløp")
     @field:NotNull val totaltAfpBeloep: Int,
+
+    @field:Schema(description = "Tidligere arbeidsinntekt")
     @field:NotNull val tidligereArbeidsinntekt: Int,
+
+    @field:Schema(description = "Grunnbeløp")
     @field:NotNull val grunnbeloep: Int,
+
+    @field:Schema(description = "Sluttpoengtall")
     @field:NotNull val sluttpoengtall: Double,
+
+    @field:Schema(description = "Antall år trygdetid")
     @field:NotNull val trygdetid: Int,
+
+    @field:Schema(description = "Antall poengår til og med 1991")
     @field:NotNull val poengaarTom1991: Int,
+
+    @field:Schema(description = "Antall poengår fra og med 1992")
     @field:NotNull val poengaarFom1992: Int,
+
+    @field:Schema(description = "Grunnpensjon")
     @field:NotNull val grunnpensjon: Int,
+
+    @field:Schema(description = "Tilleggspensjon")
     @field:NotNull val tilleggspensjon: Int,
+
+    @field:Schema(description = "AFP-tillegg")
     @field:NotNull val afpTillegg: Int,
+
+    @field:Schema(description = "Særtillegg")
     @field:NotNull val saertillegg: Int,
+
+    @field:Schema(description = "AFP-grad")
     @field:NotNull val afpGrad: Int,
+
+    @field:Schema(description = "Hvorvidt AFP-ytelsen er avkortet i.h.t. 70-prosentregelen")
     @field:NotNull val erAvkortet: Boolean
 )
 

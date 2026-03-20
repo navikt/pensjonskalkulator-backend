@@ -26,14 +26,9 @@ object PersonligSimuleringResultMapper {
             alder = dto.alderAar,
             beloep = dto.beloep,
             inntektspensjonBeloep = dto.inntektspensjon ?: 0,
-            garantipensjonBeloep = dto.garantipensjon ?: 0,
             delingstall = dto.delingstall ?: 0.0,
             pensjonBeholdningFoerUttak = dto.pensjonsbeholdningFoerUttak ?: 0,
-            andelsbroekKap19 = dto.kapittel19Pensjon?.andelsbroek ?: 0.0,
-            andelsbroekKap20 = dto.kapittel20Pensjon?.andelsbroek ?: 0.0,
             sluttpoengtall = dto.sluttpoengtall ?: 0.0,
-            trygdetidKap19 = dto.kapittel19Pensjon?.trygdetidAntallAar ?: 0,
-            trygdetidKap20 = dto.kapittel20Pensjon?.trygdetidAntallAar ?: 0,
             poengaarFoer92 = dto.poengaarFoer92 ?: 0,
             poengaarEtter91 = dto.poengaarEtter91 ?: 0,
             forholdstall = dto.forholdstall ?: 0.0,
@@ -41,7 +36,32 @@ object PersonligSimuleringResultMapper {
             tilleggspensjon = dto.tilleggspensjon ?: 0,
             pensjonstillegg = dto.pensjonstillegg ?: 0,
             skjermingstillegg = dto.skjermingstillegg ?: 0,
-            kapittel19Gjenlevendetillegg = dto.kapittel19Pensjon?.gjenlevendetillegg ?: 0
+            kapittel19Pensjon = dto.kapittel19Pensjon?.let(::kapittel19Pensjon),
+            kapittel20Pensjon = dto.kapittel20Pensjon?.let(::kapittel20Pensjon),
+        )
+
+    private fun kapittel19Pensjon(dto: Kapittel19PensjonDto) =
+        Kapittel19Pensjon(
+            andelsbroek = dto.andelsbroek,
+            trygdetidAntallAar = dto.trygdetidAntallAar,
+            basispensjon = dto.basispensjon,
+            restpensjon = dto.restpensjon,
+            gjenlevendetillegg = dto.gjenlevendetillegg,
+            minstePensjonsnivaaSats = dto.minstePensjonsnivaaSats
+        )
+
+    private fun kapittel20Pensjon(dto: Kapittel20PensjonDto) =
+        Kapittel20Pensjon(
+            andelsbroek = dto.andelsbroek,
+            trygdetidAntallAar = dto.trygdetidAntallAar,
+            garantipensjon = dto.garantipensjon?.let(::garantipensjon),
+            garantitillegg = dto.garantitillegg
+        )
+
+    private fun garantipensjon(dto: GarantipensjonDto) =
+        Garantipensjon(
+            aarligBeloep = dto.aarligBeloep,
+            sats = dto.sats
         )
 
     private fun livsvarigOffentligAfp(dto: AldersbestemtUtbetalingDto) =
