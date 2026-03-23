@@ -26,14 +26,9 @@ object SimulatorAnonymSimuleringResultMapper {
             alder = dto.alder ?: 0,
             beloep = dto.belop ?: 0,
             inntektspensjonBeloep = 0, // not required in anonym context
-            garantipensjonBeloep = 0, // ditto
             delingstall = 0.0, // ditto
             pensjonBeholdningFoerUttak = 0, // ditto
-            andelsbroekKap19 = 0.0, // ditto
-            andelsbroekKap20 = 0.0, //
             sluttpoengtall = 0.0, // ditto
-            trygdetidKap19 = 0, // ditto
-            trygdetidKap20 = 0, // ditto
             poengaarFoer92 = 0, // ditto
             poengaarEtter91 = 0, // ditto
             forholdstall = 0.0, // ditto
@@ -41,7 +36,8 @@ object SimulatorAnonymSimuleringResultMapper {
             tilleggspensjon = 0, // ditto
             pensjonstillegg = 0, // ditto
             skjermingstillegg = 0, // ditto
-            kapittel19Gjenlevendetillegg = 0 // ditto
+            kapittel19Pensjon = null, // ditto
+            kapittel20Pensjon = null // ditto
         )
 
     private fun privatAfp(dto: SimulatorAnonymPrivatAfpPeriode) =

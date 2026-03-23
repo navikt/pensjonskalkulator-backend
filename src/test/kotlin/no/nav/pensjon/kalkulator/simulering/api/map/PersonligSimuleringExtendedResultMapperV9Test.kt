@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.simulering.api.map
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
+import no.nav.pensjon.kalkulator.mock.TestObjects.alderspensjon
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import java.time.LocalDate
@@ -11,29 +12,7 @@ class PersonligSimuleringExtendedResultMapperV9Test : ShouldSpec({
     should("map domain to V9 DTO") {
         PersonligSimuleringExtendedResultMapperV9.extendedResultV9(
             source = SimuleringResult(
-                alderspensjon = listOf(
-                    SimulertAlderspensjon(
-                        alder = 67,
-                        beloep = 123456,
-                        inntektspensjonBeloep = 1,
-                        garantipensjonBeloep = 2,
-                        delingstall = 3.4,
-                        pensjonBeholdningFoerUttak = 5,
-                        andelsbroekKap19 = 0.6,
-                        andelsbroekKap20 = 0.4,
-                        sluttpoengtall = 5.11,
-                        trygdetidKap19 = 40,
-                        trygdetidKap20 = 40,
-                        poengaarFoer92 = 13,
-                        poengaarEtter91 = 27,
-                        forholdstall = 0.971,
-                        grunnpensjon = 55810,
-                        tilleggspensjon = 134641,
-                        pensjonstillegg = -70243,
-                        skjermingstillegg = 14,
-                        kapittel19Gjenlevendetillegg = 15
-                    )
-                ),
+                alderspensjon = listOf(alderspensjon()),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
                 afpPrivat = listOf(
                     SimulertAfpPrivat(
@@ -68,7 +47,7 @@ class PersonligSimuleringExtendedResultMapperV9Test : ShouldSpec({
                     andelsbroekKap20 = 0.4,
                     sluttpoengtall = 5.11,
                     trygdetidKap19 = 40,
-                    trygdetidKap20 = 40,
+                    trygdetidKap20 = 39,
                     poengaarFoer92 = 13,
                     poengaarEtter91 = 27,
                     forholdstall = 0.971,
