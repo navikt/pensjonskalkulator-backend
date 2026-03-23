@@ -70,7 +70,7 @@ class InternSimuleringController(
 
             val resultDto: SimuleringV1Result = toDto(
                 source = result,
-                naavaerendeAlderAar = result.alderAar!!,
+                naavaerendeAlderAar = result.alderAar ?: 0,
                 mode = MappingMode.INTERNAL
             ).also {
                 log.debug { "Simulering respons ${jsonMapper.writeValueAsRedactedString(it)}" }
