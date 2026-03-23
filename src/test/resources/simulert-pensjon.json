@@ -1,0 +1,316 @@
+{
+    "alderspensjonListe": [
+        {
+            "alderAar": 66,
+            "beloep": 105285,
+            "inntektspensjon": 224291,
+            "delingstall": 16.42,
+            "pensjonsbeholdningFoerUttak": 3953923,
+            "sluttpoengtall": 5.08,
+            "poengaarFoer92": 0,
+            "poengaarEtter91": 28,
+            "forholdstall": 1.143,
+            "grunnpensjon": 7971,
+            "tilleggspensjon": 17007,
+            "pensjonstillegg": -5795,
+            "kapittel19Pensjon": {
+                "andelsbroek": 0.1,
+                "trygdetidAntallAar": 28,
+                "basispensjon": 285508,
+                "restpensjon": 0,
+                "gjenlevendetillegg": 3416,
+                "minstePensjonsnivaaSats": 279933
+            },
+            "kapittel20Pensjon": {
+                "andelsbroek": 0.9,
+                "trygdetidAntallAar": 28,
+                "garantipensjon": {
+                    "aarligBeloep": -29871,
+                    "sats": 242418
+                }
+            }
+        },
+        {
+            "alderAar": 67,
+            "beloep": 256399,
+            "inntektspensjon": 224291,
+            "delingstall": 0,
+            "pensjonsbeholdningFoerUttak": 0,
+            "sluttpoengtall": 5.08,
+            "poengaarFoer92": 0,
+            "poengaarEtter91": 28,
+            "forholdstall": 1.119,
+            "grunnpensjon": 7971,
+            "tilleggspensjon": 17007,
+            "pensjonstillegg": -5795,
+            "kapittel19Pensjon": {
+                "andelsbroek": 0.1,
+                "trygdetidAntallAar": 28,
+                "basispensjon": 285508,
+                "restpensjon": 0,
+                "gjenlevendetillegg": 3417,
+                "minstePensjonsnivaaSats": 279933
+            },
+            "kapittel20Pensjon": {
+                "andelsbroek": 0.9,
+                "trygdetidAntallAar": 28,
+                "garantipensjon": {
+                    "aarligBeloep": -29871,
+                    "sats": 0
+                },
+                "garantitillegg": -163424
+            }
+        },
+        {
+            "alderAar": 68,
+            "beloep": 261600,
+            "kapittel19Pensjon": {
+                "andelsbroek": 0.1,
+                "trygdetidAntallAar": 0
+            },
+            "kapittel20Pensjon": {
+                "andelsbroek": 0.9,
+                "trygdetidAntallAar": 0
+            }
+        },
+        {
+            "alderAar": 69,
+            "beloep": 261600,
+            "kapittel19Pensjon": {
+                "andelsbroek": 0.1,
+                "trygdetidAntallAar": 0
+            },
+            "kapittel20Pensjon": {
+                "andelsbroek": 0.9,
+                "trygdetidAntallAar": 0
+            }
+        },
+        {
+            "alderAar": 70,
+            "beloep": 261600,
+            "kapittel19Pensjon": {
+                "andelsbroek": 0.1,
+                "trygdetidAntallAar": 0
+            },
+            "kapittel20Pensjon": {
+                "andelsbroek": 0.9,
+                "trygdetidAntallAar": 0
+            }
+        },
+        {
+            "alderAar": 71,
+            "beloep": 261600,
+            "kapittel19Pensjon": {
+                "andelsbroek": 0.1,
+                "trygdetidAntallAar": 0
+            },
+            "kapittel20Pensjon": {
+                "andelsbroek": 0.9,
+                "trygdetidAntallAar": 0
+            }
+        },
+        {
+            "alderAar": 72,
+            "beloep": 261600,
+            "kapittel19Pensjon": {
+                "andelsbroek": 0.1,
+                "trygdetidAntallAar": 0
+            },
+            "kapittel20Pensjon": {
+                "andelsbroek": 0.9,
+                "trygdetidAntallAar": 0
+            }
+        },
+        {
+            "alderAar": 73,
+            "beloep": 261600,
+            "kapittel19Pensjon": {
+                "andelsbroek": 0.1,
+                "trygdetidAntallAar": 0
+            },
+            "kapittel20Pensjon": {
+                "andelsbroek": 0.9,
+                "trygdetidAntallAar": 0
+            }
+        },
+        {
+            "alderAar": 74,
+            "beloep": 261600,
+            "kapittel19Pensjon": {
+                "andelsbroek": 0.1,
+                "trygdetidAntallAar": 0
+            },
+            "kapittel20Pensjon": {
+                "andelsbroek": 0.9,
+                "trygdetidAntallAar": 0
+            }
+        },
+        {
+            "alderAar": 75,
+            "beloep": 261600,
+            "kapittel19Pensjon": {
+                "andelsbroek": 0.1,
+                "trygdetidAntallAar": 0
+            },
+            "kapittel20Pensjon": {
+                "andelsbroek": 0.9,
+                "trygdetidAntallAar": 0
+            }
+        },
+        {
+            "alderAar": 76,
+            "beloep": 261600,
+            "kapittel19Pensjon": {
+                "andelsbroek": 0.1,
+                "trygdetidAntallAar": 0
+            },
+            "kapittel20Pensjon": {
+                "andelsbroek": 0.9,
+                "trygdetidAntallAar": 0
+            }
+        },
+        {
+            "alderAar": 77,
+            "beloep": 261600,
+            "kapittel19Pensjon": {
+                "andelsbroek": 0.1,
+                "trygdetidAntallAar": 0
+            },
+            "kapittel20Pensjon": {
+                "andelsbroek": 0.9,
+                "trygdetidAntallAar": 0
+            }
+        }
+    ],
+    "alderspensjonMaanedsbeloep": {
+        "heltUttakBeloep": 21057
+    },
+    "livsvarigOffentligAfpListe": [],
+    "privatAfpListe": [],
+    "primaerTrygdetid": {
+        "antallAar": 28,
+        "erUtilstrekkelig": false
+    },
+    "vilkaarsproevingsresultat": {
+        "erInnvilget": true,
+        "alternativ": null
+    },
+    "pensjonsgivendeInntektListe": [
+        {
+            "aarstall": 2000,
+            "beloep": 302083
+        },
+        {
+            "aarstall": 2001,
+            "beloep": 315982
+        },
+        {
+            "aarstall": 2002,
+            "beloep": 332405
+        },
+        {
+            "aarstall": 2003,
+            "beloep": 349458
+        },
+        {
+            "aarstall": 2004,
+            "beloep": 363040
+        },
+        {
+            "aarstall": 2005,
+            "beloep": 375029
+        },
+        {
+            "aarstall": 2006,
+            "beloep": 388154
+        },
+        {
+            "aarstall": 2007,
+            "beloep": 409036
+        },
+        {
+            "aarstall": 2008,
+            "beloep": 431534
+        },
+        {
+            "aarstall": 2009,
+            "beloep": 449630
+        },
+        {
+            "aarstall": 2010,
+            "beloep": 466583
+        },
+        {
+            "aarstall": 2011,
+            "beloep": 487208
+        },
+        {
+            "aarstall": 2012,
+            "beloep": 506747
+        },
+        {
+            "aarstall": 2013,
+            "beloep": 525799
+        },
+        {
+            "aarstall": 2014,
+            "beloep": 545306
+        },
+        {
+            "aarstall": 2015,
+            "beloep": 558881
+        },
+        {
+            "aarstall": 2016,
+            "beloep": 572856
+        },
+        {
+            "aarstall": 2017,
+            "beloep": 582478
+        },
+        {
+            "aarstall": 2018,
+            "beloep": 598208
+        },
+        {
+            "aarstall": 2019,
+            "beloep": 617353
+        },
+        {
+            "aarstall": 2020,
+            "beloep": 629761
+        },
+        {
+            "aarstall": 2021,
+            "beloep": 653882
+        },
+        {
+            "aarstall": 2022,
+            "beloep": 685529
+        },
+        {
+            "aarstall": 2023,
+            "beloep": 725836
+        },
+        {
+            "aarstall": 2024,
+            "beloep": 763215
+        },
+        {
+            "aarstall": 2025,
+            "beloep": 763215
+        },
+        {
+            "aarstall": 2026,
+            "beloep": 763215
+        },
+        {
+            "aarstall": 2027,
+            "beloep": 763215
+        },
+        {
+            "aarstall": 2028,
+            "beloep": 763215
+        }
+    ]
+}

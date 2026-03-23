@@ -2,13 +2,14 @@ package no.nav.pensjon.kalkulator.simulering.client.simulator
 
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
+import no.nav.pensjon.kalkulator.person.FoedselsnummerUtil.redact
 import no.nav.pensjon.kalkulator.simulering.ImpersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.PersonalSimuleringSpec
 import no.nav.pensjon.kalkulator.simulering.SimuleringResult
 import no.nav.pensjon.kalkulator.simulering.Vilkaarsproeving
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
-import no.nav.pensjon.kalkulator.simulering.client.simulator.acl.result.PersonligSimuleringResultMapper
 import no.nav.pensjon.kalkulator.simulering.client.simulator.acl.result.PersonligSimuleringResultDto
+import no.nav.pensjon.kalkulator.simulering.client.simulator.acl.result.PersonligSimuleringResultMapper
 import no.nav.pensjon.kalkulator.simulering.client.simulator.acl.spec.PersonligSimuleringSpecMapper
 import no.nav.pensjon.kalkulator.simulering.client.simulator.dto.SimulatorAnonymSimuleringResultEnvelope
 import no.nav.pensjon.kalkulator.simulering.client.simulator.map.SimulatorAnonymSimuleringResultMapper
@@ -28,12 +29,15 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.reactive.function.client.bodyToMono
+import tools.jackson.core.JacksonException
+import tools.jackson.databind.json.JsonMapper
 
 @Component
 class PensjonssimulatorSimuleringClient(
     @param:Value($$"${pensjonssimulator.url}") val baseUrl: String,
-    val webClientBuilder: WebClient.Builder,
-    val traceAid: TraceAid,
+    webClientBuilder: WebClient.Builder,
+    private val jsonMapper: JsonMapper,
+    private val traceAid: TraceAid,
     @param:Value($$"${web-client.retry-attempts}") private val retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), SimuleringClient, Pingable {
 
@@ -92,12 +96,9 @@ class PensjonssimulatorSimuleringClient(
             throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
+        } catch (e: EgressException) {
+            handle(e)
         }
-    }
-
-    private fun setHeaders(headers: HttpHeaders) {
-        headers.setBearerAuth(EgressAccess.token(service).value)
-        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
     }
 
     override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
@@ -107,6 +108,28 @@ class PensjonssimulatorSimuleringClient(
     override fun ping(): PingResult {
         TODO("Not yet implemented")
     }
+
+    private fun setHeaders(headers: HttpHeaders) {
+        headers.setBearerAuth(EgressAccess.token(service).value)
+        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
+    }
+
+    private fun handle(egressException: EgressException): SimuleringResult =
+        try {
+            jsonMapper.readValue(
+                egressException.message,
+                PersonligSimuleringResultDto::class.java
+            )?.let(PersonligSimuleringResultMapper::fromDto) ?: throw egressException
+        } catch (jacksonException: JacksonException) {
+            log.warn(jacksonException) {
+                redact(
+                    "Failed to handle response from ${service.description}" +
+                            " - ${jacksonException.message}" +
+                            " - attempted to deserialize '${egressException.message}' as PersonligSimuleringResultDto"
+                )
+            }
+            throw egressException
+        }
 
     private companion object {
         private const val SIMULER_ALDERSPENSJON_ANONYM_RESOURCE = "api/anonym/v1/simuler-alderspensjon"
