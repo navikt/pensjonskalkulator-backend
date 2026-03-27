@@ -40,6 +40,7 @@ class SimuleringResultMapperTest : ShouldSpec({
                     )
                 ),
                 maanedligAlderspensjonVedUttaksendring = expectedUttaksbeloep(),
+                maanedligAlderspensjonForKnekkpunkter = null,
                 livsvarigOffentligAfpListe = emptyList(),
                 tidsbegrensetOffentligAfp = null,
                 privatAfpListe = listOf(
@@ -80,6 +81,7 @@ class SimuleringResultMapperTest : ShouldSpec({
             ) shouldBe SimuleringV1Result(
                 alderspensjonListe = listOf(expectedAlderspensjonForReducedMapping()),
                 maanedligAlderspensjonVedUttaksendring = expectedUttaksbeloep(),
+                maanedligAlderspensjonForKnekkpunkter = null,
                 livsvarigOffentligAfpListe = emptyList(),
                 tidsbegrensetOffentligAfp = null,
                 privatAfpListe = emptyList(),
@@ -118,6 +120,7 @@ class SimuleringResultMapperTest : ShouldSpec({
                     )
                 ),
                 maanedligAlderspensjonVedUttaksendring = expectedUttaksbeloep(),
+                maanedligAlderspensjonForKnekkpunkter = null,
                 livsvarigOffentligAfpListe = emptyList(),
                 tidsbegrensetOffentligAfp = null,
                 privatAfpListe = emptyList(),
