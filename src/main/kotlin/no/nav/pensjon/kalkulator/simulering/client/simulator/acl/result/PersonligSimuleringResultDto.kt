@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull
 data class PersonligSimuleringResultDto(
     @field:NotNull val alderspensjonListe: List<AlderspensjonDto>,
     val alderspensjonMaanedsbeloep: UttaksbeloepDto?,
+    val maanedligAlderspensjonForKnekkpunkter: MaanedligAlderspensjonForKnekkpunkterDto?,
     @field:NotNull val livsvarigOffentligAfpListe: List<AldersbestemtUtbetalingDto>,
     val tidsbegrensetOffentligAfp: TidsbegrensetOffentligAfpDto?,
     @field:NotNull val privatAfpListe: List<PrivatAfpDto>,
@@ -119,6 +120,30 @@ data class GarantipensjonDto(
 data class AlderDto(
     @field:NotNull val aar: Int,
     @field:NotNull val maaneder: Int
+)
+
+data class MaanedligAlderspensjonForKnekkpunkterDto(
+    val vedGradertUttak: MaanedligAlderspensjonDto?,
+    val vedHeltUttak: MaanedligAlderspensjonDto,
+    val vedNormertPensjonsalder: MaanedligAlderspensjonDto
+)
+
+data class MaanedligAlderspensjonDto(
+    @field:NotNull val beloep: Int,
+    val inntektspensjon: Int?,
+    val delingstall: Double?,
+    val pensjonsbeholdningFoerUttak: Int?,
+    val pensjonsbeholdningEtterUttak: Int?,
+    val sluttpoengtall: Double?,
+    val poengaarFoer92: Int?,
+    val poengaarEtter91: Int?,
+    val forholdstall: Double?,
+    val grunnpensjon: Int?,
+    val tilleggspensjon: Int?,
+    val pensjonstillegg: Int?,
+    val skjermingstillegg: Int?,
+    val kapittel19Pensjon: Kapittel19PensjonDto?,
+    val kapittel20Pensjon: Kapittel20PensjonDto?
 )
 
 data class ProblemDto(

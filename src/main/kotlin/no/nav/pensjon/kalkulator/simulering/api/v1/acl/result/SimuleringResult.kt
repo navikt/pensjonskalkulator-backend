@@ -16,6 +16,9 @@ data class SimuleringV1Result(
     @field:Schema(description = "Månedlig alderspensjon ved endring av uttaksgrad")
     val maanedligAlderspensjonVedUttaksendring: SimuleringV1Uttaksbeloep?,
 
+    @field:Schema(description = "Månedlig alderspensjon for knekkpunkter")
+    val maanedligAlderspensjonForKnekkpunkter: SimuleringV1MaanedligAlderspensjonForKnekkpunkter?,
+
     @field:Schema(description = "Livsvarig AFP i offentlig sektor for hvert år")
     val livsvarigOffentligAfpListe: List<SimuleringV1AldersbestemtUtbetaling>?,
 
@@ -114,6 +117,41 @@ data class SimuleringV1Alderspensjon(
 
     @field:Schema(description = "Antall poengår fra og med 1992; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
     val poengaarFom1992: Int?
+)
+
+@JsonInclude(NON_NULL)
+data class SimuleringV1MaanedligAlderspensjonForKnekkpunkter(
+    val vedGradertUttak: SimuleringV1MaanedligAlderspensjon?,
+    @field:NotNull val vedHeltUttak: SimuleringV1MaanedligAlderspensjon,
+    @field:NotNull val vedNormertPensjonsalder: SimuleringV1MaanedligAlderspensjon
+)
+
+@JsonInclude(NON_NULL)
+data class SimuleringV1MaanedligAlderspensjon(
+    @field:NotNull val beloep: Int,
+    val inntektspensjonBeloep: Int?,
+    val delingstall: Double?,
+    val pensjonsbeholdningFoerUttakBeloep: Int?,
+    val pensjonsbeholdningEtterUttakBeloep: Int?,
+    val sluttpoengtall: Double?,
+    val poengaarTom1991: Int?,
+    val poengaarFom1992: Int?,
+    val forholdstall: Double?,
+    val grunnpensjonBeloep: Int?,
+    val tilleggspensjonBeloep: Int?,
+    val pensjonstillegg: Int?,
+    val skjermingstillegg: Int?,
+    val kapittel19Andel: Double?,
+    val kapittel19Trygdetid: Int?,
+    val basispensjonBeloep: Int?,
+    val restpensjonBeloep: Int?,
+    val gjenlevendetillegg: Int?,
+    val minstePensjonsnivaaSats: Double?,
+    val kapittel20Andel: Double?,
+    val kapittel20Trygdetid: Int?,
+    val garantipensjonBeloep: Int?,
+    val garantipensjonSats: Double?,
+    val garantitilleggBeloep: Int?
 )
 
 @JsonInclude(NON_NULL)

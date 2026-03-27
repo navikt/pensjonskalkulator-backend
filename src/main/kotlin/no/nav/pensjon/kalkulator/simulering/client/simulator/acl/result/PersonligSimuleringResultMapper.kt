@@ -11,6 +11,7 @@ object PersonligSimuleringResultMapper {
         SimuleringResult(
             alderspensjon = dto.alderspensjonListe.map(::alderspensjon),
             alderspensjonMaanedsbeloep = dto.alderspensjonMaanedsbeloep?.let(::alderspensjonMaanedsbeloep),
+            maanedligAlderspensjonForKnekkpunkter = dto.maanedligAlderspensjonForKnekkpunkter?.let(::maanedligAlderspensjonForKnekkpunkter),
             pre2025OffentligAfp = dto.tidsbegrensetOffentligAfp?.let(::tidsbegrensetOffentligAfp),
             afpPrivat = dto.privatAfpListe.map(::privatAfp),
             afpOffentlig = dto.livsvarigOffentligAfpListe.map(::livsvarigOffentligAfp),
@@ -125,6 +126,32 @@ object PersonligSimuleringResultMapper {
         AlderspensjonMaanedsbeloep(
             gradertUttak = dto.gradertUttakBeloep,
             heltUttak = dto.heltUttakBeloep
+        )
+
+    private fun maanedligAlderspensjonForKnekkpunkter(dto: MaanedligAlderspensjonForKnekkpunkterDto) =
+        SimulertMaanedligAlderspensjonForKnekkpunkter(
+            vedGradertUttak = dto.vedGradertUttak?.let(::maanedligAlderspensjon),
+            vedHeltUttak = maanedligAlderspensjon(dto.vedHeltUttak),
+            vedNormertPensjonsalder = maanedligAlderspensjon(dto.vedNormertPensjonsalder)
+        )
+
+    private fun maanedligAlderspensjon(dto: MaanedligAlderspensjonDto) =
+        SimulertMaanedligAlderspensjon(
+            beloep = dto.beloep,
+            inntektspensjonBeloep = dto.inntektspensjon,
+            delingstall = dto.delingstall,
+            pensjonsbeholdningFoerUttak = dto.pensjonsbeholdningFoerUttak,
+            pensjonsbeholdningEtterUttak = dto.pensjonsbeholdningEtterUttak,
+            sluttpoengtall = dto.sluttpoengtall,
+            poengaarFoer92 = dto.poengaarFoer92,
+            poengaarEtter91 = dto.poengaarEtter91,
+            forholdstall = dto.forholdstall,
+            grunnpensjon = dto.grunnpensjon,
+            tilleggspensjon = dto.tilleggspensjon,
+            pensjonstillegg = dto.pensjonstillegg,
+            skjermingstillegg = dto.skjermingstillegg,
+            kapittel19Pensjon = dto.kapittel19Pensjon?.let(::kapittel19Pensjon),
+            kapittel20Pensjon = dto.kapittel20Pensjon?.let(::kapittel20Pensjon)
         )
 
     private fun problem(dto: ProblemDto) =
