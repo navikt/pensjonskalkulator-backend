@@ -114,6 +114,7 @@ data class UttaksparametreDto(
 
 data class GarantipensjonDto(
     @field:NotNull val aarligBeloep: Int,
+    val maanedligBeloep: Int?,
     @field:NotNull val sats: Double
 )
 

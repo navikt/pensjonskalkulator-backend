@@ -154,7 +154,7 @@ object SimuleringResultMapper {
                 minstePensjonsnivaaSats = source.kapittel19Pensjon?.minstePensjonsnivaaSats,
                 kapittel20Andel = source.kapittel20Pensjon?.andelsbroek,
                 kapittel20Trygdetid = source.kapittel20Pensjon?.trygdetidAntallAar,
-                garantipensjonBeloep = source.kapittel20Pensjon?.garantipensjon?.aarligBeloep,
+                garantipensjonBeloep = source.kapittel20Pensjon?.garantipensjon?.maanedligBeloep,
                 garantipensjonSats = source.kapittel20Pensjon?.garantipensjon?.sats,
                 garantitilleggBeloep = source.kapittel20Pensjon?.garantitillegg
             )

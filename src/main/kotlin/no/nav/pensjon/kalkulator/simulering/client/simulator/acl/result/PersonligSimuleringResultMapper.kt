@@ -62,6 +62,7 @@ object PersonligSimuleringResultMapper {
     private fun garantipensjon(dto: GarantipensjonDto) =
         Garantipensjon(
             aarligBeloep = dto.aarligBeloep,
+            maanedligBeloep = dto.maanedligBeloep,
             sats = dto.sats
         )
 
