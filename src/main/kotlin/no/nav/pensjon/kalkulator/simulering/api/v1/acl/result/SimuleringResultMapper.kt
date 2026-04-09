@@ -29,32 +29,60 @@ object SimuleringResultMapper {
         )
 
     private fun alderspensjon(source: SimulertAlderspensjon, mode: MappingMode) =
-        SimuleringV1Alderspensjon(
-            alderAar = source.alder,
-            beloep = source.beloep,
-            gjenlevendetillegg = if (mode.mapGjenlevendetillegg) source.kapittel19Gjenlevendetillegg else null,
-            extension = if (mode.extended) alderspensjonExtension(source) else null
-        )
-
-    private fun alderspensjonExtension(source: SimulertAlderspensjon) =
-        SimuleringV1AlderspensjonExtension(
-            inntektspensjonBeloep = source.inntektspensjonBeloep,
-            garantipensjonBeloep = source.garantipensjonBeloep,
-            delingstall = source.delingstall,
-            pensjonBeholdningFoerUttakBeloep = source.pensjonBeholdningFoerUttak,
-            andelsbroekKap19 = source.andelsbroekKap19,
-            andelsbroekKap20 = source.andelsbroekKap20,
-            sluttpoengtall = source.sluttpoengtall,
-            trygdetidKap19 = source.trygdetidKap19,
-            trygdetidKap20 = source.trygdetidKap20,
-            poengaarFoer92 = source.poengaarFoer92,
-            poengaarEtter91 = source.poengaarEtter91,
-            forholdstall = source.forholdstall,
-            grunnpensjon = source.grunnpensjon,
-            tilleggspensjon = source.tilleggspensjon,
-            pensjonstillegg = source.pensjonstillegg,
-            skjermingstillegg = source.skjermingstillegg
-        )
+        if (mode.reduced)
+            SimuleringV1Alderspensjon(
+                alderAar = source.alder,
+                beloep = source.beloep,
+                inntektspensjonBeloep = null,
+                basispensjonBeloep = null,
+                garantipensjonBeloep = null,
+                garantipensjonSats = null,
+                garantitilleggBeloep = null,
+                restpensjonBeloep = null,
+                grunnpensjonBeloep = null,
+                tilleggspensjonBeloep = null,
+                pensjonstillegg = null,
+                skjermingstillegg = null,
+                gjenlevendetillegg = null,
+                minstePensjonsnivaaSats = null,
+                delingstall = null,
+                forholdstall = null,
+                pensjonsbeholdningFoerUttakBeloep = null,
+                kapittel19Andel = null,
+                kapittel20Andel = null,
+                sluttpoengtall = null,
+                kapittel19Trygdetid = null,
+                kapittel20Trygdetid = null,
+                poengaarTom1991 = null,
+                poengaarFom1992 = null
+            )
+        else
+            SimuleringV1Alderspensjon(
+                alderAar = source.alder,
+                beloep = source.beloep,
+                inntektspensjonBeloep = source.inntektspensjonBeloep,
+                basispensjonBeloep = source.kapittel19Pensjon?.basispensjon,
+                garantipensjonBeloep = source.kapittel20Pensjon?.garantipensjon?.aarligBeloep,
+                garantipensjonSats = source.kapittel20Pensjon?.garantipensjon?.sats,
+                garantitilleggBeloep = source.kapittel20Pensjon?.garantitillegg,
+                restpensjonBeloep = source.kapittel19Pensjon?.restpensjon,
+                grunnpensjonBeloep = source.grunnpensjon,
+                tilleggspensjonBeloep = source.tilleggspensjon,
+                pensjonstillegg = source.pensjonstillegg,
+                skjermingstillegg = source.skjermingstillegg,
+                gjenlevendetillegg = source.kapittel19Pensjon?.gjenlevendetillegg,
+                minstePensjonsnivaaSats = source.kapittel19Pensjon?.minstePensjonsnivaaSats,
+                delingstall = source.delingstall,
+                forholdstall = source.forholdstall,
+                pensjonsbeholdningFoerUttakBeloep = source.pensjonBeholdningFoerUttak,
+                kapittel19Andel = source.kapittel19Pensjon?.andelsbroek,
+                kapittel20Andel = source.kapittel20Pensjon?.andelsbroek,
+                sluttpoengtall = source.sluttpoengtall,
+                kapittel19Trygdetid = source.kapittel19Pensjon?.trygdetidAntallAar,
+                kapittel20Trygdetid = source.kapittel20Pensjon?.trygdetidAntallAar,
+                poengaarTom1991 = source.poengaarFoer92,
+                poengaarFom1992 = source.poengaarEtter91
+            )
 
     private fun maanedligPensjon(source: AlderspensjonMaanedsbeloep) =
         SimuleringV1Uttaksbeloep(

@@ -14,11 +14,16 @@ import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.testutil.Arrange
+import no.nav.pensjon.kalkulator.testutil.arrangeJsonResponse
 import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
+import no.nav.pensjon.kalkulator.validity.ProblemType
 import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
 import org.springframework.beans.factory.BeanFactory
+import org.springframework.beans.factory.getBean
+import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.WebClient
+import tools.jackson.databind.json.JsonMapper
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
 import java.time.LocalDate
@@ -28,11 +33,14 @@ class PensjonssimulatorSimuleringClientTest : FunSpec({
     var server: MockWebServer? = null
     var baseUrl: String? = null
     val traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" }
+    val pensjonJson: String = this::class.java.getResource("/simulert-pensjon.json")?.readText(Charsets.UTF_8)!!
+    val jsonMapper = JsonMapper()
 
     fun client(context: BeanFactory) =
         PensjonssimulatorSimuleringClient(
             baseUrl!!,
-            webClientBuilder = context.getBean(WebClient.Builder::class.java),
+            webClientBuilder = context.getBean<WebClient.Builder>(),
+            jsonMapper,
             traceAid,
             retryAttempts = "1"
         )
@@ -163,6 +171,39 @@ class PensjonssimulatorSimuleringClientTest : FunSpec({
             )
         }
     }
+
+    test("simulerPersonligAlderspensjon med gjenlevenderett") {
+        server?.arrangeOkJsonResponse(body = pensjonJson)
+
+        Arrange.webClientContextRunner().run {
+            val result = client(context = it).simulerPersonligAlderspensjon(
+                impersonalSpec = impersonalGradertUttakSpec(),
+                personalSpec = personalSpec(Sivilstatus.UGIFT)
+            )
+
+            with(result) {
+                alderspensjon[0].kapittel19Pensjon?.gjenlevendetillegg shouldBe 3416
+                alderspensjon[1].kapittel19Pensjon?.gjenlevendetillegg shouldBe 3417
+                alderspensjon[2].kapittel19Pensjon?.gjenlevendetillegg shouldBe null
+            }
+        }
+    }
+
+    test("simulerPersonligAlderspensjon med ugyldig uttaksdato") {
+        server?.arrangeJsonResponse(status = HttpStatus.BAD_REQUEST, body = JSON_FOR_UGYLDIG_UTTAKSDATO)
+
+        Arrange.webClientContextRunner().run {
+            val result = client(context = it).simulerPersonligAlderspensjon(
+                impersonalSpec = impersonalGradertUttakSpec(),
+                personalSpec = personalSpec(Sivilstatus.UGIFT)
+            )
+
+            with(result.problem!!) {
+                type shouldBe ProblemType.UGYLDIG_UTTAKSDATO
+                beskrivelse shouldBe "Dato for første uttak (2022-02-01) er for tidlig"
+            }
+        }
+    }
 })
 
 private fun alderspensjon(alder: Int, beloep: Int = 222612) =
@@ -170,14 +211,9 @@ private fun alderspensjon(alder: Int, beloep: Int = 222612) =
         alder,
         beloep,
         inntektspensjonBeloep = 0,
-        garantipensjonBeloep = 0,
         delingstall = 0.0,
         pensjonBeholdningFoerUttak = 0,
-        andelsbroekKap19 = 0.0,
-        andelsbroekKap20 = 0.0,
         sluttpoengtall = 0.0,
-        trygdetidKap19 = 0,
-        trygdetidKap20 = 0,
         poengaarFoer92 = 0,
         poengaarEtter91 = 0,
         forholdstall = 0.0,
@@ -185,8 +221,27 @@ private fun alderspensjon(alder: Int, beloep: Int = 222612) =
         tilleggspensjon = 0,
         pensjonstillegg = 0,
         skjermingstillegg = 0,
-        kapittel19Gjenlevendetillegg = 0
+        kapittel19Pensjon = null,
+        kapittel20Pensjon = null
     )
+
+@Language("json")
+const val JSON_FOR_UGYLDIG_UTTAKSDATO = """{
+    "alderspensjonListe": [],
+    "alderspensjonMaanedsbeloep": {
+        "heltUttakBeloep": 0
+    },
+    "livsvarigOffentligAfpListe": [],
+    "privatAfpListe": [],
+    "vilkaarsproevingsresultat": {
+        "erInnvilget": true
+    },
+    "pensjonsgivendeInntektListe": [],
+    "problem": {
+        "kode": "UGYLDIG_UTTAKSDATO",
+        "beskrivelse": "Dato for første uttak (2022-02-01) er for tidlig"
+    }
+}"""
 
 @Language("json")
 const val VILKAAR_IKKE_OPPFYLT_BODY = """{

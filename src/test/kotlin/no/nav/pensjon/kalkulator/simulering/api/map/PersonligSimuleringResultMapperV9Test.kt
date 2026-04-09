@@ -467,14 +467,9 @@ private fun alderspensjon(alder: Int, beloep: Int) =
         alder,
         beloep,
         inntektspensjonBeloep = 1,
-        garantipensjonBeloep = 2,
         delingstall = 3.4,
         pensjonBeholdningFoerUttak = 5,
-        andelsbroekKap19 = 0.6,
-        andelsbroekKap20 = 0.4,
         sluttpoengtall = 5.11,
-        trygdetidKap19 = 40,
-        trygdetidKap20 = 40,
         poengaarFoer92 = 13,
         poengaarEtter91 = 27,
         forholdstall = 0.971,
@@ -482,7 +477,23 @@ private fun alderspensjon(alder: Int, beloep: Int) =
         tilleggspensjon = 134641,
         pensjonstillegg = -70243,
         skjermingstillegg = 14,
-        kapittel19Gjenlevendetillegg = 15
+        kapittel19Pensjon = Kapittel19Pensjon(
+            andelsbroek = 0.6,
+            trygdetidAntallAar = 40,
+            basispensjon = 100,
+            restpensjon = 101,
+            gjenlevendetillegg = 15,
+            minstePensjonsnivaaSats = 1.23
+        ),
+        kapittel20Pensjon = Kapittel20Pensjon(
+            andelsbroek = 0.4,
+            trygdetidAntallAar = 39,
+            garantipensjon = Garantipensjon(
+                aarligBeloep = 2,
+                sats = 2.34
+            ),
+            garantitillegg = 201
+        )
     )
 
 private fun privatAfp(alder: Int, beloep: Int) =
