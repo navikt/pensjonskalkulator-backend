@@ -89,6 +89,7 @@ data class VedtakV1InformasjonOmAvdoed(
     val doedsdato: LocalDate?,
 
     @field:Schema(description = "Virkningsdato (fra og med) for avdødes første vedtak om alderspensjon")
+    @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val foersteAlderspensjonVirkningsdato: LocalDate?,
 
     @field:Schema(description = "Hvorvidt avdødes årlige pensjonsgivende inntekt var minst 1G (grunnbeløpet)")
