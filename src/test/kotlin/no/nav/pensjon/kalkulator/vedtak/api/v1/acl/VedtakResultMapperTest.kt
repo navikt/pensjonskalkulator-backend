@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.vedtak.api.v1.acl
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.common.api.acl.CommonV1Sivilstatus
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.vedtak.*
 import java.math.BigDecimal
@@ -32,7 +33,16 @@ class VedtakResultMapperTest : ShouldSpec({
                 fom = LocalDate.of(2021, 10, 1)
             ),
             privatAfp = LoependeEntitet(fom = LocalDate.of(2022, 10, 1)),
-            pre2025OffentligAfp = LoependeEntitet(fom = LocalDate.of(2024, 2, 1))
+            pre2025OffentligAfp = LoependeEntitet(fom = LocalDate.of(2024, 2, 1)),
+            avdoed = InformasjonOmAvdoed(
+                pid = pid,
+                doedsdato = LocalDate.of(2025, 6, 14),
+                foersteAlderspensjonVirkningsdato = LocalDate.of(2021, 1, 1),
+                aarligPensjonsgivendeInntektErMinst1G = true,
+                harTilstrekkeligMedlemskapIFolketrygden = false,
+                antallAarUtenlands = 3,
+                erFlyktning = true
+            )
         )
 
         VedtakResultMapper.toDto(vedtakSamling) shouldBe VedtakV1Samling(
@@ -53,7 +63,16 @@ class VedtakResultMapperTest : ShouldSpec({
             ),
             ufoeretrygdgrad = 50,
             privatAfpFom = LocalDate.of(2022, 10, 1),
-            tidsbegrensetOffentligAfpFom = LocalDate.of(2024, 2, 1)
+            tidsbegrensetOffentligAfpFom = LocalDate.of(2024, 2, 1),
+            avdoed = VedtakV1InformasjonOmAvdoed(
+                pid = pid.value,
+                doedsdato = LocalDate.of(2025, 6, 14),
+                foersteAlderspensjonVirkningsdato = LocalDate.of(2021, 1, 1),
+                aarligPensjonsgivendeInntektErMinst1G = true,
+                harTilstrekkeligMedlemskapIFolketrygden = false,
+                antallAarUtenlands = 3,
+                erFlyktning = true
+            )
         )
     }
 
@@ -63,7 +82,8 @@ class VedtakResultMapperTest : ShouldSpec({
             fremtidigAlderspensjon = null,
             ufoeretrygd = null,
             privatAfp = null,
-            pre2025OffentligAfp = null
+            pre2025OffentligAfp = null,
+            avdoed = null
         )
 
         VedtakResultMapper.toDto(vedtakSamling) shouldBe VedtakV1Samling(
@@ -72,7 +92,8 @@ class VedtakResultMapperTest : ShouldSpec({
             fremtidigAlderspensjon = null,
             ufoeretrygdgrad = null,
             privatAfpFom = null,
-            tidsbegrensetOffentligAfpFom = null
+            tidsbegrensetOffentligAfpFom = null,
+            avdoed = null
         )
     }
 })
