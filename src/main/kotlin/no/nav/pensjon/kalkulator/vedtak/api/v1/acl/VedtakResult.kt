@@ -12,7 +12,7 @@ import java.time.LocalDate
 
 @JsonInclude(NON_NULL)
 data class VedtakV1Samling(
-    @field:Schema(description = "Om personen har løpende eller fremtidig vedtak")
+    @field:Schema(description = "Hvorvidt personen har løpende eller fremtidig vedtak")
     @field:NotNull val harVedtak: Boolean,
 
     @field:Schema(description = "Løpende alderspensjon")
@@ -30,7 +30,10 @@ data class VedtakV1Samling(
 
     @field:Schema(description = "Startdato (fra og med) for tidsbegrenset AFP i offentlig sektor ('gammel ordning')")
     @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
-    val tidsbegrensetOffentligAfpFom: LocalDate? = null
+    val tidsbegrensetOffentligAfpFom: LocalDate? = null,
+
+    @field:Schema(description = "Informasjon om eventuell avdød ektefelle/partner/samboer")
+    val avdoed: VedtakV1InformasjonOmAvdoed? = null
 )
 
 @JsonInclude(NON_NULL)
@@ -75,4 +78,28 @@ data class VedtakV1Utbetaling(
     @field:Schema(description = "Dato for utbetalingen")
     @field:NotNull @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val utbetalingsdato: LocalDate
+)
+
+data class VedtakV1InformasjonOmAvdoed(
+    @field:Schema(description = "Avdødes person-ID")
+    val pid: String?,
+
+    @field:Schema(description = "Dato for dødsfallet")
+    @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
+    val doedsdato: LocalDate?,
+
+    @field:Schema(description = "Virkningsdato (fra og med) for avdødes første vedtak om alderspensjon")
+    val foersteAlderspensjonVirkningsdato: LocalDate?,
+
+    @field:Schema(description = "Hvorvidt avdødes årlige pensjonsgivende inntekt var minst 1G (grunnbeløpet)")
+    val aarligPensjonsgivendeInntektErMinst1G: Boolean?,
+
+    @field:Schema(description = "Hvorvidt avdøde hadde tilstrekkelig medlemskap i folketrygden")
+    val harTilstrekkeligMedlemskapIFolketrygden: Boolean?,
+
+    @field:Schema(description = "Antall år som avdøde hadde oppholdt seg i utlandet")
+    val antallAarUtenlands: Int?,
+
+    @field:Schema(description = "Hvorvidt avdøde var flyktning")
+    val erFlyktning: Boolean?
 )
