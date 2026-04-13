@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.vedtak
 
+import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -9,7 +10,8 @@ data class VedtakSamling(
     val fremtidigAlderspensjon: FremtidigAlderspensjon?,
     val ufoeretrygd: LoependeUfoeretrygd?,
     val privatAfp: LoependeEntitet?,
-    val pre2025OffentligAfp: LoependeEntitet? = null
+    val pre2025OffentligAfp: LoependeEntitet? = null,
+    val avdoed: InformasjonOmAvdoed?
 ) {
     fun withAlderspensjonUtbetalingSisteMaaned(utbetaling: Utbetaling) =
         VedtakSamling(
@@ -17,7 +19,8 @@ data class VedtakSamling(
             fremtidigAlderspensjon = fremtidigAlderspensjon,
             ufoeretrygd = ufoeretrygd,
             privatAfp = privatAfp,
-            pre2025OffentligAfp = pre2025OffentligAfp
+            pre2025OffentligAfp = pre2025OffentligAfp,
+            avdoed = avdoed
         )
 
     fun hasContent(): Boolean =
@@ -26,6 +29,7 @@ data class VedtakSamling(
                 || ufoeretrygd != null
                 || privatAfp != null
                 || pre2025OffentligAfp != null
+    // Informasjon om avdød regnes ikke som "content" i form av vedtak
 }
 
 data class LoependeAlderspensjon(
@@ -63,4 +67,14 @@ data class LoependeEntitet(
 data class Utbetaling(
     val beloep: BigDecimal?,
     val posteringsdato: LocalDate
+)
+
+data class InformasjonOmAvdoed(
+    val pid: Pid?,
+    val doedsdato: LocalDate?,
+    val foersteAlderspensjonVirkningsdato: LocalDate?,
+    val aarligPensjonsgivendeInntektErMinst1G: Boolean?,
+    val harTilstrekkeligMedlemskapIFolketrygden: Boolean?,
+    val antallAarUtenlands: Int?,
+    val erFlyktning: Boolean?
 )
