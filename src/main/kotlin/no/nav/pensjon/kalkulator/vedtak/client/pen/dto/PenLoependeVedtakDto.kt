@@ -12,7 +12,7 @@ data class PenLoependeVedtakDto(
     val afpPrivat: PenGjeldendeVedtakDto?,
     val afpOffentlig: PenGjeldendeVedtakDto?, // AFP i offentlig sektor for brukere født før 1963
     val gjeldendeUttaksgradFom: LocalDate? = null,
-    var avdoed: PenInformasjonOmAvdoedDto?
+    val avdoed: PenInformasjonOmAvdoedDto?
 )
 
 data class PenGjeldendeUfoeregradDto(
