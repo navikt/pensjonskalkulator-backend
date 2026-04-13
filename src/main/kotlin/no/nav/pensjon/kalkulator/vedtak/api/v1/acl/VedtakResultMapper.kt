@@ -1,7 +1,6 @@
 package no.nav.pensjon.kalkulator.vedtak.api.v1.acl
 
 import no.nav.pensjon.kalkulator.common.api.acl.CommonV1Sivilstatus
-import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.vedtak.*
 import java.math.BigDecimal
 
