@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.ansatt.enhet.client.navansatt
 
 import com.github.benmanes.caffeine.cache.Cache
 import mu.KotlinLogging
-import no.nav.pensjon.kalkulator.ansatt.enhet.AnsattEnhetResult
+import no.nav.pensjon.kalkulator.ansatt.enhet.TjenestekontorEnheter
 import no.nav.pensjon.kalkulator.ansatt.enhet.client.EnhetClient
 import no.nav.pensjon.kalkulator.ansatt.enhet.client.navansatt.acl.NavEnhetProblemDto
 import no.nav.pensjon.kalkulator.ansatt.enhet.client.navansatt.acl.NavEnhetResultDto
@@ -40,15 +40,15 @@ class NavAnsattClient(
     private val log = KotlinLogging.logger {}
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
 
-    private val cache: Cache<String, AnsattEnhetResult> =
-        createCache("enhet", cacheManager)
+    private val cache: Cache<String, TjenestekontorEnheter> =
+        createCache("ansattenheter", cacheManager)
 
-    override fun fetchTjenestekontorEnhetListe(ansattId: String): AnsattEnhetResult =
+    override fun fetchTjenestekontorEnhetListe(ansattId: String): TjenestekontorEnheter =
         cache.getIfPresent(ansattId) ?: fetchFreshData(ansattId).also { cache.put(ansattId, it) }
 
     override fun service() = service
 
-    private fun fetchFreshData(ansattId: String): AnsattEnhetResult {
+    private fun fetchFreshData(ansattId: String): TjenestekontorEnheter {
         val uri = "$BASE_PATH/$ansattId/enheter"
 
         return try {
@@ -62,7 +62,7 @@ class NavAnsattClient(
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
                 ?.let(::fromDto)
-                ?: AnsattEnhetResult(enhetListe = emptyList())
+                ?: TjenestekontorEnheter(enhetListe = emptyList())
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $uri", e)
         } catch (e: WebClientResponseException) {
@@ -79,12 +79,19 @@ class NavAnsattClient(
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
     }
 
-    private fun handle(egressException: EgressException): AnsattEnhetResult =
+    /**
+     * Ved klientfeil (4xx) der responsen inneholder en NavEnhetProblemDto (problembeskrivelse),
+     * så returneres et TjenestekontorEnheter-objekt med problembeskrivelsen.
+     * I øvrige tilfeller kastes bare EgressException videre.
+     */
+    private fun handle(egressException: EgressException): TjenestekontorEnheter =
         try {
+            if (egressException.isClientError.not()) throw egressException
+
             jsonMapper.readValue(
                 egressException.message,
                 NavEnhetProblemDto::class.java
-            )?.let(::fromDto) ?: throw egressException
+            )?.let { fromDto(dto = it, httpStatus = egressException.statusCode) } ?: throw egressException
         } catch (jacksonException: JacksonException) {
             log.warn(jacksonException) {
                 redact(

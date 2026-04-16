@@ -30,7 +30,7 @@ class EnhetServiceTest : ShouldSpec({
                 TjenestekontorEnhet("enhet1", "Tjenestekontor 1", nivaa = "02"),
                 TjenestekontorEnhet("enhet2", "Tjenestekontor 2", nivaa = "03"),
             )
-            every { client.fetchTjenestekontorEnhetListe(ansattId = ANSATT_ID) } returns AnsattEnhetResult(enhetListe = expectedEnhetList)
+            every { client.fetchTjenestekontorEnhetListe(ansattId = ANSATT_ID) } returns TjenestekontorEnheter(enhetListe = expectedEnhetList)
 
             service.tjenestekontorEnhetListe().enhetListe shouldBe expectedEnhetList
 
@@ -40,7 +40,7 @@ class EnhetServiceTest : ShouldSpec({
 
     context("failure - client returns no data") {
         should("return an empty list and no problem description") {
-            val expectedResult = AnsattEnhetResult(
+            val expectedResult = TjenestekontorEnheter(
                 enhetListe = emptyList(),
                 problem = null
             )
@@ -54,7 +54,7 @@ class EnhetServiceTest : ShouldSpec({
 
     context("failure - ansatt not found") {
         should("return an empty list and a problem description") {
-            val expectedResult = AnsattEnhetResult(
+            val expectedResult = TjenestekontorEnheter(
                 enhetListe = emptyList(),
                 problem = Problem(
                     type = ProblemType.PERSON_IKKE_FUNNET,

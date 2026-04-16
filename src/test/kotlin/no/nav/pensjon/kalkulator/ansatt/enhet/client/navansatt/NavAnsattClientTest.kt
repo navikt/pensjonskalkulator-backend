@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.ansatt.enhet.client.navansatt
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
-import no.nav.pensjon.kalkulator.ansatt.enhet.AnsattEnhetResult
+import no.nav.pensjon.kalkulator.ansatt.enhet.TjenestekontorEnheter
 import no.nav.pensjon.kalkulator.ansatt.enhet.TjenestekontorEnhet
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.testutil.Arrange
@@ -69,7 +69,7 @@ class NavAnsattClientTest : ShouldSpec({
 
         Arrange.webClientContextRunner().run {
             client(context = it, jsonMapper).fetchTjenestekontorEnhetListe(ansattId = ANSATT_ID) shouldBe
-                    AnsattEnhetResult(
+                    TjenestekontorEnheter(
                         listOf(
                             TjenestekontorEnhet(
                                 id = "4833",
@@ -103,7 +103,7 @@ class NavAnsattClientTest : ShouldSpec({
                 context = it,
                 jsonMapper
             ).fetchTjenestekontorEnhetListe(ansattId = ANSATT_ID) shouldBe
-                    AnsattEnhetResult(
+                    TjenestekontorEnheter(
                         enhetListe = emptyList(),
                         problem = Problem(
                             type = ProblemType.PERSON_IKKE_FUNNET,
