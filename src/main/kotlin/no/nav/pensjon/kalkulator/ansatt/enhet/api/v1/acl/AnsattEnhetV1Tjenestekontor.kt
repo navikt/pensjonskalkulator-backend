@@ -16,7 +16,7 @@ data class AnsattEnhetV1Result(
     @field:NotNull
     val enhetListe: List<AnsattEnhetV1Tjenestekontor>,
 
-    @field:Schema(description = "Eventelt problem som oppstod ved henting av enheter")
+    @field:Schema(description = "Eventuelt problem som oppstod ved henting av enheter")
     val problem: AnsattEnhetV1Problem?
 )
 

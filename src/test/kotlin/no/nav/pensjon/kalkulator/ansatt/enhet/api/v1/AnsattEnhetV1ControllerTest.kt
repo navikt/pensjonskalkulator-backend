@@ -5,7 +5,7 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.verify
-import no.nav.pensjon.kalkulator.ansatt.enhet.AnsattEnhetResult
+import no.nav.pensjon.kalkulator.ansatt.enhet.TjenestekontorEnheter
 import no.nav.pensjon.kalkulator.ansatt.enhet.EnhetService
 import no.nav.pensjon.kalkulator.ansatt.enhet.TjenestekontorEnhet
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
@@ -41,7 +41,7 @@ class AnsattEnhetV1ControllerTest : ShouldSpec() {
 
         context("success - service responds") {
             should("return status '200 OK' with a list of enheter") {
-                every { enhetService.tjenestekontorEnhetListe() } returns AnsattEnhetResult(
+                every { enhetService.tjenestekontorEnhetListe() } returns TjenestekontorEnheter(
                     enhetListe = listOf(
                         TjenestekontorEnhet(id = "123", navn = "Oslo", nivaa = "1"),
                         TjenestekontorEnhet(id = "456", navn = "Bergen", nivaa = "2")
@@ -61,7 +61,7 @@ class AnsattEnhetV1ControllerTest : ShouldSpec() {
 
         context("failure - ansatt not found") {
             should(" return status '404 Not Found' with problem description as content") {
-                every { enhetService.tjenestekontorEnhetListe() } returns AnsattEnhetResult(
+                every { enhetService.tjenestekontorEnhetListe() } returns TjenestekontorEnheter(
                     enhetListe = emptyList(),
                     problem = Problem(
                         type = ProblemType.PERSON_IKKE_FUNNET,
@@ -97,7 +97,7 @@ class AnsattEnhetV1ControllerTest : ShouldSpec() {
 
         context("failure - empty response") {
             should("return status '200 OK' with empty list as content") {
-                every { enhetService.tjenestekontorEnhetListe() } returns AnsattEnhetResult(enhetListe = emptyList())
+                every { enhetService.tjenestekontorEnhetListe() } returns TjenestekontorEnheter(enhetListe = emptyList())
                 arrangeTrace()
 
                 mockMvc.get(URL)

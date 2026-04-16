@@ -1,12 +1,12 @@
 package no.nav.pensjon.kalkulator.ansatt.enhet.api.v1.acl
 
-import no.nav.pensjon.kalkulator.ansatt.enhet.AnsattEnhetResult
+import no.nav.pensjon.kalkulator.ansatt.enhet.TjenestekontorEnheter
 import no.nav.pensjon.kalkulator.ansatt.enhet.TjenestekontorEnhet
 import no.nav.pensjon.kalkulator.validity.Problem
 
 object ResultMapper {
 
-    fun toDto(source: AnsattEnhetResult) =
+    fun toDto(source: TjenestekontorEnheter) =
         AnsattEnhetV1Result(
             enhetListe = source.enhetListe.map(::tjenestekontor),
             problem = source.problem?.let(::problem)
