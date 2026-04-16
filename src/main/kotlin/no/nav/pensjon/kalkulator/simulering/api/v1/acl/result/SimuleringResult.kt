@@ -35,7 +35,7 @@ data class SimuleringV1Result(
     @field:Schema(description = "Pensjonsgivende inntekter for hvert år")
     val pensjonsgivendeInntektListe: List<SimuleringV1AarligBeloep>?,
 
-    @field:Schema(description = "Eventelt problem som oppstod under simuleringen")
+    @field:Schema(description = "Eventuelt problem som oppstod under simuleringen")
     val problem: SimuleringV1Problem?
 )
 

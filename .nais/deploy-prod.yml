@@ -71,6 +71,8 @@ spec:
       rules:
         - application: etterlatte-api
           namespace: etterlatte
+        - application: navansatt
+          namespace: pensjon-saksbehandling
         - application: pdl-api
           namespace: pdl
           cluster: prod-fss
@@ -122,6 +124,10 @@ spec:
       value: prod-fss:pensjonselvbetjening:pensjon-selvbetjening-fss-gateway
     - name: FSS_GATEWAY_URL
       value: https://pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
+    - name: NAV_ANSATT_SERVICE_ID
+      value: prod-gcp:pensjon-saksbehandling:navansatt
+    - name: NAV_ANSATT_URL
+      value: http://navansatt.pensjon-saksbehandling
     - name: NORSK_PENSJON_URL
       value: https://pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
     - name: OMSTILLINGSSTOENAD_SERVICE_ID
