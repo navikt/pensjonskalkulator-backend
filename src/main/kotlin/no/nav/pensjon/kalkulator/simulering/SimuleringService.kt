@@ -66,7 +66,7 @@ class SimuleringService(
         } catch (e: NotFoundException) {
             problem(e, type = ProblemType.PERSON_IKKE_FUNNET)
         } catch (e: EgressException) {
-            problem(e, type = ProblemType.SERVERFEIL)
+            problem(e, type = ProblemType.ANNEN_SERVERFEIL)
         }
 
     private fun sivilstatus() =

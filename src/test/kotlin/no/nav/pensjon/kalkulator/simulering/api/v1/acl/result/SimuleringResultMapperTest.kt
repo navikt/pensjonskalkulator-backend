@@ -4,6 +4,8 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.mock.TestObjects
 import no.nav.pensjon.kalkulator.simulering.*
+import no.nav.pensjon.kalkulator.validity.Problem
+import no.nav.pensjon.kalkulator.validity.ProblemType
 
 class SimuleringResultMapperTest : ShouldSpec({
 
@@ -133,6 +135,43 @@ class SimuleringResultMapperTest : ShouldSpec({
             )
         }
     }
+
+    context("problem") {
+        should("map problemkode and -beskrivelse") {
+            SimuleringResultMapper.toDto(
+                source = SimuleringResult(
+                    alderspensjon = emptyList(),
+                    alderspensjonMaanedsbeloep = null,
+                    pre2025OffentligAfp = null,
+                    afpPrivat = emptyList(),
+                    afpOffentlig = emptyList(),
+                    vilkaarsproeving = vilkaarsproevingsresultat(innvilget = false),
+                    harForLiteTrygdetid = false,
+                    trygdetid = 0,
+                    opptjeningGrunnlagListe = emptyList(),
+                    problem = Problem(
+                        type = ProblemType.UTILSTREKKELIG_INNTEKT,
+                        beskrivelse = "10 kroner"
+                    )
+                ),
+                naavaerendeAlderAar = 65,
+                mode = MappingMode.INTERNAL
+            ) shouldBe SimuleringV1Result(
+                alderspensjonListe = emptyList(),
+                maanedligAlderspensjonVedUttaksendring = null,
+                livsvarigOffentligAfpListe = emptyList(),
+                tidsbegrensetOffentligAfp = null,
+                privatAfpListe = emptyList(),
+                vilkaarsproevingsresultat = expectedVilkaarsproevingsresultat(innvilget = false),
+                trygdetid = expectedTrygdetid(antallAar = 0),
+                pensjonsgivendeInntektListe = emptyList(),
+                problem = SimuleringV1Problem(
+                    kode = SimuleringV1ProblemType.UTILSTREKKELIG_INNTEKT,
+                    beskrivelse = "10 kroner"
+                )
+            )
+        }
+    }
 })
 
 private fun alderspensjon(gjenlevendetillegg: Int) =
@@ -206,20 +245,20 @@ private fun expectedUttaksbeloep() =
         heltUttakMaanedligBeloep = 101
     )
 
-private fun vilkaarsproevingsresultat() =
+private fun vilkaarsproevingsresultat(innvilget: Boolean = true) =
     Vilkaarsproeving(
-        innvilget = true,
+        innvilget,
         alternativ = null
     )
 
-private fun expectedVilkaarsproevingsresultat() =
+private fun expectedVilkaarsproevingsresultat(innvilget: Boolean = true) =
     SimuleringV1Vilkaarsproevingsresultat(
-        erInnvilget = true,
+        erInnvilget = innvilget,
         alternativ = null
     )
 
-private fun expectedTrygdetid() =
+private fun expectedTrygdetid(antallAar: Int = 40) =
     SimuleringV1Trygdetid(
-        antallAar = 40,
+        antallAar,
         erUtilstrekkelig = false
     )
