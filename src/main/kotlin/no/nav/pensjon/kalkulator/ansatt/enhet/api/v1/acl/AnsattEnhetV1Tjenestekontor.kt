@@ -36,5 +36,5 @@ enum class AnsattEnhetV1ProblemType(
 ) {
     ANSATT_IKKE_FUNNET(internalValue = ProblemType.PERSON_IKKE_FUNNET, httpStatus = HttpStatus.NOT_FOUND),
     ANNEN_KLIENTFEIL(internalValue = ProblemType.ANNEN_KLIENTFEIL),
-    SERVERFEIL(internalValue = ProblemType.SERVERFEIL, httpStatus = HttpStatus.INTERNAL_SERVER_ERROR)
+    SERVERFEIL(internalValue = ProblemType.ANNEN_SERVERFEIL, httpStatus = HttpStatus.INTERNAL_SERVER_ERROR)
 }

@@ -159,6 +159,7 @@ class SimuleringResultMapperTest : ShouldSpec({
             ) shouldBe SimuleringV1Result(
                 alderspensjonListe = emptyList(),
                 maanedligAlderspensjonVedUttaksendring = null,
+                maanedligAlderspensjonForKnekkpunkter = null,
                 livsvarigOffentligAfpListe = emptyList(),
                 tidsbegrensetOffentligAfp = null,
                 privatAfpListe = emptyList(),

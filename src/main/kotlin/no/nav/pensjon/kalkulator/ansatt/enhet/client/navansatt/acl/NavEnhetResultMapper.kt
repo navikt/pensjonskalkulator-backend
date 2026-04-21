@@ -18,7 +18,7 @@ object NavEnhetResultMapper {
         TjenestekontorEnheter(
             enhetListe = emptyList(),
             problem = Problem(
-                type = httpStatus?.let(::problemType) ?: ProblemType.SERVERFEIL,
+                type = httpStatus?.let(::problemType) ?: ProblemType.ANNEN_SERVERFEIL,
                 beskrivelse = dto.message
             )
         )
