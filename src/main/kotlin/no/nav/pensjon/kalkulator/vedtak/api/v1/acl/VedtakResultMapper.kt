@@ -13,7 +13,8 @@ object VedtakResultMapper {
             fremtidigAlderspensjon = source.fremtidigAlderspensjon?.let(::fremtidigAlderspensjon),
             ufoeretrygdgrad = source.ufoeretrygd?.grad,
             privatAfpFom = source.privatAfp?.fom,
-            tidsbegrensetOffentligAfpFom = source.pre2025OffentligAfp?.fom
+            tidsbegrensetOffentligAfpFom = source.pre2025OffentligAfp?.fom,
+            avdoed = source.avdoed?.let(::avdoed)
         )
 
     private fun loependeAlderspensjon(source: LoependeAlderspensjon) =
@@ -35,5 +36,16 @@ object VedtakResultMapper {
         VedtakV1Utbetaling(
             beloep = source.beloep ?: BigDecimal.ZERO,
             utbetalingsdato = source.posteringsdato
+        )
+
+    private fun avdoed(source: InformasjonOmAvdoed) =
+        VedtakV1InformasjonOmAvdoed(
+            pid = source.pid?.value,
+            doedsdato = source.doedsdato,
+            foersteAlderspensjonVirkningsdato = source.foersteAlderspensjonVirkningsdato,
+            aarligPensjonsgivendeInntektErMinst1G = source.aarligPensjonsgivendeInntektErMinst1G,
+            harTilstrekkeligMedlemskapIFolketrygden = source.harTilstrekkeligMedlemskapIFolketrygden,
+            antallAarUtenlands = source.antallAarUtenlands,
+            erFlyktning = source.erFlyktning
         )
 }

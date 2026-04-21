@@ -13,7 +13,8 @@ class VedtakSamlingTest : ShouldSpec({
             fremtidigAlderspensjon = null,
             ufoeretrygd = null,
             privatAfp = null,
-            pre2025OffentligAfp = null
+            pre2025OffentligAfp = null,
+            avdoed = null
         ).hasContent() shouldBe false
     }
 
@@ -29,11 +30,12 @@ class VedtakSamlingTest : ShouldSpec({
             fremtidigAlderspensjon = null,
             ufoeretrygd = null,
             privatAfp = null,
-            pre2025OffentligAfp = null
+            pre2025OffentligAfp = null,
+            avdoed = null
         ).hasContent() shouldBe true
     }
 
-    should("be true if containing pre-2025 offentlig AFP") {
+    should("be true if containing tidsbegrenset offentlig AFP") {
         VedtakSamling(
             loependeAlderspensjon = null,
             fremtidigAlderspensjon = null,
@@ -41,7 +43,8 @@ class VedtakSamlingTest : ShouldSpec({
             privatAfp = null,
             pre2025OffentligAfp = LoependeEntitet(
                 fom = LocalDate.of(2024, 1, 1)
-            )
+            ),
+            avdoed = null
         ).hasContent() shouldBe true
     }
 })

@@ -24,7 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
+        uses: github/codeql-action/init@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4.35.2
         with:
           languages: java
       - name: Setup java
@@ -36,12 +36,12 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
+        uses: github/codeql-action/analyze@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4.35.2
         with:
           category: "/language:java"
       - name: Create Docker image
         id: image-creation
-        uses: nais/docker-build-push@45d352fb62fb52ccb5ff6cba22c047fa02b35321 # v0
+        uses: nais/docker-build-push@cd5ec5663feb0e05c3fa374d1fb442605b046c6b # v0
         with:
           dockerfile: .docker/Dockerfile
           team: pensjonskalkulator
@@ -75,7 +75,7 @@ jobs:
       id-token: write
       security-events: write
     steps:
-      - uses: nais/login@c88ada9ce583928e1c84d2fd5c45cfacdd18d5de # v0
+      - uses: nais/login@d6ab5d83f735e9f155eb9d7d29cd20ae46820ea9 # v0
         with:
           team: pensjonskalkulator
       - name: Run Trivy vulnerability scanner on Docker image
@@ -88,6 +88,6 @@ jobs:
           severity: 'MEDIUM,HIGH,CRITICAL'
           limit-severities-for-sarif: true
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
+        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4.35.2
         with:
           sarif_file: 'trivy-results.sarif'
