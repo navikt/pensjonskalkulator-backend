@@ -51,6 +51,7 @@ class OpenApiConfiguration {
                 "/api/intern/v1/eps",
                 "/api/intern/v1/lagre-simulering",
                 "/api/intern/v1/pensjon/simulering",
+                "/api/intern/v1/pensjon/serviceberegnet-afp",
                 "/api/intern/v1/person",
                 "/api/intern/v1/sivilstatus",
                 "/api/ekstern/v1/pensjon/simulering",
