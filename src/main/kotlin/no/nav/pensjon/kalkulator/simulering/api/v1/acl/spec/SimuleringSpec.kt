@@ -16,11 +16,14 @@ data class SimuleringV1Spec(
     @field:NotNull val simuleringstype: SimuleringV1SimuleringstypeSpec,
     val aarligInntektFoerUttakBeloep: Int? = null,
     val gradertUttak: SimuleringV1GradertUttakSpec? = null, // default is helt uttak (100 %)
-    @field:NotNull val heltUttak: SimuleringV1HeltUttakSpec,
+    val heltUttak: SimuleringV1HeltUttakSpec? = null, // nullable for AFP_FOR_FPP
     val utenlandsperiodeListe: List<SimuleringV1UtenlandsperiodeSpec>? = null,
     val sivilstatus: CommonV1Sivilstatus? = null,
     val eps: SimuleringV1EpsSpec? = null,
-    val offentligAfp: SimuleringV1OffentligAfpSpec? = null
+    val offentligAfp: SimuleringV1OffentligAfpSpec? = null,
+    // AFP_FOR_FPP-specific fields (required when simuleringstype = AFP_FOR_FPP, ignored otherwise)
+    val forventetArbeidsinntekt: Int? = null,
+    val inntektMndForAfp: Int? = null
 )
 
 data class SimuleringV1GradertUttakSpec(
@@ -110,6 +113,7 @@ enum class SimuleringV1SimuleringstypeSpec(val internalValue: SimuleringType) {
     ENDRING_ALDERSPENSJON(internalValue = SimuleringType.ENDRING_ALDERSPENSJON),
     ENDRING_ALDERSPENSJON_MED_LIVSVARIG_OFFENTLIG_AFP(internalValue = SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG),
     ENDRING_ALDERSPENSJON_MED_PRIVAT_AFP(internalValue = SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT),
-    ENDRING_ALDERSPENSJON_MED_GJENLEVENDERETT(internalValue = SimuleringType.ENDRING_ALDERSPENSJON_MED_GJENLEVENDERETT)
+    ENDRING_ALDERSPENSJON_MED_GJENLEVENDERETT(internalValue = SimuleringType.ENDRING_ALDERSPENSJON_MED_GJENLEVENDERETT),
+    SERVICEBEREGN_AFP(internalValue = SimuleringType.SERVICEBEREGN_AFP)
     // ALDERSPENSJON_MED_TIDSBEGRENSET_OFFENTLIG_AFP har ingen tilsvarende type for endring (støttes ikke)
 }

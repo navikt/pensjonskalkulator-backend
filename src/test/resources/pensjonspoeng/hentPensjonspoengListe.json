@@ -1,0 +1,52 @@
+{
+  "pensjonspoeng": [
+    {
+      "pensjonspoengId": 1,
+      "fnr": "01015400044",
+      "fnrOmsorgFor": "01015400044",
+      "kilde": "k",
+      "pensjonspoengType": "ORDINAR",
+      "inntekt": {
+        "inntektId": 10,
+        "fnr": "01015400044",
+        "inntektAr": 1991,
+        "kilde": "ki",
+        "kommune": "0301",
+        "piMerke": "pim",
+        "inntektType": "INN_LON",
+        "belop": 100000
+      },
+      "omsorg": {
+        "omsorgId": 100,
+        "ar": 2000,
+        "omsorgType": "BARN"
+      },
+      "ar": 2000,
+      "anvendtPi": 1,
+      "poeng": 20.0,
+      "maxUforegrad": 70
+    },
+    {
+      "pensjonspoengId": 2,
+      "fnr": "01015400044",
+      "fnrOmsorgFor": "01015400044",
+      "kilde": "k2",
+      "pensjonspoengType": "OMSORG",
+      "inntekt": {
+        "inntektId": 11,
+        "fnr": "01015400044",
+        "inntektAr": 1992,
+        "kilde": "ki2",
+        "kommune": "0301",
+        "piMerke": null,
+        "inntektType": "SUM_PI",
+        "belop": 110000
+      },
+      "omsorg": null,
+      "ar": 2001,
+      "anvendtPi": 2,
+      "poeng": 21.5,
+      "maxUforegrad": 0
+    }
+  ]
+}

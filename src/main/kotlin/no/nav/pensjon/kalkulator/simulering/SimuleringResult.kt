@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering
 
+import no.nav.pensjon.kalkulator.afp.BeregnetAfp
 import no.nav.pensjon.kalkulator.validity.Problem
 
 data class SimuleringResult(
@@ -14,7 +15,8 @@ data class SimuleringResult(
     val trygdetid: Int,
     val opptjeningGrunnlagListe: List<SimulertOpptjeningGrunnlag>,
     val alderAar: Int? = null,
-    val problem: Problem? = null
+    val problem: Problem? = null,
+    val serviceberegnetAfpResult: BeregnetAfp? = null
 ) {
     fun withAlderAar(alderAar: Int) =
         copy(alderAar = alderAar)

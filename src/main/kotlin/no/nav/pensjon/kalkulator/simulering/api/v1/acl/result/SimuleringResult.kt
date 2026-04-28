@@ -39,7 +39,10 @@ data class SimuleringV1Result(
     val pensjonsgivendeInntektListe: List<SimuleringV1AarligBeloep>?,
 
     @field:Schema(description = "Eventuelt problem som oppstod under simuleringen")
-    val problem: SimuleringV1Problem?
+    val problem: SimuleringV1Problem?,
+
+    @field:Schema(description = "Resultat av serviceberegnet AFP (kun for simuleringstype AFP_FOR_FPP)")
+    val serviceberegnetAfp: SimuleringV1ServiceberegnetAfp? = null
 )
 
 @JsonInclude(NON_NULL)
@@ -296,3 +299,26 @@ enum class SimuleringV1ProblemType(
     TREDJEPARTSFEIL(internalValue = ProblemType.TREDJEPARTSFEIL, httpStatus = HttpStatus.INTERNAL_SERVER_ERROR),
     SERVERFEIL(internalValue = ProblemType.ANNEN_SERVERFEIL, httpStatus = HttpStatus.INTERNAL_SERVER_ERROR)
 }
+
+@JsonInclude(NON_NULL)
+data class SimuleringV1ServiceberegnetAfp(
+    val beregnetAfp: SimuleringV1BeregnetAfp?,
+)
+
+@JsonInclude(NON_NULL)
+data class SimuleringV1BeregnetAfp(
+    val totalbelopAfp: Int?,
+    val virkFom: java.time.LocalDate?,
+    val tidligereArbeidsinntekt: Int?,
+    val grunnbelop: Int?,
+    val sluttpoengtall: Double?,
+    val trygdetid: Int?,
+    val poengar: Int?,
+    val poeangarF92: Int?,
+    val poeangarE91: Int?,
+    val grunnpensjon: Int?,
+    val tilleggspensjon: Int?,
+    val afpTillegg: Int?,
+    val fpp: Double?,
+    val sertillegg: Int?
+)

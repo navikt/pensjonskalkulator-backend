@@ -24,11 +24,16 @@ object SimuleringSpecMapper {
             forventetAarligInntektFoerUttak = source.aarligInntektFoerUttakBeloep,
             sivilstatus = source.sivilstatus?.internalValue,
             gradertUttak = source.gradertUttak?.let(::gradertUttak),
-            heltUttak = heltUttak(source.heltUttak),
+            heltUttak = source.heltUttak?.let(::heltUttak) ?: HeltUttak(
+                uttakFomAlder = Alder(aar = 0, maaneder = 0),
+                inntekt = null
+            ),
             utenlandsopphold = utenlandsopphold(source),
             afpInntektMaanedFoerUttak = source.offentligAfp?.harInntektMaanedenFoerUttak,
             afpOrdning = source.offentligAfp?.afpOrdning?.internalValue,
-            innvilgetLivsvarigOffentligAfp = source.offentligAfp?.innvilgetLivsvarigAfpListe?.firstOrNull()?.let(::afp)
+            innvilgetLivsvarigOffentligAfp = source.offentligAfp?.innvilgetLivsvarigAfpListe?.firstOrNull()?.let(::afp),
+            afpFppForventetArbeidsinntekt = source.forventetArbeidsinntekt,
+            afpFppInntektMndForAfp = source.inntektMndForAfp
         )
 
     private fun epsSpec(source: SimuleringV1EpsSpec) =
