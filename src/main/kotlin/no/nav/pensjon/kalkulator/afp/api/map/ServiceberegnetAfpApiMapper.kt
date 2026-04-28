@@ -4,12 +4,13 @@ import no.nav.pensjon.kalkulator.afp.OpptjeningAar
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpResult
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpSpec
 import no.nav.pensjon.kalkulator.afp.api.dto.*
+import no.nav.pensjon.kalkulator.opptjening.Pensjonspoeng
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
 
 object ServiceberegnetAfpApiMapper {
 
-    fun fromDto(dto: InternServiceberegnetAfpSpec, pid: Pid) =
+    fun fromDto(dto: InternServiceberegnetAfpSpec, pid: Pid, pensjonspoeng: List<Pensjonspoeng>) =
         ServiceberegnetAfpSpec(
             uttaksdato = dto.uttaksdato,
             fnr = pid.value,
@@ -19,16 +20,16 @@ object ServiceberegnetAfpApiMapper {
             antAarIUtlandet = dto.antAarIUtlandet,
             forventetArbeidsinntekt = dto.forventetArbeidsinntekt,
             inntektMndForAfp = dto.inntektMndForAfp,
-            opptjeningFolketrygden = dto.opptjeningFolketrygden.map(::mapOpptjeningAar)
+            opptjeningFolketrygden = pensjonspoeng.map(::mapOpptjeningAar)
         )
 
-    private fun mapOpptjeningAar(dto: InternOpptjeningAar) =
+    private fun mapOpptjeningAar(dto: Pensjonspoeng) =
         OpptjeningAar(
             ar = dto.ar,
             pensjonsgivendeInntekt = dto.pensjonsgivendeInntekt,
-            omsorgspoeng = dto.omsorgspoeng,
+            registrertePensjonspoeng = dto.pensjonspoeng,
+            omsorgspoeng = dto.omsorgspoeng?.toDouble(),
             maksUforegrad = dto.maksUforegrad,
-            registrertePensjonspoeng = dto.registrertePensjonspoeng
         )
 
     fun toDto(result: ServiceberegnetAfpResult) =

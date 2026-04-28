@@ -447,6 +447,17 @@ class SimuleringControllerTest : ShouldSpec() {
                     trygdetid = 0,
                     opptjeningGrunnlagListe = emptyList()
                 )
+
+                SimuleringType.AFP_FOR_FPP -> SimuleringResult(
+                    alderspensjon = emptyList(),
+                    alderspensjonMaanedsbeloep = null,
+                    afpPrivat = emptyList(),
+                    afpOffentlig = emptyList(),
+                    vilkaarsproeving = vilkaarsproeving(),
+                    harForLiteTrygdetid = false,
+                    trygdetid = 0,
+                    opptjeningGrunnlagListe = emptyList()
+                )
             }
 
         private fun alderspensjon() =

@@ -25,7 +25,11 @@ data class ImpersonalSimuleringSpec(
 
     // For 'anonym simulering' only:
     val foedselAar: Int? = null,
-    val inntektOver1GAntallAar: Int? = 0
+    val inntektOver1GAntallAar: Int? = 0,
+
+    // For AFP_FOR_FPP only:
+    val afpFppForventetArbeidsinntekt: Int? = null,
+    val afpFppInntektMndForAfp: Int? = null
 )
 
 /**

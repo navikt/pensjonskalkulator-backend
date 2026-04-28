@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering.api.v1.acl.result
 
+import no.nav.pensjon.kalkulator.afp.BeregnetAfp
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.simulering.*
@@ -25,7 +26,8 @@ object SimuleringResultMapper {
             vilkaarsproevingsresultat = vilkaarsproevingsresultat(source.vilkaarsproeving),
             trygdetid = trygdetid(source),
             pensjonsgivendeInntektListe = source.opptjeningGrunnlagListe.map(::inntekt),
-            problem = source.problem?.let(::problem)
+            problem = source.problem?.let(::problem),
+            serviceberegnetAfp = source.serviceberegnetAfpResult?.let(::serviceberegnetAfp)
         )
 
     private fun alderspensjon(source: SimulertAlderspensjon, mode: MappingMode) =
@@ -166,5 +168,28 @@ object SimuleringResultMapper {
             kode = SimuleringV1ProblemType.entries.firstOrNull { it.internalValue == source.type }
                 ?: SimuleringV1ProblemType.SERVERFEIL,
             beskrivelse = source.beskrivelse
+        )
+
+    private fun serviceberegnetAfp(source: BeregnetAfp) =
+        SimuleringV1ServiceberegnetAfp(
+            beregnetAfp = beregnetAfp(source)
+        )
+
+    private fun beregnetAfp(source: BeregnetAfp) =
+        SimuleringV1BeregnetAfp(
+            totalbelopAfp = source.totalbelopAfp,
+            virkFom = source.virkFom,
+            tidligereArbeidsinntekt = source.tidligereArbeidsinntekt,
+            grunnbelop = source.grunnbelop,
+            sluttpoengtall = source.sluttpoengtall,
+            trygdetid = source.trygdetid,
+            poengar = source.poengar,
+            poeangarF92 = source.poeangarF92,
+            poeangarE91 = source.poeangarE91,
+            grunnpensjon = source.grunnpensjon,
+            tilleggspensjon = source.tilleggspensjon,
+            afpTillegg = source.afpTillegg,
+            fpp = source.fpp,
+            sertillegg = source.sertillegg
         )
 }
