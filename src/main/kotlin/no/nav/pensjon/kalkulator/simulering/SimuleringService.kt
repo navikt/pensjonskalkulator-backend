@@ -114,7 +114,7 @@ class SimuleringService(
         } catch (e: BadRequestException) {
             problem(e, type = ProblemType.ANNEN_KLIENTFEIL)
         } catch (e: EgressException) {
-            problem(e, type = ProblemType.SERVERFEIL)
+            problem(e, type = ProblemType.ANNEN_SERVERFEIL)
         }
 
     private fun sivilstatus() =
