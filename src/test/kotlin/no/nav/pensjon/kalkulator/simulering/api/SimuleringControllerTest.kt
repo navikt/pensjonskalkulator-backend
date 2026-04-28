@@ -448,7 +448,7 @@ class SimuleringControllerTest : ShouldSpec() {
                     opptjeningGrunnlagListe = emptyList()
                 )
 
-                SimuleringType.AFP_FOR_FPP -> SimuleringResult(
+                SimuleringType.SERVICEBEREGN_AFP -> SimuleringResult(
                     alderspensjon = emptyList(),
                     alderspensjonMaanedsbeloep = null,
                     afpPrivat = emptyList(),
