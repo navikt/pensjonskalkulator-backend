@@ -2,7 +2,6 @@ package no.nav.pensjon.kalkulator.simulering
 
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpProblemType
-import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpResult
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpService
 import no.nav.pensjon.kalkulator.afp.api.dto.InternServiceberegnetAfpSpec
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
@@ -53,8 +52,8 @@ class SimuleringService(
      * Same as simulerPersonligAlderspensjon but with improved handling of problems.
      */
     fun simulerPensjon(providedSpec: ImpersonalSimuleringSpec): SimuleringResult =
-        if (providedSpec.simuleringType == SimuleringType.AFP_FOR_FPP) {
-            simulerAfpForFpp(providedSpec)
+        if (providedSpec.simuleringType == SimuleringType.SERVICEBEREGN_AFP) {
+            simulerAfpMedFpp(providedSpec)
         } else {
             simulerAlderspensjon(providedSpec)
         }
@@ -83,7 +82,7 @@ class SimuleringService(
             problem(e, type = ProblemType.SERVERFEIL)
         }
 
-    private fun simulerAfpForFpp(providedSpec: ImpersonalSimuleringSpec): SimuleringResult =
+    private fun simulerAfpMedFpp(providedSpec: ImpersonalSimuleringSpec): SimuleringResult =
         try {
             val afpSpec = InternServiceberegnetAfpSpec(
                 fodselsdato = personService.getPerson().foedselsdato,

@@ -114,6 +114,6 @@ enum class SimuleringV1SimuleringstypeSpec(val internalValue: SimuleringType) {
     ENDRING_ALDERSPENSJON_MED_LIVSVARIG_OFFENTLIG_AFP(internalValue = SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG),
     ENDRING_ALDERSPENSJON_MED_PRIVAT_AFP(internalValue = SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT),
     ENDRING_ALDERSPENSJON_MED_GJENLEVENDERETT(internalValue = SimuleringType.ENDRING_ALDERSPENSJON_MED_GJENLEVENDERETT),
-    AFP_FOR_FPP(internalValue = SimuleringType.AFP_FOR_FPP)
+    SERVICEBEREGN_AFP(internalValue = SimuleringType.SERVICEBEREGN_AFP)
     // ALDERSPENSJON_MED_TIDSBEGRENSET_OFFENTLIG_AFP har ingen tilsvarende type for endring (støttes ikke)
 }
