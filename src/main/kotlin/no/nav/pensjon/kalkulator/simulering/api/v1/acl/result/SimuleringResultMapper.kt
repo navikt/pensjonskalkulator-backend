@@ -259,6 +259,7 @@ object SimuleringResultMapper {
             tilleggspensjon = source.tilleggspensjon,
             afpTillegg = source.afpTillegg,
             fpp = source.fpp,
-            sertillegg = source.sertillegg
+            sertillegg = source.sertillegg,
+            erAvkortet = source.erAvkortet
         )
 }
