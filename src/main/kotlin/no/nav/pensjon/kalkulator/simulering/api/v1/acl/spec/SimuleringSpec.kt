@@ -16,14 +16,11 @@ data class SimuleringV1Spec(
     @field:NotNull val simuleringstype: SimuleringV1SimuleringstypeSpec,
     val aarligInntektFoerUttakBeloep: Int? = null,
     val gradertUttak: SimuleringV1GradertUttakSpec? = null, // default is helt uttak (100 %)
-    val heltUttak: SimuleringV1HeltUttakSpec? = null, // nullable for AFP_FOR_FPP
+    @field:NotNull val heltUttak: SimuleringV1HeltUttakSpec,
     val utenlandsperiodeListe: List<SimuleringV1UtenlandsperiodeSpec>? = null,
     val sivilstatus: CommonV1Sivilstatus? = null,
     val eps: SimuleringV1EpsSpec? = null,
     val offentligAfp: SimuleringV1OffentligAfpSpec? = null,
-    // AFP_FOR_FPP-specific fields (required when simuleringstype = AFP_FOR_FPP, ignored otherwise)
-    val forventetArbeidsinntekt: Int? = null,
-    val inntektMndForAfp: Int? = null
 )
 
 data class SimuleringV1GradertUttakSpec(
@@ -77,7 +74,11 @@ data class SimuleringV1AvdoedEps(
 data class SimuleringV1OffentligAfpSpec(
     val harInntektMaanedenFoerUttak: Boolean? = null,
     val afpOrdning: SimuleringV1AfpOrdningTypeSpec? = null,
-    val innvilgetLivsvarigAfpListe: List<SimuleringV1InnvilgetLivsvarigOffentligAfpSpec>? = null
+    val innvilgetLivsvarigAfpListe: List<SimuleringV1InnvilgetLivsvarigOffentligAfpSpec>? = null,
+    // SERVICEBEREGNING_AFP-specific fields (required when simuleringstype = SERVICEBEREGNING_AFP, ignored otherwise)
+    val inntektForrigeKalenderaar: Int? = null,
+    val inntektFremTilUttak: Int? = null,
+    val inntektMaanedFoerAfp: Int? = null
 )
 
 /**

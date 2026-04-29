@@ -90,9 +90,10 @@ class SimuleringService(
                 afpOrdning = "AFPSTAT",
                 flyktning = false,
                 antAarIUtlandet = providedSpec.utenlandsopphold.antallAar,
-                forventetArbeidsinntekt = providedSpec.forventetAarligInntektFoerUttak,
-                inntektMndForAfp = providedSpec.afpFppInntektMndForAfp,
-                opptjeningFolketrygden = emptyList()
+                forventetArbeidsinntekt = providedSpec.gradertUttak?.aarligInntekt,
+                inntektMndForAfp = providedSpec.inntektMaanedFoerAfp,
+                inntektForrigeKalenderaar = providedSpec.inntektForrigeKalenderaar,
+                inntektFremTilUttak = providedSpec.inntektFremTilUttak
             )
 
             val afpResult = serviceberegnetAfpService.simulerServiceberegnetAfp(afpSpec)
@@ -113,9 +114,11 @@ class SimuleringService(
             )
         } catch (e: BadRequestException) {
             problem(e, type = ProblemType.ANNEN_KLIENTFEIL)
-        } catch (e: EgressException) {
-            problem(e, type = ProblemType.ANNEN_SERVERFEIL)
         }
+    //TODO: Fiks når feilkodenavn er klar
+        /*catch (e: EgressException) {
+            problem(e, type = ProblemType.ANNEN_SERVERFEIL)
+        }*/
 
     private fun sivilstatus() =
         personService.getPerson().sivilstand.sivilstatus
