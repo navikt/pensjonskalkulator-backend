@@ -7,6 +7,7 @@ import no.nav.pensjon.kalkulator.afp.api.dto.*
 import no.nav.pensjon.kalkulator.opptjening.Pensjonspoeng
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
+import java.time.LocalDate
 
 object ServiceberegnetAfpApiMapper {
 
@@ -20,7 +21,7 @@ object ServiceberegnetAfpApiMapper {
             antAarIUtlandet = dto.antAarIUtlandet,
             forventetArbeidsinntekt = dto.forventetArbeidsinntekt,
             inntektMndForAfp = dto.inntektMndForAfp,
-            opptjeningFolketrygden = pensjonspoeng.map(::mapOpptjeningAar)
+            opptjeningFolketrygden = pensjonspoeng.map(::mapOpptjeningAar) + mapInntektOpptjening(dto)
         )
 
     private fun mapOpptjeningAar(dto: Pensjonspoeng) =
@@ -31,6 +32,16 @@ object ServiceberegnetAfpApiMapper {
             omsorgspoeng = dto.omsorgspoeng?.toDouble(),
             maksUforegrad = dto.maksUforegrad,
         )
+
+    private fun mapInntektOpptjening(dto: InternServiceberegnetAfpSpec): List<OpptjeningAar> =
+        listOfNotNull(dto.inntektForrigeKalenderaar?.let {
+            OpptjeningAar(LocalDate.now().year - 1, it, registrertePensjonspoeng = null, omsorgspoeng = null, maksUforegrad = null)
+        }) +
+        (dto.inntektFremTilUttak?.let { inntekt ->
+            (LocalDate.now().year until dto.uttaksdato.year).map { year ->
+                OpptjeningAar(year, inntekt, registrertePensjonspoeng = null, omsorgspoeng = null, maksUforegrad = null)
+            }
+        } ?: emptyList())
 
     fun toDto(result: ServiceberegnetAfpResult) =
         InternServiceberegnetAfpResult(

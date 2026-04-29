@@ -10,13 +10,6 @@ data class InternServiceberegnetAfpSpec(
     val antAarIUtlandet: Int?,
     val forventetArbeidsinntekt: Int?,
     val inntektMndForAfp: Int?,
-    val opptjeningFolketrygden: List<InternOpptjeningAar>
-)
-
-data class InternOpptjeningAar(
-    val ar: Int,
-    val pensjonsgivendeInntekt: Int?,
-    val omsorgspoeng: Double?,
-    val maksUforegrad: Int?,
-    val registrertePensjonspoeng: Double?
+    val inntektForrigeKalenderaar: Int? = null,
+    val inntektFremTilUttak: Int? = null,
 )
