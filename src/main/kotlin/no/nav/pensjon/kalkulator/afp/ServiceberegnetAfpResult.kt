@@ -23,7 +23,8 @@ data class BeregnetAfp(
     val tilleggspensjon: Int?,
     val afpTillegg: Int?,
     val fpp: Double?,
-    val sertillegg: Int?
+    val sertillegg: Int?,
+    val erAvkortet: Boolean?
 )
 
 data class ServiceberegnetAfpProblem(

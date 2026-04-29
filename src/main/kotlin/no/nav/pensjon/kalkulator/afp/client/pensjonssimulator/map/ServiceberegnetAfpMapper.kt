@@ -64,7 +64,8 @@ object ServiceberegnetAfpMapper {
             tilleggspensjon = dto.tilleggspensjon,
             afpTillegg = dto.afpTillegg,
             fpp = dto.fpp,
-            sertillegg = dto.sertillegg
+            sertillegg = dto.sertillegg,
+            erAvkortet = dto.erAvkortet
         )
 
     private fun mapProblem(dto: ServiceberegnetAfpProblemDto) =
