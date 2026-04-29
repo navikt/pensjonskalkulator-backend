@@ -86,11 +86,11 @@ class SimuleringService(
         try {
             val afpSpec = InternServiceberegnetAfpSpec(
                 fodselsdato = personService.getPerson().foedselsdato,
-                uttaksdato = providedSpec.heltUttak.uttakFomAlder?.let { uttakDato(foedselDato = personService.getPerson().foedselsdato, uttakAlder = it)} as LocalDate,
+                uttaksdato = providedSpec.gradertUttak?.uttakFomAlder?.let { uttakDato(foedselDato = personService.getPerson().foedselsdato, uttakAlder = it)} as LocalDate,
                 afpOrdning = "AFPSTAT",
                 flyktning = false,
                 antAarIUtlandet = providedSpec.utenlandsopphold.antallAar,
-                forventetArbeidsinntekt = providedSpec.gradertUttak?.aarligInntekt,
+                forventetArbeidsinntekt = providedSpec.gradertUttak.aarligInntekt,
                 inntektMndForAfp = providedSpec.inntektMaanedFoerAfp,
                 inntektForrigeKalenderaar = providedSpec.inntektForrigeKalenderaar,
                 inntektFremTilUttak = providedSpec.inntektFremTilUttak
