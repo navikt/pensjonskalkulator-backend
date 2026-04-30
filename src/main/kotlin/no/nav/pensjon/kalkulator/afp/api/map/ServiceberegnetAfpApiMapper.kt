@@ -41,7 +41,7 @@ object ServiceberegnetAfpApiMapper {
             OpptjeningAar(LocalDate.now().year - 1, it, registrertePensjonspoeng = null, omsorgspoeng = null, maksUforegrad = null)
         }) +
         (dto.inntektFremTilUttak?.let { inntekt ->
-            (LocalDate.now().year until dto.uttaksdato.year + 1).map { year ->
+            (LocalDate.now().year until dto.uttaksdato.year).map { year ->
                 OpptjeningAar(year, inntekt, registrertePensjonspoeng = null, omsorgspoeng = null, maksUforegrad = null)
             }
         } ?: emptyList())
