@@ -19,8 +19,17 @@ data class PersonopplysningerDto(
     val forventetArbeidsinntekt: Int?,
     val inntektMndForAfp: Int?,
     val erUnderUtdanning: Boolean?,
-    val epsData: Any?,
+    val epsData: EpsDataDto?,
     val avdodList: List<Any>
+)
+
+data class EpsDataDto(
+    val valgtSivilstatus: String?,
+    val registrertSivilstatus: String?,
+    val epsMottarPensjon: Boolean?,
+    val epsInntektOver2G: Boolean?,
+    val tidligereGiftEllerBarnMedSamboer: Boolean?,
+    val erEpsInntektOver1G: Boolean?
 )
 
 data class OpptjeningFolketrygdenDto(

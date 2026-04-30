@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.afp.api.dto
 
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import java.time.LocalDate
 
 data class InternServiceberegnetAfpSpec(
@@ -12,4 +13,7 @@ data class InternServiceberegnetAfpSpec(
     val inntektMndForAfp: Int?,
     val inntektForrigeKalenderaar: Int? = null,
     val inntektFremTilUttak: Int? = null,
+    val epsMottarPensjon: Boolean? = null,
+    val epsInntektOver2G: Boolean? = null,
+    val sivilstatus: Sivilstatus? = null,
 )

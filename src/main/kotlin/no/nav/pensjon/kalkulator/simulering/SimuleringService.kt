@@ -93,7 +93,10 @@ class SimuleringService(
                 forventetArbeidsinntekt = providedSpec.gradertUttak.aarligInntekt,
                 inntektMndForAfp = providedSpec.inntektMaanedFoerAfp,
                 inntektForrigeKalenderaar = providedSpec.inntektForrigeKalenderaar,
-                inntektFremTilUttak = providedSpec.inntektFremTilUttak
+                inntektFremTilUttak = providedSpec.inntektFremTilUttak,
+                epsMottarPensjon = providedSpec.eps.levende?.harPensjon,
+                epsInntektOver2G = providedSpec.eps.levende?.harInntektOver2G,
+                sivilstatus = providedSpec.sivilstatus,
             )
 
             val afpResult = serviceberegnetAfpService.simulerServiceberegnetAfp(afpSpec)

@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.afp
 
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
 import java.time.LocalDate
 
@@ -12,7 +13,10 @@ data class ServiceberegnetAfpSpec(
     val antAarIUtlandet: Int?,
     val forventetArbeidsinntekt: Int?,
     val inntektMndForAfp: Int?,
-    val opptjeningFolketrygden: List<OpptjeningAar>
+    val opptjeningFolketrygden: List<OpptjeningAar>,
+    val epsMottarPensjon: Boolean? = null,
+    val epsInntektOver2G: Boolean? = null,
+    val sivilstatus: Sivilstatus? = null,
 )
 
 data class OpptjeningAar(

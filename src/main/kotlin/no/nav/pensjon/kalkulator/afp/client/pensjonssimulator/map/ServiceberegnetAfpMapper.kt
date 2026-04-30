@@ -21,7 +21,7 @@ object ServiceberegnetAfpMapper {
                 forventetArbeidsinntekt = spec.forventetArbeidsinntekt,
                 inntektMndForAfp = spec.inntektMndForAfp,
                 erUnderUtdanning = false,
-                epsData = null,
+                epsData = mapEpsData(spec),
                 avdodList = emptyList()
             ),
             barneopplysninger = null,
@@ -32,6 +32,19 @@ object ServiceberegnetAfpMapper {
                 farsOpptjeningFolketrygden = emptyList()
             )
         )
+
+    private fun mapEpsData(spec: ServiceberegnetAfpSpec): EpsDataDto? =
+        if (spec.epsMottarPensjon != null || spec.epsInntektOver2G != null || spec.sivilstatus != null)
+            EpsDataDto(
+                valgtSivilstatus = spec.sivilstatus?.let { SivilstatusTypeDto.fromInternalValue(it).name },
+                registrertSivilstatus = spec.sivilstatus?.let { SivilstatusTypeDto.fromInternalValue(it).name },
+                epsMottarPensjon = spec.epsMottarPensjon,
+                epsInntektOver2G = spec.epsInntektOver2G,
+                tidligereGiftEllerBarnMedSamboer = false,
+                erEpsInntektOver1G = true
+
+            )
+        else null
 
     private fun mapOpptjeningAar(opptjening: OpptjeningAar) =
         OpptjeningAarDto(

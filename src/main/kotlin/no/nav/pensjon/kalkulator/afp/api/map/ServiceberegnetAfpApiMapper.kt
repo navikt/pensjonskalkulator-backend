@@ -21,7 +21,10 @@ object ServiceberegnetAfpApiMapper {
             antAarIUtlandet = dto.antAarIUtlandet,
             forventetArbeidsinntekt = dto.forventetArbeidsinntekt,
             inntektMndForAfp = dto.inntektMndForAfp,
-            opptjeningFolketrygden = pensjonspoeng.map(::mapOpptjeningAar) + mapInntektOpptjening(dto)
+            opptjeningFolketrygden = pensjonspoeng.map(::mapOpptjeningAar) + mapInntektOpptjening(dto),
+            epsMottarPensjon = dto.epsMottarPensjon,
+            epsInntektOver2G = dto.epsInntektOver2G,
+            sivilstatus = dto.sivilstatus,
         )
 
     private fun mapOpptjeningAar(dto: Pensjonspoeng) =
@@ -38,7 +41,7 @@ object ServiceberegnetAfpApiMapper {
             OpptjeningAar(LocalDate.now().year - 1, it, registrertePensjonspoeng = null, omsorgspoeng = null, maksUforegrad = null)
         }) +
         (dto.inntektFremTilUttak?.let { inntekt ->
-            (LocalDate.now().year until dto.uttaksdato.year).map { year ->
+            (LocalDate.now().year until dto.uttaksdato.year + 1).map { year ->
                 OpptjeningAar(year, inntekt, registrertePensjonspoeng = null, omsorgspoeng = null, maksUforegrad = null)
             }
         } ?: emptyList())
