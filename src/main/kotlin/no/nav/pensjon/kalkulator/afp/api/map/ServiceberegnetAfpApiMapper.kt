@@ -21,7 +21,10 @@ object ServiceberegnetAfpApiMapper {
             antAarIUtlandet = dto.antAarIUtlandet,
             forventetArbeidsinntekt = dto.forventetArbeidsinntekt,
             inntektMndForAfp = dto.inntektMndForAfp,
-            opptjeningFolketrygden = pensjonspoeng.map(::mapOpptjeningAar) + mapInntektOpptjening(dto)
+            opptjeningFolketrygden = pensjonspoeng.map(::mapOpptjeningAar) + mapInntektOpptjening(dto),
+            epsMottarPensjon = dto.epsMottarPensjon,
+            epsInntektOver2G = dto.epsInntektOver2G,
+            sivilstatus = dto.sivilstatus,
         )
 
     private fun mapOpptjeningAar(dto: Pensjonspoeng) =
