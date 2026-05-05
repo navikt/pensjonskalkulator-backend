@@ -90,6 +90,7 @@ class SimuleringService(
                 afpOrdning = "AFPSTAT",
                 flyktning = false,
                 antAarIUtlandet = providedSpec.utenlandsopphold.antallAar,
+                utenlandsopphold = providedSpec.utenlandsopphold.periodeListe,
                 forventetArbeidsinntekt = providedSpec.gradertUttak.aarligInntekt,
                 inntektMndForAfp = providedSpec.inntektMaanedFoerAfp,
                 inntektForrigeKalenderaar = providedSpec.inntektForrigeKalenderaar,

@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.dto
 
+import no.nav.pensjon.kalkulator.simulering.client.simulator.acl.spec.UtlandSpecDto
 import java.time.LocalDate
 
 data class ServiceberegnetAfpSpecDto(
@@ -16,6 +17,7 @@ data class PersonopplysningerDto(
     val valgtAfpOrdning: String,
     val flyktning: Boolean?,
     val antAarIUtlandet: Int?,
+    val utenlandsopphold: List<UtlandSpecDto>?,
     val forventetArbeidsinntekt: Int?,
     val inntektMndForAfp: Int?,
     val erUnderUtdanning: Boolean?,
