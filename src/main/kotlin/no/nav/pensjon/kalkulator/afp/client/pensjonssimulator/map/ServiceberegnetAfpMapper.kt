@@ -3,6 +3,8 @@ package no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.map
 import no.nav.pensjon.kalkulator.afp.*
 import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.dto.*
 import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
+import no.nav.pensjon.kalkulator.simulering.client.simulator.acl.spec.UtlandSpecDto
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.UtenlandsperiodeForSimuleringDto
 
 object ServiceberegnetAfpMapper {
 
@@ -18,6 +20,7 @@ object ServiceberegnetAfpMapper {
                 valgtAfpOrdning = spec.afpOrdning.name,
                 flyktning = spec.flyktning,
                 antAarIUtlandet = spec.antAarIUtlandet,
+                utenlandsopphold = spec.utenlandsopphold?.map { UtlandSpecDto( it.fom, it.tom, it.land.name, it.arbeidet) },
                 forventetArbeidsinntekt = spec.forventetArbeidsinntekt,
                 inntektMndForAfp = spec.inntektMndForAfp,
                 erUnderUtdanning = false,

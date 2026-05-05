@@ -19,6 +19,7 @@ object ServiceberegnetAfpApiMapper {
             afpOrdning = AfpOrdningType.valueOf(dto.afpOrdning),
             flyktning = dto.flyktning,
             antAarIUtlandet = dto.antAarIUtlandet,
+            utenlandsopphold = dto.utenlandsopphold,
             forventetArbeidsinntekt = dto.forventetArbeidsinntekt,
             inntektMndForAfp = dto.inntektMndForAfp,
             opptjeningFolketrygden = pensjonspoeng.map(::mapOpptjeningAar) + mapInntektOpptjening(dto),
