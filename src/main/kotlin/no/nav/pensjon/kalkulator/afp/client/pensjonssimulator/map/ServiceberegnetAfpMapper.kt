@@ -81,6 +81,7 @@ object ServiceberegnetAfpMapper {
             afpTillegg = dto.afpTillegg,
             fpp = dto.fpp,
             sertillegg = dto.sertillegg,
+            grad = dto.grad,
             erAvkortet = dto.erAvkortet
         )
 

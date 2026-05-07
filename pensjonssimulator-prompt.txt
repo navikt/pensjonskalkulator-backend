@@ -1,6 +1,0 @@
-In the `simuler-for-fpp` endpoint (POST `/api/nav/v1/simuler-for-fpp?simuleringstype=AFP`), the request body has a field `opptjeningFolketrygden`.
-
-1. What is the full DTO/data class structure of `opptjeningFolketrygden`? Show me the class definition with all nested types.
-2. When `simuleringstype=AFP_FPP`, is `opptjeningFolketrygden` required or optional? What happens when it's null — does the simulator fetch opptjening from registers, or does it fail?
-3. If it needs to be populated: what data goes in it? Is it pensjonsgivende inntekt per year, pensjonspoeng, or something else?
-4. Show me an example of a valid `opptjeningFolketrygden` JSON payload for an AFP_FPP simulation.
