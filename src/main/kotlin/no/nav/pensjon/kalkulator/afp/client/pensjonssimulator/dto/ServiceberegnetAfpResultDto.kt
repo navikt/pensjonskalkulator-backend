@@ -23,6 +23,7 @@ data class BeregnetAfpDto(
     val afpTillegg: Int?,
     val fpp: Double?,
     val sertillegg: Int?,
+    val grad: Int?,
     val erAvkortet: Boolean?
 )
 
