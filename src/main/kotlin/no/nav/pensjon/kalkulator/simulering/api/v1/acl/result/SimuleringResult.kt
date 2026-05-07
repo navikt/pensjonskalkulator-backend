@@ -321,5 +321,6 @@ data class SimuleringV1BeregnetAfp(
     val afpTillegg: Int?,
     val fpp: Double?,
     val sertillegg: Int?,
+    val afpGrad: Int?,
     val erAvkortet: Boolean?,
 )

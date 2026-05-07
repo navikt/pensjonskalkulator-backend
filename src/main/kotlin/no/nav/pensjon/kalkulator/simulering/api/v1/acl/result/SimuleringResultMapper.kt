@@ -260,6 +260,7 @@ object SimuleringResultMapper {
             afpTillegg = source.afpTillegg,
             fpp = source.fpp,
             sertillegg = source.sertillegg,
+            afpGrad = source.grad,
             erAvkortet = source.erAvkortet
         )
 }
