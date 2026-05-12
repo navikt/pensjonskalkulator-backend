@@ -122,6 +122,7 @@ class SkribentenClientTest : FunSpec({
             vilkaarsproevingsresultat = LagreVilkaarsproevingsresultat(erInnvilget = true, alternativ = null),
             trygdetid = null,
             pensjonsgivendeInntektListe = emptyList(),
+            simuleringsinformasjon = null,
             enhetsId = "4817"
         )
     }

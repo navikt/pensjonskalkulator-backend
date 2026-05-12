@@ -52,6 +52,7 @@ class LagreSimuleringMapperTest : ShouldSpec({
                 pensjonsgivendeInntektListe = listOf(
                     LagreAarligBeloepDto(aarstall = 2024, beloep = 600000)
                 ),
+                simuleringsinformasjon = null,
                 navEnhetId = null
             )
         ) shouldBe LagreSimulering(
@@ -84,6 +85,7 @@ class LagreSimuleringMapperTest : ShouldSpec({
             pensjonsgivendeInntektListe = listOf(
                 LagreAarligBeloep(aarstall = 2024, beloep = 600000)
             ),
+            simuleringsinformasjon = null,
             enhetsId = "4817"
         )
     }
@@ -101,6 +103,7 @@ class LagreSimuleringMapperTest : ShouldSpec({
                 ),
                 trygdetid = null,
                 pensjonsgivendeInntektListe = null,
+                simuleringsinformasjon = null,
                 navEnhetId = null
             )
         ) shouldBe LagreSimulering(
@@ -114,6 +117,7 @@ class LagreSimuleringMapperTest : ShouldSpec({
             ),
             trygdetid = null,
             pensjonsgivendeInntektListe = emptyList(),
+            simuleringsinformasjon = null,
             enhetsId = "4817"
         )
     }
