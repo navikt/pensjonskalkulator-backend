@@ -14,6 +14,7 @@ class EgressServiceSecurityConfiguration {
 
     @Bean
     fun egressServiceListsByAudience(
+        @Value("\${nav-ansatt.service-id}") navAnsattServiceId: String,
         @Value("\${pen.service-id}") pensjonsfagligKjerneServiceId: String,
         @Value("\${popp.service-id}") pensjonsopptjeningServiceId: String,
         @Value("\${pensjon-persondata.service-id}") pensjonPersondataServiceId: String,
@@ -38,6 +39,7 @@ class EgressServiceSecurityConfiguration {
     ) =
         EgressServiceListsByAudience(
             mapOf(
+                navAnsattServiceId to listOf(EgressService.NAV_ANSATT),
                 pensjonsfagligKjerneServiceId to listOf(EgressService.PENSJONSFAGLIG_KJERNE),
                 pensjonsopptjeningServiceId to listOf(EgressService.PENSJONSOPPTJENING),
                 pensjonPersondataServiceId to listOf(EgressService.PENSJON_PERSONDATA),
