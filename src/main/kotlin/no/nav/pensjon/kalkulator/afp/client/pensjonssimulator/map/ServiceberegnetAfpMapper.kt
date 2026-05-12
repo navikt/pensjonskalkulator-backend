@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.map
 import no.nav.pensjon.kalkulator.afp.*
 import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.dto.*
 import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
+import no.nav.pensjon.kalkulator.simulering.client.simulator.acl.spec.SivilstandSpecDto
 import no.nav.pensjon.kalkulator.simulering.client.simulator.acl.spec.UtlandSpecDto
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.UtenlandsperiodeForSimuleringDto
 
@@ -40,7 +41,7 @@ object ServiceberegnetAfpMapper {
         if (spec.epsMottarPensjon != null || spec.epsInntektOver2G != null || spec.sivilstatus != null)
             EpsDataDto(
                 valgtSivilstatus = spec.sivilstatus?.let { SivilstatusTypeDto.fromInternalValue(it).name },
-                registrertSivilstatus = spec.sivilstatus?.let { SivilstatusTypeDto.fromInternalValue(it).name },
+                registrertSivilstatus = spec.registrertSivilstatus?.let { SivilstandSpecDto.fromInternalValue(it).name },
                 epsMottarPensjon = spec.epsMottarPensjon,
                 epsInntektOver2G = spec.epsInntektOver2G,
                 tidligereGiftEllerBarnMedSamboer = spec.tidligereGiftEllerBarnMedSamboer,
