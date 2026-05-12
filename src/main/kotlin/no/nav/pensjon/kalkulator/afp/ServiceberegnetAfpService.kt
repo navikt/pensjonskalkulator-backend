@@ -7,6 +7,8 @@ import no.nav.pensjon.kalkulator.afp.client.ServiceberegnetAfpClient
 import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengClient
 import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppPensjonspoengClient
+import no.nav.pensjon.kalkulator.person.relasjon.eps.EpsService
+import no.nav.pensjon.kalkulator.person.relasjon.eps.client.EpsClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.stereotype.Service
@@ -15,7 +17,8 @@ import org.springframework.stereotype.Service
 class ServiceberegnetAfpService(
     private val client: ServiceberegnetAfpClient,
     private val pensjonspoengClient: PensjonspoengClient,
-    private val pidGetter: PidGetter
+    private val pidGetter: PidGetter,
+    private val epsService: EpsService,
 ) {
     private val log = KotlinLogging.logger {}
 
@@ -23,7 +26,8 @@ class ServiceberegnetAfpService(
         try {
             val pid = pidGetter.pid()
             val pensjonspoeng = pensjonspoengClient.fetchPensjonspoeng(pid)
-            val domainSpec = ServiceberegnetAfpApiMapper.fromDto(spec, pid, pensjonspoeng)
+            val tidligereGiftEllerBarnMedSamboer = epsService.tidligereGiftEllerBarnMedSamboer()
+            val domainSpec = ServiceberegnetAfpApiMapper.fromDto(spec, pid, pensjonspoeng, tidligereGiftEllerBarnMedSamboer)
 
             log.debug { "Simulerer serviceberegnet AFP for afpOrdning=${domainSpec.afpOrdning}, uttaksdato=${domainSpec.uttaksdato}" }
             client.simulerServiceberegnetAfp(domainSpec)

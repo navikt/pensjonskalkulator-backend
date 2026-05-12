@@ -19,6 +19,7 @@ data class ServiceberegnetAfpSpec(
     val opptjeningFolketrygden: List<OpptjeningAar>,
     val epsMottarPensjon: Boolean? = null,
     val epsInntektOver2G: Boolean? = null,
+    val tidligereGiftEllerBarnMedSamboer: Boolean?,
     val sivilstatus: Sivilstatus? = null,
 )
 

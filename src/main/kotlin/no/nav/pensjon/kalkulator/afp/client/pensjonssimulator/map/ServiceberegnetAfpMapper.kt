@@ -43,7 +43,7 @@ object ServiceberegnetAfpMapper {
                 registrertSivilstatus = spec.sivilstatus?.let { SivilstatusTypeDto.fromInternalValue(it).name },
                 epsMottarPensjon = spec.epsMottarPensjon,
                 epsInntektOver2G = spec.epsInntektOver2G,
-                tidligereGiftEllerBarnMedSamboer = false,
+                tidligereGiftEllerBarnMedSamboer = spec.tidligereGiftEllerBarnMedSamboer,
                 erEpsInntektOver1G = true
 
             )

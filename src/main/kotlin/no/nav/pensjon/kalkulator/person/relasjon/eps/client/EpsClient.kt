@@ -20,4 +20,9 @@ interface EpsClient {
         sivilstatus: Sivilstatus,
         personaliaSpec: List<PersonaliaType>
     ): Familierelasjon
+
+    fun fetchTidligereGiftEllerBarnMed(
+        soekerPid: Pid,
+        samboerPid: Pid,
+    ): Boolean
 }
