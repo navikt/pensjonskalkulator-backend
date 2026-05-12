@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.afp
 
+import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
 import no.nav.pensjon.kalkulator.simulering.Opphold
@@ -21,6 +22,7 @@ data class ServiceberegnetAfpSpec(
     val epsInntektOver2G: Boolean? = null,
     val tidligereGiftEllerBarnMedSamboer: Boolean?,
     val sivilstatus: Sivilstatus? = null,
+    val registrertSivilstatus: Sivilstand? = null
 )
 
 data class OpptjeningAar(

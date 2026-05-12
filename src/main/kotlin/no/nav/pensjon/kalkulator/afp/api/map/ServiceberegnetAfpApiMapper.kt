@@ -6,12 +6,14 @@ import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpSpec
 import no.nav.pensjon.kalkulator.afp.api.dto.*
 import no.nav.pensjon.kalkulator.opptjening.Pensjonspoeng
 import no.nav.pensjon.kalkulator.person.Pid
+import no.nav.pensjon.kalkulator.person.Sivilstand
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
 import java.time.LocalDate
 
 object ServiceberegnetAfpApiMapper {
 
-    fun fromDto(dto: InternServiceberegnetAfpSpec, pid: Pid, pensjonspoeng: List<Pensjonspoeng>, tidligereGiftEllerBarnMedSamboer: Boolean?) =
+    fun fromDto(dto: InternServiceberegnetAfpSpec, pid: Pid, pensjonspoeng: List<Pensjonspoeng>, tidligereGiftEllerBarnMedSamboer: Boolean?, naavaerendeSivilstatus: Sivilstand) =
         ServiceberegnetAfpSpec(
             uttaksdato = dto.uttaksdato,
             fnr = pid.value,
@@ -27,6 +29,7 @@ object ServiceberegnetAfpApiMapper {
             epsInntektOver2G = dto.epsInntektOver2G,
             tidligereGiftEllerBarnMedSamboer = tidligereGiftEllerBarnMedSamboer,
             sivilstatus = dto.sivilstatus,
+            registrertSivilstatus = naavaerendeSivilstatus
         )
 
     private fun mapOpptjeningAar(dto: Pensjonspoeng) =
