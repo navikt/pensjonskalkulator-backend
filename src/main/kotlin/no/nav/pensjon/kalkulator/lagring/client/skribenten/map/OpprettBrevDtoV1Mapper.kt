@@ -3,8 +3,11 @@ package no.nav.pensjon.kalkulator.lagring.client.skribenten.map
 import no.nav.pensjon.kalkulator.lagring.LagreAarligBeloep
 import no.nav.pensjon.kalkulator.lagring.LagreAfpPrivat
 import no.nav.pensjon.kalkulator.lagring.LagreAlder
+import no.nav.pensjon.kalkulator.lagring.LagreMaanedligAlderspensjon
+import no.nav.pensjon.kalkulator.lagring.LagreMaanedligAlderspensjonForKnekkpunkter
 import no.nav.pensjon.kalkulator.lagring.LagreSimulering
 import no.nav.pensjon.kalkulator.lagring.LagreSimuleringResponse
+import no.nav.pensjon.kalkulator.lagring.LagreSimuleringsinformasjon
 import no.nav.pensjon.kalkulator.lagring.LagreTidsbegrensetOffentligAfp
 import no.nav.pensjon.kalkulator.lagring.LagreTrygdetid
 import no.nav.pensjon.kalkulator.lagring.LagreUttaksparametre
@@ -16,8 +19,11 @@ import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.AlderspensjonBrev
 import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.AlderBrevDtoV1
 import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.AlternativUttaksparametreBrevDtoV1
 import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.LivsvarigOffentligAfpBrevDtoV1
+import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.MaanedligAlderspensjonBrevDtoV1
+import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.MaanedligAlderspensjonForKnekkpunkterBrevDtoV1
 import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.OpprettBrevRequestDtoV1
 import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.SimuleringBrevDtoV1
+import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.SimuleringsinformasjonBrevDtoV1
 import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.TidsbegrensetOffentligAfpBrevDtoV1
 import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.TrygdetidBrevDtoV1
 import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.VilkaarsproevingsresultatBrevDtoV1
@@ -37,6 +43,7 @@ object OpprettBrevDtoV1Mapper {
             vilkaarsproevingsresultat = mapToVilkaarsproevingsresultatDto(source.vilkaarsproevingsresultat),
             trygdetid = source.trygdetid?.let{ mapToTrygdetidDto(it) },
             pensjonsgivendeInntektListe = source.pensjonsgivendeInntektListe.map { mapToPensjonsgivendeInntektDto(it) },
+            simuleringsinformasjon = source.simuleringsinformasjon?.let { mapToSimuleringsinformasjonDto(it) },
         )
     )
 
@@ -85,4 +92,46 @@ object OpprettBrevDtoV1Mapper {
         aar = source.aar,
         maaneder = source.maaneder
     )
+
+    private fun mapToSimuleringsinformasjonDto(source: LagreSimuleringsinformasjon) =
+        SimuleringsinformasjonBrevDtoV1(
+            gradertUttaksalder = source.gradertUttaksalder?.let { mapToAlderDto(it) },
+            heltUttaksalder = source.heltUttaksalder?.let { mapToAlderDto(it) },
+            maanedligAlderspensjonForKnekkpunkter = source.maanedligAlderspensjonForKnekkpunkter?.let { mapToKnekkpunkterDto(it) }
+        )
+
+    private fun mapToKnekkpunkterDto(source: LagreMaanedligAlderspensjonForKnekkpunkter) =
+        MaanedligAlderspensjonForKnekkpunkterBrevDtoV1(
+            vedGradertUttak = source.vedGradertUttak?.let { mapToMaanedligAlderspensjonDto(it) },
+            vedHeltUttak = mapToMaanedligAlderspensjonDto(source.vedHeltUttak),
+            vedNormertPensjonsalder = mapToMaanedligAlderspensjonDto(source.vedNormertPensjonsalder)
+        )
+
+    private fun mapToMaanedligAlderspensjonDto(source: LagreMaanedligAlderspensjon) =
+        MaanedligAlderspensjonBrevDtoV1(
+            beloep = source.beloep,
+            inntektspensjonBeloep = source.inntektspensjonBeloep,
+            delingstall = source.delingstall,
+            pensjonsbeholdningFoerUttakBeloep = source.pensjonsbeholdningFoerUttakBeloep,
+            pensjonsbeholdningEtterUttakBeloep = source.pensjonsbeholdningEtterUttakBeloep,
+            sluttpoengtall = source.sluttpoengtall,
+            poengaarTom1991 = source.poengaarTom1991,
+            poengaarFom1992 = source.poengaarFom1992,
+            forholdstall = source.forholdstall,
+            grunnpensjonBeloep = source.grunnpensjonBeloep,
+            tilleggspensjonBeloep = source.tilleggspensjonBeloep,
+            pensjonstillegg = source.pensjonstillegg,
+            skjermingstillegg = source.skjermingstillegg,
+            kapittel19Andel = source.kapittel19Andel,
+            kapittel19Trygdetid = source.kapittel19Trygdetid,
+            basispensjonBeloep = source.basispensjonBeloep,
+            restpensjonBeloep = source.restpensjonBeloep,
+            gjenlevendetillegg = source.gjenlevendetillegg,
+            minstePensjonsnivaaSats = source.minstePensjonsnivaaSats,
+            kapittel20Andel = source.kapittel20Andel,
+            kapittel20Trygdetid = source.kapittel20Trygdetid,
+            garantipensjonBeloep = source.garantipensjonBeloep,
+            garantipensjonSats = source.garantipensjonSats,
+            garantitilleggBeloep = source.garantitilleggBeloep
+        )
 }

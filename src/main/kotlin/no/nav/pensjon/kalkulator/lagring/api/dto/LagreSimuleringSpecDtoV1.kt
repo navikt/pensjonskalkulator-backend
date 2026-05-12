@@ -10,6 +10,7 @@ data class LagreSimuleringSpecDtoV1(
     @field:NotNull val vilkaarsproevingsresultat: LagreVilkaarsproevingsresultatDto,
     val trygdetid: LagreTrygdetidDto?,
     val pensjonsgivendeInntektListe: List<LagreAarligBeloepDto>?,
+    val simuleringsinformasjon: LagreSimuleringsinformasjonDto?,
     val navEnhetId: String?,
 )
 
@@ -75,4 +76,43 @@ data class LagreUttaksparametreDto(
 data class LagreAlderDto(
     @field:NotNull val aar: Int,
     @field:NotNull val maaneder: Int
+)
+
+data class LagreSimuleringsinformasjonDto(
+    val gradertUttaksalder: LagreAlderDto?,
+    val heltUttaksalder: LagreAlderDto?,
+    val maanedligAlderspensjonForKnekkpunkter: LagreMaanedligAlderspensjonForKnekkpunkterDto?
+)
+
+data class LagreMaanedligAlderspensjonForKnekkpunkterDto(
+    val vedGradertUttak: LagreMaanedligAlderspensjonDto?,
+    @field:NotNull val vedHeltUttak: LagreMaanedligAlderspensjonDto,
+    @field:NotNull val vedNormertPensjonsalder: LagreMaanedligAlderspensjonDto
+)
+
+data class LagreMaanedligAlderspensjonDto(
+    @field:NotNull val beloep: Int,
+    val inntektspensjonBeloep: Int?,
+    val delingstall: Double?,
+    val pensjonsbeholdningFoerUttakBeloep: Int?,
+    val pensjonsbeholdningEtterUttakBeloep: Int?,
+    val sluttpoengtall: Double?,
+    val poengaarTom1991: Int?,
+    val poengaarFom1992: Int?,
+    val forholdstall: Double?,
+    val grunnpensjonBeloep: Int?,
+    val tilleggspensjonBeloep: Int?,
+    val pensjonstillegg: Int?,
+    val skjermingstillegg: Int?,
+    val kapittel19Andel: Double?,
+    val kapittel19Trygdetid: Int?,
+    val basispensjonBeloep: Int?,
+    val restpensjonBeloep: Int?,
+    val gjenlevendetillegg: Int?,
+    val minstePensjonsnivaaSats: Double?,
+    val kapittel20Andel: Double?,
+    val kapittel20Trygdetid: Int?,
+    val garantipensjonBeloep: Int?,
+    val garantipensjonSats: Double?,
+    val garantitilleggBeloep: Int?
 )
