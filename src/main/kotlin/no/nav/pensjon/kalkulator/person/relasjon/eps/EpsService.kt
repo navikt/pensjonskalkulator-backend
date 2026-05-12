@@ -37,14 +37,38 @@ class EpsService(
             personaliaSpec
         )
 
-    private fun relasjonstype(): Relasjonstype =
-        try {
-            client.fetchNaavaerendeEps(soekerPid = pidGetter.pid(), personaliaSpec).relasjonstype
-        } catch (e: EgressException) {
-            if (e.statusCode == HttpStatus.NOT_FOUND)
-                Relasjonstype.UKJENT
-            else throw e
+    fun tidligereGiftEllerBarnMedSamboer(): Boolean? {
+        val eps = hentNaavaerendeEps()
+
+        return if (
+            eps?.relasjonstype == Relasjonstype.SAMBOER &&
+            eps.pid != null
+        ) {
+            client.fetchTidligereGiftEllerBarnMed(
+                soekerPid = pidGetter.pid(),
+                samboerPid = eps.pid
+            )
+        } else {
+            null
         }
+    }
+
+    private fun hentNaavaerendeEps() =
+        try {
+            client.fetchNaavaerendeEps(
+                soekerPid = pidGetter.pid(),
+                personaliaSpec
+            )
+        } catch (e: EgressException) {
+            if (e.statusCode == HttpStatus.NOT_FOUND) {
+                null
+            } else {
+                throw e
+            }
+        }
+
+    private fun relasjonstype(): Relasjonstype =
+        hentNaavaerendeEps()?.relasjonstype ?: Relasjonstype.UKJENT
 
     private companion object {
         private val personaliaSpec: List<PersonaliaType> = listOf(

@@ -7,6 +7,7 @@ import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.person.relasjon.Familierelasjon
 import no.nav.pensjon.kalkulator.person.relasjon.Relasjonstype
 import no.nav.pensjon.kalkulator.person.relasjon.eps.client.EpsClient
+import no.nav.pensjon.kalkulator.person.relasjon.eps.client.ppd.acl.TidligereGiftEllerBarnMedDto
 import no.nav.pensjon.kalkulator.person.relasjon.eps.client.ppd.acl.FamilierelasjonDto
 import no.nav.pensjon.kalkulator.person.relasjon.eps.client.ppd.acl.FamilierelasjonMapper
 import no.nav.pensjon.kalkulator.person.relasjon.eps.client.ppd.acl.PersonaliaTypeDto
@@ -70,6 +71,35 @@ class PensjonPersondataClient(
             throw EgressException(e.responseBodyAsString, e)
         }
     }
+
+    override fun fetchTidligereGiftEllerBarnMed(soekerPid: Pid, samboerPid: Pid): Boolean {
+        val uri = "/$TIDLIGERE_GIFT_ELLER_BARN_MED_PATH"
+        val url = "${baseUrl}${uri}"
+
+        return try {
+            webClient
+                        .get()
+                        .uri(uri)
+                        .headers {
+                            it.setBearerAuth(EgressAccess.token(service).value)
+                            it[HttpHeaders.ACCEPT] = MediaType.APPLICATION_JSON_VALUE
+                            it[CustomHttpHeaders.PERSON_ID] = soekerPid.value
+                            it[SAMBOER_PID_HEADER] = samboerPid.value
+                            it[CustomHttpHeaders.CALL_ID] = traceAid.callId()
+                        }
+                        .retrieve()
+                        .bodyToMono<TidligereGiftEllerBarnMedDto>()
+                        .retryWhen(retryBackoffSpec(url))
+                        .block()?.result
+                .also { countCalls(MetricResult.OK) }
+                ?: false
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $url", e)
+        } catch (e: WebClientResponseException) {
+            throw EgressException(e.responseBodyAsString, e)
+        }
+    }
+
 
     override fun fetchNyligsteEps(
         soekerPid: Pid,
@@ -140,6 +170,8 @@ class PensjonPersondataClient(
     companion object {
         private const val NAAVAERENDE_EPS_PATH = "api/familierelasjoner/currentEps"
         private const val NYLIGSTE_EPS_PATH = "api/familierelasjoner/mostRecentEps"
+        private const val TIDLIGERE_GIFT_ELLER_BARN_MED_PATH = "api/familierelasjoner/tidligereGiftEllerBarnMed"
+        private const val SAMBOER_PID_HEADER = "pidSamboer"
         private const val PING_PATH = "TBD" //TODO
         private val service = EgressService.PENSJON_PERSONDATA
 

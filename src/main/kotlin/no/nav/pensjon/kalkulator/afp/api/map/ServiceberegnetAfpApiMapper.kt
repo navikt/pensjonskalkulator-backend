@@ -11,7 +11,7 @@ import java.time.LocalDate
 
 object ServiceberegnetAfpApiMapper {
 
-    fun fromDto(dto: InternServiceberegnetAfpSpec, pid: Pid, pensjonspoeng: List<Pensjonspoeng>) =
+    fun fromDto(dto: InternServiceberegnetAfpSpec, pid: Pid, pensjonspoeng: List<Pensjonspoeng>, tidligereGiftEllerBarnMedSamboer: Boolean?) =
         ServiceberegnetAfpSpec(
             uttaksdato = dto.uttaksdato,
             fnr = pid.value,
@@ -25,6 +25,7 @@ object ServiceberegnetAfpApiMapper {
             opptjeningFolketrygden = pensjonspoeng.map(::mapOpptjeningAar) + mapInntektOpptjening(dto),
             epsMottarPensjon = dto.epsMottarPensjon,
             epsInntektOver2G = dto.epsInntektOver2G,
+            tidligereGiftEllerBarnMedSamboer = tidligereGiftEllerBarnMedSamboer,
             sivilstatus = dto.sivilstatus,
         )
 
