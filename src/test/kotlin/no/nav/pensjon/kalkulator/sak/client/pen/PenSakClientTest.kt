@@ -89,11 +89,11 @@ class PenSakClientTest : FunSpec({
         }
     }
 
-    test("opprettAlderspensjonSak returns created sak") {
+    test("opprettNySak returns created sak") {
         server?.arrangeOkJsonResponse(OPPRETTET_SAK)
 
         Arrange.webClientContextRunner().run {
-            val response = client(context = it).opprettAlderspensjonSak(pid)
+            val response = client(context = it).opprettNySak(pid, SakType.ALDERSPENSJON)
 
             with(response) {
                 sakId shouldBe 12345678
@@ -103,11 +103,11 @@ class PenSakClientTest : FunSpec({
         }
     }
 
-    test("opprettAlderspensjonSak sends sakType as query parameter") {
+    test("opprettNySak sends sakType as query parameter") {
         server?.arrangeOkJsonResponse(OPPRETTET_SAK)
 
         Arrange.webClientContextRunner().run {
-            client(context = it).opprettAlderspensjonSak(pid)
+            client(context = it).opprettNySak(pid, SakType.ALDERSPENSJON)
 
             server?.takeRequest()?.apply {
                 requestUrl?.queryParameter("sakType") shouldBe "ALDER"
@@ -116,12 +116,12 @@ class PenSakClientTest : FunSpec({
         }
     }
 
-    test("opprettAlderspensjonSak should throw EgressException when response is 'Internal Server Error'") {
+    test("opprettNySak should throw EgressException when response is 'Internal Server Error'") {
         server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, PEN_ERROR)
         server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, PEN_ERROR) // for retry
 
         Arrange.webClientContextRunner().run {
-            val exception = shouldThrow<EgressException> { client(context = it).opprettAlderspensjonSak(pid) }
+            val exception = shouldThrow<EgressException> { client(context = it).opprettNySak(pid, SakType.ALDERSPENSJON) }
 
             with(exception) {
                 message shouldBe "Failed calling /api/sak"
