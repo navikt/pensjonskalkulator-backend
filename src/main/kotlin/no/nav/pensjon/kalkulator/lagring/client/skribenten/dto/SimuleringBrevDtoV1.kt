@@ -2,12 +2,12 @@ package no.nav.pensjon.kalkulator.lagring.client.skribenten.dto
 
 data class SimuleringBrevDtoV1(
     val alderspensjonListe: List<AlderspensjonBrevDtoV1>,
-    val livsvarigOffentligAfpListe: List<LivsvarigOffentligAfpBrevDtoV1>,
+    val livsvarigOffentligAfpListe: List<LivsvarigOffentligAfpBrevDtoV1>?,
     val tidsbegrensetOffentligAfp: TidsbegrensetOffentligAfpBrevDtoV1?,
-    val privatAfpListe: List<AfpPrivatBrevDtoV1>,
-    val vilkaarsproevingsresultat: VilkaarsproevingsresultatBrevDtoV1,
+    val privatAfpListe: List<AfpPrivatBrevDtoV1>?,
+    val vilkaarsproevingsresultat: VilkaarsproevingsresultatBrevDtoV1?,
     val trygdetid: TrygdetidBrevDtoV1?,
-    val pensjonsgivendeInntektListe: List<AarligBeloepBrevDtoV1>,
+    val pensjonsgivendeInntektListe: List<AarligBeloepBrevDtoV1>?,
     val simuleringsinformasjon: SimuleringsinformasjonBrevDtoV1?,
 )
 
@@ -101,13 +101,13 @@ data class MaanedligAlderspensjonBrevDtoV1(
     val tilleggspensjonBeloep: Int?,
     val pensjonstillegg: Int?,
     val skjermingstillegg: Int?,
-    val kapittel19Andel: Double?,
+    val kapittel19AndelTeller: Int?,
     val kapittel19Trygdetid: Int?,
     val basispensjonBeloep: Int?,
     val restpensjonBeloep: Int?,
     val gjenlevendetillegg: Int?,
     val minstePensjonsnivaaSats: Double?,
-    val kapittel20Andel: Double?,
+    val kapittel20AndelTeller: Int?,
     val kapittel20Trygdetid: Int?,
     val garantipensjonBeloep: Int?,
     val garantipensjonSats: Double?,
