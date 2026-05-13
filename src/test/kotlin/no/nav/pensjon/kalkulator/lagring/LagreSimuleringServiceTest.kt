@@ -7,6 +7,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.pensjon.kalkulator.lagring.client.LagreSimuleringClient
 import no.nav.pensjon.kalkulator.sak.SakService
+import no.nav.pensjon.kalkulator.sak.SakType
 
 class LagreSimuleringServiceTest : ShouldSpec({
 
@@ -17,19 +18,19 @@ class LagreSimuleringServiceTest : ShouldSpec({
     should("hente sakId og delegere lagring til klient") {
         val simulering = simulering()
         val response = lagreSimuleringResponse()
-        every { sakService.hentEllerOpprettAlderspensjonSak() } returns SAK_ID
+        every { sakService.hentEllerOpprettSak(SakType.ALDERSPENSJON) } returns SAK_ID
         every { client.lagreSimulering(SAK_ID, simulering) } returns response
 
         service.lagreSimulering(simulering) shouldBe response
 
-        verify(exactly = 1) { sakService.hentEllerOpprettAlderspensjonSak() }
+        verify(exactly = 1) { sakService.hentEllerOpprettSak(SakType.ALDERSPENSJON) }
         verify(exactly = 1) { client.lagreSimulering(SAK_ID, simulering) }
     }
 
     should("returnere respons fra klient") {
         val simulering = simulering()
         val expected = LagreSimuleringResponse(brevId = "brev-999", sakId = "sak-999")
-        every { sakService.hentEllerOpprettAlderspensjonSak() } returns SAK_ID
+        every { sakService.hentEllerOpprettSak(SakType.ALDERSPENSJON) } returns SAK_ID
         every { client.lagreSimulering(SAK_ID, simulering) } returns expected
 
         service.lagreSimulering(simulering) shouldBe expected
@@ -40,12 +41,12 @@ class LagreSimuleringServiceTest : ShouldSpec({
 
         private fun simulering() = LagreSimulering(
             alderspensjonListe = listOf(LagreAlderspensjon(alderAar = 67, beloep = 250000, gjenlevendetillegg = null)),
-            livsvarigOffentligAfpListe = emptyList(),
+            livsvarigOffentligAfpListe = null,
             tidsbegrensetOffentligAfp = null,
-            privatAfpListe = emptyList(),
+            privatAfpListe = null,
             vilkaarsproevingsresultat = LagreVilkaarsproevingsresultat(erInnvilget = true, alternativ = null),
             trygdetid = null,
-            pensjonsgivendeInntektListe = emptyList(),
+            pensjonsgivendeInntektListe = null,
             simuleringsinformasjon = null,
             enhetsId = "4817"
         )

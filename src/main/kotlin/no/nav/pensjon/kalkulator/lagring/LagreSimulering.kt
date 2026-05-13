@@ -7,7 +7,7 @@ data class LagreSimulering(
     val privatAfpListe: List<LagreAfpPrivat>?,
     val vilkaarsproevingsresultat: LagreVilkaarsproevingsresultat?,
     val trygdetid: LagreTrygdetid?,
-    val pensjonsgivendeInntektListe: List<LagreAarligBeloep>,
+    val pensjonsgivendeInntektListe: List<LagreAarligBeloep>?,
     val simuleringsinformasjon: LagreSimuleringsinformasjon?,
     val enhetsId: String,
 )

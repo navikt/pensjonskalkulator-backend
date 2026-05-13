@@ -108,15 +108,15 @@ class LagreSimuleringMapperTest : ShouldSpec({
             )
         ) shouldBe LagreSimulering(
             alderspensjonListe = emptyList(),
-            livsvarigOffentligAfpListe = emptyList(),
+            livsvarigOffentligAfpListe = null,
             tidsbegrensetOffentligAfp = null,
-            privatAfpListe = emptyList(),
+            privatAfpListe = null,
             vilkaarsproevingsresultat = LagreVilkaarsproevingsresultat(
                 erInnvilget = false,
                 alternativ = null
             ),
             trygdetid = null,
-            pensjonsgivendeInntektListe = emptyList(),
+            pensjonsgivendeInntektListe = null,
             simuleringsinformasjon = null,
             enhetsId = "4817"
         )
