@@ -78,7 +78,9 @@ data class AlderBrevDtoV1(
 data class SimuleringsinformasjonBrevDtoV1(
     val gradertUttaksalder: AlderBrevDtoV1?,
     val heltUttaksalder: AlderBrevDtoV1?,
-    val maanedligAlderspensjonForKnekkpunkter: MaanedligAlderspensjonForKnekkpunkterBrevDtoV1?
+    val maanedligAlderspensjonForKnekkpunkter: MaanedligAlderspensjonForKnekkpunkterBrevDtoV1?,
+    val privatAfpVedGradertUttak: AfpPrivatBrevDtoV1?,
+    val privatAfpVedHeltUttak: AfpPrivatBrevDtoV1?
 )
 
 data class MaanedligAlderspensjonForKnekkpunkterBrevDtoV1(

@@ -43,7 +43,7 @@ object OpprettBrevDtoV1Mapper {
             vilkaarsproevingsresultat = source.vilkaarsproevingsresultat?.let { mapToVilkaarsproevingsresultatDto(it) },
             trygdetid = source.trygdetid?.let{ mapToTrygdetidDto(it) },
             pensjonsgivendeInntektListe = source.pensjonsgivendeInntektListe?.map { mapToPensjonsgivendeInntektDto(it) },
-            simuleringsinformasjon = source.simuleringsinformasjon?.let { mapToSimuleringsinformasjonDto(it) },
+            simuleringsinformasjon = source.simuleringsinformasjon?.let { mapToSimuleringsinformasjonDto(it, source.privatAfpListe) },
         )
     )
 
@@ -93,11 +93,17 @@ object OpprettBrevDtoV1Mapper {
         maaneder = source.maaneder
     )
 
-    private fun mapToSimuleringsinformasjonDto(source: LagreSimuleringsinformasjon) =
+    private fun mapToSimuleringsinformasjonDto(source: LagreSimuleringsinformasjon, privatAfpListe: List<LagreAfpPrivat>?) =
         SimuleringsinformasjonBrevDtoV1(
             gradertUttaksalder = source.gradertUttaksalder?.let { mapToAlderDto(it) },
             heltUttaksalder = source.heltUttaksalder?.let { mapToAlderDto(it) },
-            maanedligAlderspensjonForKnekkpunkter = source.maanedligAlderspensjonForKnekkpunkter?.let { mapToKnekkpunkterDto(it) }
+            maanedligAlderspensjonForKnekkpunkter = source.maanedligAlderspensjonForKnekkpunkter?.let { mapToKnekkpunkterDto(it) },
+            privatAfpVedGradertUttak = source.gradertUttaksalder?.let { alder ->
+                privatAfpListe?.firstOrNull { it.alderAar == alder.aar }?.let { maptoPrivatAfpDto(it) }
+            },
+            privatAfpVedHeltUttak = source.heltUttaksalder?.let { alder ->
+                privatAfpListe?.firstOrNull { it.alderAar == alder.aar }?.let { maptoPrivatAfpDto(it) }
+            }
         )
 
     private fun mapToKnekkpunkterDto(source: LagreMaanedligAlderspensjonForKnekkpunkter) =
