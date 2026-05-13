@@ -2,10 +2,10 @@ package no.nav.pensjon.kalkulator.lagring
 
 data class LagreSimulering(
     val alderspensjonListe: List<LagreAlderspensjon>,
-    val livsvarigOffentligAfpListe: List<LagreAfpOffentlig>,
+    val livsvarigOffentligAfpListe: List<LagreAfpOffentlig>?,
     val tidsbegrensetOffentligAfp: LagreTidsbegrensetOffentligAfp?,
-    val privatAfpListe: List<LagreAfpPrivat>,
-    val vilkaarsproevingsresultat: LagreVilkaarsproevingsresultat,
+    val privatAfpListe: List<LagreAfpPrivat>?,
+    val vilkaarsproevingsresultat: LagreVilkaarsproevingsresultat?,
     val trygdetid: LagreTrygdetid?,
     val pensjonsgivendeInntektListe: List<LagreAarligBeloep>,
     val simuleringsinformasjon: LagreSimuleringsinformasjon?,

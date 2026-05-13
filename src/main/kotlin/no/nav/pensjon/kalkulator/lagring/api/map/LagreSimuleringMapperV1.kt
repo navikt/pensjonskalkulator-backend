@@ -15,12 +15,12 @@ object LagreSimuleringMapperV1 {
     fun fromDto(source: LagreSimuleringSpecDtoV1) =
         LagreSimulering(
             alderspensjonListe = source.alderspensjonListe.map(::alderspensjon),
-            livsvarigOffentligAfpListe = source.livsvarigOffentligAfpListe.orEmpty().map(::afpOffentlig),
+            livsvarigOffentligAfpListe = source.livsvarigOffentligAfpListe?.map(::afpOffentlig),
             tidsbegrensetOffentligAfp = source.tidsbegrensetOffentligAfp?.let(::tidsbegrensetOffentligAfp),
-            privatAfpListe = source.privatAfpListe.orEmpty().map(::afpPrivat),
+            privatAfpListe = source.privatAfpListe?.map(::afpPrivat),
             vilkaarsproevingsresultat = vilkaarsproevingsresultat(source.vilkaarsproevingsresultat),
             trygdetid = source.trygdetid?.let(::trygdetid),
-            pensjonsgivendeInntektListe = source.pensjonsgivendeInntektListe.orEmpty().map(::aarligBeloep),
+            pensjonsgivendeInntektListe = source.pensjonsgivendeInntektListe?.map(::aarligBeloep),
             simuleringsinformasjon = source.simuleringsinformasjon?.let(::simuleringsinformasjon),
             enhetsId = source.navEnhetId ?: "4817", //pensjon-pen: SendStandardBrevServiceImpl.NAV_PENSJON_TKNR = arrayOf("4803", "4808", "4815", "4817")
         )
