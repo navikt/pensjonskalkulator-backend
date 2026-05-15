@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.lagring.client.skribenten
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.FunSpec
+import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.lagring.LagreAlderspensjon
@@ -15,10 +15,11 @@ import no.nav.pensjon.kalkulator.testutil.arrangeResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
 import org.springframework.beans.factory.BeanFactory
+import org.springframework.beans.factory.getBean
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.WebClient
 
-class SkribentenClientTest : FunSpec({
+class SkribentenClientTest : ShouldSpec({
 
     var server: MockWebServer? = null
     var baseUrl: String? = null
@@ -27,7 +28,7 @@ class SkribentenClientTest : FunSpec({
     fun client(context: BeanFactory) =
         SkribentenClient(
             baseUrl = baseUrl!!,
-            webClientBuilder = context.getBean(WebClient.Builder::class.java),
+            webClientBuilder = context.getBean<WebClient.Builder>(),
             traceAid = traceAid,
             retryAttempts = "1"
         )
@@ -35,25 +36,25 @@ class SkribentenClientTest : FunSpec({
     beforeSpec {
         Arrange.security()
         server = MockWebServer().apply { start() }
-        baseUrl = "http://localhost:${server!!.port}"
+        baseUrl = "http://localhost:${server.port}"
     }
 
     afterSpec {
         server?.shutdown()
     }
 
-    test("lagreSimulering returnerer brev-respons ved vellykket lagring") {
+    should("returnere brev-respons ved vellykket lagring") {
         server?.arrangeOkJsonResponse(BREV_RESPONSE)
 
         Arrange.webClientContextRunner().run {
             val response = client(it).lagreSimulering(SAK_ID, simulering())
 
-            response.brevId shouldBe BREV_ID
-            response.sakId shouldBe SAK_ID_STRING
+            response.brevId shouldBe "brev-123"
+            response.sakId shouldBe "sak-456"
         }
     }
 
-    test("lagreSimulering sender request til korrekt URI med sakId") {
+    should("sende request til korrekt URI med sak-ID") {
         server?.arrangeOkJsonResponse(BREV_RESPONSE)
 
         Arrange.webClientContextRunner().run {
@@ -63,7 +64,7 @@ class SkribentenClientTest : FunSpec({
         }
     }
 
-    test("lagreSimulering kaster EgressException ved server-feil") {
+    should("kaste EgressException ved serverfeil") {
         server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, SERVER_ERROR)
         server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, SERVER_ERROR) // retry
 
@@ -76,7 +77,7 @@ class SkribentenClientTest : FunSpec({
         }
     }
 
-    test("lagreSimulering kaster EgressException med isClientError ved 4xx-feil") {
+    should("kaste EgressException med isClientError ved 4xx-feil") {
         server?.arrangeResponse(HttpStatus.BAD_REQUEST, CLIENT_ERROR)
         server?.arrangeResponse(HttpStatus.BAD_REQUEST, CLIENT_ERROR) // retry
 
@@ -91,14 +92,12 @@ class SkribentenClientTest : FunSpec({
 }) {
     companion object {
         private const val SAK_ID = 42L
-        private const val SAK_ID_STRING = "sak-456"
-        private const val BREV_ID = "brev-123"
 
         @Language("json")
         private val BREV_RESPONSE = """{
             "info": {
-                "id": "$BREV_ID",
-                "saksId": "$SAK_ID_STRING"
+                "id": "brev-123",
+                "saksId": "sak-456"
             }
         }"""
 

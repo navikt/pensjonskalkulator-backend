@@ -25,6 +25,7 @@ import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimu
 import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
 import org.springframework.beans.factory.BeanFactory
+import org.springframework.beans.factory.getBean
 import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDate
 
@@ -37,7 +38,7 @@ class TpSimuleringClientTest : FunSpec({
     fun client(context: BeanFactory) =
         TpSimuleringClient(
             baseUrl!!,
-            webClientBuilder = context.getBean(WebClient.Builder::class.java),
+            webClientBuilder = context.getBean<WebClient.Builder>(),
             traceAid,
             retryAttempts = "1"
         )
@@ -45,7 +46,7 @@ class TpSimuleringClientTest : FunSpec({
     beforeSpec {
         Arrange.security()
         server = MockWebServer().apply { start() }
-        baseUrl = "http://localhost:${server!!.port}"
+        baseUrl = "http://localhost:${server.port}"
     }
 
     afterSpec {
