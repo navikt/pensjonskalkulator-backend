@@ -10,12 +10,11 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.ImpersonalAccessFilter
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.SecurityContextNavIdExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.fag.FagtilgangService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.AvvisningAarsak
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.PopulasjonstilgangService
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.CacheAwarePopulasjonstilgangService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.TilgangResult
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 
 class ImpersonalAccessFilterTest : ShouldSpec({
 
@@ -26,7 +25,6 @@ class ImpersonalAccessFilterTest : ShouldSpec({
 
         ImpersonalAccessFilter(
             pidGetter = mockk(),
-            navIdExtractor = mockk(),
             fagtilgangService = mockk(),
             populasjonstilgangService = mockk(),
             auditor = mockk(),
@@ -43,7 +41,6 @@ class ImpersonalAccessFilterTest : ShouldSpec({
 
         ImpersonalAccessFilter(
             pidGetter = pidExtractor,
-            navIdExtractor = mockk(),
             fagtilgangService = mockk(),
             populasjonstilgangService = mockk(),
             auditor = mockk(),
@@ -60,9 +57,8 @@ class ImpersonalAccessFilterTest : ShouldSpec({
 
         ImpersonalAccessFilter(
             pidGetter = arrangePid(),
-            navIdExtractor = arrangeNavIdExtractor(),
             fagtilgangService = arrangeFagtilgang(innvilget = false),
-            populasjonstilgangService = arrangePopulasjonstilgang(innvilget()),
+            populasjonstilgangService = arrangePopulasjonstilgang(result = null),
             auditor = mockk(),
         ).doFilter(request, response, chain)
 
@@ -77,9 +73,8 @@ class ImpersonalAccessFilterTest : ShouldSpec({
 
         ImpersonalAccessFilter(
             pidGetter = arrangePid(),
-            navIdExtractor = arrangeNavIdExtractor(),
             fagtilgangService = arrangeFagtilgang(innvilget = true),
-            populasjonstilgangService = arrangePopulasjonstilgang(result = avvist()),
+            populasjonstilgangService = arrangePopulasjonstilgang(result = avvist().avvisningsinfo),
             auditor = mockk(),
         ).doFilter(request, response, chain)
 
@@ -94,9 +89,8 @@ class ImpersonalAccessFilterTest : ShouldSpec({
 
         ImpersonalAccessFilter(
             pidGetter = arrangePidError(),
-            navIdExtractor = arrangeNavIdExtractor(),
             fagtilgangService = arrangeFagtilgang(innvilget = true),
-            populasjonstilgangService = arrangePopulasjonstilgang(innvilget()),
+            populasjonstilgangService = arrangePopulasjonstilgang(result = null),
             auditor = mockk(),
         ).doFilter(request, response, chain)
 
@@ -117,9 +111,8 @@ class ImpersonalAccessFilterTest : ShouldSpec({
 
         ImpersonalAccessFilter(
             pidGetter = arrangePid(),
-            navIdExtractor = arrangeNavIdExtractor(),
             fagtilgangService = arrangeFagtilgang(innvilget = true),
-            populasjonstilgangService = arrangePopulasjonstilgang(result = innvilget()),
+            populasjonstilgangService = arrangePopulasjonstilgang(result = null),
             auditor = auditor,
         ).doFilter(request, response, chain)
 
@@ -135,7 +128,6 @@ class ImpersonalAccessFilterTest : ShouldSpec({
 
         ImpersonalAccessFilter(
             pidGetter = arrangePid(),
-            navIdExtractor = arrangeNavIdExtractor(),
             fagtilgangService = arrangeFagtilgang(innvilget = true),
             populasjonstilgangService = arrangePopulasjonstilgangError(),
             auditor = auditor,
@@ -156,11 +148,6 @@ private fun arrangePidError(): PidExtractor =
         every { pid() } throws RuntimeException("feil")
     }
 
-private fun arrangeNavIdExtractor(): SecurityContextNavIdExtractor =
-    mockk<SecurityContextNavIdExtractor>().apply {
-        every { id() } returns "Z123456"
-    }
-
 private fun arrangeRequest(pid: String?, uri: String): HttpServletRequest =
     mockk<HttpServletRequest>().apply {
         every { getHeader("fnr") } returns pid
@@ -172,23 +159,15 @@ private fun arrangeFagtilgang(innvilget: Boolean): FagtilgangService =
         every { tilgangInnvilget() } returns innvilget
     }
 
-private fun arrangePopulasjonstilgang(result: TilgangResult): PopulasjonstilgangService =
-    mockk<PopulasjonstilgangService>().apply {
-        every { sjekkTilgang(pid) } returns result
+private fun arrangePopulasjonstilgang(result: String?): CacheAwarePopulasjonstilgangService =
+    mockk<CacheAwarePopulasjonstilgangService>().apply {
+        every { eventuellTilgangsnektAarsak(pid) } returns result
     }
 
-private fun arrangePopulasjonstilgangError(): PopulasjonstilgangService =
-    mockk<PopulasjonstilgangService>().apply {
-        every { sjekkTilgang(pid) } returns feil()
+private fun arrangePopulasjonstilgangError(): CacheAwarePopulasjonstilgangService =
+    mockk<CacheAwarePopulasjonstilgangService>().apply {
+        every { eventuellTilgangsnektAarsak(pid) } returns feil().avvisningsinfo
     }
-
-private fun innvilget() =
-    TilgangResult(
-        innvilget = true,
-        avvisningAarsak = null,
-        begrunnelse = null,
-        traceId = null
-    )
 
 private fun avvist() =
     TilgangResult(
