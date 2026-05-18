@@ -5,7 +5,6 @@ import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.dto.*
 import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
 import no.nav.pensjon.kalkulator.simulering.client.simulator.acl.spec.SivilstandSpecDto
 import no.nav.pensjon.kalkulator.simulering.client.simulator.acl.spec.UtlandSpecDto
-import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto.UtenlandsperiodeForSimuleringDto
 
 object ServiceberegnetAfpMapper {
 
