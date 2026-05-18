@@ -2,7 +2,6 @@ package no.nav.pensjon.kalkulator.afp.api.dto
 
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.Opphold
-import no.nav.pensjon.kalkulator.simulering.Utenlandsopphold
 import java.time.LocalDate
 
 data class InternServiceberegnetAfpSpec(
