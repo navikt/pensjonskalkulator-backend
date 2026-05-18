@@ -23,7 +23,8 @@ data class PenGjeldendeUfoeregradDto(
 data class PenGjeldendeVedtakApDto(
     val grad: Int,
     val fraOgMed: LocalDate,
-    val sivilstatus: String
+    val sivilstatus: String,
+    val harUtenlandsopphold: Boolean
 )
 
 data class PenGjeldendeVedtakDto(

@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.every
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
@@ -57,13 +58,14 @@ class VedtakControllerTest : FunSpec() {
                 vedtakService.hentVedtakMedUtbetaling()
             } returns VedtakSamling(
                 loependeAlderspensjon = LoependeAlderspensjon(
-                    grad = 1,
+                    grad = Uttaksgrad.TJUE_PROSENT,
                     fom = LocalDate.parse("2020-12-01"),
                     uttaksgradFom = LocalDate.of(2021, 1, 1),
-                    sivilstatus = Sivilstatus.GIFT
+                    sivilstatus = Sivilstatus.GIFT,
+                    harUtenlandsopphold = true
                 ),
                 fremtidigAlderspensjon = FremtidigAlderspensjon(
-                    grad = 10,
+                    grad = Uttaksgrad.FOERTI_PROSENT,
                     fom = LocalDate.parse("2021-12-01"),
                     sivilstatus = Sivilstatus.SKILT
                 ),
@@ -109,6 +111,6 @@ class VedtakControllerTest : FunSpec() {
 
         @Language("json")
         private const val RESPONSE_BODY_ALLE_MULIGE_VEDTAK_V4 =
-            """{"harLoependeVedtak":true,"alderspensjon":{"grad":1,"fom":"2020-12-01","uttaksgradFom":"2021-01-01","sivilstand":"GIFT"},"fremtidigAlderspensjon":{"grad":10,"fom":"2021-12-01"},"ufoeretrygd":{"grad":2},"afpPrivat":{"fom":"2022-12-01"}}"""
+            """{"harLoependeVedtak":true,"alderspensjon":{"grad":20,"fom":"2020-12-01","uttaksgradFom":"2021-01-01","sivilstand":"GIFT"},"fremtidigAlderspensjon":{"grad":40,"fom":"2021-12-01"},"ufoeretrygd":{"grad":2},"afpPrivat":{"fom":"2022-12-01"}}"""
     }
 }

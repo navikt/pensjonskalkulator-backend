@@ -13,22 +13,23 @@ object VedtakResultMapper {
             fremtidigAlderspensjon = source.fremtidigAlderspensjon?.let(::fremtidigAlderspensjon),
             ufoeretrygdgrad = source.ufoeretrygd?.grad,
             privatAfpFom = source.privatAfp?.fom,
-            tidsbegrensetOffentligAfpFom = source.pre2025OffentligAfp?.fom,
+            tidsbegrensetOffentligAfpFom = source.tidsbegrensetOffentligAfp?.fom,
             avdoed = source.avdoed?.let(::avdoed)
         )
 
     private fun loependeAlderspensjon(source: LoependeAlderspensjon) =
         VedtakV1LoependeAlderspensjon(
-            grad = source.grad,
+            grad = source.grad.prosentsats,
             fom = source.fom,
             uttaksgradFom = source.uttaksgradFom ?: source.fom,
             sisteUtbetaling = source.utbetalingSisteMaaned?.let(::utbetaling),
-            sivilstatus = CommonV1Sivilstatus.fromInternalValue(source.sivilstatus)
+            sivilstatus = CommonV1Sivilstatus.fromInternalValue(source.sivilstatus),
+            harUtenlandsopphold = source.harUtenlandsopphold
         )
 
     private fun fremtidigAlderspensjon(source: FremtidigAlderspensjon) =
         VedtakV1Alderspensjonsuttak(
-            grad = source.grad,
+            grad = source.grad.prosentsats,
             fom = source.fom
         )
 

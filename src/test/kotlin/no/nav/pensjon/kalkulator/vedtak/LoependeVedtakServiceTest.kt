@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.vedtak.client.LoependeVedtakClient
@@ -22,13 +23,14 @@ class LoependeVedtakServiceTest : ShouldSpec({
 private val vedtakSamling =
     VedtakSamling(
         loependeAlderspensjon = LoependeAlderspensjon(
-            grad = 1,
+            grad = Uttaksgrad.TJUE_PROSENT,
             fom = LocalDate.of(2020, 10, 1),
             uttaksgradFom = LocalDate.of(2021, 1, 1),
             sivilstatus = Sivilstatus.UGIFT,
+            harUtenlandsopphold = true
         ),
         fremtidigAlderspensjon = FremtidigAlderspensjon(
-            grad = 3,
+            grad = Uttaksgrad.FOERTI_PROSENT,
             fom = LocalDate.of(2023, 10, 1),
             sivilstatus = Sivilstatus.GIFT
         ),
