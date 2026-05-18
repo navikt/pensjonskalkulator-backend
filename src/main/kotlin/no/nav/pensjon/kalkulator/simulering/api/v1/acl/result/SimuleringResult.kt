@@ -38,7 +38,7 @@ data class SimuleringV1Result(
     @field:Schema(description = "Eventelt problem som oppstod under simuleringen")
     val problem: SimuleringV1Problem?,
 
-    @field:Schema(description = "Resultat av serviceberegnet AFP (kun for simuleringstype AFP_FOR_FPP)")
+    @field:Schema(description = "Resultat av serviceberegnet AFP (kun for simuleringstype SERVICEBEREGN_AFP)")
     val serviceberegnetAfp: SimuleringV1ServiceberegnetAfp? = null
 )
 
