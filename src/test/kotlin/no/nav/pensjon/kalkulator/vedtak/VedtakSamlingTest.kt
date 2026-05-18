@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.vedtak
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import java.time.LocalDate
 
@@ -13,7 +14,7 @@ class VedtakSamlingTest : ShouldSpec({
             fremtidigAlderspensjon = null,
             ufoeretrygd = null,
             privatAfp = null,
-            pre2025OffentligAfp = null,
+            tidsbegrensetOffentligAfp = null,
             avdoed = null
         ).hasContent() shouldBe false
     }
@@ -21,16 +22,17 @@ class VedtakSamlingTest : ShouldSpec({
     should("be true if containing løpende alderspensjon") {
         VedtakSamling(
             loependeAlderspensjon = LoependeAlderspensjon(
-                grad = 20,
+                grad = Uttaksgrad.TJUE_PROSENT,
                 fom = LocalDate.of(2024, 1, 1),
                 uttaksgradFom = LocalDate.of(2025, 1, 1),
                 utbetalingSisteMaaned = null,
-                sivilstatus = Sivilstatus.SAMBOER
+                sivilstatus = Sivilstatus.SAMBOER,
+                harUtenlandsopphold = true
             ),
             fremtidigAlderspensjon = null,
             ufoeretrygd = null,
             privatAfp = null,
-            pre2025OffentligAfp = null,
+            tidsbegrensetOffentligAfp = null,
             avdoed = null
         ).hasContent() shouldBe true
     }
@@ -41,9 +43,7 @@ class VedtakSamlingTest : ShouldSpec({
             fremtidigAlderspensjon = null,
             ufoeretrygd = null,
             privatAfp = null,
-            pre2025OffentligAfp = LoependeEntitet(
-                fom = LocalDate.of(2024, 1, 1)
-            ),
+            tidsbegrensetOffentligAfp = LoependeEntitet(fom = LocalDate.of(2024, 1, 1)),
             avdoed = null
         ).hasContent() shouldBe true
     }

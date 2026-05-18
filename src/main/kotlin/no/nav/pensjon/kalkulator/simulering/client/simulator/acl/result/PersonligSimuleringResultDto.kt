@@ -14,7 +14,7 @@ data class PersonligSimuleringResultDto(
     val problem: ProblemDto? = null
 )
 
-data class AlderspensjonDto(
+    data class AlderspensjonDto(
     @field:NotNull val alderAar: Int,
     @field:NotNull val beloep: Int,
     val inntektspensjon: Int?,

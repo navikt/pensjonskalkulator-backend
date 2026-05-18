@@ -19,10 +19,10 @@ class TjenestepensjonSimuleringService(
         val loependeVedtak = loependeVedtakService.hentLoependeVedtak()
         val erApoteker = ekskluderingFacade.apotekerEkskludering().ekskludert
         val erFoedtFoer1963 = spec.foedselsdato.year < 1963
-        val harUfoeretrygdEllerPre2025OffentligAfp = loependeVedtak.ufoeretrygd != null || loependeVedtak.pre2025OffentligAfp != null
+        val harUfoeretrygdEllerTidsbegrensetOffentligAfp = loependeVedtak.ufoeretrygd != null || loependeVedtak.tidsbegrensetOffentligAfp != null
         val pid = pidGetter.pid()
 
-        if (erApoteker || (erFoedtFoer1963 && harUfoeretrygdEllerPre2025OffentligAfp)) {
+        if (erApoteker || (erFoedtFoer1963 && harUfoeretrygdEllerTidsbegrensetOffentligAfp)) {
             val tpForhold = tpclient.tjenestepensjonsforhold(pid)
             return OffentligTjenestepensjonSimuleringsresultat(
                 simuleringsResultatStatus = SimuleringsResultatStatus(ResultatType.TP_ORDNING_STOETTES_IKKE),
@@ -32,5 +32,4 @@ class TjenestepensjonSimuleringService(
 
         return tjenestepensjonSimuleringClient.hentTjenestepensjonSimulering(request = spec, pid = pid)
     }
-
 }

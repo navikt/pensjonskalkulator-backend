@@ -57,7 +57,11 @@ data class VedtakV1LoependeAlderspensjon(
 
     @field:Schema(description = "Sivilstatus")
     @field:NotNull
-    val sivilstatus: CommonV1Sivilstatus
+    val sivilstatus: CommonV1Sivilstatus,
+
+    @field:Schema(description = "Hvorvidt personen har opphold i utlandet")
+    @field:NotNull
+    val harUtenlandsopphold: Boolean
 )
 
 data class VedtakV1Alderspensjonsuttak(

@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.vedtak.client.pen.map
 
 import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.vedtak.*
 import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenGjeldendeUfoeregradDto
@@ -24,7 +25,7 @@ object PenLoependeVedtakMapper {
             fremtidigAlderspensjon = fremtidigUttakgradsendring(source),
             ufoeretrygd = source.ufoeretrygd?.let(::ufoeretrygd),
             privatAfp = source.afpPrivat?.let(::vedtak),
-            pre2025OffentligAfp = source.afpOffentlig?.let(::vedtak),
+            tidsbegrensetOffentligAfp = source.afpOffentlig?.let(::vedtak),
             avdoed = source.avdoed?.let(::avdoed)
         )
 
@@ -33,16 +34,24 @@ object PenLoependeVedtakMapper {
 
     private fun loependeAlderspensjon(source: PenGjeldendeVedtakApDto, uttaksgradFom: LocalDate?) =
         LoependeAlderspensjon(
-            grad = source.grad,
+            grad = Uttaksgrad.from(prosentsats = source.grad),
             fom = source.fraOgMed,
             uttaksgradFom = uttaksgradFom ?: source.fraOgMed,
+            sivilstatus = PenSivilstand.toInternalValue(source.sivilstatus),
+            harUtenlandsopphold = source.harUtenlandsopphold
+        )
+
+    private fun fremtidigAlderspensjon(source: PenGjeldendeVedtakApDto) =
+        FremtidigAlderspensjon(
+            grad = Uttaksgrad.from(prosentsats = source.grad),
+            fom = source.fraOgMed,
             sivilstatus = PenSivilstand.toInternalValue(source.sivilstatus)
         )
 
     private fun fremtidigUttakgradsendring(source: PenLoependeVedtakDto) =
         source.alderspensjonIFremtid
             ?.takeIf { it.grad != source.alderspensjon?.grad }
-            ?.let { FremtidigAlderspensjon(it.grad, it.fraOgMed, PenSivilstand.toInternalValue(it.sivilstatus)) }
+            ?.let(::fremtidigAlderspensjon)
 
     private fun ufoeretrygd(source: PenGjeldendeUfoeregradDto) =
         LoependeUfoeretrygd(

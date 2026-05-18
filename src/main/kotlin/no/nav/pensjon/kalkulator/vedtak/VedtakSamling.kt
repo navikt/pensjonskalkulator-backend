@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.vedtak
 
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import java.math.BigDecimal
@@ -10,7 +11,7 @@ data class VedtakSamling(
     val fremtidigAlderspensjon: FremtidigAlderspensjon?,
     val ufoeretrygd: LoependeUfoeretrygd?,
     val privatAfp: LoependeEntitet?,
-    val pre2025OffentligAfp: LoependeEntitet? = null,
+    val tidsbegrensetOffentligAfp: LoependeEntitet? = null,
     val avdoed: InformasjonOmAvdoed?
 ) {
     fun withAlderspensjonUtbetalingSisteMaaned(utbetaling: Utbetaling) =
@@ -19,7 +20,7 @@ data class VedtakSamling(
             fremtidigAlderspensjon = fremtidigAlderspensjon,
             ufoeretrygd = ufoeretrygd,
             privatAfp = privatAfp,
-            pre2025OffentligAfp = pre2025OffentligAfp,
+            tidsbegrensetOffentligAfp = tidsbegrensetOffentligAfp,
             avdoed = avdoed
         )
 
@@ -28,16 +29,17 @@ data class VedtakSamling(
                 || fremtidigAlderspensjon != null
                 || ufoeretrygd != null
                 || privatAfp != null
-                || pre2025OffentligAfp != null
+                || tidsbegrensetOffentligAfp != null
     // Informasjon om avdød regnes ikke som "content" i form av vedtak
 }
 
 data class LoependeAlderspensjon(
-    val grad: Int,
+    val grad: Uttaksgrad,
     val fom: LocalDate,
     val uttaksgradFom: LocalDate? = null,
     val utbetalingSisteMaaned: Utbetaling? = null,
-    val sivilstatus: Sivilstatus
+    val sivilstatus: Sivilstatus,
+    val harUtenlandsopphold: Boolean
 ) {
     fun withUtbetalingSisteMaaned(utbetaling: Utbetaling) =
         LoependeAlderspensjon(
@@ -45,12 +47,13 @@ data class LoependeAlderspensjon(
             fom = fom,
             uttaksgradFom = uttaksgradFom,
             utbetalingSisteMaaned = utbetaling,
-            sivilstatus = sivilstatus
+            sivilstatus = sivilstatus,
+            harUtenlandsopphold = harUtenlandsopphold
         )
 }
 
 data class FremtidigAlderspensjon(
-    val grad: Int,
+    val grad: Uttaksgrad,
     val fom: LocalDate,
     val sivilstatus: Sivilstatus
 )

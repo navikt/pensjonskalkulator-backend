@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.vedtak.client.pen.map
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.vedtak.InformasjonOmAvdoed
@@ -47,14 +48,16 @@ class PenLoependeVedtakMapperTest : ShouldSpec({
     should("ignore tidsbegrenset offentlig AFP") {
         val dto = PenLoependeVedtakDto(
             alderspensjon = PenGjeldendeVedtakApDto(
-                grad = 1,
+                grad = 20,
                 fraOgMed = LocalDate.of(2021, 1, 1),
-                sivilstatus = "SAMB"
+                sivilstatus = "SAMB",
+                harUtenlandsopphold = true
             ),
             alderspensjonIFremtid = PenGjeldendeVedtakApDto(
-                grad = 3,
+                grad = 40,
                 fraOgMed = LocalDate.of(2022, 2, 2),
-                sivilstatus = "GIFT"
+                sivilstatus = "GIFT",
+                harUtenlandsopphold = false
             ),
             ufoeretrygd = PenGjeldendeUfoeregradDto(grad = 2, fraOgMed = LocalDate.of(2021, 1, 2)),
             afpPrivat = PenGjeldendeVedtakDto(fraOgMed = LocalDate.of(2021, 12, 31)),
@@ -66,11 +69,11 @@ class PenLoependeVedtakMapperTest : ShouldSpec({
         val result = PenLoependeVedtakMapper.fromDto(dto)
 
         with(result) {
-            pre2025OffentligAfp?.fom shouldBe LocalDate.of(2021, 6, 15)
+            tidsbegrensetOffentligAfp?.fom shouldBe LocalDate.of(2021, 6, 15)
             privatAfp?.fom shouldBe LocalDate.of(2021, 12, 31)
 
             with(loependeAlderspensjon!!) {
-                grad shouldBe 1
+                grad shouldBe Uttaksgrad.TJUE_PROSENT
                 fom shouldBe LocalDate.of(2021, 1, 1)
                 sivilstatus shouldBe Sivilstatus.SAMBOER
             }
@@ -81,7 +84,7 @@ class PenLoependeVedtakMapperTest : ShouldSpec({
             }
 
             with(fremtidigAlderspensjon!!) {
-                grad shouldBe 3
+                grad shouldBe Uttaksgrad.FOERTI_PROSENT
                 fom shouldBe LocalDate.of(2022, 2, 2)
                 sivilstatus shouldBe Sivilstatus.GIFT
             }
@@ -91,14 +94,16 @@ class PenLoependeVedtakMapperTest : ShouldSpec({
     should("ignore fremtidig vedtak med samme grad") {
         val dto = PenLoependeVedtakDto(
             alderspensjon = PenGjeldendeVedtakApDto(
-                grad = 1,
+                grad = 20,
                 fraOgMed = LocalDate.of(2021, 1, 1),
-                sivilstatus = "SAMB"
+                sivilstatus = "SAMB",
+                harUtenlandsopphold = false
             ),
             alderspensjonIFremtid = PenGjeldendeVedtakApDto(
-                grad = 1,
+                grad = 40,
                 fraOgMed = LocalDate.now().plusMonths(2),
-                sivilstatus = "GIFT"
+                sivilstatus = "GIFT",
+                harUtenlandsopphold = true
             ),
             ufoeretrygd = null,
             afpPrivat = null,
@@ -110,7 +115,7 @@ class PenLoependeVedtakMapperTest : ShouldSpec({
         val result = PenLoependeVedtakMapper.fromDto(dto)
 
         with(result.loependeAlderspensjon!!) {
-            grad shouldBe 1
+            grad shouldBe Uttaksgrad.TJUE_PROSENT
             fom shouldBe LocalDate.of(2021, 1, 1)
             sivilstatus shouldBe Sivilstatus.SAMBOER
         }
