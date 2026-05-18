@@ -62,6 +62,7 @@ class VedtakV1ControllerTest : FunSpec() {
                     fom = LocalDate.of(2020, 12, 1),
                     uttaksgradFom = LocalDate.of(2021, 1, 1),
                     sivilstatus = Sivilstatus.GIFT,
+                    harGjenlevenderett = true,
                     harUtenlandsopphold = true
                 ),
                 fremtidigAlderspensjon = FremtidigAlderspensjon(
@@ -111,6 +112,6 @@ class VedtakV1ControllerTest : FunSpec() {
 
         @Language("json")
         private const val FLERE_VEDTAK_JSON =
-            """{"harVedtak":true,"loependeAlderspensjon":{"grad":20,"fom":"2020-12-01","uttaksgradFom":"2021-01-01","sivilstatus":"GIFT","harUtenlandsopphold":true},"fremtidigAlderspensjon":{"grad":40,"fom":"2021-12-01"},"ufoeretrygdgrad":2,"privatAfpFom":"2022-12-01"}"""
+            """{"harVedtak":true,"loependeAlderspensjon":{"grad":20,"fom":"2020-12-01","uttaksgradFom":"2021-01-01","sivilstatus":"GIFT","harGjenlevenderett":true,"harUtenlandsopphold":true},"fremtidigAlderspensjon":{"grad":40,"fom":"2021-12-01"},"ufoeretrygdgrad":2,"privatAfpFom":"2022-12-01"}"""
     }
 }

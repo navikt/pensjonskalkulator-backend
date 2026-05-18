@@ -24,6 +24,7 @@ object VedtakResultMapper {
             uttaksgradFom = source.uttaksgradFom ?: source.fom,
             sisteUtbetaling = source.utbetalingSisteMaaned?.let(::utbetaling),
             sivilstatus = CommonV1Sivilstatus.fromInternalValue(source.sivilstatus),
+            harGjenlevenderett = source.harGjenlevenderett,
             harUtenlandsopphold = source.harUtenlandsopphold
         )
 

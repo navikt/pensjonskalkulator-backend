@@ -55,8 +55,9 @@ class PenLoependeVedtakClientTest : FunSpec({
             with(response) {
                 with(loependeAlderspensjon!!) {
                     grad shouldBe Uttaksgrad.HUNDRE_PROSENT
-                    fom shouldBe LocalDate.of(2025,10,1)
+                    fom shouldBe LocalDate.of(2025, 10, 1)
                     sivilstatus shouldBe Sivilstatus.UGIFT
+                    harGjenlevenderett shouldBe false
                     harUtenlandsopphold shouldBe true
                 }
                 ufoeretrygd shouldBe null
@@ -75,7 +76,7 @@ class PenLoependeVedtakClientTest : FunSpec({
                 loependeAlderspensjon shouldBe null
                 with(ufoeretrygd!!) {
                     grad shouldBe 100
-                    fom shouldBe LocalDate.of(2022,7,1)
+                    fom shouldBe LocalDate.of(2022, 7, 1)
                 }
                 privatAfp shouldBe null
             }
@@ -91,13 +92,14 @@ class PenLoependeVedtakClientTest : FunSpec({
             with(response) {
                 with(loependeAlderspensjon!!) {
                     grad shouldBe Uttaksgrad.FEMTI_PROSENT
-                    fom shouldBe LocalDate.of(2025,10,1)
+                    fom shouldBe LocalDate.of(2025, 10, 1)
                     sivilstatus shouldBe Sivilstatus.GIFT
+                    harGjenlevenderett shouldBe true
                     harUtenlandsopphold shouldBe false
                 }
                 with(ufoeretrygd!!) {
                     grad shouldBe 100
-                    fom shouldBe LocalDate.of(2022,7,1)
+                    fom shouldBe LocalDate.of(2022, 7, 1)
                 }
                 privatAfp shouldBe null
             }
@@ -113,15 +115,16 @@ class PenLoependeVedtakClientTest : FunSpec({
             with(response) {
                 with(loependeAlderspensjon!!) {
                     grad shouldBe Uttaksgrad.FOERTI_PROSENT
-                    fom shouldBe LocalDate.of(2025,10,1)
+                    fom shouldBe LocalDate.of(2025, 10, 1)
                     sivilstatus shouldBe Sivilstatus.SKILT
+                    harGjenlevenderett shouldBe false
                     harUtenlandsopphold shouldBe true
                 }
                 with(ufoeretrygd!!) {
                     grad shouldBe 100
-                    fom shouldBe LocalDate.of(2022,7,1)
+                    fom shouldBe LocalDate.of(2022, 7, 1)
                 }
-                privatAfp?.fom shouldBe LocalDate.of(2023,3,1)
+                privatAfp?.fom shouldBe LocalDate.of(2023, 3, 1)
             }
         }
     }
@@ -135,16 +138,17 @@ class PenLoependeVedtakClientTest : FunSpec({
             with(response) {
                 with(loependeAlderspensjon!!) {
                     grad shouldBe Uttaksgrad.TJUE_PROSENT
-                    fom shouldBe LocalDate.of(2025,10,1)
+                    fom shouldBe LocalDate.of(2025, 10, 1)
                     sivilstatus shouldBe Sivilstatus.ENKE_ELLER_ENKEMANN
+                    harGjenlevenderett shouldBe false
                     harUtenlandsopphold shouldBe false
                 }
                 with(ufoeretrygd!!) {
                     grad shouldBe 100
-                    fom shouldBe LocalDate.of(2022,7,1)
+                    fom shouldBe LocalDate.of(2022, 7, 1)
                 }
-                privatAfp?.fom shouldBe LocalDate.of(2023,3,1)
-                tidsbegrensetOffentligAfp?.fom shouldBe LocalDate.of(2024,5,1)
+                privatAfp?.fom shouldBe LocalDate.of(2023, 3, 1)
+                tidsbegrensetOffentligAfp?.fom shouldBe LocalDate.of(2024, 5, 1)
             }
         }
     }
@@ -212,7 +216,7 @@ class PenLoependeVedtakClientTest : FunSpec({
 
 @Language("json")
 private const val VEDTAK_AP = """
-{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"UGIF","sivilstatus":"UGIF","harUtenlandsopphold":true},"ufoeretrygd":null,"afpPrivat":null,"afpOffentlig":null}
+{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"UGIF","sivilstatus":"UGIF","harGjenlevenderett":false,"harUtenlandsopphold":true},"ufoeretrygd":null,"afpPrivat":null,"afpOffentlig":null}
 """
 
 @Language("json")
@@ -222,7 +226,7 @@ private const val VEDTAK_UFOERE = """
 
 @Language("json")
 private const val VEDTAK_AP_OG_UFOERE = """
-{"alderspensjon":{"grad":50,"fraOgMed":"2025-10-01","sivilstand":"GIFT","sivilstatus":"GIFT","harUtenlandsopphold":false},"ufoeretrygd":{"grad":100,"fraOgMed":"2022-07-01"},"afpPrivat":null,"afpOffentlig":null}
+{"alderspensjon":{"grad":50,"fraOgMed":"2025-10-01","sivilstand":"GIFT","sivilstatus":"GIFT","harGjenlevenderett":true,"harUtenlandsopphold":false},"ufoeretrygd":{"grad":100,"fraOgMed":"2022-07-01"},"afpPrivat":null,"afpOffentlig":null}
 """
 
 @Language("json")

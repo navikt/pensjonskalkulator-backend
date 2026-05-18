@@ -39,6 +39,7 @@ data class LoependeAlderspensjon(
     val uttaksgradFom: LocalDate? = null,
     val utbetalingSisteMaaned: Utbetaling? = null,
     val sivilstatus: Sivilstatus,
+    val harGjenlevenderett: Boolean,
     val harUtenlandsopphold: Boolean
 ) {
     fun withUtbetalingSisteMaaned(utbetaling: Utbetaling) =
@@ -48,6 +49,7 @@ data class LoependeAlderspensjon(
             uttaksgradFom = uttaksgradFom,
             utbetalingSisteMaaned = utbetaling,
             sivilstatus = sivilstatus,
+            harGjenlevenderett = harGjenlevenderett,
             harUtenlandsopphold = harUtenlandsopphold
         )
 }

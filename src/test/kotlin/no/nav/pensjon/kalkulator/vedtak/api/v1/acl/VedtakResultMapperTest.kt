@@ -23,6 +23,7 @@ class VedtakResultMapperTest : ShouldSpec({
                     posteringsdato = LocalDate.of(2025, 1, 1)
                 ),
                 sivilstatus = Sivilstatus.GIFT,
+                harGjenlevenderett = true,
                 harUtenlandsopphold = true
             ),
             fremtidigAlderspensjon = FremtidigAlderspensjon(
@@ -58,6 +59,7 @@ class VedtakResultMapperTest : ShouldSpec({
                     utbetalingsdato = LocalDate.of(2025, 1, 1)
                 ),
                 sivilstatus = CommonV1Sivilstatus.GIFT,
+                harGjenlevenderett = true,
                 harUtenlandsopphold = true
             ),
             fremtidigAlderspensjon = VedtakV1Alderspensjonsuttak(

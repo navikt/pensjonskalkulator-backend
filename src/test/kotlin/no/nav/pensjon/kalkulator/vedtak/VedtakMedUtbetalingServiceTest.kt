@@ -37,6 +37,7 @@ private fun vedtakSamling(utbetalingSisteMaaned: Utbetaling?) =
             uttaksgradFom = LocalDate.of(2021, 1, 1),
             utbetalingSisteMaaned = utbetalingSisteMaaned,
             sivilstatus = Sivilstatus.UGIFT,
+            harGjenlevenderett = true,
             harUtenlandsopphold = true
         ),
         fremtidigAlderspensjon = FremtidigAlderspensjon(
