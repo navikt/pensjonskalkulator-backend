@@ -51,12 +51,14 @@ class PenLoependeVedtakMapperTest : ShouldSpec({
                 grad = 20,
                 fraOgMed = LocalDate.of(2021, 1, 1),
                 sivilstatus = "SAMB",
+                harGjenlevenderett = true,
                 harUtenlandsopphold = true
             ),
             alderspensjonIFremtid = PenGjeldendeVedtakApDto(
                 grad = 40,
                 fraOgMed = LocalDate.of(2022, 2, 2),
                 sivilstatus = "GIFT",
+                harGjenlevenderett = false,
                 harUtenlandsopphold = false
             ),
             ufoeretrygd = PenGjeldendeUfoeregradDto(grad = 2, fraOgMed = LocalDate.of(2021, 1, 2)),
@@ -97,12 +99,14 @@ class PenLoependeVedtakMapperTest : ShouldSpec({
                 grad = 20,
                 fraOgMed = LocalDate.of(2021, 1, 1),
                 sivilstatus = "SAMB",
+                harGjenlevenderett = false,
                 harUtenlandsopphold = false
             ),
             alderspensjonIFremtid = PenGjeldendeVedtakApDto(
                 grad = 40,
                 fraOgMed = LocalDate.now().plusMonths(2),
                 sivilstatus = "GIFT",
+                harGjenlevenderett = true,
                 harUtenlandsopphold = true
             ),
             ufoeretrygd = null,

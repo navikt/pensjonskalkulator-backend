@@ -38,6 +38,7 @@ object PenLoependeVedtakMapper {
             fom = source.fraOgMed,
             uttaksgradFom = uttaksgradFom ?: source.fraOgMed,
             sivilstatus = PenSivilstand.toInternalValue(source.sivilstatus),
+            harGjenlevenderett = source.harGjenlevenderett,
             harUtenlandsopphold = source.harUtenlandsopphold
         )
 

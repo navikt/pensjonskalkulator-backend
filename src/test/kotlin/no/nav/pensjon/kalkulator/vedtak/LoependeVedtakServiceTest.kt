@@ -27,6 +27,7 @@ private val vedtakSamling =
             fom = LocalDate.of(2020, 10, 1),
             uttaksgradFom = LocalDate.of(2021, 1, 1),
             sivilstatus = Sivilstatus.UGIFT,
+            harGjenlevenderett = true,
             harUtenlandsopphold = true
         ),
         fremtidigAlderspensjon = FremtidigAlderspensjon(

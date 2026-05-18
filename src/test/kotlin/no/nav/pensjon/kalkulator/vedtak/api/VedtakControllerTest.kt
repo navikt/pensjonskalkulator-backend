@@ -62,6 +62,7 @@ class VedtakControllerTest : FunSpec() {
                     fom = LocalDate.parse("2020-12-01"),
                     uttaksgradFom = LocalDate.of(2021, 1, 1),
                     sivilstatus = Sivilstatus.GIFT,
+                    harGjenlevenderett = true,
                     harUtenlandsopphold = true
                 ),
                 fremtidigAlderspensjon = FremtidigAlderspensjon(

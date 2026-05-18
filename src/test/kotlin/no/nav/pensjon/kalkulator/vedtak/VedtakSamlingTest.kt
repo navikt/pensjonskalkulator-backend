@@ -27,6 +27,7 @@ class VedtakSamlingTest : ShouldSpec({
                 uttaksgradFom = LocalDate.of(2025, 1, 1),
                 utbetalingSisteMaaned = null,
                 sivilstatus = Sivilstatus.SAMBOER,
+                harGjenlevenderett = true,
                 harUtenlandsopphold = true
             ),
             fremtidigAlderspensjon = null,

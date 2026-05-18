@@ -22,6 +22,7 @@ class LoependeVedtakMapperV4Test : FunSpec({
                     posteringsdato = LocalDate.of(2025, 1, 1)
                 ),
                 sivilstatus = Sivilstatus.GIFT,
+                harGjenlevenderett = true,
                 harUtenlandsopphold = true
             ),
             fremtidigAlderspensjon = FremtidigAlderspensjon(
