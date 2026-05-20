@@ -18,6 +18,8 @@ import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.*
+import no.nav.pensjon.kalkulator.simulering.Opphold
+import no.nav.pensjon.kalkulator.simulering.Utenlandsopphold
 import java.math.BigDecimal
 import java.time.LocalDate
 

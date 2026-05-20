@@ -100,7 +100,6 @@ class PensjonPersondataClient(
         }
     }
 
-
     override fun fetchNyligsteEps(
         soekerPid: Pid,
         sivilstatus: Sivilstatus,
