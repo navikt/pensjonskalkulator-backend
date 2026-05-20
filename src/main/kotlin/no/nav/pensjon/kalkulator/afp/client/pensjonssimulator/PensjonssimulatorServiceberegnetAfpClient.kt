@@ -71,7 +71,7 @@ class PensjonssimulatorServiceberegnetAfpClient(
     override fun service(): EgressService = service
 
     private companion object {
-        private const val SIMULER_FOR_FPP_RESOURCE = "api/nav/v1/simuler-for-fpp"
+        private const val SIMULER_FOR_FPP_RESOURCE = "api/nav/v2/simuler-for-fpp"
         private val service = EgressService.PENSJONSSIMULATOR
     }
 }

@@ -75,7 +75,7 @@ data class SimuleringV1OffentligAfpSpec(
     val harInntektMaanedenFoerUttak: Boolean? = null,
     val afpOrdning: SimuleringV1AfpOrdningTypeSpec? = null,
     val innvilgetLivsvarigAfpListe: List<SimuleringV1InnvilgetLivsvarigOffentligAfpSpec>? = null,
-    // SERVICEBEREGNING_AFP-specific fields (required when simuleringstype = SERVICEBEREGNING_AFP, ignored otherwise)
+    // SERVICEBEREGN_AFP-specific fields (required when simuleringstype = SERVICEBEREGN_AFP, ignored otherwise)
     val inntektForrigeKalenderaar: Int? = null,
     val inntektFremTilUttak: Int? = null,
     val inntektMaanedFoerAfp: Int? = null

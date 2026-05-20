@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.simulering
 
 import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpProblem
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpProblemType
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpService
 import no.nav.pensjon.kalkulator.afp.api.dto.InternServiceberegnetAfpSpec
@@ -148,7 +149,7 @@ class SimuleringService(
                 problem = Problem(type, beskrivelse = e.message ?: "Ukjent feil - ${e.javaClass.simpleName}")
             )
 
-        private fun mapAfpProblem(source: no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpProblem) =
+        private fun mapAfpProblem(source: ServiceberegnetAfpProblem) =
             Problem(
                 type = when (source.type) {
                     ServiceberegnetAfpProblemType.UTILSTREKKELIG_TRYGDETID -> ProblemType.UTILSTREKKELIG_TRYGDETID

@@ -4,7 +4,6 @@ import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
 import no.nav.pensjon.kalkulator.simulering.Opphold
-import no.nav.pensjon.kalkulator.simulering.Utenlandsopphold
 import java.time.LocalDate
 
 data class ServiceberegnetAfpSpec(

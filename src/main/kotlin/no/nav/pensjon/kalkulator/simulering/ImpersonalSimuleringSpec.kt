@@ -27,7 +27,7 @@ data class ImpersonalSimuleringSpec(
     val foedselAar: Int? = null,
     val inntektOver1GAntallAar: Int? = 0,
 
-    // SERVICEBEREGNING_AFP-specific fields (required when simuleringstype = SERVICEBEREGNING_AFP, ignored otherwise)
+    // SERVICEBEREGN_AFP-specific fields (required when simuleringstype = SERVICEBEREGN_AFP, ignored otherwise)
     val inntektForrigeKalenderaar: Int? = null,
     val inntektFremTilUttak: Int? = null,
     val inntektMaanedFoerAfp: Int? = null
