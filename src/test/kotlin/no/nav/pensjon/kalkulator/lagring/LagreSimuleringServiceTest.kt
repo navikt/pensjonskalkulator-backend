@@ -41,13 +41,14 @@ class LagreSimuleringServiceTest : ShouldSpec({
 
         private fun simulering() = LagreSimulering(
             alderspensjonListe = listOf(LagreAlderspensjon(alderAar = 67, beloep = 250000, gjenlevendetillegg = null)),
-            livsvarigOffentligAfpListe = null,
-            tidsbegrensetOffentligAfp = null,
-            privatAfpListe = null,
+            afpPrivat = null,
+            afpOffentligLivsvarig = null,
+            afpOffentligTidsbegrenset = null,
             vilkaarsproevingsresultat = LagreVilkaarsproevingsresultat(erInnvilget = true, alternativ = null),
             trygdetid = null,
             pensjonsgivendeInntektListe = null,
             simuleringsinformasjon = null,
+            maanedligAlderspensjonForKnekkpunkter = null,
             enhetsId = "4817"
         )
 

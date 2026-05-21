@@ -116,13 +116,14 @@ class SkribentenClientTest : FunSpec({
 
         private fun simulering() = LagreSimulering(
             alderspensjonListe = listOf(LagreAlderspensjon(alderAar = 67, beloep = 250000, gjenlevendetillegg = null)),
-            livsvarigOffentligAfpListe = emptyList(),
-            tidsbegrensetOffentligAfp = null,
-            privatAfpListe = emptyList(),
+            afpPrivat = null,
+            afpOffentligLivsvarig = null,
+            afpOffentligTidsbegrenset = null,
             vilkaarsproevingsresultat = LagreVilkaarsproevingsresultat(erInnvilget = true, alternativ = null),
             trygdetid = null,
             pensjonsgivendeInntektListe = emptyList(),
             simuleringsinformasjon = null,
+            maanedligAlderspensjonForKnekkpunkter = null,
             enhetsId = "4817"
         )
     }

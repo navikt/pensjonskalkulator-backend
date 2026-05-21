@@ -1,32 +1,8 @@
 package no.nav.pensjon.kalkulator.lagring.client.skribenten.map
 
-import no.nav.pensjon.kalkulator.lagring.LagreAarligBeloep
-import no.nav.pensjon.kalkulator.lagring.LagreAfpPrivat
-import no.nav.pensjon.kalkulator.lagring.LagreAlder
-import no.nav.pensjon.kalkulator.lagring.LagreMaanedligAlderspensjon
-import no.nav.pensjon.kalkulator.lagring.LagreMaanedligAlderspensjonForKnekkpunkter
-import no.nav.pensjon.kalkulator.lagring.LagreSimulering
-import no.nav.pensjon.kalkulator.lagring.LagreSimuleringResponse
-import no.nav.pensjon.kalkulator.lagring.LagreSimuleringsinformasjon
-import no.nav.pensjon.kalkulator.lagring.LagreTidsbegrensetOffentligAfp
-import no.nav.pensjon.kalkulator.lagring.LagreTrygdetid
-import no.nav.pensjon.kalkulator.lagring.LagreUttaksparametre
-import no.nav.pensjon.kalkulator.lagring.LagreVilkaarsproevingsresultat
+import no.nav.pensjon.kalkulator.lagring.*
 import no.nav.pensjon.kalkulator.lagring.api.dto.BrevResponseDtoV1
-import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.AarligBeloepBrevDtoV1
-import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.AfpPrivatBrevDtoV1
-import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.AlderspensjonBrevDtoV1
-import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.AlderBrevDtoV1
-import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.AlternativUttaksparametreBrevDtoV1
-import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.LivsvarigOffentligAfpBrevDtoV1
-import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.MaanedligAlderspensjonBrevDtoV1
-import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.MaanedligAlderspensjonForKnekkpunkterBrevDtoV1
-import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.OpprettBrevRequestDtoV1
-import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.SimuleringBrevDtoV1
-import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.SimuleringsinformasjonBrevDtoV1
-import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.TidsbegrensetOffentligAfpBrevDtoV1
-import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.TrygdetidBrevDtoV1
-import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.VilkaarsproevingsresultatBrevDtoV1
+import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.*
 
 object OpprettBrevDtoV1Mapper {
 
@@ -36,20 +12,75 @@ object OpprettBrevDtoV1Mapper {
         avsenderEnhetsId = source.enhetsId,
         reserverForRedigering = false,
         saksbehandlerValg = SimuleringBrevDtoV1(
-            alderspensjonListe = source.alderspensjonListe.map { AlderspensjonBrevDtoV1(it.alderAar, it.beloep, it.gjenlevendetillegg) },
-            livsvarigOffentligAfpListe = source.livsvarigOffentligAfpListe?.map { LivsvarigOffentligAfpBrevDtoV1(it.alderAar, it.aarligBeloep, it.maanedligBeloep) },
-            tidsbegrensetOffentligAfp = source.tidsbegrensetOffentligAfp?.let { mapToTidsbegrensetOffentligAfpDto(it)},
-            privatAfpListe = source.privatAfpListe?.map { maptoPrivatAfpDto(it) },
-            vilkaarsproevingsresultat = source.vilkaarsproevingsresultat?.let { mapToVilkaarsproevingsresultatDto(it) },
-            trygdetid = source.trygdetid?.let{ mapToTrygdetidDto(it) },
-            pensjonsgivendeInntektListe = source.pensjonsgivendeInntektListe?.map { mapToPensjonsgivendeInntektDto(it) },
-            simuleringsinformasjon = source.simuleringsinformasjon?.let { mapToSimuleringsinformasjonDto(it, source.privatAfpListe) },
+            simulering = SimuleringBrevV1(
+                alderspensjonListe = source.alderspensjonListe.map { AlderspensjonBrevDtoV1(it.alderAar, it.beloep, it.gjenlevendetillegg) },
+                maanedligAlderspensjonForKnekkpunkter = source.maanedligAlderspensjonForKnekkpunkter?.let(::mapToKnekkpunkterDto),
+                afpPrivat = source.afpPrivat?.let(::mapToAfpPrivatSimuleringDto),
+                afpOffentligLivsvarig = source.afpOffentligLivsvarig?.let(::mapToAfpOffentligLivsvarigSimuleringDto),
+                afpOffentligTidsbegrenset = source.afpOffentligTidsbegrenset?.let(::mapToAfpOffentligTidsbegrensetSimuleringDto),
+            ),
+            simuleringsinformasjon = source.simuleringsinformasjon?.let(::mapToSimuleringsinformasjonDto),
+            vilkaarsproevingsresultat = source.vilkaarsproevingsresultat?.let(::mapToVilkaarsproevingsresultatDto),
+            trygdetid = source.trygdetid?.let(::mapToTrygdetidDto),
+            pensjonsgivendeInntektListe = source.pensjonsgivendeInntektListe?.map(::mapToPensjonsgivendeInntektDto),
         )
     )
 
     fun fromDto(source: BrevResponseDtoV1) = LagreSimuleringResponse(
         brevId = source.info.id,
         sakId = source.info.saksId,
+    )
+
+    private fun mapToAfpPrivatSimuleringDto(source: LagreAfpPrivatSimulering) =
+        AfpPrivatSimuleringBrevDtoV1(
+            vedGradertUttak = source.vedGradertUttak?.let(::mapToPrivatAfpDto),
+            vedHeltUttak = mapToPrivatAfpDto(source.vedHeltUttak),
+        )
+
+    private fun mapToAfpOffentligLivsvarigSimuleringDto(source: LagreAfpOffentligLivsvarigSimulering) =
+        AfpOffentligLivsvarigSimuleringBrevDtoV1(
+            vedGradertUttak = source.vedGradertUttak?.let(::mapToLivsvarigOffentligAfpDto),
+            vedHeltUttak = mapToLivsvarigOffentligAfpDto(source.vedHeltUttak),
+        )
+
+    private fun mapToAfpOffentligTidsbegrensetSimuleringDto(source: LagreAfpOffentligTidsbegrensetSimulering) =
+        AfpOffentligTidsbegrensetSimuleringBrevDtoV1(
+            vedGradertUttak = source.vedGradertUttak?.let(::mapToTidsbegrensetOffentligAfpDto),
+            vedHeltUttak = mapToTidsbegrensetOffentligAfpDto(source.vedHeltUttak),
+        )
+
+    private fun mapToLivsvarigOffentligAfpDto(source: LagreLivsvarigOffentligAfp) =
+        LivsvarigOffentligAfpBrevDtoV1(
+            alderAar = source.alderAar,
+            aarligBeloep = source.aarligBeloep,
+            maanedligBeloep = source.maanedligBeloep
+        )
+
+    private fun mapToTidsbegrensetOffentligAfpDto(source: LagreTidsbegrensetOffentligAfp) =
+        TidsbegrensetOffentligAfpBrevDtoV1(
+            alderAar = source.alderAar,
+            totaltAfpBeloep = source.totaltAfpBeloep,
+            tidligereArbeidsinntekt = source.tidligereArbeidsinntekt,
+            grunnbeloep = source.grunnbeloep,
+            sluttpoengtall = source.sluttpoengtall,
+            trygdetid = source.trygdetid,
+            poengaarTom1991 = source.poengaarTom1991,
+            poengaarFom1992 = source.poengaarFom1992,
+            grunnpensjon = source.grunnpensjon,
+            tilleggspensjon = source.tilleggspensjon,
+            afpTillegg = source.afpTillegg,
+            saertillegg = source.saertillegg,
+            afpGrad = source.afpGrad,
+            erAvkortet = source.erAvkortet
+        )
+
+    private fun mapToPrivatAfpDto(source: LagreAfpPrivat) = AfpPrivatBrevDtoV1(
+        alderAar = source.alderAar,
+        aarligBeloep = source.aarligBeloep,
+        kompensasjonstillegg = source.kompensasjonstillegg,
+        kronetillegg = source.kronetillegg,
+        livsvarig = source.livsvarig,
+        maanedligBeloep = source.maanedligBeloep
     )
 
     private fun mapToPensjonsgivendeInntektDto(source: LagreAarligBeloep) = AarligBeloepBrevDtoV1(
@@ -62,28 +93,14 @@ object OpprettBrevDtoV1Mapper {
         erUtilstrekkelig = source.erUtilstrekkelig
     )
 
-    private fun mapToTidsbegrensetOffentligAfpDto(source: LagreTidsbegrensetOffentligAfp
-    ): TidsbegrensetOffentligAfpBrevDtoV1 {
-        TODO("Not yet implemented")
-    }
-
-    private fun maptoPrivatAfpDto(source: LagreAfpPrivat) = AfpPrivatBrevDtoV1(
-        alderAar = source.alderAar,
-        aarligBeloep = source.aarligBeloep,
-        kompensasjonstillegg = source.kompensasjonstillegg,
-        kronetillegg = source.kronetillegg,
-        livsvarig = source.livsvarig,
-        maanedligBeloep = source.maanedligBeloep
-    )
-
     private fun mapToVilkaarsproevingsresultatDto(source: LagreVilkaarsproevingsresultat) =
         VilkaarsproevingsresultatBrevDtoV1(
             erInnvilget = source.erInnvilget,
-            alternativ = source.alternativ?.let { mapToAlternativDto(it) }
+            alternativ = source.alternativ?.let(::mapToAlternativDto)
         )
 
     private fun mapToAlternativDto(source: LagreUttaksparametre) = AlternativUttaksparametreBrevDtoV1(
-        gradertUttakAlder = source.gradertUttakAlder?.let { mapToAlderDto(it) },
+        gradertUttakAlder = source.gradertUttakAlder?.let(::mapToAlderDto),
         uttaksgrad = source.uttaksgrad,
         heltUttakAlder = mapToAlderDto(source.heltUttakAlder)
     )
@@ -93,22 +110,25 @@ object OpprettBrevDtoV1Mapper {
         maaneder = source.maaneder
     )
 
-    private fun mapToSimuleringsinformasjonDto(source: LagreSimuleringsinformasjon, privatAfpListe: List<LagreAfpPrivat>?) =
+    private fun mapToSimuleringsinformasjonDto(source: LagreSimuleringsinformasjon) =
         SimuleringsinformasjonBrevDtoV1(
-            gradertUttaksalder = source.gradertUttaksalder?.let { mapToAlderDto(it) },
-            heltUttaksalder = source.heltUttaksalder?.let { mapToAlderDto(it) },
-            maanedligAlderspensjonForKnekkpunkter = source.maanedligAlderspensjonForKnekkpunkter?.let { mapToKnekkpunkterDto(it) },
-            privatAfpVedGradertUttak = source.gradertUttaksalder?.let { alder ->
-                privatAfpListe?.firstOrNull { it.alderAar == alder.aar }?.let { maptoPrivatAfpDto(it) }
-            },
-            privatAfpVedHeltUttak = source.heltUttaksalder?.let { alder ->
-                privatAfpListe?.firstOrNull { it.alderAar == alder.aar }?.let { maptoPrivatAfpDto(it) }
-            }
+            gradertUttaksalder = source.gradertUttaksalder?.let(::mapToAlderDto),
+            heltUttaksalder = mapToAlderDto(source.heltUttaksalder),
+            sivilstatus = source.sivilstatus,
+            utenlandsperioder = source.utenlandsperioder?.map(::mapToUtenlandsperiodeDto)
+        )
+
+    private fun mapToUtenlandsperiodeDto(source: LagreUtenlandsperiode) =
+        UtenlandsperiodeBrevDtoV1(
+            fom = source.fom,
+            tom = source.tom,
+            landkode = source.landkode,
+            arbeidetUtenlands = source.arbeidetUtenlands
         )
 
     private fun mapToKnekkpunkterDto(source: LagreMaanedligAlderspensjonForKnekkpunkter) =
         MaanedligAlderspensjonForKnekkpunkterBrevDtoV1(
-            vedGradertUttak = source.vedGradertUttak?.let { mapToMaanedligAlderspensjonDto(it) },
+            vedGradertUttak = source.vedGradertUttak?.let(::mapToMaanedligAlderspensjonDto),
             vedHeltUttak = mapToMaanedligAlderspensjonDto(source.vedHeltUttak),
             vedNormertPensjonsalder = mapToMaanedligAlderspensjonDto(source.vedNormertPensjonsalder)
         )
@@ -128,16 +148,19 @@ object OpprettBrevDtoV1Mapper {
             tilleggspensjonBeloep = source.tilleggspensjonBeloep,
             pensjonstillegg = source.pensjonstillegg,
             skjermingstillegg = source.skjermingstillegg,
-            kapittel19AndelTeller = source.kapittel19Andel?.let { (it * 10).toInt() },
+            kapittel19AndelTeller = source.kapittel19AndelTeller,
             kapittel19Trygdetid = source.kapittel19Trygdetid,
             basispensjonBeloep = source.basispensjonBeloep,
             restpensjonBeloep = source.restpensjonBeloep,
             gjenlevendetillegg = source.gjenlevendetillegg,
             minstePensjonsnivaaSats = source.minstePensjonsnivaaSats,
-            kapittel20AndelTeller = source.kapittel20Andel?.let { (it * 10).toInt() },
+            minstePensjonsnivaaBeloep = source.minstePensjonsnivaaBeloep,
+            kapittel20AndelTeller = source.kapittel20AndelTeller,
             kapittel20Trygdetid = source.kapittel20Trygdetid,
             garantipensjonBeloep = source.garantipensjonBeloep,
+            garantipensjonsnivaaBeloep = source.garantipensjonsnivaaBeloep,
             garantipensjonSats = source.garantipensjonSats,
-            garantitilleggBeloep = source.garantitilleggBeloep
+            garantitilleggBeloep = source.garantitilleggBeloep,
+            grunnbeloep = source.grunnbeloep
         )
 }

@@ -15,14 +15,15 @@ object LagreSimuleringMapperV1 {
     fun fromDto(source: LagreSimuleringSpecDtoV1) =
         LagreSimulering(
             alderspensjonListe = source.alderspensjonListe.map(::alderspensjon),
-            livsvarigOffentligAfpListe = source.livsvarigOffentligAfpListe?.map(::afpOffentlig),
-            tidsbegrensetOffentligAfp = source.tidsbegrensetOffentligAfp?.let(::tidsbegrensetOffentligAfp),
-            privatAfpListe = source.privatAfpListe?.map(::afpPrivat),
+            afpPrivat = source.afpPrivat?.let(::afpPrivatSimulering),
+            afpOffentligLivsvarig = source.afpOffentligLivsvarig?.let(::afpOffentligLivsvarigSimulering),
+            afpOffentligTidsbegrenset = source.afpOffentligTidsbegrenset?.let(::afpOffentligTidsbegrensetSimulering),
             vilkaarsproevingsresultat = vilkaarsproevingsresultat(source.vilkaarsproevingsresultat),
             trygdetid = source.trygdetid?.let(::trygdetid),
             pensjonsgivendeInntektListe = source.pensjonsgivendeInntektListe?.map(::aarligBeloep),
             simuleringsinformasjon = source.simuleringsinformasjon?.let(::simuleringsinformasjon),
-            enhetsId = source.navEnhetId ?: "4817", //pensjon-pen: SendStandardBrevServiceImpl.NAV_PENSJON_TKNR = arrayOf("4803", "4808", "4815", "4817")
+            maanedligAlderspensjonForKnekkpunkter = source.maanedligAlderspensjonForKnekkpunkter?.let(::maanedligAlderspensjonForKnekkpunkter),
+            enhetsId = source.navEnhetId ?: "4817",
         )
 
     private fun alderspensjon(source: LagreAlderspensjonDto) =
@@ -32,8 +33,26 @@ object LagreSimuleringMapperV1 {
             gjenlevendetillegg = source.gjenlevendetillegg
         )
 
-    private fun afpOffentlig(source: LagreAldersbestemtUtbetalingDto) =
-        LagreAfpOffentlig(
+    private fun afpPrivatSimulering(source: LagreAfpPrivatSimuleringDto) =
+        LagreAfpPrivatSimulering(
+            vedGradertUttak = source.vedGradertUttak?.let(::afpPrivat),
+            vedHeltUttak = afpPrivat(source.vedHeltUttak),
+        )
+
+    private fun afpOffentligLivsvarigSimulering(source: LagreAfpOffentligLivsvarigSimuleringDto) =
+        LagreAfpOffentligLivsvarigSimulering(
+            vedGradertUttak = source.vedGradertUttak?.let(::livsvarigOffentligAfp),
+            vedHeltUttak = livsvarigOffentligAfp(source.vedHeltUttak),
+        )
+
+    private fun afpOffentligTidsbegrensetSimulering(source: LagreAfpOffentligTidsbegrensetSimuleringDto) =
+        LagreAfpOffentligTidsbegrensetSimulering(
+            vedGradertUttak = source.vedGradertUttak?.let(::tidsbegrensetOffentligAfp),
+            vedHeltUttak = tidsbegrensetOffentligAfp(source.vedHeltUttak),
+        )
+
+    private fun livsvarigOffentligAfp(source: LagreLivsvarigOffentligAfpDto) =
+        LagreLivsvarigOffentligAfp(
             alderAar = source.alderAar,
             aarligBeloep = source.aarligBeloep,
             maanedligBeloep = source.maanedligBeloep
@@ -101,8 +120,17 @@ object LagreSimuleringMapperV1 {
     private fun simuleringsinformasjon(source: LagreSimuleringsinformasjonDto) =
         LagreSimuleringsinformasjon(
             gradertUttaksalder = source.gradertUttaksalder?.let(::alder),
-            heltUttaksalder = source.heltUttaksalder?.let(::alder),
-            maanedligAlderspensjonForKnekkpunkter = source.maanedligAlderspensjonForKnekkpunkter?.let(::maanedligAlderspensjonForKnekkpunkter)
+            heltUttaksalder = alder(source.heltUttaksalder),
+            sivilstatus = source.sivilstatus,
+            utenlandsperioder = source.utenlandsperioder?.map(::utenlandsperiode)
+        )
+
+    private fun utenlandsperiode(source: LagreUtenlandsperiodeDto) =
+        LagreUtenlandsperiode(
+            fom = source.fom,
+            tom = source.tom,
+            landkode = source.landkode,
+            arbeidetUtenlands = source.arbeidetUtenlands
         )
 
     private fun maanedligAlderspensjonForKnekkpunkter(source: LagreMaanedligAlderspensjonForKnekkpunkterDto) =
@@ -127,16 +155,19 @@ object LagreSimuleringMapperV1 {
             tilleggspensjonBeloep = source.tilleggspensjonBeloep,
             pensjonstillegg = source.pensjonstillegg,
             skjermingstillegg = source.skjermingstillegg,
-            kapittel19Andel = source.kapittel19Andel,
+            kapittel19AndelTeller = source.kapittel19AndelTeller,
             kapittel19Trygdetid = source.kapittel19Trygdetid,
             basispensjonBeloep = source.basispensjonBeloep,
             restpensjonBeloep = source.restpensjonBeloep,
             gjenlevendetillegg = source.gjenlevendetillegg,
             minstePensjonsnivaaSats = source.minstePensjonsnivaaSats,
-            kapittel20Andel = source.kapittel20Andel,
+            minstePensjonsnivaaBeloep = source.minstePensjonsnivaaBeloep,
+            kapittel20AndelTeller = source.kapittel20AndelTeller,
             kapittel20Trygdetid = source.kapittel20Trygdetid,
             garantipensjonBeloep = source.garantipensjonBeloep,
+            garantipensjonsnivaaBeloep = source.garantipensjonsnivaaBeloep,
             garantipensjonSats = source.garantipensjonSats,
-            garantitilleggBeloep = source.garantitilleggBeloep
+            garantitilleggBeloep = source.garantitilleggBeloep,
+            grunnbeloep = source.grunnbeloep
         )
 }

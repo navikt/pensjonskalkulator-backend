@@ -26,12 +26,9 @@ class LagreSimuleringMapperTest : ShouldSpec({
                 alderspensjonListe = listOf(
                     LagreAlderspensjonDto(alderAar = 67, beloep = 250000, gjenlevendetillegg = null)
                 ),
-                livsvarigOffentligAfpListe = listOf(
-                    LagreAldersbestemtUtbetalingDto(alderAar = 65, aarligBeloep = 50000, maanedligBeloep = 4167)
-                ),
-                tidsbegrensetOffentligAfp = null,
-                privatAfpListe = listOf(
-                    LagrePrivatAfpDto(
+                afpPrivat = LagreAfpPrivatSimuleringDto(
+                    vedGradertUttak = null,
+                    vedHeltUttak = LagrePrivatAfpDto(
                         alderAar = 62,
                         aarligBeloep = 30000,
                         kompensasjonstillegg = 1000,
@@ -40,6 +37,11 @@ class LagreSimuleringMapperTest : ShouldSpec({
                         maanedligBeloep = 2500
                     )
                 ),
+                afpOffentligLivsvarig = LagreAfpOffentligLivsvarigSimuleringDto(
+                    vedGradertUttak = null,
+                    vedHeltUttak = LagreLivsvarigOffentligAfpDto(alderAar = 65, aarligBeloep = 50000, maanedligBeloep = 4167)
+                ),
+                afpOffentligTidsbegrenset = null,
                 vilkaarsproevingsresultat = LagreVilkaarsproevingsresultatDto(
                     erInnvilget = true,
                     alternativ = LagreUttaksparametreDto(
@@ -52,19 +54,22 @@ class LagreSimuleringMapperTest : ShouldSpec({
                 pensjonsgivendeInntektListe = listOf(
                     LagreAarligBeloepDto(aarstall = 2024, beloep = 600000)
                 ),
-                simuleringsinformasjon = null,
+                simuleringsinformasjon = LagreSimuleringsinformasjonDto(
+                    gradertUttaksalder = null,
+                    heltUttaksalder = LagreAlderDto(aar = 67, maaneder = 0),
+                    sivilstatus = null,
+                    utenlandsperioder = null
+                ),
+                maanedligAlderspensjonForKnekkpunkter = null,
                 navEnhetId = null
             )
         ) shouldBe LagreSimulering(
             alderspensjonListe = listOf(
                 LagreAlderspensjon(alderAar = 67, beloep = 250000, gjenlevendetillegg = null)
             ),
-            livsvarigOffentligAfpListe = listOf(
-                LagreAfpOffentlig(alderAar = 65, aarligBeloep = 50000, maanedligBeloep = 4167)
-            ),
-            tidsbegrensetOffentligAfp = null,
-            privatAfpListe = listOf(
-                LagreAfpPrivat(
+            afpPrivat = LagreAfpPrivatSimulering(
+                vedGradertUttak = null,
+                vedHeltUttak = LagreAfpPrivat(
                     alderAar = 62,
                     aarligBeloep = 30000,
                     kompensasjonstillegg = 1000,
@@ -73,6 +78,11 @@ class LagreSimuleringMapperTest : ShouldSpec({
                     maanedligBeloep = 2500
                 )
             ),
+            afpOffentligLivsvarig = LagreAfpOffentligLivsvarigSimulering(
+                vedGradertUttak = null,
+                vedHeltUttak = LagreLivsvarigOffentligAfp(alderAar = 65, aarligBeloep = 50000, maanedligBeloep = 4167)
+            ),
+            afpOffentligTidsbegrenset = null,
             vilkaarsproevingsresultat = LagreVilkaarsproevingsresultat(
                 erInnvilget = true,
                 alternativ = LagreUttaksparametre(
@@ -85,7 +95,13 @@ class LagreSimuleringMapperTest : ShouldSpec({
             pensjonsgivendeInntektListe = listOf(
                 LagreAarligBeloep(aarstall = 2024, beloep = 600000)
             ),
-            simuleringsinformasjon = null,
+            simuleringsinformasjon = LagreSimuleringsinformasjon(
+                gradertUttaksalder = null,
+                heltUttaksalder = LagreAlder(aar = 67, maaneder = 0),
+                sivilstatus = null,
+                utenlandsperioder = null
+            ),
+            maanedligAlderspensjonForKnekkpunkter = null,
             enhetsId = "4817"
         )
     }
@@ -94,9 +110,9 @@ class LagreSimuleringMapperTest : ShouldSpec({
         LagreSimuleringMapperV1.fromDto(
             LagreSimuleringSpecDtoV1(
                 alderspensjonListe = emptyList(),
-                livsvarigOffentligAfpListe = null,
-                tidsbegrensetOffentligAfp = null,
-                privatAfpListe = null,
+                afpPrivat = null,
+                afpOffentligLivsvarig = null,
+                afpOffentligTidsbegrenset = null,
                 vilkaarsproevingsresultat = LagreVilkaarsproevingsresultatDto(
                     erInnvilget = false,
                     alternativ = null
@@ -104,13 +120,14 @@ class LagreSimuleringMapperTest : ShouldSpec({
                 trygdetid = null,
                 pensjonsgivendeInntektListe = null,
                 simuleringsinformasjon = null,
+                maanedligAlderspensjonForKnekkpunkter = null,
                 navEnhetId = null
             )
         ) shouldBe LagreSimulering(
             alderspensjonListe = emptyList(),
-            livsvarigOffentligAfpListe = null,
-            tidsbegrensetOffentligAfp = null,
-            privatAfpListe = null,
+            afpPrivat = null,
+            afpOffentligLivsvarig = null,
+            afpOffentligTidsbegrenset = null,
             vilkaarsproevingsresultat = LagreVilkaarsproevingsresultat(
                 erInnvilget = false,
                 alternativ = null
@@ -118,6 +135,7 @@ class LagreSimuleringMapperTest : ShouldSpec({
             trygdetid = null,
             pensjonsgivendeInntektListe = null,
             simuleringsinformasjon = null,
+            maanedligAlderspensjonForKnekkpunkter = null,
             enhetsId = "4817"
         )
     }
