@@ -6,7 +6,7 @@ import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.*
 
 object OpprettBrevDtoV1Mapper {
 
-    fun toDto(source: LagreSimulering) = OpprettBrevRequestDtoV1(
+    fun toDto(source: LagreSimulering, forbehold: ForbeholdInnhold?) = OpprettBrevRequestDtoV1(
         brevkode = "PENSJONSKALKULATOR_AP_SIMULERING",
         spraak = "NB",
         avsenderEnhetsId = source.enhetsId,
@@ -23,6 +23,7 @@ object OpprettBrevDtoV1Mapper {
             vilkaarsproevingsresultat = source.vilkaarsproevingsresultat?.let(::mapToVilkaarsproevingsresultatDto),
             trygdetid = source.trygdetid?.let(::mapToTrygdetidDto),
             pensjonsgivendeInntektListe = source.pensjonsgivendeInntektListe?.map(::mapToPensjonsgivendeInntektDto),
+            forbehold = forbehold?.let(::mapToForbeholdDto),
         )
     )
 
@@ -162,5 +163,20 @@ object OpprettBrevDtoV1Mapper {
             garantipensjonSats = source.garantipensjonSats,
             garantitilleggBeloep = source.garantitilleggBeloep,
             grunnbeloep = source.grunnbeloep
+        )
+
+    private fun mapToForbeholdDto(source: ForbeholdInnhold) =
+        ForbeholdBrevDtoV1(
+            seksjoner = source.seksjoner.map { seksjon ->
+                ForbeholdSeksjonBrevDtoV1(
+                    tittel = seksjon.tittel,
+                    avsnitt = seksjon.avsnitt.map { avsnitt ->
+                        ForbeholdAvsnittBrevDtoV1(
+                            tekst = avsnitt.tekst,
+                            punktliste = avsnitt.punktliste
+                        )
+                    }
+                )
+            }
         )
 }

@@ -8,6 +8,7 @@ data class SimuleringBrevDtoV1(
     val vilkaarsproevingsresultat: VilkaarsproevingsresultatBrevDtoV1?,
     val trygdetid: TrygdetidBrevDtoV1?,
     val pensjonsgivendeInntektListe: List<AarligBeloepBrevDtoV1>?,
+    val forbehold: ForbeholdBrevDtoV1?,
 )
 
 data class SimuleringBrevV1(
@@ -145,4 +146,18 @@ data class MaanedligAlderspensjonBrevDtoV1(
     val garantipensjonSats: Double?,
     val garantitilleggBeloep: Int?,
     val grunnbeloep: Int?
+)
+
+data class ForbeholdBrevDtoV1(
+    val seksjoner: List<ForbeholdSeksjonBrevDtoV1>
+)
+
+data class ForbeholdSeksjonBrevDtoV1(
+    val tittel: String?,
+    val avsnitt: List<ForbeholdAvsnittBrevDtoV1>
+)
+
+data class ForbeholdAvsnittBrevDtoV1(
+    val tekst: String,
+    val punktliste: List<String>?
 )

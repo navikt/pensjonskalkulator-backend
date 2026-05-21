@@ -6,6 +6,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.pensjon.kalkulator.lagring.client.LagreSimuleringClient
+import no.nav.pensjon.kalkulator.lagring.client.sanity.ForbeholdClient
 import no.nav.pensjon.kalkulator.sak.SakService
 import no.nav.pensjon.kalkulator.sak.SakType
 
@@ -13,25 +14,28 @@ class LagreSimuleringServiceTest : ShouldSpec({
 
     val sakService = mockk<SakService>()
     val client = mockk<LagreSimuleringClient>()
-    val service = LagreSimuleringService(sakService, client)
+    val forbeholdClient = mockk<ForbeholdClient>()
+    val service = LagreSimuleringService(sakService, client, forbeholdClient)
 
     should("hente sakId og delegere lagring til klient") {
         val simulering = simulering()
         val response = lagreSimuleringResponse()
         every { sakService.hentEllerOpprettSak(SakType.ALDERSPENSJON) } returns SAK_ID
-        every { client.lagreSimulering(SAK_ID, simulering) } returns response
+        every { forbeholdClient.fetchForbehold() } returns null
+        every { client.lagreSimulering(SAK_ID, simulering, null) } returns response
 
         service.lagreSimulering(simulering) shouldBe response
 
         verify(exactly = 1) { sakService.hentEllerOpprettSak(SakType.ALDERSPENSJON) }
-        verify(exactly = 1) { client.lagreSimulering(SAK_ID, simulering) }
+        verify(exactly = 1) { client.lagreSimulering(SAK_ID, simulering, null) }
     }
 
     should("returnere respons fra klient") {
         val simulering = simulering()
         val expected = LagreSimuleringResponse(brevId = "brev-999", sakId = "sak-999")
         every { sakService.hentEllerOpprettSak(SakType.ALDERSPENSJON) } returns SAK_ID
-        every { client.lagreSimulering(SAK_ID, simulering) } returns expected
+        every { forbeholdClient.fetchForbehold() } returns null
+        every { client.lagreSimulering(SAK_ID, simulering, null) } returns expected
 
         service.lagreSimulering(simulering) shouldBe expected
     }

@@ -46,7 +46,7 @@ class SkribentenClientTest : FunSpec({
         server?.arrangeOkJsonResponse(BREV_RESPONSE)
 
         Arrange.webClientContextRunner().run {
-            val response = client(it).lagreSimulering(SAK_ID, simulering())
+            val response = client(it).lagreSimulering(SAK_ID, simulering(), null)
 
             response.brevId shouldBe BREV_ID
             response.sakId shouldBe SAK_ID_STRING
@@ -57,7 +57,7 @@ class SkribentenClientTest : FunSpec({
         server?.arrangeOkJsonResponse(BREV_RESPONSE)
 
         Arrange.webClientContextRunner().run {
-            client(it).lagreSimulering(SAK_ID, simulering())
+            client(it).lagreSimulering(SAK_ID, simulering(), null)
 
             server?.takeRequest()?.path shouldBe "/sak/$SAK_ID/brev"
         }
@@ -69,7 +69,7 @@ class SkribentenClientTest : FunSpec({
 
         Arrange.webClientContextRunner().run {
             val exception = shouldThrow<EgressException> {
-                client(it).lagreSimulering(SAK_ID, simulering())
+                client(it).lagreSimulering(SAK_ID, simulering(), null)
             }
 
             exception.isClientError shouldBe false
@@ -82,7 +82,7 @@ class SkribentenClientTest : FunSpec({
 
         Arrange.webClientContextRunner().run {
             val exception = shouldThrow<EgressException> {
-                client(it).lagreSimulering(SAK_ID, simulering())
+                client(it).lagreSimulering(SAK_ID, simulering(), null)
             }
 
             exception.isClientError shouldBe true
