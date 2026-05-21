@@ -16,7 +16,8 @@ data class EpsV1Familierelasjon(
     val pid: String?,
     val fom: LocalDate?,
     @field:NotNull val relasjonstype: EpsV1Relasjonstype,
-    val relasjonPersondata: EpsV1RelasjonPersondata?
+    val relasjonPersondata: EpsV1RelasjonPersondata?,
+    val problem: EpsV1Problem? = null
 )
 
 data class EpsV1RelasjonPersondata(
@@ -33,10 +34,20 @@ data class EpsV1Navn(
     val etternavn: String?
 )
 
+data class EpsV1Problem(
+    val type: EpsV1ProblemType,
+    val beskrivelse: String
+)
+
+enum class EpsV1ProblemType {
+    TILGANG_NEKTET
+}
+
 enum class EpsV1Relasjonstype(val internalValue: Relasjonstype) {
     EKTEFELLE(internalValue = Relasjonstype.EKTEFELLE),
     REGISTRERT_PARTNER(internalValue = Relasjonstype.REGISTRERT_PARTNER),
-    SAMBOER(internalValue = Relasjonstype.SAMBOER);
+    SAMBOER(internalValue = Relasjonstype.SAMBOER),
+    UKJENT(internalValue = Relasjonstype.UKJENT);
 
     companion object {
         fun fromInternalValue(value: Relasjonstype?): EpsV1Relasjonstype =
