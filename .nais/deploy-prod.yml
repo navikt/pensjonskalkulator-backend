@@ -119,6 +119,7 @@ spec:
         - host: ofa.opensjon.no
         - host: ofa.api.gabler.no
         - host: ofa.gabler.no
+        - host: g2by7q6m.apicdn.sanity.io
   env:
     - name: FSS_GATEWAY_SERVICE_ID
       value: prod-fss:pensjonselvbetjening:pensjon-selvbetjening-fss-gateway
