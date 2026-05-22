@@ -146,6 +146,7 @@ spec:
         - host: skjermede-personer-pip.intern.dev.nav.no
         - host: tp-api-q2.dev-fss-pub.nais.io
         - host: sokos-utbetaldata.dev-fss-pub.nais.io
+        - host: g2by7q6m.apicdn.sanity.io
   env:
     - name: FSS_GATEWAY_SERVICE_ID
       value: dev-fss:pensjonselvbetjening:pensjon-selvbetjening-fss-gateway
