@@ -1,6 +1,8 @@
 package no.nav.pensjon.kalkulator.lagring.api.dto
 
 import jakarta.validation.constraints.NotNull
+import no.nav.pensjon.kalkulator.lagring.Kull
+import no.nav.pensjon.kalkulator.lagring.NormertPensjonsalderPlassering
 import java.time.LocalDate
 
 data class LagreSimuleringSpecDtoV1(
@@ -99,14 +101,16 @@ data class LagreSimuleringsinformasjonDto(
     val gradertUttaksalder: LagreAlderDto?,
     @field:NotNull val heltUttaksalder: LagreAlderDto,
     val sivilstatus: String?,
-    val utenlandsperioder: List<LagreUtenlandsperiodeDto>?
+    val utenlandsperioder: List<LagreUtenlandsperiodeDto>?,
+    val kull: Kull,
+    val normertPensjonsalderPlassering: NormertPensjonsalderPlassering?
 )
 
 data class LagreUtenlandsperiodeDto(
     @field:NotNull val fom: LocalDate,
     val tom: LocalDate?,
     @field:NotNull val landkode: String,
-    @field:NotNull val arbeidetUtenlands: Boolean
+    @field:NotNull val arbeidetUtenlands: Boolean?
 )
 
 data class LagreMaanedligAlderspensjonForKnekkpunkterDto(

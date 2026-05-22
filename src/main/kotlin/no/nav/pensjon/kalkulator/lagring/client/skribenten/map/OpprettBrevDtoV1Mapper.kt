@@ -116,7 +116,9 @@ object OpprettBrevDtoV1Mapper {
             gradertUttaksalder = source.gradertUttaksalder?.let(::mapToAlderDto),
             heltUttaksalder = mapToAlderDto(source.heltUttaksalder),
             sivilstatus = source.sivilstatus,
-            utenlandsperioder = source.utenlandsperioder?.map(::mapToUtenlandsperiodeDto)
+            utenlandsperioder = source.utenlandsperioder?.map(::mapToUtenlandsperiodeDto),
+            kull = source.kull.name,
+            normertPensjonsalderPlassering = source.normertPensjonsalderPlassering?.name
         )
 
     private fun mapToUtenlandsperiodeDto(source: LagreUtenlandsperiode) =
