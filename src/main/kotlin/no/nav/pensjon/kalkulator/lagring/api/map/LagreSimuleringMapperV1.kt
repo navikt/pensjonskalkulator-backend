@@ -122,7 +122,9 @@ object LagreSimuleringMapperV1 {
             gradertUttaksalder = source.gradertUttaksalder?.let(::alder),
             heltUttaksalder = alder(source.heltUttaksalder),
             sivilstatus = source.sivilstatus,
-            utenlandsperioder = source.utenlandsperioder?.map(::utenlandsperiode)
+            utenlandsperioder = source.utenlandsperioder?.map(::utenlandsperiode),
+            kull = source.kull,
+            normertPensjonsalderPlassering = source.normertPensjonsalderPlassering
         )
 
     private fun utenlandsperiode(source: LagreUtenlandsperiodeDto) =

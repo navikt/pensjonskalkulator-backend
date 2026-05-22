@@ -98,14 +98,16 @@ data class LagreSimuleringsinformasjon(
     val gradertUttaksalder: LagreAlder?,
     val heltUttaksalder: LagreAlder,
     val sivilstatus: String?,
-    val utenlandsperioder: List<LagreUtenlandsperiode>?
+    val utenlandsperioder: List<LagreUtenlandsperiode>?,
+    val kull: Kull,
+    val normertPensjonsalderPlassering: NormertPensjonsalderPlassering?
 )
 
 data class LagreUtenlandsperiode(
     val fom: LocalDate,
     val tom: LocalDate?,
     val landkode: String,
-    val arbeidetUtenlands: Boolean
+    val arbeidetUtenlands: Boolean?
 )
 
 data class LagreMaanedligAlderspensjonForKnekkpunkter(

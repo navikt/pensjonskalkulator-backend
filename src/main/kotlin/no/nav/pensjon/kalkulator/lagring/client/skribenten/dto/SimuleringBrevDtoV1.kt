@@ -102,14 +102,16 @@ data class SimuleringsinformasjonBrevDtoV1(
     val gradertUttaksalder: AlderBrevDtoV1?,
     val heltUttaksalder: AlderBrevDtoV1,
     val sivilstatus: String?,
-    val utenlandsperioder: List<UtenlandsperiodeBrevDtoV1>?
+    val utenlandsperioder: List<UtenlandsperiodeBrevDtoV1>?,
+    val kull: String,
+    val normertPensjonsalderPlassering: String?
 )
 
 data class UtenlandsperiodeBrevDtoV1(
     val fom: LocalDate,
     val tom: LocalDate?,
     val landkode: String,
-    val arbeidetUtenlands: Boolean
+    val arbeidetUtenlands: Boolean?
 )
 
 data class MaanedligAlderspensjonForKnekkpunkterBrevDtoV1(
