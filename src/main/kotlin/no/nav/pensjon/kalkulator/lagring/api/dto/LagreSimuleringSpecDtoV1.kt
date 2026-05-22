@@ -1,16 +1,18 @@
 package no.nav.pensjon.kalkulator.lagring.api.dto
 
 import jakarta.validation.constraints.NotNull
+import java.time.LocalDate
 
 data class LagreSimuleringSpecDtoV1(
     @field:NotNull val alderspensjonListe: List<LagreAlderspensjonDto>,
-    val livsvarigOffentligAfpListe: List<LagreAldersbestemtUtbetalingDto>?,
-    val tidsbegrensetOffentligAfp: LagreTidsbegrensetOffentligAfpDto?,
-    val privatAfpListe: List<LagrePrivatAfpDto>?,
+    val afpPrivat: LagreAfpPrivatSimuleringDto?,
+    val afpOffentligLivsvarig: LagreAfpOffentligLivsvarigSimuleringDto?,
+    val afpOffentligTidsbegrenset: LagreAfpOffentligTidsbegrensetSimuleringDto?,
     @field:NotNull val vilkaarsproevingsresultat: LagreVilkaarsproevingsresultatDto,
     val trygdetid: LagreTrygdetidDto?,
     val pensjonsgivendeInntektListe: List<LagreAarligBeloepDto>?,
     val simuleringsinformasjon: LagreSimuleringsinformasjonDto?,
+    val maanedligAlderspensjonForKnekkpunkter: LagreMaanedligAlderspensjonForKnekkpunkterDto?,
     val navEnhetId: String?,
 )
 
@@ -20,10 +22,25 @@ data class LagreAlderspensjonDto(
     val gjenlevendetillegg: Int?
 )
 
-data class LagreAldersbestemtUtbetalingDto(
+data class LagreAfpPrivatSimuleringDto(
+    val vedGradertUttak: LagrePrivatAfpDto?,
+    @field:NotNull val vedHeltUttak: LagrePrivatAfpDto,
+)
+
+data class LagreAfpOffentligLivsvarigSimuleringDto(
+    val vedGradertUttak: LagreLivsvarigOffentligAfpDto?,
+    @field:NotNull val vedHeltUttak: LagreLivsvarigOffentligAfpDto,
+)
+
+data class LagreAfpOffentligTidsbegrensetSimuleringDto(
+    val vedGradertUttak: LagreTidsbegrensetOffentligAfpDto?,
+    @field:NotNull val vedHeltUttak: LagreTidsbegrensetOffentligAfpDto,
+)
+
+data class LagreLivsvarigOffentligAfpDto(
     @field:NotNull val alderAar: Int,
     @field:NotNull val aarligBeloep: Int,
-    val maanedligBeloep: Int?
+    @field:NotNull val maanedligBeloep: Int
 )
 
 data class LagreTidsbegrensetOffentligAfpDto(
@@ -49,7 +66,7 @@ data class LagrePrivatAfpDto(
     @field:NotNull val kompensasjonstillegg: Int,
     @field:NotNull val kronetillegg: Int,
     @field:NotNull val livsvarig: Int,
-    val maanedligBeloep: Int?
+    @field:NotNull val maanedligBeloep: Int
 )
 
 data class LagreVilkaarsproevingsresultatDto(
@@ -80,8 +97,16 @@ data class LagreAlderDto(
 
 data class LagreSimuleringsinformasjonDto(
     val gradertUttaksalder: LagreAlderDto?,
-    val heltUttaksalder: LagreAlderDto?,
-    val maanedligAlderspensjonForKnekkpunkter: LagreMaanedligAlderspensjonForKnekkpunkterDto?
+    @field:NotNull val heltUttaksalder: LagreAlderDto,
+    val sivilstatus: String?,
+    val utenlandsperioder: List<LagreUtenlandsperiodeDto>?
+)
+
+data class LagreUtenlandsperiodeDto(
+    @field:NotNull val fom: LocalDate,
+    val tom: LocalDate?,
+    @field:NotNull val landkode: String,
+    @field:NotNull val arbeidetUtenlands: Boolean
 )
 
 data class LagreMaanedligAlderspensjonForKnekkpunkterDto(
@@ -104,15 +129,18 @@ data class LagreMaanedligAlderspensjonDto(
     val tilleggspensjonBeloep: Int?,
     val pensjonstillegg: Int?,
     val skjermingstillegg: Int?,
-    val kapittel19Andel: Double?,
+    val kapittel19AndelTeller: Int?,
     val kapittel19Trygdetid: Int?,
     val basispensjonBeloep: Int?,
     val restpensjonBeloep: Int?,
     val gjenlevendetillegg: Int?,
     val minstePensjonsnivaaSats: Double?,
-    val kapittel20Andel: Double?,
+    val minstePensjonsnivaaBeloep: Int?,
+    val kapittel20AndelTeller: Int?,
     val kapittel20Trygdetid: Int?,
     val garantipensjonBeloep: Int?,
+    val garantipensjonsnivaaBeloep: Int?,
     val garantipensjonSats: Double?,
-    val garantitilleggBeloep: Int?
+    val garantitilleggBeloep: Int?,
+    val grunnbeloep: Int?
 )

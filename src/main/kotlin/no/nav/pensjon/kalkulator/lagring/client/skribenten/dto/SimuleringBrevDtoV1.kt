@@ -1,14 +1,37 @@
 package no.nav.pensjon.kalkulator.lagring.client.skribenten.dto
 
+import java.time.LocalDate
+
 data class SimuleringBrevDtoV1(
-    val alderspensjonListe: List<AlderspensjonBrevDtoV1>,
-    val livsvarigOffentligAfpListe: List<LivsvarigOffentligAfpBrevDtoV1>?,
-    val tidsbegrensetOffentligAfp: TidsbegrensetOffentligAfpBrevDtoV1?,
-    val privatAfpListe: List<AfpPrivatBrevDtoV1>?,
+    val simulering: SimuleringBrevV1,
+    val simuleringsinformasjon: SimuleringsinformasjonBrevDtoV1?,
     val vilkaarsproevingsresultat: VilkaarsproevingsresultatBrevDtoV1?,
     val trygdetid: TrygdetidBrevDtoV1?,
     val pensjonsgivendeInntektListe: List<AarligBeloepBrevDtoV1>?,
-    val simuleringsinformasjon: SimuleringsinformasjonBrevDtoV1?,
+    val forbehold: ForbeholdBrevDtoV1?,
+)
+
+data class SimuleringBrevV1(
+    val alderspensjonListe: List<AlderspensjonBrevDtoV1>,
+    val maanedligAlderspensjonForKnekkpunkter: MaanedligAlderspensjonForKnekkpunkterBrevDtoV1?,
+    val afpPrivat: AfpPrivatSimuleringBrevDtoV1?,
+    val afpOffentligLivsvarig: AfpOffentligLivsvarigSimuleringBrevDtoV1?,
+    val afpOffentligTidsbegrenset: AfpOffentligTidsbegrensetSimuleringBrevDtoV1?,
+)
+
+data class AfpPrivatSimuleringBrevDtoV1(
+    val vedGradertUttak: AfpPrivatBrevDtoV1?,
+    val vedHeltUttak: AfpPrivatBrevDtoV1,
+)
+
+data class AfpOffentligLivsvarigSimuleringBrevDtoV1(
+    val vedGradertUttak: LivsvarigOffentligAfpBrevDtoV1?,
+    val vedHeltUttak: LivsvarigOffentligAfpBrevDtoV1,
+)
+
+data class AfpOffentligTidsbegrensetSimuleringBrevDtoV1(
+    val vedGradertUttak: TidsbegrensetOffentligAfpBrevDtoV1?,
+    val vedHeltUttak: TidsbegrensetOffentligAfpBrevDtoV1,
 )
 
 data class AlderspensjonBrevDtoV1(
@@ -20,7 +43,7 @@ data class AlderspensjonBrevDtoV1(
 data class LivsvarigOffentligAfpBrevDtoV1(
     val alderAar: Int,
     val aarligBeloep: Int,
-    val maanedligBeloep: Int?
+    val maanedligBeloep: Int
 )
 
 data class TidsbegrensetOffentligAfpBrevDtoV1(
@@ -46,7 +69,7 @@ data class AfpPrivatBrevDtoV1(
     val kompensasjonstillegg: Int,
     val kronetillegg: Int,
     val livsvarig: Int,
-    val maanedligBeloep: Int?
+    val maanedligBeloep: Int
 )
 
 data class VilkaarsproevingsresultatBrevDtoV1(
@@ -77,10 +100,16 @@ data class AlderBrevDtoV1(
 
 data class SimuleringsinformasjonBrevDtoV1(
     val gradertUttaksalder: AlderBrevDtoV1?,
-    val heltUttaksalder: AlderBrevDtoV1?,
-    val maanedligAlderspensjonForKnekkpunkter: MaanedligAlderspensjonForKnekkpunkterBrevDtoV1?,
-    val privatAfpVedGradertUttak: AfpPrivatBrevDtoV1?,
-    val privatAfpVedHeltUttak: AfpPrivatBrevDtoV1?
+    val heltUttaksalder: AlderBrevDtoV1,
+    val sivilstatus: String?,
+    val utenlandsperioder: List<UtenlandsperiodeBrevDtoV1>?
+)
+
+data class UtenlandsperiodeBrevDtoV1(
+    val fom: LocalDate,
+    val tom: LocalDate?,
+    val landkode: String,
+    val arbeidetUtenlands: Boolean
 )
 
 data class MaanedligAlderspensjonForKnekkpunkterBrevDtoV1(
@@ -109,9 +138,26 @@ data class MaanedligAlderspensjonBrevDtoV1(
     val restpensjonBeloep: Int?,
     val gjenlevendetillegg: Int?,
     val minstePensjonsnivaaSats: Double?,
+    val minstePensjonsnivaaBeloep: Int?,
     val kapittel20AndelTeller: Int?,
     val kapittel20Trygdetid: Int?,
     val garantipensjonBeloep: Int?,
+    val garantipensjonsnivaaBeloep: Int?,
     val garantipensjonSats: Double?,
-    val garantitilleggBeloep: Int?
+    val garantitilleggBeloep: Int?,
+    val grunnbeloep: Int?
+)
+
+data class ForbeholdBrevDtoV1(
+    val seksjoner: List<ForbeholdSeksjonBrevDtoV1>
+)
+
+data class ForbeholdSeksjonBrevDtoV1(
+    val tittel: String?,
+    val avsnitt: List<ForbeholdAvsnittBrevDtoV1>
+)
+
+data class ForbeholdAvsnittBrevDtoV1(
+    val tekst: String,
+    val punktliste: List<String>?
 )
