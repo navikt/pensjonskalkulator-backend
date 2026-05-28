@@ -272,7 +272,7 @@ private fun arrangeLoependeVedtak(
                 )
             } else null,
             privatAfp = null,
-            pre2025OffentligAfp = if (harTidsbegrensetOffentligAfp) {
+            tidsbegrensetOffentligAfp = if (harTidsbegrensetOffentligAfp) {
                 LoependeEntitet(fom = LocalDate.of(2024, 1, 1))
             } else null,
             avdoed = null

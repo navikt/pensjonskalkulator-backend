@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.vedtak.api.v1.acl
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.common.api.acl.CommonV1Sivilstatus
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.vedtak.*
@@ -14,17 +15,19 @@ class VedtakResultMapperTest : ShouldSpec({
     should("map vedtaksamling to data transfer object") {
         val vedtakSamling = VedtakSamling(
             loependeAlderspensjon = LoependeAlderspensjon(
-                grad = 100,
+                grad = Uttaksgrad.HUNDRE_PROSENT,
                 fom = LocalDate.of(2020, 10, 1),
                 uttaksgradFom = LocalDate.of(2021, 1, 1),
                 utbetalingSisteMaaned = Utbetaling(
                     beloep = BigDecimal("100"),
                     posteringsdato = LocalDate.of(2025, 1, 1)
                 ),
-                sivilstatus = Sivilstatus.GIFT
+                sivilstatus = Sivilstatus.GIFT,
+                harGjenlevenderett = true,
+                harUtenlandsopphold = true
             ),
             fremtidigAlderspensjon = FremtidigAlderspensjon(
-                grad = 10,
+                grad = Uttaksgrad.TJUE_PROSENT,
                 fom = LocalDate.of(2021, 12, 1),
                 sivilstatus = Sivilstatus.SKILT
             ),
@@ -33,7 +36,7 @@ class VedtakResultMapperTest : ShouldSpec({
                 fom = LocalDate.of(2021, 10, 1)
             ),
             privatAfp = LoependeEntitet(fom = LocalDate.of(2022, 10, 1)),
-            pre2025OffentligAfp = LoependeEntitet(fom = LocalDate.of(2024, 2, 1)),
+            tidsbegrensetOffentligAfp = LoependeEntitet(fom = LocalDate.of(2024, 2, 1)),
             avdoed = InformasjonOmAvdoed(
                 pid = pid,
                 doedsdato = LocalDate.of(2025, 6, 14),
@@ -55,10 +58,12 @@ class VedtakResultMapperTest : ShouldSpec({
                     beloep = BigDecimal("100"),
                     utbetalingsdato = LocalDate.of(2025, 1, 1)
                 ),
-                sivilstatus = CommonV1Sivilstatus.GIFT
+                sivilstatus = CommonV1Sivilstatus.GIFT,
+                harGjenlevenderett = true,
+                harUtenlandsopphold = true
             ),
             fremtidigAlderspensjon = VedtakV1Alderspensjonsuttak(
-                grad = 10,
+                grad = 20,
                 fom = LocalDate.of(2021, 12, 1)
             ),
             ufoeretrygdgrad = 50,
@@ -82,7 +87,7 @@ class VedtakResultMapperTest : ShouldSpec({
             fremtidigAlderspensjon = null,
             ufoeretrygd = null,
             privatAfp = null,
-            pre2025OffentligAfp = null,
+            tidsbegrensetOffentligAfp = null,
             avdoed = null
         )
 
