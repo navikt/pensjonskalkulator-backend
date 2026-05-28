@@ -141,12 +141,12 @@
         <dependency>
             <groupId>io.getunleash</groupId>
             <artifactId>unleash-client-java</artifactId>
-            <version>12.2.1</version>
+            <version>12.2.2</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-resolver-dns-native-macos</artifactId>
-            <version>4.2.13.Final</version>
+            <version>4.2.14.Final</version>
             <classifier>osx-aarch_64</classifier>
         </dependency>
         <dependency>
@@ -214,7 +214,7 @@
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
-            <version>3.5.5</version>
+            <version>3.5.6</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.guava</groupId>
