@@ -125,8 +125,8 @@ data class AlderDto(
 
 data class MaanedligAlderspensjonForKnekkpunkterDto(
     val vedGradertUttak: MaanedligAlderspensjonDto?,
-    val vedHeltUttak: MaanedligAlderspensjonDto,
-    val vedNormertPensjonsalder: MaanedligAlderspensjonDto
+    val vedHeltUttak: MaanedligAlderspensjonDto?,
+    val vedNormertPensjonsalder: MaanedligAlderspensjonDto?
 )
 
 data class MaanedligAlderspensjonDto(

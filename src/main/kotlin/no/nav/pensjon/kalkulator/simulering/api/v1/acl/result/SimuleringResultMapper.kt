@@ -99,8 +99,8 @@ object SimuleringResultMapper {
     ) =
         SimuleringV1MaanedligAlderspensjonForKnekkpunkter(
             vedGradertUttak = source.vedGradertUttak?.let { maanedligAlderspensjon(it, mode) },
-            vedHeltUttak = maanedligAlderspensjon(source.vedHeltUttak, mode),
-            vedNormertPensjonsalder = maanedligAlderspensjon(source.vedNormertPensjonsalder, mode)
+            vedHeltUttak = source.vedHeltUttak?.let { maanedligAlderspensjon(it, mode) },
+            vedNormertPensjonsalder = source.vedNormertPensjonsalder?.let { maanedligAlderspensjon(it, mode) }
         )
 
     private fun maanedligAlderspensjon(source: SimulertMaanedligAlderspensjon, mode: MappingMode) =
