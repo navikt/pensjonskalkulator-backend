@@ -125,8 +125,8 @@ data class SimuleringV1Alderspensjon(
 @JsonInclude(NON_NULL)
 data class SimuleringV1MaanedligAlderspensjonForKnekkpunkter(
     val vedGradertUttak: SimuleringV1MaanedligAlderspensjon?,
-    @field:NotNull val vedHeltUttak: SimuleringV1MaanedligAlderspensjon,
-    @field:NotNull val vedNormertPensjonsalder: SimuleringV1MaanedligAlderspensjon
+    val vedHeltUttak: SimuleringV1MaanedligAlderspensjon?,
+    val vedNormertPensjonsalder: SimuleringV1MaanedligAlderspensjon?
 )
 
 @JsonInclude(NON_NULL)

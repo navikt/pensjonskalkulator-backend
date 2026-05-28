@@ -132,8 +132,8 @@ object PersonligSimuleringResultMapper {
     private fun maanedligAlderspensjonForKnekkpunkter(dto: MaanedligAlderspensjonForKnekkpunkterDto) =
         SimulertMaanedligAlderspensjonForKnekkpunkter(
             vedGradertUttak = dto.vedGradertUttak?.let(::maanedligAlderspensjon),
-            vedHeltUttak = maanedligAlderspensjon(dto.vedHeltUttak),
-            vedNormertPensjonsalder = maanedligAlderspensjon(dto.vedNormertPensjonsalder)
+            vedHeltUttak = dto.vedHeltUttak?.let(::maanedligAlderspensjon),
+            vedNormertPensjonsalder = dto.vedNormertPensjonsalder?.let(::maanedligAlderspensjon)
         )
 
     private fun maanedligAlderspensjon(dto: MaanedligAlderspensjonDto) =
