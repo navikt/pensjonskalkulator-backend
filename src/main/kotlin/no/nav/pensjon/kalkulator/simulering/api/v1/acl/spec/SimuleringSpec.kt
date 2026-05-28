@@ -20,7 +20,7 @@ data class SimuleringV1Spec(
     val utenlandsperiodeListe: List<SimuleringV1UtenlandsperiodeSpec>? = null,
     val sivilstatus: CommonV1Sivilstatus? = null,
     val eps: SimuleringV1EpsSpec? = null,
-    val offentligAfp: SimuleringV1OffentligAfpSpec? = null
+    val offentligAfp: SimuleringV1OffentligAfpSpec? = null,
 )
 
 data class SimuleringV1GradertUttakSpec(
@@ -74,7 +74,11 @@ data class SimuleringV1AvdoedEps(
 data class SimuleringV1OffentligAfpSpec(
     val harInntektMaanedenFoerUttak: Boolean? = null,
     val afpOrdning: SimuleringV1AfpOrdningTypeSpec? = null,
-    val innvilgetLivsvarigAfpListe: List<SimuleringV1InnvilgetLivsvarigOffentligAfpSpec>? = null
+    val innvilgetLivsvarigAfpListe: List<SimuleringV1InnvilgetLivsvarigOffentligAfpSpec>? = null,
+    // SERVICEBEREGN_AFP-specific fields (required when simuleringstype = SERVICEBEREGN_AFP, ignored otherwise)
+    val inntektForrigeKalenderaar: Int? = null,
+    val inntektFremTilUttak: Int? = null,
+    val inntektMaanedFoerAfp: Int? = null
 )
 
 /**
@@ -110,6 +114,7 @@ enum class SimuleringV1SimuleringstypeSpec(val internalValue: SimuleringType) {
     ENDRING_ALDERSPENSJON(internalValue = SimuleringType.ENDRING_ALDERSPENSJON),
     ENDRING_ALDERSPENSJON_MED_LIVSVARIG_OFFENTLIG_AFP(internalValue = SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG),
     ENDRING_ALDERSPENSJON_MED_PRIVAT_AFP(internalValue = SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT),
-    ENDRING_ALDERSPENSJON_MED_GJENLEVENDERETT(internalValue = SimuleringType.ENDRING_ALDERSPENSJON_MED_GJENLEVENDERETT)
+    ENDRING_ALDERSPENSJON_MED_GJENLEVENDERETT(internalValue = SimuleringType.ENDRING_ALDERSPENSJON_MED_GJENLEVENDERETT),
+    SERVICEBEREGN_AFP(internalValue = SimuleringType.SERVICEBEREGN_AFP)
     // ALDERSPENSJON_MED_TIDSBEGRENSET_OFFENTLIG_AFP har ingen tilsvarende type for endring (støttes ikke)
 }

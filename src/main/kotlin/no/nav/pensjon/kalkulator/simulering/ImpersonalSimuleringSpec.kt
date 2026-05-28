@@ -25,7 +25,12 @@ data class ImpersonalSimuleringSpec(
 
     // For 'anonym simulering' only:
     val foedselAar: Int? = null,
-    val inntektOver1GAntallAar: Int? = 0
+    val inntektOver1GAntallAar: Int? = 0,
+
+    // SERVICEBEREGN_AFP-specific fields (required when simuleringstype = SERVICEBEREGN_AFP, ignored otherwise)
+    val inntektForrigeKalenderaar: Int? = null,
+    val inntektFremTilUttak: Int? = null,
+    val inntektMaanedFoerAfp: Int? = null
 )
 
 /**
