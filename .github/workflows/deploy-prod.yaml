@@ -24,7 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@9e0d7b8d25671d64c341c19c0152d693099fb5ba # v4.35.5
+        uses: github/codeql-action/init@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0
         with:
           languages: java
       - name: Setup java
@@ -36,7 +36,7 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@9e0d7b8d25671d64c341c19c0152d693099fb5ba # v4.35.5
+        uses: github/codeql-action/analyze@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0
         with:
           category: "/language:java"
       - name: Create Docker image
@@ -58,7 +58,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Deploy to prod-gcp
-        uses: nais/deploy/actions/deploy@a7f8690f9b367fcbf5348a0a1e21d44f1aae50eb # v2
+        uses: nais/deploy/actions/deploy@d57354b433c8d6847ab092467d9fe976a3d008aa # v2
         env:
           CLUSTER: prod-gcp
           IMAGE: ${{ needs.build.outputs.image }}
@@ -88,6 +88,6 @@ jobs:
           severity: 'MEDIUM,HIGH,CRITICAL'
           limit-severities-for-sarif: true
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@9e0d7b8d25671d64c341c19c0152d693099fb5ba # v4.35.5
+        uses: github/codeql-action/upload-sarif@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0
         with:
           sarif_file: 'trivy-results.sarif'

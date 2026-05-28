@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering.api.v1.acl.result
 
+import no.nav.pensjon.kalkulator.afp.BeregnetAfp
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.simulering.*
@@ -18,6 +19,9 @@ object SimuleringResultMapper {
             alderspensjonListe = source.alderspensjon.map { alderspensjon(source = it, mode) }
                 .let { justerAlderspensjonListe(pensjonListe = it, naavaerendeAlderAar) },
             maanedligAlderspensjonVedUttaksendring = source.alderspensjonMaanedsbeloep?.let(::maanedligPensjon),
+            maanedligAlderspensjonForKnekkpunkter = source.maanedligAlderspensjonForKnekkpunkter?.let {
+                maanedligAlderspensjonForKnekkpunkter(it, mode)
+            },
             tidsbegrensetOffentligAfp = source.pre2025OffentligAfp?.let(::tidsbegrensetOffentligAfp),
             privatAfpListe = source.afpPrivat.map(::privatAfp)
                 .let { justerPrivatAfpListe(pensjonListe = it, naavaerendeAlderAar) },
@@ -25,7 +29,8 @@ object SimuleringResultMapper {
             vilkaarsproevingsresultat = vilkaarsproevingsresultat(source.vilkaarsproeving),
             trygdetid = trygdetid(source),
             pensjonsgivendeInntektListe = source.opptjeningGrunnlagListe.map(::inntekt),
-            problem = source.problem?.let(::problem)
+            problem = source.problem?.let(::problem),
+            serviceberegnetAfp = source.serviceberegnetAfpResult?.let(::serviceberegnetAfp)
         )
 
     private fun alderspensjon(source: SimulertAlderspensjon, mode: MappingMode) =
@@ -89,6 +94,72 @@ object SimuleringResultMapper {
             gradertUttakMaanedligBeloep = source.gradertUttak,
             heltUttakMaanedligBeloep = source.heltUttak
         )
+
+    private fun maanedligAlderspensjonForKnekkpunkter(
+        source: SimulertMaanedligAlderspensjonForKnekkpunkter,
+        mode: MappingMode
+    ) =
+        SimuleringV1MaanedligAlderspensjonForKnekkpunkter(
+            vedGradertUttak = source.vedGradertUttak?.let { maanedligAlderspensjon(it, mode) },
+            vedHeltUttak = source.vedHeltUttak?.let { maanedligAlderspensjon(it, mode) },
+            vedNormertPensjonsalder = source.vedNormertPensjonsalder?.let { maanedligAlderspensjon(it, mode) }
+        )
+
+    private fun maanedligAlderspensjon(source: SimulertMaanedligAlderspensjon, mode: MappingMode) =
+        if (mode.reduced)
+            SimuleringV1MaanedligAlderspensjon(
+                beloep = source.beloep,
+                inntektspensjonBeloep = null,
+                delingstall = null,
+                pensjonsbeholdningFoerUttakBeloep = null,
+                pensjonsbeholdningEtterUttakBeloep = null,
+                sluttpoengtall = null,
+                poengaarTom1991 = null,
+                poengaarFom1992 = null,
+                forholdstall = null,
+                grunnpensjonBeloep = null,
+                tilleggspensjonBeloep = null,
+                pensjonstillegg = null,
+                skjermingstillegg = null,
+                kapittel19Andel = null,
+                kapittel19Trygdetid = null,
+                basispensjonBeloep = null,
+                restpensjonBeloep = null,
+                gjenlevendetillegg = null,
+                minstePensjonsnivaaSats = null,
+                kapittel20Andel = null,
+                kapittel20Trygdetid = null,
+                garantipensjonBeloep = null,
+                garantipensjonSats = null,
+                garantitilleggBeloep = null
+            )
+        else
+            SimuleringV1MaanedligAlderspensjon(
+                beloep = source.beloep,
+                inntektspensjonBeloep = source.inntektspensjonBeloep,
+                delingstall = source.delingstall,
+                pensjonsbeholdningFoerUttakBeloep = source.pensjonsbeholdningFoerUttak,
+                pensjonsbeholdningEtterUttakBeloep = source.pensjonsbeholdningEtterUttak,
+                sluttpoengtall = source.sluttpoengtall,
+                poengaarTom1991 = source.poengaarFoer92,
+                poengaarFom1992 = source.poengaarEtter91,
+                forholdstall = source.forholdstall,
+                grunnpensjonBeloep = source.grunnpensjon,
+                tilleggspensjonBeloep = source.tilleggspensjon,
+                pensjonstillegg = source.pensjonstillegg,
+                skjermingstillegg = source.skjermingstillegg,
+                kapittel19Andel = source.kapittel19Pensjon?.andelsbroek,
+                kapittel19Trygdetid = source.kapittel19Pensjon?.trygdetidAntallAar,
+                basispensjonBeloep = source.kapittel19Pensjon?.basispensjon,
+                restpensjonBeloep = source.kapittel19Pensjon?.restpensjon,
+                gjenlevendetillegg = source.kapittel19Pensjon?.gjenlevendetillegg,
+                minstePensjonsnivaaSats = source.kapittel19Pensjon?.minstePensjonsnivaaSats,
+                kapittel20Andel = source.kapittel20Pensjon?.andelsbroek,
+                kapittel20Trygdetid = source.kapittel20Pensjon?.trygdetidAntallAar,
+                garantipensjonBeloep = source.kapittel20Pensjon?.garantipensjon?.maanedligBeloep,
+                garantipensjonSats = source.kapittel20Pensjon?.garantipensjon?.sats,
+                garantitilleggBeloep = source.kapittel20Pensjon?.garantitillegg
+            )
 
     private fun livsvarigOffentligAfp(source: SimulertAfpOffentlig) =
         SimuleringV1AldersbestemtUtbetaling(
@@ -166,5 +237,30 @@ object SimuleringResultMapper {
             kode = SimuleringV1ProblemType.entries.firstOrNull { it.internalValue == source.type }
                 ?: SimuleringV1ProblemType.SERVERFEIL,
             beskrivelse = source.beskrivelse
+        )
+
+    private fun serviceberegnetAfp(source: BeregnetAfp) =
+        SimuleringV1ServiceberegnetAfp(
+            beregnetAfp = beregnetAfp(source)
+        )
+
+    private fun beregnetAfp(source: BeregnetAfp) =
+        SimuleringV1BeregnetAfp(
+            totalbelopAfp = source.totalbelopAfp,
+            virkFom = source.virkFom,
+            tidligereArbeidsinntekt = source.tidligereArbeidsinntekt,
+            grunnbelop = source.grunnbelop,
+            sluttpoengtall = source.sluttpoengtall,
+            trygdetid = source.trygdetid,
+            poengar = source.poengar,
+            poeangarF92 = source.poeangarF92,
+            poeangarE91 = source.poeangarE91,
+            grunnpensjon = source.grunnpensjon,
+            tilleggspensjon = source.tilleggspensjon,
+            afpTillegg = source.afpTillegg,
+            fpp = source.fpp,
+            saertillegg = source.sertillegg,
+            afpGrad = source.grad,
+            erAvkortet = source.erAvkortet
         )
 }

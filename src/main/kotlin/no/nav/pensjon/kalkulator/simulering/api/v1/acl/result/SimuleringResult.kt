@@ -16,6 +16,9 @@ data class SimuleringV1Result(
     @field:Schema(description = "Månedlig alderspensjon ved endring av uttaksgrad")
     val maanedligAlderspensjonVedUttaksendring: SimuleringV1Uttaksbeloep?,
 
+    @field:Schema(description = "Månedlig alderspensjon for knekkpunkter")
+    val maanedligAlderspensjonForKnekkpunkter: SimuleringV1MaanedligAlderspensjonForKnekkpunkter?,
+
     @field:Schema(description = "Livsvarig AFP i offentlig sektor for hvert år")
     val livsvarigOffentligAfpListe: List<SimuleringV1AldersbestemtUtbetaling>?,
 
@@ -36,7 +39,10 @@ data class SimuleringV1Result(
     val pensjonsgivendeInntektListe: List<SimuleringV1AarligBeloep>?,
 
     @field:Schema(description = "Eventuelt problem som oppstod under simuleringen")
-    val problem: SimuleringV1Problem?
+    val problem: SimuleringV1Problem?,
+
+    @field:Schema(description = "Resultat av serviceberegnet AFP (kun for simuleringstype SERVICEBEREGN_AFP)")
+    val serviceberegnetAfp: SimuleringV1ServiceberegnetAfp? = null
 )
 
 @JsonInclude(NON_NULL)
@@ -114,6 +120,41 @@ data class SimuleringV1Alderspensjon(
 
     @field:Schema(description = "Antall poengår fra og med 1992; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
     val poengaarFom1992: Int?
+)
+
+@JsonInclude(NON_NULL)
+data class SimuleringV1MaanedligAlderspensjonForKnekkpunkter(
+    val vedGradertUttak: SimuleringV1MaanedligAlderspensjon?,
+    val vedHeltUttak: SimuleringV1MaanedligAlderspensjon?,
+    val vedNormertPensjonsalder: SimuleringV1MaanedligAlderspensjon?
+)
+
+@JsonInclude(NON_NULL)
+data class SimuleringV1MaanedligAlderspensjon(
+    @field:NotNull val beloep: Int,
+    val inntektspensjonBeloep: Int?,
+    val delingstall: Double?,
+    val pensjonsbeholdningFoerUttakBeloep: Int?,
+    val pensjonsbeholdningEtterUttakBeloep: Int?,
+    val sluttpoengtall: Double?,
+    val poengaarTom1991: Int?,
+    val poengaarFom1992: Int?,
+    val forholdstall: Double?,
+    val grunnpensjonBeloep: Int?,
+    val tilleggspensjonBeloep: Int?,
+    val pensjonstillegg: Int?,
+    val skjermingstillegg: Int?,
+    val kapittel19Andel: Double?,
+    val kapittel19Trygdetid: Int?,
+    val basispensjonBeloep: Int?,
+    val restpensjonBeloep: Int?,
+    val gjenlevendetillegg: Int?,
+    val minstePensjonsnivaaSats: Double?,
+    val kapittel20Andel: Double?,
+    val kapittel20Trygdetid: Int?,
+    val garantipensjonBeloep: Int?,
+    val garantipensjonSats: Double?,
+    val garantitilleggBeloep: Int?
 )
 
 @JsonInclude(NON_NULL)
@@ -247,9 +288,39 @@ enum class SimuleringV1ProblemType(
     UGYLDIG_ANTALL_AAR(internalValue = ProblemType.UGYLDIG_ANTALL_AAR),
     UGYLDIG_PERSONIDENT(internalValue = ProblemType.UGYLDIG_PERSONIDENT),
     PERSON_IKKE_FUNNET(internalValue = ProblemType.PERSON_IKKE_FUNNET, httpStatus = HttpStatus.NOT_FOUND),
+    PERSON_FOR_LAV_ALDER(internalValue = ProblemType.PERSON_FOR_LAV_ALDER),
     PERSON_FOR_HOEY_ALDER(internalValue = ProblemType.PERSON_FOR_HOEY_ALDER),
+    UTILSTREKKELIG_INNTEKT(internalValue = ProblemType.UTILSTREKKELIG_INNTEKT, httpStatus = HttpStatus.OK),
     UTILSTREKKELIG_OPPTJENING(internalValue = ProblemType.UTILSTREKKELIG_OPPTJENING, httpStatus = HttpStatus.OK),
     UTILSTREKKELIG_TRYGDETID(internalValue = ProblemType.UTILSTREKKELIG_TRYGDETID, httpStatus = HttpStatus.OK),
     ANNEN_KLIENTFEIL(internalValue = ProblemType.ANNEN_KLIENTFEIL),
-    SERVERFEIL(internalValue = ProblemType.SERVERFEIL, httpStatus = HttpStatus.INTERNAL_SERVER_ERROR)
+    INTERN_DATA_INKONSISTENS(internalValue = ProblemType.INTERN_DATA_INKONSISTENS, httpStatus = HttpStatus.INTERNAL_SERVER_ERROR),
+    IMPLEMENTASJONSFEIL(internalValue = ProblemType.IMPLEMENTASJONSFEIL, httpStatus = HttpStatus.INTERNAL_SERVER_ERROR),
+    TREDJEPARTSFEIL(internalValue = ProblemType.TREDJEPARTSFEIL, httpStatus = HttpStatus.INTERNAL_SERVER_ERROR),
+    SERVERFEIL(internalValue = ProblemType.ANNEN_SERVERFEIL, httpStatus = HttpStatus.INTERNAL_SERVER_ERROR)
 }
+
+@JsonInclude(NON_NULL)
+data class SimuleringV1ServiceberegnetAfp(
+    val beregnetAfp: SimuleringV1BeregnetAfp?,
+)
+
+@JsonInclude(NON_NULL)
+data class SimuleringV1BeregnetAfp(
+    val totalbelopAfp: Int?,
+    val virkFom: java.time.LocalDate?,
+    val tidligereArbeidsinntekt: Int?,
+    val grunnbelop: Int?,
+    val sluttpoengtall: Double?,
+    val trygdetid: Int?,
+    val poengar: Int?,
+    val poeangarF92: Int?,
+    val poeangarE91: Int?,
+    val grunnpensjon: Int?,
+    val tilleggspensjon: Int?,
+    val afpTillegg: Int?,
+    val fpp: Double?,
+    val saertillegg: Int?,
+    val afpGrad: Int?,
+    val erAvkortet: Boolean?,
+)

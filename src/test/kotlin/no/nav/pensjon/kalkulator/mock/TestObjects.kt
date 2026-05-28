@@ -38,7 +38,7 @@ object TestObjects {
             kapittel20Pensjon = Kapittel20Pensjon(
                 andelsbroek = 0.4,
                 trygdetidAntallAar = 39,
-                garantipensjon = Garantipensjon(aarligBeloep = 2, sats = 2.34),
+                garantipensjon = Garantipensjon(aarligBeloep = 2, maanedligBeloep = null, sats = 2.34),
                 garantitillegg = 201
             )
         )

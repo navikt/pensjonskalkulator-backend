@@ -14,6 +14,9 @@ import no.nav.pensjon.kalkulator.person.relasjon.eps.api.v1.acl.FamilierelasjonM
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -72,13 +75,15 @@ class EpsController(
             )
         ]
     )
-    fun nyligsteEps(@RequestBody spec: EpsV1EpsSpec): EpsV1Familierelasjon {
+    fun nyligsteEps(@RequestBody spec: EpsV1EpsSpec): ResponseEntity<EpsV1Familierelasjon> {
         traceAid.begin()
 
         return try {
             val relasjon = service.nyligsteRelasjon(sivilstatus = spec.sivilstatus.internalValue)
             relasjon.pid?.let { audit(pid = it, bakgrunn = spec.bakgrunn) }
-            toDto(source = relasjon)
+            ResponseEntity.status(HttpStatus.OK).body(toDto(source = relasjon))
+        } catch (e: AccessDeniedException) {
+            ResponseEntity.status(HttpStatus.FORBIDDEN).body(tilgangNektet(e))
         } catch (e: EgressException) {
             handleError(e, "V1")!!
         } finally {
@@ -98,5 +103,17 @@ class EpsController(
 
     private companion object {
         private const val ERROR_MESSAGE = "eps-feil"
+
+        private fun tilgangNektet(e: AccessDeniedException) =
+            EpsV1Familierelasjon(
+                pid = null,
+                fom = null,
+                relasjonstype = EpsV1Relasjonstype.UKJENT,
+                relasjonPersondata = null,
+                problem = EpsV1Problem(
+                    type = EpsV1ProblemType.TILGANG_NEKTET,
+                    beskrivelse = e.message ?: "(ingen beskrivelse)"
+                )
+            )
     }
 }

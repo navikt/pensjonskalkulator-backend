@@ -111,6 +111,7 @@ class EksternSimuleringController(
             SimuleringV1Result(
                 alderspensjonListe = emptyList(),
                 maanedligAlderspensjonVedUttaksendring = null,
+                maanedligAlderspensjonForKnekkpunkter = null,
                 tidsbegrensetOffentligAfp = null,
                 privatAfpListe = null,
                 livsvarigOffentligAfpListe = null,

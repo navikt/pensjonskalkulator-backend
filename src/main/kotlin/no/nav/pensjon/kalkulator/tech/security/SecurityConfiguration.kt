@@ -5,7 +5,7 @@ import no.nav.pensjon.kalkulator.tech.security.egress.SecurityContextEnricher
 import no.nav.pensjon.kalkulator.tech.security.ingress.*
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.ImpersonalAccessFilter
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.fag.FagtilgangService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.PopulasjonstilgangService
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.CacheAwarePopulasjonstilgangService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.SecurityContextNavIdExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
@@ -93,13 +93,11 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
     fun filterChain(
         http: HttpSecurity,
         securityContextEnricher: SecurityContextEnricher,
-        pidExtractor: PidExtractor,
         pidGetter: PidGetter,
         auditor: Auditor,
         adresseService: FortroligAdresseService,
-        navIdExtractor: SecurityContextNavIdExtractor,
         fagtilgangService: FagtilgangService,
-        populasjonstilgangService: PopulasjonstilgangService,
+        populasjonstilgangService: CacheAwarePopulasjonstilgangService,
         authResolver: AuthenticationManagerResolver<HttpServletRequest>,
         authenticationEntryPoint: LoggingAuthenticationEntryPoint,
         @Value("\${pkb.request-matcher.internal}") internalRequestMatcher: String
@@ -109,7 +107,12 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
             BasicAuthenticationFilter::class.java
         )
             .addFilterAfter(
-                ImpersonalAccessFilter(pidExtractor, navIdExtractor, fagtilgangService, populasjonstilgangService, auditor),
+                ImpersonalAccessFilter(
+                    pidGetter,
+                    fagtilgangService,
+                    populasjonstilgangService,
+                    auditor
+                ),
                 AuthenticationEnricherFilter::class.java
             )
             .addFilterAfter(
