@@ -1,15 +1,17 @@
 package no.nav.pensjon.kalkulator.vedtak.client.pen.map
 
 import no.nav.pensjon.kalkulator.common.client.pen.PenSivilstand
+import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.vedtak.*
 import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenGjeldendeUfoeregradDto
 import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenGjeldendeVedtakApDto
 import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenGjeldendeVedtakDto
+import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenInformasjonOmAvdoedDto
 import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenLoependeVedtakDto
 import java.time.LocalDate
 
 /**
- * Maps from data transfer object (DTO) to domain object.
+ * Maps from a data transfer object (DTO) to a domain object.
  * The DTO represents 'løpende vedtak' received from PEN.
  */
 object PenLoependeVedtakMapper {
@@ -22,7 +24,8 @@ object PenLoependeVedtakMapper {
             fremtidigAlderspensjon = fremtidigUttakgradsendring(source),
             ufoeretrygd = source.ufoeretrygd?.let(::ufoeretrygd),
             privatAfp = source.afpPrivat?.let(::vedtak),
-            pre2025OffentligAfp = source.afpOffentlig?.let(::vedtak)
+            pre2025OffentligAfp = source.afpOffentlig?.let(::vedtak),
+            avdoed = source.avdoed?.let(::avdoed)
         )
 
     private fun vedtak(source: PenGjeldendeVedtakDto) =
@@ -45,5 +48,16 @@ object PenLoependeVedtakMapper {
         LoependeUfoeretrygd(
             grad = source.grad,
             fom = source.fraOgMed
+        )
+
+    private fun avdoed(source: PenInformasjonOmAvdoedDto) =
+        InformasjonOmAvdoed(
+            pid = source.pid?.let(::Pid),
+            doedsdato = source.doedsdato,
+            foersteAlderspensjonVirkningsdato = source.foersteVirkningsdato,
+            aarligPensjonsgivendeInntektErMinst1G = source.aarligPensjonsgivendeInntektErMinst1G,
+            harTilstrekkeligMedlemskapIFolketrygden = source.harTilstrekkeligMedlemskapIFolketrygden,
+            antallAarUtenlands = source.antallAarUtenlands,
+            erFlyktning = source.erFlyktning
         )
 }

@@ -48,6 +48,7 @@ class OpenApiConfiguration {
         return GroupedOpenApi.builder()
             .group("current")
             .pathsToMatch(
+                "/api/intern/v1/enheter",
                 "/api/intern/v1/eps",
                 "/api/intern/v1/lagre-simulering",
                 "/api/intern/v1/pensjon/simulering",

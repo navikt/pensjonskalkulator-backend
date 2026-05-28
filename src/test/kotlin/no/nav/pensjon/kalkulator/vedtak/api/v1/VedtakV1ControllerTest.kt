@@ -68,7 +68,8 @@ class VedtakV1ControllerTest : FunSpec() {
                     sivilstatus = Sivilstatus.SKILT
                 ),
                 ufoeretrygd = LoependeUfoeretrygd(grad = 2, fom = LocalDate.of(2021, 12, 1)),
-                privatAfp = LoependeEntitet(fom = LocalDate.of(2022, 12, 1))
+                privatAfp = LoependeEntitet(fom = LocalDate.of(2022, 12, 1)),
+                avdoed = null
             )
 
             val result = mvc.get(URL).asyncDispatch().andReturn()
@@ -86,7 +87,8 @@ class VedtakV1ControllerTest : FunSpec() {
                 loependeAlderspensjon = null,
                 fremtidigAlderspensjon = null,
                 ufoeretrygd = null,
-                privatAfp = null
+                privatAfp = null,
+                avdoed = null
             )
 
             val result = mvc.get(URL).asyncDispatch().andReturn()

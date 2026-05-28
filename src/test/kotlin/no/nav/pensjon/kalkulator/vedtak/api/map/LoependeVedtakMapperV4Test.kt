@@ -32,7 +32,8 @@ class LoependeVedtakMapperV4Test : FunSpec({
                 fom = LocalDate.of(2021, 10, 1)
             ),
             privatAfp = LoependeEntitet(fom = LocalDate.of(2022, 10, 1)),
-            pre2025OffentligAfp = LoependeEntitet(fom = LocalDate.of(2024, 2, 1))
+            pre2025OffentligAfp = LoependeEntitet(fom = LocalDate.of(2024, 2, 1)),
+            avdoed = null
         )
 
         val dto: LoependeVedtakV4 = LoependeVedtakMapperV4.toDto(vedtakSamling)
@@ -66,19 +67,19 @@ class LoependeVedtakMapperV4Test : FunSpec({
             fremtidigAlderspensjon = null,
             ufoeretrygd = null,
             privatAfp = null,
-            pre2025OffentligAfp = null
+            pre2025OffentligAfp = null,
+            avdoed = null
         )
 
-        val dto = LoependeVedtakMapperV4.toDto(vedtakSamling)
-
-        dto shouldBe LoependeVedtakV4(
-            harLoependeVedtak = false,
-            alderspensjon = null,
-            fremtidigAlderspensjon = null,
-            ufoeretrygd = UfoeretrygdDetaljerV4(grad = 0),
-            afpPrivat = null,
-            afpOffentlig = null,
-            pre2025OffentligAfp = null
-        )
+        LoependeVedtakMapperV4.toDto(vedtakSamling) shouldBe
+                LoependeVedtakV4(
+                    harLoependeVedtak = false,
+                    alderspensjon = null,
+                    fremtidigAlderspensjon = null,
+                    ufoeretrygd = UfoeretrygdDetaljerV4(grad = 0),
+                    afpPrivat = null,
+                    afpOffentlig = null,
+                    pre2025OffentligAfp = null
+                )
     }
 })
