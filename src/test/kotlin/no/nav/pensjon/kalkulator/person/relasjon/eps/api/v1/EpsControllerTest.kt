@@ -101,16 +101,12 @@ class EpsControllerTest : ShouldSpec() {
         private const val OK_RESPONSE_BODY = """{
             "pid": "12906498357",
             "fom": "2021-01-01",
-            "relasjonstype": "SAMBOER",
-            "relasjonPersondata": null
+            "relasjonstype": "SAMBOER"
         }"""
 
         @Language("json")
         private const val PROBLEM_RESPONSE_BODY = """{
-            "pid": null,
-            "fom": null,
             "relasjonstype": "UKJENT",
-            "relasjonPersondata": null,
             "problem": {
               "type": "TILGANG_NEKTET",
               "beskrivelse": "Tilgang til EPS nektet: Egen ansatt"
