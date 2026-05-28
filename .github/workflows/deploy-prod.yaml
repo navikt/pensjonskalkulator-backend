@@ -24,7 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4.35.2
+        uses: github/codeql-action/init@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0
         with:
           languages: java
       - name: Setup java
@@ -36,12 +36,12 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4.35.2
+        uses: github/codeql-action/analyze@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0
         with:
           category: "/language:java"
       - name: Create Docker image
         id: image-creation
-        uses: nais/docker-build-push@cd5ec5663feb0e05c3fa374d1fb442605b046c6b # v0
+        uses: nais/docker-build-push@751a312f0803eb96a05a41fadf51be19b7be362c # v0
         with:
           dockerfile: .docker/Dockerfile
           team: pensjonskalkulator
@@ -58,7 +58,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Deploy to prod-gcp
-        uses: nais/deploy/actions/deploy@fa754451577294aae42872a69b888b3470478ec1 # v2
+        uses: nais/deploy/actions/deploy@d57354b433c8d6847ab092467d9fe976a3d008aa # v2
         env:
           CLUSTER: prod-gcp
           IMAGE: ${{ needs.build.outputs.image }}
@@ -79,7 +79,7 @@ jobs:
         with:
           team: pensjonskalkulator
       - name: Run Trivy vulnerability scanner on Docker image
-        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: ${{ needs.build.outputs.image }}
           ignore-unfixed: true
@@ -88,6 +88,6 @@ jobs:
           severity: 'MEDIUM,HIGH,CRITICAL'
           limit-severities-for-sarif: true
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4.35.2
+        uses: github/codeql-action/upload-sarif@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0
         with:
           sarif_file: 'trivy-results.sarif'

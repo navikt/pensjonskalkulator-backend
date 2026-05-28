@@ -16,6 +16,7 @@ enum class EgressService(
     GANDALF_STS("Gandalf Security Token Service", "STS", "Tokenveksling til SAML", GatewayUsage.INTERNAL),
     ID_PORTEN("ID-porten", "IDP", "Token-utsteder"),
     MICROSOFT_ENTRA_ID("Microsoft Entra ID", "MEID", "OAuth2 configuration data"),
+    NAV_ANSATT("Nav-ansatt", "NA", "Info om Nav-ansatt"),
     NORSK_PENSJON("Norsk Pensjon", "NP", "Private pensjonsavtaler", GatewayUsage.INTERNAL),
     OAUTH2_TOKEN("OAuth2 token", "OA2", "OAuth2 access token"),
     PENSJON_PERSONDATA(
