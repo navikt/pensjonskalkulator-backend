@@ -61,7 +61,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Deploy
-        uses: nais/deploy/actions/deploy@d57354b433c8d6847ab092467d9fe976a3d008aa # v2
+        uses: nais/deploy/actions/deploy@e90640a98702d2554350fb35c4d5d242dd8e4346 # v2
         env:
           CLUSTER: dev-gcp
           IMAGE: ${{ needs.build.outputs.image }}
