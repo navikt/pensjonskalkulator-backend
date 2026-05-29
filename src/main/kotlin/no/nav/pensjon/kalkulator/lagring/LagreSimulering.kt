@@ -6,7 +6,7 @@ data class LagreSimulering(
     val alderspensjonListe: List<LagreAlderspensjon>,
     val afpPrivat: LagreAfpPrivatSimulering?,
     val afpOffentligLivsvarig: LagreAfpOffentligLivsvarigSimulering?,
-    val afpOffentligTidsbegrenset: LagreAfpOffentligTidsbegrensetSimulering?,
+    val afpOffentligTidsbegrenset: LagreTidsbegrensetOffentligAfp?,
     val vilkaarsproevingsresultat: LagreVilkaarsproevingsresultat?,
     val trygdetid: LagreTrygdetid?,
     val pensjonsgivendeInntektListe: List<LagreAarligBeloep>?,
@@ -24,16 +24,12 @@ data class LagreAlderspensjon(
 data class LagreAfpPrivatSimulering(
     val vedGradertUttak: LagreAfpPrivat?,
     val vedHeltUttak: LagreAfpPrivat,
+    val vedNormertPensjonsalder: LagreAfpPrivat?,
 )
 
 data class LagreAfpOffentligLivsvarigSimulering(
     val vedGradertUttak: LagreLivsvarigOffentligAfp?,
     val vedHeltUttak: LagreLivsvarigOffentligAfp,
-)
-
-data class LagreAfpOffentligTidsbegrensetSimulering(
-    val vedGradertUttak: LagreTidsbegrensetOffentligAfp?,
-    val vedHeltUttak: LagreTidsbegrensetOffentligAfp,
 )
 
 data class LagreLivsvarigOffentligAfp(
@@ -63,7 +59,7 @@ data class LagreAfpPrivat(
     val alderAar: Int,
     val aarligBeloep: Int,
     val kompensasjonstillegg: Int,
-    val kronetillegg: Int,
+    val kronetillegg: Int?,
     val livsvarig: Int,
     val maanedligBeloep: Int
 )
@@ -113,7 +109,7 @@ data class LagreUtenlandsperiode(
 data class LagreMaanedligAlderspensjonForKnekkpunkter(
     val vedGradertUttak: LagreMaanedligAlderspensjon?,
     val vedHeltUttak: LagreMaanedligAlderspensjon,
-    val vedNormertPensjonsalder: LagreMaanedligAlderspensjon
+    val vedNormertPensjonsalder: LagreMaanedligAlderspensjon?
 )
 
 data class LagreMaanedligAlderspensjon(

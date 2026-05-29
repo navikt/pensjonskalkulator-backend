@@ -16,22 +16,18 @@ data class SimuleringBrevV1(
     val maanedligAlderspensjonForKnekkpunkter: MaanedligAlderspensjonForKnekkpunkterBrevDtoV1?,
     val afpPrivat: AfpPrivatSimuleringBrevDtoV1?,
     val afpOffentligLivsvarig: AfpOffentligLivsvarigSimuleringBrevDtoV1?,
-    val afpOffentligTidsbegrenset: AfpOffentligTidsbegrensetSimuleringBrevDtoV1?,
+    val afpOffentligTidsbegrenset: TidsbegrensetOffentligAfpBrevDtoV1?,
 )
 
 data class AfpPrivatSimuleringBrevDtoV1(
     val vedGradertUttak: AfpPrivatBrevDtoV1?,
     val vedHeltUttak: AfpPrivatBrevDtoV1,
+    val vedNormertPensjonsalder: AfpPrivatBrevDtoV1?,
 )
 
 data class AfpOffentligLivsvarigSimuleringBrevDtoV1(
     val vedGradertUttak: LivsvarigOffentligAfpBrevDtoV1?,
     val vedHeltUttak: LivsvarigOffentligAfpBrevDtoV1,
-)
-
-data class AfpOffentligTidsbegrensetSimuleringBrevDtoV1(
-    val vedGradertUttak: TidsbegrensetOffentligAfpBrevDtoV1?,
-    val vedHeltUttak: TidsbegrensetOffentligAfpBrevDtoV1,
 )
 
 data class AlderspensjonBrevDtoV1(
@@ -67,7 +63,7 @@ data class AfpPrivatBrevDtoV1(
     val alderAar: Int,
     val aarligBeloep: Int,
     val kompensasjonstillegg: Int,
-    val kronetillegg: Int,
+    val kronetillegg: Int?,
     val livsvarig: Int,
     val maanedligBeloep: Int
 )
@@ -117,7 +113,7 @@ data class UtenlandsperiodeBrevDtoV1(
 data class MaanedligAlderspensjonForKnekkpunkterBrevDtoV1(
     val vedGradertUttak: MaanedligAlderspensjonBrevDtoV1?,
     val vedHeltUttak: MaanedligAlderspensjonBrevDtoV1,
-    val vedNormertPensjonsalder: MaanedligAlderspensjonBrevDtoV1
+    val vedNormertPensjonsalder: MaanedligAlderspensjonBrevDtoV1?
 )
 
 data class MaanedligAlderspensjonBrevDtoV1(
@@ -151,7 +147,7 @@ data class MaanedligAlderspensjonBrevDtoV1(
 )
 
 data class ForbeholdBrevDtoV1(
-    val seksjoner: List<ForbeholdSeksjonBrevDtoV1>
+    val seksjoner: List<ForbeholdSeksjonBrevDtoV1>?
 )
 
 data class ForbeholdSeksjonBrevDtoV1(

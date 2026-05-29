@@ -17,7 +17,7 @@ object LagreSimuleringMapperV1 {
             alderspensjonListe = source.alderspensjonListe.map(::alderspensjon),
             afpPrivat = source.afpPrivat?.let(::afpPrivatSimulering),
             afpOffentligLivsvarig = source.afpOffentligLivsvarig?.let(::afpOffentligLivsvarigSimulering),
-            afpOffentligTidsbegrenset = source.afpOffentligTidsbegrenset?.let(::afpOffentligTidsbegrensetSimulering),
+            afpOffentligTidsbegrenset = source.afpOffentligTidsbegrenset?.let(::tidsbegrensetOffentligAfp),
             vilkaarsproevingsresultat = vilkaarsproevingsresultat(source.vilkaarsproevingsresultat),
             trygdetid = source.trygdetid?.let(::trygdetid),
             pensjonsgivendeInntektListe = source.pensjonsgivendeInntektListe?.map(::aarligBeloep),
@@ -37,18 +37,13 @@ object LagreSimuleringMapperV1 {
         LagreAfpPrivatSimulering(
             vedGradertUttak = source.vedGradertUttak?.let(::afpPrivat),
             vedHeltUttak = afpPrivat(source.vedHeltUttak),
+            vedNormertPensjonsalder = source.vedNormertPensjonsalder?.let(::afpPrivat),
         )
 
     private fun afpOffentligLivsvarigSimulering(source: LagreAfpOffentligLivsvarigSimuleringDto) =
         LagreAfpOffentligLivsvarigSimulering(
             vedGradertUttak = source.vedGradertUttak?.let(::livsvarigOffentligAfp),
             vedHeltUttak = livsvarigOffentligAfp(source.vedHeltUttak),
-        )
-
-    private fun afpOffentligTidsbegrensetSimulering(source: LagreAfpOffentligTidsbegrensetSimuleringDto) =
-        LagreAfpOffentligTidsbegrensetSimulering(
-            vedGradertUttak = source.vedGradertUttak?.let(::tidsbegrensetOffentligAfp),
-            vedHeltUttak = tidsbegrensetOffentligAfp(source.vedHeltUttak),
         )
 
     private fun livsvarigOffentligAfp(source: LagreLivsvarigOffentligAfpDto) =
@@ -139,7 +134,7 @@ object LagreSimuleringMapperV1 {
         LagreMaanedligAlderspensjonForKnekkpunkter(
             vedGradertUttak = source.vedGradertUttak?.let(::maanedligAlderspensjon),
             vedHeltUttak = maanedligAlderspensjon(source.vedHeltUttak),
-            vedNormertPensjonsalder = maanedligAlderspensjon(source.vedNormertPensjonsalder)
+            vedNormertPensjonsalder = source.vedNormertPensjonsalder?.let(::maanedligAlderspensjon)
         )
 
     private fun maanedligAlderspensjon(source: LagreMaanedligAlderspensjonDto) =
