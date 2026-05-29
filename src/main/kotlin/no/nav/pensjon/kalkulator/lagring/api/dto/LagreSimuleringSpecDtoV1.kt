@@ -9,7 +9,7 @@ data class LagreSimuleringSpecDtoV1(
     @field:NotNull val alderspensjonListe: List<LagreAlderspensjonDto>,
     val afpPrivat: LagreAfpPrivatSimuleringDto?,
     val afpOffentligLivsvarig: LagreAfpOffentligLivsvarigSimuleringDto?,
-    val afpOffentligTidsbegrenset: LagreAfpOffentligTidsbegrensetSimuleringDto?,
+    val afpOffentligTidsbegrenset: LagreTidsbegrensetOffentligAfpDto?,
     @field:NotNull val vilkaarsproevingsresultat: LagreVilkaarsproevingsresultatDto,
     val trygdetid: LagreTrygdetidDto?,
     val pensjonsgivendeInntektListe: List<LagreAarligBeloepDto>?,
@@ -27,16 +27,12 @@ data class LagreAlderspensjonDto(
 data class LagreAfpPrivatSimuleringDto(
     val vedGradertUttak: LagrePrivatAfpDto?,
     @field:NotNull val vedHeltUttak: LagrePrivatAfpDto,
+    val vedNormertPensjonsalder: LagrePrivatAfpDto?,
 )
 
 data class LagreAfpOffentligLivsvarigSimuleringDto(
     val vedGradertUttak: LagreLivsvarigOffentligAfpDto?,
     @field:NotNull val vedHeltUttak: LagreLivsvarigOffentligAfpDto,
-)
-
-data class LagreAfpOffentligTidsbegrensetSimuleringDto(
-    val vedGradertUttak: LagreTidsbegrensetOffentligAfpDto?,
-    @field:NotNull val vedHeltUttak: LagreTidsbegrensetOffentligAfpDto,
 )
 
 data class LagreLivsvarigOffentligAfpDto(
@@ -66,7 +62,7 @@ data class LagrePrivatAfpDto(
     @field:NotNull val alderAar: Int,
     @field:NotNull val aarligBeloep: Int,
     @field:NotNull val kompensasjonstillegg: Int,
-    @field:NotNull val kronetillegg: Int,
+    val kronetillegg: Int?,
     @field:NotNull val livsvarig: Int,
     @field:NotNull val maanedligBeloep: Int
 )
@@ -116,7 +112,7 @@ data class LagreUtenlandsperiodeDto(
 data class LagreMaanedligAlderspensjonForKnekkpunkterDto(
     val vedGradertUttak: LagreMaanedligAlderspensjonDto?,
     @field:NotNull val vedHeltUttak: LagreMaanedligAlderspensjonDto,
-    @field:NotNull val vedNormertPensjonsalder: LagreMaanedligAlderspensjonDto
+    val vedNormertPensjonsalder: LagreMaanedligAlderspensjonDto?
 )
 
 data class LagreMaanedligAlderspensjonDto(

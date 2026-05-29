@@ -17,7 +17,7 @@ object OpprettBrevDtoV1Mapper {
                 maanedligAlderspensjonForKnekkpunkter = source.maanedligAlderspensjonForKnekkpunkter?.let(::mapToKnekkpunkterDto),
                 afpPrivat = source.afpPrivat?.let(::mapToAfpPrivatSimuleringDto),
                 afpOffentligLivsvarig = source.afpOffentligLivsvarig?.let(::mapToAfpOffentligLivsvarigSimuleringDto),
-                afpOffentligTidsbegrenset = source.afpOffentligTidsbegrenset?.let(::mapToAfpOffentligTidsbegrensetSimuleringDto),
+                afpOffentligTidsbegrenset = source.afpOffentligTidsbegrenset?.let(::mapToTidsbegrensetOffentligAfpDto),
             ),
             simuleringsinformasjon = source.simuleringsinformasjon?.let(::mapToSimuleringsinformasjonDto),
             vilkaarsproevingsresultat = source.vilkaarsproevingsresultat?.let(::mapToVilkaarsproevingsresultatDto),
@@ -36,18 +36,13 @@ object OpprettBrevDtoV1Mapper {
         AfpPrivatSimuleringBrevDtoV1(
             vedGradertUttak = source.vedGradertUttak?.let(::mapToPrivatAfpDto),
             vedHeltUttak = mapToPrivatAfpDto(source.vedHeltUttak),
+            vedNormertPensjonsalder = source.vedNormertPensjonsalder?.let(::mapToPrivatAfpDto),
         )
 
     private fun mapToAfpOffentligLivsvarigSimuleringDto(source: LagreAfpOffentligLivsvarigSimulering) =
         AfpOffentligLivsvarigSimuleringBrevDtoV1(
             vedGradertUttak = source.vedGradertUttak?.let(::mapToLivsvarigOffentligAfpDto),
             vedHeltUttak = mapToLivsvarigOffentligAfpDto(source.vedHeltUttak),
-        )
-
-    private fun mapToAfpOffentligTidsbegrensetSimuleringDto(source: LagreAfpOffentligTidsbegrensetSimulering) =
-        AfpOffentligTidsbegrensetSimuleringBrevDtoV1(
-            vedGradertUttak = source.vedGradertUttak?.let(::mapToTidsbegrensetOffentligAfpDto),
-            vedHeltUttak = mapToTidsbegrensetOffentligAfpDto(source.vedHeltUttak),
         )
 
     private fun mapToLivsvarigOffentligAfpDto(source: LagreLivsvarigOffentligAfp) =
@@ -133,7 +128,7 @@ object OpprettBrevDtoV1Mapper {
         MaanedligAlderspensjonForKnekkpunkterBrevDtoV1(
             vedGradertUttak = source.vedGradertUttak?.let(::mapToMaanedligAlderspensjonDto),
             vedHeltUttak = mapToMaanedligAlderspensjonDto(source.vedHeltUttak),
-            vedNormertPensjonsalder = mapToMaanedligAlderspensjonDto(source.vedNormertPensjonsalder)
+            vedNormertPensjonsalder = source.vedNormertPensjonsalder?.let(::mapToMaanedligAlderspensjonDto)
         )
 
     private fun mapToMaanedligAlderspensjonDto(source: LagreMaanedligAlderspensjon) =

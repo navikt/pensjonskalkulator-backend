@@ -35,7 +35,8 @@ class LagreSimuleringMapperTest : ShouldSpec({
                         kronetillegg = 2000,
                         livsvarig = 27000,
                         maanedligBeloep = 2500
-                    )
+                    ),
+                    vedNormertPensjonsalder = null
                 ),
                 afpOffentligLivsvarig = LagreAfpOffentligLivsvarigSimuleringDto(
                     vedGradertUttak = null,
@@ -78,7 +79,8 @@ class LagreSimuleringMapperTest : ShouldSpec({
                     kronetillegg = 2000,
                     livsvarig = 27000,
                     maanedligBeloep = 2500
-                )
+                ),
+                vedNormertPensjonsalder = null
             ),
             afpOffentligLivsvarig = LagreAfpOffentligLivsvarigSimulering(
                 vedGradertUttak = null,
