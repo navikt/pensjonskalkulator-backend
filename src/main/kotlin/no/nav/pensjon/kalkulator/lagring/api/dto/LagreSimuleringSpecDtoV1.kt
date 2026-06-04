@@ -106,7 +106,7 @@ data class LagreUtenlandsperiodeDto(
     @field:NotNull val fom: LocalDate,
     val tom: LocalDate?,
     @field:NotNull val landkode: String,
-    @field:NotNull val arbeidetUtenlands: Boolean?
+    val arbeidetUtenlands: Boolean?
 )
 
 data class LagreMaanedligAlderspensjonForKnekkpunkterDto(
