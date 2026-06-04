@@ -14,12 +14,14 @@ import java.net.URI
 
 @Component
 class SanityForbeholdClient(
+    @Value("\${sanity.project-id}") private val projectId: String,
+    @Value("\${sanity.dataset}") private val dataset: String,
     webClientBuilder: WebClient.Builder,
 ) : ForbeholdClient {
 
     private val log = KotlinLogging.logger {}
 
-    private val baseUrl = "https://g2by7q6m.apicdn.sanity.io/v2025-07-02/data/query/development"
+    private val baseUrl = "https://$projectId.apicdn.sanity.io/v2025-07-02/data/query/$dataset"
 
     private val webClient = webClientBuilder.build()
 
