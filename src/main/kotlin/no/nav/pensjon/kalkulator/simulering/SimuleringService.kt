@@ -1,10 +1,15 @@
 package no.nav.pensjon.kalkulator.simulering
 
 import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpProblem
+import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpProblemType
+import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpService
+import no.nav.pensjon.kalkulator.afp.api.dto.InternServiceberegnetAfpSpec
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.person.PersonService
+import no.nav.pensjon.kalkulator.simulering.PensjonUtil.uttakDato
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.time.TodayProvider
@@ -13,6 +18,7 @@ import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.validity.Problem
 import no.nav.pensjon.kalkulator.validity.ProblemType
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.time.format.DateTimeParseException
 
 @Service
@@ -21,7 +27,8 @@ class SimuleringService(
     private val inntektService: InntektService,
     private val personService: PersonService,
     private val pidGetter: PidGetter,
-    private val time: TodayProvider
+    private val time: TodayProvider,
+    private val serviceberegnetAfpService: ServiceberegnetAfpService
 ) {
     private val log = KotlinLogging.logger {}
 
@@ -46,6 +53,13 @@ class SimuleringService(
      * Same as simulerPersonligAlderspensjon but with improved handling of problems.
      */
     fun simulerPensjon(providedSpec: ImpersonalSimuleringSpec): SimuleringResult =
+        if (providedSpec.simuleringType == SimuleringType.SERVICEBEREGN_AFP) {
+            simulerAfpMedFpp(providedSpec)
+        } else {
+            simulerAlderspensjon(providedSpec)
+        }
+
+    private fun simulerAlderspensjon(providedSpec: ImpersonalSimuleringSpec): SimuleringResult =
         try {
             val registeredSpec = PersonalSimuleringSpec(
                 pid = pidGetter.pid(),
@@ -66,8 +80,50 @@ class SimuleringService(
         } catch (e: NotFoundException) {
             problem(e, type = ProblemType.PERSON_IKKE_FUNNET)
         } catch (e: EgressException) {
-            problem(e, type = ProblemType.SERVERFEIL)
+            problem(e, type = ProblemType.ANNEN_SERVERFEIL)
         }
+
+    private fun simulerAfpMedFpp(providedSpec: ImpersonalSimuleringSpec): SimuleringResult =
+        try {
+            val afpSpec = InternServiceberegnetAfpSpec(
+                fodselsdato = personService.getPerson().foedselsdato,
+                uttaksdato = providedSpec.gradertUttak?.uttakFomAlder?.let { uttakDato(foedselDato = personService.getPerson().foedselsdato, uttakAlder = it)} as LocalDate,
+                afpOrdning = "AFPSTAT",
+                flyktning = false,
+                antAarIUtlandet = providedSpec.utenlandsopphold.antallAar,
+                utenlandsopphold = providedSpec.utenlandsopphold.periodeListe,
+                forventetArbeidsinntekt = providedSpec.gradertUttak.aarligInntekt,
+                inntektMndForAfp = providedSpec.inntektMaanedFoerAfp,
+                inntektForrigeKalenderaar = providedSpec.inntektForrigeKalenderaar,
+                inntektFremTilUttak = providedSpec.inntektFremTilUttak,
+                epsMottarPensjon = providedSpec.eps.levende?.harPensjon,
+                epsInntektOver2G = providedSpec.eps.levende?.harInntektOver2G,
+                sivilstatus = providedSpec.sivilstatus,
+            )
+
+            val afpResult = serviceberegnetAfpService.simulerServiceberegnetAfp(afpSpec)
+
+            SimuleringResult(
+                alderspensjon = emptyList(),
+                alderspensjonMaanedsbeloep = null,
+                afpPrivat = emptyList(),
+                afpOffentlig = emptyList(),
+                vilkaarsproeving = Vilkaarsproeving(
+                    innvilget = afpResult.beregnetAfp != null && afpResult.problem == null
+                ),
+                harForLiteTrygdetid = false,
+                trygdetid = 0,
+                opptjeningGrunnlagListe = emptyList(),
+                serviceberegnetAfpResult = afpResult.beregnetAfp,
+                problem = afpResult.problem?.let { mapAfpProblem(it) }
+            )
+        } catch (e: BadRequestException) {
+            problem(e, type = ProblemType.ANNEN_KLIENTFEIL)
+        }
+    //TODO: Fiks når feilkodenavn er klar
+        /*catch (e: EgressException) {
+            problem(e, type = ProblemType.ANNEN_SERVERFEIL)
+        }*/
 
     private fun sivilstatus() =
         personService.getPerson().sivilstand.sivilstatus
@@ -91,6 +147,16 @@ class SimuleringService(
                 trygdetid = 0,
                 opptjeningGrunnlagListe = emptyList(),
                 problem = Problem(type, beskrivelse = e.message ?: "Ukjent feil - ${e.javaClass.simpleName}")
+            )
+
+        private fun mapAfpProblem(source: ServiceberegnetAfpProblem) =
+            Problem(
+                type = when (source.type) {
+                    ServiceberegnetAfpProblemType.UTILSTREKKELIG_TRYGDETID -> ProblemType.UTILSTREKKELIG_TRYGDETID
+                    ServiceberegnetAfpProblemType.UTILSTREKKELIG_OPPTJENING -> ProblemType.UTILSTREKKELIG_OPPTJENING
+                    ServiceberegnetAfpProblemType.ANNEN_KLIENTFEIL -> ProblemType.ANNEN_KLIENTFEIL
+                },
+                beskrivelse = source.beskrivelse
             )
     }
 }

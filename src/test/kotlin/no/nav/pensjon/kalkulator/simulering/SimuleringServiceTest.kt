@@ -6,6 +6,7 @@ import io.mockk.Called
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpService
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.land.Land
@@ -43,7 +44,8 @@ class SimuleringServiceTest : ShouldSpec({
                 inntektService,
                 personService,
                 pidGetter = pidGetter,
-                time = arrangeTime()
+                time = arrangeTime(),
+                serviceberegnetAfpService = mockk<ServiceberegnetAfpService>()
             )
 
         val response = service.simulerPersonligAlderspensjon(incomingSpec)
@@ -72,7 +74,8 @@ class SimuleringServiceTest : ShouldSpec({
                 inntektService,
                 personService,
                 pidGetter,
-                time = arrangeTime()
+                time = arrangeTime(),
+                serviceberegnetAfpService = mockk<ServiceberegnetAfpService>()
             )
 
         val response = service.simulerPersonligAlderspensjon(incomingSpec)

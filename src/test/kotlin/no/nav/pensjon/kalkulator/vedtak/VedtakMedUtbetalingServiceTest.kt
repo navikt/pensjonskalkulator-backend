@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.utbetaling.SamletUtbetaling
@@ -31,14 +32,16 @@ class VedtakMedUtbetalingServiceTest : ShouldSpec({
 private fun vedtakSamling(utbetalingSisteMaaned: Utbetaling?) =
     VedtakSamling(
         loependeAlderspensjon = LoependeAlderspensjon(
-            grad = 1,
+            grad = Uttaksgrad.TJUE_PROSENT,
             fom = LocalDate.of(2020, 10, 1),
             uttaksgradFom = LocalDate.of(2021, 1, 1),
             utbetalingSisteMaaned = utbetalingSisteMaaned,
             sivilstatus = Sivilstatus.UGIFT,
+            harGjenlevenderett = true,
+            harUtenlandsopphold = true
         ),
         fremtidigAlderspensjon = FremtidigAlderspensjon(
-            grad = 3,
+            grad = Uttaksgrad.FOERTI_PROSENT,
             fom = LocalDate.of(2023, 10, 1),
             sivilstatus = Sivilstatus.GIFT
         ),

@@ -23,11 +23,11 @@ jobs:
       security-events: write
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           ref: 'sandbox'
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@68bde559dea0fdcac2102bfdf6230c5f70eb485e # v4.35.4
+        uses: github/codeql-action/init@87557b9c84dde89fdd9b10e88954ac2f4248e463 # v4.36.1
         with:
           languages: java
       - name: Setup java
@@ -39,12 +39,12 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@68bde559dea0fdcac2102bfdf6230c5f70eb485e # v4.35.4
+        uses: github/codeql-action/analyze@87557b9c84dde89fdd9b10e88954ac2f4248e463 # v4.36.1
         with:
           category: "/language:java"
       - name: Create Docker image
         id: image-creation
-        uses: nais/docker-build-push@be85229e81c0293c265c646c084f05317fb6e0d2 # v0
+        uses: nais/docker-build-push@751a312f0803eb96a05a41fadf51be19b7be362c # v0
         with:
           dockerfile: .docker/Dockerfile
           team: pensjonskalkulator
@@ -59,9 +59,9 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       - name: Deploy
-        uses: nais/deploy/actions/deploy@823ec9b7e305ce7cf911d0f9a25f7da9d7486cf2 # v2
+        uses: nais/deploy/actions/deploy@c55d6073d913975d2dada508bdfefc6427d39867 # v2
         env:
           CLUSTER: dev-gcp
           IMAGE: ${{ needs.build.outputs.image }}

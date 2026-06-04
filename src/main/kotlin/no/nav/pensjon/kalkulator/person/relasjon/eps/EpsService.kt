@@ -8,15 +8,18 @@ import no.nav.pensjon.kalkulator.person.relasjon.Familierelasjon
 import no.nav.pensjon.kalkulator.person.relasjon.Relasjonstype
 import no.nav.pensjon.kalkulator.person.relasjon.eps.client.EpsClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.CacheAwarePopulasjonstilgangService
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 
 @Service
 class EpsService(
     private val client: EpsClient,
     private val personService: PersonService,
-    private val pidGetter: PidGetter
+    private val pidGetter: PidGetter,
+    private val populasjonstilgangService: CacheAwarePopulasjonstilgangService
 ) {
     /**
      * Ref. PSELV: PersonopplysningerActionDelegate.setBrukersSivilstatus
@@ -30,21 +33,52 @@ class EpsService(
     /**
      * Ref. PSELV: PersonopplysningerAction.findSisteEpsRelasjon
      */
-    fun nyligsteRelasjon(sivilstatus: Sivilstatus): Familierelasjon =
-        client.fetchNyligsteEps(
+    fun nyligsteRelasjon(sivilstatus: Sivilstatus): Familierelasjon {
+        val eps: Familierelasjon = client.fetchNyligsteEps(
             soekerPid = pidGetter.pid(),
             sivilstatus,
             personaliaSpec
         )
 
-    private fun relasjonstype(): Relasjonstype =
-        try {
-            client.fetchNaavaerendeEps(soekerPid = pidGetter.pid(), personaliaSpec).relasjonstype
-        } catch (e: EgressException) {
-            if (e.statusCode == HttpStatus.NOT_FOUND)
-                Relasjonstype.UKJENT
-            else throw e
+        eps.pid?.let(populasjonstilgangService::eventuellTilgangsnektAarsak)?.let {
+            throw AccessDeniedException("Tilgang til EPS nektet: $it")
         }
+
+        return eps
+    }
+
+    fun tidligereGiftEllerBarnMedSamboer(): Boolean? {
+        val eps = hentNaavaerendeEps()
+
+        return if (
+            eps?.relasjonstype == Relasjonstype.SAMBOER &&
+            eps.pid != null
+        ) {
+            client.fetchTidligereGiftEllerBarnMed(
+                soekerPid = pidGetter.pid(),
+                samboerPid = eps.pid
+            )
+        } else {
+            null
+        }
+    }
+
+    private fun hentNaavaerendeEps() =
+        try {
+            client.fetchNaavaerendeEps(
+                soekerPid = pidGetter.pid(),
+                personaliaSpec
+            )
+        } catch (e: EgressException) {
+            if (e.statusCode == HttpStatus.NOT_FOUND) {
+                null
+            } else {
+                throw e
+            }
+        }
+
+    private fun relasjonstype(): Relasjonstype =
+        hentNaavaerendeEps()?.relasjonstype ?: Relasjonstype.UKJENT
 
     private companion object {
         private val personaliaSpec: List<PersonaliaType> = listOf(
@@ -61,7 +95,7 @@ class EpsService(
                 else -> registrertSivilstand?.sivilstatus
             }
 
-        private fun erUkjent(sivilstatus: Sivilstand?): Boolean =
-            sivilstatus == null || Sivilstand.UOPPGITT == sivilstatus
+        private fun erUkjent(sivilstand: Sivilstand?): Boolean =
+            sivilstand == null || Sivilstand.UOPPGITT == sivilstand
     }
 }

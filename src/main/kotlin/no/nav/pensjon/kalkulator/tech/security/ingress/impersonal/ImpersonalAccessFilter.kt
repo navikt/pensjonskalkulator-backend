@@ -1,43 +1,29 @@
 package no.nav.pensjon.kalkulator.tech.security.ingress.impersonal
 
-import com.github.benmanes.caffeine.cache.Cache
-import com.github.benmanes.caffeine.cache.Caffeine
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletRequest
 import jakarta.servlet.ServletResponse
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import kotlinx.coroutines.*
 import mu.KotlinLogging
-import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.SecurityConfiguration.Companion.FEATURE_URI
-import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
-import no.nav.pensjon.kalkulator.tech.security.ingress.SecurityCoroutineContext
+import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.fag.FagtilgangService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.PopulasjonstilgangService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.TilgangResult
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.CacheAwarePopulasjonstilgangService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.SecurityContextNavIdExtractor
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.util.StringUtils.hasLength
 import org.springframework.web.filter.GenericFilterBean
-import java.util.concurrent.TimeUnit
 
 class ImpersonalAccessFilter(
-    private val pidGetter: PidExtractor,
-    private val navIdExtractor: SecurityContextNavIdExtractor,
+    private val pidGetter: PidGetter,
     private val fagtilgangService: FagtilgangService,
-    private val populasjonstilgangService: PopulasjonstilgangService,
+    private val populasjonstilgangService: CacheAwarePopulasjonstilgangService,
     private val auditor: Auditor
 ) : GenericFilterBean() {
 
     private val log = KotlinLogging.logger {}
-    private val tilgangCache: Cache<String, Deferred<TilgangResult>> = Caffeine.newBuilder()
-        .expireAfterWrite(1, TimeUnit.MINUTES)
-        .maximumSize(1000)
-        .build()
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
         // Request for state of feature toggle requires no authentication or access check:
@@ -66,28 +52,9 @@ class ImpersonalAccessFilter(
 
     private fun eventuellTilgangsnektAarsak(): String? =
         if (fagtilgangService.tilgangInnvilget())
-            eventuellPopulasjonstilgangsnektAarsak()
+            populasjonstilgangService.eventuellTilgangsnektAarsak(pid = pidGetter.pid())
         else
             "manglende faggruppemedlemskap"
-
-    private fun eventuellPopulasjonstilgangsnektAarsak(): String? =
-        with(populasjonstilgang(pid = pidGetter.pid())) {
-            if (innvilget) null
-            else avvisningsinfo
-        }
-
-    private fun populasjonstilgang(pid: Pid): TilgangResult {
-        val deferred = tilgangCache.get(cacheKey(navIdent = navIdExtractor.id(), pid)) {
-            scope.async(SecurityCoroutineContext()) {
-                populasjonstilgangService.sjekkTilgang(pid)
-            }
-        }
-
-        return runBlocking { deferred.await() }
-    }
-
-    private fun cacheKey(navIdent: String, pid: Pid): String =
-        "$navIdent:${pid.value}"
 
     private fun hasPid(request: HttpServletRequest): Boolean =
         hasLength(request.getHeader(CustomHttpHeaders.PID))

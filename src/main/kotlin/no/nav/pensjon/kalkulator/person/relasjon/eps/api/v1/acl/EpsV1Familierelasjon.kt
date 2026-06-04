@@ -1,5 +1,7 @@
 package no.nav.pensjon.kalkulator.person.relasjon.eps.api.v1.acl
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import jakarta.validation.constraints.NotNull
 import no.nav.pensjon.kalkulator.person.Tilgangsbegrensning
 import no.nav.pensjon.kalkulator.person.relasjon.Relasjonstype
@@ -12,13 +14,16 @@ import java.time.LocalDate
  * An alternative is to use 'springdoc.use-fqn=true', but this causes problems for the frontend's type checker (which
  * cannot handle DTO names with dots).
  */
+@JsonInclude(NON_NULL)
 data class EpsV1Familierelasjon(
     val pid: String?,
     val fom: LocalDate?,
     @field:NotNull val relasjonstype: EpsV1Relasjonstype,
-    val relasjonPersondata: EpsV1RelasjonPersondata?
+    val relasjonPersondata: EpsV1RelasjonPersondata?,
+    val problem: EpsV1Problem? = null
 )
 
+@JsonInclude(NON_NULL)
 data class EpsV1RelasjonPersondata(
     val tilgangsbegrensning: EpsV1Tilgangsbegrensning?,
     val navn: EpsV1Navn?,
@@ -27,16 +32,27 @@ data class EpsV1RelasjonPersondata(
     val statsborgerskap: String?
 )
 
+@JsonInclude(NON_NULL)
 data class EpsV1Navn(
     val fornavn: String?,
     val mellomnavn: String?,
     val etternavn: String?
 )
 
+data class EpsV1Problem(
+    @field:NotNull val type: EpsV1ProblemType,
+    @field:NotNull val beskrivelse: String
+)
+
+enum class EpsV1ProblemType {
+    TILGANG_NEKTET
+}
+
 enum class EpsV1Relasjonstype(val internalValue: Relasjonstype) {
     EKTEFELLE(internalValue = Relasjonstype.EKTEFELLE),
     REGISTRERT_PARTNER(internalValue = Relasjonstype.REGISTRERT_PARTNER),
-    SAMBOER(internalValue = Relasjonstype.SAMBOER);
+    SAMBOER(internalValue = Relasjonstype.SAMBOER),
+    UKJENT(internalValue = Relasjonstype.UKJENT);
 
     companion object {
         fun fromInternalValue(value: Relasjonstype?): EpsV1Relasjonstype =

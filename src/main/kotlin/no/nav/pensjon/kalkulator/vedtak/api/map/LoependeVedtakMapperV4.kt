@@ -13,12 +13,12 @@ object LoependeVedtakMapperV4 {
         ufoeretrygd = source.ufoeretrygd?.let(::ufoeretrygd) ?: UfoeretrygdDetaljerV4(grad = 0),
         afpPrivat = source.privatAfp?.let(::loependeEntitet),
         afpOffentlig = null, //TODO remove?
-        pre2025OffentligAfp = source.pre2025OffentligAfp?.let(::loependeEntitet),
+        pre2025OffentligAfp = source.tidsbegrensetOffentligAfp?.let(::loependeEntitet),
     )
 
     private fun loependeAlderspensjon(source: LoependeAlderspensjon) =
         AlderspensjonDetaljerV4(
-            grad = source.grad,
+            grad = source.grad.prosentsats,
             fom = source.fom,
             uttaksgradFom = source.uttaksgradFom ?: source.fom,
             sisteUtbetaling = source.utbetalingSisteMaaned?.let(::utbetaling),
@@ -27,7 +27,7 @@ object LoependeVedtakMapperV4 {
 
     private fun fremtidigAlderspensjon(source: FremtidigAlderspensjon) =
         FremtidigAlderspensjonDetaljerV4(
-            grad = source.grad,
+            grad = source.grad.prosentsats,
             fom = source.fom,
         )
 

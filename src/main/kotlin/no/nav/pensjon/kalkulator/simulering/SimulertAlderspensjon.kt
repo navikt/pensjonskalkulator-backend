@@ -36,5 +36,6 @@ data class Kapittel20Pensjon(
 
 data class Garantipensjon(
     val aarligBeloep: Int,
+    val maanedligBeloep: Int?,
     val sats: Double
 )

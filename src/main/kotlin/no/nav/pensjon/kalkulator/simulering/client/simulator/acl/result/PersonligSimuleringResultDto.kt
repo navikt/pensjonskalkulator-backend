@@ -1,16 +1,35 @@
 package no.nav.pensjon.kalkulator.simulering.client.simulator.acl.result
 
+import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotNull
 
 data class PersonligSimuleringResultDto(
+    @field:Schema(description = "Liste over prognosert alderspensjon per år")
     @field:NotNull val alderspensjonListe: List<AlderspensjonDto>,
+
+    @field:Schema(description = "Prognosert utbetalt månedsbeløp for alderspensjon")
     val alderspensjonMaanedsbeloep: UttaksbeloepDto?,
+    val maanedligAlderspensjonForKnekkpunkter: MaanedligAlderspensjonForKnekkpunkterDto?,
+
+    @field:Schema(description = "Liste over prognosert livsvarig AFP i offentlig sektor, per år")
     @field:NotNull val livsvarigOffentligAfpListe: List<AldersbestemtUtbetalingDto>,
+
+    @field:Schema(description = "Prognosert tidsbegrenset AFP i offentlig sektor")
     val tidsbegrensetOffentligAfp: TidsbegrensetOffentligAfpDto?,
+
+    @field:Schema(description = "Liste over prognosert livsvarig AFP i privat sektor, per år")
     @field:NotNull val privatAfpListe: List<PrivatAfpDto>,
+
+    @field:Schema(description = "Primær trygdetid")
     val primaerTrygdetid: TrygdetidDto?,
+
+    @field:Schema(description = "Resultatet av vilkårsprøvingen i henhold til pensjonsregelverket")
     @field:NotNull val vilkaarsproevingsresultat: VilkaarsproevingsresultatDto,
+
+    @field:Schema(description = "Liste over pensjonsgivende inntekter brukt i beregningen")
     @field:NotNull val pensjonsgivendeInntektListe: List<AarligBeloepDto>,
+
+    @field:Schema(description = "Eventuelt problem som oppstod under simuleringen")
     val problem: ProblemDto? = null
 )
 
@@ -113,12 +132,37 @@ data class UttaksparametreDto(
 
 data class GarantipensjonDto(
     @field:NotNull val aarligBeloep: Int,
+    val maanedligBeloep: Int?,
     @field:NotNull val sats: Double
 )
 
 data class AlderDto(
     @field:NotNull val aar: Int,
     @field:NotNull val maaneder: Int
+)
+
+data class MaanedligAlderspensjonForKnekkpunkterDto(
+    val vedGradertUttak: MaanedligAlderspensjonDto?,
+    val vedHeltUttak: MaanedligAlderspensjonDto?,
+    val vedNormertPensjonsalder: MaanedligAlderspensjonDto?
+)
+
+data class MaanedligAlderspensjonDto(
+    @field:NotNull val beloep: Int,
+    val inntektspensjon: Int?,
+    val delingstall: Double?,
+    val pensjonsbeholdningFoerUttak: Int?,
+    val pensjonsbeholdningEtterUttak: Int?,
+    val sluttpoengtall: Double?,
+    val poengaarFoer92: Int?,
+    val poengaarEtter91: Int?,
+    val forholdstall: Double?,
+    val grunnpensjon: Int?,
+    val tilleggspensjon: Int?,
+    val pensjonstillegg: Int?,
+    val skjermingstillegg: Int?,
+    val kapittel19Pensjon: Kapittel19PensjonDto?,
+    val kapittel20Pensjon: Kapittel20PensjonDto?
 )
 
 data class ProblemDto(
