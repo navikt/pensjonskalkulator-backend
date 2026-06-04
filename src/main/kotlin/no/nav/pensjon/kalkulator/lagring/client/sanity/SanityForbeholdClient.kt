@@ -21,7 +21,7 @@ class SanityForbeholdClient(
 
     private val log = KotlinLogging.logger {}
 
-    private val baseUrl = "https://$projectId.apicdn.sanity.io/v2025-07-02/data/query/$dataset"
+    private val sanityUrl = "https://$projectId.apicdn.sanity.io/v2025-07-02/data/query/$dataset"
 
     private val webClient = webClientBuilder.build()
 
@@ -30,7 +30,7 @@ class SanityForbeholdClient(
 
         log.debug { "GET Sanity query for forbehold" }
 
-        val uri: URI = UriComponentsBuilder.fromUriString(baseUrl)
+        val uri: URI = UriComponentsBuilder.fromUriString(sanityUrl)
             .queryParam("query", query)
             .queryParam("returnQuery", "false")
             .build()
