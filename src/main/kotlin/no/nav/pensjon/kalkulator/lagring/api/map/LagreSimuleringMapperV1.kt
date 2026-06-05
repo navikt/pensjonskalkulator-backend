@@ -5,12 +5,13 @@ import no.nav.pensjon.kalkulator.lagring.api.dto.*
 
 object LagreSimuleringMapperV1 {
 
-    fun toDto(source: LagreSimuleringResponse) =
-        LagreSimuleringResponseDtoV1(
+    fun toDto(source: LagreSimuleringResponse, skribentenUrl: String): LagreSimuleringResponseDtoV1 {
+        return LagreSimuleringResponseDtoV1(
             brevId = source.brevId,
             sakId = source.sakId,
-            brevDevQ2Url = "https://pensjon-skribenten-web-q2.intern.dev.nav.no/saksnummer/${source.sakId}/brev/${source.brevId}",
+            url = "${skribentenUrl}/saksnummer/${source.sakId}/brev/${source.brevId}",
         )
+    }
 
     fun fromDto(source: LagreSimuleringSpecDtoV1) =
         LagreSimulering(
