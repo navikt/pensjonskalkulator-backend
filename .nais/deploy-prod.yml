@@ -217,6 +217,8 @@ spec:
       value: https://api.ofa.storebrand.no/sbp/{tpnr}/ofa/v1/hentAfpStatus/{fnr}?uttaksdato={uttaksdato}
     - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_STOREBRAND_PEN_SCOPE
       value: stbsbp:nav
+    - name: SKRIBENTEN_WEB_URL
+      value: https://pensjon-skribenten.intern.nav.no
     - name: SANITY_PROJECT_ID
       value: g2by7q6m
     - name: SANITY_DATASET

@@ -12,11 +12,12 @@ class LagreSimuleringMapperTest : ShouldSpec({
             LagreSimuleringResponse(
                 brevId = "brev-123",
                 sakId = "sak-456",
-            )
+            ),
+            "https://pensjon-skribenten-web-q2.intern.dev.nav.no"
         ) shouldBe LagreSimuleringResponseDtoV1(
             brevId = "brev-123",
             sakId = "sak-456",
-            brevDevQ2Url = "https://pensjon-skribenten-web-q2.intern.dev.nav.no/saksnummer/sak-456/brev/brev-123",
+            url = "https://pensjon-skribenten-web-q2.intern.dev.nav.no/saksnummer/sak-456/brev/brev-123",
         )
     }
 

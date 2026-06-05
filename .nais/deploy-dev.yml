@@ -246,6 +246,8 @@ spec:
       value: https://pensjon-afp-offentlig-mock-q2.intern.dev.nav.no/api/afp-offentlig-status/{tpnr}/hentAfpStatus/{fnr}?uttaksdato={uttaksdato}
     - name: LIVSVARIG_AFP_OFFENTLIG_TILBYDERE_STOREBRAND_PEN_SCOPE
       value: nav:pensjon:mock.livsvarig.afp.offentlig
+    - name: SKRIBENTEN_WEB_URL
+      value: https://pensjon-skribenten-web-q2.intern.dev.nav.no
     - name: SANITY_PROJECT_ID
       value: g2by7q6m
     - name: SANITY_DATASET
