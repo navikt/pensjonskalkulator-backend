@@ -12,13 +12,15 @@ import no.nav.pensjon.kalkulator.lagring.api.map.LagreSimuleringMapperV1.fromDto
 import no.nav.pensjon.kalkulator.lagring.api.map.LagreSimuleringMapperV1.toDto
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("api/intern")
 class LagreSimuleringController(
     private val service: LagreSimuleringService,
-    private val traceAid: TraceAid
+    private val traceAid: TraceAid,
+    @Value("\${skribenten.web.url}") private val skribentenUrl: String
 ) : ControllerBase(traceAid) {
 
     private val log = KotlinLogging.logger {}
@@ -43,9 +45,8 @@ class LagreSimuleringController(
     fun lagreSimuleringV1(@RequestBody spec: LagreSimuleringSpecDtoV1): LagreSimuleringResponseDtoV1 {
         traceAid.begin()
         log.debug { "Request for lagre-simulering" }
-
         return try {
-            timed({ toDto(service.lagreSimulering(fromDto(spec))) }, "lagreSimulering")
+            timed({ toDto(service.lagreSimulering(fromDto(spec)), skribentenUrl) }, "lagreSimulering")
         } catch (e: EgressException) {
             handleError(e, "V1")!!
         } finally {

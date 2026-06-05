@@ -44,42 +44,42 @@ class SakServiceTest : ShouldSpec({
         )
     }
 
-    should("hentEllerOpprettAlderspensjonSak returnerer eksisterende alderspensjon sakId") {
+    should("hentEllerOpprettSak returnerer eksisterende alderspensjon sakId") {
         val sakClient = arrangeSaker(
             Sak(sakId = 1, type = SakType.GENERELL, status = SakStatus.LOEPENDE),
             Sak(sakId = 2, type = SakType.ALDERSPENSJON, status = SakStatus.OPPRETTET)
         )
 
         SakService(sakClient, pidGetter)
-            .hentEllerOpprettAlderspensjonSak() shouldBe 2
+            .hentEllerOpprettSak(SakType.ALDERSPENSJON) shouldBe 2
 
-        verify(exactly = 0) { sakClient.opprettAlderspensjonSak(any()) }
+        verify(exactly = 0) { sakClient.opprettNySak(any(), any()) }
     }
 
-    should("hentEllerOpprettAlderspensjonSak oppretter sak når ingen alderspensjon finnes") {
+    should("hentEllerOpprettSak oppretter sak når ingen alderspensjon finnes") {
         val sakClient = arrangeSaker(
             Sak(sakId = 1, type = SakType.GENERELL, status = SakStatus.LOEPENDE)
         ).also {
-            every { it.opprettAlderspensjonSak(any()) } returns
+            every { it.opprettNySak(any(), any()) } returns
                     Sak(sakId = 3, type = SakType.ALDERSPENSJON, status = SakStatus.OPPRETTET)
         }
 
         SakService(sakClient, pidGetter)
-            .hentEllerOpprettAlderspensjonSak() shouldBe 3
+            .hentEllerOpprettSak(SakType.ALDERSPENSJON) shouldBe 3
 
-        verify(exactly = 1) { sakClient.opprettAlderspensjonSak(any()) }
+        verify(exactly = 1) { sakClient.opprettNySak(any(), any()) }
     }
 
-    should("hentEllerOpprettAlderspensjonSak oppretter sak når ingen saker finnes") {
+    should("hentEllerOpprettSak oppretter sak når ingen saker finnes") {
         val sakClient = arrangeSaker().also {
-            every { it.opprettAlderspensjonSak(any()) } returns
+            every { it.opprettNySak(any(), any()) } returns
                     Sak(sakId = 4, type = SakType.ALDERSPENSJON, status = SakStatus.OPPRETTET)
         }
 
         SakService(sakClient, pidGetter)
-            .hentEllerOpprettAlderspensjonSak() shouldBe 4
+            .hentEllerOpprettSak(SakType.ALDERSPENSJON) shouldBe 4
 
-        verify(exactly = 1) { sakClient.opprettAlderspensjonSak(any()) }
+        verify(exactly = 1) { sakClient.opprettNySak(any(), any()) }
     }
 })
 

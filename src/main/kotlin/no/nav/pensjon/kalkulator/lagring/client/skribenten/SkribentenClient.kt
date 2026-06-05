@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.lagring.client.skribenten
 
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
+import no.nav.pensjon.kalkulator.lagring.ForbeholdInnhold
 import no.nav.pensjon.kalkulator.lagring.LagreSimulering
 import no.nav.pensjon.kalkulator.lagring.LagreSimuleringResponse
 import no.nav.pensjon.kalkulator.lagring.client.LagreSimuleringClient
@@ -33,7 +34,7 @@ class SkribentenClient(
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
     private val log = KotlinLogging.logger {}
 
-    override fun lagreSimulering(sakId: Long, lagreSimulering: LagreSimulering): LagreSimuleringResponse {
+    override fun lagreSimulering(sakId: Long, lagreSimulering: LagreSimulering, forbehold: ForbeholdInnhold?): LagreSimuleringResponse {
         val uri = "/sak/$sakId/brev"
         log.debug { "POST to URI: '$uri'" }
 
@@ -42,7 +43,7 @@ class SkribentenClient(
                 .post()
                 .uri(uri)
                 .headers(::setHeaders)
-                .bodyValue(toDto(lagreSimulering))
+                .bodyValue(toDto(lagreSimulering, forbehold))
                 .retrieve()
                 .bodyToMono<BrevResponseDtoV1>()
                 .retryWhen(retryBackoffSpec(uri))

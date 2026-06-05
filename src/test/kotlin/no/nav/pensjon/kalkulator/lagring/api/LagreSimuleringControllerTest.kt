@@ -118,7 +118,7 @@ class LagreSimuleringControllerTest : ShouldSpec() {
         private val RESPONSE_BODY = """{
             "brevId": "$BREV_ID",
             "sakId": "$SAK_ID",
-            "brevDevQ2Url": "https://pensjon-skribenten-web-q2.intern.dev.nav.no/saksnummer/$SAK_ID/brev/$BREV_ID"
+            "url": "https://pensjon-skribenten-web-q2.intern.dev.nav.no/saksnummer/$SAK_ID/brev/$BREV_ID"
         }""".trimIndent()
 
         private fun lagreSimuleringResponse() =

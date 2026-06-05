@@ -1,15 +1,20 @@
 package no.nav.pensjon.kalkulator.lagring.api.dto
 
 import jakarta.validation.constraints.NotNull
+import no.nav.pensjon.kalkulator.lagring.Kull
+import no.nav.pensjon.kalkulator.lagring.NormertPensjonsalderPlassering
+import java.time.LocalDate
 
 data class LagreSimuleringSpecDtoV1(
     @field:NotNull val alderspensjonListe: List<LagreAlderspensjonDto>,
-    val livsvarigOffentligAfpListe: List<LagreAldersbestemtUtbetalingDto>?,
-    val tidsbegrensetOffentligAfp: LagreTidsbegrensetOffentligAfpDto?,
-    val privatAfpListe: List<LagrePrivatAfpDto>?,
+    val afpPrivat: LagreAfpPrivatSimuleringDto?,
+    val afpOffentligLivsvarig: LagreAfpOffentligLivsvarigSimuleringDto?,
+    val afpOffentligTidsbegrenset: LagreTidsbegrensetOffentligAfpDto?,
     @field:NotNull val vilkaarsproevingsresultat: LagreVilkaarsproevingsresultatDto,
     val trygdetid: LagreTrygdetidDto?,
     val pensjonsgivendeInntektListe: List<LagreAarligBeloepDto>?,
+    val simuleringsinformasjon: LagreSimuleringsinformasjonDto?,
+    val maanedligAlderspensjonForKnekkpunkter: LagreMaanedligAlderspensjonForKnekkpunkterDto?,
     val navEnhetId: String?,
 )
 
@@ -19,10 +24,21 @@ data class LagreAlderspensjonDto(
     val gjenlevendetillegg: Int?
 )
 
-data class LagreAldersbestemtUtbetalingDto(
+data class LagreAfpPrivatSimuleringDto(
+    val vedGradertUttak: LagrePrivatAfpDto?,
+    @field:NotNull val vedHeltUttak: LagrePrivatAfpDto,
+    val vedNormertPensjonsalder: LagrePrivatAfpDto?,
+)
+
+data class LagreAfpOffentligLivsvarigSimuleringDto(
+    val vedGradertUttak: LagreLivsvarigOffentligAfpDto?,
+    @field:NotNull val vedHeltUttak: LagreLivsvarigOffentligAfpDto,
+)
+
+data class LagreLivsvarigOffentligAfpDto(
     @field:NotNull val alderAar: Int,
     @field:NotNull val aarligBeloep: Int,
-    val maanedligBeloep: Int?
+    @field:NotNull val maanedligBeloep: Int
 )
 
 data class LagreTidsbegrensetOffentligAfpDto(
@@ -46,9 +62,9 @@ data class LagrePrivatAfpDto(
     @field:NotNull val alderAar: Int,
     @field:NotNull val aarligBeloep: Int,
     @field:NotNull val kompensasjonstillegg: Int,
-    @field:NotNull val kronetillegg: Int,
+    val kronetillegg: Int?,
     @field:NotNull val livsvarig: Int,
-    val maanedligBeloep: Int?
+    @field:NotNull val maanedligBeloep: Int
 )
 
 data class LagreVilkaarsproevingsresultatDto(
@@ -75,4 +91,56 @@ data class LagreUttaksparametreDto(
 data class LagreAlderDto(
     @field:NotNull val aar: Int,
     @field:NotNull val maaneder: Int
+)
+
+data class LagreSimuleringsinformasjonDto(
+    val gradertUttaksalder: LagreAlderDto?,
+    @field:NotNull val heltUttaksalder: LagreAlderDto,
+    val sivilstatus: String?,
+    val utenlandsperioder: List<LagreUtenlandsperiodeDto>?,
+    val kull: Kull,
+    val normertPensjonsalderPlassering: NormertPensjonsalderPlassering?
+)
+
+data class LagreUtenlandsperiodeDto(
+    @field:NotNull val fom: LocalDate,
+    val tom: LocalDate?,
+    @field:NotNull val landkode: String,
+    val arbeidetUtenlands: Boolean?
+)
+
+data class LagreMaanedligAlderspensjonForKnekkpunkterDto(
+    val vedGradertUttak: LagreMaanedligAlderspensjonDto?,
+    @field:NotNull val vedHeltUttak: LagreMaanedligAlderspensjonDto,
+    val vedNormertPensjonsalder: LagreMaanedligAlderspensjonDto?
+)
+
+data class LagreMaanedligAlderspensjonDto(
+    @field:NotNull val beloep: Int,
+    val inntektspensjonBeloep: Int?,
+    val delingstall: Double?,
+    val pensjonsbeholdningFoerUttakBeloep: Int?,
+    val pensjonsbeholdningEtterUttakBeloep: Int?,
+    val sluttpoengtall: Double?,
+    val poengaarTom1991: Int?,
+    val poengaarFom1992: Int?,
+    val forholdstall: Double?,
+    val grunnpensjonBeloep: Int?,
+    val tilleggspensjonBeloep: Int?,
+    val pensjonstillegg: Int?,
+    val skjermingstillegg: Int?,
+    val kapittel19AndelTeller: Int?,
+    val kapittel19Trygdetid: Int?,
+    val basispensjonBeloep: Int?,
+    val restpensjonBeloep: Int?,
+    val gjenlevendetillegg: Int?,
+    val minstePensjonsnivaaSats: Double?,
+    val minstePensjonsnivaaBeloep: Int?,
+    val kapittel20AndelTeller: Int?,
+    val kapittel20Trygdetid: Int?,
+    val garantipensjonBeloep: Int?,
+    val garantipensjonsnivaaBeloep: Int?,
+    val garantipensjonSats: Double?,
+    val garantitilleggBeloep: Int?,
+    val grunnbeloep: Int?
 )

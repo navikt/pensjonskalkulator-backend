@@ -47,7 +47,7 @@ class SkribentenClientTest : ShouldSpec({
         server?.arrangeOkJsonResponse(BREV_RESPONSE)
 
         Arrange.webClientContextRunner().run {
-            val response = client(it).lagreSimulering(SAK_ID, simulering())
+            val response = client(it).lagreSimulering(SAK_ID, simulering(), null)
 
             response.brevId shouldBe "brev-123"
             response.sakId shouldBe "sak-456"
@@ -58,7 +58,7 @@ class SkribentenClientTest : ShouldSpec({
         server?.arrangeOkJsonResponse(BREV_RESPONSE)
 
         Arrange.webClientContextRunner().run {
-            client(it).lagreSimulering(SAK_ID, simulering())
+            client(it).lagreSimulering(SAK_ID, simulering(), null)
 
             server?.takeRequest()?.path shouldBe "/sak/$SAK_ID/brev"
         }
@@ -70,7 +70,7 @@ class SkribentenClientTest : ShouldSpec({
 
         Arrange.webClientContextRunner().run {
             val exception = shouldThrow<EgressException> {
-                client(it).lagreSimulering(SAK_ID, simulering())
+                client(it).lagreSimulering(SAK_ID, simulering(), null)
             }
 
             exception.isClientError shouldBe false
@@ -83,7 +83,7 @@ class SkribentenClientTest : ShouldSpec({
 
         Arrange.webClientContextRunner().run {
             val exception = shouldThrow<EgressException> {
-                client(it).lagreSimulering(SAK_ID, simulering())
+                client(it).lagreSimulering(SAK_ID, simulering(), null)
             }
 
             exception.isClientError shouldBe true
@@ -115,12 +115,14 @@ class SkribentenClientTest : ShouldSpec({
 
         private fun simulering() = LagreSimulering(
             alderspensjonListe = listOf(LagreAlderspensjon(alderAar = 67, beloep = 250000, gjenlevendetillegg = null)),
-            livsvarigOffentligAfpListe = emptyList(),
-            tidsbegrensetOffentligAfp = null,
-            privatAfpListe = emptyList(),
+            afpPrivat = null,
+            afpOffentligLivsvarig = null,
+            afpOffentligTidsbegrenset = null,
             vilkaarsproevingsresultat = LagreVilkaarsproevingsresultat(erInnvilget = true, alternativ = null),
             trygdetid = null,
             pensjonsgivendeInntektListe = emptyList(),
+            simuleringsinformasjon = null,
+            maanedligAlderspensjonForKnekkpunkter = null,
             enhetsId = "4817"
         )
     }

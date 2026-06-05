@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.sak.client.pen
 import no.nav.pensjon.kalkulator.common.client.pen.PenClient
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.sak.Sak
+import no.nav.pensjon.kalkulator.sak.SakType
 import no.nav.pensjon.kalkulator.sak.client.SakClient
 import no.nav.pensjon.kalkulator.sak.client.pen.map.SakMapper
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
@@ -36,14 +37,14 @@ class PenSakClient(
         )?.let(SakMapper::fromDto)
             ?: emptyList()
 
-    override fun opprettAlderspensjonSak(pid: Pid): Sak =
+    override fun opprettNySak(pid: Pid, sakstype: SakType): Sak =
         (doPost(
             path = OPPRETT_SAK_PATH,
             requestBody = "",
             requestClass = String::class.java,
             responseClass = SakDto::class.java,
             pid = pid,
-            queryParams = mapOf("sakType" to PenSakType.ALDERSPENSJON.externalValue),
+            queryParams = mapOf("sakType" to (PenSakType.fromInternalValue(sakstype)?.externalValue ?: PenSakType.GENERELL.externalValue)),
         ) ?: throw EgressException("No response body from opprett sak"))
             .let(SakMapper::fromDto)
 

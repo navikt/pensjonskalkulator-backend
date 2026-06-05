@@ -27,6 +27,8 @@ enum class PenSakType(val externalValue: String, val internalValue: SakType) {
         fun fromExternalValue(value: String?) =
             values.singleOrNull { it.externalValue.equals(value, true) } ?: default(value)
 
+        fun fromInternalValue(value: SakType?) = values.singleOrNull { it.internalValue == value }
+
         private fun default(externalValue: String?) =
             if (hasLength(externalValue))
                 UNKNOWN.also { log.warn { "Unknown PEN sakstype '$externalValue'" } }
