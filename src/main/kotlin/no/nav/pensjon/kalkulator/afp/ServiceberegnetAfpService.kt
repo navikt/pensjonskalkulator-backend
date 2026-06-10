@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.afp
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.afp.api.dto.InternServiceberegnetAfpSpec
 import no.nav.pensjon.kalkulator.afp.client.ServiceberegnetAfpClient
-import no.nav.pensjon.kalkulator.opptjening.Pensjonspoeng
+import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengClient
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.relasjon.eps.EpsService
@@ -54,13 +54,13 @@ class ServiceberegnetAfpService(
             throw e
         }
 
-    private fun mapOpptjeningAar(dto: Pensjonspoeng) =
+    private fun mapOpptjeningAar(dto: AarligOpptjening) =
         OpptjeningAar(
-            ar = dto.ar,
+            ar = dto.aar,
             pensjonsgivendeInntekt = dto.pensjonsgivendeInntekt,
             registrertePensjonspoeng = dto.pensjonspoeng,
             omsorgspoeng = dto.omsorgspoeng?.toDouble(),
-            maksUforegrad = dto.maksUforegrad,
+            maksUforegrad = dto.maksimalUfoeregrad,
         )
 
     private fun mapInntektOpptjening(dto: InternServiceberegnetAfpSpec): List<OpptjeningAar> =

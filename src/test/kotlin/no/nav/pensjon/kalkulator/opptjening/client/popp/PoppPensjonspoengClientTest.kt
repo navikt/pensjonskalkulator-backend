@@ -5,7 +5,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.opptjening.Pensjonspoeng
+import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.testutil.Arrange
@@ -45,23 +45,23 @@ class PoppPensjonspoengClientTest : FunSpec({
         server?.arrangeOkJsonResponse(responseBody)
 
         Arrange.webClientContextRunner().run {
-            val response: List<Pensjonspoeng> = pensjonspoengClient(context = it).fetchPensjonspoeng(pid)
+            val response: List<AarligOpptjening> = pensjonspoengClient(context = it).fetchPensjonspoeng(pid)
 
             response shouldBe listOf(
-                Pensjonspoeng(
-                    ar = 2000,
+                AarligOpptjening(
+                    aar = 2000,
                     pensjonsgivendeInntekt = 100000,
                     pensjonspoeng = 20.0,
                     pensjonspoengType = "ORDINAR",
-                    maksUforegrad = 70,
+                    maksimalUfoeregrad = 70,
                     omsorgspoeng = 2000
                 ),
-                Pensjonspoeng(
-                    ar = 2001,
+                AarligOpptjening(
+                    aar = 2001,
                     pensjonsgivendeInntekt = 110000,
                     pensjonspoeng = 21.5,
                     pensjonspoengType = "OMSORG",
-                    maksUforegrad = 0,
+                    maksimalUfoeregrad = 0,
                     omsorgspoeng = null
                 )
             )
