@@ -67,7 +67,8 @@ class LagreSimuleringMapperTest : ShouldSpec({
                     sivilstatus = null,
                     utenlandsperioder = null,
                     kull = Kull.KAP20,
-                    normertPensjonsalderPlassering = NormertPensjonsalderPlassering.ETTER_HELT
+                    normertPensjonsalderPlassering = NormertPensjonsalderPlassering.ETTER_HELT,
+                    forbeholdVisningsvilkaar = emptyList()
                 ),
                 maanedligAlderspensjonForKnekkpunkter = null,
                 navEnhetId = null
@@ -116,7 +117,8 @@ class LagreSimuleringMapperTest : ShouldSpec({
                 sivilstatus = null,
                 utenlandsperioder = null,
                 kull = Kull.KAP20,
-                normertPensjonsalderPlassering = NormertPensjonsalderPlassering.ETTER_HELT
+                normertPensjonsalderPlassering = NormertPensjonsalderPlassering.ETTER_HELT,
+                emptyList()
             ),
             maanedligAlderspensjonForKnekkpunkter = null,
             enhetsId = "4817"

@@ -98,7 +98,8 @@ data class LagreSimuleringsinformasjon(
     val sivilstatus: String?,
     val utenlandsperioder: List<LagreUtenlandsperiode>?,
     val kull: Kull,
-    val normertPensjonsalderPlassering: NormertPensjonsalderPlassering?
+    val normertPensjonsalderPlassering: NormertPensjonsalderPlassering?,
+    val sanityVisningsvilkaar: List<SanityVisningsvilkaar>
 )
 
 data class LagreUttaksinformasjon(

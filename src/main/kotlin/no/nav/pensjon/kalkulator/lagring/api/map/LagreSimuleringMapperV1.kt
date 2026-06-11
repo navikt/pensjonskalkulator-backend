@@ -25,7 +25,7 @@ object LagreSimuleringMapperV1 {
             aarligInntektOgPensjonListe = source.aarligInntektOgPensjonListe?.map(::aarligInntektOgPensjon),
             simuleringsinformasjon = source.simuleringsinformasjon?.let(::simuleringsinformasjon),
             maanedligAlderspensjonForKnekkpunkter = source.maanedligAlderspensjonForKnekkpunkter?.let(::maanedligAlderspensjonForKnekkpunkter),
-            enhetsId = source.navEnhetId ?: "4817",
+            enhetsId = source.navEnhetId ?: "4817"
         )
 
     private fun alderspensjon(source: LagreAlderspensjonDto) =
@@ -130,7 +130,8 @@ object LagreSimuleringMapperV1 {
             sivilstatus = source.sivilstatus,
             utenlandsperioder = source.utenlandsperioder?.map(::utenlandsperiode),
             kull = source.kull,
-            normertPensjonsalderPlassering = source.normertPensjonsalderPlassering
+            normertPensjonsalderPlassering = source.normertPensjonsalderPlassering,
+            sanityVisningsvilkaar = source.forbeholdVisningsvilkaar.map { it.internalValue }
         )
 
     private fun uttaksinformasjon(source: LagreUttaksinformasjonDto) =

@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.lagring.api.dto
 import jakarta.validation.constraints.NotNull
 import no.nav.pensjon.kalkulator.lagring.Kull
 import no.nav.pensjon.kalkulator.lagring.NormertPensjonsalderPlassering
+import no.nav.pensjon.kalkulator.lagring.SanityVisningsvilkaar
 import java.time.LocalDate
 
 data class LagreSimuleringSpecDtoV1(
@@ -101,7 +102,8 @@ data class LagreSimuleringsinformasjonDto(
     val sivilstatus: String?,
     val utenlandsperioder: List<LagreUtenlandsperiodeDto>?,
     val kull: Kull,
-    val normertPensjonsalderPlassering: NormertPensjonsalderPlassering?
+    val normertPensjonsalderPlassering: NormertPensjonsalderPlassering?,
+    val forbeholdVisningsvilkaar: List<ForbeholdVisningsvilkaar>
 )
 
 data class LagreUttaksinformasjonDto(
@@ -158,3 +160,12 @@ data class LagreAarligInntektOgPensjonDto(
     @field:NotNull val avtalefestetPensjon: Int,
     @field:NotNull val pensjonsgivendeInntekt: Int,
 )
+
+enum class ForbeholdVisningsvilkaar(val internalValue: SanityVisningsvilkaar) {
+    BEREGNER_GAMMEL_AFP(SanityVisningsvilkaar.BEREGNER_GAMMEL_AFP),
+    BEREGNER_AFP_GENERELT(SanityVisningsvilkaar.BEREGNER_AFP_GENERELT),
+    BEREGNER_AFP_PRIVAT(SanityVisningsvilkaar.BEREGNER_AFP_PRIVAT),
+    BEREGNER_MED_GJENLEVENDERETT(SanityVisningsvilkaar.BEREGNER_MED_GJENLEVENDERETT),
+    HAR_UFOERETRYGD(SanityVisningsvilkaar.HAR_UFOERETRYGD),
+    HAR_GJENLEVENDE_ELLER_OMSTILLINGSSTOENAD(SanityVisningsvilkaar.HAR_GJENLEVENDE_ELLER_OMSTILLINGSSTOENAD);
+}

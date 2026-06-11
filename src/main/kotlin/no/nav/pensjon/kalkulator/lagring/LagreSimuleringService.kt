@@ -19,6 +19,12 @@ class LagreSimuleringService(
 
         val sakId = sakService.hentEllerOpprettSak(sakstype)
         val forbehold = forbeholdClient.fetchForbehold()
-        return client.lagreSimulering(sakId, simulering, forbehold)
+        val filteredForbehold = forbehold?.seksjoner?.filter { seksjon ->
+            seksjon.vilkaarsliste.all { vilkaar ->
+                simulering.simuleringsinformasjon?.sanityVisningsvilkaar?.contains(vilkaar) == true
+            }
+        }
+
+        return client.lagreSimulering(sakId, simulering, ForbeholdInnhold(filteredForbehold ?: emptyList()))
     }
 }
