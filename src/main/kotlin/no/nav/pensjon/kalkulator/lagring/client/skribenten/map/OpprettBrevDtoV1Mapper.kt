@@ -23,6 +23,7 @@ object OpprettBrevDtoV1Mapper {
             vilkaarsproevingsresultat = source.vilkaarsproevingsresultat?.let(::mapToVilkaarsproevingsresultatDto),
             trygdetid = source.trygdetid?.let(::mapToTrygdetidDto),
             pensjonsgivendeInntektListe = source.pensjonsgivendeInntektListe?.map(::mapToPensjonsgivendeInntektDto),
+            aarligInntektOgPensjonListe = source.aarligInntektOgPensjonListe?.map(::mapToAarligInntektOgPensjonDto),
             forbehold = forbehold?.let(::mapToForbeholdDto),
         )
     )
@@ -84,6 +85,13 @@ object OpprettBrevDtoV1Mapper {
         beloep = source.beloep
     )
 
+    private fun mapToAarligInntektOgPensjonDto(source: LagreAarligInntektOgPensjon) = AarligInntektOgPensjonBrevDtoV1(
+        alderLabel = source.alderLabel,
+        alderspensjon = source.alderspensjon,
+        avtalefestetPensjon = source.avtalefestetPensjon,
+        pensjonsgivendeInntekt = source.pensjonsgivendeInntekt
+    )
+
     private fun mapToTrygdetidDto(source: LagreTrygdetid) = TrygdetidBrevDtoV1(
         antallAar = source.antallAar,
         erUtilstrekkelig = source.erUtilstrekkelig
@@ -108,12 +116,19 @@ object OpprettBrevDtoV1Mapper {
 
     private fun mapToSimuleringsinformasjonDto(source: LagreSimuleringsinformasjon) =
         SimuleringsinformasjonBrevDtoV1(
-            gradertUttaksalder = source.gradertUttaksalder?.let(::mapToAlderDto),
-            heltUttaksalder = mapToAlderDto(source.heltUttaksalder),
+            gradertUttakInformasjon = source.gradertUttakInformasjon?.let(::mapToUttaksinformasjonDto),
+            heltUttakInformasjon = mapToUttaksinformasjonDto(source.heltUttakInformasjon),
+            normertUttakInformasjon = source.normertUttakInformasjon?.let(::mapToUttaksinformasjonDto),
             sivilstatus = source.sivilstatus,
             utenlandsperioder = source.utenlandsperioder?.map(::mapToUtenlandsperiodeDto),
             kull = source.kull.name,
             normertPensjonsalderPlassering = source.normertPensjonsalderPlassering?.name
+        )
+
+    private fun mapToUttaksinformasjonDto(source: LagreUttaksinformasjon) =
+        UttaksinformasjonBrevDtoV1(
+            alder = mapToAlderDto(source.alder),
+            uttaksdato = source.uttaksdato
         )
 
     private fun mapToUtenlandsperiodeDto(source: LagreUtenlandsperiode) =

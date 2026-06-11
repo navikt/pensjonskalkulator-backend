@@ -10,6 +10,7 @@ data class LagreSimulering(
     val vilkaarsproevingsresultat: LagreVilkaarsproevingsresultat?,
     val trygdetid: LagreTrygdetid?,
     val pensjonsgivendeInntektListe: List<LagreAarligBeloep>?,
+    val aarligInntektOgPensjonListe: List<LagreAarligInntektOgPensjon>?,
     val simuleringsinformasjon: LagreSimuleringsinformasjon?,
     val maanedligAlderspensjonForKnekkpunkter: LagreMaanedligAlderspensjonForKnekkpunkter?,
     val enhetsId: String,
@@ -91,12 +92,19 @@ data class LagreAlder(
 )
 
 data class LagreSimuleringsinformasjon(
-    val gradertUttaksalder: LagreAlder?,
-    val heltUttaksalder: LagreAlder,
+    val gradertUttakInformasjon: LagreUttaksinformasjon?,
+    val heltUttakInformasjon: LagreUttaksinformasjon,
+    val normertUttakInformasjon: LagreUttaksinformasjon?,
     val sivilstatus: String?,
     val utenlandsperioder: List<LagreUtenlandsperiode>?,
     val kull: Kull,
-    val normertPensjonsalderPlassering: NormertPensjonsalderPlassering?
+    val normertPensjonsalderPlassering: NormertPensjonsalderPlassering?,
+    val sanityVisningsvilkaar: List<SanityVisningsvilkaar>
+)
+
+data class LagreUttaksinformasjon(
+    val alder: LagreAlder,
+    val uttaksdato: String
 )
 
 data class LagreUtenlandsperiode(
@@ -140,4 +148,11 @@ data class LagreMaanedligAlderspensjon(
     val garantipensjonSats: Double?,
     val garantitilleggBeloep: Int?,
     val grunnbeloep: Int?
+)
+
+data class LagreAarligInntektOgPensjon(
+    val alderLabel: String,
+    val alderspensjon: Int,
+    val avtalefestetPensjon: Int,
+    val pensjonsgivendeInntekt: Int,
 )

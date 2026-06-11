@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.lagring.client.sanity.map
 import no.nav.pensjon.kalkulator.lagring.ForbeholdAvsnitt
 import no.nav.pensjon.kalkulator.lagring.ForbeholdInnhold
 import no.nav.pensjon.kalkulator.lagring.ForbeholdSeksjon
+import no.nav.pensjon.kalkulator.lagring.SanityVisningsvilkaar
 import no.nav.pensjon.kalkulator.lagring.client.sanity.dto.SanityBlock
 import no.nav.pensjon.kalkulator.lagring.client.sanity.dto.SanityForbeholdAvsnittDto
 
@@ -19,7 +20,11 @@ object SanityForbeholdMapper {
 
         return ForbeholdSeksjon(
             tittel = source.overskrift,
-            avsnitt = avsnitt
+            avsnitt = avsnitt,
+            vilkaarsliste = source.vilkaar
+                ?.flatMap { it.betingelser.orEmpty() }
+                ?.mapNotNull { SanityVisningsvilkaar.fromExternalValue(it.tag) }
+                ?: emptyList()
         )
     }
 

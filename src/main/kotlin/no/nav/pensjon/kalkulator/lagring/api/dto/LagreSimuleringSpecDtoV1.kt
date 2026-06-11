@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.lagring.api.dto
 import jakarta.validation.constraints.NotNull
 import no.nav.pensjon.kalkulator.lagring.Kull
 import no.nav.pensjon.kalkulator.lagring.NormertPensjonsalderPlassering
+import no.nav.pensjon.kalkulator.lagring.SanityVisningsvilkaar
 import java.time.LocalDate
 
 data class LagreSimuleringSpecDtoV1(
@@ -13,6 +14,7 @@ data class LagreSimuleringSpecDtoV1(
     @field:NotNull val vilkaarsproevingsresultat: LagreVilkaarsproevingsresultatDto,
     val trygdetid: LagreTrygdetidDto?,
     val pensjonsgivendeInntektListe: List<LagreAarligBeloepDto>?,
+    val aarligInntektOgPensjonListe: List<LagreAarligInntektOgPensjonDto>?,
     val simuleringsinformasjon: LagreSimuleringsinformasjonDto?,
     val maanedligAlderspensjonForKnekkpunkter: LagreMaanedligAlderspensjonForKnekkpunkterDto?,
     val navEnhetId: String?,
@@ -94,12 +96,19 @@ data class LagreAlderDto(
 )
 
 data class LagreSimuleringsinformasjonDto(
-    val gradertUttaksalder: LagreAlderDto?,
-    @field:NotNull val heltUttaksalder: LagreAlderDto,
+    val gradertUttakInformasjon: LagreUttaksinformasjonDto?,
+    @field:NotNull val heltUttakInformasjon: LagreUttaksinformasjonDto,
+    val normertUttakInformasjon: LagreUttaksinformasjonDto?,
     val sivilstatus: String?,
     val utenlandsperioder: List<LagreUtenlandsperiodeDto>?,
     val kull: Kull,
-    val normertPensjonsalderPlassering: NormertPensjonsalderPlassering?
+    val normertPensjonsalderPlassering: NormertPensjonsalderPlassering?,
+    val forbeholdVisningsvilkaar: List<ForbeholdVisningsvilkaar>
+)
+
+data class LagreUttaksinformasjonDto(
+    @field:NotNull val alder: LagreAlderDto,
+    @field:NotNull val uttaksdato: String
 )
 
 data class LagreUtenlandsperiodeDto(
@@ -144,3 +153,19 @@ data class LagreMaanedligAlderspensjonDto(
     val garantitilleggBeloep: Int?,
     val grunnbeloep: Int?
 )
+
+data class LagreAarligInntektOgPensjonDto(
+    @field:NotNull val alderLabel: String,
+    @field:NotNull val alderspensjon: Int,
+    @field:NotNull val avtalefestetPensjon: Int,
+    @field:NotNull val pensjonsgivendeInntekt: Int,
+)
+
+enum class ForbeholdVisningsvilkaar(val internalValue: SanityVisningsvilkaar) {
+    BEREGNER_GAMMEL_AFP(SanityVisningsvilkaar.BEREGNER_GAMMEL_AFP),
+    BEREGNER_AFP_GENERELT(SanityVisningsvilkaar.BEREGNER_AFP_GENERELT),
+    BEREGNER_AFP_PRIVAT(SanityVisningsvilkaar.BEREGNER_AFP_PRIVAT),
+    BEREGNER_MED_GJENLEVENDERETT(SanityVisningsvilkaar.BEREGNER_MED_GJENLEVENDERETT),
+    HAR_UFOERETRYGD(SanityVisningsvilkaar.HAR_UFOERETRYGD),
+    HAR_GJENLEVENDE_ELLER_OMSTILLINGSSTOENAD(SanityVisningsvilkaar.HAR_GJENLEVENDE_ELLER_OMSTILLINGSSTOENAD);
+}
