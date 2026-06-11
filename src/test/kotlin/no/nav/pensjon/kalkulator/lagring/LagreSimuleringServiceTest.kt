@@ -51,6 +51,7 @@ class LagreSimuleringServiceTest : ShouldSpec({
             vilkaarsproevingsresultat = LagreVilkaarsproevingsresultat(erInnvilget = true, alternativ = null),
             trygdetid = null,
             pensjonsgivendeInntektListe = null,
+            aarligInntektOgPensjonListe = null,
             simuleringsinformasjon = null,
             maanedligAlderspensjonForKnekkpunkter = null,
             enhetsId = "4817"

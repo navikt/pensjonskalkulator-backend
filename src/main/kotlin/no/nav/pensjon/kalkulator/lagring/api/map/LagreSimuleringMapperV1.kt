@@ -22,6 +22,7 @@ object LagreSimuleringMapperV1 {
             vilkaarsproevingsresultat = vilkaarsproevingsresultat(source.vilkaarsproevingsresultat),
             trygdetid = source.trygdetid?.let(::trygdetid),
             pensjonsgivendeInntektListe = source.pensjonsgivendeInntektListe?.map(::aarligBeloep),
+            aarligInntektOgPensjonListe = source.aarligInntektOgPensjonListe?.map(::aarligInntektOgPensjon),
             simuleringsinformasjon = source.simuleringsinformasjon?.let(::simuleringsinformasjon),
             maanedligAlderspensjonForKnekkpunkter = source.maanedligAlderspensjonForKnekkpunkter?.let(::maanedligAlderspensjonForKnekkpunkter),
             enhetsId = source.navEnhetId ?: "4817",
@@ -107,6 +108,14 @@ object LagreSimuleringMapperV1 {
             beloep = source.beloep
         )
 
+    private fun aarligInntektOgPensjon(source: LagreAarligInntektOgPensjonDto) =
+        LagreAarligInntektOgPensjon(
+            alderLabel = source.alderLabel,
+            alderspensjon = source.alderspensjon,
+            avtalefestetPensjon = source.avtalefestetPensjon,
+            pensjonsgivendeInntekt = source.pensjonsgivendeInntekt
+        )
+
     private fun alder(source: LagreAlderDto) =
         LagreAlder(
             aar = source.aar,
@@ -115,12 +124,19 @@ object LagreSimuleringMapperV1 {
 
     private fun simuleringsinformasjon(source: LagreSimuleringsinformasjonDto) =
         LagreSimuleringsinformasjon(
-            gradertUttaksalder = source.gradertUttaksalder?.let(::alder),
-            heltUttaksalder = alder(source.heltUttaksalder),
+            gradertUttakInformasjon = source.gradertUttakInformasjon?.let(::uttaksinformasjon),
+            heltUttakInformasjon = uttaksinformasjon(source.heltUttakInformasjon),
+            normertUttakInformasjon = source.normertUttakInformasjon?.let(::uttaksinformasjon),
             sivilstatus = source.sivilstatus,
             utenlandsperioder = source.utenlandsperioder?.map(::utenlandsperiode),
             kull = source.kull,
             normertPensjonsalderPlassering = source.normertPensjonsalderPlassering
+        )
+
+    private fun uttaksinformasjon(source: LagreUttaksinformasjonDto) =
+        LagreUttaksinformasjon(
+            alder = alder(source.alder),
+            uttaksdato = source.uttaksdato
         )
 
     private fun utenlandsperiode(source: LagreUtenlandsperiodeDto) =

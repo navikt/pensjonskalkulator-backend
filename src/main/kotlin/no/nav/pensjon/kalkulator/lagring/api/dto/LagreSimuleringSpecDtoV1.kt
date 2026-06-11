@@ -13,6 +13,7 @@ data class LagreSimuleringSpecDtoV1(
     @field:NotNull val vilkaarsproevingsresultat: LagreVilkaarsproevingsresultatDto,
     val trygdetid: LagreTrygdetidDto?,
     val pensjonsgivendeInntektListe: List<LagreAarligBeloepDto>?,
+    val aarligInntektOgPensjonListe: List<LagreAarligInntektOgPensjonDto>?,
     val simuleringsinformasjon: LagreSimuleringsinformasjonDto?,
     val maanedligAlderspensjonForKnekkpunkter: LagreMaanedligAlderspensjonForKnekkpunkterDto?,
     val navEnhetId: String?,
@@ -94,12 +95,18 @@ data class LagreAlderDto(
 )
 
 data class LagreSimuleringsinformasjonDto(
-    val gradertUttaksalder: LagreAlderDto?,
-    @field:NotNull val heltUttaksalder: LagreAlderDto,
+    val gradertUttakInformasjon: LagreUttaksinformasjonDto?,
+    @field:NotNull val heltUttakInformasjon: LagreUttaksinformasjonDto,
+    val normertUttakInformasjon: LagreUttaksinformasjonDto?,
     val sivilstatus: String?,
     val utenlandsperioder: List<LagreUtenlandsperiodeDto>?,
     val kull: Kull,
     val normertPensjonsalderPlassering: NormertPensjonsalderPlassering?
+)
+
+data class LagreUttaksinformasjonDto(
+    @field:NotNull val alder: LagreAlderDto,
+    @field:NotNull val uttaksdato: String
 )
 
 data class LagreUtenlandsperiodeDto(
@@ -143,4 +150,11 @@ data class LagreMaanedligAlderspensjonDto(
     val garantipensjonSats: Double?,
     val garantitilleggBeloep: Int?,
     val grunnbeloep: Int?
+)
+
+data class LagreAarligInntektOgPensjonDto(
+    @field:NotNull val alderLabel: String,
+    @field:NotNull val alderspensjon: Int,
+    @field:NotNull val avtalefestetPensjon: Int,
+    @field:NotNull val pensjonsgivendeInntekt: Int,
 )

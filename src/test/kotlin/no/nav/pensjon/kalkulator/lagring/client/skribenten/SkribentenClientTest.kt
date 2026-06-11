@@ -121,6 +121,7 @@ class SkribentenClientTest : ShouldSpec({
             vilkaarsproevingsresultat = LagreVilkaarsproevingsresultat(erInnvilget = true, alternativ = null),
             trygdetid = null,
             pensjonsgivendeInntektListe = emptyList(),
+            aarligInntektOgPensjonListe = null,
             simuleringsinformasjon = null,
             maanedligAlderspensjonForKnekkpunkter = null,
             enhetsId = "4817"

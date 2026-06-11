@@ -56,9 +56,14 @@ class LagreSimuleringMapperTest : ShouldSpec({
                 pensjonsgivendeInntektListe = listOf(
                     LagreAarligBeloepDto(aarstall = 2024, beloep = 600000)
                 ),
+                aarligInntektOgPensjonListe = null,
                 simuleringsinformasjon = LagreSimuleringsinformasjonDto(
-                    gradertUttaksalder = null,
-                    heltUttaksalder = LagreAlderDto(aar = 67, maaneder = 0),
+                    gradertUttakInformasjon = null,
+                    heltUttakInformasjon = LagreUttaksinformasjonDto(
+                        alder = LagreAlderDto(aar = 67, maaneder = 0),
+                        uttaksdato = "2030-01-01"
+                    ),
+                    normertUttakInformasjon = null,
                     sivilstatus = null,
                     utenlandsperioder = null,
                     kull = Kull.KAP20,
@@ -100,9 +105,14 @@ class LagreSimuleringMapperTest : ShouldSpec({
             pensjonsgivendeInntektListe = listOf(
                 LagreAarligBeloep(aarstall = 2024, beloep = 600000)
             ),
+            aarligInntektOgPensjonListe = null,
             simuleringsinformasjon = LagreSimuleringsinformasjon(
-                gradertUttaksalder = null,
-                heltUttaksalder = LagreAlder(aar = 67, maaneder = 0),
+                gradertUttakInformasjon = null,
+                heltUttakInformasjon = LagreUttaksinformasjon(
+                    alder = LagreAlder(aar = 67, maaneder = 0),
+                    uttaksdato = "2030-01-01"
+                ),
+                normertUttakInformasjon = null,
                 sivilstatus = null,
                 utenlandsperioder = null,
                 kull = Kull.KAP20,
@@ -126,6 +136,7 @@ class LagreSimuleringMapperTest : ShouldSpec({
                 ),
                 trygdetid = null,
                 pensjonsgivendeInntektListe = null,
+                aarligInntektOgPensjonListe = null,
                 simuleringsinformasjon = null,
                 maanedligAlderspensjonForKnekkpunkter = null,
                 navEnhetId = null
@@ -141,6 +152,7 @@ class LagreSimuleringMapperTest : ShouldSpec({
             ),
             trygdetid = null,
             pensjonsgivendeInntektListe = null,
+            aarligInntektOgPensjonListe = null,
             simuleringsinformasjon = null,
             maanedligAlderspensjonForKnekkpunkter = null,
             enhetsId = "4817"
