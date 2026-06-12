@@ -24,14 +24,15 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
 
 @Component
 class PoppPensjonspoengClient(
-    @Value("\${popp.url}") private val baseUrl: String,
+    @param:Value($$"${popp.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
-    @Value("\${web-client.retry-attempts}") retryAttempts: String
+    @Value($$"${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), PensjonspoengClient, Pingable {
 
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
@@ -52,7 +53,7 @@ class PoppPensjonspoengClient(
                 .headers { setHeaders(it, pid) }
                 .body(Mono.just(requestBody), PensjonspoengRequestDto::class.java)
                 .retrieve()
-                .bodyToMono(PensjonspoengResponseDto::class.java)
+                .bodyToMono<PensjonspoengResponseDto>()
                 .retryWhen(retryBackoffSpec(url))
                 .block()
                 ?.let(PensjonspoengMapper::fromDto)
@@ -74,7 +75,7 @@ class PoppPensjonspoengClient(
                 .uri("/$PING_PATH")
                 .headers(::setPingHeaders)
                 .retrieve()
-                .bodyToMono(String::class.java)
+                .bodyToMono<String>()
                 .retryWhen(retryBackoffSpec(url))
                 .block()
                 ?: ""

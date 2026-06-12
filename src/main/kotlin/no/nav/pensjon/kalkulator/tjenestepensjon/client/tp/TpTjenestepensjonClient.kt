@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import org.springframework.web.reactive.function.client.bodyToMono
 import org.springframework.web.util.DefaultUriBuilderFactory
 import reactor.core.publisher.Mono
 import java.time.Duration
@@ -39,11 +40,11 @@ import java.util.concurrent.TimeoutException
  */
 @Component
 class TpTjenestepensjonClient(
-    @Value("\${tjenestepensjon.url}") private val baseUrl: String,
+    @param:Value($$"${tjenestepensjon.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     val timeoutSeconds: Long = 3,
     private val traceAid: TraceAid,
-    @Value("\${web-client.retry-attempts}") retryAttempts: String,
+    @Value($$"${web-client.retry-attempts}") retryAttempts: String,
     private val afpOffentligLivsvarigProperties: AfpOffentligLivsvarigProperties
 ) : PingableServiceClient(baseUrl, webClientBuilder, retryAttempts),
     TjenestepensjonClient {
@@ -64,7 +65,7 @@ class TpTjenestepensjonClient(
                 .uri("/$APOTEKER_PATH")
                 .headers { setHeaders(it, pid) }
                 .retrieve()
-                .bodyToMono(TpApotekerDto::class.java)
+                .bodyToMono<TpApotekerDto>()
                 .retryWhen(retryBackoffSpec(url))
                 .withTimeout()
                 .block()
@@ -93,7 +94,7 @@ class TpTjenestepensjonClient(
                 .uri(uri)
                 .headers { setHeaders(it, pid) }
                 .retrieve()
-                .bodyToMono(TpTjenestepensjonStatusDto::class.java)
+                .bodyToMono<TpTjenestepensjonStatusDto>()
                 .retryWhen(retryBackoffSpec(url))
                 .withTimeout()
                 .block()
@@ -119,7 +120,7 @@ class TpTjenestepensjonClient(
                 .uri("/$API_PATH/")
                 .headers { setHeaders(it, pid) }
                 .retrieve()
-                .bodyToMono(TpTjenestepensjonDto::class.java)
+                .bodyToMono<TpTjenestepensjonDto>()
                 .retryWhen(retryBackoffSpec(url))
                 .withTimeout()
                 .block()
@@ -145,7 +146,7 @@ class TpTjenestepensjonClient(
                 .uri("/$API_TP_FORHOLD")
                 .headers { setHeaders(it, pid) }
                 .retrieve()
-                .bodyToMono(FinnTjenestepensjonsforholdResponsDto::class.java)
+                .bodyToMono<FinnTjenestepensjonsforholdResponsDto>()
                 .retryWhen(retryBackoffSpec(url))
                 .withTimeout()
                 .block()
@@ -196,7 +197,7 @@ class TpTjenestepensjonClient(
                 .uri("/$TP_ORDNING_PATH/$tpNr")
                 .headers { headers -> headers[CustomHttpHeaders.CALL_ID] = traceAid.callId() }
                 .retrieve()
-                .bodyToMono(String::class.java)
+                .bodyToMono<String>()
                 .retryWhen(retryBackoffSpec(url))
                 .withTimeout()
                 .block()
@@ -255,7 +256,7 @@ class TpTjenestepensjonClient(
                 .uri(url)
                 .headers { setExternalHeaders(service, headers = it) }
                 .retrieve()
-                .bodyToMono(TpAfpOffentligLivsvarigDetaljerDto::class.java)
+                .bodyToMono<TpAfpOffentligLivsvarigDetaljerDto>()
                 .withTimeout()
                 .block()
 

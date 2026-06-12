@@ -23,14 +23,15 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import org.springframework.web.reactive.function.client.bodyToMono
 import java.util.*
 
 @Component
 class PdlPersonClient(
-    @Value("\${persondata.url}") private val baseUrl: String,
+    @param:Value($$"${persondata.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
-    @Value("\${web-client.retry-attempts}") retryAttempts: String
+    @Value($$"${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), PersonClient, Pingable {
 
     private val webClient: WebClient = webClientBuilder.baseUrl(baseUrl).build()
@@ -52,11 +53,11 @@ class PdlPersonClient(
                 .headers(::setHeaders)
                 .bodyValue(query)
                 .retrieve()
-                .bodyToMono(PdlPersonResult::class.java)
+                .bodyToMono<PdlPersonResult>()
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
                 ?.also {
-                    warnings(it)?.let { log.warn { it } }
+                    handleWarnings(it)
                     countCalls(MetricResult.OK)
                 }
                 ?.let(PdlPersonMapper::fromDto)
@@ -105,6 +106,10 @@ class PdlPersonClient(
     private fun down(e: Throwable) = down(e.message ?: "Failed calling ${service()}")
 
     private fun down(message: String) = PingResult(service(), ServiceStatus.DOWN, "$baseUrl$RESOURCE", message)
+
+    private fun handleWarnings(result: PdlPersonResult) {
+        warnings(response = result)?.let { log.warn { it } }
+    }
 
     companion object {
         private const val RESOURCE = "graphql"

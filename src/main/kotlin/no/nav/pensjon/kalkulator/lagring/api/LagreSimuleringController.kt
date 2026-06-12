@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*
 class LagreSimuleringController(
     private val service: LagreSimuleringService,
     private val traceAid: TraceAid,
-    @Value("\${skribenten.web.url}") private val skribentenUrl: String
+    @param:Value($$"${skribenten.web.url}") private val skribentenUrl: String
 ) : ControllerBase(traceAid) {
 
     private val log = KotlinLogging.logger {}

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class MaskinportenJwtBearerAssertionBasis(
-    @Value("\${maskinporten.client.id}") override val clientId: String,
-    @Value("\${maskinporten.client.jwk}") override val clientJwk: String,
-    @Value("\${maskinporten.issuer}") override val issuer: String,
+    @param:Value($$"${maskinporten.client.id}") override val clientId: String,
+    @param:Value($$"${maskinporten.client.jwk}") override val clientJwk: String,
+    @param:Value($$"${maskinporten.issuer}") override val issuer: String,
 ) : JwtBearerAssertionBasis

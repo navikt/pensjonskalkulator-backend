@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.tjenestepensjonsimulering.foer1963.client.tpsimulering.dto
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING
 import no.nav.pensjon.kalkulator.person.Pid
 import java.time.LocalDate
 
@@ -18,11 +19,11 @@ data class SimuleringEtter2011Dto(
     val fnrAvdod: Pid?,
     val samtykke: Boolean?,
     val forventetInntekt: Int?,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val forsteUttakDato: LocalDate?,
     val utg: String?, //UttaksgradCode i pen
     val inntektUnderGradertUttak: Int?,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val heltUttakDato: LocalDate?,
     val inntektEtterHeltUttak: Int?,
     val antallArInntektEtterHeltUttak: Int?,
@@ -35,7 +36,7 @@ data class SimuleringEtter2011Dto(
     val afpInntektMndForUttak: Boolean?,
     val stillingsprosentOffHeltUttak: String?, //StillingsprOffCode i pen
     val stillingsprosentOffGradertUttak: String?, //StillingsprOffCode i pen
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val dodsdato: LocalDate?,
     val avdodAntallArIUtlandet: Int?,
     val avdodInntektForDod: Int?,
@@ -49,15 +50,15 @@ data class SimuleringEtter2011Dto(
 
 data class UtenlandsperiodeForSimuleringDto(
     val land: String? = null,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val periodeFom: LocalDate? = null,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val periodeTom: LocalDate? = null,
     val pensjonType: String? = null
 )
 
 data class FremtidigInntektDto(
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val datoFom: LocalDate,
     val arliginntekt: Int
 )
