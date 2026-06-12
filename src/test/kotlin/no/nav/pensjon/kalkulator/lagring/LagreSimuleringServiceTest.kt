@@ -22,12 +22,12 @@ class LagreSimuleringServiceTest : ShouldSpec({
         val response = lagreSimuleringResponse()
         every { sakService.hentEllerOpprettSak(SakType.ALDERSPENSJON) } returns SAK_ID
         every { forbeholdClient.fetchForbehold() } returns null
-        every { client.lagreSimulering(SAK_ID, simulering, null) } returns response
+        every { client.lagreSimulering(SAK_ID, simulering, ForbeholdInnhold(seksjoner = emptyList())) } returns response
 
         service.lagreSimulering(simulering) shouldBe response
 
         verify(exactly = 1) { sakService.hentEllerOpprettSak(SakType.ALDERSPENSJON) }
-        verify(exactly = 1) { client.lagreSimulering(SAK_ID, simulering, null) }
+        verify(exactly = 1) { client.lagreSimulering(SAK_ID, simulering, ForbeholdInnhold(seksjoner = emptyList())) }
     }
 
     should("returnere respons fra klient") {
@@ -35,7 +35,7 @@ class LagreSimuleringServiceTest : ShouldSpec({
         val expected = LagreSimuleringResponse(brevId = "brev-999", sakId = "sak-999")
         every { sakService.hentEllerOpprettSak(SakType.ALDERSPENSJON) } returns SAK_ID
         every { forbeholdClient.fetchForbehold() } returns null
-        every { client.lagreSimulering(SAK_ID, simulering, null) } returns expected
+        every { client.lagreSimulering(SAK_ID, simulering, ForbeholdInnhold(seksjoner = emptyList())) } returns expected
 
         service.lagreSimulering(simulering) shouldBe expected
     }
