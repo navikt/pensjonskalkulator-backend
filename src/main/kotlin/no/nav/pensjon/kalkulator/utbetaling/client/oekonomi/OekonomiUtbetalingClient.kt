@@ -26,10 +26,10 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 @Component
 class OekonomiUtbetalingClient(
-    @Value("\${sokos.utbetaldata.url}") private val baseUrl: String,
+    @param:Value($$"${sokos.utbetaldata.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
-    @Value("\${web-client.retry-attempts}") private val retryAttempts: String
+    @param:Value($$"${web-client.retry-attempts}") private val retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), UtbetalingClient {
 
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
@@ -46,12 +46,11 @@ class OekonomiUtbetalingClient(
                 .bodyValue(toDto(pid))
                 .headers { setHeaders(it, pid) }
                 .retrieve()
-                .bodyToMono(object: ParameterizedTypeReference<List<OekonomiUtbetalingDto>>() {})
+                .bodyToMono(object : ParameterizedTypeReference<List<OekonomiUtbetalingDto>>() {})
                 .retryWhen(retryBackoffSpec(uri))
                 .awaitSingle()
-                ?.let { fromDto(it) }
+                .let(::fromDto)
                 .also { countCalls(MetricResult.OK) }
-                ?: throw EgressException("No utbetaling found")
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $uri", e)
         } catch (e: WebClientResponseException) {
