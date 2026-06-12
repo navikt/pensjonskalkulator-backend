@@ -17,15 +17,16 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import org.springframework.web.reactive.function.client.bodyToMono
 import org.springframework.web.util.DefaultUriBuilderFactory
 import java.time.LocalDate
 
 @Component
 class EtterlatteOmstillingsstoenadClient(
-    @Value("\${omstillingsstoenad.url}") private val baseUrl: String,
+    @param:Value($$"${omstillingsstoenad.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
-    @Value("\${web-client.retry-attempts}") private val retryAttempts: String
+    @param:Value($$"${web-client.retry-attempts}") private val retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), OmstillingsstoenadClient {
 
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
@@ -41,11 +42,11 @@ class EtterlatteOmstillingsstoenadClient(
                 .headers(::setHeaders)
                 .bodyValue(RequestBody(pid.value))
                 .retrieve()
-                .bodyToMono(MottarOmstillingsstoenadDto::class.java)
+                .bodyToMono<MottarOmstillingsstoenadDto>()
                 .retryWhen(retryBackoffSpec(uri))
                 .awaitSingle()
-                ?.omstillingsstoenad
-                .also { countCalls(MetricResult.OK) } == true
+                .omstillingsstoenad
+                .also { countCalls(MetricResult.OK) }
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $uri", e)
         } catch (e: WebClientResponseException) {
