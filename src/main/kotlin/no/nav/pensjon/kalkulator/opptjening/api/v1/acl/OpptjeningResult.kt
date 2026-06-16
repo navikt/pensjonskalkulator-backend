@@ -11,5 +11,5 @@ data class OpptjeningV1(
     @field:NotNull val pensjonsgivendeInntekt: Int,
     @field:NotNull val pensjonspoeng: Double,
     val omsorgspoeng: Int?,
-    @field:NotNull val pensjonspoengType: String
+    @field:NotNull val beholdning: Int
 )

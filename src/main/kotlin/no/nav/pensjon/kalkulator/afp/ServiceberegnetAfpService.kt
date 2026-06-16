@@ -26,7 +26,7 @@ class ServiceberegnetAfpService(
     fun simulerServiceberegnetAfp(spec: InternServiceberegnetAfpSpec): ServiceberegnetAfpResult =
         try {
             val pid = pidGetter.pid()
-            val pensjonspoeng = pensjonspoengClient.fetchPensjonspoeng(pid)
+            val pensjonspoeng = pensjonspoengClient.fetchOpptjeningOgBeholdning(pid)
             val tidligereGiftEllerBarnMedSamboer = epsService.tidligereGiftEllerBarnMedSamboer()
             val person = personService.getPerson()
             val domainSpec = ServiceberegnetAfpSpec(
@@ -39,7 +39,7 @@ class ServiceberegnetAfpService(
                 utenlandsopphold = spec.utenlandsopphold,
                 forventetArbeidsinntekt = spec.forventetArbeidsinntekt,
                 inntektMndForAfp = spec.inntektMndForAfp,
-                opptjeningFolketrygden = pensjonspoeng.map { mapOpptjeningAar(it) } + mapInntektOpptjening(spec),
+                opptjeningFolketrygden = pensjonspoeng.first.map { mapOpptjeningAar(it) } + mapInntektOpptjening(spec),
                 epsMottarPensjon = spec.epsMottarPensjon,
                 epsInntektOver2G = spec.epsInntektOver2G,
                 tidligereGiftEllerBarnMedSamboer = tidligereGiftEllerBarnMedSamboer,
