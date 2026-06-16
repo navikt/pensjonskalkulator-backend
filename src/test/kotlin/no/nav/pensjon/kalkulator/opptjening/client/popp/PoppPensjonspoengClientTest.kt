@@ -1,105 +1,110 @@
 package no.nav.pensjon.kalkulator.opptjening.client.popp
 
-import io.kotest.assertions.throwables.shouldThrow
+import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.opptjening.AarligBeholdning
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
-import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.testutil.Arrange
-import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
-import no.nav.pensjon.kalkulator.testutil.arrangeResponse
-import okhttp3.mockwebserver.MockWebServer
 import org.springframework.beans.factory.BeanFactory
-import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.beans.factory.getBean
+import org.springframework.cache.caffeine.CaffeineCacheManager
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.web.reactive.function.client.WebClient
 
+/**
+ * Bruker WireMock istedenfor MockWebServer her, siden WireMock støtter testing av parallelle kall.
+ */
 class PoppPensjonspoengClientTest : FunSpec({
 
-    var server: MockWebServer? = null
+    var server: WireMockServer? = null
     var baseUrl: String? = null
     val traceAid = mockk<TraceAid>(relaxed = true)
-    val responseBody = this::class.java.getResource("/pensjonspoeng/hentPensjonspoengListe.json")?.readText(Charsets.UTF_8)!!
+    val cacheManager = CaffeineCacheManager()
+    val opptjeningResponseBody: String = loadJson(tema = "hentPensjonspoengListe")
+    val beholdningResponseBody: String = loadJson(tema = "poppBeholdningListe")
 
     fun pensjonspoengClient(context: BeanFactory) =
         PoppPensjonspoengClient(
             baseUrl!!,
-            webClientBuilder = context.getBean(WebClient.Builder::class.java),
+            webClientBuilder = context.getBean<WebClient.Builder>(),
+            cacheManager,
             traceAid,
             retryAttempts = "1"
         )
 
     beforeSpec {
         Arrange.security()
-        server = MockWebServer().apply { start() }
-        baseUrl = "http://localhost:${server.port}"
+        server = WireMockServer(options().dynamicPort()).apply { start() }
+        baseUrl = "http://localhost:${server.port()}"
     }
 
     afterSpec {
-        server?.shutdown()
+        server?.stop()
     }
 
-    test("fetchPensjonspoeng returns pensjonspoeng when OK response") {
-        server?.arrangeOkJsonResponse(responseBody)
+    context("fetchOpptjeningOgBeholdning") {
+        test("returns opptjening & beholdning when OK response") {
+            configureFor("localhost", server!!.port())
+            arrangeOkJsonResponse(resource = "pensjonspoeng/hent", body = opptjeningResponseBody)
+            arrangeOkJsonResponse(resource = "beholdning", body = beholdningResponseBody)
 
-        Arrange.webClientContextRunner().run {
-            val response: List<AarligOpptjening> = pensjonspoengClient(context = it).fetchPensjonspoeng(pid)
+            Arrange.webClientContextRunner().run {
+                val response = pensjonspoengClient(context = it).fetchOpptjeningOgBeholdning(pid)
 
-            response shouldBe listOf(
-                AarligOpptjening(
-                    aar = 2000,
-                    pensjonsgivendeInntekt = 100000,
-                    pensjonspoeng = 20.0,
-                    pensjonspoengType = "ORDINAR",
-                    maksimalUfoeregrad = 70,
-                    omsorgspoeng = 2000
-                ),
-                AarligOpptjening(
-                    aar = 2001,
-                    pensjonsgivendeInntekt = 110000,
-                    pensjonspoeng = 21.5,
-                    pensjonspoengType = "OMSORG",
-                    maksimalUfoeregrad = 0,
-                    omsorgspoeng = null
+                response.first shouldBe listOf(
+                    AarligOpptjening(
+                        aar = 2000,
+                        pensjonsgivendeInntekt = 100000,
+                        pensjonspoeng = 20.0,
+                        pensjonspoengType = "ORDINAR",
+                        maksimalUfoeregrad = 70,
+                        omsorgspoeng = 2000,
+                        beholdning = 0
+                    ),
+                    AarligOpptjening(
+                        aar = 2001,
+                        pensjonsgivendeInntekt = 110000,
+                        pensjonspoeng = 21.5,
+                        pensjonspoengType = "OMSORG",
+                        maksimalUfoeregrad = 0,
+                        omsorgspoeng = null,
+                        beholdning = 0
+                    )
                 )
-            )
-        }
-    }
 
-    test("fetchPensjonspoeng retries in case of server error") {
-        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Feil")
-        server?.arrangeOkJsonResponse(responseBody)
-
-        Arrange.webClientContextRunner().run {
-            pensjonspoengClient(context = it).fetchPensjonspoeng(pid).first().pensjonsgivendeInntekt shouldBe 100000
-        }
-    }
-
-    test("fetchPensjonspoeng does not retry in case of client error") {
-        server?.arrangeResponse(HttpStatus.BAD_REQUEST, "My bad")
-
-        Arrange.webClientContextRunner().run {
-            shouldThrow<EgressException> {
-                pensjonspoengClient(context = it).fetchPensjonspoeng(pid)
-            }.message shouldBe "My bad"
-        }
-    }
-
-    test("fetchPensjonspoeng handles server error") {
-        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Feil")
-        server?.arrangeResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Feil")
-
-        Arrange.webClientContextRunner().run {
-            val exception = shouldThrow<EgressException> {
-                pensjonspoengClient(context = it).fetchPensjonspoeng(pid)
-            }
-
-            with(exception) {
-                message shouldBe "Failed calling $baseUrl/popp/api/pensjonspoeng/hent"
-                (cause as EgressException).message shouldBe "Feil"
+                response.second shouldBe listOf(
+                    AarligBeholdning(
+                        aar = 1978,
+                        beholdning = 12
+                    ),
+                    AarligBeholdning(
+                        aar = 1979,
+                        beholdning = 23
+                    )
+                )
             }
         }
     }
 })
+
+private fun arrangeOkJsonResponse(resource: String, body: String) {
+    stubFor(
+        post(urlEqualTo("/popp/api/$resource")).willReturn(
+            aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .withBody(body)
+        )
+    )
+}
+
+private fun FunSpec.loadJson(tema: String): String =
+    this::class.java.getResource("/pensjonspoeng/$tema.json")?.readText(Charsets.UTF_8)!!

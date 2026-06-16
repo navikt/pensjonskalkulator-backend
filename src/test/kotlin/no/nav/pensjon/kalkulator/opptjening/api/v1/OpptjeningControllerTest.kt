@@ -45,7 +45,8 @@ class OpptjeningControllerTest : FunSpec() {
                     pensjonspoeng = 2.1,
                     omsorgspoeng = 3,
                     maksimalUfoeregrad = 4,
-                    pensjonspoengType = "T1"
+                    pensjonspoengType = "T1",
+                    beholdning = 12
                 )
             )
 
@@ -63,16 +64,14 @@ class OpptjeningControllerTest : FunSpec() {
         private const val URL = "/api/intern/v1/opptjening"
 
         @Language("json")
-        private const val RESPONSE_BODY = """{
-  "opptjeningListe": [
+        private const val RESPONSE_BODY = """[
     {
       "aar": 2021,
       "pensjonsgivendeInntekt": 1,
       "pensjonspoeng": 2.1,
       "omsorgspoeng": 3,
-      "pensjonspoengType": "T1"
+      "beholdning": 12
     }
-  ]
-}"""
+]"""
     }
 }

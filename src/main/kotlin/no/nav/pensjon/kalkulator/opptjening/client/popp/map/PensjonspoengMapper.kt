@@ -9,19 +9,16 @@ object PensjonspoengMapper {
     fun fromDto(dto: PensjonspoengResponseDto): List<AarligOpptjening> =
         dto.pensjonspoeng.orEmpty().mapNotNull(::fromDto)
 
-    private fun fromDto(dto: PensjonspoengDto): AarligOpptjening? {
-        val ar = dto.ar ?: return null
-        val pensjonspoeng = dto.poeng ?: return null
-        val pensjonspoengType = dto.pensjonspoengType ?: return null
-        val pensjonsgivendeInntekt = dto.inntekt?.belop?.toInt() ?: return null
-
-        return AarligOpptjening(
-            aar = ar,
-            pensjonsgivendeInntekt = pensjonsgivendeInntekt,
-            pensjonspoeng = pensjonspoeng,
-            pensjonspoengType = pensjonspoengType,
-            maksimalUfoeregrad = dto.maxUforegrad,
-            omsorgspoeng = dto.omsorg?.ar
-        )
-    }
+    private fun fromDto(dto: PensjonspoengDto): AarligOpptjening? =
+        dto.ar?.let {
+            AarligOpptjening(
+                aar = it,
+                pensjonsgivendeInntekt = dto.inntekt?.belop?.toInt() ?: 0,
+                pensjonspoeng = dto.poeng ?: 0.0,
+                pensjonspoengType = dto.pensjonspoengType ?: "",
+                maksimalUfoeregrad = dto.maxUforegrad,
+                omsorgspoeng = dto.omsorg?.ar,
+                beholdning = 0 // not available here
+            )
+        }
 }
