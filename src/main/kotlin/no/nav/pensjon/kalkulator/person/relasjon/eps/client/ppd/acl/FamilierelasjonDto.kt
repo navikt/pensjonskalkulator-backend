@@ -2,63 +2,16 @@ package no.nav.pensjon.kalkulator.person.relasjon.eps.client.ppd.acl
 
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.person.PersonaliaType
-import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.person.Tilgangsbegrensning
-import no.nav.pensjon.kalkulator.person.relasjon.Relasjonstype
 import org.springframework.util.StringUtils.hasLength
 import java.time.LocalDate
 
 data class FamilierelasjonDto(
     val pid: String?,
     val fom: LocalDate?,
-    val relasjonstype: RelasjonstypeDto,
+    val relasjonstype: String,
     val relasjonPersondata: RelasjonPersondataDto?
 )
-
-/**
- * Ref. PSELV: PersonopplysningerActionDelegate.hentEpsRelasjonMedGjenlevenderettighet
- */
-enum class RelasjonstypeDto(
-    val internalValue: Relasjonstype,
-    val correspondingSivilstatusListe: List<Sivilstatus>
-) {
-    EKTEFELLE(
-        internalValue = Relasjonstype.EKTEFELLE,
-        correspondingSivilstatusListe = listOf(
-            Sivilstatus.GIFT,
-            Sivilstatus.SEPARERT,
-            Sivilstatus.SKILT,
-            Sivilstatus.ENKE_ELLER_ENKEMANN
-        )
-    ),
-    REGISTRERT_PARTNER(
-        internalValue = Relasjonstype.REGISTRERT_PARTNER,
-        correspondingSivilstatusListe = listOf(
-            Sivilstatus.REGISTRERT_PARTNER,
-            Sivilstatus.SEPARERT_PARTNER,
-            Sivilstatus.SKILT_PARTNER,
-            Sivilstatus.GJENLEVENDE_PARTNER
-        )
-    ),
-    SAMBOER(
-        internalValue = Relasjonstype.SAMBOER,
-        correspondingSivilstatusListe = listOf(
-            Sivilstatus.SAMBOER,
-            Sivilstatus.UNKNOWN,
-            Sivilstatus.UOPPGITT,
-            Sivilstatus.UGIFT
-        )
-    );
-
-    companion object {
-        fun fromInternalValue(value: Relasjonstype?): RelasjonstypeDto =
-            entries.firstOrNull { it.internalValue == value }
-                ?: throw IllegalArgumentException("Ingen ekstern verdi for relasjonstype $value")
-
-        fun fromSivilstatus(value: Sivilstatus?): RelasjonstypeDto =
-            entries.firstOrNull { it.correspondingSivilstatusListe.contains(value) } ?: SAMBOER
-    }
-}
 
 data class RelasjonPersondataDto(
     val tilgangsbegrensning: String?,
