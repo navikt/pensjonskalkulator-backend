@@ -9,6 +9,7 @@ import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.testutil.Arrange
 import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
 import okhttp3.mockwebserver.MockWebServer
+import org.springframework.beans.factory.getBean
 import org.springframework.web.reactive.function.client.WebClient
 
 class PensjonRepresentasjonClientTest : FunSpec({
@@ -32,7 +33,7 @@ class PensjonRepresentasjonClientTest : FunSpec({
         Arrange.webClientContextRunner().run {
             val client = PensjonRepresentasjonClient(
                 baseUrl = baseUrl!!,
-                webClientBuilder = it.getBean(WebClient.Builder::class.java),
+                webClientBuilder = it.getBean<WebClient.Builder>(),
                 traceAid = mockk<TraceAid>(relaxed = true),
                 retryAttempts = "0"
             )
@@ -40,11 +41,11 @@ class PensjonRepresentasjonClientTest : FunSpec({
             client.hasValidRepresentasjonsforhold(pid) shouldBe
                     Representasjon(isValid = true, fullmaktGiverNavn = "Abc Æøå")
 
-            server.takeRequest().requestUrl?.query shouldBe "validRepresentasjonstyper=PENSJON_FULLSTENDIG" +
+            server.takeRequest().requestUrl?.query shouldBe
+                    "validRepresentasjonstyper=PENSJON_LES" +
                     "&validRepresentasjonstyper=PENSJON_SKRIV" +
-                    "&validRepresentasjonstyper=PENSJON_PENGEMOTTAKER" +
-                    "&validRepresentasjonstyper=PENSJON_VERGE" +
-                    "&validRepresentasjonstyper=PENSJON_VERGE_PENGEMOTTAKER" +
+                    "&validRepresentasjonstyper=VERGE_PENSJON_LES" +
+                    "&validRepresentasjonstyper=VERGE_PENSJON_SKRIV" +
                     "&includeFullmaktsgiverNavn=false"
         }
     }
