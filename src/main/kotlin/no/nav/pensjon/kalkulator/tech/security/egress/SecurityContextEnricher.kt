@@ -31,8 +31,11 @@ class SecurityContextEnricher(
             if (authentication == null) {
                 authentication = anonymousAuthentication()
             } else {
-                authentication = enrich(authentication!!, request)
-                authentication = applyPotentialFullmakt(authentication!!, request)
+                authentication = authentication?.let { enrich(it, request) }
+
+                if (authentication?.enriched()?.veilederInnlogget() != true) {
+                    authentication = authentication?.let { applyPotentialFullmakt(it, request) }
+                }
             }
         }
     }
@@ -73,7 +76,10 @@ class SecurityContextEnricher(
      * Dette fordi pensjon-representasjon henter ut PID fra TokenX-tokenet (som ikke finnes når veileder er logget inn).
      */
     private fun validRepresentasjonForhold(pid: Pid) =
-        representasjonService.hasValidRepresentasjonsforhold(pid).isValid
+        if (pid.isValid)
+            representasjonService.hasValidRepresentasjonsforhold(pid).isValid
+        else
+            false
 
     private fun enrichWithFullmakt(auth: Authentication, fullmaktGiverPid: Pid) =
         EnrichedAuthentication(
@@ -111,8 +117,14 @@ class SecurityContextEnricher(
     private fun onBehalfOfPid(cookies: Array<Cookie>?): Pid? =
         cookies.orEmpty()
             .filter { ON_BEHALF_OF_COOKIE_NAME.equals(it.name, ignoreCase = true) }
-            .map { Pid(it.value) }
+            .map { Pid((decrypt(it.value.orEmpty()))) }
             .firstOrNull()
+
+    private fun decrypt(value: String): String =
+        if (value.contains(ENCRYPTION_MARK))
+            pidDecrypter.decrypt(value)
+        else
+            value
 
     private companion object {
         private const val ENCRYPTION_MARK = "."
