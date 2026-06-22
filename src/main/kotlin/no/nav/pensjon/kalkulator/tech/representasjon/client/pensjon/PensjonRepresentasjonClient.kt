@@ -93,11 +93,10 @@ class PensjonRepresentasjonClient(
 
         private val representasjonTypeListe: List<String> =
             listOf(
-                "PENSJON_FULLSTENDIG",
+                "PENSJON_LES",
                 "PENSJON_SKRIV",
-                "PENSJON_PENGEMOTTAKER",
-                "PENSJON_VERGE",
-                "PENSJON_VERGE_PENGEMOTTAKER"
+                "VERGE_PENSJON_LES",
+                "VERGE_PENSJON_SKRIV"
             )
 
         private val service = EgressService.PENSJON_REPRESENTASJON
