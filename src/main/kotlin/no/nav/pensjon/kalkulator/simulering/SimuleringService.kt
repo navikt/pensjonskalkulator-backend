@@ -104,17 +104,20 @@ class SimuleringService(
             val afpResult = serviceberegnetAfpService.simulerServiceberegnetAfp(afpSpec)
 
             SimuleringResult(
-                alderspensjon = emptyList(),
+                alderspensjonListe = emptyList(),
                 alderspensjonMaanedsbeloep = null,
-                afpPrivat = emptyList(),
-                afpOffentlig = emptyList(),
+                maanedligAlderspensjonForKnekkpunkter = null,
+                livsvarigOffentligAfpListe = emptyList(),
+                tidsbegrensetOffentligAfp = null,
+                serviceberegnetAfp = afpResult.beregnetAfp,
+                privatAfpListe = emptyList(),
                 vilkaarsproeving = Vilkaarsproeving(
                     innvilget = afpResult.beregnetAfp != null && afpResult.problem == null
                 ),
                 harForLiteTrygdetid = false,
                 trygdetid = 0,
-                opptjeningGrunnlagListe = emptyList(),
-                serviceberegnetAfpResult = afpResult.beregnetAfp,
+                opptjeningListe = emptyList(),
+                alderAar = null,
                 problem = afpResult.problem?.let { mapAfpProblem(it) }
             )
         } catch (e: BadRequestException) {
@@ -135,18 +138,22 @@ class SimuleringService(
         )
 
     private companion object {
+
         private fun problem(e: RuntimeException, type: ProblemType) =
             SimuleringResult(
-                alderspensjon = emptyList(),
+                alderspensjonListe = emptyList(),
                 alderspensjonMaanedsbeloep = null,
-                pre2025OffentligAfp = null,
-                afpPrivat = emptyList(),
-                afpOffentlig = emptyList(),
+                maanedligAlderspensjonForKnekkpunkter = null,
+                livsvarigOffentligAfpListe = emptyList(),
+                tidsbegrensetOffentligAfp = null,
+                serviceberegnetAfp = null,
+                privatAfpListe = emptyList(),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = false),
                 harForLiteTrygdetid = false,
                 trygdetid = 0,
-                opptjeningGrunnlagListe = emptyList(),
-                problem = Problem(type, beskrivelse = e.message ?: "Ukjent feil - ${e.javaClass.simpleName}")
+                opptjeningListe = emptyList(),
+                alderAar = null,
+                problem = Problem(type, beskrivelse = e.message ?: e.javaClass.simpleName)
             )
 
         private fun mapAfpProblem(source: ServiceberegnetAfpProblem) =

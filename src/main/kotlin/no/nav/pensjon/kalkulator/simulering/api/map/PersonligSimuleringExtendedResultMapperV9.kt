@@ -16,17 +16,17 @@ object PersonligSimuleringExtendedResultMapperV9 {
 
     fun extendedResultV9(source: SimuleringResult, foedselsdato: LocalDate) =
         PersonligSimuleringResultV9(
-            alderspensjon = source.alderspensjon.map(::alderspensjon)
+            alderspensjon = source.alderspensjonListe.map(::alderspensjon)
                 .let { justerAlderspensjonInnevaerendeAar(alderspensjonList = it, foedselsdato) },
             alderspensjonMaanedligVedEndring = maanedligPensjon(source.alderspensjonMaanedsbeloep),
-            pre2025OffentligAfp = source.pre2025OffentligAfp?.let(::pre2025OffentligAfp),
-            afpPrivat = source.afpPrivat.map(::privatAfp)
+            pre2025OffentligAfp = source.tidsbegrensetOffentligAfp?.let(::pre2025OffentligAfp),
+            afpPrivat = source.privatAfpListe.map(::privatAfp)
                 .let { justerPrivatAfpInnevaerendeAar(afpListe = it, foedselsdato) },
-            afpOffentlig = source.afpOffentlig.map(::livsvarigOffentligAfp),
+            afpOffentlig = source.livsvarigOffentligAfpListe.map(::livsvarigOffentligAfp),
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving),
             harForLiteTrygdetid = source.harForLiteTrygdetid,
             trygdetid = source.trygdetid,
-            opptjeningGrunnlagListe = source.opptjeningGrunnlagListe.map(::opptjeningGrunnlag)
+            opptjeningGrunnlagListe = source.opptjeningListe.map(::inntekt)
         )
 
     private fun alderspensjon(source: SimulertAlderspensjon) =
@@ -99,9 +99,9 @@ object PersonligSimuleringExtendedResultMapperV9 {
             alternativ = source.alternativ?.let(::alternativ)
         )
 
-    private fun opptjeningGrunnlag(source: SimulertOpptjeningGrunnlag) =
+    private fun inntekt(source: SimulertOpptjening) =
         PersonligSimuleringAarligInntektResultV9(
-            aar = source.aar,
+            aar = source.aarstall,
             pensjonsgivendeInntektBeloep = source.pensjonsgivendeInntektBeloep
         )
 

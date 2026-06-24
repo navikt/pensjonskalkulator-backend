@@ -112,15 +112,16 @@ class EksternSimuleringController(
                 alderspensjonListe = emptyList(),
                 maanedligAlderspensjonVedUttaksendring = null,
                 maanedligAlderspensjonForKnekkpunkter = null,
-                tidsbegrensetOffentligAfp = null,
-                privatAfpListe = null,
                 livsvarigOffentligAfpListe = null,
+                tidsbegrensetOffentligAfp = null,
+                serviceberegnetAfp = null,
+                privatAfpListe = null,
                 vilkaarsproevingsresultat = SimuleringV1Vilkaarsproevingsresultat(
                     erInnvilget = false,
                     alternativ = null
                 ),
                 trygdetid = null,
-                pensjonsgivendeInntektListe = null,
+                opptjeningListe = emptyList(),
                 problem = SimuleringV1Problem(
                     kode = SimuleringV1ProblemType.SERVERFEIL,
                     beskrivelse = e.message ?: e.javaClass.simpleName
