@@ -29,6 +29,7 @@ object SimuleringResultMapper {
                 .let { justerPrivatAfpListe(pensjonListe = it, naavaerendeAlderAar) },
             vilkaarsproevingsresultat = vilkaarsproevingsresultat(source.vilkaarsproeving),
             trygdetid = trygdetid(source),
+            pensjonsgivendeInntektListe = source.opptjeningListe.map(::inntekt),
             opptjeningListe = source.opptjeningListe.map(::opptjening),
             problem = source.problem?.let(::problem)
         )
@@ -206,6 +207,12 @@ object SimuleringResultMapper {
         SimuleringV1Trygdetid(
             antallAar = source.trygdetid,
             erUtilstrekkelig = source.harForLiteTrygdetid
+        )
+
+    private fun inntekt(source: SimulertOpptjening) =
+        SimuleringV1AarligBeloep(
+            aarstall = source.aarstall,
+            beloep = source.pensjonsgivendeInntektBeloep
         )
 
     private fun opptjening(source: SimulertOpptjening) =

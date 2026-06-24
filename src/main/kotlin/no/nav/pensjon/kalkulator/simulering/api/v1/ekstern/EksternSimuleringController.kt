@@ -121,6 +121,7 @@ class EksternSimuleringController(
                     alternativ = null
                 ),
                 trygdetid = null,
+                pensjonsgivendeInntektListe = emptyList(),
                 opptjeningListe = emptyList(),
                 problem = SimuleringV1Problem(
                     kode = SimuleringV1ProblemType.SERVERFEIL,
