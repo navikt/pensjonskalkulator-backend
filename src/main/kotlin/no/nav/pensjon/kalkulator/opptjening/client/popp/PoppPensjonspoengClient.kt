@@ -73,7 +73,7 @@ class PoppPensjonspoengClient(
                 .headers { setHeaders(it, pid) }
                 .bodyValue(PoppBeholdningSpec(fnr = pid.value))
                 .retrieve()
-                .bodyToMono<PoppBeholdningResult>()
+                .bodyToMono<PensjonspoengResponseDto>()
                 .retryWhen(retryBackoffSpec(url))
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $url", e)

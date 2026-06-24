@@ -1,10 +1,11 @@
 package no.nav.pensjon.kalkulator.simulering.client.simulator.dto
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING
 import java.time.LocalDate
 
 // Corresponds to SimuleringEtter2011 in PEN
-data class SimulatorAnonymSimuleringSpec (
+data class SimulatorAnonymSimuleringSpec(
     val simuleringType: String, // SimuleringTypeCode in PEN
     val fodselsar: Int,
     val sivilstatus: String, // SivilstatusTypeCode in PEN
@@ -13,10 +14,10 @@ data class SimulatorAnonymSimuleringSpec (
     val utenlandsopphold: Int,
     val antArInntektOverG: Int,
     val forventetInntekt: Int,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "CET") val forsteUttakDato: LocalDate? = null,
+    @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd", timezone = "CET") val forsteUttakDato: LocalDate? = null,
     val utg: String, // UttaksgradCode in PEN
     val inntektUnderGradertUttak: Int? = null,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "CET") val heltUttakDato: LocalDate? = null,
+    @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd", timezone = "CET") val heltUttakDato: LocalDate? = null,
     val inntektEtterHeltUttak: Int,
     val antallArInntektEtterHeltUttak: Int
 )

@@ -23,16 +23,17 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import org.springframework.web.reactive.function.client.bodyToMono
 
 /**
  * Client for accessing the 'popp' service (see https://github.com/navikt/popp)
  */
 @Component
 class PoppOpptjeningsgrunnlagClient(
-    @Value("\${popp.url}") private val baseUrl: String,
+    @param:Value($$"${popp.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
-    @Value("\${web-client.retry-attempts}") retryAttempts: String
+    @Value($$"${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), OpptjeningsgrunnlagClient, Pingable {
 
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
@@ -50,7 +51,7 @@ class PoppOpptjeningsgrunnlagClient(
                 .uri("/$OPPTJENINGSGRUNNLAG_PATH")
                 .headers { setHeaders(it, pid) }
                 .retrieve()
-                .bodyToMono(OpptjeningsgrunnlagResponseDto::class.java)
+                .bodyToMono<OpptjeningsgrunnlagResponseDto>()
                 .retryWhen(retryBackoffSpec(url))
                 .block()
                 ?.let(OpptjeningsgrunnlagMapper::fromDto)
@@ -72,7 +73,7 @@ class PoppOpptjeningsgrunnlagClient(
                 .uri("/$PING_PATH")
                 .headers(::setPingHeaders)
                 .retrieve()
-                .bodyToMono(String::class.java)
+                .bodyToMono<String>()
                 .retryWhen(retryBackoffSpec(url))
                 .block()
                 ?: ""

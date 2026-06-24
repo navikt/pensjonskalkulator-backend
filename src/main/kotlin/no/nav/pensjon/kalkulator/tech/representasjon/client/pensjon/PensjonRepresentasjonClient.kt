@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import org.springframework.web.reactive.function.client.bodyToMono
 import org.springframework.web.util.UriComponentsBuilder
 
 /**
@@ -28,10 +29,10 @@ import org.springframework.web.util.UriComponentsBuilder
  */
 @Component
 class PensjonRepresentasjonClient(
-    @Value("\${pensjon-representasjon.url}") private val baseUrl: String,
+    @param:Value($$"${pensjon-representasjon.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
-    @Value("\${web-client.retry-attempts}") retryAttempts: String
+    @Value($$"${web-client.retry-attempts}") retryAttempts: String
 ) : PingableServiceClient(null, webClientBuilder, retryAttempts),
     RepresentasjonClient {
 
@@ -48,7 +49,7 @@ class PensjonRepresentasjonClient(
                 .accept(MediaType.APPLICATION_JSON)
                 .headers { setHeaders(it, fullmaktGiverPid) }
                 .retrieve()
-                .bodyToMono(PensjonRepresentasjonResult::class.java)
+                .bodyToMono<PensjonRepresentasjonResult>()
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
                 ?.let(::fromDto)
@@ -92,11 +93,10 @@ class PensjonRepresentasjonClient(
 
         private val representasjonTypeListe: List<String> =
             listOf(
-                "PENSJON_FULLSTENDIG",
+                "PENSJON_LES",
                 "PENSJON_SKRIV",
-                "PENSJON_PENGEMOTTAKER",
-                "PENSJON_VERGE",
-                "PENSJON_VERGE_PENGEMOTTAKER"
+                "VERGE_PENSJON_LES",
+                "VERGE_PENSJON_SKRIV"
             )
 
         private val service = EgressService.PENSJON_REPRESENTASJON
