@@ -258,13 +258,13 @@ private fun arrangeSimulering(spec: ImpersonalSimuleringSpec): SimuleringService
         every {
             simulerPersonligAlderspensjon(impersonalSpec = spec)
         } returns SimuleringResult(
-            alderspensjon = emptyList(),
-            afpPrivat = emptyList(),
-            afpOffentlig = emptyList(),
+            alderspensjonListe = emptyList(),
+            livsvarigOffentligAfpListe = emptyList(),
+            privatAfpListe = emptyList(),
             vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
             harForLiteTrygdetid = false,
             trygdetid = 0,
-            opptjeningGrunnlagListe = emptyList()
+            opptjeningListe = emptyList()
         )
     }
 

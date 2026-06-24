@@ -138,13 +138,19 @@ class PensjonssimulatorSimuleringClient(
 
         private fun emptyResult() =
             SimuleringResult(
-                alderspensjon = emptyList(),
-                afpPrivat = emptyList(),
-                afpOffentlig = emptyList(),
+                alderspensjonListe = emptyList(),
+                alderspensjonMaanedsbeloep = null,
+                maanedligAlderspensjonForKnekkpunkter = null,
+                tidsbegrensetOffentligAfp = null,
+                livsvarigOffentligAfpListe = emptyList(),
+                serviceberegnetAfp = null,
+                privatAfpListe = emptyList(),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = false),
                 harForLiteTrygdetid = false,
                 trygdetid = 0,
-                opptjeningGrunnlagListe = emptyList()
+                opptjeningListe = emptyList(),
+                alderAar = null,
+                problem = null
             )
     }
 }
