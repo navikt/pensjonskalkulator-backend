@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.person.relasjon.eps.client.ppd
 
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.person.PersonaliaType
 import no.nav.pensjon.kalkulator.person.Pid
@@ -23,6 +24,7 @@ import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -42,6 +44,7 @@ class PensjonPersondataClient(
 ) : ExternalServiceClient(retryAttempts), EpsClient, Pingable {
 
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
+    private val log = KotlinLogging.logger {}
 
     override fun service() = service
 
@@ -50,7 +53,7 @@ class PensjonPersondataClient(
         personaliaSpec: List<PersonaliaType>
     ): Familierelasjon {
         val uri = "/$NAAVAERENDE_EPS_PATH"
-        val url = "${baseUrl}uri"
+        val url = "$baseUrl$uri"
         val body: List<String> = personaliaSpec.map(PersonaliaTypeDto::externalValue)
 
         return try {
@@ -69,34 +72,40 @@ class PensjonPersondataClient(
             throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
+        } catch (e: EgressException) {
+            if (e.statusCode == HttpStatus.NOT_FOUND)
+                emptyFamilierelasjon.also { log.info { "$url ga status ${e.statusCode} for pid $soekerPid" } }
+            else
+                throw e
         }
     }
 
     override fun fetchTidligereGiftEllerBarnMed(soekerPid: Pid, samboerPid: Pid): Boolean {
         val uri = "/$TIDLIGERE_GIFT_ELLER_BARN_MED_PATH"
-        val url = "${baseUrl}${uri}"
+        val url = "$baseUrl$uri"
 
         return try {
             webClient
-                        .get()
-                        .uri(uri)
-                        .headers {
-                            it.setBearerAuth(EgressAccess.token(service).value)
-                            it[HttpHeaders.ACCEPT] = MediaType.APPLICATION_JSON_VALUE
-                            it[CustomHttpHeaders.PERSON_ID] = soekerPid.value
-                            it[SAMBOER_PID_HEADER] = samboerPid.value
-                            it[CustomHttpHeaders.CALL_ID] = traceAid.callId()
-                        }
-                        .retrieve()
-                        .bodyToMono<TidligereGiftEllerBarnMedDto>()
-                        .retryWhen(retryBackoffSpec(url))
-                        .block()?.result
+                .get()
+                .uri(uri)
+                .headers { setHeaders(headers = it, soekerPid, samboerPid) }
+                .retrieve()
+                .bodyToMono<TidligereGiftEllerBarnMedDto>()
+                .retryWhen(retryBackoffSpec(url))
+                .block()?.result
                 .also { countCalls(MetricResult.OK) }
                 ?: false
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
+        } catch (e: EgressException) {
+            if (e.statusCode == HttpStatus.NOT_FOUND)
+                false.also {
+                    log.info { "$url ga status ${e.statusCode} for soekerPid $soekerPid samboerPid $samboerPid" }
+                }
+            else
+                throw e
         }
     }
 
@@ -107,7 +116,7 @@ class PensjonPersondataClient(
     ): Familierelasjon {
         val relasjonstype = RelasjonstypeDto.fromSivilstatus(sivilstatus)
         val uri = "/$NYLIGSTE_EPS_PATH?epsType=${relasjonstype.name}"
-        val url = "${baseUrl}uri"
+        val url = "$baseUrl$uri"
         val body: List<String> = personaliaSpec.map(PersonaliaTypeDto::externalValue)
 
         return try {
@@ -126,6 +135,11 @@ class PensjonPersondataClient(
             throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
+        } catch (e: EgressException) {
+            if (e.statusCode == HttpStatus.NOT_FOUND)
+                emptyFamilierelasjon.also { log.info { "$url ga status ${e.statusCode} for pid $soekerPid" } }
+            else
+                throw e
         }
     }
 
@@ -156,9 +170,15 @@ class PensjonPersondataClient(
 
     private fun setHeaders(headers: HttpHeaders, pid: Pid) {
         headers.setBearerAuth(EgressAccess.token(service).value)
+        headers[HttpHeaders.ACCEPT] = MediaType.APPLICATION_JSON_VALUE
         headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_JSON_VALUE
         headers[CustomHttpHeaders.PERSON_ID] = pid.value
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
+    }
+
+    private fun setHeaders(headers: HttpHeaders, soekerPid: Pid, samboerPid: Pid) {
+        setHeaders(headers, soekerPid)
+        headers[CustomHttpHeaders.SAMBOER_PID] = samboerPid.value
     }
 
     private fun setPingHeaders(headers: HttpHeaders) {
@@ -167,10 +187,10 @@ class PensjonPersondataClient(
     }
 
     companion object {
-        private const val NAAVAERENDE_EPS_PATH = "api/familierelasjoner/currentEps"
-        private const val NYLIGSTE_EPS_PATH = "api/familierelasjoner/mostRecentEps"
-        private const val TIDLIGERE_GIFT_ELLER_BARN_MED_PATH = "api/familierelasjoner/tidligereGiftEllerBarnMed"
-        private const val SAMBOER_PID_HEADER = "pidSamboer"
+        private const val BASE_PATH = "api/familierelasjoner"
+        private const val NAAVAERENDE_EPS_PATH = "$BASE_PATH/currentEps"
+        private const val NYLIGSTE_EPS_PATH = "$BASE_PATH/mostRecentEps"
+        private const val TIDLIGERE_GIFT_ELLER_BARN_MED_PATH = "$BASE_PATH/tidligereGiftEllerBarnMed"
         private const val PING_PATH = "TBD" //TODO
         private val service = EgressService.PENSJON_PERSONDATA
 
