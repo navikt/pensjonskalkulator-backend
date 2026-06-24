@@ -58,6 +58,7 @@ class SimuleringResultMapperTest : ShouldSpec({
                 ),
                 vilkaarsproevingsresultat = expectedVilkaarsproevingsresultat(),
                 trygdetid = expectedTrygdetid(),
+                pensjonsgivendeInntektListe = emptyList(),
                 opptjeningListe = emptyList(),
                 problem = null
             )
@@ -91,6 +92,7 @@ class SimuleringResultMapperTest : ShouldSpec({
                 privatAfpListe = emptyList(),
                 vilkaarsproevingsresultat = expectedVilkaarsproevingsresultat(),
                 trygdetid = expectedTrygdetid(),
+                pensjonsgivendeInntektListe = emptyList(),
                 opptjeningListe = emptyList(),
                 problem = null
             )
@@ -135,6 +137,7 @@ class SimuleringResultMapperTest : ShouldSpec({
                 privatAfpListe = emptyList(),
                 vilkaarsproevingsresultat = expectedVilkaarsproevingsresultat(),
                 trygdetid = expectedTrygdetid(),
+                pensjonsgivendeInntektListe = listOf(SimuleringV1AarligBeloep(aarstall = 2021, beloep = 10000)),
                 opptjeningListe = listOf(
                     SimuleringV1Opptjening(
                         aarstall = 2021,
@@ -178,6 +181,7 @@ class SimuleringResultMapperTest : ShouldSpec({
                 privatAfpListe = emptyList(),
                 vilkaarsproevingsresultat = expectedVilkaarsproevingsresultat(innvilget = false),
                 trygdetid = expectedTrygdetid(antallAar = 0),
+                pensjonsgivendeInntektListe = emptyList(),
                 opptjeningListe = emptyList(),
                 problem = SimuleringV1Problem(
                     kode = SimuleringV1ProblemType.UTILSTREKKELIG_INNTEKT,

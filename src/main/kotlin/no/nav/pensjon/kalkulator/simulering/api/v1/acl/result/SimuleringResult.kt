@@ -39,6 +39,9 @@ data class SimuleringV1Result(
     @field:Schema(description = "Personens trygdetid")
     val trygdetid: SimuleringV1Trygdetid?,
 
+    @field:Schema(description = "Pensjonsgivende inntekter for hvert år")
+    val pensjonsgivendeInntektListe: List<SimuleringV1AarligBeloep>? = null,
+
     @field:Schema(description = "Opptjeningsdata brukt i beregningen for hvert år")
     @field:NotNull
     val opptjeningListe: List<SimuleringV1Opptjening>,
@@ -325,6 +328,14 @@ data class SimuleringV1Vilkaarsproevingsresultat(
 
     @field:Schema(description = "Et alternativ sett av uttaksparametre som vil resultere i innvilget pensjon (relevant når de opprinnelig angitte parametre ga avslag)")
     val alternativ: SimuleringV1Uttaksparametre?
+)
+
+data class SimuleringV1AarligBeloep(
+    @field:Schema(description = "Hvilket årstall (kalenderår) som informasjonen gjelder for")
+    @field:NotNull
+    val aarstall: Int,
+
+    @field:NotNull val beloep: Int
 )
 
 data class SimuleringV1Opptjening(
