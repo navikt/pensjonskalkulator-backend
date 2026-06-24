@@ -8,5 +8,6 @@ object CustomHttpHeaders {
     const val FULLMAKT_GIVER_PID = "fullmaktsgiverPid" // PID = person identifier
     const val PID = "fnr" // fødselsnummer
     const val PERSON_ID = "pid"
+    const val SAMBOER_PID = "pidSamboer"
     const val THEME = "Tema"
 }
