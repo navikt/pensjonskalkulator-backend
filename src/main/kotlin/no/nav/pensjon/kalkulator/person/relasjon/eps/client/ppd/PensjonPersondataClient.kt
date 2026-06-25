@@ -1,18 +1,21 @@
 package no.nav.pensjon.kalkulator.person.relasjon.eps.client.ppd
 
+import com.github.benmanes.caffeine.cache.Cache
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
-import no.nav.pensjon.kalkulator.person.PersonaliaType
 import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.person.relasjon.Familierelasjon
 import no.nav.pensjon.kalkulator.person.relasjon.Relasjonstype
 import no.nav.pensjon.kalkulator.person.relasjon.eps.client.EpsClient
+import no.nav.pensjon.kalkulator.person.relasjon.eps.client.NaavaerendeEpsSpec
+import no.nav.pensjon.kalkulator.person.relasjon.eps.client.NyligsteEpsSpec
+import no.nav.pensjon.kalkulator.person.relasjon.eps.client.TidligereStatusSpec
 import no.nav.pensjon.kalkulator.person.relasjon.eps.client.ppd.acl.TidligereGiftEllerBarnMedDto
 import no.nav.pensjon.kalkulator.person.relasjon.eps.client.ppd.acl.FamilierelasjonDto
 import no.nav.pensjon.kalkulator.person.relasjon.eps.client.ppd.acl.FamilierelasjonMapper
 import no.nav.pensjon.kalkulator.person.relasjon.eps.client.ppd.acl.PersonaliaTypeDto
 import no.nav.pensjon.kalkulator.person.relasjon.eps.client.ppd.acl.RelasjonstypeDto
+import no.nav.pensjon.kalkulator.tech.cache.CacheConfigurator.createCache
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
@@ -23,6 +26,7 @@ import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.caffeine.CaffeineCacheManager
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -39,6 +43,7 @@ import org.springframework.web.reactive.function.client.bodyToMono
 class PensjonPersondataClient(
     @param:Value($$"${pensjon-persondata.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
+    cacheManager: CaffeineCacheManager,
     private val traceAid: TraceAid,
     @Value($$"${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), EpsClient, Pingable {
@@ -46,21 +51,39 @@ class PensjonPersondataClient(
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
     private val log = KotlinLogging.logger {}
 
+    private val naavarendeEpsCache: Cache<NaavaerendeEpsSpec, Familierelasjon> =
+        createCache("naavaerendEps", cacheManager)
+
+    private val nyligsteEpsCache: Cache<NyligsteEpsSpec, Familierelasjon> =
+        createCache("nyligsteEps", cacheManager)
+
+    private val tidligereStatusCache: Cache<TidligereStatusSpec, Boolean> =
+        createCache("tidligereStatus", cacheManager)
+
     override fun service() = service
 
-    override fun fetchNaavaerendeEps(
-        soekerPid: Pid,
-        personaliaSpec: List<PersonaliaType>
-    ): Familierelasjon {
+    override fun fetchNaavaerendeEps(spec: NaavaerendeEpsSpec): Familierelasjon =
+        naavarendeEpsCache.getIfPresent(spec)
+            ?: fetchFreshNaavaerendeEps(spec).also { naavarendeEpsCache.put(spec, it) }
+
+    override fun fetchNyligsteEps(spec: NyligsteEpsSpec): Familierelasjon =
+        nyligsteEpsCache.getIfPresent(spec)
+            ?: fetchFreshNyligsteEps(spec).also { nyligsteEpsCache.put(spec, it) }
+
+    override fun fetchTidligereGiftEllerBarnMed(spec: TidligereStatusSpec): Boolean =
+        tidligereStatusCache.getIfPresent(spec)
+            ?: fetchFreshTidligereGiftEllerBarnMed(spec).also { tidligereStatusCache.put(spec, it) }
+
+    private fun fetchFreshNaavaerendeEps(spec: NaavaerendeEpsSpec): Familierelasjon {
         val uri = "/$NAAVAERENDE_EPS_PATH"
         val url = "$baseUrl$uri"
-        val body: List<String> = personaliaSpec.map(PersonaliaTypeDto::externalValue)
+        val body: List<String> = spec.personalia.map(PersonaliaTypeDto::externalValue)
 
         return try {
             webClient
                 .post()
                 .uri(uri)
-                .headers { setHeaders(headers = it, soekerPid) }
+                .headers { setHeaders(headers = it, spec.soekerPid) }
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono<FamilierelasjonDto>()
@@ -74,13 +97,13 @@ class PensjonPersondataClient(
             throw EgressException(e.responseBodyAsString, e)
         } catch (e: EgressException) {
             if (e.statusCode == HttpStatus.NOT_FOUND)
-                emptyFamilierelasjon.also { log.info { "$url ga status ${e.statusCode} for pid $soekerPid" } }
+                emptyFamilierelasjon.also { log.info { "$url ga status ${e.statusCode} for pid ${spec.soekerPid}" } }
             else
                 throw e
         }
     }
 
-    override fun fetchTidligereGiftEllerBarnMed(soekerPid: Pid, samboerPid: Pid): Boolean {
+    private fun fetchFreshTidligereGiftEllerBarnMed(spec: TidligereStatusSpec): Boolean {
         val uri = "/$TIDLIGERE_GIFT_ELLER_BARN_MED_PATH"
         val url = "$baseUrl$uri"
 
@@ -88,7 +111,7 @@ class PensjonPersondataClient(
             webClient
                 .get()
                 .uri(uri)
-                .headers { setHeaders(headers = it, soekerPid, samboerPid) }
+                .headers { setHeaders(headers = it, spec.soekerPid, spec.samboerPid) }
                 .retrieve()
                 .bodyToMono<TidligereGiftEllerBarnMedDto>()
                 .retryWhen(retryBackoffSpec(url))
@@ -102,28 +125,26 @@ class PensjonPersondataClient(
         } catch (e: EgressException) {
             if (e.statusCode == HttpStatus.NOT_FOUND)
                 false.also {
-                    log.info { "$url ga status ${e.statusCode} for soekerPid $soekerPid samboerPid $samboerPid" }
+                    log.info {
+                        "$url ga status ${e.statusCode} for soekerPid ${spec.soekerPid} samboerPid ${spec.samboerPid}"
+                    }
                 }
             else
                 throw e
         }
     }
 
-    override fun fetchNyligsteEps(
-        soekerPid: Pid,
-        sivilstatus: Sivilstatus,
-        personaliaSpec: List<PersonaliaType>
-    ): Familierelasjon {
-        val relasjonstype = RelasjonstypeDto.fromSivilstatus(sivilstatus)
+    private fun fetchFreshNyligsteEps(spec: NyligsteEpsSpec): Familierelasjon {
+        val relasjonstype = RelasjonstypeDto.fromSivilstatus(spec.sivilstatus)
         val uri = "/$NYLIGSTE_EPS_PATH?epsType=${relasjonstype.name}"
         val url = "$baseUrl$uri"
-        val body: List<String> = personaliaSpec.map(PersonaliaTypeDto::externalValue)
+        val body: List<String> = spec.personalia.map(PersonaliaTypeDto::externalValue)
 
         return try {
             webClient
                 .post()
                 .uri(uri)
-                .headers { setHeaders(headers = it, soekerPid) }
+                .headers { setHeaders(headers = it, spec.soekerPid) }
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono<FamilierelasjonDto>()
@@ -137,7 +158,7 @@ class PensjonPersondataClient(
             throw EgressException(e.responseBodyAsString, e)
         } catch (e: EgressException) {
             if (e.statusCode == HttpStatus.NOT_FOUND)
-                emptyFamilierelasjon.also { log.info { "$url ga status ${e.statusCode} for pid $soekerPid" } }
+                emptyFamilierelasjon.also { log.info { "$url ga status ${e.statusCode} for pid ${spec.soekerPid}" } }
             else
                 throw e
         }

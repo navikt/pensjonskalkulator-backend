@@ -35,9 +35,9 @@ class TilgangsmaskinClient(
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
     private val log = KotlinLogging.logger {}
 
-    override fun sjekkTilgang(pid: Pid): TilgangResult =
+    override fun sjekkTilgang(pid: Pid, sjekkKunKjerneregler: Boolean): TilgangResult =
         try {
-            val uri = "/$API_RESOURCE"
+            val uri = if (sjekkKunKjerneregler) "/$KJERNE_RESOURCE" else "/$KOMPLETT_RESOURCE"
             log.debug { "POST to URI: '$uri'" }
 
             webClient
@@ -90,7 +90,9 @@ class TilgangsmaskinClient(
     }
 
     companion object {
-        private const val API_RESOURCE = "api/v1/komplett"
+        private const val RESOURCE_BASE = "api/v1"
+        private const val KJERNE_RESOURCE = "$RESOURCE_BASE/kjerne"
+        private const val KOMPLETT_RESOURCE = "$RESOURCE_BASE/komplett"
         private val service = EgressService.TILGANGSMASKINEN
 
         private fun feilResultat(begrunnelse: String?) =

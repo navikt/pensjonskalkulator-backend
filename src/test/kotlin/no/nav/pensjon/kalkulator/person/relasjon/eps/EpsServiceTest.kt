@@ -25,11 +25,7 @@ class EpsServiceTest : ShouldSpec({
             )
 
             EpsService(
-                client = mockk {
-                    every {
-                        fetchNyligsteEps(any(), any(), any())
-                    } returns familierelasjon
-                },
+                client = mockk { every { fetchNyligsteEps(any()) } returns familierelasjon },
                 personService = mockk(),
                 pidGetter = mockk(relaxed = true),
                 populasjonstilgangService = arrangeTilgang(tilgangsnektAarsak = null)
@@ -38,7 +34,7 @@ class EpsServiceTest : ShouldSpec({
     }
 
     context("nyligsteRelasjon - tilgang nektet") {
-        should("throw 'access denied' exception") {
+        should("kaste 'access denied' exception med beskrivelse av årsak") {
             shouldThrow<AccessDeniedException> {
                 EpsService(
                     client = mockk(relaxed = true),
@@ -52,4 +48,4 @@ class EpsServiceTest : ShouldSpec({
 })
 
 private fun arrangeTilgang(tilgangsnektAarsak: String?): CacheAwarePopulasjonstilgangService =
-    mockk { every { eventuellTilgangsnektAarsak(any()) } returns tilgangsnektAarsak }
+    mockk { every { eventuellTilgangsnektAarsak(any(), any()) } returns tilgangsnektAarsak }
