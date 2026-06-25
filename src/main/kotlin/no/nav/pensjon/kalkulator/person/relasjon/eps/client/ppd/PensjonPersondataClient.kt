@@ -63,8 +63,8 @@ class PensjonPersondataClient(
     override fun service() = service
 
     override fun fetchNaavaerendeEps(spec: NaavaerendeEpsSpec): Familierelasjon =
-        naavarendeEpsCache.getIfPresent(spec)
-            ?: fetchFreshNaavaerendeEps(spec).also { naavarendeEpsCache.put(spec, it) }
+        naavaerendeEpsCache.getIfPresent(spec)
+            ?: fetchFreshNaavaerendeEps(spec).also { naavaerendeEpsCache.put(spec, it) }
 
     override fun fetchNyligsteEps(spec: NyligsteEpsSpec): Familierelasjon =
         nyligsteEpsCache.getIfPresent(spec)
