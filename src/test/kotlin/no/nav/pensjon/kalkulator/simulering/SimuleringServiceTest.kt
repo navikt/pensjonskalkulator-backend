@@ -25,7 +25,7 @@ import java.time.LocalDate
 
 class SimuleringServiceTest : ShouldSpec({
 
-    val pidGetter = mockk<PidGetter>().apply { every { pid() } returns pid }
+    val pidGetter: PidGetter = mockk { every { pid() } returns pid }
 
     should("use specified inntekt and sivilstatus") {
         val incomingSpec = impersonalSimuleringSpec(
@@ -50,7 +50,7 @@ class SimuleringServiceTest : ShouldSpec({
 
         val response = service.simulerPersonligAlderspensjon(incomingSpec)
 
-        response.alderspensjon[0].beloep shouldBe 123456
+        response.alderspensjonListe[0].beloep shouldBe 123456
         verify { inntektService wasNot Called }
         verify(exactly = 1) { personService.getPerson() } // for fødselsdato (not sivilstatus)
 
@@ -80,7 +80,7 @@ class SimuleringServiceTest : ShouldSpec({
 
         val response = service.simulerPersonligAlderspensjon(incomingSpec)
 
-        response.alderspensjon[0].beloep shouldBe PENSJONSBELOEP
+        response.alderspensjonListe[0].beloep shouldBe PENSJONSBELOEP
         verify(exactly = 1) { inntektService.sistePensjonsgivendeInntekt() }
         verify(exactly = 2) { personService.getPerson() } // for sivilstatus and fødselsdato
     }
@@ -103,7 +103,7 @@ private val inntekt = Inntekt(
 
 private val simuleringResult =
     SimuleringResult(
-        alderspensjon = listOf(
+        alderspensjonListe = listOf(
             SimulertAlderspensjon(
                 alder = 67,
                 beloep = PENSJONSBELOEP,
@@ -126,12 +126,12 @@ private val simuleringResult =
             gradertUttak = null,
             heltUttak = 0
         ),
-        afpPrivat = emptyList(),
-        afpOffentlig = emptyList(),
+        livsvarigOffentligAfpListe = emptyList(),
+        privatAfpListe = emptyList(),
         vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
         harForLiteTrygdetid = false,
         trygdetid = 0,
-        opptjeningGrunnlagListe = emptyList()
+        opptjeningListe = emptyList()
     )
 
 private fun impersonalSimuleringSpec(forventetInntekt: Int?, sivilstatus: Sivilstatus?) =
@@ -157,21 +157,21 @@ private fun impersonalSimuleringSpec(forventetInntekt: Int?, sivilstatus: Sivils
     )
 
 private fun arrangeInntekt(): InntektService =
-    mockk<InntektService>().apply {
+    mockk {
         every { sistePensjonsgivendeInntekt() } returns inntekt
     }
 
 private fun arrangePerson(): PersonService =
-    mockk<PersonService>().apply {
+    mockk {
         every { getPerson() } returns person()
     }
 
 private fun arrangeSimuleringClient(incomingSpec: ImpersonalSimuleringSpec): SimuleringClient =
-    mockk<SimuleringClient>().apply {
+    mockk {
         every { simulerPersonligAlderspensjon(incomingSpec, personalSpec) } returns simuleringResult
     }
 
 private fun arrangeTime(): TodayProvider =
-    mockk<TodayProvider>().apply {
+    mockk {
         every { date() } returns LocalDate.of(2026, 1, 1)
     }
