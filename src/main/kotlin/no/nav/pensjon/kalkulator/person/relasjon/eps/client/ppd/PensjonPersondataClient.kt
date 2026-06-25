@@ -51,8 +51,8 @@ class PensjonPersondataClient(
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
     private val log = KotlinLogging.logger {}
 
-    private val naavarendeEpsCache: Cache<NaavaerendeEpsSpec, Familierelasjon> =
-        createCache("naavaerendEps", cacheManager)
+    private val naavaerendeEpsCache: Cache<NaavaerendeEpsSpec, Familierelasjon> =
+        createCache("naavaerendeEps", cacheManager)
 
     private val nyligsteEpsCache: Cache<NyligsteEpsSpec, Familierelasjon> =
         createCache("nyligsteEps", cacheManager)
