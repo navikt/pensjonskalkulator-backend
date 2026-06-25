@@ -6,10 +6,9 @@ object OpptjeningResultMapper {
 
     fun toDto(opptjening: AarligOpptjening) =
         OpptjeningV1(
-            aar = opptjening.aar,
-            pensjonsgivendeInntekt = opptjening.pensjonsgivendeInntekt,
+            aarstall = opptjening.aar,
+            pensjonsgivendeInntektBeloep = opptjening.pensjonsgivendeInntekt,
             pensjonspoeng = opptjening.pensjonspoeng,
-            omsorgspoeng = opptjening.omsorgspoeng,
-            beholdning = opptjening.beholdning
+            pensjonsbeholdningBeloep = opptjening.beholdning
         )
 }
