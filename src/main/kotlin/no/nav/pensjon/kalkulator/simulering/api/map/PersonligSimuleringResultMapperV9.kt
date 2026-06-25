@@ -14,13 +14,13 @@ object PersonligSimuleringResultMapperV9 {
 
     fun resultV9(source: SimuleringResult, foedselsdato: LocalDate) =
         PersonligSimuleringResultV9(
-            alderspensjon = source.alderspensjon.map(::alderspensjon)
+            alderspensjon = source.alderspensjonListe.map(::alderspensjon)
                 .let { justerAlderspensjonInnevaerendeAar(it, foedselsdato) },
             alderspensjonMaanedligVedEndring = maanedligPensjon(source.alderspensjonMaanedsbeloep),
-            pre2025OffentligAfp = source.pre2025OffentligAfp?.let(::pre2025OffentligAfp),
-            afpPrivat = source.afpPrivat.map(::privatAfp)
+            pre2025OffentligAfp = source.tidsbegrensetOffentligAfp?.let(::pre2025OffentligAfp),
+            afpPrivat = source.privatAfpListe.map(::privatAfp)
                 .let { justerPrivatAfpInnevaerendeAar(it, foedselsdato) },
-            afpOffentlig = source.afpOffentlig.map(::offentligAfp),
+            afpOffentlig = source.livsvarigOffentligAfpListe.map(::offentligAfp),
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving),
             harForLiteTrygdetid = source.harForLiteTrygdetid,
         )
