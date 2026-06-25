@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service
 class PopulasjonstilgangService(private val client: PopulasjonstilgangClient) {
     private val log = KotlinLogging.logger {}
 
-    fun sjekkTilgang(pid: Pid): TilgangResult =
+    fun sjekkTilgang(pid: Pid, sjekkKunKjerneregler: Boolean = false): TilgangResult =
         try {
-            client.sjekkTilgang(pid)
+            client.sjekkTilgang(pid, sjekkKunKjerneregler)
         } catch (e: Exception) {
             // Enhver feil skal gi 'tilgang avvist'
             "Populasjonstilgangssjekk feilet".let {

@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.person.relasjon.eps.client.ppd
 
-import io.kotest.core.spec.style.FunSpec
+import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -12,6 +12,7 @@ import no.nav.pensjon.kalkulator.person.Tilgangsbegrensning
 import no.nav.pensjon.kalkulator.person.relasjon.Familierelasjon
 import no.nav.pensjon.kalkulator.person.relasjon.RelasjonPersondata
 import no.nav.pensjon.kalkulator.person.relasjon.Relasjonstype
+import no.nav.pensjon.kalkulator.person.relasjon.eps.client.NyligsteEpsSpec
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.testutil.Arrange
 import no.nav.pensjon.kalkulator.testutil.arrangeJsonResponse
@@ -24,7 +25,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDate
 
-class PensjonPersondataClientTest : FunSpec({
+class PensjonPersondataClientTest : ShouldSpec({
 
     var server: MockWebServer? = null
     var baseUrl: String? = null
@@ -34,6 +35,7 @@ class PensjonPersondataClientTest : FunSpec({
         PensjonPersondataClient(
             baseUrl!!,
             webClientBuilder = context.getBean<WebClient.Builder>(),
+            cacheManager = mockk(relaxed = true),
             traceAid,
             retryAttempts = "1"
         )
@@ -48,43 +50,51 @@ class PensjonPersondataClientTest : FunSpec({
         server?.shutdown()
     }
 
-    test("fetchNyligsteEps - suksess") {
-        server?.arrangeOkJsonResponse(OK_RESPONSE_BODY)
+    context("fetchNyligsteEps - suksess") {
+        should("returnere familierelasjon med angitte personalia hentet") {
+            server?.arrangeOkJsonResponse(OK_RESPONSE_BODY)
 
-        Arrange.webClientContextRunner().run {
-            client(context = it).fetchNyligsteEps(
-                soekerPid = pid,
-                sivilstatus = Sivilstatus.SAMBOER,
-                personaliaSpec = listOf(PersonaliaType.NAVN)
-            ) shouldBe Familierelasjon(
-                pid = pid,
-                fom = LocalDate.of(2021, 4, 1),
-                relasjonstype = Relasjonstype.SAMBOER,
-                relasjonPersondata = RelasjonPersondata(
-                    navn = Navn(fornavn = "F", mellomnavn = "M", etternavn = "E"),
-                    foedselsdato = null,
-                    doedsdato = null,
-                    statsborgerskap = null,
-                    tilgangsbegrensning = Tilgangsbegrensning.UNKNOWN
+            Arrange.webClientContextRunner().run {
+                client(context = it).fetchNyligsteEps(
+                    spec = NyligsteEpsSpec(
+                        soekerPid = pid,
+                        sivilstatus = Sivilstatus.SAMBOER,
+                        personalia = listOf(PersonaliaType.NAVN)
+                    )
+                ) shouldBe Familierelasjon(
+                    pid = pid,
+                    fom = LocalDate.of(2021, 4, 1),
+                    relasjonstype = Relasjonstype.SAMBOER,
+                    relasjonPersondata = RelasjonPersondata(
+                        navn = Navn(fornavn = "F", mellomnavn = "M", etternavn = "E"),
+                        foedselsdato = null,
+                        doedsdato = null,
+                        statsborgerskap = null,
+                        tilgangsbegrensning = Tilgangsbegrensning.UNKNOWN
+                    )
                 )
-            )
+            }
         }
     }
 
-    test("fetchNyligsteEps - EPS ikke funnet") {
-        server?.arrangeJsonResponse(HttpStatus.NOT_FOUND, "{}")
+    context("fetchNyligsteEps - EPS ikke funnet") {
+        should("returnere familierelasjon med relasjonstype 'ukjent' og øvrige data udefinert") {
+            server?.arrangeJsonResponse(HttpStatus.NOT_FOUND, "{}")
 
-        Arrange.webClientContextRunner().run {
-            client(context = it).fetchNyligsteEps(
-                soekerPid = pid,
-                sivilstatus = Sivilstatus.SAMBOER,
-                personaliaSpec = listOf(PersonaliaType.NAVN)
-            ) shouldBe Familierelasjon(
-                pid = null,
-                fom = null,
-                relasjonstype = Relasjonstype.UKJENT,
-                relasjonPersondata = null
-            )
+            Arrange.webClientContextRunner().run {
+                client(context = it).fetchNyligsteEps(
+                    spec = NyligsteEpsSpec(
+                        soekerPid = pid,
+                        sivilstatus = Sivilstatus.SAMBOER,
+                        personalia = listOf(PersonaliaType.NAVN)
+                    )
+                ) shouldBe Familierelasjon(
+                    pid = null,
+                    fom = null,
+                    relasjonstype = Relasjonstype.UKJENT,
+                    relasjonPersondata = null
+                )
+            }
         }
     }
 })

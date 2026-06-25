@@ -4,5 +4,5 @@ import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.TilgangResult
 
 interface PopulasjonstilgangClient {
-    fun sjekkTilgang(pid: Pid): TilgangResult
+    fun sjekkTilgang(pid: Pid, sjekkKunKjerneregler: Boolean): TilgangResult
 }
