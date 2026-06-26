@@ -10,8 +10,10 @@ import io.mockk.verify
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.person.PossiblyEncryptedPid
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.crypto.CryptoService
+import no.nav.pensjon.kalkulator.tech.representasjon.Personalia
 import no.nav.pensjon.kalkulator.tech.representasjon.Representasjon
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonService
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonTarget
@@ -96,6 +98,9 @@ class SecurityContextEnricherTest : ShouldSpec({
     }
 
     context("valid representasjon") {
+        /**
+         * NB: plaintext OBO cookie is only allowed in development environment; in production, OBO cookie is encrypted.
+         */
         should("set target PID from plaintext OBO cookie") {
             setSecurityContext(authentication = mockk())
 
@@ -103,7 +108,7 @@ class SecurityContextEnricherTest : ShouldSpec({
                 tokenSuppliers,
                 securityContextPidExtractor = arrangeSecurityContextPidExtractor(),
                 pidDecrypter = mockk(),
-                representasjonService = arrange(Representasjon(isValid = true, fullmaktGiverNavn = "F. Giver"))
+                representasjonService = arrange(validRepresentasjon)
             ).enrichAuthentication(
                 request = arrangeOnBehalfOfCookie(PID),
                 response = mockk()
@@ -119,7 +124,7 @@ class SecurityContextEnricherTest : ShouldSpec({
                 tokenSuppliers,
                 securityContextPidExtractor = arrangeSecurityContextPidExtractor(),
                 pidDecrypter = arrangeDecryption(),
-                representasjonService = arrange(Representasjon(isValid = true, fullmaktGiverNavn = "F. Giver"))
+                representasjonService = arrange(validRepresentasjon)
             ).enrichAuthentication(
                 request = arrangeOnBehalfOfCookie(ENCRYPTED_PID),
                 response = mockk()
@@ -138,9 +143,9 @@ class SecurityContextEnricherTest : ShouldSpec({
                     tokenSuppliers,
                     securityContextPidExtractor = arrangeSecurityContextPidExtractor(),
                     pidDecrypter = mockk(),
-                    representasjonService = arrange(Representasjon(isValid = false, fullmaktGiverNavn = ""))
+                    representasjonService = arrange(Representasjon(isValid = false, fullmaktsgiver = null))
                 ).enrichAuthentication(
-                    request = arrangeOnBehalfOfCookie(PID),
+                    request = arrangeOnBehalfOfCookie(ENCRYPTED_PID),
                     response = mockk()
                 )
             }.message shouldBe "INVALID_REPRESENTASJON"
@@ -179,6 +184,12 @@ class SecurityContextEnricherTest : ShouldSpec({
 private const val PID = "12906498357"
 private const val ENCRYPTED_PID = "contains.dot"
 
+private val validRepresentasjon =
+    Representasjon(
+        isValid = true,
+        fullmaktsgiver = Personalia(navn = "F. Giver", pid)
+    )
+
 private fun setSecurityContext(authentication: Authentication) {
     SecurityContextHolder.setContext(SecurityContextImpl(authentication))
 }
@@ -187,25 +198,29 @@ private fun securityContextTargetPid(): Pid? =
     SecurityContextHolder.getContext().authentication?.enriched()?.targetPid()
 
 private fun arrangeFoedselsnummer(value: String?): HttpServletRequest =
-    mockk<HttpServletRequest>(relaxed = true).apply {
+    mockk(relaxed = true) {
         every { getHeader("fnr") } returns value
     }
 
 private fun arrangeOnBehalfOfCookie(value: String): HttpServletRequest =
-    mockk<HttpServletRequest>(relaxed = true).apply {
+    mockk(relaxed = true) {
         every { cookies } returns listOf(Cookie("nav-obo", value)).toTypedArray()
     }
 
 private fun arrangeOnBehalfOfCookieAndHeader(): HttpServletRequest =
-    mockk<HttpServletRequest>(relaxed = true).apply {
+    mockk(relaxed = true) {
         every { getHeader("fnr") } returns PID
-        every { cookies } returns listOf(Cookie("nav-obo", PID)).toTypedArray()
+        every { cookies } returns listOf(Cookie("nav-obo", ENCRYPTED_PID)).toTypedArray()
     }
 
 private fun arrange(representasjon: Representasjon): RepresentasjonService =
     mockk {
         every {
-            hasValidRepresentasjonsforhold(fullmaktGiverPid = Pid(PID))
+            hasValidRepresentasjonsforhold(fullmaktsgiverPid = PossiblyEncryptedPid(ENCRYPTED_PID))
+        } returns representasjon
+
+        every {
+            hasValidRepresentasjonsforhold(fullmaktsgiverPid = PossiblyEncryptedPid(PID)) // use case in dev only
         } returns representasjon
     }
 

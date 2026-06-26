@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.tech.representasjon.client.pensjon
 
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.PingableServiceClient
-import no.nav.pensjon.kalkulator.person.Pid
+import no.nav.pensjon.kalkulator.person.EncryptedPid
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.representasjon.Representasjon
 import no.nav.pensjon.kalkulator.tech.representasjon.client.RepresentasjonClient
@@ -38,7 +38,7 @@ class PensjonRepresentasjonClient(
 
     private val log = KotlinLogging.logger {}
 
-    override fun hasValidRepresentasjonsforhold(fullmaktGiverPid: Pid): Representasjon {
+    override fun hasValidRepresentasjonsforhold(fullmaktsgiverPid: EncryptedPid): Representasjon {
         val uri = uri()
         log.debug { "GET from URI: '$uri'" }
 
@@ -47,7 +47,7 @@ class PensjonRepresentasjonClient(
                 .get()
                 .uri(uri)
                 .accept(MediaType.APPLICATION_JSON)
-                .headers { setHeaders(it, fullmaktGiverPid) }
+                .headers { setHeaders(it, fullmaktsgiverPid) }
                 .retrieve()
                 .bodyToMono<PensjonRepresentasjonResult>()
                 .retryWhen(retryBackoffSpec(uri))
@@ -80,10 +80,10 @@ class PensjonRepresentasjonClient(
             .build()
             .toUriString()
 
-    private fun setHeaders(headers: HttpHeaders, fullmaktGiverPid: Pid? = null) {
+    private fun setHeaders(headers: HttpHeaders, fullmaktsgiverPid: EncryptedPid) {
         headers.setBearerAuth(EgressAccess.token(service).value)
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
-        fullmaktGiverPid?.let { headers[CustomHttpHeaders.FULLMAKT_GIVER_PID] = it.value }
+        headers[CustomHttpHeaders.FULLMAKT_GIVER_PID] = fullmaktsgiverPid.value
     }
 
     companion object {
@@ -102,6 +102,6 @@ class PensjonRepresentasjonClient(
         private val service = EgressService.PENSJON_REPRESENTASJON
 
         private fun noRepresentasjonForhold() =
-            Representasjon(isValid = false, fullmaktGiverNavn = "")
+            Representasjon(isValid = false, fullmaktsgiver = null)
     }
 }
