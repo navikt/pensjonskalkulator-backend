@@ -4,16 +4,21 @@ import no.nav.pensjon.kalkulator.afp.OpptjeningAar
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpResult
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpSpec
 import no.nav.pensjon.kalkulator.afp.api.dto.*
-import no.nav.pensjon.kalkulator.opptjening.Pensjonspoeng
+import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
 import java.time.LocalDate
 
 object ServiceberegnetAfpApiMapper {
 
-    fun fromDto(dto: InternServiceberegnetAfpSpec, pid: Pid, pensjonspoeng: List<Pensjonspoeng>, tidligereGiftEllerBarnMedSamboer: Boolean?, naavaerendeSivilstatus: Sivilstand) =
+    fun fromDto(
+        dto: InternServiceberegnetAfpSpec,
+        pid: Pid,
+        opptjeningListe: List<AarligOpptjening>,
+        tidligereGiftEllerBarnMedSamboer: Boolean?,
+        naavaerendeSivilstatus: Sivilstand
+    ) =
         ServiceberegnetAfpSpec(
             uttaksdato = dto.uttaksdato,
             fnr = pid.value,
@@ -24,7 +29,7 @@ object ServiceberegnetAfpApiMapper {
             utenlandsopphold = dto.utenlandsopphold,
             forventetArbeidsinntekt = dto.forventetArbeidsinntekt,
             inntektMndForAfp = dto.inntektMndForAfp,
-            opptjeningFolketrygden = pensjonspoeng.map(::mapOpptjeningAar) + mapInntektOpptjening(dto),
+            opptjeningFolketrygden = opptjeningListe.map(::mapOpptjeningAar) + mapInntektOpptjening(dto),
             epsMottarPensjon = dto.epsMottarPensjon,
             epsInntektOver2G = dto.epsInntektOver2G,
             tidligereGiftEllerBarnMedSamboer = tidligereGiftEllerBarnMedSamboer,
@@ -32,24 +37,36 @@ object ServiceberegnetAfpApiMapper {
             registrertSivilstatus = naavaerendeSivilstatus
         )
 
-    private fun mapOpptjeningAar(dto: Pensjonspoeng) =
+    private fun mapOpptjeningAar(dto: AarligOpptjening) =
         OpptjeningAar(
-            ar = dto.ar,
+            ar = dto.aar,
             pensjonsgivendeInntekt = dto.pensjonsgivendeInntekt,
             registrertePensjonspoeng = dto.pensjonspoeng,
             omsorgspoeng = dto.omsorgspoeng?.toDouble(),
-            maksUforegrad = dto.maksUforegrad,
+            maksUforegrad = dto.maksimalUfoeregrad,
         )
 
     private fun mapInntektOpptjening(dto: InternServiceberegnetAfpSpec): List<OpptjeningAar> =
         listOfNotNull(dto.inntektForrigeKalenderaar?.let {
-            OpptjeningAar(LocalDate.now().year - 1, it, registrertePensjonspoeng = null, omsorgspoeng = null, maksUforegrad = null)
+            OpptjeningAar(
+                LocalDate.now().year - 1,
+                it,
+                registrertePensjonspoeng = null,
+                omsorgspoeng = null,
+                maksUforegrad = null
+            )
         }) +
-        (dto.inntektFremTilUttak?.let { inntekt ->
-            (LocalDate.now().year until dto.uttaksdato.year).map { year ->
-                OpptjeningAar(year, inntekt, registrertePensjonspoeng = null, omsorgspoeng = null, maksUforegrad = null)
-            }
-        } ?: emptyList())
+                (dto.inntektFremTilUttak?.let { inntekt ->
+                    (LocalDate.now().year until dto.uttaksdato.year).map { year ->
+                        OpptjeningAar(
+                            year,
+                            inntekt,
+                            registrertePensjonspoeng = null,
+                            omsorgspoeng = null,
+                            maksUforegrad = null
+                        )
+                    }
+                } ?: emptyList())
 
     fun toDto(result: ServiceberegnetAfpResult) =
         InternServiceberegnetAfpResult(

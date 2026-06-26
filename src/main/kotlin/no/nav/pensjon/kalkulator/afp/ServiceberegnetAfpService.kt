@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.afp
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.afp.api.dto.InternServiceberegnetAfpSpec
 import no.nav.pensjon.kalkulator.afp.client.ServiceberegnetAfpClient
-import no.nav.pensjon.kalkulator.opptjening.Pensjonspoeng
+import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengClient
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.relasjon.eps.EpsService
@@ -26,7 +26,7 @@ class ServiceberegnetAfpService(
     fun simulerServiceberegnetAfp(spec: InternServiceberegnetAfpSpec): ServiceberegnetAfpResult =
         try {
             val pid = pidGetter.pid()
-            val pensjonspoeng = pensjonspoengClient.fetchPensjonspoeng(pid)
+            val pensjonspoeng = pensjonspoengClient.fetchOpptjeningOgBeholdning(pid)
             val tidligereGiftEllerBarnMedSamboer = epsService.tidligereGiftEllerBarnMedSamboer()
             val person = personService.getPerson()
             val domainSpec = ServiceberegnetAfpSpec(
@@ -39,7 +39,7 @@ class ServiceberegnetAfpService(
                 utenlandsopphold = spec.utenlandsopphold,
                 forventetArbeidsinntekt = spec.forventetArbeidsinntekt,
                 inntektMndForAfp = spec.inntektMndForAfp,
-                opptjeningFolketrygden = pensjonspoeng.map { mapOpptjeningAar(it) } + mapInntektOpptjening(spec),
+                opptjeningFolketrygden = pensjonspoeng.first.map { mapOpptjeningAar(it) } + mapInntektOpptjening(spec),
                 epsMottarPensjon = spec.epsMottarPensjon,
                 epsInntektOver2G = spec.epsInntektOver2G,
                 tidligereGiftEllerBarnMedSamboer = tidligereGiftEllerBarnMedSamboer,
@@ -54,13 +54,13 @@ class ServiceberegnetAfpService(
             throw e
         }
 
-    private fun mapOpptjeningAar(dto: Pensjonspoeng) =
+    private fun mapOpptjeningAar(dto: AarligOpptjening) =
         OpptjeningAar(
-            ar = dto.ar,
+            ar = dto.aar,
             pensjonsgivendeInntekt = dto.pensjonsgivendeInntekt,
             registrertePensjonspoeng = dto.pensjonspoeng,
             omsorgspoeng = dto.omsorgspoeng?.toDouble(),
-            maksUforegrad = dto.maksUforegrad,
+            maksUforegrad = dto.maksimalUfoeregrad,
         )
 
     private fun mapInntektOpptjening(dto: InternServiceberegnetAfpSpec): List<OpptjeningAar> =
