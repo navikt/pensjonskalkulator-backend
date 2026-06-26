@@ -51,8 +51,8 @@ class PensjonPersondataClient(
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
     private val log = KotlinLogging.logger {}
 
-    private val naavarendeEpsCache: Cache<NaavaerendeEpsSpec, Familierelasjon> =
-        createCache("naavaerendEps", cacheManager)
+    private val naavaerendeEpsCache: Cache<NaavaerendeEpsSpec, Familierelasjon> =
+        createCache("naavaerendeEps", cacheManager)
 
     private val nyligsteEpsCache: Cache<NyligsteEpsSpec, Familierelasjon> =
         createCache("nyligsteEps", cacheManager)
@@ -63,8 +63,8 @@ class PensjonPersondataClient(
     override fun service() = service
 
     override fun fetchNaavaerendeEps(spec: NaavaerendeEpsSpec): Familierelasjon =
-        naavarendeEpsCache.getIfPresent(spec)
-            ?: fetchFreshNaavaerendeEps(spec).also { naavarendeEpsCache.put(spec, it) }
+        naavaerendeEpsCache.getIfPresent(spec)
+            ?: fetchFreshNaavaerendeEps(spec).also { naavaerendeEpsCache.put(spec, it) }
 
     override fun fetchNyligsteEps(spec: NyligsteEpsSpec): Familierelasjon =
         nyligsteEpsCache.getIfPresent(spec)

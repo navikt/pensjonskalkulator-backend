@@ -143,24 +143,16 @@ class SecurityLevelFilterTest : ShouldSpec({
 })
 
 private fun arrangeFilterChain(request: HttpServletRequest, response: HttpServletResponse): FilterChain =
-    mockk<FilterChain>().apply {
-        every { doFilter(request, response) } returns Unit
-    }
+    mockk { every { doFilter(request, response) } returns Unit }
 
 private fun arrangeAdressebeskyttelse(gradering: AdressebeskyttelseGradering): FortroligAdresseService =
-    mockk<FortroligAdresseService>().apply {
-        every { adressebeskyttelseGradering(any()) } returns gradering
-    }
+    mockk { every { adressebeskyttelseGradering(any()) } returns gradering }
 
 private fun arrangeRequest(uri: String = "/api/foo"): HttpServletRequest =
-    mockk<HttpServletRequest>().apply {
-        every { requestURI } returns uri
-    }
+    mockk { every { requestURI } returns uri }
 
 private fun arrangeResponse(printWriter: PrintWriter = mockk()): HttpServletResponse =
-    mockk<HttpServletResponse>().apply {
-        every { writer } returns printWriter
-    }
+    mockk { every { writer } returns printWriter }
 
 private fun arrangeForbiddenResponse(printWriter: PrintWriter): HttpServletResponse =
     arrangeResponse(printWriter).apply {
@@ -169,9 +161,7 @@ private fun arrangeForbiddenResponse(printWriter: PrintWriter): HttpServletRespo
     }
 
 private fun arrangeWriter(): PrintWriter =
-    mockk<PrintWriter>().apply {
-        every { append("""{ "reason": "INSUFFICIENT_LEVEL_OF_ASSURANCE" }""") } returns this
-    }
+    mockk { every { append("""{ "reason": "INSUFFICIENT_LEVEL_OF_ASSURANCE" }""") } returns this }
 
 private fun arrangeSecurity(securityLevel: String, rolle: RepresentertRolle) {
     SecurityContextHolder.setContext(
@@ -179,7 +169,7 @@ private fun arrangeSecurity(securityLevel: String, rolle: RepresentertRolle) {
             EnrichedAuthentication(
                 initialAuth = MockAuthentication(claimKey = "acr", claimValue = securityLevel),
                 egressTokenSuppliersByService = EgressTokenSuppliersByService(emptyMap()),
-                target = RepresentasjonTarget(pid = null, rolle)
+                target = RepresentasjonTarget(pid = null, rolle = rolle)
             )
         )
     )
