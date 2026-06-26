@@ -1,6 +1,8 @@
 package no.nav.pensjon.kalkulator.tech.representasjon
 
 import no.nav.pensjon.kalkulator.person.EncryptedPid
+import no.nav.pensjon.kalkulator.person.FoedselsnummerUtil.redact
+import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.PossiblyEncryptedPid
 import no.nav.pensjon.kalkulator.tech.crypto.CryptoService
 import no.nav.pensjon.kalkulator.tech.representasjon.client.RepresentasjonClient
@@ -15,8 +17,9 @@ class RepresentasjonService(
         client.hasValidRepresentasjonsforhold(fullmaktsgiverPid = encrypted(fullmaktsgiverPid))
 
     private fun encrypted(pid: PossiblyEncryptedPid): EncryptedPid =
-        if (pid.isEncrypted)
-            EncryptedPid(pid)
-        else
-            EncryptedPid(pidEncrypter.encrypt(pid.value))
+        when {
+            pid.isEncrypted -> EncryptedPid(pid)
+            Pid(pid.value).isValid -> EncryptedPid(pidEncrypter.encrypt(pid.value))
+            else -> throw IllegalArgumentException("PID is invalid: ${redact(pid.value)}")
+        }
 }
