@@ -17,7 +17,7 @@ class RepresentasjonServiceTest : ShouldSpec({
                 client = arrangeRepresentasjon(isValid = false),
                 pidEncrypter = mockk()
             ).hasValidRepresentasjonsforhold(PossiblyEncryptedPid(ENCRYPTED_PID)) shouldBe
-                    Representasjon(isValid = false, fullmaktGiverNavn = "F")
+                    Representasjon(isValid = false, fullmaktsgiver = null)
         }
     }
 
@@ -28,7 +28,7 @@ class RepresentasjonServiceTest : ShouldSpec({
                     client = arrangeRepresentasjon(isValid = true),
                     pidEncrypter = mockk()
                 ).hasValidRepresentasjonsforhold(PossiblyEncryptedPid(ENCRYPTED_PID)) shouldBe
-                        Representasjon(isValid = true, fullmaktGiverNavn = "F")
+                        Representasjon(isValid = true, fullmaktsgiver = fullmaktsgiver)
             }
         }
 
@@ -38,7 +38,7 @@ class RepresentasjonServiceTest : ShouldSpec({
                     client = arrangeRepresentasjon(isValid = true),
                     pidEncrypter = mockk { every { encrypt(any()) } returns ENCRYPTED_PID }
                 ).hasValidRepresentasjonsforhold(PossiblyEncryptedPid(pid.value)) shouldBe
-                        Representasjon(isValid = true, fullmaktGiverNavn = "F")
+                        Representasjon(isValid = true, fullmaktsgiver = fullmaktsgiver)
             }
         }
 
@@ -57,9 +57,11 @@ class RepresentasjonServiceTest : ShouldSpec({
 
 private const val ENCRYPTED_PID = "contains.dot"
 
+private val fullmaktsgiver = Personalia(navn = "F", pid)
+
 private fun arrangeRepresentasjon(isValid: Boolean): RepresentasjonClient =
     mockk {
         every {
             hasValidRepresentasjonsforhold(any())
-        } returns Representasjon(isValid, fullmaktGiverNavn = "F")
+        } returns Representasjon(isValid, fullmaktsgiver = if (isValid) fullmaktsgiver else null)
     }

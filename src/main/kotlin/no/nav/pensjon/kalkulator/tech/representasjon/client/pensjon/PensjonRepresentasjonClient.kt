@@ -102,6 +102,6 @@ class PensjonRepresentasjonClient(
         private val service = EgressService.PENSJON_REPRESENTASJON
 
         private fun noRepresentasjonForhold() =
-            Representasjon(isValid = false, fullmaktGiverNavn = "")
+            Representasjon(isValid = false, fullmaktsgiver = null)
     }
 }
