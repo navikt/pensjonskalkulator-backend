@@ -13,6 +13,7 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.PossiblyEncryptedPid
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.crypto.CryptoService
+import no.nav.pensjon.kalkulator.tech.representasjon.Personalia
 import no.nav.pensjon.kalkulator.tech.representasjon.Representasjon
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonService
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonTarget
@@ -107,7 +108,7 @@ class SecurityContextEnricherTest : ShouldSpec({
                 tokenSuppliers,
                 securityContextPidExtractor = arrangeSecurityContextPidExtractor(),
                 pidDecrypter = mockk(),
-                representasjonService = arrange(Representasjon(isValid = true, fullmaktGiverNavn = "F. Giver"))
+                representasjonService = arrange(validRepresentasjon)
             ).enrichAuthentication(
                 request = arrangeOnBehalfOfCookie(PID),
                 response = mockk()
@@ -123,7 +124,7 @@ class SecurityContextEnricherTest : ShouldSpec({
                 tokenSuppliers,
                 securityContextPidExtractor = arrangeSecurityContextPidExtractor(),
                 pidDecrypter = arrangeDecryption(),
-                representasjonService = arrange(Representasjon(isValid = true, fullmaktGiverNavn = "F. Giver"))
+                representasjonService = arrange(validRepresentasjon)
             ).enrichAuthentication(
                 request = arrangeOnBehalfOfCookie(ENCRYPTED_PID),
                 response = mockk()
@@ -142,7 +143,7 @@ class SecurityContextEnricherTest : ShouldSpec({
                     tokenSuppliers,
                     securityContextPidExtractor = arrangeSecurityContextPidExtractor(),
                     pidDecrypter = mockk(),
-                    representasjonService = arrange(Representasjon(isValid = false, fullmaktGiverNavn = ""))
+                    representasjonService = arrange(Representasjon(isValid = false, fullmaktsgiver = null))
                 ).enrichAuthentication(
                     request = arrangeOnBehalfOfCookie(ENCRYPTED_PID),
                     response = mockk()
@@ -182,6 +183,12 @@ class SecurityContextEnricherTest : ShouldSpec({
 
 private const val PID = "12906498357"
 private const val ENCRYPTED_PID = "contains.dot"
+
+private val validRepresentasjon =
+    Representasjon(
+        isValid = true,
+        fullmaktsgiver = Personalia(navn = "F. Giver", pid)
+    )
 
 private fun setSecurityContext(authentication: Authentication) {
     SecurityContextHolder.setContext(SecurityContextImpl(authentication))

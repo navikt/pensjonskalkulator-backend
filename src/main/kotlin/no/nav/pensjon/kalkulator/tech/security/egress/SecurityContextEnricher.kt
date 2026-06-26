@@ -10,6 +10,7 @@ import no.nav.pensjon.kalkulator.tech.crypto.CryptoService
 import no.nav.pensjon.kalkulator.tech.crypto.EncryptionDetector.isEncryptedPid
 import no.nav.pensjon.kalkulator.tech.env.EnvironmentUtil.isProduction
 import no.nav.pensjon.kalkulator.tech.metric.Metrics
+import no.nav.pensjon.kalkulator.tech.representasjon.Representasjon
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonService
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonTarget
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentertRolle
@@ -70,21 +71,27 @@ class SecurityContextEnricher(
         auth: Authentication,
         request: HttpServletRequest
     ): Authentication =
-        onBehalfOfPid(request.cookies)?.let {
-            if (validRepresentasjonForhold(fullmaktsgiverPid = it))
-                enrichWithFullmakt(auth, fullmaktsgiverPid = Pid(decrypt(it.value))).also {
+        onBehalfOfPid(request.cookies)?.let { applyPotentialFullmakt(auth, pid = it) } ?: auth
+
+    private fun applyPotentialFullmakt(
+        auth: Authentication,
+        pid: PossiblyEncryptedPid
+    ): EnrichedAuthentication =
+        representasjon(fullmaktsgiverPid = pid).let {
+            if (it.isValid)
+                enrichWithFullmakt(auth, fullmaktsgiverPid = it.fullmaktsgiver!!.pid).also {
                     Metrics.countEvent(eventName = "obo", result = "ok")
                 }
             else
                 invalidRepresentasjonForhold()
-        } ?: auth
+        }
 
     /**
      * NB: Dette støtter ikke brukstilfellet der veileder er innlogget på vegne av en fullmektig.
      * Årsak: pensjon-representasjon henter ut fullmektigens PID fra TokenX-token (finnes ikke når veileder innlogget).
      */
-    private fun validRepresentasjonForhold(fullmaktsgiverPid: PossiblyEncryptedPid) =
-        representasjonService.hasValidRepresentasjonsforhold(fullmaktsgiverPid).isValid
+    private fun representasjon(fullmaktsgiverPid: PossiblyEncryptedPid): Representasjon =
+        representasjonService.hasValidRepresentasjonsforhold(fullmaktsgiverPid)
 
     private fun enrichWithFullmakt(auth: Authentication, fullmaktsgiverPid: Pid) =
         EnrichedAuthentication(
@@ -106,6 +113,10 @@ class SecurityContextEnricher(
             target = RepresentasjonTarget(rolle = RepresentertRolle.NONE)
         )
 
+    /**
+     * Header PID is used in 'veiledning' context.
+     * The PID has been encrypted by pensjon-pid-encryption.
+     */
     private fun headerPid(request: HttpServletRequest): Pid? =
         request.getHeader(CustomHttpHeaders.PID)?.let {
             when {
@@ -119,17 +130,15 @@ class SecurityContextEnricher(
             }
         }?.let(::Pid)
 
+    /**
+     * Cookie PID is used in 'representasjon' context.
+     * The PID has been encrypted by pensjon-representasjon (not by pensjon-pid-encryption).
+     */
     private fun onBehalfOfPid(cookies: Array<Cookie>?): PossiblyEncryptedPid? =
         cookies.orEmpty()
             .firstOrNull { ON_BEHALF_OF_COOKIE_NAME.equals(it.name, ignoreCase = true) }
             ?.value
             ?.let(::possiblyEncryptedPid)
-
-    private fun decrypt(value: String): String =
-        if (isEncryptedPid(value))
-            pidDecrypter.decrypt(value)
-        else
-            value
 
     private fun possiblyEncryptedPid(value: String) =
         PossiblyEncryptedPid(value).also {
