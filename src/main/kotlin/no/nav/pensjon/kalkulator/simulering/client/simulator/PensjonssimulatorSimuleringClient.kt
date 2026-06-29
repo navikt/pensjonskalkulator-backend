@@ -121,6 +121,7 @@ class PensjonssimulatorSimuleringClient(
 
     private fun asResult(json: String?): SimuleringResult? =
         json
+            ?.takeIf(::looksLikeJson)
             ?.let(::deserialize)
             ?.let(PersonligSimuleringResultMapper::fromDto)
 
@@ -142,6 +143,11 @@ class PensjonssimulatorSimuleringClient(
         private const val SIMULER_ALDERSPENSJON_ANONYM_RESOURCE = "api/anonym/v1/simuler-alderspensjon"
         private const val SIMULER_ALDERSPENSJON_PERSONLIG_RESOURCE = "api/nav/v2/simuler-pensjon"
         private val service = EgressService.PENSJONSSIMULATOR
+
+        private fun looksLikeJson(text: String): Boolean =
+            text.trimStart().let {
+                it.startsWith("{") || it.startsWith("[")
+            }
 
         private fun emptyResult() =
             SimuleringResult(
