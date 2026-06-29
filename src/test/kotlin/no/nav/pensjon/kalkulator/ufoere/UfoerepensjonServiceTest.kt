@@ -6,6 +6,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.DateFactory.date
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.sak.SakType
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.ufoere.client.UfoeregradClient
 import no.nav.pensjon.kalkulator.ufoere.client.VedtakClient
@@ -14,7 +15,7 @@ class UfoerepensjonServiceTest : ShouldSpec({
 
     should("return 'true' when uførepensjonsvedtak exists") {
         val service = UfoerepensjonService(
-            vedtakClient = arrangeVedtak(Sakstype.UFOEREPENSJON),
+            vedtakClient = arrangeVedtak(SakType.UFOERETRYGD),
             ufoeregradClient = mockk(),
             pidGetter = arrangePid()
         )
@@ -23,7 +24,7 @@ class UfoerepensjonServiceTest : ShouldSpec({
 
     should("return 'false' when no uførepensjonsvedtak exists") {
         val service = UfoerepensjonService(
-            vedtakClient = arrangeVedtak(Sakstype.UNKNOWN),
+            vedtakClient = arrangeVedtak(SakType.UNKNOWN),
             ufoeregradClient = mockk(),
             pidGetter = arrangePid()
         )
@@ -43,16 +44,14 @@ class UfoerepensjonServiceTest : ShouldSpec({
 })
 
 private fun arrangePid(): PidGetter =
-    mockk<PidGetter>().apply {
-        every { pid() } returns pid
-    }
+    mockk { every { pid() } returns pid }
 
 private fun arrangeUfoeregrad60(): UfoeregradClient =
-    mockk<UfoeregradClient>().apply {
+    mockk {
         every { hentUfoeregrad(any()) } returns Ufoeregrad(60)
     }
 
-private fun arrangeVedtak(sakstype: Sakstype) =
-    mockk<VedtakClient>().apply {
-        every { bestemGjeldendeVedtak(pid, date) } returns listOf(Vedtak(sakstype))
+private fun arrangeVedtak(sakType: SakType): VedtakClient =
+    mockk {
+        every { bestemGjeldendeVedtak(pid, date) } returns listOf(Vedtak(sakType))
     }
