@@ -36,13 +36,13 @@ class PensjonssimulatorSimuleringClientTest : FunSpec({
     val pensjonJson: String = this::class.java.getResource("/simulert-pensjon.json")?.readText(Charsets.UTF_8)!!
     val jsonMapper = JsonMapper()
 
-    fun client(context: BeanFactory) =
+    fun client(context: BeanFactory, retryAttempts: String = "1") =
         PensjonssimulatorSimuleringClient(
             baseUrl!!,
             webClientBuilder = context.getBean<WebClient.Builder>(),
             jsonMapper,
             traceAid,
-            retryAttempts = "1"
+            retryAttempts
         )
 
     beforeTest {
@@ -214,6 +214,24 @@ class PensjonssimulatorSimuleringClientTest : FunSpec({
             with(result.problem!!) {
                 type shouldBe ProblemType.UGYLDIG_UTTAKSDATO
                 beskrivelse shouldBe "Dato for første uttak (2022-02-01) er for tidlig"
+            }
+        }
+    }
+
+    context("Intern serverfeil") {
+        test("JSON med feilbeskrivelse deserialiseres korrekt") {
+            server?.arrangeJsonResponse(status = HttpStatus.INTERNAL_SERVER_ERROR, body = JSON_FOR_INTERN_DATAFEIL)
+
+            Arrange.webClientContextRunner().run {
+                val result = client(context = it, retryAttempts = "0").simulerPersonligAlderspensjon(
+                    impersonalSpec = impersonalGradertUttakSpec(),
+                    personalSpec = personalSpec(Sivilstatus.UGIFT)
+                )
+
+                with(result.problem!!) {
+                    type shouldBe ProblemType.ANNEN_SERVERFEIL
+                    beskrivelse shouldBe "Inkonsistente data"
+                }
             }
         }
     }
@@ -457,6 +475,24 @@ const val PENSJON_MED_LIVSVARIG_OFFENTLIG_AFP_OG_OPPTJENING = """{
     "vilkaarsproevingsresultat": {
         "erInnvilget": true,
         "alternativ": null
+    }
+}"""
+
+@Language("json")
+const val JSON_FOR_INTERN_DATAFEIL = """{
+    "alderspensjonListe": [],
+    "alderspensjonMaanedsbeloep": {
+        "heltUttakBeloep": 0
+    },
+    "livsvarigOffentligAfpListe": [],
+    "privatAfpListe": [],
+    "vilkaarsproevingsresultat": {
+        "erInnvilget": false
+    },
+    "pensjonsgivendeInntektListe": [],
+    "problem": {
+        "kode": "INTERN_DATAFEIL",
+        "beskrivelse": "Inkonsistente data"
     }
 }"""
 
