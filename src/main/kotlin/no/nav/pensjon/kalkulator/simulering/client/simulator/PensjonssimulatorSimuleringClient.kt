@@ -114,21 +114,28 @@ class PensjonssimulatorSimuleringClient(
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
     }
 
-    private fun handle(egressException: EgressException): SimuleringResult =
+    private fun handle(e: EgressException): SimuleringResult =
+        e.message?.let(::asResult)
+            ?: e.cause?.message?.let(::asResult)
+            ?: throw e
+
+    private fun asResult(json: String?): SimuleringResult? =
+        json
+            ?.let(::deserialize)
+            ?.let(PersonligSimuleringResultMapper::fromDto)
+
+    private fun deserialize(resultJson: String): PersonligSimuleringResultDto? =
         try {
-            jsonMapper.readValue(
-                egressException.message,
-                PersonligSimuleringResultDto::class.java
-            )?.let(PersonligSimuleringResultMapper::fromDto) ?: throw egressException
-        } catch (jacksonException: JacksonException) {
-            log.warn(jacksonException) {
+            jsonMapper.readValue(resultJson, PersonligSimuleringResultDto::class.java)
+        } catch (e: JacksonException) {
+            log.warn(e) {
                 redact(
                     "Failed to handle response from ${service.description}" +
-                            " - ${jacksonException.message}" +
-                            " - attempted to deserialize '${egressException.message}' as PersonligSimuleringResultDto"
+                            " - ${e.message}" +
+                            " - attempted to deserialize '$resultJson' as PersonligSimuleringResultDto"
                 )
             }
-            throw egressException
+            null
         }
 
     private companion object {
