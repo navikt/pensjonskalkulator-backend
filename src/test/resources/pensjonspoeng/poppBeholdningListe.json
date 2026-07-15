@@ -1,0 +1,68 @@
+{
+  "beholdninger": [
+    {
+      "beholdningId": 441667808,
+      "fnr": "05845997316",
+      "status": "G",
+      "beholdningType": "PEN_B",
+      "belop": 12.3,
+      "vedtakId": null,
+      "fomDato": 252457200000,
+      "tomDato": 283906800000,
+      "beholdningGrunnlag": 0.0,
+      "beholdningGrunnlagAvkortet": 0.0,
+      "beholdningInnskudd": 0.0,
+      "beholdningInnskuddUtenOmsorg": 0.0,
+      "oppdateringArsak": "NY_OPPTJENING",
+      "lonnsvekstregulering": null,
+      "inntektOpptjeningBelop": null,
+      "omsorgOpptjeningBelop": null,
+      "dagpengerOpptjeningBelop": null,
+      "forstegangstjenesteOpptjeningBelop": null,
+      "uforeOpptjeningBelop": null,
+      "changeStamp": {
+        "createdBy": "srvpensjon",
+        "createdDate": 1652358062861,
+        "updatedBy": "srvpensjon",
+        "updatedDate": 1652358062861
+      }
+    },
+    {
+      "beholdningId": 441667809,
+      "fnr": "05845997316",
+      "status": "G",
+      "beholdningType": "PEN_B",
+      "belop": 23.4,
+      "vedtakId": null,
+      "fomDato": 283993200000,
+      "tomDato": 315442800000,
+      "beholdningGrunnlag": 0.0,
+      "beholdningGrunnlagAvkortet": 0.0,
+      "beholdningInnskudd": 0.0,
+      "beholdningInnskuddUtenOmsorg": 0.0,
+      "oppdateringArsak": "NY_OPPTJENING",
+      "lonnsvekstregulering": {
+        "lonnsvekstreguleringId": 325197808,
+        "reguleringsbelop": 0.0,
+        "reguleringsDato": 283906800000,
+        "changeStamp": {
+          "createdBy": "srvpensjon",
+          "createdDate": 1652358062862,
+          "updatedBy": "srvpensjon",
+          "updatedDate": 1652358062862
+        }
+      },
+      "inntektOpptjeningBelop": null,
+      "omsorgOpptjeningBelop": null,
+      "dagpengerOpptjeningBelop": null,
+      "forstegangstjenesteOpptjeningBelop": null,
+      "uforeOpptjeningBelop": null,
+      "changeStamp": {
+        "createdBy": "srvpensjon",
+        "createdDate": 1652358062862,
+        "updatedBy": "srvpensjon",
+        "updatedDate": 1652358062862
+      }
+    }
+  ]
+}

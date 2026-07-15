@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import org.springframework.web.reactive.function.client.bodyToMono
 
 /**
  * Client for accessing the 'pensjonssimulator' service (see https://github.com/navikt/pensjonssimulator).
@@ -21,7 +22,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
  */
 @Component
 class SimulatorDevClient(
-    @Value("\${pensjonssimulator.url}") private val baseUrl: String,
+    @param:Value($$"${pensjonssimulator.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
 ) : ExternalServiceClient("0") {
@@ -41,7 +42,7 @@ class SimulatorDevClient(
                 .uri("/$STATUS_RESOURCE")
                 .headers(::setHeaders)
                 .retrieve()
-                .bodyToMono(String::class.java)
+                .bodyToMono<String>()
                 .retryWhen(retryBackoffSpec(url))
                 .block()
                 ?: ""
@@ -65,7 +66,7 @@ class SimulatorDevClient(
                 .headers(::setHeaders)
                 .bodyValue(TMU_BODY)
                 .retrieve()
-                .bodyToMono(TmuResult::class.java)
+                .bodyToMono<TmuResult>()
                 .retryWhen(retryBackoffSpec(url))
                 .block()
         } catch (e: WebClientRequestException) {
@@ -88,7 +89,7 @@ class SimulatorDevClient(
                 .headers(::setHeaders)
                 .bodyValue(ALDERSPENSJON_BODY)
                 .retrieve()
-                .bodyToMono(String::class.java)
+                .bodyToMono<String>()
                 .retryWhen(retryBackoffSpec(url))
                 .block()
         } catch (e: WebClientRequestException) {
@@ -111,7 +112,7 @@ class SimulatorDevClient(
                 .headers(::setHeaders)
                 .bodyValue(FOLKETRYGDBEHOLDNING_BODY)
                 .retrieve()
-                .bodyToMono(String::class.java)
+                .bodyToMono<String>()
                 .retryWhen(retryBackoffSpec(url))
                 .block()
         } catch (e: WebClientRequestException) {

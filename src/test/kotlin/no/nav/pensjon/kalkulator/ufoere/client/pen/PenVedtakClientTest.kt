@@ -6,16 +6,17 @@ import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.DateFactory.date
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.sak.SakType
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.testutil.Arrange
 import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
 import no.nav.pensjon.kalkulator.testutil.arrangeResponse
-import no.nav.pensjon.kalkulator.ufoere.Sakstype
 import no.nav.pensjon.kalkulator.ufoere.client.pen.PenVedtakClientTestObjects.RESPONSE
 import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
 import org.springframework.beans.factory.BeanFactory
+import org.springframework.beans.factory.getBean
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.WebClient
 import java.io.ByteArrayOutputStream
@@ -29,7 +30,7 @@ class PenVedtakClientTest : FunSpec({
     fun client(context: BeanFactory) =
         PenVedtakClient(
             baseUrl!!,
-            webClientBuilder = context.getBean(WebClient.Builder::class.java),
+            webClientBuilder = context.getBean<WebClient.Builder>(),
             traceAid,
             retryAttempts = "1"
         )
@@ -57,7 +58,7 @@ class PenVedtakClientTest : FunSpec({
                     requestUrl?.queryParameter("fom") shouldBe "2023-04-05"
                 }
             }
-            vedtaksliste[0].sakstype shouldBe Sakstype.UFOEREPENSJON
+            vedtaksliste[0].sakstype shouldBe SakType.UFOERETRYGD
         }
     }
 
@@ -67,7 +68,7 @@ class PenVedtakClientTest : FunSpec({
 
         Arrange.webClientContextRunner().run {
             val response = client(context = it).bestemGjeldendeVedtak(pid, date)
-            response[0].sakstype shouldBe Sakstype.UFOEREPENSJON
+            response[0].sakstype shouldBe SakType.UFOERETRYGD
         }
     }
 

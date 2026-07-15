@@ -12,9 +12,16 @@ class PersonligSimuleringExtendedResultMapperV9Test : ShouldSpec({
     should("map domain to V9 DTO") {
         PersonligSimuleringExtendedResultMapperV9.extendedResultV9(
             source = SimuleringResult(
-                alderspensjon = listOf(alderspensjon()),
+                alderspensjonListe = listOf(alderspensjon()),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
-                afpPrivat = listOf(
+                livsvarigOffentligAfpListe = listOf(
+                    SimulertAfpOffentlig(
+                        alder = 67,
+                        beloep = 12000,
+                        maanedligBeloep = 1000
+                    )
+                ),
+                privatAfpListe = listOf(
                     SimulertAfpPrivat(
                         alder = 67,
                         beloep = 12000,
@@ -24,13 +31,22 @@ class PersonligSimuleringExtendedResultMapperV9Test : ShouldSpec({
                         maanedligBeloep = 1000
                     )
                 ),
-                afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                 harForLiteTrygdetid = true,
                 trygdetid = 10,
-                opptjeningGrunnlagListe = listOf(
-                    SimulertOpptjeningGrunnlag(aar = 2001, pensjonsgivendeInntektBeloep = 501000),
-                    SimulertOpptjeningGrunnlag(aar = 2002, pensjonsgivendeInntektBeloep = 502000)
+                opptjeningListe = listOf(
+                    SimulertOpptjening(
+                        aarstall = 2001,
+                        pensjonsgivendeInntektBeloep = 501000,
+                        pensjonspoeng = 1.2,
+                        pensjonsbeholdningBeloep = 333000
+                    ),
+                    SimulertOpptjening(
+                        aarstall = 2002,
+                        pensjonsgivendeInntektBeloep = 502000,
+                        pensjonspoeng = 2.3,
+                        pensjonsbeholdningBeloep = 444000
+                    )
                 )
             ),
             foedselsdato = LocalDate.of(1963, 1, 1)

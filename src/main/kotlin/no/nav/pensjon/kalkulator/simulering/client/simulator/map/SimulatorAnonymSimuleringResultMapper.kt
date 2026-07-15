@@ -12,20 +12,26 @@ object SimulatorAnonymSimuleringResultMapper {
 
     private fun result(dto: SimulatorAnonymSimuleringResult) =
         SimuleringResult(
-            alderspensjon = dto.alderspensjonPerioder.map(::alderspensjon),
-            afpPrivat = dto.afpPrivatPerioder.map(::privatAfp),
-            afpOffentlig = dto.afpOffentligPerioder.map(::livsvarigOffentligAfp),
+            alderspensjonListe = dto.alderspensjonPerioder.map(::alderspensjon),
+            alderspensjonMaanedsbeloep = null, // ikke relevant i anonym kontekst
+            maanedligAlderspensjonForKnekkpunkter = null, // ditto
+            livsvarigOffentligAfpListe = dto.afpOffentligPerioder.map(::livsvarigOffentligAfp),
+            tidsbegrensetOffentligAfp = null, // ikke relevant i anonym kontekst
+            serviceberegnetAfp = null, // ditto
+            privatAfpListe = dto.afpPrivatPerioder.map(::privatAfp),
             vilkaarsproeving = Vilkaarsproeving(innvilget = dto.alderspensjonPerioder.isNotEmpty(), alternativ = null),
             harForLiteTrygdetid = false, //TODO
-            trygdetid = 0, // not required in anonym context
-            opptjeningGrunnlagListe = emptyList() // not required in anonym context
+            trygdetid = 0, // ikke relevant i anonym kontekst
+            opptjeningListe = emptyList(), // ditto
+            alderAar = null, // ditto
+            problem = null // ditto
         )
 
     private fun alderspensjon(dto: SimulatorAnonymPensjonsperiode) =
         SimulertAlderspensjon(
             alder = dto.alder ?: 0,
             beloep = dto.belop ?: 0,
-            inntektspensjonBeloep = 0, // not required in anonym context
+            inntektspensjonBeloep = 0, // ikke relevant i anonym kontekst
             delingstall = 0.0, // ditto
             pensjonBeholdningFoerUttak = 0, // ditto
             sluttpoengtall = 0.0, // ditto
@@ -44,17 +50,17 @@ object SimulatorAnonymSimuleringResultMapper {
         SimulertAfpPrivat(
             alder = dto.alder ?: 0,
             beloep = dto.belopArlig ?: 0,
-            kompensasjonstillegg = 0, // Ikke relevant i anonym kontekst enda
-            kronetillegg = 0, // Ikke relevant i anonym kontekst enda
-            livsvarig = 0, // Ikke relevant i anonym kontekst enda
-            maanedligBeloep = 0 // Ikke relevant i anonym kontekst enda
+            kompensasjonstillegg = 0, // ikke relevant i anonym kontekst
+            kronetillegg = 0, // ditto
+            livsvarig = 0, // ditto
+            maanedligBeloep = 0 // ditto
         )
 
     private fun livsvarigOffentligAfp(dto: SimulatorAnonymLivsvarigOffentligAfpPeriode) =
         SimulertAfpOffentlig(
             alder = dto.alder ?: 0,
             beloep = dto.belopArlig ?: 0,
-            maanedligBeloep = 0 // Ikke relevant i anonym kontekst enda
+            maanedligBeloep = 0 // ikke relevant i anonym kontekst
         )
 
     private fun error(dto: SimulatorAnonymSimuleringError) =

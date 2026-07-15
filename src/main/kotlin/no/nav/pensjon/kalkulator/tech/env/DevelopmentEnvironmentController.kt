@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.env
 
+import no.nav.pensjon.kalkulator.tech.env.EnvironmentUtil.isDevelopment
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -22,8 +23,6 @@ class DevelopmentEnvironmentController {
 
     private companion object {
         private fun environmentVariable(name: String) =
-            if (System.getenv("NAIS_CLUSTER_NAME") == "dev-gcp")
-                System.getenv(name)
-            else "forbidden"
+            if (isDevelopment()) System.getenv(name) else "forbidden"
     }
 }

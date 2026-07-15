@@ -22,9 +22,9 @@ class CacheAwarePopulasjonstilgangService(
         .build()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    fun eventuellTilgangsnektAarsak(pid: Pid): String? =
+    fun eventuellTilgangsnektAarsak(pid: Pid, sjekkKunKjerneregler: Boolean = false): String? =
         try {
-            with(populasjonstilgang(pid)) {
+            with(populasjonstilgang(pid, sjekkKunKjerneregler)) {
                 if (innvilget) null
                 else avvisningsinfo
             }
@@ -32,16 +32,16 @@ class CacheAwarePopulasjonstilgangService(
             "${AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEILET}: ${e.message}".also { log.error(e) { it } }
         }
 
-    private fun populasjonstilgang(pid: Pid): TilgangResult {
-        val deferred = tilgangCache.get(cacheKey(pid)) {
+    private fun populasjonstilgang(pid: Pid, sjekkKunKjerneregler: Boolean): TilgangResult {
+        val deferred = tilgangCache.get(cacheKey(pid, sjekkKunKjerneregler)) {
             scope.async(SecurityCoroutineContext()) {
-                populasjonstilgangService.sjekkTilgang(pid)
+                populasjonstilgangService.sjekkTilgang(pid, sjekkKunKjerneregler)
             }
         }
 
         return runBlocking { deferred.await() }
     }
 
-    private fun cacheKey(pid: Pid): String =
-        "${navIdExtractor.id()}:${pid.value}"
+    private fun cacheKey(pid: Pid, sjekkKunKjerneregler: Boolean): String =
+        "${navIdExtractor.id()}:${pid.value}:$sjekkKunKjerneregler"
 }

@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class PensjonsavtaleService(
-    @Qualifier("norskPensjon") private val avtaleClient: PensjonsavtaleClient,
-    @Qualifier("norskPensjonMock") private val mockAvtaleClient: PensjonsavtaleClient,
+    @param:Qualifier("norskPensjon") private val avtaleClient: PensjonsavtaleClient,
+    @param:Qualifier("norskPensjonMock") private val mockAvtaleClient: PensjonsavtaleClient,
     private val pidGetter: PidGetter,
     private val featureToggleService: FeatureToggleService
 ) {

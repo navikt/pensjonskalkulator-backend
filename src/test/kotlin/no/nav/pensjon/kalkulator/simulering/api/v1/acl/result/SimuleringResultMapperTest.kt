@@ -13,10 +13,11 @@ class SimuleringResultMapperTest : ShouldSpec({
         should("map alderspensjon and gjenlevendetillegg, not extension") {
             SimuleringResultMapper.toDto(
                 source = SimuleringResult(
-                    alderspensjon = listOf(alderspensjon(gjenlevendetillegg = 500)),
+                    alderspensjonListe = listOf(alderspensjon(gjenlevendetillegg = 500)),
                     alderspensjonMaanedsbeloep = uttaksbeloep(),
-                    pre2025OffentligAfp = null,
-                    afpPrivat = listOf(
+                    livsvarigOffentligAfpListe = emptyList(),
+                    tidsbegrensetOffentligAfp = null,
+                    privatAfpListe = listOf(
                         SimulertAfpPrivat(
                             alder = 64,
                             beloep = 200,
@@ -26,11 +27,10 @@ class SimuleringResultMapperTest : ShouldSpec({
                             maanedligBeloep = 204
                         )
                     ),
-                    afpOffentlig = emptyList(),
                     vilkaarsproeving = vilkaarsproevingsresultat(),
                     harForLiteTrygdetid = false,
                     trygdetid = 40,
-                    opptjeningGrunnlagListe = emptyList(),
+                    opptjeningListe = emptyList(),
                     problem = null
                 ),
                 naavaerendeAlderAar = 65,
@@ -45,6 +45,7 @@ class SimuleringResultMapperTest : ShouldSpec({
                 maanedligAlderspensjonForKnekkpunkter = null,
                 livsvarigOffentligAfpListe = emptyList(),
                 tidsbegrensetOffentligAfp = null,
+                serviceberegnetAfp = null,
                 privatAfpListe = listOf(
                     SimuleringV1PrivatAfp(
                         alderAar = 64,
@@ -58,6 +59,7 @@ class SimuleringResultMapperTest : ShouldSpec({
                 vilkaarsproevingsresultat = expectedVilkaarsproevingsresultat(),
                 trygdetid = expectedTrygdetid(),
                 pensjonsgivendeInntektListe = emptyList(),
+                opptjeningListe = emptyList(),
                 problem = null
             )
         }
@@ -67,15 +69,15 @@ class SimuleringResultMapperTest : ShouldSpec({
         should("map alderspensjon, not extension, not gjenlevendetillegg") {
             SimuleringResultMapper.toDto(
                 source = SimuleringResult(
-                    alderspensjon = listOf(alderspensjon(gjenlevendetillegg = 600)),
+                    alderspensjonListe = listOf(alderspensjon(gjenlevendetillegg = 600)),
                     alderspensjonMaanedsbeloep = uttaksbeloep(),
-                    pre2025OffentligAfp = null,
-                    afpPrivat = emptyList(),
-                    afpOffentlig = emptyList(),
+                    livsvarigOffentligAfpListe = emptyList(),
+                    tidsbegrensetOffentligAfp = null,
+                    privatAfpListe = emptyList(),
                     vilkaarsproeving = vilkaarsproevingsresultat(),
                     harForLiteTrygdetid = false,
                     trygdetid = 40,
-                    opptjeningGrunnlagListe = emptyList(),
+                    opptjeningListe = emptyList(),
                     problem = null
                 ),
                 naavaerendeAlderAar = 65,
@@ -86,10 +88,12 @@ class SimuleringResultMapperTest : ShouldSpec({
                 maanedligAlderspensjonForKnekkpunkter = null,
                 livsvarigOffentligAfpListe = emptyList(),
                 tidsbegrensetOffentligAfp = null,
+                serviceberegnetAfp = null,
                 privatAfpListe = emptyList(),
                 vilkaarsproevingsresultat = expectedVilkaarsproevingsresultat(),
                 trygdetid = expectedTrygdetid(),
                 pensjonsgivendeInntektListe = emptyList(),
+                opptjeningListe = emptyList(),
                 problem = null
             )
         }
@@ -99,16 +103,21 @@ class SimuleringResultMapperTest : ShouldSpec({
         should("map alderspensjon, extension and gjenlevendetillegg") {
             SimuleringResultMapper.toDto(
                 source = SimuleringResult(
-                    alderspensjon = listOf(alderspensjon(gjenlevendetillegg = 700)),
+                    alderspensjonListe = listOf(alderspensjon(gjenlevendetillegg = 700)),
                     alderspensjonMaanedsbeloep = uttaksbeloep(),
-                    pre2025OffentligAfp = null,
-                    afpPrivat = emptyList(),
-                    afpOffentlig = emptyList(),
+                    livsvarigOffentligAfpListe = emptyList(),
+                    tidsbegrensetOffentligAfp = null,
+                    privatAfpListe = emptyList(),
                     vilkaarsproeving = vilkaarsproevingsresultat(),
                     harForLiteTrygdetid = false,
                     trygdetid = 40,
-                    opptjeningGrunnlagListe = listOf(
-                        SimulertOpptjeningGrunnlag(aar = 2021, pensjonsgivendeInntektBeloep = 10000)
+                    opptjeningListe = listOf(
+                        SimulertOpptjening(
+                            aarstall = 2021,
+                            pensjonsgivendeInntektBeloep = 10000,
+                            pensjonspoeng = 1.2,
+                            pensjonsbeholdningBeloep = 333000
+                        ),
                     ),
                     problem = null
                 ),
@@ -118,18 +127,24 @@ class SimuleringResultMapperTest : ShouldSpec({
                 alderspensjonListe = listOf(
                     expectedAlderspensjon(
                         gjenlevendetillegg = 700, // mapped
-
                     )
                 ),
                 maanedligAlderspensjonVedUttaksendring = expectedUttaksbeloep(),
                 maanedligAlderspensjonForKnekkpunkter = null,
                 livsvarigOffentligAfpListe = emptyList(),
                 tidsbegrensetOffentligAfp = null,
+                serviceberegnetAfp = null,
                 privatAfpListe = emptyList(),
                 vilkaarsproevingsresultat = expectedVilkaarsproevingsresultat(),
                 trygdetid = expectedTrygdetid(),
-                pensjonsgivendeInntektListe = listOf(
-                    SimuleringV1AarligBeloep(aarstall = 2021, beloep = 10000)
+                pensjonsgivendeInntektListe = listOf(SimuleringV1AarligBeloep(aarstall = 2021, beloep = 10000)),
+                opptjeningListe = listOf(
+                    SimuleringV1Opptjening(
+                        aarstall = 2021,
+                        pensjonsgivendeInntektBeloep = 10000,
+                        pensjonspoeng = 1.2,
+                        pensjonsbeholdningBeloep = 333000
+                    )
                 ),
                 problem = null
             )
@@ -140,15 +155,15 @@ class SimuleringResultMapperTest : ShouldSpec({
         should("map problemkode and -beskrivelse") {
             SimuleringResultMapper.toDto(
                 source = SimuleringResult(
-                    alderspensjon = emptyList(),
+                    alderspensjonListe = emptyList(),
                     alderspensjonMaanedsbeloep = null,
-                    pre2025OffentligAfp = null,
-                    afpPrivat = emptyList(),
-                    afpOffentlig = emptyList(),
+                    livsvarigOffentligAfpListe = emptyList(),
+                    tidsbegrensetOffentligAfp = null,
+                    privatAfpListe = emptyList(),
                     vilkaarsproeving = vilkaarsproevingsresultat(innvilget = false),
                     harForLiteTrygdetid = false,
                     trygdetid = 0,
-                    opptjeningGrunnlagListe = emptyList(),
+                    opptjeningListe = emptyList(),
                     problem = Problem(
                         type = ProblemType.UTILSTREKKELIG_INNTEKT,
                         beskrivelse = "10 kroner"
@@ -162,10 +177,12 @@ class SimuleringResultMapperTest : ShouldSpec({
                 maanedligAlderspensjonForKnekkpunkter = null,
                 livsvarigOffentligAfpListe = emptyList(),
                 tidsbegrensetOffentligAfp = null,
+                serviceberegnetAfp = null,
                 privatAfpListe = emptyList(),
                 vilkaarsproevingsresultat = expectedVilkaarsproevingsresultat(innvilget = false),
                 trygdetid = expectedTrygdetid(antallAar = 0),
                 pensjonsgivendeInntektListe = emptyList(),
+                opptjeningListe = emptyList(),
                 problem = SimuleringV1Problem(
                     kode = SimuleringV1ProblemType.UTILSTREKKELIG_INNTEKT,
                     beskrivelse = "10 kroner"

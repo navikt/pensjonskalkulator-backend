@@ -9,16 +9,18 @@ object PersonligSimuleringResultMapper {
 
     fun fromDto(dto: PersonligSimuleringResultDto) =
         SimuleringResult(
-            alderspensjon = dto.alderspensjonListe.map(::alderspensjon),
+            alderspensjonListe = dto.alderspensjonListe.map(::alderspensjon),
             alderspensjonMaanedsbeloep = dto.alderspensjonMaanedsbeloep?.let(::alderspensjonMaanedsbeloep),
             maanedligAlderspensjonForKnekkpunkter = dto.maanedligAlderspensjonForKnekkpunkter?.let(::maanedligAlderspensjonForKnekkpunkter),
-            pre2025OffentligAfp = dto.tidsbegrensetOffentligAfp?.let(::tidsbegrensetOffentligAfp),
-            afpPrivat = dto.privatAfpListe.map(::privatAfp),
-            afpOffentlig = dto.livsvarigOffentligAfpListe.map(::livsvarigOffentligAfp),
+            livsvarigOffentligAfpListe = dto.livsvarigOffentligAfpListe.map(::livsvarigOffentligAfp),
+            tidsbegrensetOffentligAfp = dto.tidsbegrensetOffentligAfp?.let(::tidsbegrensetOffentligAfp),
+            serviceberegnetAfp = null, // ikke relevant her
+            privatAfpListe = dto.privatAfpListe.map(::privatAfp),
             vilkaarsproeving = vilkaarsproeving(dto.vilkaarsproevingsresultat),
             harForLiteTrygdetid = dto.primaerTrygdetid?.erUtilstrekkelig == true,
             trygdetid = dto.primaerTrygdetid?.antallAar ?: 0,
-            opptjeningGrunnlagListe = dto.pensjonsgivendeInntektListe.map(::opptjeningGrunnlag),
+            opptjeningListe = dto.opptjeningListe.orEmpty().map(::opptjening),
+            alderAar = null, // ikke relevant her
             problem = dto.problem?.let(::problem)
         )
 
@@ -107,10 +109,12 @@ object PersonligSimuleringResultMapper {
             alternativ = dto.alternativ?.let(::alternativ)
         )
 
-    private fun opptjeningGrunnlag(dto: AarligBeloepDto) =
-        SimulertOpptjeningGrunnlag(
-            aar = dto.aarstall,
-            pensjonsgivendeInntektBeloep = dto.beloep
+    private fun opptjening(dto: OpptjeningDto) =
+        SimulertOpptjening(
+            aarstall = dto.aarstall ?: 0,
+            pensjonsgivendeInntektBeloep = dto.pensjonsgivendeInntekt ?: 0,
+            pensjonspoeng = dto.pensjonspoeng ?: 0.0,
+            pensjonsbeholdningBeloep = dto.pensjonsbeholdning ?: 0
         )
 
     private fun alternativ(dto: UttaksparametreDto) =

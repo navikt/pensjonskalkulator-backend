@@ -15,10 +15,10 @@ import org.springframework.web.reactive.function.client.WebClient
 
 @Component
 class PenUfoeregradClient(
-    @Value("\${pen.url}") baseUrl: String,
+    @Value($$"${pen.url}") baseUrl: String,
     webClientBuilder: WebClient.Builder,
     traceAid: TraceAid,
-    @Value("\${web-client.retry-attempts}") private val retryAttempts: String
+    @param:Value($$"${web-client.retry-attempts}") private val retryAttempts: String
 ) : PenClient(baseUrl, webClientBuilder, traceAid, retryAttempts), UfoeregradClient {
 
     override fun hentUfoeregrad(pid: Pid): Ufoeregrad =

@@ -11,17 +11,14 @@ class PersonligSimuleringResultMapperV9Test : ShouldSpec({
     should("map domain to V9 DTO") {
         PersonligSimuleringResultMapperV9.resultV9(
             SimuleringResult(
-                alderspensjon = listOf(alderspensjon(alder = 67, beloep = 123456)),
+                alderspensjonListe = listOf(alderspensjon(alder = 67, beloep = 123456)),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
-                afpPrivat = listOf(privatAfp(alder = 67, beloep = 12000)),
-                afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
+                livsvarigOffentligAfpListe = livsvarigOffentligAfpListe(),
+                privatAfpListe = listOf(privatAfp(alder = 67, beloep = 12000)),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                 harForLiteTrygdetid = true,
                 trygdetid = 10,
-                opptjeningGrunnlagListe = listOf(
-                    SimulertOpptjeningGrunnlag(aar = 2001, pensjonsgivendeInntektBeloep = 501000),
-                    SimulertOpptjeningGrunnlag(aar = 2002, pensjonsgivendeInntektBeloep = 502000)
-                )
+                opptjeningListe = opptjeningListe()
             ),
             LocalDate.now().minusYears(67).minusMonths(1)
         ) shouldBe PersonligSimuleringResultV9(
@@ -66,21 +63,18 @@ class PersonligSimuleringResultMapperV9Test : ShouldSpec({
     should("ignore alderspensjon with age 0 when mapping domain to V9 DTO") {
         PersonligSimuleringResultMapperV9.resultV9(
             SimuleringResult(
-                alderspensjon = listOf(
+                alderspensjonListe = listOf(
                     alderspensjon(alder = 67, beloep = 123456),
                     alderspensjon(alder = 68, beloep = 123456),
                     alderspensjon(alder = 0, beloep = 1)
                 ),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
-                afpPrivat = listOf(privatAfp(alder = 67, beloep = 12000)),
-                afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
+                livsvarigOffentligAfpListe = livsvarigOffentligAfpListe(),
+                privatAfpListe = listOf(privatAfp(alder = 67, beloep = 12000)),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                 harForLiteTrygdetid = true,
                 trygdetid = 10,
-                opptjeningGrunnlagListe = listOf(
-                    SimulertOpptjeningGrunnlag(aar = 2001, pensjonsgivendeInntektBeloep = 501000),
-                    SimulertOpptjeningGrunnlag(aar = 2002, pensjonsgivendeInntektBeloep = 502000)
-                )
+                opptjeningListe = opptjeningListe()
             ),
             LocalDate.now().minusYears(67).minusMonths(1)
         ) shouldBe PersonligSimuleringResultV9(
@@ -133,21 +127,18 @@ class PersonligSimuleringResultMapperV9Test : ShouldSpec({
     should("assign 0 age to current age and adds it to the list, when mapping domain to V9 DTO") {
         PersonligSimuleringResultMapperV9.resultV9(
             SimuleringResult(
-                alderspensjon = listOf(
+                alderspensjonListe = listOf(
                     alderspensjon(alder = 68, beloep = 123456),
                     alderspensjon(alder = 69, beloep = 123456),
                     alderspensjon(alder = 0, beloep = 1)
                 ),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
-                afpPrivat = listOf(privatAfp(alder = 67, beloep = 12000)),
-                afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
+                livsvarigOffentligAfpListe = livsvarigOffentligAfpListe(),
+                privatAfpListe = listOf(privatAfp(alder = 67, beloep = 12000)),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                 harForLiteTrygdetid = true,
                 trygdetid = 10,
-                opptjeningGrunnlagListe = listOf(
-                    SimulertOpptjeningGrunnlag(aar = 2001, pensjonsgivendeInntektBeloep = 501000),
-                    SimulertOpptjeningGrunnlag(aar = 2002, pensjonsgivendeInntektBeloep = 502000)
-                )
+                opptjeningListe = opptjeningListe()
             ),
             LocalDate.now().minusYears(67).minusMonths(1)
         ) shouldBe PersonligSimuleringResultV9(
@@ -208,21 +199,18 @@ class PersonligSimuleringResultMapperV9Test : ShouldSpec({
     should("filter away 'privat AFP' with age 0 when mapping domain to V9 DTO") {
         PersonligSimuleringResultMapperV9.resultV9(
             SimuleringResult(
-                alderspensjon = listOf(alderspensjon(alder = 67, beloep = 123456)),
+                alderspensjonListe = listOf(alderspensjon(alder = 67, beloep = 123456)),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
-                afpPrivat = listOf(
+                livsvarigOffentligAfpListe = livsvarigOffentligAfpListe(),
+                privatAfpListe = listOf(
                     privatAfp(alder = 67, beloep = 12000),
                     privatAfp(alder = 68, beloep = 13000),
                     privatAfp(alder = 0, beloep = 14000)
                 ),
-                afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                 harForLiteTrygdetid = true,
                 trygdetid = 10,
-                opptjeningGrunnlagListe = listOf(
-                    SimulertOpptjeningGrunnlag(aar = 2001, pensjonsgivendeInntektBeloep = 501000),
-                    SimulertOpptjeningGrunnlag(aar = 2002, pensjonsgivendeInntektBeloep = 502000)
-                )
+                opptjeningListe = opptjeningListe()
             ),
             LocalDate.now().minusYears(67).minusMonths(1)
         ) shouldBe PersonligSimuleringResultV9(
@@ -275,21 +263,18 @@ class PersonligSimuleringResultMapperV9Test : ShouldSpec({
     should("assign 'privat AFP' at 0 age to current age and add it to the list, when mapping domain to V9 DTO") {
         PersonligSimuleringResultMapperV9.resultV9(
             SimuleringResult(
-                alderspensjon = listOf(alderspensjon(alder = 67, beloep = 123456)),
+                alderspensjonListe = listOf(alderspensjon(alder = 67, beloep = 123456)),
                 alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
-                afpPrivat = listOf(
+                livsvarigOffentligAfpListe = livsvarigOffentligAfpListe(),
+                privatAfpListe = listOf(
                     privatAfp(alder = 68, beloep = 12000),
                     privatAfp(alder = 69, beloep = 13000),
                     privatAfp(alder = 0, beloep = 14000)
                 ),
-                afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
                 vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                 harForLiteTrygdetid = true,
                 trygdetid = 10,
-                opptjeningGrunnlagListe = listOf(
-                    SimulertOpptjeningGrunnlag(aar = 2001, pensjonsgivendeInntektBeloep = 501000),
-                    SimulertOpptjeningGrunnlag(aar = 2002, pensjonsgivendeInntektBeloep = 502000)
-                )
+                opptjeningListe = opptjeningListe()
             ),
             LocalDate.now().minusYears(67).minusMonths(1)
         ) shouldBe PersonligSimuleringResultV9(
@@ -365,25 +350,22 @@ class PersonligSimuleringResultMapperV9Test : ShouldSpec({
             val foedselsdato = now.minusYears(63).plusMonths(1).withDayOfMonth(1).minusDays(1) //siste dag i måneden
             PersonligSimuleringResultMapperV9.resultV9(
                 source = SimuleringResult(
-                    alderspensjon = listOf(
+                    alderspensjonListe = listOf(
                         alderspensjon(alder = 62, beloep = 1),
                         alderspensjon(alder = 63, beloep = 2),
                         alderspensjon(alder = 64, beloep = 3)
                     ),
                     alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 6, heltUttak = 7),
-                    afpPrivat = listOf(
+                    livsvarigOffentligAfpListe = livsvarigOffentligAfpListe(),
+                    privatAfpListe = listOf(
                         privatAfp(alder = 62, beloep = 12000),
                         privatAfp(alder = 63, beloep = 12000),
                         privatAfp(alder = 64, beloep = 12000)
                     ),
-                    afpOffentlig = listOf(SimulertAfpOffentlig(alder = 67, beloep = 12000, maanedligBeloep = 1000)),
                     vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
                     harForLiteTrygdetid = true,
                     trygdetid = 10,
-                    opptjeningGrunnlagListe = listOf(
-                        SimulertOpptjeningGrunnlag(aar = 2001, pensjonsgivendeInntektBeloep = 501000),
-                        SimulertOpptjeningGrunnlag(aar = 2002, pensjonsgivendeInntektBeloep = 502000)
-                    )
+                    opptjeningListe = opptjeningListe()
                 ),
                 foedselsdato = foedselsdato
             ) shouldBe PersonligSimuleringResultV9(
@@ -497,6 +479,15 @@ private fun alderspensjon(alder: Int, beloep: Int) =
         )
     )
 
+private fun livsvarigOffentligAfpListe(): List<SimulertAfpOffentlig> =
+    listOf(
+        SimulertAfpOffentlig(
+            alder = 67,
+            beloep = 12000,
+            maanedligBeloep = 1000
+        )
+    )
+
 private fun privatAfp(alder: Int, beloep: Int) =
     SimulertAfpPrivat(
         alder,
@@ -505,4 +496,20 @@ private fun privatAfp(alder: Int, beloep: Int) =
         kronetillegg = 69,
         livsvarig = 321,
         maanedligBeloep = 1000
+    )
+
+private fun opptjeningListe(): List<SimulertOpptjening> =
+    listOf(
+        SimulertOpptjening(
+            aarstall = 2001,
+            pensjonsgivendeInntektBeloep = 501000,
+            pensjonspoeng = 1.2,
+            pensjonsbeholdningBeloep = 333000
+        ),
+        SimulertOpptjening(
+            aarstall = 2002,
+            pensjonsgivendeInntektBeloep = 502000,
+            pensjonspoeng = 2.3,
+            pensjonsbeholdningBeloep = 444000
+        )
     )

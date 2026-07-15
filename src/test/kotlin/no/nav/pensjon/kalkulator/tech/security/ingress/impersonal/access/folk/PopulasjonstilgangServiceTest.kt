@@ -17,11 +17,7 @@ class PopulasjonstilgangServiceTest : ShouldSpec({
             traceId = null
         )
 
-        PopulasjonstilgangService(
-            client = mockk<PopulasjonstilgangClient>().apply {
-                every { sjekkTilgang(any()) } returns result
-            }
-        ).sjekkTilgang(pid) shouldBe result
+        PopulasjonstilgangService(client = arrangeTilgang(result)).sjekkTilgang(pid) shouldBe result
     }
 
     should("gi 'tilgang avvist' når klienten gir 'tilgang avvist'") {
@@ -32,11 +28,7 @@ class PopulasjonstilgangServiceTest : ShouldSpec({
             traceId = "t"
         )
 
-        PopulasjonstilgangService(
-            client = mockk<PopulasjonstilgangClient>().apply {
-                every { sjekkTilgang(any()) } returns result
-            }
-        ).sjekkTilgang(pid) shouldBe result
+        PopulasjonstilgangService(client = arrangeTilgang(result)).sjekkTilgang(pid) shouldBe result
     }
 
     /**
@@ -45,8 +37,8 @@ class PopulasjonstilgangServiceTest : ShouldSpec({
      */
     should("gi 'tilgang avvist' når klienten feiler, og henvise til logg i begrunnelsen") {
         PopulasjonstilgangService(
-            client = mockk<PopulasjonstilgangClient>().apply {
-                every { sjekkTilgang(any()) } throws IllegalStateException("feil")
+            client = mockk {
+                every { sjekkTilgang(any(), any()) } throws IllegalStateException("feil")
             }
         ).sjekkTilgang(pid) shouldBe TilgangResult(
             innvilget = false,
@@ -56,3 +48,6 @@ class PopulasjonstilgangServiceTest : ShouldSpec({
         )
     }
 })
+
+private fun arrangeTilgang(result: TilgangResult): PopulasjonstilgangClient =
+    mockk { every { sjekkTilgang(any(), any()) } returns result }

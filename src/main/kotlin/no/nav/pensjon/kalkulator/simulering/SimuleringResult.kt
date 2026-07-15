@@ -4,28 +4,23 @@ import no.nav.pensjon.kalkulator.afp.BeregnetAfp
 import no.nav.pensjon.kalkulator.validity.Problem
 
 data class SimuleringResult(
-    val alderspensjon: List<SimulertAlderspensjon>,
+    val alderspensjonListe: List<SimulertAlderspensjon>,
     val alderspensjonMaanedsbeloep: AlderspensjonMaanedsbeloep? = null,
     val maanedligAlderspensjonForKnekkpunkter: SimulertMaanedligAlderspensjonForKnekkpunkter? = null,
-    val pre2025OffentligAfp: SimulertPre2025OffentligAfp? = null,
-    val afpPrivat: List<SimulertAfpPrivat>,
-    val afpOffentlig: List<SimulertAfpOffentlig>,
+    val livsvarigOffentligAfpListe: List<SimulertAfpOffentlig>,
+    val tidsbegrensetOffentligAfp: SimulertPre2025OffentligAfp? = null,
+    val serviceberegnetAfp: BeregnetAfp? = null,
+    val privatAfpListe: List<SimulertAfpPrivat>,
     val vilkaarsproeving: Vilkaarsproeving,
     val harForLiteTrygdetid: Boolean,
     val trygdetid: Int,
-    val opptjeningGrunnlagListe: List<SimulertOpptjeningGrunnlag>,
+    val opptjeningListe: List<SimulertOpptjening>,
     val alderAar: Int? = null,
-    val problem: Problem? = null,
-    val serviceberegnetAfpResult: BeregnetAfp? = null
+    val problem: Problem? = null
 ) {
     fun withAlderAar(alderAar: Int) =
         copy(alderAar = alderAar)
 }
-
-data class SimulertOpptjeningGrunnlag(
-    val aar: Int,
-    val pensjonsgivendeInntektBeloep: Int
-)
 
 data class AlderspensjonMaanedsbeloep(
     val gradertUttak: Int?,
@@ -54,4 +49,11 @@ data class SimulertMaanedligAlderspensjon(
     val skjermingstillegg: Int?,
     val kapittel19Pensjon: Kapittel19Pensjon?,
     val kapittel20Pensjon: Kapittel20Pensjon?
+)
+
+data class SimulertOpptjening(
+    val aarstall: Int,
+    val pensjonsgivendeInntektBeloep: Int,
+    val pensjonspoeng: Double,
+    val pensjonsbeholdningBeloep: Int
 )

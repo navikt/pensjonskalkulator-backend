@@ -11,7 +11,7 @@ object FamilierelasjonMapper {
         Familierelasjon(
             pid = dto.pid?.let(::Pid),
             fom = dto.fom,
-            relasjonstype = dto.relasjonstype.internalValue,
+            relasjonstype = RelasjonstypeDto.internalValue(dto.relasjonstype),
             relasjonPersondata = dto.relasjonPersondata?.let(::relasjonPersondata)
         )
 

@@ -1,8 +1,5 @@
 package no.nav.pensjon.kalkulator.person.relasjon.eps.client
 
-import no.nav.pensjon.kalkulator.person.PersonaliaType
-import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.person.relasjon.Familierelasjon
 
 /**
@@ -10,19 +7,9 @@ import no.nav.pensjon.kalkulator.person.relasjon.Familierelasjon
  */
 interface EpsClient {
 
-    fun fetchNaavaerendeEps(
-        soekerPid: Pid,
-        personaliaSpec: List<PersonaliaType>
-    ): Familierelasjon
+    fun fetchNaavaerendeEps(spec: NaavaerendeEpsSpec): Familierelasjon
 
-    fun fetchNyligsteEps(
-        soekerPid: Pid,
-        sivilstatus: Sivilstatus,
-        personaliaSpec: List<PersonaliaType>
-    ): Familierelasjon
+    fun fetchNyligsteEps(spec: NyligsteEpsSpec): Familierelasjon
 
-    fun fetchTidligereGiftEllerBarnMed(
-        soekerPid: Pid,
-        samboerPid: Pid,
-    ): Boolean
+    fun fetchTidligereGiftEllerBarnMed(spec: TidligereStatusSpec): Boolean
 }

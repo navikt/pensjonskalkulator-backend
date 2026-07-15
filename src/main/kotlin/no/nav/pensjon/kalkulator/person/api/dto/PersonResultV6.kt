@@ -8,7 +8,7 @@ import java.time.LocalDate
 data class PersonResultV6(
     @field:NotNull val navn: String,
     @field:NotNull val fornavn: String,
-    @field:NotNull @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val foedselsdato: LocalDate,
+    @field:NotNull @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val foedselsdato: LocalDate,
     @field:NotNull val sivilstand: PersonSivilstandV6, //TODO: not used in frontend?
     @field:NotNull val pensjoneringAldre: PersonPensjonsaldreV6
 )

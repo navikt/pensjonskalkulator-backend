@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import org.springframework.web.reactive.function.client.bodyToMono
 
 /**
  * Client for pinging the FSS gateway (see github.com/navikt/pensjon-selvbetjening-fss-gateway)
@@ -21,10 +22,10 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
  */
 @Component
 class FssGatewayPingClient(
-    @Value("\${proxy.url}") private val baseUrl: String,
+    @param:Value($$"${proxy.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
-    @Value("\${web-client.retry-attempts}") retryAttempts: String
+    @Value($$"${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), Pingable {
 
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
@@ -40,7 +41,7 @@ class FssGatewayPingClient(
                 .uri("/$PATH")
                 .headers(::setHeaders)
                 .retrieve()
-                .bodyToMono(String::class.java)
+                .bodyToMono<String>()
                 .retryWhen(retryBackoffSpec(url))
                 .block()
                 ?: ""

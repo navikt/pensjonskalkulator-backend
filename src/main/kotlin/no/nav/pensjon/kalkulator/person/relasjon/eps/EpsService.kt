@@ -2,11 +2,15 @@ package no.nav.pensjon.kalkulator.person.relasjon.eps
 
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.PersonaliaType
+import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.person.relasjon.Familierelasjon
 import no.nav.pensjon.kalkulator.person.relasjon.Relasjonstype
 import no.nav.pensjon.kalkulator.person.relasjon.eps.client.EpsClient
+import no.nav.pensjon.kalkulator.person.relasjon.eps.client.NaavaerendeEpsSpec
+import no.nav.pensjon.kalkulator.person.relasjon.eps.client.NyligsteEpsSpec
+import no.nav.pensjon.kalkulator.person.relasjon.eps.client.TidligereStatusSpec
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.CacheAwarePopulasjonstilgangService
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -35,39 +39,36 @@ class EpsService(
      */
     fun nyligsteRelasjon(sivilstatus: Sivilstatus): Familierelasjon {
         val eps: Familierelasjon = client.fetchNyligsteEps(
-            soekerPid = pidGetter.pid(),
-            sivilstatus,
-            personaliaSpec
+            spec = NyligsteEpsSpec(
+                soekerPid = pidGetter.pid(),
+                sivilstatus,
+                personalia = personaliaSpec
+            )
         )
 
-        eps.pid?.let(populasjonstilgangService::eventuellTilgangsnektAarsak)?.let {
-            throw AccessDeniedException("Tilgang til EPS nektet: $it")
-        }
+        eps.pid?.let(::eventuellTilgangsnektAarsak)
+            ?.let { throw AccessDeniedException("Tilgang til EPS nektet: $it") }
 
         return eps
     }
 
-    fun tidligereGiftEllerBarnMedSamboer(): Boolean? {
-        val eps = hentNaavaerendeEps()
-
-        return if (
-            eps?.relasjonstype == Relasjonstype.SAMBOER &&
-            eps.pid != null
-        ) {
-            client.fetchTidligereGiftEllerBarnMed(
-                soekerPid = pidGetter.pid(),
-                samboerPid = eps.pid
-            )
-        } else {
-            null
+    fun tidligereGiftEllerBarnMedSamboer(): Boolean? =
+        hentNaavaerendeEps()?.let {
+            if (it.relasjonstype == Relasjonstype.SAMBOER && it.pid != null)
+                erTidligereGiftEllerHarBarnMed(it.pid)
+            else
+                null
         }
-    }
+
+    private fun erTidligereGiftEllerHarBarnMed(pid: Pid): Boolean =
+        client.fetchTidligereGiftEllerBarnMed(
+            spec = TidligereStatusSpec(soekerPid = pidGetter.pid(), samboerPid = pid)
+        )
 
     private fun hentNaavaerendeEps() =
         try {
             client.fetchNaavaerendeEps(
-                soekerPid = pidGetter.pid(),
-                personaliaSpec
+                spec = NaavaerendeEpsSpec(soekerPid = pidGetter.pid(), personalia = personaliaSpec)
             )
         } catch (e: EgressException) {
             if (e.statusCode == HttpStatus.NOT_FOUND) {
@@ -80,13 +81,17 @@ class EpsService(
     private fun relasjonstype(): Relasjonstype =
         hentNaavaerendeEps()?.relasjonstype ?: Relasjonstype.UKJENT
 
+    private fun eventuellTilgangsnektAarsak(pid: Pid): String? =
+        populasjonstilgangService.eventuellTilgangsnektAarsak(pid = pid, sjekkKunKjerneregler = true)
+
     private companion object {
-        private val personaliaSpec: List<PersonaliaType> = listOf(
-            PersonaliaType.NAVN,
-            PersonaliaType.FOEDSELSDATO,
-            PersonaliaType.DOEDSDATO,
-            PersonaliaType.STATSBORGERSKAP
-        )
+        private val personaliaSpec: List<PersonaliaType> =
+            listOf(
+                PersonaliaType.NAVN,
+                PersonaliaType.FOEDSELSDATO,
+                PersonaliaType.DOEDSDATO,
+                PersonaliaType.STATSBORGERSKAP
+            )
 
         private fun sivilstatus(registrertSivilstand: Sivilstand?, harSamboer: Boolean): Sivilstatus? =
             when {

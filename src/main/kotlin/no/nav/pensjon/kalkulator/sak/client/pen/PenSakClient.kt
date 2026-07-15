@@ -23,26 +23,24 @@ class PenSakClient(
 
     override fun fetchSaker(pid: Pid): List<Sak> =
         doGet(
-            object : ParameterizedTypeReference<List<SakDto>>() {},
+            object : ParameterizedTypeReference<List<PenSak>>() {},
             FETCH_SAK_PATH,
             pid
-        )?.let(SakMapper::fromDto)
-            ?: emptyList()
+        ).orEmpty().map(SakMapper::fromDto)
 
     override suspend fun fetchSakerAsync(pid: Pid): List<Sak> =
         doGetAsync(
-            object : ParameterizedTypeReference<List<SakDto>>() {},
+            object : ParameterizedTypeReference<List<PenSak>>() {},
             FETCH_SAK_PATH,
             pid
-        )?.let(SakMapper::fromDto)
-            ?: emptyList()
+        ).orEmpty().map(SakMapper::fromDto)
 
     override fun opprettNySak(pid: Pid, sakstype: SakType): Sak =
         (doPost(
             path = OPPRETT_SAK_PATH,
             requestBody = "",
             requestClass = String::class.java,
-            responseClass = SakDto::class.java,
+            responseClass = PenSak::class.java,
             pid = pid,
             queryParams = mapOf("sakType" to (PenSakType.fromInternalValue(sakstype)?.externalValue ?: PenSakType.GENERELL.externalValue)),
         ) ?: throw EgressException("No response body from opprett sak"))

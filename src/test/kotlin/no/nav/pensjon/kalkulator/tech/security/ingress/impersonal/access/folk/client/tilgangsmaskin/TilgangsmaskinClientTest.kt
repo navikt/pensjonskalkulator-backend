@@ -43,20 +43,26 @@ class TilgangsmaskinClientTest : ShouldSpec({
         server?.shutdown()
     }
 
-    should("return innvilget when service returns 204 No Content") {
-        server?.arrangeNoContentResponse()
 
-        Arrange.webClientContextRunner().run {
-            val result = client(context = it, jsonMapper).sjekkTilgang(pid)
-            with(result) {
-                innvilget shouldBe true
-                avvisningAarsak shouldBe null
+    context("sjekk kun kjerneregler, tjenesten returnerer '204 No Content'") {
+        should("bruke 'kjerne' URL og returnere 'innvilget'") {
+            server?.arrangeNoContentResponse()
+
+            Arrange.webClientContextRunner().run {
+                val result = client(context = it, jsonMapper).sjekkTilgang(pid, sjekkKunKjerneregler = true)
+                with(result) {
+                    innvilget shouldBe true
+                    avvisningAarsak shouldBe null
+                }
+
+                server?.takeRequest()?.path shouldBe "/api/v1/kjerne"
             }
         }
     }
 
-    should("return avvist with details when service returns 403 Forbidden") {
-        val problemDetailJson = """
+    context("sjekk komplett regelsett, tjenesten returnerer '403 Forbidden'") {
+        should("bruke 'komplett' URL og returnere 'avvist' med beskrivelse av årsak") {
+            val problemDetailJson = """
             {
                 "type": "urn:tilgangsmaskin:avvist",
                 "title": "AVVIST_GEOGRAFISK",
@@ -70,15 +76,18 @@ class TilgangsmaskinClientTest : ShouldSpec({
             }
         """.trimIndent()
 
-        server?.arrangeJsonResponse(status = HttpStatus.FORBIDDEN, body = problemDetailJson)
+            server?.arrangeJsonResponse(status = HttpStatus.FORBIDDEN, body = problemDetailJson)
 
-        Arrange.webClientContextRunner().run {
-            client(context = it, jsonMapper).sjekkTilgang(pid) shouldBe TilgangResult(
-                innvilget = false,
-                avvisningAarsak = AvvisningAarsak.GEOGRAFISK,
-                begrunnelse = "Veileder har ikke tilgang til bruker i denne geografiske enheten",
-                traceId = "trace-123"
-            )
+            Arrange.webClientContextRunner().run {
+                client(context = it, jsonMapper).sjekkTilgang(pid, sjekkKunKjerneregler = false) shouldBe TilgangResult(
+                    innvilget = false,
+                    avvisningAarsak = AvvisningAarsak.GEOGRAFISK,
+                    begrunnelse = "Veileder har ikke tilgang til bruker i denne geografiske enheten",
+                    traceId = "trace-123"
+                )
+
+                server?.takeRequest()?.path shouldBe "/api/v1/komplett"
+            }
         }
     }
 })

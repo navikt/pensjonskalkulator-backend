@@ -10,10 +10,6 @@ object DateUtil {
     private const val TIME_ZONE_ID = "Europe/Oslo"
     private val locale = Locale.of("nb", "NO")
     private val timeZone = TimeZone.getTimeZone(TIME_ZONE_ID)
-    private val zoneId = ZoneId.of(TIME_ZONE_ID)
-
-    fun toEpoch(date: LocalDate): Long =
-        date.atStartOfDay(zoneId).toInstant().toEpochMilli()
 
     fun toLocalDate(time: ZonedDateTime): LocalDate =
         time.withZoneSameInstant(ZoneId.of(TIME_ZONE_ID)).toLocalDate()
@@ -29,3 +25,12 @@ object DateUtil {
             it[Calendar.MILLISECOND] = 0
         }.time
 }
+
+fun Date.toNorwegianLocalDate(): LocalDate =
+    NorwegianCalendar.forDate(date = this).let {
+        LocalDate.of(
+            it[Calendar.YEAR],
+            it[Calendar.MONTH] + 1,
+            it[Calendar.DAY_OF_MONTH]
+        )
+    }

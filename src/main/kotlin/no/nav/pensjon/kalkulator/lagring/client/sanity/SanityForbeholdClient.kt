@@ -14,8 +14,8 @@ import java.net.URI
 
 @Component
 class SanityForbeholdClient(
-    @Value("\${sanity.project-id}") private val projectId: String,
-    @Value("\${sanity.dataset}") private val dataset: String,
+    @param:Value($$"${sanity.project-id}") private val projectId: String,
+    @param:Value($$"${sanity.dataset}") private val dataset: String,
     webClientBuilder: WebClient.Builder,
 ) : ForbeholdClient {
 

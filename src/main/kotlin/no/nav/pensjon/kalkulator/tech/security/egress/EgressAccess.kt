@@ -9,7 +9,7 @@ import org.springframework.security.oauth2.jwt.Jwt
 object EgressAccess {
 
     fun token(service: EgressService): RawJwt {
-        val authentication = SecurityContextHolder.getContext()?.authentication
+        val authentication = SecurityContextHolder.getContext().authentication
 
         return authentication?.enriched()?.getEgressAccessToken(
             service,

@@ -16,21 +16,22 @@ object SimuleringResultMapper {
 
     fun toDto(source: SimuleringResult, naavaerendeAlderAar: Int, mode: MappingMode) =
         SimuleringV1Result(
-            alderspensjonListe = source.alderspensjon.map { alderspensjon(source = it, mode) }
+            alderspensjonListe = source.alderspensjonListe.map { alderspensjon(source = it, mode) }
                 .let { justerAlderspensjonListe(pensjonListe = it, naavaerendeAlderAar) },
             maanedligAlderspensjonVedUttaksendring = source.alderspensjonMaanedsbeloep?.let(::maanedligPensjon),
             maanedligAlderspensjonForKnekkpunkter = source.maanedligAlderspensjonForKnekkpunkter?.let {
                 maanedligAlderspensjonForKnekkpunkter(it, mode)
             },
-            tidsbegrensetOffentligAfp = source.pre2025OffentligAfp?.let(::tidsbegrensetOffentligAfp),
-            privatAfpListe = source.afpPrivat.map(::privatAfp)
+            livsvarigOffentligAfpListe = source.livsvarigOffentligAfpListe.map(::livsvarigOffentligAfp),
+            tidsbegrensetOffentligAfp = source.tidsbegrensetOffentligAfp?.let(::tidsbegrensetOffentligAfp),
+            serviceberegnetAfp = source.serviceberegnetAfp?.let(::serviceberegnetAfp),
+            privatAfpListe = source.privatAfpListe.map(::privatAfp)
                 .let { justerPrivatAfpListe(pensjonListe = it, naavaerendeAlderAar) },
-            livsvarigOffentligAfpListe = source.afpOffentlig.map(::livsvarigOffentligAfp),
             vilkaarsproevingsresultat = vilkaarsproevingsresultat(source.vilkaarsproeving),
             trygdetid = trygdetid(source),
-            pensjonsgivendeInntektListe = source.opptjeningGrunnlagListe.map(::inntekt),
-            problem = source.problem?.let(::problem),
-            serviceberegnetAfp = source.serviceberegnetAfpResult?.let(::serviceberegnetAfp)
+            pensjonsgivendeInntektListe = source.opptjeningListe.map(::inntekt),
+            opptjeningListe = source.opptjeningListe.map(::opptjening),
+            problem = source.problem?.let(::problem)
         )
 
     private fun alderspensjon(source: SimulertAlderspensjon, mode: MappingMode) =
@@ -208,10 +209,18 @@ object SimuleringResultMapper {
             erUtilstrekkelig = source.harForLiteTrygdetid
         )
 
-    private fun inntekt(source: SimulertOpptjeningGrunnlag) =
+    private fun inntekt(source: SimulertOpptjening) =
         SimuleringV1AarligBeloep(
-            aarstall = source.aar,
+            aarstall = source.aarstall,
             beloep = source.pensjonsgivendeInntektBeloep
+        )
+
+    private fun opptjening(source: SimulertOpptjening) =
+        SimuleringV1Opptjening(
+            aarstall = source.aarstall,
+            pensjonsgivendeInntektBeloep = source.pensjonsgivendeInntektBeloep,
+            pensjonspoeng = source.pensjonspoeng,
+            pensjonsbeholdningBeloep = source.pensjonsbeholdningBeloep
         )
 
     private fun alternativ(source: Alternativ) =

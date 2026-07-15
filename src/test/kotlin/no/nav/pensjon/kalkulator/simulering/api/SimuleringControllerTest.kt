@@ -371,92 +371,92 @@ class SimuleringControllerTest : ShouldSpec() {
             when (simuleringType) {
                 SimuleringType.ALDERSPENSJON,
                 SimuleringType.ALDERSPENSJON_MED_GJENLEVENDERETT -> SimuleringResult(
-                    alderspensjon = listOf(alderspensjon()),
+                    alderspensjonListe = listOf(alderspensjon()),
                     alderspensjonMaanedsbeloep = maanedsbeloep(heltUttak),
-                    afpPrivat = emptyList(),
-                    afpOffentlig = emptyList(),
+                    livsvarigOffentligAfpListe = emptyList(),
+                    privatAfpListe = emptyList(),
                     vilkaarsproeving = vilkaarsproeving(),
                     harForLiteTrygdetid = false,
                     trygdetid = 0,
-                    opptjeningGrunnlagListe = emptyList()
+                    opptjeningListe = emptyList()
                 )
 
                 SimuleringType.PRE2025_OFFENTLIG_AFP_ETTERFULGT_AV_ALDERSPENSJON -> SimuleringResult(
-                    alderspensjon = listOf(alderspensjon()),
+                    alderspensjonListe = listOf(alderspensjon()),
                     alderspensjonMaanedsbeloep = maanedsbeloep(heltUttak),
-                    afpPrivat = listOf(privatAfp()),
-                    afpOffentlig = emptyList(),
+                    livsvarigOffentligAfpListe = emptyList(),
+                    privatAfpListe = listOf(privatAfp()),
                     vilkaarsproeving = vilkaarsproeving(),
                     harForLiteTrygdetid = false,
                     trygdetid = 0,
-                    opptjeningGrunnlagListe = emptyList()
+                    opptjeningListe = emptyList()
                 )
 
                 SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT -> SimuleringResult(
-                    alderspensjon = listOf(alderspensjon()),
+                    alderspensjonListe = listOf(alderspensjon()),
                     alderspensjonMaanedsbeloep = maanedsbeloep(heltUttak),
-                    afpPrivat = listOf(privatAfp()),
-                    afpOffentlig = emptyList(),
+                    livsvarigOffentligAfpListe = emptyList(),
+                    privatAfpListe = listOf(privatAfp()),
                     vilkaarsproeving = vilkaarsproeving(),
                     harForLiteTrygdetid = false,
                     trygdetid = 0,
-                    opptjeningGrunnlagListe = emptyList()
+                    opptjeningListe = emptyList()
                 )
 
                 SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG -> SimuleringResult(
-                    alderspensjon = listOf(alderspensjon()),
+                    alderspensjonListe = listOf(alderspensjon()),
                     alderspensjonMaanedsbeloep = maanedsbeloep(heltUttak),
-                    afpPrivat = emptyList(),
-                    afpOffentlig = listOf(livsvarigOffentligAfp()),
+                    livsvarigOffentligAfpListe = listOf(livsvarigOffentligAfp()),
+                    privatAfpListe = emptyList(),
                     vilkaarsproeving = vilkaarsproeving(),
                     harForLiteTrygdetid = false,
                     trygdetid = 0,
-                    opptjeningGrunnlagListe = emptyList()
+                    opptjeningListe = emptyList()
                 )
 
                 SimuleringType.ENDRING_ALDERSPENSJON,
                 SimuleringType.ENDRING_ALDERSPENSJON_MED_GJENLEVENDERETT -> SimuleringResult(
-                    alderspensjon = listOf(alderspensjon()),
+                    alderspensjonListe = listOf(alderspensjon()),
                     alderspensjonMaanedsbeloep = maanedsbeloep(heltUttak),
-                    afpPrivat = emptyList(),
-                    afpOffentlig = emptyList(),
+                    livsvarigOffentligAfpListe = emptyList(),
+                    privatAfpListe = emptyList(),
                     vilkaarsproeving = vilkaarsproeving(),
                     harForLiteTrygdetid = false,
                     trygdetid = 0,
-                    opptjeningGrunnlagListe = emptyList()
+                    opptjeningListe = emptyList()
                 )
 
                 SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT -> SimuleringResult(
-                    alderspensjon = listOf(alderspensjon()),
+                    alderspensjonListe = listOf(alderspensjon()),
                     alderspensjonMaanedsbeloep = maanedsbeloep(heltUttak),
-                    afpPrivat = listOf(privatAfp()),
-                    afpOffentlig = emptyList(),
+                    livsvarigOffentligAfpListe = emptyList(),
+                    privatAfpListe = listOf(privatAfp()),
                     vilkaarsproeving = vilkaarsproeving(),
                     harForLiteTrygdetid = false,
                     trygdetid = 0,
-                    opptjeningGrunnlagListe = emptyList()
+                    opptjeningListe = emptyList()
                 )
 
                 SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG -> SimuleringResult(
-                    alderspensjon = listOf(alderspensjon()),
+                    alderspensjonListe = listOf(alderspensjon()),
                     alderspensjonMaanedsbeloep = maanedsbeloep(heltUttak),
-                    afpPrivat = emptyList(),
-                    afpOffentlig = listOf(livsvarigOffentligAfp()),
+                    livsvarigOffentligAfpListe = listOf(livsvarigOffentligAfp()),
+                    privatAfpListe = emptyList(),
                     vilkaarsproeving = vilkaarsproeving(),
                     harForLiteTrygdetid = false,
                     trygdetid = 0,
-                    opptjeningGrunnlagListe = emptyList()
+                    opptjeningListe = emptyList()
                 )
 
                 SimuleringType.SERVICEBEREGN_AFP -> SimuleringResult(
-                    alderspensjon = emptyList(),
+                    alderspensjonListe = emptyList(),
                     alderspensjonMaanedsbeloep = null,
-                    afpPrivat = emptyList(),
-                    afpOffentlig = emptyList(),
+                    livsvarigOffentligAfpListe = emptyList(),
+                    privatAfpListe = emptyList(),
                     vilkaarsproeving = vilkaarsproeving(),
                     harForLiteTrygdetid = false,
                     trygdetid = 0,
-                    opptjeningGrunnlagListe = emptyList()
+                    opptjeningListe = emptyList()
                 )
             }
 

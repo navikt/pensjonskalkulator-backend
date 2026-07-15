@@ -12,7 +12,9 @@ class AudienceValidator(val thisAppAudience: String) : OAuth2TokenValidator<Jwt>
 
     private val log = KotlinLogging.logger {}
 
-    override fun validate(jwt: Jwt): OAuth2TokenValidatorResult = validate(jwt.audience)
+    override fun validate(jwt: Jwt): OAuth2TokenValidatorResult =
+        jwt.audience?.let(::validate)
+            ?: failure(OAuth2Error("No audience claim found in JWT"))
 
     private fun validate(audiences: List<String>): OAuth2TokenValidatorResult =
         if (audiences.contains(thisAppAudience))

@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.ufoere
 
+import no.nav.pensjon.kalkulator.sak.SakType
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.ufoere.client.UfoeregradClient
 import no.nav.pensjon.kalkulator.ufoere.client.VedtakClient
@@ -14,7 +15,7 @@ class UfoerepensjonService(
 ) {
      fun harLoependeUfoerepensjon(fom: LocalDate) =
         vedtakClient.bestemGjeldendeVedtak(pidGetter.pid(), fom)
-            .any { Sakstype.UFOEREPENSJON == it.sakstype }
+            .any { SakType.UFOERETRYGD == it.sakstype }
 
     fun hentUfoeregrad() = ufoeregradClient.hentUfoeregrad(pidGetter.pid())
 }

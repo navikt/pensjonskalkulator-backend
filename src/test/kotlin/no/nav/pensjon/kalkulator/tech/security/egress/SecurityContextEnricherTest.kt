@@ -10,10 +10,14 @@ import io.mockk.verify
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.person.PossiblyEncryptedPid
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.crypto.CryptoService
+import no.nav.pensjon.kalkulator.tech.representasjon.Personalia
 import no.nav.pensjon.kalkulator.tech.representasjon.Representasjon
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonService
+import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonTarget
+import no.nav.pensjon.kalkulator.tech.representasjon.RepresentertRolle
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
 import no.nav.pensjon.kalkulator.tech.security.ingress.SecurityContextPidExtractor
 import org.springframework.security.core.Authentication
@@ -70,11 +74,11 @@ class SecurityContextEnricherTest : ShouldSpec({
             pidDecrypter = arrangeDecryption(),
             representasjonService = mockk()
         ).enrichAuthentication(
-            request = arrangeFoedselsnummer("encrypted.string.containing.dot"), // encrypted PID
+            request = arrangeFoedselsnummer(ENCRYPTED_PID),
             response = mockk()
         )
 
-        securityContextTargetPid()?.value shouldBe "12906498357"
+        securityContextTargetPid()?.value shouldBe PID
     }
 
     should("use plaintext PID if not encrypted") {
@@ -86,76 +90,142 @@ class SecurityContextEnricherTest : ShouldSpec({
             pidDecrypter = mockk(),
             representasjonService = mockk()
         ).enrichAuthentication(
-            request = arrangeFoedselsnummer("12906498357"), // not encrypted
+            request = arrangeFoedselsnummer(PID), // not encrypted
             response = mockk()
         )
 
-        securityContextTargetPid()?.value shouldBe "12906498357"
+        securityContextTargetPid()?.value shouldBe PID
     }
 
-    should("set target PID from OBO cookie if valid representasjon") {
-        setSecurityContext(authentication = mockk())
+    context("valid representasjon") {
+        /**
+         * NB: plaintext OBO cookie is only allowed in development environment; in production, OBO cookie is encrypted.
+         */
+        should("set target PID from plaintext OBO cookie") {
+            setSecurityContext(authentication = mockk())
 
-        SecurityContextEnricher(
-            tokenSuppliers,
-            securityContextPidExtractor = arrangeSecurityContextPidExtractor(),
-            pidDecrypter = mockk(),
-            representasjonService = arrange(Representasjon(isValid = true, fullmaktGiverNavn = "F. Giver"))
-        ).enrichAuthentication(
-            request = arrangeOnBehalfOfCookie(),
-            response = mockk()
-        )
-
-        securityContextTargetPid()?.value shouldBe "12906498357"
-    }
-
-    should("throw AccessDeniedException if invalid representasjon") {
-        setSecurityContext(authentication = mockk())
-
-        shouldThrow<org.springframework.security.access.AccessDeniedException> {
             SecurityContextEnricher(
                 tokenSuppliers,
                 securityContextPidExtractor = arrangeSecurityContextPidExtractor(),
                 pidDecrypter = mockk(),
-                representasjonService = arrange(Representasjon(isValid = false, fullmaktGiverNavn = ""))
+                representasjonService = arrange(validRepresentasjon)
             ).enrichAuthentication(
-                request = arrangeOnBehalfOfCookie(),
+                request = arrangeOnBehalfOfCookie(PID),
                 response = mockk()
             )
-        }.message shouldBe "INVALID_REPRESENTASJON"
 
-        securityContextTargetPid()?.value shouldBe null
+            securityContextTargetPid()?.value shouldBe PID
+        }
+
+        should("set target PID from encrypted OBO cookie") {
+            setSecurityContext(authentication = mockk())
+
+            SecurityContextEnricher(
+                tokenSuppliers,
+                securityContextPidExtractor = arrangeSecurityContextPidExtractor(),
+                pidDecrypter = arrangeDecryption(),
+                representasjonService = arrange(validRepresentasjon)
+            ).enrichAuthentication(
+                request = arrangeOnBehalfOfCookie(ENCRYPTED_PID),
+                response = mockk()
+            )
+
+            securityContextTargetPid()?.value shouldBe PID
+        }
+    }
+
+    context("invalid representasjon") {
+        should("throw AccessDeniedException") {
+            setSecurityContext(authentication = mockk())
+
+            shouldThrow<org.springframework.security.access.AccessDeniedException> {
+                SecurityContextEnricher(
+                    tokenSuppliers,
+                    securityContextPidExtractor = arrangeSecurityContextPidExtractor(),
+                    pidDecrypter = mockk(),
+                    representasjonService = arrange(Representasjon(isValid = false, fullmaktsgiver = null))
+                ).enrichAuthentication(
+                    request = arrangeOnBehalfOfCookie(ENCRYPTED_PID),
+                    response = mockk()
+                )
+            }.message shouldBe "INVALID_REPRESENTASJON"
+
+            securityContextTargetPid()?.value shouldBe null
+        }
+    }
+
+    context("person under veiledning") {
+        should("not check representasjonsforhold despite presence of OBO cookie") {
+            setSecurityContext(
+                authentication = EnrichedAuthentication(
+                    initialAuth = mockk(),
+                    egressTokenSuppliersByService = tokenSuppliers,
+                    target = RepresentasjonTarget(pid, rolle = RepresentertRolle.UNDER_VEILEDNING)
+                )
+            )
+            val securityContextPidExtractor = mockk<SecurityContextPidExtractor>(relaxed = true)
+            val representasjonService = mockk<RepresentasjonService>(relaxed = true)
+
+            SecurityContextEnricher(
+                tokenSuppliers,
+                securityContextPidExtractor,
+                pidDecrypter = mockk(),
+                representasjonService
+            ).enrichAuthentication(
+                request = arrangeOnBehalfOfCookieAndHeader(),
+                response = mockk()
+            )
+
+            verify(exactly = 0) { representasjonService.hasValidRepresentasjonsforhold(any()) }
+        }
     }
 })
+
+private const val PID = "12906498357"
+private const val ENCRYPTED_PID = "contains.dot"
+
+private val validRepresentasjon =
+    Representasjon(
+        isValid = true,
+        fullmaktsgiver = Personalia(navn = "F. Giver", pid)
+    )
 
 private fun setSecurityContext(authentication: Authentication) {
     SecurityContextHolder.setContext(SecurityContextImpl(authentication))
 }
 
-private fun securityContextTargetPid() =
+private fun securityContextTargetPid(): Pid? =
     SecurityContextHolder.getContext().authentication?.enriched()?.targetPid()
 
-private fun arrangeFoedselsnummer(value: String?) =
-    mockk<HttpServletRequest>(relaxed = true).apply {
+private fun arrangeFoedselsnummer(value: String?): HttpServletRequest =
+    mockk(relaxed = true) {
         every { getHeader("fnr") } returns value
     }
 
-private fun arrangeOnBehalfOfCookie() =
-    mockk<HttpServletRequest>(relaxed = true).apply {
-        every { cookies } returns listOf(Cookie("nav-obo", "12906498357")).toTypedArray()
+private fun arrangeOnBehalfOfCookie(value: String): HttpServletRequest =
+    mockk(relaxed = true) {
+        every { cookies } returns listOf(Cookie("nav-obo", value)).toTypedArray()
     }
 
-private fun arrange(representasjon: Representasjon) =
-    mockk<RepresentasjonService>().apply {
-        every { hasValidRepresentasjonsforhold(Pid("12906498357")) } returns representasjon
+private fun arrangeOnBehalfOfCookieAndHeader(): HttpServletRequest =
+    mockk(relaxed = true) {
+        every { getHeader("fnr") } returns PID
+        every { cookies } returns listOf(Cookie("nav-obo", ENCRYPTED_PID)).toTypedArray()
     }
 
-private fun arrangeDecryption() =
-    mockk<CryptoService>().apply {
-        every { decrypt("encrypted.string.containing.dot") } returns "12906498357"
+private fun arrange(representasjon: Representasjon): RepresentasjonService =
+    mockk {
+        every {
+            hasValidRepresentasjonsforhold(fullmaktsgiverPid = PossiblyEncryptedPid(ENCRYPTED_PID))
+        } returns representasjon
+
+        every {
+            hasValidRepresentasjonsforhold(fullmaktsgiverPid = PossiblyEncryptedPid(PID)) // use case in dev only
+        } returns representasjon
     }
+
+private fun arrangeDecryption(): CryptoService =
+    mockk { every { decrypt(ENCRYPTED_PID) } returns PID }
 
 private fun arrangeSecurityContextPidExtractor(): SecurityContextPidExtractor =
-    mockk<SecurityContextPidExtractor>().apply {
-        every { pid() } returns null
-    }
+    mockk { every { pid() } returns null }

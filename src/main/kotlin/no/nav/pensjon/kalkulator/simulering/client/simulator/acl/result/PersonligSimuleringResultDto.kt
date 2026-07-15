@@ -4,20 +4,20 @@ import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotNull
 
 data class PersonligSimuleringResultDto(
-    @field:Schema(description = "Liste over prognosert alderspensjon per år")
+    @field:Schema(description = "Prognosert alderspensjon for hvert år")
     @field:NotNull val alderspensjonListe: List<AlderspensjonDto>,
 
     @field:Schema(description = "Prognosert utbetalt månedsbeløp for alderspensjon")
     val alderspensjonMaanedsbeloep: UttaksbeloepDto?,
     val maanedligAlderspensjonForKnekkpunkter: MaanedligAlderspensjonForKnekkpunkterDto?,
 
-    @field:Schema(description = "Liste over prognosert livsvarig AFP i offentlig sektor, per år")
+    @field:Schema(description = "Prognosert livsvarig AFP i offentlig sektor for hvert år")
     @field:NotNull val livsvarigOffentligAfpListe: List<AldersbestemtUtbetalingDto>,
 
     @field:Schema(description = "Prognosert tidsbegrenset AFP i offentlig sektor")
     val tidsbegrensetOffentligAfp: TidsbegrensetOffentligAfpDto?,
 
-    @field:Schema(description = "Liste over prognosert livsvarig AFP i privat sektor, per år")
+    @field:Schema(description = "Prognosert livsvarig AFP i privat sektor for hvert år")
     @field:NotNull val privatAfpListe: List<PrivatAfpDto>,
 
     @field:Schema(description = "Primær trygdetid")
@@ -26,8 +26,8 @@ data class PersonligSimuleringResultDto(
     @field:Schema(description = "Resultatet av vilkårsprøvingen i henhold til pensjonsregelverket")
     @field:NotNull val vilkaarsproevingsresultat: VilkaarsproevingsresultatDto,
 
-    @field:Schema(description = "Liste over pensjonsgivende inntekter brukt i beregningen")
-    @field:NotNull val pensjonsgivendeInntektListe: List<AarligBeloepDto>,
+    @field:Schema(description = "Opptjeningsdata brukt i beregningen for hvert år")
+    @field:NotNull val opptjeningListe: List<OpptjeningDto>?,
 
     @field:Schema(description = "Eventuelt problem som oppstod under simuleringen")
     val problem: ProblemDto? = null
@@ -102,6 +102,13 @@ data class PrivatAfpDto(
     @field:NotNull val kronetillegg: Int,
     @field:NotNull val livsvarig: Int,
     @field:NotNull val maanedligBeloep: Int
+)
+
+data class OpptjeningDto(
+    val aarstall: Int?,
+    val pensjonsgivendeInntekt: Int?,
+    val pensjonsbeholdning: Int?,
+    val pensjonspoeng: Double?
 )
 
 data class VilkaarsproevingsresultatDto(

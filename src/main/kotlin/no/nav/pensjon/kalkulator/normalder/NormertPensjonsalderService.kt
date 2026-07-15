@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.normalder
 
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.normalder.client.NormertPensjonsalderClient
+import no.nav.pensjon.kalkulator.tech.env.EnvironmentUtil.isDevelopment
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -22,7 +23,7 @@ class NormertPensjonsalderService(private val normalderClient: NormertPensjonsal
         )
 
     fun aldersgrenser(foedselsdato: LocalDate): Aldersgrenser =
-        if (System.getenv("NAIS_CLUSTER_NAME") == "dev-gcp")
+        if (isDevelopment())
             testAldersgrenser(foedselsdato)
         else
             normalderClient.fetchNormalderListe().first { it.aarskull == foedselsdato.year }
