@@ -16,37 +16,48 @@ import java.time.LocalDate
  * cannot handle DTO names with dots).
  */
 data class PersonInternV1Person(
-    @param:Schema(description = "Personens navn, format: Fornavn (Mellomnavn) Etternavn")
-    @field:NotNull val navn: String,
+    @field:Schema(description = "Personens navn, format: Fornavn (Mellomnavn) Etternavn")
+    @field:NotNull
+    val navn: String,
 
-    @param:Schema(description = "Personens fødselsdato")
-    @field:NotNull @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val foedselsdato: LocalDate,
+    @field:Schema(description = "Personens fødselsdato")
+    @field:NotNull
+    @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
+    val foedselsdato: LocalDate,
 
-    @param:Schema(description = "Personens sivilstand")
-    @field:NotNull val sivilstand: PersonInternV1Sivilstand,
+    @field:Schema(description = "Personens sivilstand")
+    @field:NotNull
+    val sivilstand: PersonInternV1Sivilstand,
 
-    @param:Schema(description = "Personens sivilstatus (sivilstand pluss samboerskap")
-    @field:NotNull val sivilstatus: PersonInternV1Sivilstatus,
+    @field:Schema(description = "Personens sivilstatus (sivilstand pluss samboerskap)")
+    @field:NotNull
+    val sivilstatus: PersonInternV1Sivilstatus,
 
-    @param:Schema(description = "Personens mulige pensjoneringsaldre")
-    @field:NotNull val pensjoneringAldre: PersonInternV1Pensjonsaldre
+    @field:Schema(description = "Personens mulige pensjoneringsaldre")
+    @field:NotNull
+    val pensjoneringAldre: PersonInternV1Pensjonsaldre
 )
 
 data class PersonInternV1Pensjonsaldre(
-    @param:Schema(description = "Normert pensjonsalder (alder for ubetinget start av pensjonsuttak)")
-    @field:NotNull val normertPensjoneringsalder: PersonInternV1Alder,
+    @field:Schema(description = "Normert pensjonsalder (alder for ubetinget start av pensjonsuttak)")
+    @field:NotNull
+    val normertPensjoneringsalder: PersonInternV1Alder,
 
-    @param:Schema(description = "Nedre aldersgrense for start av pensjonsuttak")
-    @field:NotNull val nedreAldersgrense: PersonInternV1Alder,
+    @field:Schema(description = "Nedre aldersgrense for start av pensjonsuttak")
+    @field:NotNull
+    val nedreAldersgrense: PersonInternV1Alder,
 
-    @param:Schema(description = "Øvre aldersgrense for start av pensjonsuttak")
-    @field:NotNull val oevreAldersgrense: PersonInternV1Alder
+    @field:Schema(description = "Øvre aldersgrense for start av pensjonsuttak")
+    @field:NotNull
+    val oevreAldersgrense: PersonInternV1Alder
 )
 
 data class PersonInternV1Alder(
-    @param:Schema(description = "Antall fylte år")
-    @field:NotNull val aar: Int,
+    @field:Schema(description = "Antall fylte år")
+    @field:NotNull
+    val aar: Int,
 
-    @param:Schema(description = "Antall fylte måneder (0-11)")
-    @field:NotNull val maaneder: Int
+    @field:Schema(description = "Antall fylte måneder (0-11)")
+    @field:NotNull
+    val maaneder: Int
 )
