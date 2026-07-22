@@ -27,7 +27,7 @@ enum class PersonInternV1Sivilstand(val internalValue: Sivilstand) {
     UNKNOWN(internalValue = Sivilstand.UNKNOWN);
 
     companion object {
-        val log = KotlinLogging.logger {}
+        private val log = KotlinLogging.logger {}
 
         fun fromInternalValue(value: Sivilstand): PersonInternV1Sivilstand =
             if (value == Sivilstand.SAMBOER)
