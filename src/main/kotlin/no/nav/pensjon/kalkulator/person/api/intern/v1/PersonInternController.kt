@@ -9,7 +9,7 @@ import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.person.PersonFacade
 import no.nav.pensjon.kalkulator.person.api.intern.v1.acl.PersonInternV1Person
-import no.nav.pensjon.kalkulator.person.api.intern.v1.acl.PersonMapper.toDto
+import no.nav.pensjon.kalkulator.person.api.intern.v1.acl.PersonMapper.transferable
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.http.HttpStatus
@@ -51,7 +51,7 @@ class PersonInternController(
         traceAid.begin()
 
         return try {
-            toDto(service.getPerson())
+            transferable(service.getPerson())
         } catch (e: NotFoundException) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, e.message)
         } catch (e: EgressException) {
