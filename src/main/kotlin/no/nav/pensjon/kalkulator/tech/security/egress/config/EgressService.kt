@@ -19,6 +19,12 @@ enum class EgressService(
     NAV_ANSATT("Nav-ansatt", "NA", "Info om Nav-ansatt"),
     NORSK_PENSJON("Norsk Pensjon", "NP", "Private pensjonsavtaler", GatewayUsage.INTERNAL),
     OAUTH2_TOKEN("OAuth2 token", "OA2", "OAuth2 access token"),
+    OPPTJENING_SELVBETJENING(
+        description = "Prosesserte pensjonsopptjeningsdata",
+        shortName = "OS",
+        purpose = "Hente merknader relatert til pensjonsopptjening",
+        authType = AuthType.MACHINE_INSIDE_NAV
+    ),
     PENSJON_PERSONDATA(
         description = "Pensjonsrelaterte persondata",
         shortName = "PPD",

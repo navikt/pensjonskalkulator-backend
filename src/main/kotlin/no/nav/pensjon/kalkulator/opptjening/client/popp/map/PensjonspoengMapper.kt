@@ -18,7 +18,8 @@ object PensjonspoengMapper {
                 pensjonspoengType = dto.pensjonspoengType ?: "",
                 maksimalUfoeregrad = dto.maxUforegrad,
                 omsorgspoeng = dto.omsorg?.ar,
-                beholdning = 0 // not available here
+                beholdning = 0, // not available here
+                merknadListe = emptyList() // not available here
             )
         }
 }
