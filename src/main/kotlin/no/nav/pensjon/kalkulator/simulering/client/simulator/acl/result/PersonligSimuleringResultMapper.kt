@@ -114,7 +114,8 @@ object PersonligSimuleringResultMapper {
             aarstall = dto.aarstall ?: 0,
             pensjonsgivendeInntektBeloep = dto.pensjonsgivendeInntekt ?: 0,
             pensjonspoeng = dto.pensjonspoeng ?: 0.0,
-            pensjonsbeholdningBeloep = dto.pensjonsbeholdning ?: 0
+            pensjonsbeholdningBeloep = dto.pensjonsbeholdning ?: 0,
+            merknadListe = emptyList() // ikke relevant her
         )
 
     private fun alternativ(dto: UttaksparametreDto) =

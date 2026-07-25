@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotNull
+import no.nav.pensjon.kalkulator.opptjening.api.v1.acl.MerknadCodeV1
 import no.nav.pensjon.kalkulator.validity.ProblemType
 import org.springframework.http.HttpStatus
 import java.time.LocalDate
@@ -353,7 +354,11 @@ data class SimuleringV1Opptjening(
 
     @field:Schema(description = "Pensjonsbeholdning (beløp i norske kroner)")
     @field:NotNull
-    val pensjonsbeholdningBeloep: Int
+    val pensjonsbeholdningBeloep: Int,
+
+    @field:Schema(description = "Merknader som er knyttet til opptjeningen")
+    @field:NotNull
+    val merknadListe: List<MerknadCodeV1>
 )
 
 data class SimuleringV1Trygdetid(

@@ -164,6 +164,27 @@ class OpptjeningServiceTest : ShouldSpec({
             )
         )
     }
+
+    should("utelate tom merknadliste for år uten opptjening") {
+        OpptjeningService(
+            opptjeningClient = arrangeOpptjening(opptjeningListe(aar = 2020), beholdningListe = emptyList()),
+            merknadClient = arrangeMerknader(perAar = mapOf(2021 to emptyList())), // tom merknadliste
+            pidGetter
+        ).opptjening() shouldBe listOf(
+            // År 2020 har kun opptjening:
+            AarligOpptjening(
+                aar = 2020,
+                pensjonsgivendeInntekt = 1,
+                pensjonspoeng = 2.1,
+                omsorgspoeng = 3,
+                maksimalUfoeregrad = 4,
+                pensjonspoengType = "T1",
+                beholdning = 0,
+                merknadListe = emptyList()
+            )
+            // År 2021 har kun en tom merknadliste (ingen opptjening) og utelates derfor
+        )
+    }
 })
 
 private fun arrangeMerknader(perAar: Map<Int, List<MerknadCode>>): MerknadClient =

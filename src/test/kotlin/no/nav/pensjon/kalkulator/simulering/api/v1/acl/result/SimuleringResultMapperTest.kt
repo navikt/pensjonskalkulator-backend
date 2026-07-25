@@ -116,7 +116,8 @@ class SimuleringResultMapperTest : ShouldSpec({
                             aarstall = 2021,
                             pensjonsgivendeInntektBeloep = 10000,
                             pensjonspoeng = 1.2,
-                            pensjonsbeholdningBeloep = 333000
+                            pensjonsbeholdningBeloep = 333000,
+                            merknadListe = emptyList()
                         ),
                     ),
                     problem = null
@@ -143,7 +144,8 @@ class SimuleringResultMapperTest : ShouldSpec({
                         aarstall = 2021,
                         pensjonsgivendeInntektBeloep = 10000,
                         pensjonspoeng = 1.2,
-                        pensjonsbeholdningBeloep = 333000
+                        pensjonsbeholdningBeloep = 333000,
+                        merknadListe = emptyList()
                     )
                 ),
                 problem = null

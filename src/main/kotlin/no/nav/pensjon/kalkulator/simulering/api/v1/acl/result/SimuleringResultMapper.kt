@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.simulering.api.v1.acl.result
 import no.nav.pensjon.kalkulator.afp.BeregnetAfp
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
+import no.nav.pensjon.kalkulator.opptjening.api.v1.acl.MerknadCodeV1
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.v1.acl.result.SimuleringResultAdjuster.justerAlderspensjonListe
 import no.nav.pensjon.kalkulator.simulering.api.v1.acl.result.SimuleringResultAdjuster.justerPrivatAfpListe
@@ -220,7 +221,8 @@ object SimuleringResultMapper {
             aarstall = source.aarstall,
             pensjonsgivendeInntektBeloep = source.pensjonsgivendeInntektBeloep,
             pensjonspoeng = source.pensjonspoeng,
-            pensjonsbeholdningBeloep = source.pensjonsbeholdningBeloep
+            pensjonsbeholdningBeloep = source.pensjonsbeholdningBeloep,
+            merknadListe = source.merknadListe.map(MerknadCodeV1::fromInternalValue)
         )
 
     private fun alternativ(source: Alternativ) =
