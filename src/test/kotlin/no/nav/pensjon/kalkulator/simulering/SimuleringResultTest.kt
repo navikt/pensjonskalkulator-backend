@@ -21,7 +21,8 @@ class SimuleringResultTest : ShouldSpec({
                         aarstall = 2021,
                         pensjonsgivendeInntektBeloep = 10000,
                         pensjonspoeng = 1.2,
-                        pensjonsbeholdningBeloep = 333000
+                        pensjonsbeholdningBeloep = 333000,
+                        merknadListe = emptyList()
                     )
                 ),
                 alderAar = null,
@@ -40,7 +41,8 @@ class SimuleringResultTest : ShouldSpec({
                         aarstall = 2021,
                         pensjonsgivendeInntektBeloep = 10000,
                         pensjonspoeng = 1.2,
-                        pensjonsbeholdningBeloep = 333000
+                        pensjonsbeholdningBeloep = 333000,
+                        merknadListe = emptyList()
                     )
                 ),
                 alderAar = 65,

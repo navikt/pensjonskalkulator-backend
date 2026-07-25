@@ -504,12 +504,14 @@ private fun opptjeningListe(): List<SimulertOpptjening> =
             aarstall = 2001,
             pensjonsgivendeInntektBeloep = 501000,
             pensjonspoeng = 1.2,
-            pensjonsbeholdningBeloep = 333000
+            pensjonsbeholdningBeloep = 333000,
+            merknadListe = emptyList()
         ),
         SimulertOpptjening(
             aarstall = 2002,
             pensjonsgivendeInntektBeloep = 502000,
             pensjonspoeng = 2.3,
-            pensjonsbeholdningBeloep = 444000
+            pensjonsbeholdningBeloep = 444000,
+            merknadListe = emptyList()
         )
     )

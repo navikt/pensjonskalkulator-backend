@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.simulering
 
 import no.nav.pensjon.kalkulator.afp.BeregnetAfp
+import no.nav.pensjon.kalkulator.merknad.MerknadCode
 import no.nav.pensjon.kalkulator.validity.Problem
 
 data class SimuleringResult(
@@ -20,6 +21,9 @@ data class SimuleringResult(
 ) {
     fun withAlderAar(alderAar: Int) =
         copy(alderAar = alderAar)
+
+    fun withOpptjeningListe(opptjeningListe: List<SimulertOpptjening>) =
+        copy(opptjeningListe = opptjeningListe)
 }
 
 data class AlderspensjonMaanedsbeloep(
@@ -55,5 +59,9 @@ data class SimulertOpptjening(
     val aarstall: Int,
     val pensjonsgivendeInntektBeloep: Int,
     val pensjonspoeng: Double,
-    val pensjonsbeholdningBeloep: Int
-)
+    val pensjonsbeholdningBeloep: Int,
+    val merknadListe: List<MerknadCode>
+) {
+    fun withMerknadListe(merknadListe: List<MerknadCode>) =
+        copy(merknadListe = merknadListe)
+}
