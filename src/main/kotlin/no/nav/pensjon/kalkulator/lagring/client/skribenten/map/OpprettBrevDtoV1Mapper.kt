@@ -6,7 +6,8 @@ import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.*
 
 object OpprettBrevDtoV1Mapper {
 
-    fun toDto(source: LagreSimulering, forbehold: ForbeholdInnhold?) = OpprettBrevRequestDtoV1(
+    fun toDto(source: LagreSimulering, saksId: Long, forbehold: ForbeholdInnhold?) = OpprettBrevRequestDtoV1(
+        saksId = saksId,
         brevkode = "PENSJONSKALKULATOR_AP_SIMULERING",
         spraak = "NB",
         avsenderEnhetsId = source.enhetsId,
@@ -29,8 +30,8 @@ object OpprettBrevDtoV1Mapper {
     )
 
     fun fromDto(source: BrevResponseDtoV1) = LagreSimuleringResponse(
-        brevId = source.info.id,
-        sakId = source.info.saksId,
+        brevId = source.brevId.toString(),
+        sakId = source.sakId.toString(),
     )
 
     private fun mapToAfpPrivatSimuleringDto(source: LagreAfpPrivatSimulering) =
