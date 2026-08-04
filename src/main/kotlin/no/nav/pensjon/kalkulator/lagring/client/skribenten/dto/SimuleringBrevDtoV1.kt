@@ -9,6 +9,7 @@ data class SimuleringBrevDtoV1(
     val trygdetid: TrygdetidBrevDtoV1?,
     val pensjonsgivendeInntektListe: List<AarligBeloepBrevDtoV1>?,
     val aarligInntektOgPensjonListe: List<AarligInntektOgPensjonBrevDtoV1>?,
+    val pensjonsopptjeningListe: List<PensjonsopptjeningBrevDtoV1>?,
     val forbehold: ForbeholdBrevDtoV1?,
 )
 
@@ -18,7 +19,6 @@ data class SimuleringBrevV1(
     val afpPrivat: AfpPrivatSimuleringBrevDtoV1?,
     val afpOffentligLivsvarig: AfpOffentligLivsvarigSimuleringBrevDtoV1?,
     val afpOffentligTidsbegrenset: TidsbegrensetOffentligAfpBrevDtoV1?,
-    val pensjonsopptjeningListe: List<PensjonsopptjeningBrevDtoV1>?
 )
 
 data class AfpPrivatSimuleringBrevDtoV1(
