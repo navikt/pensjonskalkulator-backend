@@ -19,13 +19,13 @@ object OpprettBrevDtoV1Mapper {
                 afpPrivat = source.afpPrivat?.let(::mapToAfpPrivatSimuleringDto),
                 afpOffentligLivsvarig = source.afpOffentligLivsvarig?.let(::mapToAfpOffentligLivsvarigSimuleringDto),
                 afpOffentligTidsbegrenset = source.afpOffentligTidsbegrenset?.let(::mapToTidsbegrensetOffentligAfpDto),
-                pensjonsopptjeningListe = source.pensjonsopptjeningListe?.map(::mapToPensjonsopptjeningDto),
             ),
             simuleringsinformasjon = source.simuleringsinformasjon?.let(::mapToSimuleringsinformasjonDto),
             vilkaarsproevingsresultat = source.vilkaarsproevingsresultat?.let(::mapToVilkaarsproevingsresultatDto),
             trygdetid = source.trygdetid?.let(::mapToTrygdetidDto),
             pensjonsgivendeInntektListe = source.pensjonsgivendeInntektListe?.map(::mapToPensjonsgivendeInntektDto),
             aarligInntektOgPensjonListe = source.aarligInntektOgPensjonListe?.map(::mapToAarligInntektOgPensjonDto),
+            pensjonsopptjeningListe = source.pensjonsopptjeningListe?.map(::mapToPensjonsopptjeningDto),
             forbehold = forbehold?.let(::mapToForbeholdDto),
         )
     )
