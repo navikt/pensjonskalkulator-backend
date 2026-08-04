@@ -23,6 +23,7 @@ object LagreSimuleringMapperV1 {
             trygdetid = source.trygdetid?.let(::trygdetid),
             pensjonsgivendeInntektListe = source.pensjonsgivendeInntektListe?.map(::aarligBeloep),
             aarligInntektOgPensjonListe = source.aarligInntektOgPensjonListe?.map(::aarligInntektOgPensjon),
+            pensjonsopptjeningListe = source.pensjonsopptjeningListe?.map(::pensjonsopptjening),
             simuleringsinformasjon = source.simuleringsinformasjon?.let(::simuleringsinformasjon),
             maanedligAlderspensjonForKnekkpunkter = source.maanedligAlderspensjonForKnekkpunkter?.let(::maanedligAlderspensjonForKnekkpunkter),
             enhetsId = source.navEnhetId ?: "4817"
@@ -106,6 +107,15 @@ object LagreSimuleringMapperV1 {
         LagreAarligBeloep(
             aarstall = source.aarstall,
             beloep = source.beloep
+        )
+
+    private fun pensjonsopptjening(source: LagrePensjonsopptjeningDto) =
+        LagrePensjonsopptjening(
+            aarstall = source.aarstall,
+            pensjonsgivendeInntekt = source.pensjonsgivendeInntekt,
+            pensjonspoeng = source.pensjonspoeng,
+            pensjonsbeholdning = source.pensjonsbeholdning,
+            merknad = source.merknad,
         )
 
     private fun aarligInntektOgPensjon(source: LagreAarligInntektOgPensjonDto) =

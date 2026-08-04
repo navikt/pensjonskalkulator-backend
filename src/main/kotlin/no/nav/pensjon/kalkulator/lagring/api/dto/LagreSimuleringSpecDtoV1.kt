@@ -15,6 +15,7 @@ data class LagreSimuleringSpecDtoV1(
     val trygdetid: LagreTrygdetidDto?,
     val pensjonsgivendeInntektListe: List<LagreAarligBeloepDto>?,
     val aarligInntektOgPensjonListe: List<LagreAarligInntektOgPensjonDto>?,
+    val pensjonsopptjeningListe: List<LagrePensjonsopptjeningDto>?,
     val simuleringsinformasjon: LagreSimuleringsinformasjonDto?,
     val maanedligAlderspensjonForKnekkpunkter: LagreMaanedligAlderspensjonForKnekkpunkterDto?,
     val navEnhetId: String?,
@@ -82,6 +83,14 @@ data class LagreTrygdetidDto(
 data class LagreAarligBeloepDto(
     @field:NotNull val aarstall: Int,
     @field:NotNull val beloep: Int
+)
+
+data class LagrePensjonsopptjeningDto(
+    @field:NotNull val aarstall: Int,
+    val pensjonsgivendeInntekt: Int?,
+    val pensjonspoeng: Double?,
+    val pensjonsbeholdning: Int?,
+    val merknad: String?,
 )
 
 data class LagreUttaksparametreDto(

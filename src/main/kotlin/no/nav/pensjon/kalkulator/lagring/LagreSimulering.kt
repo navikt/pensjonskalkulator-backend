@@ -11,6 +11,7 @@ data class LagreSimulering(
     val trygdetid: LagreTrygdetid?,
     val pensjonsgivendeInntektListe: List<LagreAarligBeloep>?,
     val aarligInntektOgPensjonListe: List<LagreAarligInntektOgPensjon>?,
+    val pensjonsopptjeningListe: List<LagrePensjonsopptjening>?,
     val simuleringsinformasjon: LagreSimuleringsinformasjon?,
     val maanedligAlderspensjonForKnekkpunkter: LagreMaanedligAlderspensjonForKnekkpunkter?,
     val enhetsId: String,
@@ -78,6 +79,14 @@ data class LagreTrygdetid(
 data class LagreAarligBeloep(
     val aarstall: Int,
     val beloep: Int
+)
+
+data class LagrePensjonsopptjening(
+    val aarstall: Int,
+    val pensjonsgivendeInntekt: Int?,
+    val pensjonspoeng: Double?,
+    val pensjonsbeholdning: Int?,
+    val merknad: String?,
 )
 
 data class LagreUttaksparametre(

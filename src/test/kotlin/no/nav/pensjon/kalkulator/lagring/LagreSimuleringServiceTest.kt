@@ -52,6 +52,7 @@ class LagreSimuleringServiceTest : ShouldSpec({
             trygdetid = null,
             pensjonsgivendeInntektListe = null,
             aarligInntektOgPensjonListe = null,
+            pensjonsopptjeningListe = null,
             simuleringsinformasjon = null,
             maanedligAlderspensjonForKnekkpunkter = null,
             enhetsId = "4817"
