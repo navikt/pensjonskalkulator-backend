@@ -19,6 +19,7 @@ object OpprettBrevDtoV1Mapper {
                 afpPrivat = source.afpPrivat?.let(::mapToAfpPrivatSimuleringDto),
                 afpOffentligLivsvarig = source.afpOffentligLivsvarig?.let(::mapToAfpOffentligLivsvarigSimuleringDto),
                 afpOffentligTidsbegrenset = source.afpOffentligTidsbegrenset?.let(::mapToTidsbegrensetOffentligAfpDto),
+                pensjonsopptjeningListe = source.pensjonsopptjeningListe?.map(::mapToPensjonsopptjeningDto),
             ),
             simuleringsinformasjon = source.simuleringsinformasjon?.let(::mapToSimuleringsinformasjonDto),
             vilkaarsproevingsresultat = source.vilkaarsproevingsresultat?.let(::mapToVilkaarsproevingsresultatDto),
@@ -91,6 +92,14 @@ object OpprettBrevDtoV1Mapper {
         alderspensjon = source.alderspensjon,
         avtalefestetPensjon = source.avtalefestetPensjon,
         pensjonsgivendeInntekt = source.pensjonsgivendeInntekt
+    )
+
+    private fun mapToPensjonsopptjeningDto(source: LagrePensjonsopptjening) = PensjonsopptjeningBrevDtoV1(
+        aarstall = source.aarstall,
+        pensjonsgivendeInntekt = source.pensjonsgivendeInntekt,
+        pensjonspoeng = source.pensjonspoeng,
+        pensjonsbeholdning = source.pensjonsbeholdning,
+        merknad = source.merknad,
     )
 
     private fun mapToTrygdetidDto(source: LagreTrygdetid) = TrygdetidBrevDtoV1(

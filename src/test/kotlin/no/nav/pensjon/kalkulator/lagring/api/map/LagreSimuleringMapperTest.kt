@@ -57,6 +57,15 @@ class LagreSimuleringMapperTest : ShouldSpec({
                     LagreAarligBeloepDto(aarstall = 2024, beloep = 600000)
                 ),
                 aarligInntektOgPensjonListe = null,
+                pensjonsopptjeningListe = listOf(
+                    LagrePensjonsopptjeningDto(
+                        aarstall = 2024,
+                        pensjonsgivendeInntekt = 600000,
+                        pensjonspoeng = 5.2,
+                        pensjonsbeholdning = 1000000,
+                        merknad = "Omsorgspoeng",
+                    )
+                ),
                 simuleringsinformasjon = LagreSimuleringsinformasjonDto(
                     gradertUttakInformasjon = null,
                     heltUttakInformasjon = LagreUttaksinformasjonDto(
@@ -107,6 +116,15 @@ class LagreSimuleringMapperTest : ShouldSpec({
                 LagreAarligBeloep(aarstall = 2024, beloep = 600000)
             ),
             aarligInntektOgPensjonListe = null,
+            pensjonsopptjeningListe = listOf(
+                LagrePensjonsopptjening(
+                    aarstall = 2024,
+                    pensjonsgivendeInntekt = 600000,
+                    pensjonspoeng = 5.2,
+                    pensjonsbeholdning = 1000000,
+                    merknad = "Omsorgspoeng",
+                )
+            ),
             simuleringsinformasjon = LagreSimuleringsinformasjon(
                 gradertUttakInformasjon = null,
                 heltUttakInformasjon = LagreUttaksinformasjon(
@@ -139,6 +157,7 @@ class LagreSimuleringMapperTest : ShouldSpec({
                 trygdetid = null,
                 pensjonsgivendeInntektListe = null,
                 aarligInntektOgPensjonListe = null,
+                pensjonsopptjeningListe = null,
                 simuleringsinformasjon = null,
                 maanedligAlderspensjonForKnekkpunkter = null,
                 navEnhetId = null
@@ -155,6 +174,7 @@ class LagreSimuleringMapperTest : ShouldSpec({
             trygdetid = null,
             pensjonsgivendeInntektListe = null,
             aarligInntektOgPensjonListe = null,
+            pensjonsopptjeningListe = null,
             simuleringsinformasjon = null,
             maanedligAlderspensjonForKnekkpunkter = null,
             enhetsId = "4817"

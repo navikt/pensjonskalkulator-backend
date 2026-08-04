@@ -109,6 +109,15 @@ class LagreSimuleringControllerTest : ShouldSpec() {
             "alderspensjonListe": [
                 { "alderAar": 67, "beloep": 250000 }
             ],
+            "pensjonsopptjeningListe": [
+                {
+                    "aarstall": 2024,
+                    "pensjonsgivendeInntekt": 600000,
+                    "pensjonspoeng": 5.2,
+                    "pensjonsbeholdning": 1000000,
+                    "merknad": "Omsorgspoeng"
+                }
+            ],
             "vilkaarsproevingsresultat": {
                 "erInnvilget": true
             }

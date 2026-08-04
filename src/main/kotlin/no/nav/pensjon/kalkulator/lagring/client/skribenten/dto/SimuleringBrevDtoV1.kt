@@ -18,6 +18,7 @@ data class SimuleringBrevV1(
     val afpPrivat: AfpPrivatSimuleringBrevDtoV1?,
     val afpOffentligLivsvarig: AfpOffentligLivsvarigSimuleringBrevDtoV1?,
     val afpOffentligTidsbegrenset: TidsbegrensetOffentligAfpBrevDtoV1?,
+    val pensjonsopptjeningListe: List<PensjonsopptjeningBrevDtoV1>?
 )
 
 data class AfpPrivatSimuleringBrevDtoV1(
@@ -82,6 +83,14 @@ data class TrygdetidBrevDtoV1(
 data class AarligBeloepBrevDtoV1(
     val aarstall: Int,
     val beloep: Int
+)
+
+data class PensjonsopptjeningBrevDtoV1(
+    val aarstall: Int,
+    val pensjonsgivendeInntekt: Int?,
+    val pensjonspoeng: Double?,
+    val pensjonsbeholdning: Int?,
+    val merknad: String?,
 )
 
 data class AlternativUttaksparametreBrevDtoV1(

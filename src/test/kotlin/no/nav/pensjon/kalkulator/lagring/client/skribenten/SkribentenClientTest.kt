@@ -3,8 +3,10 @@ package no.nav.pensjon.kalkulator.lagring.client.skribenten
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.lagring.LagreAlderspensjon
+import no.nav.pensjon.kalkulator.lagring.LagrePensjonsopptjening
 import no.nav.pensjon.kalkulator.lagring.LagreSimulering
 import no.nav.pensjon.kalkulator.lagring.LagreVilkaarsproevingsresultat
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
@@ -49,8 +51,8 @@ class SkribentenClientTest : ShouldSpec({
         Arrange.webClientContextRunner().run {
             val response = client(it).lagreSimulering(SAK_ID, simulering(), null)
 
-            response.brevId shouldBe "brev-123"
-            response.sakId shouldBe "sak-456"
+            response.brevId shouldBe "123"
+            response.sakId shouldBe "456"
         }
     }
 
@@ -60,7 +62,10 @@ class SkribentenClientTest : ShouldSpec({
         Arrange.webClientContextRunner().run {
             client(it).lagreSimulering(SAK_ID, simulering(), null)
 
-            server?.takeRequest()?.path shouldBe "/sak/$SAK_ID/brev"
+            server?.takeRequest()?.let { request ->
+                request.path shouldBe "/external/api/v1/brev"
+                request.body.readUtf8() shouldContain "\"pensjonsopptjeningListe\":[{\"aarstall\":2024,\"pensjonsgivendeInntekt\":600000,\"pensjonspoeng\":5.2,\"pensjonsbeholdning\":1000000,\"merknad\":\"Omsorgspoeng\"}]"
+            }
         }
     }
 
@@ -95,10 +100,8 @@ class SkribentenClientTest : ShouldSpec({
 
         @Language("json")
         private val BREV_RESPONSE = """{
-            "info": {
-                "id": "brev-123",
-                "saksId": "sak-456"
-            }
+            "brevId": 123,
+            "sakId": 456
         }"""
 
         @Language("json")
@@ -122,6 +125,15 @@ class SkribentenClientTest : ShouldSpec({
             trygdetid = null,
             pensjonsgivendeInntektListe = emptyList(),
             aarligInntektOgPensjonListe = null,
+            pensjonsopptjeningListe = listOf(
+                LagrePensjonsopptjening(
+                    aarstall = 2024,
+                    pensjonsgivendeInntekt = 600000,
+                    pensjonspoeng = 5.2,
+                    pensjonsbeholdning = 1000000,
+                    merknad = "Omsorgspoeng",
+                )
+            ),
             simuleringsinformasjon = null,
             maanedligAlderspensjonForKnekkpunkter = null,
             enhetsId = "4817"
