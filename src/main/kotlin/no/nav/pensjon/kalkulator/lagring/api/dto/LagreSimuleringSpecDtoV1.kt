@@ -117,7 +117,8 @@ data class LagreSimuleringsinformasjonDto(
 
 data class LagreUttaksinformasjonDto(
     @field:NotNull val alder: LagreAlderDto,
-    @field:NotNull val uttaksdato: String
+    @field:NotNull val uttaksdato: String,
+    @field:NotNull val grad: Int
 )
 
 data class LagreUtenlandsperiodeDto(

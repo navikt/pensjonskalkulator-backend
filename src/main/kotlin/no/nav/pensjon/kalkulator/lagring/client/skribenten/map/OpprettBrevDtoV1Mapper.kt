@@ -138,7 +138,8 @@ object OpprettBrevDtoV1Mapper {
     private fun mapToUttaksinformasjonDto(source: LagreUttaksinformasjon) =
         UttaksinformasjonBrevDtoV1(
             alder = mapToAlderDto(source.alder),
-            uttaksdato = source.uttaksdato
+            uttaksdato = source.uttaksdato,
+            grad = source.grad
         )
 
     private fun mapToUtenlandsperiodeDto(source: LagreUtenlandsperiode) =

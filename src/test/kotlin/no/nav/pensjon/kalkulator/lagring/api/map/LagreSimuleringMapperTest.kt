@@ -70,7 +70,8 @@ class LagreSimuleringMapperTest : ShouldSpec({
                     gradertUttakInformasjon = null,
                     heltUttakInformasjon = LagreUttaksinformasjonDto(
                         alder = LagreAlderDto(aar = 67, maaneder = 0),
-                        uttaksdato = "2030-01-01"
+                        uttaksdato = "2030-01-01",
+                        grad = 100
                     ),
                     normertUttakInformasjon = null,
                     sivilstatus = null,
@@ -129,7 +130,8 @@ class LagreSimuleringMapperTest : ShouldSpec({
                 gradertUttakInformasjon = null,
                 heltUttakInformasjon = LagreUttaksinformasjon(
                     alder = LagreAlder(aar = 67, maaneder = 0),
-                    uttaksdato = "2030-01-01"
+                    uttaksdato = "2030-01-01",
+                    grad = 100
                 ),
                 normertUttakInformasjon = null,
                 sivilstatus = null,
