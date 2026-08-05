@@ -106,7 +106,8 @@ data class AlderBrevDtoV1(
 
 data class UttaksinformasjonBrevDtoV1(
     val alder: AlderBrevDtoV1,
-    val uttaksdato: String
+    val uttaksdato: String,
+    val grad: Int
 )
 
 data class SimuleringsinformasjonBrevDtoV1(

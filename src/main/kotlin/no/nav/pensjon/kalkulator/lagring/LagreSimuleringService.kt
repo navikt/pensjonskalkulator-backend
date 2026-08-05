@@ -14,7 +14,6 @@ class LagreSimuleringService(
 ) {
     fun lagreSimulering(simulering: LagreSimulering): LagreSimuleringResponse {
         val sakstype = if (simulering.afpOffentligLivsvarig != null || simulering.afpOffentligTidsbegrenset != null) SakType.AVTALEFESTET_PENSJON_I_OFFENTLIG_SEKTOR
-        else if (simulering.afpPrivat != null) SakType.AVTALEFESTET_PENSJON_I_PRIVAT_SEKTOR
         else SakType.ALDERSPENSJON
 
         val sakId = sakService.hentEllerOpprettSak(sakstype)

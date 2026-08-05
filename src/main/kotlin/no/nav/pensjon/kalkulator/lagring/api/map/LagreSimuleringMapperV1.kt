@@ -147,7 +147,8 @@ object LagreSimuleringMapperV1 {
     private fun uttaksinformasjon(source: LagreUttaksinformasjonDto) =
         LagreUttaksinformasjon(
             alder = alder(source.alder),
-            uttaksdato = source.uttaksdato
+            uttaksdato = source.uttaksdato,
+            grad = source.grad
         )
 
     private fun utenlandsperiode(source: LagreUtenlandsperiodeDto) =

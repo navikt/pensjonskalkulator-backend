@@ -113,7 +113,8 @@ data class LagreSimuleringsinformasjon(
 
 data class LagreUttaksinformasjon(
     val alder: LagreAlder,
-    val uttaksdato: String
+    val uttaksdato: String,
+    val grad: Int
 )
 
 data class LagreUtenlandsperiode(
