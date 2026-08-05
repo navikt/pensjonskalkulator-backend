@@ -6,7 +6,8 @@ import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.*
 
 object OpprettBrevDtoV1Mapper {
 
-    fun toDto(source: LagreSimulering, forbehold: ForbeholdInnhold?) = OpprettBrevRequestDtoV1(
+    fun toDto(source: LagreSimulering, saksId: Long, forbehold: ForbeholdInnhold?) = OpprettBrevRequestDtoV1(
+        saksId = saksId,
         brevkode = "PENSJONSKALKULATOR_AP_SIMULERING",
         spraak = "NB",
         avsenderEnhetsId = source.enhetsId,
@@ -23,13 +24,15 @@ object OpprettBrevDtoV1Mapper {
             vilkaarsproevingsresultat = source.vilkaarsproevingsresultat?.let(::mapToVilkaarsproevingsresultatDto),
             trygdetid = source.trygdetid?.let(::mapToTrygdetidDto),
             pensjonsgivendeInntektListe = source.pensjonsgivendeInntektListe?.map(::mapToPensjonsgivendeInntektDto),
+            aarligInntektOgPensjonListe = source.aarligInntektOgPensjonListe?.map(::mapToAarligInntektOgPensjonDto),
+            pensjonsopptjeningListe = source.pensjonsopptjeningListe?.map(::mapToPensjonsopptjeningDto),
             forbehold = forbehold?.let(::mapToForbeholdDto),
         )
     )
 
     fun fromDto(source: BrevResponseDtoV1) = LagreSimuleringResponse(
-        brevId = source.info.id,
-        sakId = source.info.saksId,
+        brevId = source.brevId.toString(),
+        sakId = source.sakId.toString(),
     )
 
     private fun mapToAfpPrivatSimuleringDto(source: LagreAfpPrivatSimulering) =
@@ -84,6 +87,21 @@ object OpprettBrevDtoV1Mapper {
         beloep = source.beloep
     )
 
+    private fun mapToAarligInntektOgPensjonDto(source: LagreAarligInntektOgPensjon) = AarligInntektOgPensjonBrevDtoV1(
+        alderLabel = source.alderLabel,
+        alderspensjon = source.alderspensjon,
+        avtalefestetPensjon = source.avtalefestetPensjon,
+        pensjonsgivendeInntekt = source.pensjonsgivendeInntekt
+    )
+
+    private fun mapToPensjonsopptjeningDto(source: LagrePensjonsopptjening) = PensjonsopptjeningBrevDtoV1(
+        aarstall = source.aarstall,
+        pensjonsgivendeInntekt = source.pensjonsgivendeInntekt,
+        pensjonspoeng = source.pensjonspoeng,
+        pensjonsbeholdning = source.pensjonsbeholdning,
+        merknad = source.merknad,
+    )
+
     private fun mapToTrygdetidDto(source: LagreTrygdetid) = TrygdetidBrevDtoV1(
         antallAar = source.antallAar,
         erUtilstrekkelig = source.erUtilstrekkelig
@@ -108,12 +126,20 @@ object OpprettBrevDtoV1Mapper {
 
     private fun mapToSimuleringsinformasjonDto(source: LagreSimuleringsinformasjon) =
         SimuleringsinformasjonBrevDtoV1(
-            gradertUttaksalder = source.gradertUttaksalder?.let(::mapToAlderDto),
-            heltUttaksalder = mapToAlderDto(source.heltUttaksalder),
+            gradertUttakInformasjon = source.gradertUttakInformasjon?.let(::mapToUttaksinformasjonDto),
+            heltUttakInformasjon = mapToUttaksinformasjonDto(source.heltUttakInformasjon),
+            normertUttakInformasjon = source.normertUttakInformasjon?.let(::mapToUttaksinformasjonDto),
             sivilstatus = source.sivilstatus,
             utenlandsperioder = source.utenlandsperioder?.map(::mapToUtenlandsperiodeDto),
             kull = source.kull.name,
             normertPensjonsalderPlassering = source.normertPensjonsalderPlassering?.name
+        )
+
+    private fun mapToUttaksinformasjonDto(source: LagreUttaksinformasjon) =
+        UttaksinformasjonBrevDtoV1(
+            alder = mapToAlderDto(source.alder),
+            uttaksdato = source.uttaksdato,
+            grad = source.grad
         )
 
     private fun mapToUtenlandsperiodeDto(source: LagreUtenlandsperiode) =

@@ -35,7 +35,7 @@ class SkribentenClient(
     private val log = KotlinLogging.logger {}
 
     override fun lagreSimulering(sakId: Long, lagreSimulering: LagreSimulering, forbehold: ForbeholdInnhold?): LagreSimuleringResponse {
-        val uri = "/sak/$sakId/brev"
+        val uri = "/external/api/v1/brev"
         log.debug { "POST to URI: '$uri'" }
 
         try {
@@ -43,7 +43,7 @@ class SkribentenClient(
                 .post()
                 .uri(uri)
                 .headers(::setHeaders)
-                .bodyValue(toDto(lagreSimulering, forbehold))
+                .bodyValue(toDto(lagreSimulering, sakId, forbehold))
                 .retrieve()
                 .bodyToMono<BrevResponseDtoV1>()
                 .retryWhen(retryBackoffSpec(uri))

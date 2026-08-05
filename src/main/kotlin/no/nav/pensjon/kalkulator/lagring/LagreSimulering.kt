@@ -10,6 +10,8 @@ data class LagreSimulering(
     val vilkaarsproevingsresultat: LagreVilkaarsproevingsresultat?,
     val trygdetid: LagreTrygdetid?,
     val pensjonsgivendeInntektListe: List<LagreAarligBeloep>?,
+    val aarligInntektOgPensjonListe: List<LagreAarligInntektOgPensjon>?,
+    val pensjonsopptjeningListe: List<LagrePensjonsopptjening>?,
     val simuleringsinformasjon: LagreSimuleringsinformasjon?,
     val maanedligAlderspensjonForKnekkpunkter: LagreMaanedligAlderspensjonForKnekkpunkter?,
     val enhetsId: String,
@@ -79,6 +81,14 @@ data class LagreAarligBeloep(
     val beloep: Int
 )
 
+data class LagrePensjonsopptjening(
+    val aarstall: Int,
+    val pensjonsgivendeInntekt: Int?,
+    val pensjonspoeng: Double?,
+    val pensjonsbeholdning: Int?,
+    val merknad: String?,
+)
+
 data class LagreUttaksparametre(
     val gradertUttakAlder: LagreAlder?,
     val uttaksgrad: Int?,
@@ -91,12 +101,20 @@ data class LagreAlder(
 )
 
 data class LagreSimuleringsinformasjon(
-    val gradertUttaksalder: LagreAlder?,
-    val heltUttaksalder: LagreAlder,
+    val gradertUttakInformasjon: LagreUttaksinformasjon?,
+    val heltUttakInformasjon: LagreUttaksinformasjon,
+    val normertUttakInformasjon: LagreUttaksinformasjon?,
     val sivilstatus: String?,
     val utenlandsperioder: List<LagreUtenlandsperiode>?,
     val kull: Kull,
-    val normertPensjonsalderPlassering: NormertPensjonsalderPlassering?
+    val normertPensjonsalderPlassering: NormertPensjonsalderPlassering?,
+    val sanityVisningsvilkaar: List<SanityVisningsvilkaar>
+)
+
+data class LagreUttaksinformasjon(
+    val alder: LagreAlder,
+    val uttaksdato: String,
+    val grad: Int
 )
 
 data class LagreUtenlandsperiode(
@@ -140,4 +158,11 @@ data class LagreMaanedligAlderspensjon(
     val garantipensjonSats: Double?,
     val garantitilleggBeloep: Int?,
     val grunnbeloep: Int?
+)
+
+data class LagreAarligInntektOgPensjon(
+    val alderLabel: String,
+    val alderspensjon: Int,
+    val avtalefestetPensjon: Int,
+    val pensjonsgivendeInntekt: Int,
 )

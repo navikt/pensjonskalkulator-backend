@@ -8,6 +8,8 @@ data class SimuleringBrevDtoV1(
     val vilkaarsproevingsresultat: VilkaarsproevingsresultatBrevDtoV1?,
     val trygdetid: TrygdetidBrevDtoV1?,
     val pensjonsgivendeInntektListe: List<AarligBeloepBrevDtoV1>?,
+    val aarligInntektOgPensjonListe: List<AarligInntektOgPensjonBrevDtoV1>?,
+    val pensjonsopptjeningListe: List<PensjonsopptjeningBrevDtoV1>?,
     val forbehold: ForbeholdBrevDtoV1?,
 )
 
@@ -83,6 +85,14 @@ data class AarligBeloepBrevDtoV1(
     val beloep: Int
 )
 
+data class PensjonsopptjeningBrevDtoV1(
+    val aarstall: Int,
+    val pensjonsgivendeInntekt: Int?,
+    val pensjonspoeng: Double?,
+    val pensjonsbeholdning: Int?,
+    val merknad: String?,
+)
+
 data class AlternativUttaksparametreBrevDtoV1(
     val gradertUttakAlder: AlderBrevDtoV1?,
     val uttaksgrad: Int?,
@@ -94,9 +104,16 @@ data class AlderBrevDtoV1(
     val maaneder: Int
 )
 
+data class UttaksinformasjonBrevDtoV1(
+    val alder: AlderBrevDtoV1,
+    val uttaksdato: String,
+    val grad: Int
+)
+
 data class SimuleringsinformasjonBrevDtoV1(
-    val gradertUttaksalder: AlderBrevDtoV1?,
-    val heltUttaksalder: AlderBrevDtoV1,
+    val gradertUttakInformasjon: UttaksinformasjonBrevDtoV1?,
+    val heltUttakInformasjon: UttaksinformasjonBrevDtoV1,
+    val normertUttakInformasjon: UttaksinformasjonBrevDtoV1?,
     val sivilstatus: String?,
     val utenlandsperioder: List<UtenlandsperiodeBrevDtoV1>?,
     val kull: String,
@@ -144,6 +161,13 @@ data class MaanedligAlderspensjonBrevDtoV1(
     val garantipensjonSats: Double?,
     val garantitilleggBeloep: Int?,
     val grunnbeloep: Int?
+)
+
+data class AarligInntektOgPensjonBrevDtoV1(
+    val alderLabel: String,
+    val alderspensjon: Int,
+    val avtalefestetPensjon: Int,
+    val pensjonsgivendeInntekt: Int,
 )
 
 data class ForbeholdBrevDtoV1(
