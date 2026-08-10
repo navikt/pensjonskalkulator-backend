@@ -16,7 +16,7 @@ data class SimuleringBrevDtoV1(
 data class ServiceberegningBrevDtoV1(
     val uttaksalder: AlderBrevDtoV1,
     val uttaksdato: String,
-    val forventetFremtidigInntekt: Int,
+    val forventetFremtidigInntekt: Int?,
     val afp: TidsbegrensetOffentligAfpBrevDtoV1,
 ) : SaksbehandlerValgBrevdata
 

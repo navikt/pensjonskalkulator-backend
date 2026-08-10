@@ -61,7 +61,7 @@ data class LagreTidsbegrensetOffentligAfp(
 data class LagreServiceberegning(
     val uttaksalder: LagreAlder,
     val uttaksdato: String,
-    val forventetFremtidigInntekt: Int,
+    val forventetFremtidigInntekt: Int?,
     val afp: LagreTidsbegrensetOffentligAfp?,
 )
 
