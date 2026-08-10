@@ -80,7 +80,7 @@ class SkribentenClientTest : ShouldSpec({
 
             server?.takeRequest()?.let { request ->
                 val body = request.body.readUtf8()
-                body shouldContain "\"brevkode\":\"SERVICEBEREGNING\""
+                body shouldContain "\"brevkode\":\"SERVICEBEREGNING_SIMULERINGSBREV\""
                 body shouldContain "\"uttaksalder\":{\"aar\":62,\"maaneder\":0}"
                 body shouldContain "\"forventetFremtidigInntekt\":500000"
                 body shouldContain "\"afp\":{\"alderAar\":62"
