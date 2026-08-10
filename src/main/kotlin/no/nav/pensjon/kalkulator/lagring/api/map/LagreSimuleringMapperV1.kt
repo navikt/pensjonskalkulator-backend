@@ -26,7 +26,8 @@ object LagreSimuleringMapperV1 {
             pensjonsopptjeningListe = source.pensjonsopptjeningListe?.map(::pensjonsopptjening),
             simuleringsinformasjon = source.simuleringsinformasjon?.let(::simuleringsinformasjon),
             maanedligAlderspensjonForKnekkpunkter = source.maanedligAlderspensjonForKnekkpunkter?.let(::maanedligAlderspensjonForKnekkpunkter),
-            enhetsId = source.navEnhetId ?: "4817"
+            enhetsId = source.navEnhetId ?: "4817",
+            serviceberegning = source.serviceberegning?.let(::serviceberegning),
         )
 
     private fun alderspensjon(source: LagreAlderspensjonDto) =
@@ -72,6 +73,14 @@ object LagreSimuleringMapperV1 {
             saertillegg = source.saertillegg,
             afpGrad = source.afpGrad,
             erAvkortet = source.erAvkortet
+        )
+
+    private fun serviceberegning(source: LagreServiceberegningDto) =
+        LagreServiceberegning(
+            uttaksalder = alder(source.uttaksalder),
+            uttaksdato = source.uttaksdato,
+            forventetFremtidigInntekt = source.forventetFremtidigInntekt,
+            afp = source.afp?.let(::tidsbegrensetOffentligAfp),
         )
 
     private fun afpPrivat(source: LagrePrivatAfpDto) =
