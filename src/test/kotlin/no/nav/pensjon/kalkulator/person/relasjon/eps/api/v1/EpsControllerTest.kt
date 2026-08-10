@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.mockk.every
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.person.relasjon.Familierelasjon
 import no.nav.pensjon.kalkulator.person.relasjon.Relasjonstype
 import no.nav.pensjon.kalkulator.person.relasjon.eps.EpsService
@@ -52,7 +53,47 @@ class EpsControllerTest : ShouldSpec() {
 
         context("suksess") {
             should("gi familierelasjon") {
-                every { service.nyligsteRelasjon(any()) } returns Familierelasjon(
+                every { service.nyligsteRelasjon(Sivilstatus.GIFT) } returns Familierelasjon(
+                    pid,
+                    fom = LocalDate.of(2021, 1, 1),
+                    relasjonstype = Relasjonstype.EKTEFELLE,
+                    relasjonPersondata = null
+                )
+
+                mvc.perform(
+                    post(URL)
+                        .with(csrf())
+                        .content(GIFT_REQUEST_BODY)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                    .andExpect(status().isOk())
+                    .andExpect(content().json(EKTEFELLE_RESPONSE_BODY))
+            }
+        }
+
+        context("både sivilstand og sivilstatus angitt") {
+            should("ignorere sivilstatus") {
+                every { service.nyligsteRelasjon(Sivilstatus.ENKE_ELLER_ENKEMANN) } returns Familierelasjon(
+                    pid,
+                    fom = LocalDate.of(2021, 1, 1),
+                    relasjonstype = Relasjonstype.AVDOED_EKTEFELLE,
+                    relasjonPersondata = null
+                )
+
+                mvc.perform(
+                    post(URL)
+                        .with(csrf())
+                        .content(ENKE_SAMBOER_REQUEST_BODY)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                    .andExpect(status().isOk())
+                    .andExpect(content().json(AVDOED_EKTEFELLE_RESPONSE_BODY))
+            }
+        }
+
+        context("sivilstand ikke angitt") {
+            should("bruke sivilstatus") {
+                every { service.nyligsteRelasjon(Sivilstatus.SAMBOER) } returns Familierelasjon(
                     pid,
                     fom = LocalDate.of(2021, 1, 1),
                     relasjonstype = Relasjonstype.SAMBOER,
@@ -62,11 +103,11 @@ class EpsControllerTest : ShouldSpec() {
                 mvc.perform(
                     post(URL)
                         .with(csrf())
-                        .content(REQUEST_BODY)
+                        .content(SAMBOER_REQUEST_BODY)
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                     .andExpect(status().isOk())
-                    .andExpect(content().json(OK_RESPONSE_BODY))
+                    .andExpect(content().json(SAMBOER_RESPONSE_BODY))
             }
         }
 
@@ -79,7 +120,7 @@ class EpsControllerTest : ShouldSpec() {
                 mvc.perform(
                     post(URL)
                         .with(csrf())
-                        .content(REQUEST_BODY)
+                        .content(GIFT_REQUEST_BODY)
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                     .andExpect(status().isForbidden())
@@ -92,16 +133,43 @@ class EpsControllerTest : ShouldSpec() {
         private const val URL = "/api/intern/v1/eps"
 
         @Language("json")
-        private const val REQUEST_BODY = """{
+        private const val GIFT_REQUEST_BODY = """{
+            "sivilstand": "GIFT",
+            "bakgrunn": "abc"
+        }"""
+
+        @Language("json")
+        private const val SAMBOER_REQUEST_BODY = """{
             "sivilstatus": "SAMBOER",
             "bakgrunn": "abc"
         }"""
 
         @Language("json")
-        private const val OK_RESPONSE_BODY = """{
+        private const val ENKE_SAMBOER_REQUEST_BODY = """{
+            "sivilstand": "ENKE_ELLER_ENKEMANN",
+            "sivilstatus": "SAMBOER",
+            "bakgrunn": "abc"
+        }"""
+
+        @Language("json")
+        private const val EKTEFELLE_RESPONSE_BODY = """{
+            "pid": "12906498357",
+            "fom": "2021-01-01",
+            "relasjonstype": "EKTEFELLE"
+        }"""
+
+        @Language("json")
+        private const val SAMBOER_RESPONSE_BODY = """{
             "pid": "12906498357",
             "fom": "2021-01-01",
             "relasjonstype": "SAMBOER"
+        }"""
+
+        @Language("json")
+        private const val AVDOED_EKTEFELLE_RESPONSE_BODY = """{
+            "pid": "12906498357",
+            "fom": "2021-01-01",
+            "relasjonstype": "AVDOED_EKTEFELLE"
         }"""
 
         @Language("json")

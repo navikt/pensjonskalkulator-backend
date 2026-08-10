@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.common.api.acl.CommonV1Sivilstatus
 import no.nav.pensjon.kalkulator.person.Pid
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.person.relasjon.eps.EpsService
 import no.nav.pensjon.kalkulator.person.relasjon.eps.api.v1.acl.*
 import no.nav.pensjon.kalkulator.person.relasjon.eps.api.v1.acl.FamilierelasjonMapper.toDto
@@ -79,7 +80,7 @@ class EpsController(
         traceAid.begin()
 
         return try {
-            val relasjon = service.nyligsteRelasjon(sivilstatus = spec.sivilstatus.internalValue)
+            val relasjon = service.nyligsteRelasjon(sivilstatus = sivilstatus(spec))
             relasjon.pid?.let { audit(pid = it, bakgrunn = spec.bakgrunn) }
             ResponseEntity.status(HttpStatus.OK).body(toDto(source = relasjon))
         } catch (e: AccessDeniedException) {
@@ -103,6 +104,9 @@ class EpsController(
 
     private companion object {
         private const val ERROR_MESSAGE = "eps-feil"
+
+        private fun sivilstatus(spec: EpsV1EpsSpec): Sivilstatus =
+            spec.sivilstand?.internalValue?.sivilstatus ?: spec.sivilstatus!!.internalValue
 
         private fun tilgangNektet(e: AccessDeniedException) =
             EpsV1Familierelasjon(

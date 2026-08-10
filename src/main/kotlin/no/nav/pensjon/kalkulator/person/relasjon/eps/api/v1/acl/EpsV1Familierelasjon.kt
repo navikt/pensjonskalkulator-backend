@@ -51,7 +51,20 @@ enum class EpsV1ProblemType {
 enum class EpsV1Relasjonstype(val internalValue: Relasjonstype) {
     EKTEFELLE(internalValue = Relasjonstype.EKTEFELLE),
     REGISTRERT_PARTNER(internalValue = Relasjonstype.REGISTRERT_PARTNER),
+    FRASKILT_EKTEFELLE(internalValue = Relasjonstype.FRASKILT_EKTEFELLE),
+    FRASKILT_PARTNER(internalValue = Relasjonstype.FRASKILT_PARTNER),
+    FRASEPARERT_EKTEFELLE(internalValue = Relasjonstype.FRASEPARERT_EKTEFELLE),
+    FRASEPARERT_PARTNER(internalValue = Relasjonstype.FRASEPARERT_PARTNER),
+    AVDOED_EKTEFELLE(internalValue = Relasjonstype.AVDOED_EKTEFELLE),
+    AVDOED_PARTNER(internalValue = Relasjonstype.AVDOED_PARTNER),
     SAMBOER(internalValue = Relasjonstype.SAMBOER),
+    BARN(internalValue = Relasjonstype.BARN),
+    FAR(internalValue = Relasjonstype.FAR),
+    MEDMOR(internalValue = Relasjonstype.MEDMOR),
+    MOR(internalValue = Relasjonstype.MOR),
+    HELSOESKEN(internalValue = Relasjonstype.HELSOESKEN),
+    HALVSOESKEN_FELLES_MOR(internalValue = Relasjonstype.HALVSOESKEN_FELLES_MOR),
+    HALVSOESKEN_FELLES_FAR_MEDMOR(internalValue = Relasjonstype.HALVSOESKEN_FELLES_FAR_MEDMOR),
     UKJENT(internalValue = Relasjonstype.UKJENT);
 
     companion object {
