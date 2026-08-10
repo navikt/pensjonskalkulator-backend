@@ -65,7 +65,7 @@ data class LagreTidsbegrensetOffentligAfpDto(
 data class LagreServiceberegningDto(
     @field:NotNull val uttaksalder: LagreAlderDto,
     @field:NotNull val uttaksdato: String,
-    @field:NotNull val forventetFremtidigInntekt: Int,
+    @field:NotNull val forventetFremtidigInntekt: Int?,
     val afp: LagreTidsbegrensetOffentligAfpDto?,
 )
 
