@@ -45,7 +45,8 @@ data class EpsV1Problem(
 )
 
 enum class EpsV1ProblemType {
-    TILGANG_NEKTET
+    TILGANG_NEKTET,
+    MANGELFULL_SPESIFIKASJON
 }
 
 enum class EpsV1Relasjonstype(val internalValue: Relasjonstype) {

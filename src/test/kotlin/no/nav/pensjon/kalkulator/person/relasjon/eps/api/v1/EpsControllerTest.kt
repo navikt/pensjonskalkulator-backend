@@ -111,6 +111,26 @@ class EpsControllerTest : ShouldSpec() {
             }
         }
 
+        context("verken sivilstand eller sivilstatus angitt") {
+            should("gi statuskode 'Bad Request' og problembeskrivelse") {
+                every { service.nyligsteRelasjon(any()) } returns Familierelasjon(
+                    pid,
+                    fom = LocalDate.of(2021, 1, 1),
+                    relasjonstype = Relasjonstype.SAMBOER,
+                    relasjonPersondata = null
+                )
+
+                mvc.perform(
+                    post(URL)
+                        .with(csrf())
+                        .content(MANGELFULL_REQUEST_BODY)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().json(MANGELFULL_SPESIFIKASJON_RESPONSE_BODY))
+            }
+        }
+
         context("tilgang nektet") {
             should("gi statuskode 'Forbidden' og problembeskrivelse") {
                 every {
@@ -124,7 +144,7 @@ class EpsControllerTest : ShouldSpec() {
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                     .andExpect(status().isForbidden())
-                    .andExpect(content().json(PROBLEM_RESPONSE_BODY))
+                    .andExpect(content().json(TILGANG_NEKTET_RESPONSE_BODY))
             }
         }
     }
@@ -152,6 +172,11 @@ class EpsControllerTest : ShouldSpec() {
         }"""
 
         @Language("json")
+        private const val MANGELFULL_REQUEST_BODY = """{
+            "bakgrunn": "abc"
+        }"""
+
+        @Language("json")
         private const val EKTEFELLE_RESPONSE_BODY = """{
             "pid": "12906498357",
             "fom": "2021-01-01",
@@ -173,11 +198,20 @@ class EpsControllerTest : ShouldSpec() {
         }"""
 
         @Language("json")
-        private const val PROBLEM_RESPONSE_BODY = """{
+        private const val TILGANG_NEKTET_RESPONSE_BODY = """{
             "relasjonstype": "UKJENT",
             "problem": {
               "type": "TILGANG_NEKTET",
               "beskrivelse": "Tilgang til EPS nektet: Egen ansatt"
+            }
+        }"""
+
+        @Language("json")
+        private const val MANGELFULL_SPESIFIKASJON_RESPONSE_BODY = """{
+            "relasjonstype": "UKJENT",
+            "problem": {
+              "type": "MANGELFULL_SPESIFIKASJON",
+              "beskrivelse": "sivilstand eller sivilstatus ikke angitt"
             }
         }"""
     }
