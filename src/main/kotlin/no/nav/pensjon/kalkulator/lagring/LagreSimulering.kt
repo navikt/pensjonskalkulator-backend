@@ -15,6 +15,7 @@ data class LagreSimulering(
     val simuleringsinformasjon: LagreSimuleringsinformasjon?,
     val maanedligAlderspensjonForKnekkpunkter: LagreMaanedligAlderspensjonForKnekkpunkter?,
     val enhetsId: String,
+    val serviceberegning: LagreServiceberegning? = null,
 )
 
 data class LagreAlderspensjon(
@@ -55,6 +56,13 @@ data class LagreTidsbegrensetOffentligAfp(
     val saertillegg: Int,
     val afpGrad: Int,
     val erAvkortet: Boolean
+)
+
+data class LagreServiceberegning(
+    val uttaksalder: LagreAlder,
+    val uttaksdato: String,
+    val forventetFremtidigInntekt: Int,
+    val afp: LagreTidsbegrensetOffentligAfp?,
 )
 
 data class LagreAfpPrivat(

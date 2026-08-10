@@ -19,6 +19,7 @@ data class LagreSimuleringSpecDtoV1(
     val simuleringsinformasjon: LagreSimuleringsinformasjonDto?,
     val maanedligAlderspensjonForKnekkpunkter: LagreMaanedligAlderspensjonForKnekkpunkterDto?,
     val navEnhetId: String?,
+    val serviceberegning: LagreServiceberegningDto? = null,
 )
 
 data class LagreAlderspensjonDto(
@@ -59,6 +60,13 @@ data class LagreTidsbegrensetOffentligAfpDto(
     @field:NotNull val saertillegg: Int,
     @field:NotNull val afpGrad: Int,
     @field:NotNull val erAvkortet: Boolean
+)
+
+data class LagreServiceberegningDto(
+    @field:NotNull val uttaksalder: LagreAlderDto,
+    @field:NotNull val uttaksdato: String,
+    @field:NotNull val forventetFremtidigInntekt: Int,
+    val afp: LagreTidsbegrensetOffentligAfpDto?,
 )
 
 data class LagrePrivatAfpDto(

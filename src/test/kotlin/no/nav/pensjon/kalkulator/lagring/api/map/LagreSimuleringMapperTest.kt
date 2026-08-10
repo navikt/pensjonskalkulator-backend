@@ -145,6 +145,68 @@ class LagreSimuleringMapperTest : ShouldSpec({
         )
     }
 
+    should("map serviceberegning from DTO to domain object") {
+        val mapped = LagreSimuleringMapperV1.fromDto(
+            LagreSimuleringSpecDtoV1(
+                alderspensjonListe = emptyList(),
+                afpPrivat = null,
+                afpOffentligLivsvarig = null,
+                afpOffentligTidsbegrenset = null,
+                vilkaarsproevingsresultat = LagreVilkaarsproevingsresultatDto(erInnvilget = false, alternativ = null),
+                trygdetid = null,
+                pensjonsgivendeInntektListe = null,
+                aarligInntektOgPensjonListe = null,
+                pensjonsopptjeningListe = null,
+                simuleringsinformasjon = null,
+                maanedligAlderspensjonForKnekkpunkter = null,
+                navEnhetId = null,
+                serviceberegning = LagreServiceberegningDto(
+                    uttaksalder = LagreAlderDto(aar = 62, maaneder = 0),
+                    uttaksdato = "2028-01-01",
+                    forventetFremtidigInntekt = 500000,
+                    afp = LagreTidsbegrensetOffentligAfpDto(
+                        alderAar = 62,
+                        totaltAfpBeloep = 100000,
+                        tidligereArbeidsinntekt = 600000,
+                        grunnbeloep = 124028,
+                        sluttpoengtall = 4.2,
+                        trygdetid = 40,
+                        poengaarTom1991 = 10,
+                        poengaarFom1992 = 20,
+                        grunnpensjon = 40000,
+                        tilleggspensjon = 50000,
+                        afpTillegg = 10000,
+                        saertillegg = 0,
+                        afpGrad = 100,
+                        erAvkortet = false,
+                    ),
+                ),
+            )
+        )
+
+        mapped.serviceberegning shouldBe LagreServiceberegning(
+            uttaksalder = LagreAlder(aar = 62, maaneder = 0),
+            uttaksdato = "2028-01-01",
+            forventetFremtidigInntekt = 500000,
+            afp = LagreTidsbegrensetOffentligAfp(
+                alderAar = 62,
+                totaltAfpBeloep = 100000,
+                tidligereArbeidsinntekt = 600000,
+                grunnbeloep = 124028,
+                sluttpoengtall = 4.2,
+                trygdetid = 40,
+                poengaarTom1991 = 10,
+                poengaarFom1992 = 20,
+                grunnpensjon = 40000,
+                tilleggspensjon = 50000,
+                afpTillegg = 10000,
+                saertillegg = 0,
+                afpGrad = 100,
+                erAvkortet = false,
+            ),
+        )
+    }
+
     should("map with nullable fields as null") {
         LagreSimuleringMapperV1.fromDto(
             LagreSimuleringSpecDtoV1(

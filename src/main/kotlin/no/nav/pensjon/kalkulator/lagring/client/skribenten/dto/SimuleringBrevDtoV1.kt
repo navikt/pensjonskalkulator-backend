@@ -11,7 +11,14 @@ data class SimuleringBrevDtoV1(
     val aarligInntektOgPensjonListe: List<AarligInntektOgPensjonBrevDtoV1>?,
     val pensjonsopptjeningListe: List<PensjonsopptjeningBrevDtoV1>?,
     val forbehold: ForbeholdBrevDtoV1?,
-)
+) : SaksbehandlerValgBrevdata
+
+data class ServiceberegningBrevDtoV1(
+    val uttaksalder: AlderBrevDtoV1,
+    val uttaksdato: String,
+    val forventetFremtidigInntekt: Int,
+    val afp: TidsbegrensetOffentligAfpBrevDtoV1,
+) : SaksbehandlerValgBrevdata
 
 data class SimuleringBrevV1(
     val alderspensjonListe: List<AlderspensjonBrevDtoV1>,

@@ -6,8 +6,11 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.lagring.LagreAlderspensjon
+import no.nav.pensjon.kalkulator.lagring.LagreAlder
 import no.nav.pensjon.kalkulator.lagring.LagrePensjonsopptjening
+import no.nav.pensjon.kalkulator.lagring.LagreServiceberegning
 import no.nav.pensjon.kalkulator.lagring.LagreSimulering
+import no.nav.pensjon.kalkulator.lagring.LagreTidsbegrensetOffentligAfp
 import no.nav.pensjon.kalkulator.lagring.LagreVilkaarsproevingsresultat
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -65,6 +68,22 @@ class SkribentenClientTest : ShouldSpec({
             server?.takeRequest()?.let { request ->
                 request.path shouldBe "/external/api/v1/brev"
                 request.body.readUtf8() shouldContain "\"pensjonsopptjeningListe\":[{\"aarstall\":2024,\"pensjonsgivendeInntekt\":600000,\"pensjonspoeng\":5.2,\"pensjonsbeholdning\":1000000,\"merknad\":\"Omsorgspoeng\"}]"
+            }
+        }
+    }
+
+    should("sende serviceberegningbrev når serviceberegning har AFP") {
+        server?.arrangeOkJsonResponse(BREV_RESPONSE)
+
+        Arrange.webClientContextRunner().run {
+            client(it).lagreSimulering(SAK_ID, simulering().copy(serviceberegning = serviceberegning()), null)
+
+            server?.takeRequest()?.let { request ->
+                val body = request.body.readUtf8()
+                body shouldContain "\"brevkode\":\"SERVICEBEREGNING\""
+                body shouldContain "\"uttaksalder\":{\"aar\":62,\"maaneder\":0}"
+                body shouldContain "\"forventetFremtidigInntekt\":500000"
+                body shouldContain "\"afp\":{\"alderAar\":62"
             }
         }
     }
@@ -137,6 +156,28 @@ class SkribentenClientTest : ShouldSpec({
             simuleringsinformasjon = null,
             maanedligAlderspensjonForKnekkpunkter = null,
             enhetsId = "4817"
+        )
+
+        private fun serviceberegning() = LagreServiceberegning(
+            uttaksalder = LagreAlder(aar = 62, maaneder = 0),
+            uttaksdato = "2028-01-01",
+            forventetFremtidigInntekt = 500000,
+            afp = LagreTidsbegrensetOffentligAfp(
+                alderAar = 62,
+                totaltAfpBeloep = 100000,
+                tidligereArbeidsinntekt = 600000,
+                grunnbeloep = 124028,
+                sluttpoengtall = 4.2,
+                trygdetid = 40,
+                poengaarTom1991 = 10,
+                poengaarFom1992 = 20,
+                grunnpensjon = 40000,
+                tilleggspensjon = 50000,
+                afpTillegg = 10000,
+                saertillegg = 0,
+                afpGrad = 100,
+                erAvkortet = false,
+            ),
         )
     }
 }
