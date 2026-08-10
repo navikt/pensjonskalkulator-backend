@@ -11,7 +11,7 @@ object OpprettBrevDtoV1Mapper {
             return opprettBrevRequest(
                 source = source,
                 saksId = saksId,
-                brevkode = "SERVICEBEREGNING",
+                brevkode = "SERVICEBEREGNING_SIMULERINGSBREV",
                 saksbehandlerValg = ServiceberegningBrevDtoV1(
                     uttaksalder = mapToAlderDto(source.serviceberegning.uttaksalder),
                     uttaksdato = source.serviceberegning.uttaksdato,
