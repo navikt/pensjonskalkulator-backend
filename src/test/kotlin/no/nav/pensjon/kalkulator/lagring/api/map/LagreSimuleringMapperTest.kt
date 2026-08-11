@@ -141,7 +141,8 @@ class LagreSimuleringMapperTest : ShouldSpec({
                 emptyList()
             ),
             maanedligAlderspensjonForKnekkpunkter = null,
-            enhetsId = "4817"
+            enhetsId = "4817",
+            serviceberegning = null,
         )
     }
 
@@ -241,7 +242,8 @@ class LagreSimuleringMapperTest : ShouldSpec({
             pensjonsopptjeningListe = null,
             simuleringsinformasjon = null,
             maanedligAlderspensjonForKnekkpunkter = null,
-            enhetsId = "4817"
+            enhetsId = "4817",
+            serviceberegning = null
         )
     }
 })

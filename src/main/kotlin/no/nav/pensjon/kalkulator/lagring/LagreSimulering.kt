@@ -15,7 +15,7 @@ data class LagreSimulering(
     val simuleringsinformasjon: LagreSimuleringsinformasjon?,
     val maanedligAlderspensjonForKnekkpunkter: LagreMaanedligAlderspensjonForKnekkpunkter?,
     val enhetsId: String,
-    val serviceberegning: LagreServiceberegning? = null,
+    val serviceberegning: LagreServiceberegning?,
 )
 
 data class LagreAlderspensjon(
