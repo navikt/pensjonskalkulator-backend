@@ -1,5 +1,8 @@
 package no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.dto
 
+import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.map.FppSivilstandDto
+import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.map.SivilstatusTypeDto
+import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
 import java.time.LocalDate
 
 data class ServiceberegnetAfpSpecDto(
@@ -13,7 +16,7 @@ data class ServiceberegnetAfpSpecDto(
 data class PersonopplysningerDto(
     val ident: String,
     val fodselsdato: LocalDate,
-    val valgtAfpOrdning: String,
+    val valgtAfpOrdning: AfpOrdningType,
     val flyktning: Boolean?,
     val antAarIUtlandet: Int?,
     val utenlandsopphold: List<FppUtlandPeriodeDto>?,
@@ -25,8 +28,8 @@ data class PersonopplysningerDto(
 )
 
 data class EpsDataDto(
-    val valgtSivilstatus: String?,
-    val registrertSivilstatus: String?,
+    val valgtSivilstatus: SivilstatusTypeDto?,
+    val registrertSivilstatus: FppSivilstandDto?,
     val epsMottarPensjon: Boolean?,
     val epsInntektOver2G: Boolean?,
     val tidligereGiftEllerBarnMedSamboer: Boolean?,

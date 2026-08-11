@@ -5,7 +5,8 @@ import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpResult
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpSpec
 import no.nav.pensjon.kalkulator.afp.client.ServiceberegnetAfpClient
 import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.dto.ServiceberegnetAfpResultDto
-import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.map.ServiceberegnetAfpMapper
+import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.map.ServiceberegnetAfpResultMapper.fromDto
+import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.map.ServiceberegnetAfpSpecMapper.toDto
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
@@ -24,10 +25,10 @@ import org.springframework.web.reactive.function.client.bodyToMono
 
 @Component
 class PensjonssimulatorServiceberegnetAfpClient(
-    @param:Value("\${pensjonssimulator.url}") private val baseUrl: String,
+    @param:Value($$"${pensjonssimulator.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
-    @Value("\${web-client.retry-attempts}") retryAttempts: String
+    @Value($$"${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), ServiceberegnetAfpClient {
 
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
@@ -38,20 +39,18 @@ class PensjonssimulatorServiceberegnetAfpClient(
         log.debug { "POST to URL: '$url'" }
 
         return try {
-            val dto = ServiceberegnetAfpMapper.toDto(spec)
-
             webClient
                 .post()
                 .uri("/$SIMULER_FOR_FPP_RESOURCE?simuleringstype=AFP")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .headers(::setHeaders)
-                .bodyValue(dto)
+                .bodyValue(toDto(spec))
                 .retrieve()
                 .bodyToMono<ServiceberegnetAfpResultDto>()
                 .retryWhen(retryBackoffSpec(url))
                 .block()
-                ?.let(ServiceberegnetAfpMapper::fromDto)
+                ?.let(::fromDto)
                 .also { countCalls(MetricResult.OK) }
                 ?: throw EgressException("No response body from $url")
         } catch (e: WebClientRequestException) {

@@ -22,6 +22,22 @@ data class ServiceberegnetAfpSpec(
     val tidligereGiftEllerBarnMedSamboer: Boolean?,
     val sivilstatus: Sivilstatus? = null,
     val registrertSivilstatus: Sivilstand? = null
+) {
+    val minimumEpsData: MinimumEpsSpec? =
+        if (epsMottarPensjon == null && epsInntektOver2G == null && sivilstatus == null)
+            null
+        else
+            MinimumEpsSpec(
+                mottarPensjon = epsMottarPensjon,
+                harInntektOver2G = epsInntektOver2G,
+                sivilstatus = sivilstatus
+            )
+}
+
+data class MinimumEpsSpec(
+    val mottarPensjon: Boolean?,
+    val harInntektOver2G: Boolean?,
+    val sivilstatus: Sivilstatus?
 )
 
 data class OpptjeningAar(

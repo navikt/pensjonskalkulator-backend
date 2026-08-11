@@ -1,12 +1,13 @@
 package no.nav.pensjon.kalkulator.simulering
 
-import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpProblem
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpProblemType
+import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpResult
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpService
-import no.nav.pensjon.kalkulator.afp.api.dto.InternServiceberegnetAfpSpec
+import no.nav.pensjon.kalkulator.afp.InternServiceberegnetAfpSpec
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.simulering.PensjonUtil.uttakDato
@@ -30,8 +31,6 @@ class SimuleringService(
     private val time: TodayProvider,
     private val serviceberegnetAfpService: ServiceberegnetAfpService
 ) {
-    private val log = KotlinLogging.logger {}
-
     fun simulerAnonymAlderspensjon(spec: ImpersonalSimuleringSpec): SimuleringResult =
         simuleringClient.simulerAnonymAlderspensjon(spec)
 
@@ -43,7 +42,6 @@ class SimuleringService(
                 ?: inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact()
         )
 
-        log.debug { "Simulerer med parametre $impersonalSpec og $personalSpec" }
         return simuleringClient
             .simulerPersonligAlderspensjon(impersonalSpec, personalSpec)
             .withAlderAar(naavaerendeAlder().aar)
@@ -53,11 +51,11 @@ class SimuleringService(
      * Same as simulerPersonligAlderspensjon but with improved handling of problems.
      */
     fun simulerPensjon(providedSpec: ImpersonalSimuleringSpec): SimuleringResult =
-        if (providedSpec.simuleringType == SimuleringType.SERVICEBEREGN_AFP) {
+        if (providedSpec.simuleringType == SimuleringType.SERVICEBEREGN_AFP)
             simulerAfpMedFpp(providedSpec)
-        } else {
+        else
             simulerAlderspensjon(providedSpec)
-        }
+
 
     private fun simulerAlderspensjon(providedSpec: ImpersonalSimuleringSpec): SimuleringResult =
         try {
@@ -68,31 +66,29 @@ class SimuleringService(
                     ?: inntektService.sistePensjonsgivendeInntekt().beloep.intValueExact()
             )
 
-            log.debug { "Simulerer med parametre $providedSpec og $registeredSpec" }
-
             simuleringClient
                 .simulerPersonligAlderspensjon(providedSpec, registeredSpec)
                 .withAlderAar(naavaerendeAlder().aar)
         } catch (e: BadRequestException) {
-            problem(e, type = ProblemType.ANNEN_KLIENTFEIL)
+            problemResult(e, type = ProblemType.ANNEN_KLIENTFEIL)
         } catch (e: DateTimeParseException) {
-            problem(e, type = ProblemType.ANNEN_KLIENTFEIL)
+            problemResult(e, type = ProblemType.ANNEN_KLIENTFEIL)
         } catch (e: NotFoundException) {
-            problem(e, type = ProblemType.PERSON_IKKE_FUNNET)
+            problemResult(e, type = ProblemType.PERSON_IKKE_FUNNET)
         } catch (e: EgressException) {
-            problem(e, type = ProblemType.ANNEN_SERVERFEIL)
+            problemResult(e, type = ProblemType.ANNEN_SERVERFEIL)
         }
 
     private fun simulerAfpMedFpp(providedSpec: ImpersonalSimuleringSpec): SimuleringResult =
         try {
             val afpSpec = InternServiceberegnetAfpSpec(
                 fodselsdato = personService.getPerson().foedselsdato,
-                uttaksdato = providedSpec.gradertUttak?.uttakFomAlder?.let { uttakDato(foedselDato = personService.getPerson().foedselsdato, uttakAlder = it)} as LocalDate,
-                afpOrdning = "AFPSTAT",
+                uttaksdato = uttaksdato(providedSpec),
+                afpOrdning = AfpOrdningType.AFPSTAT.name,
                 flyktning = false,
                 antAarIUtlandet = providedSpec.utenlandsopphold.antallAar,
                 utenlandsopphold = providedSpec.utenlandsopphold.periodeListe,
-                forventetArbeidsinntekt = providedSpec.gradertUttak.aarligInntekt,
+                forventetArbeidsinntekt = providedSpec.gradertUttak?.aarligInntekt,
                 inntektMndForAfp = providedSpec.inntektMaanedFoerAfp,
                 inntektForrigeKalenderaar = providedSpec.inntektForrigeKalenderaar,
                 inntektFremTilUttak = providedSpec.inntektFremTilUttak,
@@ -111,17 +107,15 @@ class SimuleringService(
                 tidsbegrensetOffentligAfp = null,
                 serviceberegnetAfp = afpResult.beregnetAfp,
                 privatAfpListe = emptyList(),
-                vilkaarsproeving = Vilkaarsproeving(
-                    innvilget = afpResult.beregnetAfp != null && afpResult.problem == null
-                ),
+                vilkaarsproeving = vilkaarsproevingsresultat(afpResult),
                 harForLiteTrygdetid = false,
                 trygdetid = 0,
-                opptjeningListe = emptyList(),
+                opptjeningListe = afpResult.opptjeningListe.map(::opptjening),
                 alderAar = null,
-                problem = afpResult.problem?.let { mapAfpProblem(it) }
+                problem = afpResult.problem?.let(::mapAfpProblem)
             )
         } catch (e: BadRequestException) {
-            problem(e, type = ProblemType.ANNEN_KLIENTFEIL)
+            problemResult(e, type = ProblemType.ANNEN_KLIENTFEIL)
         }
     //TODO: Fiks når feilkodenavn er klar
         /*catch (e: EgressException) {
@@ -137,9 +131,32 @@ class SimuleringService(
             dato = time.date()
         )
 
+    private fun uttaksdato(spec: ImpersonalSimuleringSpec): LocalDate =
+        spec.gradertUttak?.uttakFomAlder?.let(::uttaksdato)
+            ?: throw BadRequestException("startalder for gradert uttak må angis")
+
+    private fun uttaksdato(alder: Alder): LocalDate =
+        uttakDato(
+            foedselDato = personService.getPerson().foedselsdato,
+            uttakAlder = alder
+        )
+
     private companion object {
 
-        private fun problem(e: RuntimeException, type: ProblemType) =
+        private fun opptjening(source: AarligOpptjening) =
+            SimulertOpptjening(
+                aarstall = source.aar,
+                pensjonsgivendeInntektBeloep = source.pensjonsgivendeInntekt,
+                pensjonspoeng = source.pensjonspoeng,
+                pensjonsbeholdningBeloep = source.beholdning
+            )
+
+        private fun vilkaarsproevingsresultat(afpResult: ServiceberegnetAfpResult) =
+            Vilkaarsproeving(
+                innvilget = afpResult.beregnetAfp != null && afpResult.problem == null
+            )
+
+        private fun problemResult(e: RuntimeException, type: ProblemType) =
             SimuleringResult(
                 alderspensjonListe = emptyList(),
                 alderspensjonMaanedsbeloep = null,

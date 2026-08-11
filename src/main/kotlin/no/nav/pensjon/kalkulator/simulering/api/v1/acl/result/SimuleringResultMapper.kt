@@ -255,20 +255,20 @@ object SimuleringResultMapper {
 
     private fun beregnetAfp(source: BeregnetAfp) =
         SimuleringV1BeregnetAfp(
-            totalbelopAfp = source.totalbelopAfp,
-            virkFom = source.virkFom,
+            totalbelopAfp = source.afpTotalbeloep,
+            virkFom = source.virkningFom,
             tidligereArbeidsinntekt = source.tidligereArbeidsinntekt,
-            grunnbelop = source.grunnbelop,
+            grunnbelop = source.grunnbeloep,
             sluttpoengtall = source.sluttpoengtall,
             trygdetid = source.trygdetid,
-            poengar = source.poengar,
-            poeangarF92 = source.poeangarF92,
-            poeangarE91 = source.poeangarE91,
+            poengar = source.poengaar,
+            poeangarF92 = source.poengaarFoer1992,
+            poeangarE91 = source.poengaarEtter1991,
             grunnpensjon = source.grunnpensjon,
             tilleggspensjon = source.tilleggspensjon,
             afpTillegg = source.afpTillegg,
             fpp = source.fpp,
-            saertillegg = source.sertillegg,
+            saertillegg = source.saertillegg,
             afpGrad = source.grad,
             erAvkortet = source.erAvkortet
         )

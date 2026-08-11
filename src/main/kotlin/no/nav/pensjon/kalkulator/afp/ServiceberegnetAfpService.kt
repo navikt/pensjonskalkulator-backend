@@ -1,9 +1,10 @@
 package no.nav.pensjon.kalkulator.afp
 
 import mu.KotlinLogging
-import no.nav.pensjon.kalkulator.afp.api.dto.InternServiceberegnetAfpSpec
 import no.nav.pensjon.kalkulator.afp.client.ServiceberegnetAfpClient
+import no.nav.pensjon.kalkulator.opptjening.AarligBeholdning
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
+import no.nav.pensjon.kalkulator.opptjening.OpptjeningService
 import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengClient
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.relasjon.eps.EpsService
@@ -26,9 +27,8 @@ class ServiceberegnetAfpService(
     fun simulerServiceberegnetAfp(spec: InternServiceberegnetAfpSpec): ServiceberegnetAfpResult =
         try {
             val pid = pidGetter.pid()
-            val pensjonspoeng = pensjonspoengClient.fetchOpptjeningOgBeholdning(pid)
-            val tidligereGiftEllerBarnMedSamboer = epsService.tidligereGiftEllerBarnMedSamboer()
-            val person = personService.getPerson()
+            val opptjeningOgBeholdning = pensjonspoengClient.fetchOpptjeningOgBeholdning(pid)
+
             val domainSpec = ServiceberegnetAfpSpec(
                 uttaksdato = spec.uttaksdato,
                 fnr = pid.value,
@@ -39,37 +39,55 @@ class ServiceberegnetAfpService(
                 utenlandsopphold = spec.utenlandsopphold,
                 forventetArbeidsinntekt = spec.forventetArbeidsinntekt,
                 inntektMndForAfp = spec.inntektMndForAfp,
-                opptjeningFolketrygden = pensjonspoeng.first.map { mapOpptjeningAar(it) } + mapInntektOpptjening(spec),
+                opptjeningFolketrygden = opptjeningOgBeholdning.first.map(::opptjening) + pensjonsgivendeInntektListe(spec),
                 epsMottarPensjon = spec.epsMottarPensjon,
                 epsInntektOver2G = spec.epsInntektOver2G,
-                tidligereGiftEllerBarnMedSamboer = tidligereGiftEllerBarnMedSamboer,
+                tidligereGiftEllerBarnMedSamboer = epsService.tidligereGiftEllerBarnMedSamboer(),
                 sivilstatus = spec.sivilstatus,
-                registrertSivilstatus = person.sivilstand
+                registrertSivilstatus = personService.getPerson().sivilstand
             )
 
             log.debug { "Simulerer serviceberegnet AFP for afpOrdning=${domainSpec.afpOrdning}, uttaksdato=${domainSpec.uttaksdato}" }
-            client.simulerServiceberegnetAfp(domainSpec)
+            client.simulerServiceberegnetAfp(domainSpec).withOpptjening(opptjeningListe = merge(opptjeningOgBeholdning))
         } catch (e: EgressException) {
             log.error(e) { "Feil ved simulering av serviceberegnet AFP" }
             throw e
         }
 
-    private fun mapOpptjeningAar(dto: AarligOpptjening) =
-        OpptjeningAar(
-            ar = dto.aar,
-            pensjonsgivendeInntekt = dto.pensjonsgivendeInntekt,
-            registrertePensjonspoeng = dto.pensjonspoeng,
-            omsorgspoeng = dto.omsorgspoeng?.toDouble(),
-            maksUforegrad = dto.maksimalUfoeregrad,
-        )
+    private companion object {
 
-    private fun mapInntektOpptjening(dto: InternServiceberegnetAfpSpec): List<OpptjeningAar> =
-        listOfNotNull(dto.inntektForrigeKalenderaar?.let {
-            OpptjeningAar(LocalDate.now().year - 1, it, registrertePensjonspoeng = null, omsorgspoeng = null, maksUforegrad = null)
-        }) +
-        (dto.inntektFremTilUttak?.let { inntekt ->
-            (LocalDate.now().year until dto.uttaksdato.year).map { year ->
-                OpptjeningAar(year, inntekt, registrertePensjonspoeng = null, omsorgspoeng = null, maksUforegrad = null)
-            }
-        } ?: emptyList())
+        private fun merge(
+            pair: Pair<List<AarligOpptjening>, List<AarligBeholdning>>
+        ): List<AarligOpptjening> =
+            OpptjeningService.merge(opptjeningListe = pair.first, beholdningListe = pair.second)
+
+        private fun pensjonsgivendeInntektListe(spec: InternServiceberegnetAfpSpec): List<OpptjeningAar> =
+            listOfNotNull(spec.inntektForrigeKalenderaar?.let(::fjoraaretsPensjonsgivendeInntekt)) +
+                    (spec.inntektFremTilUttak?.let { pensjonsgivendeInntektListe(uttaksaar = spec.uttaksdato.year, beloep = it) }
+                        .orEmpty())
+
+        private fun pensjonsgivendeInntektListe(uttaksaar: Int, beloep: Int): List<OpptjeningAar> =
+            (LocalDate.now().year until uttaksaar).map { pensjonsgivendeInntekt(aar = it, beloep) }
+
+        private fun fjoraaretsPensjonsgivendeInntekt(beloep: Int) =
+            pensjonsgivendeInntekt(LocalDate.now().year - 1, beloep)
+
+        private fun pensjonsgivendeInntekt(aar: Int, beloep: Int) =
+            OpptjeningAar(
+                ar = aar,
+                pensjonsgivendeInntekt = beloep,
+                registrertePensjonspoeng = null,
+                omsorgspoeng = null,
+                maksUforegrad = null
+            )
+
+        private fun opptjening(source: AarligOpptjening) =
+            OpptjeningAar(
+                ar = source.aar,
+                pensjonsgivendeInntekt = source.pensjonsgivendeInntekt,
+                registrertePensjonspoeng = source.pensjonspoeng,
+                omsorgspoeng = source.omsorgspoeng?.toDouble(),
+                maksUforegrad = source.maksimalUfoeregrad,
+            )
+    }
 }

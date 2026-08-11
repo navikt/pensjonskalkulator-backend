@@ -18,29 +18,29 @@ class OpptjeningService(
             )
         }
 
-    private fun merge(
-        opptjeningListe: List<AarligOpptjening>,
-        beholdningListe: List<AarligBeholdning>
-    ): List<AarligOpptjening> {
-        val foersteAar = minAar(opptjeningListe).coerceAtMost(minAar(beholdningListe))
-        val sisteAar = maxAar(opptjeningListe).coerceAtLeast(maxAar(beholdningListe))
-        if (foersteAar > sisteAar) return emptyList()
+    companion object {
 
-        val liste = mutableListOf<AarligOpptjening>()
+        fun merge(
+            opptjeningListe: List<AarligOpptjening>,
+            beholdningListe: List<AarligBeholdning>
+        ): List<AarligOpptjening> {
+            val foersteAar = minAar(opptjeningListe).coerceAtMost(minAar(beholdningListe))
+            val sisteAar = maxAar(opptjeningListe).coerceAtLeast(maxAar(beholdningListe))
+            if (foersteAar > sisteAar) return emptyList()
 
-        for (aar in foersteAar..sisteAar) {
-            val beholdning = beholdningListe.firstOrNull { it.aar == aar }?.beholdning ?: 0
+            val liste = mutableListOf<AarligOpptjening>()
 
-            liste.add(
-                opptjeningListe.firstOrNull { it.aar == aar }?.withBeholdning(beholdning)
-                    ?: bareBeholdning(aar, beholdning)
-            )
+            for (aar in foersteAar..sisteAar) {
+                val beholdning = beholdningListe.firstOrNull { it.aar == aar }?.beholdning ?: 0
+
+                liste.add(
+                    opptjeningListe.firstOrNull { it.aar == aar }?.withBeholdning(beholdning)
+                        ?: bareBeholdning(aar, beholdning)
+                )
+            }
+
+            return liste
         }
-
-        return liste
-    }
-
-    private companion object {
 
         private fun minAar(aarligListe: List<Aarlig>): Int =
             aarligListe.minOfOrNull { it.aar } ?: 9999

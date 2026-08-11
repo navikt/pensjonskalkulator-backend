@@ -1,29 +1,34 @@
 package no.nav.pensjon.kalkulator.afp
 
+import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
 import java.time.LocalDate
 
 data class ServiceberegnetAfpResult(
     val afpOrdning: AfpOrdningType?,
     val beregnetAfp: BeregnetAfp?,
+    val opptjeningListe: List<AarligOpptjening> = emptyList(),
     val problem: ServiceberegnetAfpProblem?
-)
+) {
+    fun withOpptjening(opptjeningListe: List<AarligOpptjening>) =
+        copy(opptjeningListe = opptjeningListe)
+}
 
 data class BeregnetAfp(
-    val totalbelopAfp: Int?,
-    val virkFom: LocalDate?,
+    val afpTotalbeloep: Int?,
+    val virkningFom: LocalDate?,
     val tidligereArbeidsinntekt: Int?,
-    val grunnbelop: Int?,
+    val grunnbeloep: Int?,
     val sluttpoengtall: Double?,
     val trygdetid: Int?,
-    val poengar: Int?,
-    val poeangarF92: Int?,
-    val poeangarE91: Int?,
+    val poengaar: Int?,
+    val poengaarFoer1992: Int?,
+    val poengaarEtter1991: Int?,
     val grunnpensjon: Int?,
     val tilleggspensjon: Int?,
     val afpTillegg: Int?,
     val fpp: Double?,
-    val sertillegg: Int?,
+    val saertillegg: Int?,
     val grad: Int?,
     val erAvkortet: Boolean?
 )
