@@ -8,7 +8,6 @@ enum class Sivilstand(
     val harEps: Boolean = false,
     val allowsSamboer: Boolean = true
 ) {
-    UNKNOWN(sivilstatus = Sivilstatus.UNKNOWN),
     UOPPGITT(sivilstatus = Sivilstatus.UOPPGITT),
     UGIFT(sivilstatus = Sivilstatus.UGIFT),
     GIFT(sivilstatus = Sivilstatus.GIFT, harEps = true, allowsSamboer = false),
@@ -19,6 +18,9 @@ enum class Sivilstand(
     SEPARERT_PARTNER(sivilstatus = Sivilstatus.SEPARERT_PARTNER, allowsSamboer = false),
     SKILT_PARTNER(sivilstatus = Sivilstatus.SKILT_PARTNER, allowsSamboer = false),
     GJENLEVENDE_PARTNER(sivilstatus = Sivilstatus.GJENLEVENDE_PARTNER),
-    SAMBOER(sivilstatus = Sivilstatus.SAMBOER, harEps = true) //TODO remove
+    SAMBOER(sivilstatus = Sivilstatus.SAMBOER, harEps = true), //TODO remove
+
+    // Special value not in folkeregisterloven (used to represent unknown values):
+    UNKNOWN(sivilstatus = Sivilstatus.UNKNOWN)
 }
 
