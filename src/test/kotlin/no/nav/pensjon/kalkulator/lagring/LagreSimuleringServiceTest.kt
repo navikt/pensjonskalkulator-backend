@@ -55,7 +55,8 @@ class LagreSimuleringServiceTest : ShouldSpec({
             pensjonsopptjeningListe = null,
             simuleringsinformasjon = null,
             maanedligAlderspensjonForKnekkpunkter = null,
-            enhetsId = "4817"
+            enhetsId = "4817",
+            serviceberegning = null,
         )
 
         private fun lagreSimuleringResponse() =
