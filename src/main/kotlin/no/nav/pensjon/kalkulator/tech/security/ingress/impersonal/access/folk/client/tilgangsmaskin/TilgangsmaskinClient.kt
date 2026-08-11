@@ -9,9 +9,8 @@ import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.AvvisningAarsak
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.TilgangResult
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.client.PopulasjonstilgangClient
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.client.tilgangsmaskin.acl.AvvisningsKodeDto
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.client.tilgangsmaskin.acl.ProblemDetailResponseDto
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.client.tilgangsmaskin.acl.TilgangResultDto
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.client.tilgangsmaskin.acl.TilgangResultMapper
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -51,7 +50,7 @@ class TilgangsmaskinClient(
                 .block()
 
             countCalls(MetricResult.OK)
-            TilgangResultMapper.fromDto(TilgangResultDto.Innvilget)
+            innvilget()
         } catch (e: WebClientRequestException) {
             handle(e, summary = "Kall til Tilgangsmaskin feilet")
         } catch (e: EgressException) {
@@ -77,8 +76,8 @@ class TilgangsmaskinClient(
     private fun avvist(message: String): TilgangResult =
         try {
             countCalls(MetricResult.OK)
-            val problemDetail = jsonMapper.readValue(message, ProblemDetailResponseDto::class.java)
-            TilgangResultMapper.fromDto(TilgangResultDto.Avvist(problemDetail))
+            val problem = jsonMapper.readValue(message, ProblemDetailResponseDto::class.java)
+            avvist(problem)
         } catch (e: Exception) {
             handle(e, summary = "Failed to parse Tilgangsmaskin avvist response - $message")
         }
@@ -95,12 +94,22 @@ class TilgangsmaskinClient(
         private const val KOMPLETT_RESOURCE = "$RESOURCE_BASE/komplett"
         private val service = EgressService.TILGANGSMASKINEN
 
+        private fun innvilget() =
+            TilgangResult(innvilget = true)
+
+        private fun avvist(problem: ProblemDetailResponseDto?) =
+            TilgangResult(
+                innvilget = false,
+                avvisningAarsak = problem?.title?.let(AvvisningsKodeDto::internalValue) ?: AvvisningAarsak.UNKNOWN,
+                begrunnelse = problem?.begrunnelse ?: "ingen begrunnelse",
+                traceId = problem?.traceId
+            )
+
         private fun feilResultat(begrunnelse: String?) =
             TilgangResult(
                 innvilget = false,
                 avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEILET,
-                begrunnelse,
-                traceId = null
+                begrunnelse
             )
     }
 }
