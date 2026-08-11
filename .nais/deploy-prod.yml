@@ -90,14 +90,13 @@ spec:
         - application: pensjon-selvbetjening-fss-gateway
           namespace: pensjonselvbetjening
           cluster: prod-fss
-        - application: skribenten-backend
-          namespace: pensjonsbrev
-          cluster: prod-gcp
+        - application: pensjon-selvbetjening-opptjening-backend
+          namespace: pensjonselvbetjening
         - application: pensjonssimulator
         - application: populasjonstilgangskontroll
           namespace: tilgangsmaskin
-        - application: skjermede-personer-pip
-          namespace: nom
+        - application: skribenten-backend
+          namespace: pensjonsbrev
         - application: tp
           namespace: pensjonsamhandling
           cluster: prod-fss
@@ -109,7 +108,6 @@ spec:
         - host: pensjon-representasjon.prod-fss-pub.nais.io
         - host: pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
         - host: pensjonskalkulator-unleash-api.nav.cloud.nais.io
-        - host: skjermede-personer-pip.intern.nav.no
         - host: sokos-utbetaldata.prod-fss-pub.nais.io
         - host: tp-api.prod-fss-pub.nais.io
         - host: api.klp.no
@@ -151,6 +149,10 @@ spec:
       value: prod-fss:pensjon-person:pensjon-representasjon
     - name: PENSJON_REPRESENTASJON_URL
       value: https://pensjon-representasjon.prod-fss-pub.nais.io
+    - name: PENSJON_SELVBETJENING_OPPTJENING_BACKEND_SERVICE_ID
+      value: prod-gcp:pensjonselvbetjening:pensjon-selvbetjening-opptjening-backend
+    - name: PENSJON_SELVBETJENING_OPPTJENING_BACKEND_URL
+      value: http://pensjon-selvbetjening-opptjening-backend.pensjonselvbetjening
     - name: PENSJONSSIMULATOR_SERVICE_ID
       value: prod-gcp:pensjonskalkulator:pensjonssimulator
     - name: PENSJONSSIMULATOR_URL

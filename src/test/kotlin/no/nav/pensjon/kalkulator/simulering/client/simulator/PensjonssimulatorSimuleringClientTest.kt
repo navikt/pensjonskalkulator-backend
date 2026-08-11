@@ -172,13 +172,15 @@ class PensjonssimulatorSimuleringClientTest : FunSpec({
                         aarstall = 1982,
                         pensjonsgivendeInntektBeloep = 112920,
                         pensjonspoeng = 4.46,
-                        pensjonsbeholdningBeloep = 0
+                        pensjonsbeholdningBeloep = 0,
+                        merknadListe = emptyList()
                     ),
                     SimulertOpptjening(
                         aarstall = 1983,
                         pensjonsgivendeInntektBeloep = 129312,
                         pensjonspoeng = 4.47,
-                        pensjonsbeholdningBeloep = 22086
+                        pensjonsbeholdningBeloep = 22086,
+                        merknadListe = emptyList()
                     )
                 )
             )
