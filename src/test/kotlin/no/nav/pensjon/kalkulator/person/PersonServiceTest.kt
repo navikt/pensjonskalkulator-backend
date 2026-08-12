@@ -122,8 +122,7 @@ private fun arrangePerson(
     mockk {
         every {
             fetchPerson(any(), any())
-        } returns person(foedselsdato = foedselsdato)
-            .withPensjoneringAldre(pensjoneringAldre)
+        } returns person(foedselsdato = foedselsdato).withPensjoneringAldre(pensjoneringAldre)
     }
 
 private fun arrangeAldersgruppe(): AldersgruppeFinder =

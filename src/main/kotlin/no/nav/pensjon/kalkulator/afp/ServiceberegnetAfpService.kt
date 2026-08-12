@@ -30,6 +30,8 @@ class ServiceberegnetAfpService(
             val opptjeningOgBeholdning = pensjonspoengClient.fetchOpptjeningOgBeholdning(pid)
             val tidligereGiftEllerBarnMedSamboer = epsService.tidligereGiftEllerBarnMedSamboer()
             val person = personService.getPerson()
+            val renOpptjeningListe = opptjeningOgBeholdning.first
+
             val domainSpec = ServiceberegnetAfpSpec(
                 uttaksdato = spec.uttaksdato,
                 fnr = pid.value,
@@ -40,7 +42,7 @@ class ServiceberegnetAfpService(
                 utenlandsopphold = spec.utenlandsopphold,
                 forventetArbeidsinntekt = spec.forventetArbeidsinntekt,
                 inntektMndForAfp = spec.inntektMndForAfp,
-                opptjeningFolketrygden = opptjeningOgBeholdning.first.map { mapOpptjeningAar(it) } + mapInntektOpptjening(spec),
+                opptjeningFolketrygden = renOpptjeningListe.map { mapOpptjeningAar(it) } + mapInntektOpptjening(spec),
                 epsMottarPensjon = spec.epsMottarPensjon,
                 epsInntektOver2G = spec.epsInntektOver2G,
                 tidligereGiftEllerBarnMedSamboer = tidligereGiftEllerBarnMedSamboer,
@@ -49,8 +51,13 @@ class ServiceberegnetAfpService(
             )
 
             log.debug { "Simulerer serviceberegnet AFP for afpOrdning=${domainSpec.afpOrdning}, uttaksdato=${domainSpec.uttaksdato}" }
-            val opptjeningListe = opptjeningService.opptjeningMedMerknader(pid, opptjeningOgBeholdning)
-            client.simulerServiceberegnetAfp(domainSpec).withOpptjening(opptjeningListe)
+
+            client.simulerServiceberegnetAfp(domainSpec)
+                .withOpptjening(
+                    opptjeningService.opptjeningMedMerknader(
+                        pid, renOpptjeningListe, beholdningListe = opptjeningOgBeholdning.second
+                    )
+                )
         } catch (e: EgressException) {
             log.error(e) { "Feil ved simulering av serviceberegnet AFP" }
             throw e
