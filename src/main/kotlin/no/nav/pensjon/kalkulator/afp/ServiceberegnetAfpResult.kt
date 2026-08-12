@@ -1,13 +1,18 @@
 package no.nav.pensjon.kalkulator.afp
 
+import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.simulering.AfpOrdningType
 import java.time.LocalDate
 
 data class ServiceberegnetAfpResult(
     val afpOrdning: AfpOrdningType?,
     val beregnetAfp: BeregnetAfp?,
+    val opptjeningListe: List<AarligOpptjening> = emptyList(),
     val problem: ServiceberegnetAfpProblem?
-)
+) {
+    fun withOpptjening(opptjeningListe: List<AarligOpptjening>) =
+        copy(opptjeningListe = opptjeningListe)
+}
 
 data class BeregnetAfp(
     val totalbelopAfp: Int?,

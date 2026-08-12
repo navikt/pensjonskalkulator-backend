@@ -4,6 +4,7 @@ import no.nav.pensjon.kalkulator.general.Aarlig
 import no.nav.pensjon.kalkulator.merknad.MerknadCode
 import no.nav.pensjon.kalkulator.merknad.client.MerknadClient
 import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengClient
+import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import org.springframework.stereotype.Service
 import kotlin.collections.emptyList
@@ -16,9 +17,17 @@ class OpptjeningService(
 ) {
     fun opptjening(): List<AarligOpptjening> {
         val pid = pidGetter.pid()
-        val opptjeningOgBeholdning = opptjeningClient.fetchOpptjeningOgBeholdning(pid)
-        val opptjeningListe = opptjeningOgBeholdning.first
-        val beholdningListe = opptjeningOgBeholdning.second
+
+        return opptjeningClient.fetchOpptjeningOgBeholdning(pid).let {
+            opptjeningMedMerknader(pid, opptjeningListe = it.first, beholdningListe = it.second)
+        }
+    }
+
+    fun opptjeningMedMerknader(
+        pid: Pid,
+        opptjeningListe: List<AarligOpptjening>,
+        beholdningListe: List<AarligBeholdning>
+    ): List<AarligOpptjening> {
         val foersteAar = minAar(opptjeningListe).coerceAtMost(minAar(beholdningListe))
         val sisteAar = maxAar(opptjeningListe).coerceAtLeast(maxAar(beholdningListe))
         val opptjeningComboListe = merge(opptjeningListe, beholdningListe, foersteAar, sisteAar)

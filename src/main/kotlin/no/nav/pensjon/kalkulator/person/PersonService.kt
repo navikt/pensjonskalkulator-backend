@@ -31,9 +31,13 @@ class PersonService(
             pid = pid.also(::validate),
             fetchFulltNavn = navnRequirement.needFulltNavn()
         )
+            ?.let(::validated)
             ?.let { it.withPensjoneringAldre(normalderService.aldersgrenser(it.foedselsdato)) }
             ?.also(::updateMetrics)
             ?: throw NotFoundException("person")
+
+    private fun validated(person: Person): Person =
+        person.also { if (it.harFoedselsdato.not()) throw NotFoundException("fødselsdato") }
 
     private fun validate(pid: Pid) {
         if (pid.isValid.not()) throw NotFoundException("person")

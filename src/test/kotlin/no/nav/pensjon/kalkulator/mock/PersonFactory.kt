@@ -10,18 +10,19 @@ import no.nav.pensjon.kalkulator.person.Sivilstatus
 import java.time.LocalDate
 
 object PersonFactory {
-    val pid = Pid("12906498357") // synthetic fødselsnummer
-    val foedselsdato = LocalDate.of(1963, 12, 31)
 
-    fun person(sivilstand: Sivilstand) =
+    private val defaultFoedselsdato = LocalDate.of(1963, 12, 31)
+
+    val pid = Pid("12906498357") // synthetic fødselsnummer
+    val foedselsdato = defaultFoedselsdato
+
+    fun person(sivilstand: Sivilstand = Sivilstand.UOPPGITT, foedselsdato: LocalDate = defaultFoedselsdato) =
         Person(
             navn = "Fornavn1 Etternavn1",
             fornavn = "Fornavn1",
             foedselsdato,
             sivilstand = sivilstand
         )
-
-    fun person() = person(Sivilstand.UOPPGITT)
 
     fun personWithPensjoneringAldre() =
         Person(
