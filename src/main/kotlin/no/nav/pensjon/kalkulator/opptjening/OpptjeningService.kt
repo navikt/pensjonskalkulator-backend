@@ -4,6 +4,7 @@ import no.nav.pensjon.kalkulator.general.Aarlig
 import no.nav.pensjon.kalkulator.merknad.MerknadCode
 import no.nav.pensjon.kalkulator.merknad.client.MerknadClient
 import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengClient
+import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import org.springframework.stereotype.Service
 import kotlin.collections.emptyList
@@ -17,6 +18,13 @@ class OpptjeningService(
     fun opptjening(): List<AarligOpptjening> {
         val pid = pidGetter.pid()
         val opptjeningOgBeholdning = opptjeningClient.fetchOpptjeningOgBeholdning(pid)
+        return opptjeningMedMerknader(pid, opptjeningOgBeholdning)
+    }
+
+    fun opptjeningMedMerknader(
+        pid: Pid,
+        opptjeningOgBeholdning: Pair<List<AarligOpptjening>, List<AarligBeholdning>>
+    ): List<AarligOpptjening> {
         val opptjeningListe = opptjeningOgBeholdning.first
         val beholdningListe = opptjeningOgBeholdning.second
         val foersteAar = minAar(opptjeningListe).coerceAtMost(minAar(beholdningListe))
