@@ -4,11 +4,12 @@ import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpProblem
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpProblemType
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpService
-import no.nav.pensjon.kalkulator.afp.api.dto.InternServiceberegnetAfpSpec
+import no.nav.pensjon.kalkulator.afp.InternServiceberegnetAfpSpec
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.merknad.MerknadCode
 import no.nav.pensjon.kalkulator.merknad.client.MerknadClient
+import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.simulering.PensjonUtil.uttakDato
@@ -20,6 +21,7 @@ import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.validity.Problem
 import no.nav.pensjon.kalkulator.validity.ProblemType
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.time.format.DateTimeParseException
 
 @Service
@@ -96,17 +98,12 @@ class SimuleringService(
         try {
             val afpSpec = InternServiceberegnetAfpSpec(
                 fodselsdato = personService.getPerson().foedselsdato,
-                uttaksdato = providedSpec.gradertUttak?.uttakFomAlder?.let {
-                    uttakDato(
-                        foedselDato = personService.getPerson().foedselsdato,
-                        uttakAlder = it
-                    )
-                }!!,
+                uttaksdato = uttaksdato(providedSpec),
                 afpOrdning = AfpOrdningType.AFPSTAT.name,
                 flyktning = false,
                 antAarIUtlandet = providedSpec.utenlandsopphold.antallAar,
                 utenlandsopphold = providedSpec.utenlandsopphold.periodeListe,
-                forventetArbeidsinntekt = providedSpec.gradertUttak.aarligInntekt,
+                forventetArbeidsinntekt = providedSpec.gradertUttak?.aarligInntekt,
                 inntektMndForAfp = providedSpec.inntektMaanedFoerAfp,
                 inntektForrigeKalenderaar = providedSpec.inntektForrigeKalenderaar,
                 inntektFremTilUttak = providedSpec.inntektFremTilUttak,
@@ -130,8 +127,7 @@ class SimuleringService(
                 ),
                 harForLiteTrygdetid = false,
                 trygdetid = 0,
-                opptjeningListe = emptyList(),
-                alderAar = null,
+                opptjeningListe = afpResult.opptjeningListe.map(::simulert), alderAar = null,
                 problem = afpResult.problem?.let(::mapAfpProblem)
             )
         } catch (e: BadRequestException) {
@@ -149,6 +145,16 @@ class SimuleringService(
         Alder.from(
             foedselDato = personService.getPerson().foedselsdato,
             dato = time.date()
+        )
+
+    private fun uttaksdato(spec: ImpersonalSimuleringSpec): LocalDate =
+        spec.gradertUttak?.uttakFomAlder?.let(::uttaksdato)
+            ?: throw BadRequestException("startalder for gradert uttak må angis")
+
+    private fun uttaksdato(alder: Alder): LocalDate =
+        uttakDato(
+            foedselDato = personService.getPerson().foedselsdato,
+            uttakAlder = alder
         )
 
     private companion object {
@@ -176,6 +182,15 @@ class SimuleringService(
 
             return liste
         }
+
+        private fun simulert(opptjening: AarligOpptjening) =
+            SimulertOpptjening(
+                aarstall = opptjening.aar,
+                pensjonsgivendeInntektBeloep = opptjening.pensjonsgivendeInntekt,
+                pensjonspoeng = opptjening.pensjonspoeng,
+                pensjonsbeholdningBeloep = opptjening.beholdning,
+                merknadListe = opptjening.merknadListe
+            )
 
         private fun opptjening(opptjeningListe: List<SimulertOpptjening>, aar: Int): SimulertOpptjening? =
             opptjeningListe.firstOrNull { it.aarstall == aar }
