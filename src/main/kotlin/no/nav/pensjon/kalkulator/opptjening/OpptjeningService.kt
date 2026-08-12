@@ -17,16 +17,17 @@ class OpptjeningService(
 ) {
     fun opptjening(): List<AarligOpptjening> {
         val pid = pidGetter.pid()
-        val opptjeningOgBeholdning = opptjeningClient.fetchOpptjeningOgBeholdning(pid)
-        return opptjeningMedMerknader(pid, opptjeningOgBeholdning)
+
+        return opptjeningClient.fetchOpptjeningOgBeholdning(pid).let {
+            opptjeningMedMerknader(pid, opptjeningListe = it.first, beholdningListe = it.second)
+        }
     }
 
     fun opptjeningMedMerknader(
         pid: Pid,
-        opptjeningOgBeholdning: Pair<List<AarligOpptjening>, List<AarligBeholdning>>
+        opptjeningListe: List<AarligOpptjening>,
+        beholdningListe: List<AarligBeholdning>
     ): List<AarligOpptjening> {
-        val opptjeningListe = opptjeningOgBeholdning.first
-        val beholdningListe = opptjeningOgBeholdning.second
         val foersteAar = minAar(opptjeningListe).coerceAtMost(minAar(beholdningListe))
         val sisteAar = maxAar(opptjeningListe).coerceAtLeast(maxAar(beholdningListe))
         val opptjeningComboListe = merge(opptjeningListe, beholdningListe, foersteAar, sisteAar)
