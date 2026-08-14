@@ -5,12 +5,14 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.tech.crypto.CryptoService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("api")
@@ -18,8 +20,6 @@ class CryptoController(
     private val service: CryptoService,
     private val traceAid: TraceAid
 ) : ControllerBase(traceAid) {
-
-    private val log = KotlinLogging.logger {}
 
     @PostMapping("v1/encrypt")
     @Operation(
@@ -40,7 +40,6 @@ class CryptoController(
     )
     fun encrypt(@RequestBody text: String): String {
         traceAid.begin()
-        log.debug { "Request for encryption: $text" }
 
         return try {
             timed(service::encrypt, text, "encrypt")
@@ -70,7 +69,6 @@ class CryptoController(
     )
     fun decrypt(@RequestBody text: String): String {
         traceAid.begin()
-        log.debug { "Request for decryption: $text" }
 
         return try {
             timed(service::decrypt, text, "decrypt")

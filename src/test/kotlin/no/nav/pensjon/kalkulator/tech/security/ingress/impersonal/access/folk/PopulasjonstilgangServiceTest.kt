@@ -5,6 +5,8 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.AvvisningAarsak
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.TilgangResult
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.client.PopulasjonstilgangClient
 
 class PopulasjonstilgangServiceTest : ShouldSpec({
@@ -13,8 +15,7 @@ class PopulasjonstilgangServiceTest : ShouldSpec({
         val result = TilgangResult(
             innvilget = true,
             avvisningAarsak = null,
-            begrunnelse = null,
-            traceId = null
+            begrunnelse = null
         )
 
         PopulasjonstilgangService(client = arrangeTilgang(result)).sjekkTilgang(pid) shouldBe result
@@ -42,9 +43,8 @@ class PopulasjonstilgangServiceTest : ShouldSpec({
             }
         ).sjekkTilgang(pid) shouldBe TilgangResult(
             innvilget = false,
-            avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEILET,
-            begrunnelse = "Populasjonstilgangssjekk feilet - se logg for detaljer",
-            traceId = null
+            avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEIL,
+            begrunnelse = "Populasjonstilgangssjekk feilet - se logg for detaljer"
         )
     }
 })

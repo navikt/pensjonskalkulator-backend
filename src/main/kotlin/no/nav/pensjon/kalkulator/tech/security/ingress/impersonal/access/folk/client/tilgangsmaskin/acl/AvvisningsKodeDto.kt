@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.client.tilgangsmaskin.acl
 
 import mu.KotlinLogging
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.AvvisningAarsak
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.AvvisningAarsak
 import org.springframework.util.StringUtils.hasLength
 
 /**
@@ -57,11 +57,13 @@ enum class AvvisningsKodeDto(val externalValue: String, val internalValue: Avvis
     companion object {
         private val log = KotlinLogging.logger {}
 
+        val valuesByExternal = AvvisningsKodeDto.entries.associateBy { it.externalValue }
+
         fun internalValue(value: String?): AvvisningAarsak =
             fromExternalValue(value).internalValue
 
         private fun fromExternalValue(value: String?): AvvisningsKodeDto =
-            entries.firstOrNull { it.externalValue.equals(value, true) } ?: default(value)
+            value?.let { valuesByExternal[it.uppercase()] } ?: default(value)
 
         private fun default(externalValue: String?): AvvisningsKodeDto =
             if (hasLength(externalValue))

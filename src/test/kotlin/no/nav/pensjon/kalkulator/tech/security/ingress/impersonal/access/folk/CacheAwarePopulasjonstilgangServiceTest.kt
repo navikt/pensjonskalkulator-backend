@@ -5,6 +5,8 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.AvvisningAarsak
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.TilgangResult
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.SecurityContextNavIdExtractor
 
 class CacheAwarePopulasjonstilgangServiceTest : ShouldSpec({
@@ -12,72 +14,68 @@ class CacheAwarePopulasjonstilgangServiceTest : ShouldSpec({
     should("gi null når populasjonstilgang innvilget") {
         CacheAwarePopulasjonstilgangService(
             navIdExtractor = arrangeNavIdExtractor(),
-            populasjonstilgangService = arrangePopulasjonstilgang(result = innvilget())
+            populasjonstilgangService = arrangePopulasjonstilgang(result = innvilget)
         ).eventuellTilgangsnektAarsak(pid) shouldBe null
     }
 
     should("gi årsak når populasjonstilgang avvist") {
         CacheAwarePopulasjonstilgangService(
             navIdExtractor = arrangeNavIdExtractor(),
-            populasjonstilgangService = arrangePopulasjonstilgang(result = avvist())
-        ).eventuellTilgangsnektAarsak(pid) shouldBe "GEOGRAFISK: årsaken"
+            populasjonstilgangService = arrangePopulasjonstilgang(result = avvist)
+        ).eventuellTilgangsnektAarsak(pid) shouldBe TilgangResult(
+            innvilget = false,
+            avvisningAarsak = AvvisningAarsak.GEOGRAFISK,
+            begrunnelse = "årsaken"
+        )
     }
 
     should("gi årsak når populasjonstilgangssjekk feiler") {
         CacheAwarePopulasjonstilgangService(
             navIdExtractor = arrangeNavIdExtractor(),
             populasjonstilgangService = arrangePopulasjonstilgangError()
-        ).eventuellTilgangsnektAarsak(pid) shouldBe "POPULASJONSTILGANGSSJEKK_FEILET: feil"
+        ).eventuellTilgangsnektAarsak(pid) shouldBe TilgangResult(
+            innvilget = false,
+            avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEIL,
+            begrunnelse = "feil"
+        )
     }
 
     should("gi årsak når uthenting av Nav-ID feiler") {
         CacheAwarePopulasjonstilgangService(
             navIdExtractor = arrangeNavIdError(),
-            populasjonstilgangService = arrangePopulasjonstilgang(innvilget())
-        ).eventuellTilgangsnektAarsak(pid) shouldBe "POPULASJONSTILGANGSSJEKK_FEILET: defekt"
+            populasjonstilgangService = arrangePopulasjonstilgang(innvilget)
+        ).eventuellTilgangsnektAarsak(pid) shouldBe TilgangResult(
+            innvilget = false,
+            avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEIL,
+            begrunnelse = "defekt"
+        )
     }
 })
 
-private fun arrangeNavIdExtractor(): SecurityContextNavIdExtractor =
-    mockk<SecurityContextNavIdExtractor>().apply {
-        every { id() } returns "Z123456"
-    }
+private val innvilget = TilgangResult(innvilget = true)
 
-private fun arrangeNavIdError(): SecurityContextNavIdExtractor =
-    mockk<SecurityContextNavIdExtractor>().apply {
-        every { id() } throws RuntimeException("defekt")
-    }
-
-private fun arrangePopulasjonstilgang(result: TilgangResult): PopulasjonstilgangService =
-    mockk<PopulasjonstilgangService>().apply {
-        every { sjekkTilgang(pid) } returns result
-    }
-
-private fun arrangePopulasjonstilgangError(): PopulasjonstilgangService =
-    mockk<PopulasjonstilgangService>().apply {
-        every { sjekkTilgang(pid) } returns feil()
-    }
-
-private fun innvilget() =
-    TilgangResult(
-        innvilget = true,
-        avvisningAarsak = null,
-        begrunnelse = null,
-        traceId = null
-    )
-
-private fun avvist() =
+private val avvist =
     TilgangResult(
         innvilget = false,
         avvisningAarsak = AvvisningAarsak.GEOGRAFISK,
-        begrunnelse = "årsaken",
-        traceId = null
+        begrunnelse = "årsaken"
     )
 
-private fun feil() =
+private val feil =
     TilgangResult(
         innvilget = false,
-        avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEILET,
-        begrunnelse = "feil",
-        traceId = null
+        avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEIL,
+        begrunnelse = "feil"
     )
+
+private fun arrangeNavIdExtractor(): SecurityContextNavIdExtractor =
+    mockk { every { id() } returns "Z123456" }
+
+private fun arrangeNavIdError(): SecurityContextNavIdExtractor =
+    mockk { every { id() } throws RuntimeException("defekt") }
+
+private fun arrangePopulasjonstilgang(result: TilgangResult): PopulasjonstilgangService =
+    mockk { every { sjekkTilgang(pid) } returns result }
+
+private fun arrangePopulasjonstilgangError(): PopulasjonstilgangService =
+    mockk { every { sjekkTilgang(pid) } returns feil }

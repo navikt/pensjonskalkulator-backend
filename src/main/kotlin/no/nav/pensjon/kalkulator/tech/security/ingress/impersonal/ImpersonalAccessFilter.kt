@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.tech.security.SecurityConfiguration.Companion.FEATURE_URI
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.AvvisningAarsak
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.TilgangResult
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.fag.FagtilgangService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.CacheAwarePopulasjonstilgangService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
@@ -43,24 +45,21 @@ class ImpersonalAccessFilter(
             }
         } catch (e: Exception) {
             // Enhver feil skal gi 'tilgang avvist'
-            forbidden(response, aarsak = "feil i tilgangssjekk", e)
+            forbidden(response, aarsak = tilgangssjekkFeilet(e), e)
             return
         }
 
         chain.doFilter(request, response)
     }
 
-    private fun eventuellTilgangsnektAarsak(): String? =
+    private fun eventuellTilgangsnektAarsak(): TilgangResult? =
         if (fagtilgangService.tilgangInnvilget())
             populasjonstilgangService.eventuellTilgangsnektAarsak(pid = pidGetter.pid())
         else
-            "manglende faggruppemedlemskap"
+            manglendeFaggruppemedlemskap()
 
-    private fun hasPid(request: HttpServletRequest): Boolean =
-        hasLength(request.getHeader(CustomHttpHeaders.PID))
-
-    private fun forbidden(response: ServletResponse, aarsak: String, e: Exception? = null) {
-        "Tilgang nektet pga. $aarsak".let {
+    private fun forbidden(response: ServletResponse, aarsak: TilgangResult, e: Exception? = null) {
+        "Tilgang nektet pga. ${aarsak.begrunnelse}".let {
             if (e == null) {
                 log.warn { it }
                 respondForbidden(response, aarsak = it)
@@ -71,7 +70,27 @@ class ImpersonalAccessFilter(
         }
     }
 
-    private fun respondForbidden(response: ServletResponse, aarsak: String) {
-        (response as HttpServletResponse).sendError(HttpStatus.FORBIDDEN.value(), aarsak)
+    private companion object {
+
+        private fun hasPid(request: HttpServletRequest): Boolean =
+            hasLength(request.getHeader(CustomHttpHeaders.PID))
+
+        private fun respondForbidden(response: ServletResponse, aarsak: String) {
+            (response as HttpServletResponse).sendError(HttpStatus.FORBIDDEN.value(), aarsak)
+        }
+
+        private fun manglendeFaggruppemedlemskap() =
+            TilgangResult(
+                innvilget = false,
+                avvisningAarsak = AvvisningAarsak.MANGLENDE_FAGGRUPPE_MEDLEMSKAP,
+                begrunnelse = "manglende faggruppemedlemskap",
+            )
+
+        private fun tilgangssjekkFeilet(e: Exception) =
+            TilgangResult(
+                innvilget = false,
+                avvisningAarsak = AvvisningAarsak.TILGANGSSJEKK_FEIL,
+                begrunnelse = e.message
+            )
     }
 }
