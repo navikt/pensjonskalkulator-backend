@@ -2,10 +2,12 @@ package no.nav.pensjon.kalkulator.person.relasjon.eps.api.v1.acl
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
+import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotNull
 import no.nav.pensjon.kalkulator.person.Tilgangsbegrensning
 import no.nav.pensjon.kalkulator.person.relasjon.Relasjonstype
 import no.nav.pensjon.kalkulator.person.relasjon.eps.api.v1.acl.EnumUtil.missingExternalValue
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.AvvisningAarsak
 import java.time.LocalDate
 
 /**
@@ -39,14 +41,60 @@ data class EpsV1Navn(
     val etternavn: String?
 )
 
+@JsonInclude(NON_NULL)
 data class EpsV1Problem(
+    @field:Schema(description = "Type problem")
     @field:NotNull val type: EpsV1ProblemType,
-    @field:NotNull val beskrivelse: String
+
+    @field:Schema(description = "Beskrivelse av problemet")
+    @field:NotNull val beskrivelse: String,
+
+    @field:Schema(description = "Begrunnelse for nekting av tilgang til person")
+    val tilgangsnekt: EpsV1Tilgangsnekt?
 )
 
 enum class EpsV1ProblemType {
     TILGANG_NEKTET,
     MANGELFULL_SPESIFIKASJON
+}
+
+data class EpsV1Tilgangsnekt(
+    @field:Schema(description = "Årsakskode for nekting av tilgang til person")
+    @field:NotNull
+    val aarsak: EpsV1AvvisningAarsak,
+
+    @field:Schema(description = "Begrunnelse for nekting av tilgang til person")
+    @field:NotNull
+    val begrunnelse: String
+)
+
+enum class EpsV1AvvisningAarsak(val internalValue: AvvisningAarsak) {
+
+    STRENGT_FORTROLIG_ADRESSE(internalValue = AvvisningAarsak.STRENGT_FORTROLIG_ADRESSE),
+    STRENGT_FORTROLIG_UTLAND(internalValue = AvvisningAarsak.STRENGT_FORTROLIG_UTLAND),
+    AVDOED(internalValue = AvvisningAarsak.AVDOED),
+    VERGEMAAL(internalValue = AvvisningAarsak.VERGEMAAL),
+    PERSON_UTLAND(internalValue = AvvisningAarsak.PERSON_UTLAND),
+    SKJERMING(internalValue = AvvisningAarsak.SKJERMING),
+    FORTROLIG_ADRESSE(internalValue = AvvisningAarsak.FORTROLIG_ADRESSE),
+    UKJENT_BOSTED(internalValue = AvvisningAarsak.UKJENT_BOSTED),
+    GEOGRAFISK(internalValue = AvvisningAarsak.GEOGRAFISK),
+    HABILITET(internalValue = AvvisningAarsak.HABILITET),
+    POPULASJONSTILGANGSSJEKK_FEIL(internalValue = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEIL),
+
+    // Special value not used by tilgangsmaskinen (for handling unexpected/missing enum values):
+    UNKNOWN(internalValue = AvvisningAarsak.UNKNOWN);
+
+    // NB: These are not relevant for EPS access:
+    // – MANGLENDE_FAGGRUPPE_MEDLEMSKAP
+    // – TILGANGSSJEKK_FEIL
+
+    companion object {
+        val valuesByInternal = entries.associateBy { it.internalValue }
+
+        fun fromInternalValue(value: AvvisningAarsak?): EpsV1AvvisningAarsak =
+            value?.let { valuesByInternal[it] } ?: missingExternalValue(type = "avvisningsårsak", value)
+    }
 }
 
 enum class EpsV1Relasjonstype(val internalValue: Relasjonstype) {
@@ -69,8 +117,10 @@ enum class EpsV1Relasjonstype(val internalValue: Relasjonstype) {
     UKJENT(internalValue = Relasjonstype.UKJENT);
 
     companion object {
+        val valuesByInternal = entries.associateBy { it.internalValue }
+
         fun fromInternalValue(value: Relasjonstype?): EpsV1Relasjonstype =
-            entries.firstOrNull { it.internalValue == value } ?: missingExternalValue(type = "relasjonstype", value)
+            value?.let { valuesByInternal[it] } ?: missingExternalValue(type = "relasjonstype", value)
     }
 }
 
@@ -81,8 +131,9 @@ enum class EpsV1Tilgangsbegrensning(val internalValue: Tilgangsbegrensning) {
     UNKNOWN(internalValue = Tilgangsbegrensning.UNKNOWN);
 
     companion object {
-        fun fromInternalValue(value: Tilgangsbegrensning?) =
-            entries.firstOrNull { it.internalValue == value }
-                ?: missingExternalValue(type = "tilgangsbegrensning", value)
+        val valuesByInternal = entries.associateBy { it.internalValue }
+
+        fun fromInternalValue(value: Tilgangsbegrensning?): EpsV1Tilgangsbegrensning =
+            value?.let { valuesByInternal[it] } ?: missingExternalValue(type = "tilgangsbegrensning", value)
     }
 }

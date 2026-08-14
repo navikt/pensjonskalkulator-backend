@@ -9,8 +9,11 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.person.relasjon.Familierelasjon
 import no.nav.pensjon.kalkulator.person.relasjon.Relasjonstype
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.AvvisningAarsak
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.TilgangResult
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.CacheAwarePopulasjonstilgangService
-import org.springframework.security.access.AccessDeniedException
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.PopulasjonstilgangNektetException
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.Populasjonstilgangsnekt
 import java.time.LocalDate
 
 class EpsServiceTest : ShouldSpec({
@@ -28,24 +31,37 @@ class EpsServiceTest : ShouldSpec({
                 client = mockk { every { fetchNyligsteEps(any()) } returns familierelasjon },
                 personService = mockk(),
                 pidGetter = mockk(relaxed = true),
-                populasjonstilgangService = arrangeTilgang(tilgangsnektAarsak = null)
+                populasjonstilgangService = arrangeTilgang(tilgangsnektBegrunnelse = null)
             ).nyligsteRelasjon(Sivilstatus.SAMBOER) shouldBe familierelasjon
         }
     }
 
     context("nyligsteRelasjon - tilgang nektet") {
         should("kaste 'access denied' exception med beskrivelse av årsak") {
-            shouldThrow<AccessDeniedException> {
+            shouldThrow<PopulasjonstilgangNektetException> {
                 EpsService(
                     client = mockk(relaxed = true),
                     personService = mockk(),
                     pidGetter = mockk(relaxed = true),
-                    populasjonstilgangService = arrangeTilgang(tilgangsnektAarsak = "egen ansatt")
+                    populasjonstilgangService = arrangeTilgang(tilgangsnektBegrunnelse = "egen ansatt")
                 ).nyligsteRelasjon(Sivilstatus.GIFT)
-            }.message shouldBe "Tilgang til EPS nektet: egen ansatt"
+            } shouldBe PopulasjonstilgangNektetException(
+                message = "Tilgang til EPS nektet",
+                aarsak = Populasjonstilgangsnekt(aarsak = AvvisningAarsak.SKJERMING, begrunnelse = "egen ansatt")
+            )
         }
     }
 })
 
-private fun arrangeTilgang(tilgangsnektAarsak: String?): CacheAwarePopulasjonstilgangService =
-    mockk { every { eventuellTilgangsnektAarsak(any(), any()) } returns tilgangsnektAarsak }
+private fun arrangeTilgang(tilgangsnektBegrunnelse: String?): CacheAwarePopulasjonstilgangService =
+    mockk {
+        every {
+            eventuellTilgangsnektAarsak(any(), any())
+        } returns tilgangsnektBegrunnelse?.let {
+            TilgangResult(
+                innvilget = false,
+                avvisningAarsak = AvvisningAarsak.SKJERMING,
+                begrunnelse = it
+            )
+        }
+    }

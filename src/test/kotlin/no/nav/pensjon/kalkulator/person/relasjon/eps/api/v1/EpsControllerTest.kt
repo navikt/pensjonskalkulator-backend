@@ -10,6 +10,9 @@ import no.nav.pensjon.kalkulator.person.relasjon.Familierelasjon
 import no.nav.pensjon.kalkulator.person.relasjon.Relasjonstype
 import no.nav.pensjon.kalkulator.person.relasjon.eps.EpsService
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.AvvisningAarsak
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.PopulasjonstilgangNektetException
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.Populasjonstilgangsnekt
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.intellij.lang.annotations.Language
@@ -17,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
-import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -135,7 +137,10 @@ class EpsControllerTest : ShouldSpec() {
             should("gi statuskode 'Forbidden' og problembeskrivelse") {
                 every {
                     service.nyligsteRelasjon(any())
-                } throws AccessDeniedException("Tilgang til EPS nektet: Egen ansatt")
+                } throws PopulasjonstilgangNektetException(
+                    message = "Tilgang til EPS nektet",
+                    aarsak = Populasjonstilgangsnekt(aarsak = AvvisningAarsak.SKJERMING, begrunnelse = "Egen ansatt")
+                )
 
                 mvc.perform(
                     post(URL)
@@ -201,8 +206,12 @@ class EpsControllerTest : ShouldSpec() {
         private const val TILGANG_NEKTET_RESPONSE_BODY = """{
             "relasjonstype": "UKJENT",
             "problem": {
-              "type": "TILGANG_NEKTET",
-              "beskrivelse": "Tilgang til EPS nektet: Egen ansatt"
+                "type": "TILGANG_NEKTET",
+                "beskrivelse": "Ikke tilgang til personen",
+                "tilgangsnekt": {
+                    "aarsak": "SKJERMING",
+                    "begrunnelse": "Egen ansatt"
+                }
             }
         }"""
 

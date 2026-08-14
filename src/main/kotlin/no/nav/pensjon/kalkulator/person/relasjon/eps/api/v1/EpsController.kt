@@ -12,13 +12,14 @@ import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.person.relasjon.eps.EpsService
 import no.nav.pensjon.kalkulator.person.relasjon.eps.api.v1.acl.*
 import no.nav.pensjon.kalkulator.person.relasjon.eps.api.v1.acl.FamilierelasjonMapper.toDto
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.PopulasjonstilgangNektetException
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.Populasjonstilgangsnekt
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -92,7 +93,7 @@ class EpsController(
             val relasjon = service.nyligsteRelasjon(sivilstatus = sivilstatus(spec))
             relasjon.pid?.let { audit(pid = it, bakgrunn = spec.bakgrunn) }
             ResponseEntity.status(HttpStatus.OK).body(toDto(source = relasjon))
-        } catch (e: AccessDeniedException) {
+        } catch (e: PopulasjonstilgangNektetException) {
             ResponseEntity.status(HttpStatus.FORBIDDEN).body(tilgangNektet(e))
         } catch (e: BadRequestException) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resultForMangelfullSpesifikasjon(e))
@@ -121,19 +122,37 @@ class EpsController(
                 ?: spec.sivilstatus?.internalValue
                 ?: throw BadRequestException("sivilstand eller sivilstatus ikke angitt")
 
-        private fun tilgangNektet(e: AccessDeniedException) =
-            problemResult(type = EpsV1ProblemType.TILGANG_NEKTET, beskrivelse = e.message)
+        private fun tilgangNektet(e: PopulasjonstilgangNektetException): EpsV1Familierelasjon =
+            problemResult(
+                type = EpsV1ProblemType.TILGANG_NEKTET,
+                beskrivelse = "Ikke tilgang til personen",
+                tilgangsnekt = e.aarsak
+            )
 
-        private fun resultForMangelfullSpesifikasjon(e: BadRequestException) =
+        private fun resultForMangelfullSpesifikasjon(e: BadRequestException): EpsV1Familierelasjon =
             problemResult(type = EpsV1ProblemType.MANGELFULL_SPESIFIKASJON, beskrivelse = e.message)
 
-        private fun problemResult(type: EpsV1ProblemType, beskrivelse: String?) =
+        private fun problemResult(
+            type: EpsV1ProblemType,
+            beskrivelse: String? = null,
+            tilgangsnekt: Populasjonstilgangsnekt? = null
+        ) =
             EpsV1Familierelasjon(
                 pid = null,
                 fom = null,
                 relasjonstype = EpsV1Relasjonstype.UKJENT,
                 relasjonPersondata = null,
-                problem = EpsV1Problem(type, beskrivelse ?: "(ingen beskrivelse)")
+                problem = EpsV1Problem(
+                    type,
+                    beskrivelse ?: "ukjent",
+                    tilgangsnekt = tilgangsnekt?.let(::tilgangsnekt)
+                )
+            )
+
+        private fun tilgangsnekt(source: Populasjonstilgangsnekt) =
+            EpsV1Tilgangsnekt(
+                aarsak = EpsV1AvvisningAarsak.fromInternalValue(source.aarsak),
+                begrunnelse = source.begrunnelse
             )
     }
 }

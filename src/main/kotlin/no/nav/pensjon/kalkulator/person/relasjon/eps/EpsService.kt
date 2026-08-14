@@ -1,10 +1,6 @@
 package no.nav.pensjon.kalkulator.person.relasjon.eps
 
-import no.nav.pensjon.kalkulator.person.PersonService
-import no.nav.pensjon.kalkulator.person.PersonaliaType
-import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.person.Sivilstand
-import no.nav.pensjon.kalkulator.person.Sivilstatus
+import no.nav.pensjon.kalkulator.person.*
 import no.nav.pensjon.kalkulator.person.relasjon.Familierelasjon
 import no.nav.pensjon.kalkulator.person.relasjon.Relasjonstype
 import no.nav.pensjon.kalkulator.person.relasjon.eps.client.EpsClient
@@ -12,10 +8,11 @@ import no.nav.pensjon.kalkulator.person.relasjon.eps.client.NaavaerendeEpsSpec
 import no.nav.pensjon.kalkulator.person.relasjon.eps.client.NyligsteEpsSpec
 import no.nav.pensjon.kalkulator.person.relasjon.eps.client.TidligereStatusSpec
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.CacheAwarePopulasjonstilgangService
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.AvvisningAarsak
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.TilgangResult
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.*
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.http.HttpStatus
-import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 
 @Service
@@ -47,7 +44,7 @@ class EpsService(
         )
 
         eps.pid?.let(::eventuellTilgangsnektAarsak)
-            ?.let { throw AccessDeniedException("Tilgang til EPS nektet: $it") }
+            ?.let { throw PopulasjonstilgangNektetException("Tilgang til EPS nektet", tilgangsnekt(it)) }
 
         return eps
     }
@@ -81,10 +78,11 @@ class EpsService(
     private fun relasjonstype(): Relasjonstype =
         hentNaavaerendeEps()?.relasjonstype ?: Relasjonstype.UKJENT
 
-    private fun eventuellTilgangsnektAarsak(pid: Pid): String? =
+    private fun eventuellTilgangsnektAarsak(pid: Pid): TilgangResult? =
         populasjonstilgangService.eventuellTilgangsnektAarsak(pid = pid, sjekkKunKjerneregler = true)
 
     private companion object {
+
         private val personaliaSpec: List<PersonaliaType> =
             listOf(
                 PersonaliaType.NAVN,
@@ -102,5 +100,11 @@ class EpsService(
 
         private fun erUkjent(sivilstand: Sivilstand?): Boolean =
             sivilstand == null || Sivilstand.UOPPGITT == sivilstand
+
+        private fun tilgangsnekt(result: TilgangResult) =
+            Populasjonstilgangsnekt(
+                aarsak = result.avvisningAarsak ?: AvvisningAarsak.UNKNOWN,
+                begrunnelse = result.begrunnelse ?: "ukjent"
+            )
     }
 }
