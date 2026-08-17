@@ -15,7 +15,7 @@ data class PoppBeholdningResult(
 
 data class PoppBeholdning(
     val belop: Double,
-    val oppdateringArsak: String,
+    val oppdateringArsak: String?,
     val fomDato: Date
 )
 
