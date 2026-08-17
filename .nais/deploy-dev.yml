@@ -123,14 +123,13 @@ spec:
         - application: pensjon-selvbetjening-fss-gateway
           namespace: pensjonselvbetjening
           cluster: dev-fss
-        - application: skribenten-backend
-          namespace: pensjonsbrev
-          cluster: dev-gcp
+        - application: pensjon-selvbetjening-opptjening-backend
+          namespace: pensjonselvbetjening
         - application: pensjonssimulator
         - application: populasjonstilgangskontroll
           namespace: tilgangsmaskin
-        - application: skjermede-personer-pip
-          namespace: nom
+        - application: skribenten-backend
+          namespace: pensjonsbrev
         - application: tp-q2
           namespace: pensjonsamhandling
           cluster: dev-fss
@@ -143,9 +142,8 @@ spec:
         - host: pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
         - host: pensjon-testdata-facade.dev-fss-pub.nais.io # only in dev
         - host: pensjonskalkulator-unleash-api.nav.cloud.nais.io
-        - host: skjermede-personer-pip.intern.dev.nav.no
-        - host: tp-api-q2.dev-fss-pub.nais.io
         - host: sokos-utbetaldata.dev-fss-pub.nais.io
+        - host: tp-api-q2.dev-fss-pub.nais.io
         - host: g2by7q6m.apicdn.sanity.io
   env:
     - name: FSS_GATEWAY_SERVICE_ID
@@ -180,6 +178,10 @@ spec:
       value: dev-fss:pensjon-person:pensjon-representasjon-q2
     - name: PENSJON_REPRESENTASJON_URL
       value: https://pensjon-representasjon-q2.dev-fss-pub.nais.io
+    - name: PENSJON_SELVBETJENING_OPPTJENING_BACKEND_SERVICE_ID
+      value: dev-gcp:pensjonselvbetjening:pensjon-selvbetjening-opptjening-backend
+    - name: PENSJON_SELVBETJENING_OPPTJENING_BACKEND_URL
+      value: http://pensjon-selvbetjening-opptjening-backend.pensjonselvbetjening
     - name: PENSJONSSIMULATOR_SERVICE_ID
       value: dev-gcp:pensjonskalkulator:pensjonssimulator
     - name: PENSJONSSIMULATOR_URL
@@ -252,7 +254,6 @@ spec:
       value: g2by7q6m
     - name: SANITY_DATASET
       value: development
-
   envFrom:
     - secret: pensjonskalkulator-backend-unleash-api-token
     - secret: pkb-pid-encryption

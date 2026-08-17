@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.opptjening.api.v1
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.ShouldSpec
 import io.mockk.every
+import no.nav.pensjon.kalkulator.merknad.MerknadCode
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.opptjening.OpptjeningService
@@ -47,7 +48,8 @@ class OpptjeningControllerTest : ShouldSpec() {
                         omsorgspoeng = 3,
                         maksimalUfoeregrad = 4,
                         pensjonspoengType = "T1",
-                        beholdning = 12
+                        beholdning = 12,
+                        merknadListe = listOf(MerknadCode.AFP, MerknadCode.DAGPENGER)
                     )
                 )
 
@@ -71,7 +73,8 @@ class OpptjeningControllerTest : ShouldSpec() {
       "aarstall": 2021,
       "pensjonsgivendeInntektBeloep": 1,
       "pensjonspoeng": 2.1,
-      "pensjonsbeholdningBeloep": 12
+      "pensjonsbeholdningBeloep": 12,
+      "merknadListe": ["AFP", "DAGPENGER"]
     }
 ]"""
     }

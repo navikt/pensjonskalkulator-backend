@@ -8,11 +8,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.common.api.acl.CommonV1Sivilstatus
 import no.nav.pensjon.kalkulator.person.Pid
+import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.person.relasjon.eps.EpsService
 import no.nav.pensjon.kalkulator.person.relasjon.eps.api.v1.acl.*
 import no.nav.pensjon.kalkulator.person.relasjon.eps.api.v1.acl.FamilierelasjonMapper.toDto
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -69,6 +71,14 @@ class EpsController(
                 description = "Henting av EPS utført."
             ),
             ApiResponse(
+                responseCode = "400",
+                description = "Henting av EPS kunne ikke utføres pga. mangelfull spesifikasjon."
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "Henting av EPS kunne ikke utføres pga. manglende tilganger."
+            ),
+            ApiResponse(
                 responseCode = "503",
                 description = "Henting av EPS kunne ikke utføres av tekniske årsaker.",
                 content = [Content(examples = [ExampleObject(value = SERVICE_UNAVAILABLE_EXAMPLE)])]
@@ -79,11 +89,13 @@ class EpsController(
         traceAid.begin()
 
         return try {
-            val relasjon = service.nyligsteRelasjon(sivilstatus = spec.sivilstatus.internalValue)
+            val relasjon = service.nyligsteRelasjon(sivilstatus = sivilstatus(spec))
             relasjon.pid?.let { audit(pid = it, bakgrunn = spec.bakgrunn) }
             ResponseEntity.status(HttpStatus.OK).body(toDto(source = relasjon))
         } catch (e: AccessDeniedException) {
             ResponseEntity.status(HttpStatus.FORBIDDEN).body(tilgangNektet(e))
+        } catch (e: BadRequestException) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resultForMangelfullSpesifikasjon(e))
         } catch (e: EgressException) {
             handleError(e, "V1")!!
         } finally {
@@ -104,16 +116,24 @@ class EpsController(
     private companion object {
         private const val ERROR_MESSAGE = "eps-feil"
 
+        private fun sivilstatus(spec: EpsV1EpsSpec): Sivilstatus =
+            spec.sivilstand?.internalValue?.sivilstatus
+                ?: spec.sivilstatus?.internalValue
+                ?: throw BadRequestException("sivilstand eller sivilstatus ikke angitt")
+
         private fun tilgangNektet(e: AccessDeniedException) =
+            problemResult(type = EpsV1ProblemType.TILGANG_NEKTET, beskrivelse = e.message)
+
+        private fun resultForMangelfullSpesifikasjon(e: BadRequestException) =
+            problemResult(type = EpsV1ProblemType.MANGELFULL_SPESIFIKASJON, beskrivelse = e.message)
+
+        private fun problemResult(type: EpsV1ProblemType, beskrivelse: String?) =
             EpsV1Familierelasjon(
                 pid = null,
                 fom = null,
                 relasjonstype = EpsV1Relasjonstype.UKJENT,
                 relasjonPersondata = null,
-                problem = EpsV1Problem(
-                    type = EpsV1ProblemType.TILGANG_NEKTET,
-                    beskrivelse = e.message ?: "(ingen beskrivelse)"
-                )
+                problem = EpsV1Problem(type, beskrivelse ?: "(ingen beskrivelse)")
             )
     }
 }

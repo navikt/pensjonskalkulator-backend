@@ -73,41 +73,57 @@ class PersonServiceTest : ShouldSpec({
         }
     }
 
-    should("throw 'not found' exception when invalid fødselsnummer") {
-        shouldThrow<NotFoundException> {
-            PersonService(
-                client = arrangePerson(),
-                pidGetter = arrangePid(pid = Pid("bad")),
-                aldersgruppeFinder = arrangeAldersgruppe(),
-                navnRequirement,
-                normalderService = arrangeNormalder()
-            ).getPerson() shouldBe person().withPensjoneringAldre(pensjoneringAldre = defaultAldersgrenser)
-        }.message shouldBe "person"
+    context("invalid fødselsnummer") {
+        should("throw 'not found' exception") {
+            shouldThrow<NotFoundException> {
+                PersonService(
+                    client = arrangePerson(),
+                    pidGetter = arrangePid(pid = Pid("bad")),
+                    aldersgruppeFinder = arrangeAldersgruppe(),
+                    navnRequirement,
+                    normalderService = arrangeNormalder()
+                ).getPerson() shouldBe person().withPensjoneringAldre(pensjoneringAldre = defaultAldersgrenser)
+            }.message shouldBe "person"
+        }
+    }
+
+    context("missing fødselsdato") {
+        should("throw 'not found' exception") {
+            shouldThrow<NotFoundException> {
+                PersonService(
+                    client = arrangePerson(foedselsdato = datoSomRepresentererManglendeFoedselsdato),
+                    pidGetter = arrangePid(),
+                    aldersgruppeFinder = arrangeAldersgruppe(),
+                    navnRequirement,
+                    normalderService = arrangeNormalder()
+                ).getPerson() shouldBe person().withPensjoneringAldre(pensjoneringAldre = defaultAldersgrenser)
+            }.message shouldBe "fødselsdato"
+        }
     }
 })
+
+/**
+ * Datoer tidligere enn Person.minimumFoedselsdato representerer manglende fødselsdato.
+ */
+private val datoSomRepresentererManglendeFoedselsdato = LocalDate.of(1900, 12, 31)
 
 private val navnRequirement = mockk<NavnRequirement>(relaxed = true)
 
 private fun arrangePid(pid: Pid = PersonFactory.pid): PidGetter =
-    mockk<PidGetter>().apply {
-        every { pid() } returns pid
-    }
+    mockk { every { pid() } returns pid }
 
 private fun arrangeNormalder(pensjonsaldre: Aldersgrenser = defaultAldersgrenser): NormertPensjonsalderService =
-    mockk<NormertPensjonsalderService>().apply {
-        every { aldersgrenser(any<LocalDate>()) } returns pensjonsaldre
-    }
+    mockk { every { aldersgrenser(any<LocalDate>()) } returns pensjonsaldre }
 
 private fun arrangePerson(
+    foedselsdato: LocalDate = LocalDate.of(1963, 12, 31),
     pensjoneringAldre: Aldersgrenser = defaultAldersgrenser
 ): PersonClient =
-    mockk<PersonClient>().apply {
+    mockk {
         every {
             fetchPerson(any(), any())
-        } returns person().withPensjoneringAldre(pensjoneringAldre)
+        } returns person(foedselsdato = foedselsdato).withPensjoneringAldre(pensjoneringAldre)
     }
 
 private fun arrangeAldersgruppe(): AldersgruppeFinder =
-    mockk<AldersgruppeFinder>().apply {
-        every { aldersgruppe(any()) } returns ""
-    }
+    mockk { every { aldersgruppe(any()) } returns "" }

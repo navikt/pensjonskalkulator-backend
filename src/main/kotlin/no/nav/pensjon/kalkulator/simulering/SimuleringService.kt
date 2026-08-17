@@ -4,9 +4,12 @@ import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpProblem
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpProblemType
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpService
-import no.nav.pensjon.kalkulator.afp.api.dto.InternServiceberegnetAfpSpec
+import no.nav.pensjon.kalkulator.afp.InternServiceberegnetAfpSpec
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.merknad.MerknadCode
+import no.nav.pensjon.kalkulator.merknad.client.MerknadClient
+import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.simulering.PensjonUtil.uttakDato
@@ -28,7 +31,8 @@ class SimuleringService(
     private val personService: PersonService,
     private val pidGetter: PidGetter,
     private val time: TodayProvider,
-    private val serviceberegnetAfpService: ServiceberegnetAfpService
+    private val serviceberegnetAfpService: ServiceberegnetAfpService,
+    private val merknadClient: MerknadClient
 ) {
     private val log = KotlinLogging.logger {}
 
@@ -50,14 +54,21 @@ class SimuleringService(
     }
 
     /**
-     * Same as simulerPersonligAlderspensjon but with improved handling of problems.
+     * simulerPensjon = simulerPersonligAlderspensjon + merknader & improved handling of problems.
      */
-    fun simulerPensjon(providedSpec: ImpersonalSimuleringSpec): SimuleringResult =
-        if (providedSpec.simuleringType == SimuleringType.SERVICEBEREGN_AFP) {
-            simulerAfpMedFpp(providedSpec)
-        } else {
-            simulerAlderspensjon(providedSpec)
-        }
+    fun simulerPensjon(providedSpec: ImpersonalSimuleringSpec): SimuleringResult {
+        if (providedSpec.simuleringType == SimuleringType.SERVICEBEREGN_AFP)
+            return simulerAfpMedFpp(providedSpec)
+
+        val result = simulerAlderspensjon(providedSpec)
+
+        val opptjeningComboListe: List<SimulertOpptjening> = merge(
+            opptjeningListe = result.opptjeningListe,
+            merknaderPerAar = merknadClient.fetchMerknader(pid = pidGetter.pid()).perAar
+        )
+
+        return result.withOpptjeningListe(opptjeningComboListe)
+    }
 
     private fun simulerAlderspensjon(providedSpec: ImpersonalSimuleringSpec): SimuleringResult =
         try {
@@ -87,12 +98,12 @@ class SimuleringService(
         try {
             val afpSpec = InternServiceberegnetAfpSpec(
                 fodselsdato = personService.getPerson().foedselsdato,
-                uttaksdato = providedSpec.gradertUttak?.uttakFomAlder?.let { uttakDato(foedselDato = personService.getPerson().foedselsdato, uttakAlder = it)} as LocalDate,
-                afpOrdning = "AFPSTAT",
+                uttaksdato = uttaksdato(providedSpec),
+                afpOrdning = AfpOrdningType.AFPSTAT.name,
                 flyktning = false,
                 antAarIUtlandet = providedSpec.utenlandsopphold.antallAar,
                 utenlandsopphold = providedSpec.utenlandsopphold.periodeListe,
-                forventetArbeidsinntekt = providedSpec.gradertUttak.aarligInntekt,
+                forventetArbeidsinntekt = providedSpec.gradertUttak?.aarligInntekt,
                 inntektMndForAfp = providedSpec.inntektMaanedFoerAfp,
                 inntektForrigeKalenderaar = providedSpec.inntektForrigeKalenderaar,
                 inntektFremTilUttak = providedSpec.inntektFremTilUttak,
@@ -116,9 +127,8 @@ class SimuleringService(
                 ),
                 harForLiteTrygdetid = false,
                 trygdetid = 0,
-                opptjeningListe = emptyList(),
-                alderAar = null,
-                problem = afpResult.problem?.let { mapAfpProblem(it) }
+                opptjeningListe = afpResult.opptjeningListe.map(::simulert), alderAar = null,
+                problem = afpResult.problem?.let(::mapAfpProblem)
             )
         } catch (e: BadRequestException) {
             problem(e, type = ProblemType.ANNEN_KLIENTFEIL)
@@ -137,7 +147,68 @@ class SimuleringService(
             dato = time.date()
         )
 
+    private fun uttaksdato(spec: ImpersonalSimuleringSpec): LocalDate =
+        spec.gradertUttak?.uttakFomAlder?.let(::uttaksdato)
+            ?: throw BadRequestException("startalder for gradert uttak må angis")
+
+    private fun uttaksdato(alder: Alder): LocalDate =
+        uttakDato(
+            foedselDato = personService.getPerson().foedselsdato,
+            uttakAlder = alder
+        )
+
     private companion object {
+
+        private fun merge(
+            opptjeningListe: List<SimulertOpptjening>,
+            merknaderPerAar: Map<Int, List<MerknadCode>>
+        ): List<SimulertOpptjening> {
+            val nonEmptyMerknaderPerAar = merknaderPerAar.filter { it.value.isNotEmpty() }
+            val foersteMerknadAar = nonEmptyMerknaderPerAar.minOfOrNull { it.key } ?: 9999
+            val sisteMerknadAar = nonEmptyMerknaderPerAar.maxOfOrNull { it.key } ?: 0
+            val foersteAar = minAar(opptjeningListe).coerceAtMost(foersteMerknadAar)
+            val sisteAar = maxAar(opptjeningListe).coerceAtLeast(sisteMerknadAar)
+            if (foersteAar > sisteAar) return emptyList()
+
+            val liste = mutableListOf<SimulertOpptjening>()
+
+            for (aar in foersteAar..sisteAar) {
+                merknaderPerAar[aar].orEmpty().let {
+                    liste.add(
+                        opptjening(opptjeningListe, aar)?.withMerknadListe(it) ?: bareMerknader(aar, merknadListe = it)
+                    )
+                }
+            }
+
+            return liste
+        }
+
+        private fun simulert(opptjening: AarligOpptjening) =
+            SimulertOpptjening(
+                aarstall = opptjening.aar,
+                pensjonsgivendeInntektBeloep = opptjening.pensjonsgivendeInntekt,
+                pensjonspoeng = opptjening.pensjonspoeng,
+                pensjonsbeholdningBeloep = opptjening.beholdning,
+                merknadListe = opptjening.merknadListe
+            )
+
+        private fun opptjening(opptjeningListe: List<SimulertOpptjening>, aar: Int): SimulertOpptjening? =
+            opptjeningListe.firstOrNull { it.aarstall == aar }
+
+        private fun minAar(aarligListe: List<SimulertOpptjening>): Int =
+            aarligListe.minOfOrNull { it.aarstall } ?: 9999
+
+        private fun maxAar(aarligListe: List<SimulertOpptjening>): Int =
+            aarligListe.maxOfOrNull { it.aarstall } ?: 0
+
+        private fun bareMerknader(aar: Int, merknadListe: List<MerknadCode>) =
+            SimulertOpptjening(
+                aarstall = aar,
+                pensjonsgivendeInntektBeloep = 0,
+                pensjonspoeng = 0.0,
+                pensjonsbeholdningBeloep = 0,
+                merknadListe
+            )
 
         private fun problem(e: RuntimeException, type: ProblemType) =
             SimuleringResult(

@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.opptjening.OpptjeningService
-import no.nav.pensjon.kalkulator.opptjening.api.v1.acl.OpptjeningResultMapper.toDto
+import no.nav.pensjon.kalkulator.opptjening.api.v1.acl.OpptjeningResultMapper.transferable
 import no.nav.pensjon.kalkulator.opptjening.api.v1.acl.OpptjeningV1
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
@@ -43,7 +43,7 @@ class OpptjeningController(
         traceAid.begin()
 
         return try {
-            service.opptjening().map(::toDto)
+            service.opptjening().map(::transferable)
         } catch (e: EgressException) {
             handleError(e, "V1")!!
         } finally {
