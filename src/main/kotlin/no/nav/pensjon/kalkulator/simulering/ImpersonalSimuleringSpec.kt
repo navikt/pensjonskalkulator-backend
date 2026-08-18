@@ -30,7 +30,12 @@ data class ImpersonalSimuleringSpec(
     // SERVICEBEREGN_AFP-specific fields (required when simuleringstype = SERVICEBEREGN_AFP, ignored otherwise)
     val inntektForrigeKalenderaar: Int? = null,
     val inntektFremTilUttak: Int? = null,
-    val inntektMaanedFoerAfp: Int? = null
+    val inntektMaanedFoerAfp: Int? = null,
+
+    // NB: Bruk dette feltet med forsiktighet:
+    // Hvis det settes til 'true' vil simulatoren kunne foreslå alternative (senere) uttaksdatoer som kan medføre
+    // inntektstap for personen det gjelder, dersom vedkommende har uføretrygd og kvalifiserer til AFP
+    val tillatSenereFoersteuttakForUfoere: Boolean = false
 )
 
 /**

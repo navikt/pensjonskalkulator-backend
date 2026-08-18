@@ -41,7 +41,8 @@ class LavesteUttaksalderService(
                 periodeListe = impersonalSpec.utenlandsperiodeListe,
                 antallAar = null
             ),
-            innvilgetLivsvarigOffentligAfp = impersonalSpec.innvilgetLivsvarigOffentligAfp
+            innvilgetLivsvarigOffentligAfp = impersonalSpec.innvilgetLivsvarigOffentligAfp,
+            tillatSenereFoersteuttakForUfoere = false
         )
 
     private fun foedselsdato(): LocalDate =
