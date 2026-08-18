@@ -19,6 +19,7 @@ data class LagreSimuleringSpecDtoV1(
     val simuleringsinformasjon: LagreSimuleringsinformasjonDto?,
     val maanedligAlderspensjonForKnekkpunkter: LagreMaanedligAlderspensjonForKnekkpunkterDto?,
     val navEnhetId: String?,
+    val serviceberegning: LagreServiceberegningDto? = null,
 )
 
 data class LagreAlderspensjonDto(
@@ -45,20 +46,27 @@ data class LagreLivsvarigOffentligAfpDto(
 )
 
 data class LagreTidsbegrensetOffentligAfpDto(
-    @field:NotNull val alderAar: Int,
-    @field:NotNull val totaltAfpBeloep: Int,
-    @field:NotNull val tidligereArbeidsinntekt: Int,
-    @field:NotNull val grunnbeloep: Int,
-    @field:NotNull val sluttpoengtall: Double,
-    @field:NotNull val trygdetid: Int,
-    @field:NotNull val poengaarTom1991: Int,
-    @field:NotNull val poengaarFom1992: Int,
-    @field:NotNull val grunnpensjon: Int,
-    @field:NotNull val tilleggspensjon: Int,
-    @field:NotNull val afpTillegg: Int,
-    @field:NotNull val saertillegg: Int,
-    @field:NotNull val afpGrad: Int,
-    @field:NotNull val erAvkortet: Boolean
+    val alderAar: Int?,
+    val totaltAfpBeloep: Int?,
+    val tidligereArbeidsinntekt: Int?,
+    val grunnbeloep: Int?,
+    val sluttpoengtall: Double?,
+    val trygdetid: Int?,
+    val poengaarTom1991: Int?,
+    val poengaarFom1992: Int?,
+    val grunnpensjon: Int?,
+    val tilleggspensjon: Int?,
+    val afpTillegg: Int?,
+    val saertillegg: Int?,
+    val afpGrad: Int?,
+    val erAvkortet: Boolean?
+)
+
+data class LagreServiceberegningDto(
+    @field:NotNull val uttaksalder: LagreAlderDto,
+    @field:NotNull val uttaksdato: String,
+    val forventetFremtidigInntekt: Int?,
+    val afp: LagreTidsbegrensetOffentligAfpDto?,
 )
 
 data class LagrePrivatAfpDto(
