@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.opptjening
 import no.nav.pensjon.kalkulator.general.Aarlig
 import no.nav.pensjon.kalkulator.merknad.MerknadCode
 import no.nav.pensjon.kalkulator.merknad.client.MerknadClient
+import no.nav.pensjon.kalkulator.opptjening.BeholdningVelger.velg
 import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengClient
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
@@ -26,80 +27,82 @@ class OpptjeningService(
     fun opptjeningMedMerknader(
         pid: Pid,
         opptjeningListe: List<AarligOpptjening>,
-        beholdningListe: List<AarligBeholdning>
+        beholdningListe: List<DatertBeholdning>
     ): List<AarligOpptjening> {
-        val foersteAar = minAar(opptjeningListe).coerceAtMost(minAar(beholdningListe))
-        val sisteAar = maxAar(opptjeningListe).coerceAtLeast(maxAar(beholdningListe))
-        val opptjeningComboListe = merge(opptjeningListe, beholdningListe, foersteAar, sisteAar)
+        val opptjeningListePerAar: Map<Int, List<AarligOpptjening>> = opptjeningListe.groupBy { it.aar }
+        val beholdningListePerAar: Map<Int, List<DatertBeholdning>> = beholdningListe.groupBy { it.aar }
+        val foersteComboAar = minAar(opptjeningListePerAar).coerceAtMost(minAar(beholdningListePerAar))
+        val sisteComboAar = maxAar(opptjeningListePerAar).coerceAtLeast(maxAar(beholdningListePerAar))
+        val opptjeningComboPerAar = merge(opptjeningListePerAar, beholdningListePerAar, foersteComboAar, sisteComboAar)
+        val nonEmptyMerknaderPerAar = merknadClient.fetchMerknader(pid).perAar.filter { it.value.isNotEmpty() }
+        val foersteMerknadAar = nonEmptyMerknaderPerAar.minOfOrNull { it.key } ?: foersteComboAar
+        val sisteMerknadAar = nonEmptyMerknaderPerAar.maxOfOrNull { it.key } ?: sisteComboAar
 
         return merge(
-            opptjeningListe = opptjeningComboListe,
-            merknaderPerAar = merknadClient.fetchMerknader(pid).perAar,
-            foersteOpptjeningAar = foersteAar,
-            sisteOppptjeningAar = sisteAar
+            opptjeningPerAar = opptjeningComboPerAar,
+            merknadListePerAar = nonEmptyMerknaderPerAar,
+            foersteAar = foersteComboAar.coerceAtMost(foersteMerknadAar),
+            sisteAar = sisteComboAar.coerceAtLeast(sisteMerknadAar)
         )
     }
 
     private fun merge(
-        opptjeningListe: List<AarligOpptjening>,
-        beholdningListe: List<AarligBeholdning>,
+        opptjeningListePerAar: Map<Int, List<AarligOpptjening>>,
+        beholdningListePerAar: Map<Int, List<DatertBeholdning>>,
         foersteAar: Int,
         sisteAar: Int
-    ): List<AarligOpptjening> {
-        if (foersteAar > sisteAar) return emptyList()
-
-        val liste = mutableListOf<AarligOpptjening>()
-
-        for (aar in foersteAar..sisteAar) {
-            val beholdning = beholdningListe.firstOrNull { it.aar == aar }?.beholdning ?: 0
-
-            liste.add(
-                opptjeningListe.firstOrNull { it.aar == aar }?.withBeholdning(beholdning)
-                    ?: bareBeholdning(aar, beholdning)
-            )
-        }
-
-        return liste
-    }
-
-    private fun merge(
-        opptjeningListe: List<AarligOpptjening>,
-        merknaderPerAar: Map<Int, List<MerknadCode>>,
-        foersteOpptjeningAar: Int,
-        sisteOppptjeningAar: Int
-    ): List<AarligOpptjening> {
-        val nonEmptyMerknaderPerAar = merknaderPerAar.filter { it.value.isNotEmpty() }
-        val foersteMerknadAar = nonEmptyMerknaderPerAar.minOfOrNull { it.key } ?: 9999
-        val sisteMerknadAar = nonEmptyMerknaderPerAar.maxOfOrNull { it.key } ?: 0
-        val foersteAar = foersteOpptjeningAar.coerceAtMost(foersteMerknadAar)
-        val sisteAar = sisteOppptjeningAar.coerceAtLeast(sisteMerknadAar)
-        if (foersteAar > sisteAar) return emptyList()
-
-        val liste = mutableListOf<AarligOpptjening>()
-
-        for (aar in foersteAar..sisteAar) {
-            merknaderPerAar[aar].orEmpty().let {
-                liste.add(
-                    opptjening(opptjeningListe, aar)?.withMerknadListe(it) ?: bareMerknader(aar, merknadListe = it)
+    ): Map<Int, AarligOpptjening> =
+        if (foersteAar > sisteAar)
+            emptyMap()
+        else
+            (foersteAar..sisteAar).associateWith {
+                opptjeningCombo(
+                    aar = it,
+                    opptjening = opptjeningListePerAar[it]?.firstOrNull(),
+                    beholdning = beholdningListePerAar[it]?.let(::velg)?.beholdning ?: 0
                 )
             }
-        }
 
-        return liste
-    }
+    private fun merge(
+        opptjeningPerAar: Map<Int, AarligOpptjening>,
+        merknadListePerAar: Map<Int, List<MerknadCode>>,
+        foersteAar: Int,
+        sisteAar: Int
+    ): List<AarligOpptjening> =
+         if (foersteAar > sisteAar)
+            emptyList()
+        else
+            (foersteAar..sisteAar).map {
+                opptjeningCombo(
+                    aar = it,
+                    opptjening = opptjeningPerAar[it],
+                    merknadListe = merknadListePerAar[it].orEmpty()
+                )
+            }
 
     private companion object {
 
-        private fun minAar(aarligListe: List<Aarlig>): Int =
-            aarligListe.minOfOrNull { it.aar } ?: 9999
+        private fun minAar(map: Map<Int, List<Aarlig>>): Int =
+            map.minOfOrNull { it.key } ?: 9999
 
-        private fun maxAar(aarligListe: List<Aarlig>): Int =
-            aarligListe.maxOfOrNull { it.aar } ?: 0
+        private fun maxAar(map: Map<Int, List<Aarlig>>): Int =
+            map.maxOfOrNull { it.key } ?: 0
 
-        private fun opptjening(opptjeningListe: List<AarligOpptjening>, aar: Int): AarligOpptjening? =
-            opptjeningListe.firstOrNull { it.aar == aar }
+        private fun opptjeningCombo(
+            aar: Int,
+            opptjening: AarligOpptjening?,
+            beholdning: Int
+        ): AarligOpptjening =
+            opptjening?.withBeholdning(beholdning) ?: kunBeholdning(aar, beholdning)
 
-        private fun bareBeholdning(aar: Int, beholdning: Int) =
+        private fun opptjeningCombo(
+            aar: Int,
+            opptjening: AarligOpptjening?,
+            merknadListe: List<MerknadCode>
+        ): AarligOpptjening =
+            opptjening?.withMerknadListe(merknadListe) ?: kunMerknadListe(aar, merknadListe)
+
+        private fun kunBeholdning(aar: Int, beholdning: Int) =
             AarligOpptjening(
                 aar,
                 pensjonsgivendeInntekt = 0,
@@ -111,7 +114,7 @@ class OpptjeningService(
                 merknadListe = emptyList()
             )
 
-        private fun bareMerknader(aar: Int, merknadListe: List<MerknadCode>) =
+        private fun kunMerknadListe(aar: Int, merknadListe: List<MerknadCode>) =
             AarligOpptjening(
                 aar,
                 pensjonsgivendeInntekt = 0,
