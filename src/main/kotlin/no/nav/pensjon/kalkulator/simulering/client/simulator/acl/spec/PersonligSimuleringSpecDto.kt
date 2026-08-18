@@ -21,7 +21,8 @@ data class PersonligSimuleringSpecDto(
     val fremtidigInntektListe: List<InntektSpecDto>? = null,
     val utenlandsperiodeListe: List<UtlandSpecDto>? = null,
     val eps: EpsSpecDto? = null,
-    val offentligAfp: OffentligAfpSpecDto? = null
+    val offentligAfp: OffentligAfpSpecDto? = null,
+    val tillatSenereFoersteuttakForUfoere: Boolean = false
 )
 
 data class GradertUttakSpecDto(

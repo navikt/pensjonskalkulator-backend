@@ -17,7 +17,7 @@ object SimuleringSpecMapper {
             avdoed = null
         )
 
-    fun fromDto(source: SimuleringV1Spec) =
+    fun fromDto(source: SimuleringV1Spec, tillatSenereFoersteuttakForUfoere: Boolean) =
         ImpersonalSimuleringSpec(
             simuleringType = source.simuleringstype.internalValue,
             eps = source.eps?.let(::epsSpec) ?: defaultEpsSpec,
@@ -31,7 +31,8 @@ object SimuleringSpecMapper {
             innvilgetLivsvarigOffentligAfp = source.offentligAfp?.innvilgetLivsvarigAfpListe?.firstOrNull()?.let(::afp),
             inntektForrigeKalenderaar = source.offentligAfp?.inntektForrigeKalenderaar,
             inntektFremTilUttak = source.offentligAfp?.inntektFremTilUttak,
-            inntektMaanedFoerAfp = source.offentligAfp?.inntektMaanedFoerAfp
+            inntektMaanedFoerAfp = source.offentligAfp?.inntektMaanedFoerAfp,
+            tillatSenereFoersteuttakForUfoere = tillatSenereFoersteuttakForUfoere
         )
 
     private fun epsSpec(source: SimuleringV1EpsSpec) =

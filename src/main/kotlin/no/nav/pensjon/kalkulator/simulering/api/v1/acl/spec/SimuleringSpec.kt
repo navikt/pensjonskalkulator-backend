@@ -20,7 +20,7 @@ data class SimuleringV1Spec(
     val utenlandsperiodeListe: List<SimuleringV1UtenlandsperiodeSpec>? = null,
     val sivilstatus: CommonV1Sivilstatus? = null,
     val eps: SimuleringV1EpsSpec? = null,
-    val offentligAfp: SimuleringV1OffentligAfpSpec? = null,
+    val offentligAfp: SimuleringV1OffentligAfpSpec? = null
 )
 
 data class SimuleringV1GradertUttakSpec(
@@ -102,7 +102,7 @@ enum class SimuleringV1AfpOrdningTypeSpec(val internalValue: AfpOrdningType) {
     KONVERTERT_PRIVAT(internalValue = AfpOrdningType.KONV_K),
     KONVERTERT_OFFENTLIG(internalValue = AfpOrdningType.KONV_O),
     LO_NHO_ORDNINGEN(internalValue = AfpOrdningType.LONHO),
-    SPEKTER(internalValue = AfpOrdningType.NAVO),
+    SPEKTER(internalValue = AfpOrdningType.NAVO)
 }
 
 enum class SimuleringV1SimuleringstypeSpec(val internalValue: SimuleringType) {
