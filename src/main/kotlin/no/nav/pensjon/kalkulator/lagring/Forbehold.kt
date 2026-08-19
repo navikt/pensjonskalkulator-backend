@@ -4,6 +4,15 @@ data class ForbeholdInnhold(
     val seksjoner: List<ForbeholdSeksjon>
 )
 
+data class Kortforbehold(
+    val avsnitt: List<ForbeholdAvsnitt>
+)
+
+data class ForbeholdOgKortforbehold(
+    val forbehold: ForbeholdInnhold?,
+    val kortforbehold: Kortforbehold?
+)
+
 data class ForbeholdSeksjon(
     val tittel: String?,
     val avsnitt: List<ForbeholdAvsnitt>,

@@ -1,8 +1,8 @@
 package no.nav.pensjon.kalkulator.lagring.client.sanity
 
 import mu.KotlinLogging
-import no.nav.pensjon.kalkulator.lagring.ForbeholdInnhold
-import no.nav.pensjon.kalkulator.lagring.client.sanity.dto.SanityQueryResponseDto
+import no.nav.pensjon.kalkulator.lagring.ForbeholdOgKortforbehold
+import no.nav.pensjon.kalkulator.lagring.client.sanity.dto.SanityForbeholdOgKortforbeholdResponseDto
 import no.nav.pensjon.kalkulator.lagring.client.sanity.map.SanityForbeholdMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
@@ -25,10 +25,10 @@ class SanityForbeholdClient(
 
     private val webClient = webClientBuilder.build()
 
-    override fun fetchForbehold(): ForbeholdInnhold? {
-        val query = """*[_type == "forbeholdAvsnitt" && language == "nb" && visIntern == true] | order(order asc) | {_id,overskrift,"innhold":innholdIntern,alltidSynlig,vilkaar}"""
+    override fun fetchForbeholdOgKortforbehold(): ForbeholdOgKortforbehold {
+        val query = """{"forbehold":*[_type == "forbeholdAvsnitt" && language == "nb" && visIntern == true] | order(order asc) | {_id,overskrift,"innhold":innholdIntern,alltidSynlig,vilkaar},"kortforbehold":*[_type == "kortforbehold"]{innhold}}"""
 
-        log.debug { "GET Sanity query for forbehold" }
+        log.debug { "GET Sanity query for forbehold og kortforbehold" }
 
         val uri: URI = UriComponentsBuilder.fromUriString(sanityUrl)
             .queryParam("query", query)
@@ -44,10 +44,11 @@ class SanityForbeholdClient(
                 headers.accept = listOf(MediaType.APPLICATION_JSON)
             }
             .retrieve()
-            .bodyToMono<SanityQueryResponseDto>()
+            .bodyToMono<SanityForbeholdOgKortforbeholdResponseDto>()
             .block()
 
-        val documents = response?.result ?: return null
-        return if (documents.isEmpty()) null else SanityForbeholdMapper.fromDto(documents)
+        val result = response?.result
+            ?: return ForbeholdOgKortforbehold(forbehold = null, kortforbehold = null)
+        return SanityForbeholdMapper.fromForbeholdOgKortforbeholdDto(result)
     }
 }
