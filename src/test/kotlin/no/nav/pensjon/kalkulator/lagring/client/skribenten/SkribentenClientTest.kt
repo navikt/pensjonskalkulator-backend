@@ -52,7 +52,7 @@ class SkribentenClientTest : ShouldSpec({
         server?.arrangeOkJsonResponse(BREV_RESPONSE)
 
         Arrange.webClientContextRunner().run {
-            val response = client(it).lagreSimulering(SAK_ID, simulering(), null)
+            val response = client(it).lagreSimulering(SAK_ID, simulering(), null, null)
 
             response.brevId shouldBe "123"
             response.sakId shouldBe "456"
@@ -63,7 +63,7 @@ class SkribentenClientTest : ShouldSpec({
         server?.arrangeOkJsonResponse(BREV_RESPONSE)
 
         Arrange.webClientContextRunner().run {
-            client(it).lagreSimulering(SAK_ID, simulering(), null)
+            client(it).lagreSimulering(SAK_ID, simulering(), null, null)
 
             server?.takeRequest()?.let { request ->
                 request.path shouldBe "/external/api/v1/brev"
@@ -76,7 +76,7 @@ class SkribentenClientTest : ShouldSpec({
         server?.arrangeOkJsonResponse(BREV_RESPONSE)
 
         Arrange.webClientContextRunner().run {
-            client(it).lagreSimulering(SAK_ID, simulering().copy(serviceberegning = serviceberegning()), null)
+            client(it).lagreSimulering(SAK_ID, simulering().copy(serviceberegning = serviceberegning()), null, null)
 
             server?.takeRequest()?.let { request ->
                 val body = request.body.readUtf8()
@@ -94,7 +94,7 @@ class SkribentenClientTest : ShouldSpec({
 
         Arrange.webClientContextRunner().run {
             val exception = shouldThrow<EgressException> {
-                client(it).lagreSimulering(SAK_ID, simulering(), null)
+                client(it).lagreSimulering(SAK_ID, simulering(), null, null)
             }
 
             exception.isClientError shouldBe false
@@ -107,7 +107,7 @@ class SkribentenClientTest : ShouldSpec({
 
         Arrange.webClientContextRunner().run {
             val exception = shouldThrow<EgressException> {
-                client(it).lagreSimulering(SAK_ID, simulering(), null)
+                client(it).lagreSimulering(SAK_ID, simulering(), null, null)
             }
 
             exception.isClientError shouldBe true

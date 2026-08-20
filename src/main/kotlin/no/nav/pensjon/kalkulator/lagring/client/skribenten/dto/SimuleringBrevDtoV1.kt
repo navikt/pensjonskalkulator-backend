@@ -11,6 +11,7 @@ data class SimuleringBrevDtoV1(
     val aarligInntektOgPensjonListe: List<AarligInntektOgPensjonBrevDtoV1>?,
     val pensjonsopptjeningListe: List<PensjonsopptjeningBrevDtoV1>?,
     val forbehold: ForbeholdBrevDtoV1?,
+    val kortforbehold: KortforbeholdBrevDtoV1?,
 ) : SaksbehandlerValgBrevdata
 
 data class ServiceberegningBrevDtoV1(
@@ -189,4 +190,8 @@ data class ForbeholdSeksjonBrevDtoV1(
 data class ForbeholdAvsnittBrevDtoV1(
     val tekst: String,
     val punktliste: List<String>?
+)
+
+data class KortforbeholdBrevDtoV1(
+    val avsnitt: List<ForbeholdAvsnittBrevDtoV1>,
 )

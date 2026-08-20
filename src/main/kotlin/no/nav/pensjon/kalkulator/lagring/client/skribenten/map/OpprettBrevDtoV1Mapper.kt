@@ -6,7 +6,7 @@ import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.*
 
 object OpprettBrevDtoV1Mapper {
 
-    fun toDto(source: LagreSimulering, saksId: Long, forbehold: ForbeholdInnhold?): OpprettBrevRequestDtoV1<SaksbehandlerValgBrevdata> {
+    fun toDto(source: LagreSimulering, saksId: Long, forbehold: ForbeholdInnhold?, kortforbehold: Kortforbehold?): OpprettBrevRequestDtoV1<SaksbehandlerValgBrevdata> {
         source.serviceberegning?.afp?.let { afp ->
             return opprettBrevRequest(
                 source = source,
@@ -40,6 +40,7 @@ object OpprettBrevDtoV1Mapper {
                 aarligInntektOgPensjonListe = source.aarligInntektOgPensjonListe?.map(::mapToAarligInntektOgPensjonDto),
                 pensjonsopptjeningListe = source.pensjonsopptjeningListe?.map(::mapToPensjonsopptjeningDto),
                 forbehold = forbehold?.let(::mapToForbeholdDto),
+                kortforbehold = kortforbehold?.let(::mapToKortforbeholdDto),
             ),
         )
     }
@@ -227,6 +228,16 @@ object OpprettBrevDtoV1Mapper {
                             punktliste = avsnitt.punktliste
                         )
                     }
+                )
+            }
+        )
+
+    private fun mapToKortforbeholdDto(source: Kortforbehold) =
+        KortforbeholdBrevDtoV1(
+            avsnitt = source.avsnitt.map { avsnitt ->
+                ForbeholdAvsnittBrevDtoV1(
+                    tekst = avsnitt.tekst,
+                    punktliste = avsnitt.punktliste
                 )
             }
         )
