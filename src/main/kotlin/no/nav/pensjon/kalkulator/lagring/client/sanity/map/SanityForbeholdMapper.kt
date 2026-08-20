@@ -2,16 +2,31 @@ package no.nav.pensjon.kalkulator.lagring.client.sanity.map
 
 import no.nav.pensjon.kalkulator.lagring.ForbeholdAvsnitt
 import no.nav.pensjon.kalkulator.lagring.ForbeholdInnhold
+import no.nav.pensjon.kalkulator.lagring.ForbeholdOgKortforbehold
 import no.nav.pensjon.kalkulator.lagring.ForbeholdSeksjon
+import no.nav.pensjon.kalkulator.lagring.Kortforbehold
 import no.nav.pensjon.kalkulator.lagring.SanityVisningsvilkaar
 import no.nav.pensjon.kalkulator.lagring.client.sanity.dto.SanityBlock
 import no.nav.pensjon.kalkulator.lagring.client.sanity.dto.SanityForbeholdAvsnittDto
+import no.nav.pensjon.kalkulator.lagring.client.sanity.dto.SanityForbeholdOgKortforbeholdResultDto
+import no.nav.pensjon.kalkulator.lagring.client.sanity.dto.SanityKortforbeholdDto
 
 object SanityForbeholdMapper {
 
     fun fromDto(documents: List<SanityForbeholdAvsnittDto>): ForbeholdInnhold =
         ForbeholdInnhold(
             seksjoner = documents.map(::mapToSeksjon)
+        )
+
+    fun fromKortforbeholdDto(document: SanityKortforbeholdDto): Kortforbehold =
+        Kortforbehold(
+            avsnitt = extractAvsnitt(document.innhold ?: emptyList())
+        )
+
+    fun fromForbeholdOgKortforbeholdDto(result: SanityForbeholdOgKortforbeholdResultDto): ForbeholdOgKortforbehold =
+        ForbeholdOgKortforbehold(
+            forbehold = result.forbehold?.takeIf { it.isNotEmpty() }?.let(::fromDto),
+            kortforbehold = result.kortforbehold?.firstOrNull()?.let(::fromKortforbeholdDto)
         )
 
     private fun mapToSeksjon(source: SanityForbeholdAvsnittDto): ForbeholdSeksjon {
