@@ -29,7 +29,8 @@ object PersonligSimuleringSpecMapper {
             fremtidigInntektListe = null,
             utenlandsperiodeListe = impersonalSpec.utenlandsopphold.periodeListe.map(::utlandPeriode),
             eps = eps(impersonalSpec.eps),
-            offentligAfp = offentligAfp(impersonalSpec)
+            offentligAfp = offentligAfp(impersonalSpec),
+            tillatSenereFoersteuttakForUfoere = impersonalSpec.tillatSenereFoersteuttakForUfoere
         )
 
     private fun gradertUttak(source: GradertUttak) =
