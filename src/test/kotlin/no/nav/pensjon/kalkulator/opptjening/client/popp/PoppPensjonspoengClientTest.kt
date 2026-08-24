@@ -7,8 +7,8 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.opptjening.AarligBeholdning
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
+import no.nav.pensjon.kalkulator.opptjening.DatertBeholdning
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.testutil.Arrange
 import org.springframework.beans.factory.BeanFactory
@@ -18,6 +18,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
+import java.time.LocalDate
 
 /**
  * Bruker WireMock istedenfor MockWebServer her, siden WireMock støtter testing av parallelle kall.
@@ -83,12 +84,12 @@ class PoppPensjonspoengClientTest : FunSpec({
                 )
 
                 response.second shouldBe listOf(
-                    AarligBeholdning(
-                        aar = 1978,
+                    DatertBeholdning(
+                        dato = LocalDate.of(1978, 1, 1),
                         beholdning = 12
                     ),
-                    AarligBeholdning(
-                        aar = 1979,
+                    DatertBeholdning(
+                        dato = LocalDate.of(1979, 1, 1),
                         beholdning = 23
                     )
                 )
