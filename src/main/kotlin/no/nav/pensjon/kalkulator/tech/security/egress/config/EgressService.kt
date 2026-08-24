@@ -18,6 +18,12 @@ enum class EgressService(
     MICROSOFT_ENTRA_ID("Microsoft Entra ID", "MEID", "OAuth2 configuration data"),
     NAV_ANSATT("Nav-ansatt", "NA", "Info om Nav-ansatt"),
     NORSK_PENSJON("Norsk Pensjon", "NP", "Private pensjonsavtaler", GatewayUsage.INTERNAL),
+    NORSK_PENSJON_REST(
+        description = "Norsk Pensjon",
+        shortName = "NP",
+        purpose = "Private pensjonsavtaler",
+        authType = AuthType.MUTUAL_TLS
+    ),
     OAUTH2_TOKEN("OAuth2 token", "OA2", "OAuth2 access token"),
     OPPTJENING_SELVBETJENING(
         description = "Prosesserte pensjonsopptjeningsdata",
