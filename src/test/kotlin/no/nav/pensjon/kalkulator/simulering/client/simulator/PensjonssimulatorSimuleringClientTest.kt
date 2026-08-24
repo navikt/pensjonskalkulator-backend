@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering.client.simulator
 
-import io.kotest.core.spec.style.FunSpec
+import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -28,7 +28,7 @@ import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
 import java.time.LocalDate
 
-class PensjonssimulatorSimuleringClientTest : FunSpec({
+class PensjonssimulatorSimuleringClientTest : ShouldSpec({
 
     var server: MockWebServer? = null
     var baseUrl: String? = null
@@ -58,170 +58,182 @@ class PensjonssimulatorSimuleringClientTest : FunSpec({
     /**
      * NAU = Nærmest Angitt Uttak (alternative simuleringsparametre)
      */
-    test("simulerPersonligAlderspensjon der responsen har alternativ NAU-beregning") {
-        server?.arrangeOkJsonResponse(ALTERNATIV_PENSJON)
+    context("respons-JSON har alternativ NAU-beregning") {
+        should("inkludere 'alternativ' i responsobjektet") {
+            server?.arrangeOkJsonResponse(ALTERNATIV_PENSJON)
 
-        Arrange.webClientContextRunner().run {
+            Arrange.webClientContextRunner().run {
 
-            val response: SimuleringResult =
-                client(context = it).simulerPersonligAlderspensjon(
-                    impersonalSpec(),
-                    personalSpec(Sivilstatus.ENKE_ELLER_ENKEMANN)
-                )
-
-            response shouldBe SimuleringResult(
-                alderspensjonListe = listOf(
-                    alderspensjon(alder = 63, beloep = 13956),
-                    alderspensjon(alder = 64, beloep = 83736),
-                    alderspensjon(alder = 65, beloep = 153174),
-                    alderspensjon(alder = 66, beloep = 222612),
-                    alderspensjon(alder = 67, beloep = 222612),
-                    alderspensjon(alder = 68, beloep = 222612),
-                    alderspensjon(alder = 69, beloep = 222612),
-                    alderspensjon(alder = 70, beloep = 222612),
-                    alderspensjon(alder = 71, beloep = 222612),
-                    alderspensjon(alder = 72, beloep = 222612),
-                    alderspensjon(alder = 73, beloep = 222612),
-                    alderspensjon(alder = 74, beloep = 222612),
-                    alderspensjon(alder = 75, beloep = 222612),
-                    alderspensjon(alder = 76, beloep = 222612),
-                    alderspensjon(alder = 77, beloep = 222612)
-                ),
-                alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 13000, heltUttak = 26000),
-                livsvarigOffentligAfpListe = emptyList(),
-                tidsbegrensetOffentligAfp = null,
-                privatAfpListe = emptyList(),
-                vilkaarsproeving = Vilkaarsproeving(
-                    innvilget = false,
-                    alternativ = Alternativ(
-                        gradertUttakAlder = Alder(aar = 63, maaneder = 10),
-                        uttakGrad = Uttaksgrad.FOERTI_PROSENT,
-                        heltUttakAlder = Alder(aar = 65, maaneder = 6)
+                val response: SimuleringResult =
+                    client(context = it).simulerPersonligAlderspensjon(
+                        impersonalSpec(),
+                        personalSpec(Sivilstatus.ENKE_ELLER_ENKEMANN)
                     )
-                ),
-                harForLiteTrygdetid = false,
-                trygdetid = 0,
-                opptjeningListe = emptyList()
-            )
-        }
-    }
 
-    test("simulerPersonligAlderspensjon sends request body with gradert uttak when specified") {
-        server?.arrangeOkJsonResponse(body = ALTERNATIV_PENSJON)
-
-        Arrange.webClientContextRunner().run {
-            client(context = it).simulerPersonligAlderspensjon(
-                impersonalSpec = impersonalGradertUttakSpec(),
-                personalSpec = personalSpec(Sivilstatus.ENKE_ELLER_ENKEMANN)
-            )
-
-            server?.let(::assertGradertUttakRequestBody)
-        }
-    }
-
-    test("simulerPersonligAlderspensjon med ikke-oppfylte vilkaar returnerer alternativ") {
-        server?.arrangeOkJsonResponse(VILKAAR_IKKE_OPPFYLT_BODY)
-
-        Arrange.webClientContextRunner().run {
-            val result = client(context = it).simulerPersonligAlderspensjon(
-                impersonalSpec = impersonalGradertUttakSpec(),
-                personalSpec = personalSpec(Sivilstatus.UGIFT)
-            )
-
-            result shouldBe SimuleringResult(
-                alderspensjonListe = emptyList(),
-                alderspensjonMaanedsbeloep = null,
-                livsvarigOffentligAfpListe = emptyList(),
-                privatAfpListe = emptyList(),
-                vilkaarsproeving = Vilkaarsproeving(
-                    innvilget = false,
-                    alternativ = Alternativ(
-                        gradertUttakAlder = null,
-                        uttakGrad = Uttaksgrad.HUNDRE_PROSENT,
-                        heltUttakAlder = Alder(aar = 67, maaneder = 0)
-                    )
-                ),
-                harForLiteTrygdetid = false,
-                trygdetid = 0,
-                opptjeningListe = emptyList()
-            )
-        }
-    }
-
-    test("simulerPersonligAlderspensjon med livsvarig offentlig AFP og opptjening") {
-        server?.arrangeOkJsonResponse(PENSJON_MED_LIVSVARIG_OFFENTLIG_AFP_OG_OPPTJENING)
-
-        Arrange.webClientContextRunner().run {
-            client(context = it).simulerPersonligAlderspensjon(
-                impersonalSpec = impersonalGradertUttakSpec(),
-                personalSpec = personalSpec(Sivilstatus.UGIFT)
-            ) shouldBe SimuleringResult(
-                alderspensjonListe = IntRange(62, 75).map(::alderspensjon),
-                alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 13000, heltUttak = 26000),
-                livsvarigOffentligAfpListe = listOf(
-                    SimulertAfpOffentlig(alder = 62, beloep = 55000, maanedligBeloep = 0),
-                    SimulertAfpOffentlig(alder = 63, beloep = 65000, maanedligBeloep = 0)
-                ),
-                tidsbegrensetOffentligAfp = null,
-                privatAfpListe = emptyList(),
-                vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
-                harForLiteTrygdetid = false,
-                trygdetid = 0,
-                opptjeningListe = listOf(
-                    SimulertOpptjening(
-                        aarstall = 1982,
-                        pensjonsgivendeInntektBeloep = 112920,
-                        pensjonspoeng = 4.46,
-                        pensjonsbeholdningBeloep = 0,
-                        merknadListe = emptyList()
+                response shouldBe SimuleringResult(
+                    alderspensjonListe = listOf(
+                        alderspensjon(alder = 63, beloep = 13956),
+                        alderspensjon(alder = 64, beloep = 83736),
+                        alderspensjon(alder = 65, beloep = 153174),
+                        alderspensjon(alder = 66, beloep = 222612),
+                        alderspensjon(alder = 67, beloep = 222612),
+                        alderspensjon(alder = 68, beloep = 222612),
+                        alderspensjon(alder = 69, beloep = 222612),
+                        alderspensjon(alder = 70, beloep = 222612),
+                        alderspensjon(alder = 71, beloep = 222612),
+                        alderspensjon(alder = 72, beloep = 222612),
+                        alderspensjon(alder = 73, beloep = 222612),
+                        alderspensjon(alder = 74, beloep = 222612),
+                        alderspensjon(alder = 75, beloep = 222612),
+                        alderspensjon(alder = 76, beloep = 222612),
+                        alderspensjon(alder = 77, beloep = 222612)
                     ),
-                    SimulertOpptjening(
-                        aarstall = 1983,
-                        pensjonsgivendeInntektBeloep = 129312,
-                        pensjonspoeng = 4.47,
-                        pensjonsbeholdningBeloep = 22086,
-                        merknadListe = emptyList()
+                    alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 13000, heltUttak = 26000),
+                    livsvarigOffentligAfpListe = emptyList(),
+                    tidsbegrensetOffentligAfp = null,
+                    privatAfpListe = emptyList(),
+                    vilkaarsproeving = Vilkaarsproeving(
+                        innvilget = false,
+                        alternativ = Alternativ(
+                            gradertUttakAlder = Alder(aar = 63, maaneder = 10),
+                            uttakGrad = Uttaksgrad.FOERTI_PROSENT,
+                            heltUttakAlder = Alder(aar = 65, maaneder = 6)
+                        )
+                    ),
+                    harForLiteTrygdetid = false,
+                    trygdetid = 0,
+                    opptjeningListe = emptyList()
+                )
+            }
+        }
+    }
+
+    context("gradert uttak spesifisert") {
+        should("inkludere parametre for gradert uttak i request-JSON") {
+            server?.arrangeOkJsonResponse(body = ALTERNATIV_PENSJON)
+
+            Arrange.webClientContextRunner().run {
+                client(context = it).simulerPersonligAlderspensjon(
+                    impersonalSpec = impersonalGradertUttakSpec(),
+                    personalSpec = personalSpec(Sivilstatus.ENKE_ELLER_ENKEMANN)
+                )
+
+                server?.let(::assertGradertUttakRequestBody)
+            }
+        }
+    }
+
+    context("vilkår ikke oppfylt") {
+        should("inkludere alternative uttaksparametre i resultatet") {
+            server?.arrangeOkJsonResponse(VILKAAR_IKKE_OPPFYLT_BODY)
+
+            Arrange.webClientContextRunner().run {
+                val result = client(context = it).simulerPersonligAlderspensjon(
+                    impersonalSpec = impersonalGradertUttakSpec(),
+                    personalSpec = personalSpec(Sivilstatus.UGIFT)
+                )
+
+                result shouldBe SimuleringResult(
+                    alderspensjonListe = emptyList(),
+                    alderspensjonMaanedsbeloep = null,
+                    livsvarigOffentligAfpListe = emptyList(),
+                    privatAfpListe = emptyList(),
+                    vilkaarsproeving = Vilkaarsproeving(
+                        innvilget = false,
+                        alternativ = Alternativ(
+                            gradertUttakAlder = null,
+                            uttakGrad = Uttaksgrad.HUNDRE_PROSENT,
+                            heltUttakAlder = Alder(aar = 67, maaneder = 0)
+                        )
+                    ),
+                    harForLiteTrygdetid = false,
+                    trygdetid = 0,
+                    opptjeningListe = emptyList()
+                )
+            }
+        }
+    }
+
+    context("person med livsvarig offentlig AFP og opptjening") {
+        should("inkludere livsvarig offentlig AFP og opptjening i resultatet") {
+            server?.arrangeOkJsonResponse(PENSJON_MED_LIVSVARIG_OFFENTLIG_AFP_OG_OPPTJENING)
+
+            Arrange.webClientContextRunner().run {
+                client(context = it).simulerPersonligAlderspensjon(
+                    impersonalSpec = impersonalGradertUttakSpec(),
+                    personalSpec = personalSpec(Sivilstatus.UGIFT)
+                ) shouldBe SimuleringResult(
+                    alderspensjonListe = IntRange(62, 75).map(::alderspensjon),
+                    alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 13000, heltUttak = 26000),
+                    livsvarigOffentligAfpListe = listOf(
+                        SimulertAfpOffentlig(alder = 62, beloep = 55000, maanedligBeloep = 0),
+                        SimulertAfpOffentlig(alder = 63, beloep = 65000, maanedligBeloep = 0)
+                    ),
+                    tidsbegrensetOffentligAfp = null,
+                    privatAfpListe = emptyList(),
+                    vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
+                    harForLiteTrygdetid = false,
+                    trygdetid = 0,
+                    opptjeningListe = listOf(
+                        SimulertOpptjening(
+                            aarstall = 1982,
+                            pensjonsgivendeInntektBeloep = 112920,
+                            pensjonspoeng = 4.46,
+                            pensjonsbeholdningBeloep = 0,
+                            merknadListe = emptyList()
+                        ),
+                        SimulertOpptjening(
+                            aarstall = 1983,
+                            pensjonsgivendeInntektBeloep = 129312,
+                            pensjonspoeng = 4.47,
+                            pensjonsbeholdningBeloep = 22086,
+                            merknadListe = emptyList()
+                        )
                     )
                 )
-            )
-        }
-    }
-
-    test("simulerPersonligAlderspensjon med gjenlevenderett") {
-        server?.arrangeOkJsonResponse(body = pensjonJson)
-
-        Arrange.webClientContextRunner().run {
-            val result = client(context = it).simulerPersonligAlderspensjon(
-                impersonalSpec = impersonalGradertUttakSpec(),
-                personalSpec = personalSpec(Sivilstatus.UGIFT)
-            )
-
-            with(result) {
-                alderspensjonListe[0].kapittel19Pensjon?.gjenlevendetillegg shouldBe 3416
-                alderspensjonListe[1].kapittel19Pensjon?.gjenlevendetillegg shouldBe 3417
-                alderspensjonListe[2].kapittel19Pensjon?.gjenlevendetillegg shouldBe null
             }
         }
     }
 
-    test("simulerPersonligAlderspensjon med ugyldig uttaksdato") {
-        server?.arrangeJsonResponse(status = HttpStatus.BAD_REQUEST, body = JSON_FOR_UGYLDIG_UTTAKSDATO)
+    context("person med gjenlevenderett") {
+        should("inkludere gjenlevendetillegg i kapittel19-delen av resultatet") {
+            server?.arrangeOkJsonResponse(body = pensjonJson)
 
-        Arrange.webClientContextRunner().run {
-            val result = client(context = it).simulerPersonligAlderspensjon(
-                impersonalSpec = impersonalGradertUttakSpec(),
-                personalSpec = personalSpec(Sivilstatus.UGIFT)
-            )
+            Arrange.webClientContextRunner().run {
+                val result = client(context = it).simulerPersonligAlderspensjon(
+                    impersonalSpec = impersonalGradertUttakSpec(),
+                    personalSpec = personalSpec(Sivilstatus.UGIFT)
+                )
 
-            with(result.problem!!) {
-                type shouldBe ProblemType.UGYLDIG_UTTAKSDATO
-                beskrivelse shouldBe "Dato for første uttak (2022-02-01) er for tidlig"
+                with(result) {
+                    alderspensjonListe[0].kapittel19Pensjon?.gjenlevendetillegg shouldBe 3416
+                    alderspensjonListe[1].kapittel19Pensjon?.gjenlevendetillegg shouldBe 3417
+                    alderspensjonListe[2].kapittel19Pensjon?.gjenlevendetillegg shouldBe null
+                }
             }
         }
     }
 
-    context("Intern serverfeil") {
-        test("JSON med feilbeskrivelse deserialiseres korrekt") {
+    context("ugyldig uttaksdato") {
+        should("inkludere problembeskrivelse i resultatet") {
+            server?.arrangeJsonResponse(status = HttpStatus.BAD_REQUEST, body = JSON_FOR_UGYLDIG_UTTAKSDATO)
+
+            Arrange.webClientContextRunner().run {
+                val result = client(context = it).simulerPersonligAlderspensjon(
+                    impersonalSpec = impersonalGradertUttakSpec(),
+                    personalSpec = personalSpec(Sivilstatus.UGIFT)
+                )
+
+                with(result.problem!!) {
+                    type shouldBe ProblemType.UGYLDIG_UTTAKSDATO
+                    beskrivelse shouldBe "Dato for første uttak (2022-02-01) er for tidlig"
+                }
+            }
+        }
+    }
+
+    context("intern serverfeil") {
+        should("deserialisere feilbeskrivelse korrekt") {
             server?.arrangeJsonResponse(status = HttpStatus.INTERNAL_SERVER_ERROR, body = JSON_FOR_INTERN_DATAFEIL)
 
             Arrange.webClientContextRunner().run {
@@ -297,7 +309,7 @@ const val VILKAAR_IKKE_OPPFYLT_BODY = """{
 
 @Language("json")
 const val EXPECTED_GRADERT_UTTAK_REQUEST_BODY =
-    """{"pid":"12906498357","sivilstatus":"ENKE_ELLER_ENKEMANN","sisteInntekt":123000,"simuleringstype":"ALDERSPENSJON","gradertUttak":{"grad":"FEMTI_PROSENT","uttakFomAlder":{"aar":64,"maaneder":2},"aarligInntekt":12000},"heltUttak":{"uttakFomAlder":{"aar":67,"maaneder":1},"aarligInntekt":0,"inntektTomAlder":{"aar":67,"maaneder":1}},"aarUtenlandsEtter16Aar":null,"fremtidigInntektListe":null,"utenlandsperiodeListe":[{"fom":"1990-01-02","tom":"1999-11-30","land":"AUS","arbeidetUtenlands":true}],"eps":{"levende":{"harInntektOver2G":true,"harPensjon":false},"avdoed":null},"offentligAfp":{"harInntektMaanedenFoerUttak":null,"afpOrdning":null,"innvilgetLivsvarigAfp":null}}"""
+    """{"pid":"12906498357","sivilstatus":"ENKE_ELLER_ENKEMANN","sisteInntekt":123000,"simuleringstype":"ALDERSPENSJON","gradertUttak":{"grad":"FEMTI_PROSENT","uttakFomAlder":{"aar":64,"maaneder":2},"aarligInntekt":12000},"heltUttak":{"uttakFomAlder":{"aar":67,"maaneder":1},"aarligInntekt":0,"inntektTomAlder":{"aar":67,"maaneder":1}},"aarUtenlandsEtter16Aar":null,"fremtidigInntektListe":null,"utenlandsperiodeListe":[{"fom":"1990-01-02","tom":"1999-11-30","land":"AUS","arbeidetUtenlands":true}],"eps":{"levende":{"harInntektOver2G":true,"harPensjon":false},"avdoed":null},"offentligAfp":{"harInntektMaanedenFoerUttak":null,"afpOrdning":null,"innvilgetLivsvarigAfp":null},"tillatSenereFoersteuttakForUfoere":false}"""
 
 @Language("json")
 const val ALTERNATIV_PENSJON = """{

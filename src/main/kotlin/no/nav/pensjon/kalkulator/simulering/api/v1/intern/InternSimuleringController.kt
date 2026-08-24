@@ -66,7 +66,9 @@ class InternSimuleringController(
         log.debug { "Simulering request ${jsonMapper.writeValueAsRedactedString(spec)}" }
 
         return try {
-            val result = service.simulerPensjon(providedSpec = fromDto(spec))
+            val result = service.simulerPensjon(
+                providedSpec = fromDto(source = spec, tillatSenereFoersteuttakForUfoere = true)
+            )
 
             val resultDto: SimuleringV1Result = toDto(
                 source = result,

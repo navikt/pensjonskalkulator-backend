@@ -6,6 +6,8 @@ import kotlinx.coroutines.*
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.SecurityCoroutineContext
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.AvvisningAarsak
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.TilgangResult
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.SecurityContextNavIdExtractor
 import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
@@ -22,14 +24,11 @@ class CacheAwarePopulasjonstilgangService(
         .build()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    fun eventuellTilgangsnektAarsak(pid: Pid, sjekkKunKjerneregler: Boolean = false): String? =
+    fun eventuellTilgangsnektAarsak(pid: Pid, sjekkKunKjerneregler: Boolean = false): TilgangResult? =
         try {
-            with(populasjonstilgang(pid, sjekkKunKjerneregler)) {
-                if (innvilget) null
-                else avvisningsinfo
-            }
+            with(populasjonstilgang(pid, sjekkKunKjerneregler)) { if (innvilget) null else this }
         } catch (e: Exception) {
-            "${AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEILET}: ${e.message}".also { log.error(e) { it } }
+            tilgangssjekkFeil(e).also { log.error(e) { it } }
         }
 
     private fun populasjonstilgang(pid: Pid, sjekkKunKjerneregler: Boolean): TilgangResult {
@@ -44,4 +43,14 @@ class CacheAwarePopulasjonstilgangService(
 
     private fun cacheKey(pid: Pid, sjekkKunKjerneregler: Boolean): String =
         "${navIdExtractor.id()}:${pid.value}:$sjekkKunKjerneregler"
+
+    private companion object {
+
+        private fun tilgangssjekkFeil(e: Exception) =
+            TilgangResult(
+                innvilget = false,
+                avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEIL,
+                begrunnelse = e.message
+            )
+    }
 }

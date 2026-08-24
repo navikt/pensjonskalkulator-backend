@@ -21,21 +21,21 @@ class LagreSimuleringServiceTest : ShouldSpec({
         val simulering = simulering()
         val response = lagreSimuleringResponse()
         every { sakService.hentEllerOpprettSak(SakType.ALDERSPENSJON) } returns SAK_ID
-        every { forbeholdClient.fetchForbehold() } returns null
-        every { client.lagreSimulering(SAK_ID, simulering, ForbeholdInnhold(seksjoner = emptyList())) } returns response
+        every { forbeholdClient.fetchForbeholdOgKortforbehold() } returns ForbeholdOgKortforbehold(forbehold = null, kortforbehold = null)
+        every { client.lagreSimulering(SAK_ID, simulering, ForbeholdInnhold(seksjoner = emptyList()), null) } returns response
 
         service.lagreSimulering(simulering) shouldBe response
 
         verify(exactly = 1) { sakService.hentEllerOpprettSak(SakType.ALDERSPENSJON) }
-        verify(exactly = 1) { client.lagreSimulering(SAK_ID, simulering, ForbeholdInnhold(seksjoner = emptyList())) }
+        verify(exactly = 1) { client.lagreSimulering(SAK_ID, simulering, ForbeholdInnhold(seksjoner = emptyList()), null) }
     }
 
     should("returnere respons fra klient") {
         val simulering = simulering()
         val expected = LagreSimuleringResponse(brevId = "brev-999", sakId = "sak-999")
         every { sakService.hentEllerOpprettSak(SakType.ALDERSPENSJON) } returns SAK_ID
-        every { forbeholdClient.fetchForbehold() } returns null
-        every { client.lagreSimulering(SAK_ID, simulering, ForbeholdInnhold(seksjoner = emptyList())) } returns expected
+        every { forbeholdClient.fetchForbeholdOgKortforbehold() } returns ForbeholdOgKortforbehold(forbehold = null, kortforbehold = null)
+        every { client.lagreSimulering(SAK_ID, simulering, ForbeholdInnhold(seksjoner = emptyList()), null) } returns expected
 
         service.lagreSimulering(simulering) shouldBe expected
     }
@@ -55,7 +55,8 @@ class LagreSimuleringServiceTest : ShouldSpec({
             pensjonsopptjeningListe = null,
             simuleringsinformasjon = null,
             maanedligAlderspensjonForKnekkpunkter = null,
-            enhetsId = "4817"
+            enhetsId = "4817",
+            serviceberegning = null,
         )
 
         private fun lagreSimuleringResponse() =

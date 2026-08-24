@@ -13,17 +13,19 @@ class LagreSimuleringService(
     private val forbeholdClient: ForbeholdClient
 ) {
     fun lagreSimulering(simulering: LagreSimulering): LagreSimuleringResponse {
-        val sakstype = if (simulering.afpOffentligLivsvarig != null || simulering.afpOffentligTidsbegrenset != null) SakType.AVTALEFESTET_PENSJON_I_OFFENTLIG_SEKTOR
+        val sakstype = if (simulering.afpOffentligLivsvarig != null || simulering.afpOffentligTidsbegrenset != null || simulering.serviceberegning != null) SakType.AVTALEFESTET_PENSJON_I_OFFENTLIG_SEKTOR
         else SakType.ALDERSPENSJON
 
         val sakId = sakService.hentEllerOpprettSak(sakstype)
-        val forbehold = forbeholdClient.fetchForbehold()
+        val forbeholdOgKortforbehold = forbeholdClient.fetchForbeholdOgKortforbehold()
+        val forbehold = forbeholdOgKortforbehold.forbehold
+        val kortforbehold = forbeholdOgKortforbehold.kortforbehold
         val filteredForbehold = forbehold?.seksjoner?.filter { seksjon ->
             seksjon.vilkaarsliste.all { vilkaar ->
                 simulering.simuleringsinformasjon?.sanityVisningsvilkaar?.contains(vilkaar) == true
             }
         }
 
-        return client.lagreSimulering(sakId, simulering, ForbeholdInnhold(filteredForbehold ?: emptyList()))
+        return client.lagreSimulering(sakId, simulering, ForbeholdInnhold(filteredForbehold ?: emptyList()), kortforbehold)
     }
 }

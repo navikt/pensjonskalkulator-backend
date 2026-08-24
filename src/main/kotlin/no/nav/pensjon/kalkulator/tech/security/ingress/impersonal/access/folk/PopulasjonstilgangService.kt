@@ -2,6 +2,8 @@ package no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk
 
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.person.Pid
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.AvvisningAarsak
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.TilgangResult
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.client.PopulasjonstilgangClient
 import org.springframework.stereotype.Service
 
@@ -19,9 +21,8 @@ class PopulasjonstilgangService(private val client: PopulasjonstilgangClient) {
 
                 TilgangResult(
                     innvilget = false,
-                    avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEILET,
-                    begrunnelse = "$it - se logg for detaljer",
-                    traceId = null
+                    avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEIL,
+                    begrunnelse = "$it - se logg for detaljer"
                 )
             }
         }

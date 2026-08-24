@@ -23,9 +23,9 @@
         <kotlin.code.style>official</kotlin.code.style>
         <kotlin.compiler.jvmTarget>25</kotlin.compiler.jvmTarget>
         <kotlin.version>2.4.10</kotlin.version>
-        <logback.version>1.6.2</logback.version>
-        <okhttp3.version>5.4.0</okhttp3.version>
-        <kotest.version>6.2.3</kotest.version>
+        <logback.version>1.6.3</logback.version>
+        <okhttp3.version>5.5.0</okhttp3.version>
+        <kotest.version>6.2.4</kotest.version>
     </properties>
     <build>
         <finalName>pensjonskalkulator-backend</finalName>

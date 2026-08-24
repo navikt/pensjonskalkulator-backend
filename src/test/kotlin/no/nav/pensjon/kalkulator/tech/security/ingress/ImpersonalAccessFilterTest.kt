@@ -11,9 +11,9 @@ import jakarta.servlet.http.HttpServletResponse
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.ImpersonalAccessFilter
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.fag.FagtilgangService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.AvvisningAarsak
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.AvvisningAarsak
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.CacheAwarePopulasjonstilgangService
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.TilgangResult
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.TilgangResult
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 
 class ImpersonalAccessFilterTest : ShouldSpec({
@@ -74,11 +74,11 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         ImpersonalAccessFilter(
             pidGetter = arrangePid(),
             fagtilgangService = arrangeFagtilgang(innvilget = true),
-            populasjonstilgangService = arrangePopulasjonstilgang(result = avvist().avvisningsinfo),
+            populasjonstilgangService = arrangePopulasjonstilgang(result = avvist),
             auditor = mockk(),
         ).doFilter(request, response, chain)
 
-        verify(exactly = 1) { response.sendError(403, "Tilgang nektet pga. GEOGRAFISK: some reason") }
+        verify(exactly = 1) { response.sendError(403, "Tilgang nektet pga. some reason") }
         verify(exactly = 0) { chain.doFilter(request, response) }
     }
 
@@ -95,10 +95,7 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         ).doFilter(request, response, chain)
 
         verify(exactly = 1) {
-            response.sendError(
-                403,
-                "Tilgang nektet pga. feil i tilgangssjekk - se logg for detaljer"
-            )
+            response.sendError(403, "Tilgang nektet pga. feil - se logg for detaljer")
         }
         verify(exactly = 0) { chain.doFilter(request, response) }
     }
@@ -129,7 +126,7 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         ImpersonalAccessFilter(
             pidGetter = arrangePid(),
             fagtilgangService = arrangeFagtilgang(innvilget = true),
-            populasjonstilgangService = arrangePopulasjonstilgangError(),
+            populasjonstilgangService = arrangePopulasjonstilgang(feil),
             auditor = auditor,
         ).doFilter(request, response, chain)
 
@@ -138,49 +135,34 @@ class ImpersonalAccessFilterTest : ShouldSpec({
     }
 })
 
+private val avvist =
+    TilgangResult(
+        innvilget = false,
+        avvisningAarsak = AvvisningAarsak.GEOGRAFISK,
+        begrunnelse = "some reason"
+    )
+
+private val feil =
+    TilgangResult(
+        innvilget = false,
+        avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEIL,
+        begrunnelse = "feil"
+    )
+
 private fun arrangePid(): PidExtractor =
-    mockk<PidExtractor>().apply {
-        every { pid() } returns pid
-    }
+    mockk { every { pid() } returns pid }
 
 private fun arrangePidError(): PidExtractor =
-    mockk<PidExtractor>().apply {
-        every { pid() } throws RuntimeException("feil")
-    }
+    mockk { every { pid() } throws RuntimeException("feil") }
 
 private fun arrangeRequest(pid: String?, uri: String): HttpServletRequest =
-    mockk<HttpServletRequest>().apply {
+    mockk {
         every { getHeader("fnr") } returns pid
         every { requestURI } returns uri
     }
 
 private fun arrangeFagtilgang(innvilget: Boolean): FagtilgangService =
-    mockk<FagtilgangService>().apply {
-        every { tilgangInnvilget() } returns innvilget
-    }
+    mockk { every { tilgangInnvilget() } returns innvilget }
 
-private fun arrangePopulasjonstilgang(result: String?): CacheAwarePopulasjonstilgangService =
-    mockk<CacheAwarePopulasjonstilgangService>().apply {
-        every { eventuellTilgangsnektAarsak(pid) } returns result
-    }
-
-private fun arrangePopulasjonstilgangError(): CacheAwarePopulasjonstilgangService =
-    mockk<CacheAwarePopulasjonstilgangService>().apply {
-        every { eventuellTilgangsnektAarsak(pid) } returns feil().avvisningsinfo
-    }
-
-private fun avvist() =
-    TilgangResult(
-        innvilget = false,
-        avvisningAarsak = AvvisningAarsak.GEOGRAFISK,
-        begrunnelse = "some reason",
-        traceId = null
-    )
-
-private fun feil() =
-    TilgangResult(
-        innvilget = false,
-        avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEILET,
-        begrunnelse = "feil",
-        traceId = null
-    )
+private fun arrangePopulasjonstilgang(result: TilgangResult?): CacheAwarePopulasjonstilgangService =
+    mockk { every { eventuellTilgangsnektAarsak(pid) } returns result }

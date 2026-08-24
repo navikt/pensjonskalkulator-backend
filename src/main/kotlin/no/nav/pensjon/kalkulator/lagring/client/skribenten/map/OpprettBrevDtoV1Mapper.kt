@@ -6,28 +6,57 @@ import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.*
 
 object OpprettBrevDtoV1Mapper {
 
-    fun toDto(source: LagreSimulering, saksId: Long, forbehold: ForbeholdInnhold?) = OpprettBrevRequestDtoV1(
+    fun toDto(source: LagreSimulering, saksId: Long, forbehold: ForbeholdInnhold?, kortforbehold: Kortforbehold?): OpprettBrevRequestDtoV1<SaksbehandlerValgBrevdata> {
+        source.serviceberegning?.afp?.let { afp ->
+            return opprettBrevRequest(
+                source = source,
+                saksId = saksId,
+                brevkode = "SERVICEBEREGNING_SIMULERINGSBREV",
+                saksbehandlerValg = ServiceberegningBrevDtoV1(
+                    uttaksalder = mapToAlderDto(source.serviceberegning.uttaksalder),
+                    uttaksdato = source.serviceberegning.uttaksdato,
+                    forventetFremtidigInntekt = source.serviceberegning.forventetFremtidigInntekt,
+                    afp = mapToTidsbegrensetOffentligAfpDto(afp),
+                ),
+            )
+        }
+
+        return opprettBrevRequest(
+            source = source,
+            saksId = saksId,
+            brevkode = "PENSJONSKALKULATOR_AP_SIMULERING",
+            saksbehandlerValg = SimuleringBrevDtoV1(
+                simulering = SimuleringBrevV1(
+                    alderspensjonListe = source.alderspensjonListe.map { AlderspensjonBrevDtoV1(it.alderAar, it.beloep, it.gjenlevendetillegg) },
+                    maanedligAlderspensjonForKnekkpunkter = source.maanedligAlderspensjonForKnekkpunkter?.let(::mapToKnekkpunkterDto),
+                    afpPrivat = source.afpPrivat?.let(::mapToAfpPrivatSimuleringDto),
+                    afpOffentligLivsvarig = source.afpOffentligLivsvarig?.let(::mapToAfpOffentligLivsvarigSimuleringDto),
+                    afpOffentligTidsbegrenset = source.afpOffentligTidsbegrenset?.let(::mapToTidsbegrensetOffentligAfpDto),
+                ),
+                simuleringsinformasjon = source.simuleringsinformasjon?.let(::mapToSimuleringsinformasjonDto),
+                vilkaarsproevingsresultat = source.vilkaarsproevingsresultat?.let(::mapToVilkaarsproevingsresultatDto),
+                trygdetid = source.trygdetid?.let(::mapToTrygdetidDto),
+                pensjonsgivendeInntektListe = source.pensjonsgivendeInntektListe?.map(::mapToPensjonsgivendeInntektDto),
+                aarligInntektOgPensjonListe = source.aarligInntektOgPensjonListe?.map(::mapToAarligInntektOgPensjonDto),
+                pensjonsopptjeningListe = source.pensjonsopptjeningListe?.map(::mapToPensjonsopptjeningDto),
+                forbehold = forbehold?.let(::mapToForbeholdDto),
+                kortforbehold = kortforbehold?.let(::mapToKortforbeholdDto),
+            ),
+        )
+    }
+
+    private fun <T : SaksbehandlerValgBrevdata> opprettBrevRequest(
+        source: LagreSimulering,
+        saksId: Long,
+        brevkode: String,
+        saksbehandlerValg: T,
+    ) = OpprettBrevRequestDtoV1(
         saksId = saksId,
-        brevkode = "PENSJONSKALKULATOR_AP_SIMULERING",
+        brevkode = brevkode,
         spraak = "NB",
         avsenderEnhetsId = source.enhetsId,
         reserverForRedigering = false,
-        saksbehandlerValg = SimuleringBrevDtoV1(
-            simulering = SimuleringBrevV1(
-                alderspensjonListe = source.alderspensjonListe.map { AlderspensjonBrevDtoV1(it.alderAar, it.beloep, it.gjenlevendetillegg) },
-                maanedligAlderspensjonForKnekkpunkter = source.maanedligAlderspensjonForKnekkpunkter?.let(::mapToKnekkpunkterDto),
-                afpPrivat = source.afpPrivat?.let(::mapToAfpPrivatSimuleringDto),
-                afpOffentligLivsvarig = source.afpOffentligLivsvarig?.let(::mapToAfpOffentligLivsvarigSimuleringDto),
-                afpOffentligTidsbegrenset = source.afpOffentligTidsbegrenset?.let(::mapToTidsbegrensetOffentligAfpDto),
-            ),
-            simuleringsinformasjon = source.simuleringsinformasjon?.let(::mapToSimuleringsinformasjonDto),
-            vilkaarsproevingsresultat = source.vilkaarsproevingsresultat?.let(::mapToVilkaarsproevingsresultatDto),
-            trygdetid = source.trygdetid?.let(::mapToTrygdetidDto),
-            pensjonsgivendeInntektListe = source.pensjonsgivendeInntektListe?.map(::mapToPensjonsgivendeInntektDto),
-            aarligInntektOgPensjonListe = source.aarligInntektOgPensjonListe?.map(::mapToAarligInntektOgPensjonDto),
-            pensjonsopptjeningListe = source.pensjonsopptjeningListe?.map(::mapToPensjonsopptjeningDto),
-            forbehold = forbehold?.let(::mapToForbeholdDto),
-        )
+        saksbehandlerValg = saksbehandlerValg,
     )
 
     fun fromDto(source: BrevResponseDtoV1) = LagreSimuleringResponse(
@@ -199,6 +228,16 @@ object OpprettBrevDtoV1Mapper {
                             punktliste = avsnitt.punktliste
                         )
                     }
+                )
+            }
+        )
+
+    private fun mapToKortforbeholdDto(source: Kortforbehold) =
+        KortforbeholdBrevDtoV1(
+            avsnitt = source.avsnitt.map { avsnitt ->
+                ForbeholdAvsnittBrevDtoV1(
+                    tekst = avsnitt.tekst,
+                    punktliste = avsnitt.punktliste
                 )
             }
         )

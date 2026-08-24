@@ -71,7 +71,9 @@ class EksternSimuleringController(
         traceAid.begin()
 
         return try {
-            val result: SimuleringResult = service.simulerPersonligAlderspensjon(fromDto(spec))
+            val result: SimuleringResult = service.simulerPersonligAlderspensjon(
+                impersonalSpec = fromDto(source = spec, tillatSenereFoersteuttakForUfoere = false)
+            )
 
             val resultDto: SimuleringV1Result =
                 if (feature.isEnabled("utvidet-simuleringsresultat"))

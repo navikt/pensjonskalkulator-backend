@@ -1,7 +1,16 @@
 package no.nav.pensjon.kalkulator.lagring.client.sanity.dto
 
-data class SanityQueryResponseDto(
-    val result: List<SanityForbeholdAvsnittDto>?
+data class SanityForbeholdOgKortforbeholdResponseDto(
+    val result: SanityForbeholdOgKortforbeholdResultDto?
+)
+
+data class SanityForbeholdOgKortforbeholdResultDto(
+    val forbehold: List<SanityForbeholdAvsnittDto>?,
+    val kortforbehold: List<SanityKortforbeholdDto>?
+)
+
+data class SanityKortforbeholdDto(
+    val innhold: List<SanityBlock>?
 )
 
 data class SanityForbeholdAvsnittDto(
