@@ -200,7 +200,6 @@ object LagreSimuleringMapperV1 {
             kapittel20AndelTeller = source.kapittel20AndelTeller,
             kapittel20Trygdetid = source.kapittel20Trygdetid,
             garantipensjonBeloep = source.garantipensjonBeloep,
-            garantipensjonsnivaaBeloep = source.garantipensjonsnivaaBeloep,
             garantipensjonSats = source.garantipensjonSats,
             garantitilleggBeloep = source.garantitilleggBeloep,
             grunnbeloep = source.grunnbeloep
