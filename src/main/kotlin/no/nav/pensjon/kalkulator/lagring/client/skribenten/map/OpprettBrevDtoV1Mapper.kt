@@ -161,7 +161,8 @@ object OpprettBrevDtoV1Mapper {
             sivilstatus = source.sivilstatus,
             utenlandsperioder = source.utenlandsperioder?.map(::mapToUtenlandsperiodeDto),
             kull = source.kull.name,
-            normertPensjonsalderPlassering = source.normertPensjonsalderPlassering?.name
+            normertPensjonsalderPlassering = source.normertPensjonsalderPlassering?.name,
+            simulererEndringMedAfpPrivat = source.simulererEndringMedAfpPrivat
         )
 
     private fun mapToUttaksinformasjonDto(source: LagreUttaksinformasjon) =
