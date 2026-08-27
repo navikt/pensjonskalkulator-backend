@@ -121,7 +121,7 @@ data class LagreSimuleringsinformasjonDto(
     val kull: Kull,
     val normertPensjonsalderPlassering: NormertPensjonsalderPlassering?,
     val forbeholdVisningsvilkaar: List<ForbeholdVisningsvilkaar>,
-    val simulererEndringMedAfpPrivat: Boolean,
+    @field:NotNull val simulererEndringMedAfpPrivat: Boolean,
 )
 
 data class LagreUttaksinformasjonDto(
