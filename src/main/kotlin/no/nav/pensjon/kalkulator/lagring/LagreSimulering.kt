@@ -116,7 +116,8 @@ data class LagreSimuleringsinformasjon(
     val utenlandsperioder: List<LagreUtenlandsperiode>?,
     val kull: Kull,
     val normertPensjonsalderPlassering: NormertPensjonsalderPlassering?,
-    val sanityVisningsvilkaar: List<SanityVisningsvilkaar>
+    val sanityVisningsvilkaar: List<SanityVisningsvilkaar>,
+    val simulererEndringMedAfpPrivat: Boolean,
 )
 
 data class LagreUttaksinformasjon(

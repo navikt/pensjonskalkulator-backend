@@ -150,7 +150,8 @@ object LagreSimuleringMapperV1 {
             utenlandsperioder = source.utenlandsperioder?.map(::utenlandsperiode),
             kull = source.kull,
             normertPensjonsalderPlassering = source.normertPensjonsalderPlassering,
-            sanityVisningsvilkaar = source.forbeholdVisningsvilkaar.map { it.internalValue }
+            sanityVisningsvilkaar = source.forbeholdVisningsvilkaar.map { it.internalValue },
+            simulererEndringMedAfpPrivat = source.simulererEndringMedAfpPrivat
         )
 
     private fun uttaksinformasjon(source: LagreUttaksinformasjonDto) =
