@@ -4,8 +4,9 @@ import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpResult
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpSpec
 import no.nav.pensjon.kalkulator.afp.client.ServiceberegnetAfpClient
-import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.dto.ServiceberegnetAfpResultDto
-import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.map.ServiceberegnetAfpMapper
+import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.dto.ServiceberegningAfpResultDto
+import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.map.ServiceberegningAfpResultMapper
+import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.map.ServiceberegningAfpSpecMapper
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
@@ -34,24 +35,24 @@ class PensjonssimulatorServiceberegnetAfpClient(
     private val log = KotlinLogging.logger {}
 
     override fun simulerServiceberegnetAfp(spec: ServiceberegnetAfpSpec): ServiceberegnetAfpResult {
-        val url = "$baseUrl/$SIMULER_FOR_FPP_RESOURCE"
+        val url = "$baseUrl/$RESOURCE"
         log.debug { "POST to URL: '$url'" }
 
         return try {
-            val dto = ServiceberegnetAfpMapper.toDto(spec)
+            val dto = ServiceberegningAfpSpecMapper.toDto(spec)
 
             webClient
                 .post()
-                .uri("/$SIMULER_FOR_FPP_RESOURCE?simuleringstype=AFP")
+                .uri("/$RESOURCE")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .headers(::setHeaders)
                 .bodyValue(dto)
                 .retrieve()
-                .bodyToMono<ServiceberegnetAfpResultDto>()
+                .bodyToMono<ServiceberegningAfpResultDto>()
                 .retryWhen(retryBackoffSpec(url))
                 .block()
-                ?.let(ServiceberegnetAfpMapper::fromDto)
+                ?.let(ServiceberegningAfpResultMapper::fromDto)
                 .also { countCalls(MetricResult.OK) }
                 ?: throw EgressException("No response body from $url")
         } catch (e: WebClientRequestException) {
@@ -71,7 +72,7 @@ class PensjonssimulatorServiceberegnetAfpClient(
     override fun service(): EgressService = service
 
     private companion object {
-        private const val SIMULER_FOR_FPP_RESOURCE = "api/nav/v2/simuler-for-fpp"
+        private const val RESOURCE = "api/nav/v1/simuler-afp-serviceberegning"
         private val service = EgressService.PENSJONSSIMULATOR
     }
 }
