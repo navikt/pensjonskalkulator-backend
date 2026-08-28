@@ -125,7 +125,8 @@ data class SimuleringsinformasjonBrevDtoV1(
     val sivilstatus: String?,
     val utenlandsperioder: List<UtenlandsperiodeBrevDtoV1>?,
     val kull: String,
-    val normertPensjonsalderPlassering: String?
+    val normertPensjonsalderPlassering: String?,
+    val simulererEndringMedAfpPrivat: Boolean,
 )
 
 data class UtenlandsperiodeBrevDtoV1(

@@ -120,7 +120,8 @@ data class LagreSimuleringsinformasjonDto(
     val utenlandsperioder: List<LagreUtenlandsperiodeDto>?,
     val kull: Kull,
     val normertPensjonsalderPlassering: NormertPensjonsalderPlassering?,
-    val forbeholdVisningsvilkaar: List<ForbeholdVisningsvilkaar>
+    val forbeholdVisningsvilkaar: List<ForbeholdVisningsvilkaar>,
+    @field:NotNull val simulererEndringMedAfpPrivat: Boolean,
 )
 
 data class LagreUttaksinformasjonDto(
