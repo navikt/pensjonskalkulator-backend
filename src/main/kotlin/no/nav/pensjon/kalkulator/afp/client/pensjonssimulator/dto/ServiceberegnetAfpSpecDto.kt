@@ -2,48 +2,55 @@ package no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.dto
 
 import java.time.LocalDate
 
-data class ServiceberegnetAfpSpecDto(
-    val simuleringstype: String,
-    val uttaksdato: LocalDate,
+data class ServiceberegningAfpSpecDto(
+    val uttakFom: LocalDate,
     val personopplysninger: PersonopplysningerDto,
-    val barneopplysninger: Any?,
-    val opptjeningFolketrygden: OpptjeningFolketrygdenDto
+    var opptjeningListe: List<OpptjeningFolketrygdenDataDto>
 )
 
 data class PersonopplysningerDto(
-    val ident: String,
-    val fodselsdato: LocalDate,
-    val valgtAfpOrdning: String,
-    val flyktning: Boolean?,
-    val antAarIUtlandet: Int?,
-    val utenlandsopphold: List<FppUtlandPeriodeDto>?,
-    val forventetArbeidsinntekt: Int?,
-    val inntektMndForAfp: Int?,
-    val erUnderUtdanning: Boolean?,
-    val epsData: EpsDataDto?,
-    val avdodList: List<Any>
+    val pid: String? = null,
+    val foedselsdato: LocalDate? = null,
+    val angittAfpOrdning: String? = null, // AfpTypeDto
+    val flyktning: Boolean? = null,
+    val antallAarUtenlands: Int? = null,
+    val utenlandsoppholdListe: List<UtlandSpecDto>? = null,
+    val forventetArbeidsinntekt: Int? = null,
+    val inntektMaanedenFoerAfp: Int? = null,
+    val eps: EpsDataDto? = null
 )
 
 data class EpsDataDto(
-    val valgtSivilstatus: String?,
-    val registrertSivilstatus: String?,
-    val epsMottarPensjon: Boolean?,
-    val epsInntektOver2G: Boolean?,
-    val tidligereGiftEllerBarnMedSamboer: Boolean?,
-    val erEpsInntektOver1G: Boolean?
+    val relasjon: RelasjonDto,
+    val angittSivilstatus: String ? = null, // SivilstatusDto
+    val registrertSivilstand: String ? = null, // SivilstandDto
+    val mottarPensjon: Boolean? = null,
+    val harInntektOver1G: Boolean? = null,
+    val harInntektOver2G: Boolean? = null,
+    val tidligereGiftEllerBarnMedSamboer: Boolean? = null
 )
 
-data class OpptjeningFolketrygdenDto(
-    val egenOpptjeningFolketrygden: List<OpptjeningAarDto>,
-    val avdodesOpptjeningFolketrygden: List<Any>,
-    val morsOpptjeningFolketrygden: List<Any>,
-    val farsOpptjeningFolketrygden: List<Any>
+data class OpptjeningFolketrygdenDataDto(
+    val aar: Int? = null,
+    val pensjonsgivendeInntekt: Int? = null,
+    val omsorgspoeng: Double? = null,
+    val registrertePensjonspoeng: Double? = null,
+    val maxUfoeregrad: Int? = null
 )
 
-data class OpptjeningAarDto(
-    val ar: Int?,
-    val pensjonsgivendeInntekt: Int?,
-    val omsorgspoeng: Double?,
-    val maksUforegrad: Int?,
-    val registrertePensjonspoeng: Double?
+data class StatsborgerDto(
+    val pid: String? = null,
+    val statsborgerskap: String ? = null // LandkodeEnum
+)
+
+data class RelasjonDto(
+    val fom: LocalDate? = null,
+    val person: StatsborgerDto? = null
+)
+
+data class UtlandSpecDto(
+    val fom: LocalDate,
+    val tom: LocalDate?,
+    val land: String, // LandkodeEnum
+    val arbeidetUtenlands: Boolean
 )

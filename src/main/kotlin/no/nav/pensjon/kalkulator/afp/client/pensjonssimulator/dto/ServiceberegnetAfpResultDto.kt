@@ -2,32 +2,36 @@ package no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.dto
 
 import java.time.LocalDate
 
-data class ServiceberegnetAfpResultDto(
-    val afpOrdning: String?,
-    val beregnetAfp: BeregnetAfpDto?,
-    val problem: ServiceberegnetAfpProblemDto?
+data class ServiceberegningAfpResultDto(
+    val beregnetAfp: ServiceberegningFolketrygdberegnetAfpDto?,
+    val opptjeningListe: List<ServiceberegningOpptjeningDto>,
+    val problem: ServiceberegningProblemDto? = null
 )
 
-data class BeregnetAfpDto(
-    val totalbelopAfp: Int?,
-    val virkFom: LocalDate?,
+data class ServiceberegningFolketrygdberegnetAfpDto(
+    val afpTotalbeloep: Int,
+    val virkningFom: LocalDate?,
     val tidligereArbeidsinntekt: Int?,
-    val grunnbelop: Int?,
+    val grunnbeloep: Int?,
     val sluttpoengtall: Double?,
     val trygdetid: Int?,
-    val poengar: Int?,
-    val poeangar_f92: Int?,
-    val poeangar_e91: Int?,
+    val poengaar: Int?,
+    val poengaarFoer1992: Int?,
+    val poengaarEtter1991: Int?,
     val grunnpensjon: Int?,
     val tilleggspensjon: Int?,
     val afpTillegg: Int?,
     val fpp: Double?,
-    val sertillegg: Int?,
-    val grad: Int?,
-    val erAvkortet: Boolean?
+    val saertillegg: Int?
 )
 
-data class ServiceberegnetAfpProblemDto(
-    val type: String?,
-    val beskrivelse: String?
+data class ServiceberegningOpptjeningDto(
+    val aarstall: Int,
+    val pensjonsgivendeInntekt: Int,
+    val pensjonspoeng: Double
+)
+
+data class ServiceberegningProblemDto(
+    val type: String, // ServiceberegningProblemtypeDto
+    val beskrivelse: String
 )
