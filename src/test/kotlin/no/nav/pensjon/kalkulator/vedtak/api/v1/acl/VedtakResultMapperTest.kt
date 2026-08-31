@@ -77,7 +77,8 @@ class VedtakResultMapperTest : ShouldSpec({
                 harTilstrekkeligMedlemskapIFolketrygden = false,
                 antallAarUtenlands = 3,
                 erFlyktning = true
-            )
+            ),
+            kanSimulereMedGjenlevenderett = false
         )
     }
 
@@ -98,7 +99,8 @@ class VedtakResultMapperTest : ShouldSpec({
             ufoeretrygdgrad = null,
             privatAfpFom = null,
             tidsbegrensetOffentligAfpFom = null,
-            avdoed = null
+            avdoed = null,
+            kanSimulereMedGjenlevenderett = false
         )
     }
 })
