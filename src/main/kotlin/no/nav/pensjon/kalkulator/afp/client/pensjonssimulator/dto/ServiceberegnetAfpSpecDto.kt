@@ -5,7 +5,7 @@ import java.time.LocalDate
 data class ServiceberegningAfpSpecDto(
     val uttakFom: LocalDate,
     val personopplysninger: PersonopplysningerDto,
-    var opptjeningListe: List<OpptjeningFolketrygdenDataDto>
+    val opptjeningListe: List<OpptjeningFolketrygdenDataDto>
 )
 
 data class PersonopplysningerDto(
@@ -22,8 +22,8 @@ data class PersonopplysningerDto(
 
 data class EpsDataDto(
     val relasjon: RelasjonDto,
-    val angittSivilstatus: String ? = null, // SivilstatusDto
-    val registrertSivilstand: String ? = null, // SivilstandDto
+    val angittSivilstatus: String? = null, // SivilstatusDto
+    val registrertSivilstand: String? = null, // SivilstandDto
     val mottarPensjon: Boolean? = null,
     val harInntektOver1G: Boolean? = null,
     val harInntektOver2G: Boolean? = null,
@@ -40,7 +40,7 @@ data class OpptjeningFolketrygdenDataDto(
 
 data class StatsborgerDto(
     val pid: String? = null,
-    val statsborgerskap: String ? = null // LandkodeEnum
+    val statsborgerskap: String? = null // LandkodeEnum
 )
 
 data class RelasjonDto(
