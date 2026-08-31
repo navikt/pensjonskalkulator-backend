@@ -72,7 +72,8 @@ class VedtakV1ControllerTest : FunSpec() {
                 ),
                 ufoeretrygd = LoependeUfoeretrygd(grad = 2, fom = LocalDate.of(2021, 12, 1)),
                 privatAfp = LoependeEntitet(fom = LocalDate.of(2022, 12, 1)),
-                avdoed = null
+                avdoed = null,
+                harGjenlevenderett = false
             )
 
             val result = mvc.get(URL).asyncDispatch().andReturn()
@@ -91,7 +92,8 @@ class VedtakV1ControllerTest : FunSpec() {
                 fremtidigAlderspensjon = null,
                 ufoeretrygd = null,
                 privatAfp = null,
-                avdoed = null
+                avdoed = null,
+                harGjenlevenderett = null
             )
 
             val result = mvc.get(URL).asyncDispatch().andReturn()
@@ -108,10 +110,10 @@ class VedtakV1ControllerTest : FunSpec() {
 
         @Language("json")
         private const val INGEN_VEDTAK_JSON =
-            """{"harVedtak":false}"""
+            """{"harVedtak":false,"kanSimulereMedGjenlevenderett":false}"""
 
         @Language("json")
         private const val FLERE_VEDTAK_JSON =
-            """{"harVedtak":true,"loependeAlderspensjon":{"grad":20,"fom":"2020-12-01","uttaksgradFom":"2021-01-01","sivilstatus":"GIFT","harGjenlevenderett":true,"harUtenlandsopphold":true},"fremtidigAlderspensjon":{"grad":40,"fom":"2021-12-01"},"ufoeretrygdgrad":2,"privatAfpFom":"2022-12-01"}"""
+            """{"harVedtak":true,"loependeAlderspensjon":{"grad":20,"fom":"2020-12-01","uttaksgradFom":"2021-01-01","sivilstatus":"GIFT","harGjenlevenderett":true,"harUtenlandsopphold":true},"fremtidigAlderspensjon":{"grad":40,"fom":"2021-12-01"},"ufoeretrygdgrad":2,"privatAfpFom":"2022-12-01","kanSimulereMedGjenlevenderett":false}"""
     }
 }
