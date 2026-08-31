@@ -18,14 +18,15 @@ class VedtakMedUtbetalingServiceTest : ShouldSpec({
     should("hente vedtak med utbetaling") {
         VedtakMedUtbetalingService(
             vedtakService = arrangeVedtak(),
-            utbetalingService = arrangeUtbetaling()
+            utbetalingService = arrangeUtbetaling(),
+            innledningService = arrangeInnledning()
         ).hentVedtakMedUtbetaling() shouldBe
                 vedtakSamling(
                     utbetalingSisteMaaned = Utbetaling(
                         beloep = BigDecimal.TEN,
                         posteringsdato = LocalDate.of(2024, 1, 1)
                     )
-                )
+                ).withGjenlevenderett(true)
     }
 })
 
@@ -73,4 +74,11 @@ private fun arrangeVedtak(): LoependeVedtakService =
         every {
             hentLoependeVedtak()
         } returns vedtakSamling(utbetalingSisteMaaned = null)
+    }
+
+private fun arrangeInnledning(): InnledningService =
+    mockk<InnledningService> {
+        every {
+            hentInnledningsdata()
+        } returns Innledningsdata(harGjenlevenderett = true)
     }

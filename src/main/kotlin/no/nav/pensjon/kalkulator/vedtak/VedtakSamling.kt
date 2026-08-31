@@ -12,17 +12,14 @@ data class VedtakSamling(
     val ufoeretrygd: LoependeUfoeretrygd?,
     val privatAfp: LoependeEntitet?,
     val tidsbegrensetOffentligAfp: LoependeEntitet? = null,
-    val avdoed: InformasjonOmAvdoed?
+    val avdoed: InformasjonOmAvdoed?,
+    val harGjenlevenderett: Boolean? = null
 ) {
     fun withAlderspensjonUtbetalingSisteMaaned(utbetaling: Utbetaling) =
-        VedtakSamling(
-            loependeAlderspensjon = loependeAlderspensjon?.withUtbetalingSisteMaaned(utbetaling),
-            fremtidigAlderspensjon = fremtidigAlderspensjon,
-            ufoeretrygd = ufoeretrygd,
-            privatAfp = privatAfp,
-            tidsbegrensetOffentligAfp = tidsbegrensetOffentligAfp,
-            avdoed = avdoed
-        )
+        copy(loependeAlderspensjon = loependeAlderspensjon?.withUtbetalingSisteMaaned(utbetaling))
+
+    fun withGjenlevenderett(harGjenlevenderett: Boolean?) =
+        copy(harGjenlevenderett = harGjenlevenderett)
 
     fun hasContent(): Boolean =
         loependeAlderspensjon != null

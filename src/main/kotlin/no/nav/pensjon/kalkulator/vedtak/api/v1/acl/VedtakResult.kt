@@ -33,7 +33,10 @@ data class VedtakV1Samling(
     val tidsbegrensetOffentligAfpFom: LocalDate? = null,
 
     @field:Schema(description = "Informasjon om eventuell avdød ektefelle/partner/samboer")
-    val avdoed: VedtakV1InformasjonOmAvdoed? = null
+    val avdoed: VedtakV1InformasjonOmAvdoed? = null,
+
+    @field:Schema(description = "Informasjon om hvorvidt personen kan simulere med gjenlevenderett")
+    @field:NotNull val kanSimulereMedGjenlevenderett: Boolean
 )
 
 @JsonInclude(NON_NULL)
