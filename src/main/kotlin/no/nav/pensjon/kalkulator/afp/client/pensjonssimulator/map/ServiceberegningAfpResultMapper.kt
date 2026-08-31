@@ -36,8 +36,8 @@ object ServiceberegningAfpResultMapper {
             afpTillegg = dto.afpTillegg,
             fpp = dto.fpp,
             sertillegg = dto.saertillegg,
-            grad = null, //TODO sjekk om behøves
-            erAvkortet = null //TODO sjekk om behøves
+            grad = dto.grad,
+            erAvkortet = dto.erAvkortet
         )
 
     private fun opptjening(dto: ServiceberegningOpptjeningDto) =
@@ -45,11 +45,11 @@ object ServiceberegningAfpResultMapper {
             aar = dto.aarstall,
             pensjonsgivendeInntekt = dto.pensjonsgivendeInntekt,
             pensjonspoeng = dto.pensjonspoeng,
-            omsorgspoeng = null,
-            maksimalUfoeregrad = null,
-            pensjonspoengType = "",
-            beholdning = 0,
-            merknadListe = emptyList()
+            omsorgspoeng = null, // ikke relevant her
+            maksimalUfoeregrad = null, // ditto
+            pensjonspoengType = "", // ditto
+            beholdning = 0, // ditto
+            merknadListe = emptyList() // ditto
         )
 
     private fun mapProblem(dto: ServiceberegningProblemDto) =

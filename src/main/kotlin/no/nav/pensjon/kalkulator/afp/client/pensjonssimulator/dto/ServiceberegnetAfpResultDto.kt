@@ -2,6 +2,9 @@ package no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.dto
 
 import java.time.LocalDate
 
+/**
+ * Korresponderer med ServiceberegningAfpResultDto i pensjonssimulator.
+ */
 data class ServiceberegningAfpResultDto(
     val beregnetAfp: ServiceberegningFolketrygdberegnetAfpDto?,
     val opptjeningListe: List<ServiceberegningOpptjeningDto>,
@@ -22,7 +25,9 @@ data class ServiceberegningFolketrygdberegnetAfpDto(
     val tilleggspensjon: Int?,
     val afpTillegg: Int?,
     val fpp: Double?,
-    val saertillegg: Int?
+    val saertillegg: Int?,
+    val grad: Int?,
+    val erAvkortet: Boolean?
 )
 
 data class ServiceberegningOpptjeningDto(
