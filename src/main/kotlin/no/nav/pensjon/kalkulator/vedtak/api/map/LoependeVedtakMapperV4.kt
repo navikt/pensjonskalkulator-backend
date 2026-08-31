@@ -14,6 +14,7 @@ object LoependeVedtakMapperV4 {
         afpPrivat = source.privatAfp?.let(::loependeEntitet),
         afpOffentlig = null, //TODO remove?
         pre2025OffentligAfp = source.tidsbegrensetOffentligAfp?.let(::loependeEntitet),
+        kanSimulereGjenlevenderett = source.harGjenlevenderett,
     )
 
     private fun loependeAlderspensjon(source: LoependeAlderspensjon) =

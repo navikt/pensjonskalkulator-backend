@@ -34,7 +34,8 @@ abstract class PenClient(
     protected fun <T: Any> doGet(
         elementTypeRef: ParameterizedTypeReference<T>,
         path: String,
-        pid: Pid
+        pid: Pid,
+        pidHeaderName: String = CustomHttpHeaders.PID
     ): T? {
         val uri = "/$BASE_PATH/$path"
         log.debug { "GET from URI: '$uri'" }
@@ -43,7 +44,7 @@ abstract class PenClient(
             webClient
                 .get()
                 .uri(uri)
-                .headers { setHeaders(it, pid) }
+                .headers { setHeaders(it, pid, pidHeaderName) }
                 .retrieve()
                 .bodyToMono(elementTypeRef)
                 .retryWhen(retryBackoffSpec(uri))
@@ -118,12 +119,16 @@ abstract class PenClient(
 
     override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
 
-    private fun setHeaders(headers: HttpHeaders, pid: Pid? = null) {
+    private fun setHeaders(
+        headers: HttpHeaders,
+        pid: Pid? = null,
+        pidHeaderName: String = CustomHttpHeaders.PID
+    ) {
         headers.contentType = MediaType.APPLICATION_JSON
         headers.accept = listOf(MediaType.APPLICATION_JSON)
         headers.setBearerAuth(EgressAccess.token(service).value)
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
-        pid?.let { headers[CustomHttpHeaders.PID] = it.value }
+        pid?.let { headers[pidHeaderName] = it.value }
     }
 
     companion object {

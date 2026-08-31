@@ -11,15 +11,20 @@ import org.springframework.stereotype.Service
 @Service
 class VedtakMedUtbetalingService(
     private val vedtakService: LoependeVedtakService,
-    private val utbetalingService: UtbetalingService
+    private val utbetalingService: UtbetalingService,
+    private val innledningService: InnledningService
 ) {
     suspend fun hentVedtakMedUtbetaling(): VedtakSamling =
         withContext(Dispatchers.IO + SecurityCoroutineContext()) {
             val vedtakDeferred = async { vedtakService.hentLoependeVedtak() }
             val utbetalingDeferred = async { utbetalingService.hentSisteMaanedsUtbetaling() }
+            val innledningDeferred = async { innledningService.hentInnledningsdata() }
 
-            val vedtakSamling: VedtakSamling = vedtakDeferred.await()
             val sisteMaanedsUtbetaling: SamletUtbetaling? = utbetalingDeferred.await()
+            val innledningsdata: Innledningsdata = innledningDeferred.await()
+
+            val vedtakSamling: VedtakSamling =
+                vedtakDeferred.await().withGjenlevenderett(innledningsdata.harGjenlevenderett)
 
             sisteMaanedsUtbetaling?.let {
                 vedtakSamling.withAlderspensjonUtbetalingSisteMaaned(
