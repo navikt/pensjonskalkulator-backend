@@ -14,7 +14,8 @@ object VedtakResultMapper {
             ufoeretrygdgrad = source.ufoeretrygd?.grad,
             privatAfpFom = source.privatAfp?.fom,
             tidsbegrensetOffentligAfpFom = source.tidsbegrensetOffentligAfp?.fom,
-            avdoed = source.avdoed?.let(::avdoed)
+            avdoed = source.avdoed?.let(::avdoed),
+            kanSimulereMedGjenlevenderett = source.harGjenlevenderett ?: false
         )
 
     private fun loependeAlderspensjon(source: LoependeAlderspensjon) =

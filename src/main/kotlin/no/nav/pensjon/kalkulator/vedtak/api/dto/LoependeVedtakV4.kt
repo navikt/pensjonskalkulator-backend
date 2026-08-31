@@ -18,8 +18,7 @@ data class LoependeVedtakV4(
     @field:NotNull val ufoeretrygd: UfoeretrygdDetaljerV4,
     val afpPrivat: LoependeFraV4?,
     val afpOffentlig: LoependeFraV4?,
-    val pre2025OffentligAfp: LoependeFraV4? = null,
-    val kanSimulereGjenlevenderett: Boolean? = null,
+    val pre2025OffentligAfp: LoependeFraV4? = null
 )
 
 @JsonInclude(NON_NULL)

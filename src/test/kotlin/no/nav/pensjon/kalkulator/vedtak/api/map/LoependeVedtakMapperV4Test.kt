@@ -62,7 +62,6 @@ class LoependeVedtakMapperV4Test : FunSpec({
             afpPrivat = LoependeFraV4(fom = LocalDate.of(2022, 10, 1)),
             afpOffentlig = null,
             pre2025OffentligAfp = LoependeFraV4(fom = LocalDate.of(2024, 2, 1)),
-            kanSimulereGjenlevenderett = true
         )
     }
 
