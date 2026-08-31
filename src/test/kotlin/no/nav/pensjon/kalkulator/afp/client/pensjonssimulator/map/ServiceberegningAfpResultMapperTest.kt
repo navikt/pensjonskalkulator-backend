@@ -33,7 +33,9 @@ class ServiceberegningAfpResultMapperTest : ShouldSpec({
                         tilleggspensjon = 10,
                         afpTillegg = 11,
                         fpp = 12.2,
-                        saertillegg = 13
+                        saertillegg = 13,
+                        grad = 14,
+                        erAvkortet = true
                     ),
                     opptjeningListe = listOf(
                         ServiceberegningOpptjeningDto(
@@ -61,8 +63,8 @@ class ServiceberegningAfpResultMapperTest : ShouldSpec({
                     afpTillegg = 11,
                     fpp = 12.2,
                     sertillegg = 13,
-                    grad = null, // not mapped
-                    erAvkortet = null // not mapped
+                    grad = 14,
+                    erAvkortet = true
                 ),
                 opptjeningListe = listOf(
                     AarligOpptjening(
