@@ -6,6 +6,7 @@ object CustomHttpHeaders {
     const val CORRELATION_ID = "X-CORRELATION-ID" // required by Storebrand
     const val DATE = "date"
     const val FULLMAKT_GIVER_PID = "fullmaktsgiverPid" // PID = person identifier
+    const val IDENT = "ident" // fødselsnummer
     const val PID = "fnr" // fødselsnummer
     const val PERSON_ID = "pid"
     const val SAMBOER_PID = "pidSamboer"
