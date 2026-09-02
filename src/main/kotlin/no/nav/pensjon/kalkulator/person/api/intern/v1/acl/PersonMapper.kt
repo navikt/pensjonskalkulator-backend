@@ -11,7 +11,7 @@ object PersonMapper {
 
     fun transferable(source: Person) =
         PersonInternV1Person(
-            navn = source.navn,
+            navn = source.navn.formatert(),
             foedselsdato = source.foedselsdato,
             sivilstand = PersonInternV1Sivilstand.fromInternalValue(source.sivilstand),
             sivilstatus = PersonInternV1Sivilstatus.fromInternalValue(source.sivilstatus),
@@ -22,7 +22,7 @@ object PersonMapper {
         PersonInternV1Pensjonsaldre(
             normertPensjoneringsalder = alder(source.normalder),
             nedreAldersgrense = alder(source.nedreAlder),
-            oevreAldersgrense = alder(source.oevreAlder),
+            oevreAldersgrense = alder(source.oevreAlder)
         )
 
     private fun alder(source: Alder) =

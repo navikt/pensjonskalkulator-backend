@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.vedtak.api.v1.acl
 
 import no.nav.pensjon.kalkulator.common.api.acl.CommonV1Sivilstatus
+import no.nav.pensjon.kalkulator.person.Navn
 import no.nav.pensjon.kalkulator.vedtak.*
 import java.math.BigDecimal
 
@@ -14,6 +15,7 @@ object VedtakResultMapper {
             ufoeretrygdgrad = source.ufoeretrygd?.grad,
             privatAfpFom = source.privatAfp?.fom,
             tidsbegrensetOffentligAfpFom = source.tidsbegrensetOffentligAfp?.fom,
+            gjenlevenderett = source.gjenlevenderett?.let(::gjenlevenderett),
             avdoed = source.avdoed?.let(::avdoed)
         )
 
@@ -40,6 +42,14 @@ object VedtakResultMapper {
             utbetalingsdato = source.posteringsdato
         )
 
+    private fun gjenlevenderett(source: Gjenlevenderett) =
+        VedtakV1Gjenlevenderett(
+            avdoedPid = source.avdoedPid.value,
+            avdoedNavn = source.navn?.let(::navn),
+            doedsdato = source.doedsdato,
+            foersteVirkningsdato = source.foersteVirkningsdato
+        )
+
     private fun avdoed(source: InformasjonOmAvdoed) =
         VedtakV1InformasjonOmAvdoed(
             pid = source.pid?.value,
@@ -49,5 +59,12 @@ object VedtakResultMapper {
             harTilstrekkeligMedlemskapIFolketrygden = source.harTilstrekkeligMedlemskapIFolketrygden,
             antallAarUtenlands = source.antallAarUtenlands,
             erFlyktning = source.erFlyktning
+        )
+
+    private fun navn(source: Navn) =
+        VedtakV1Navn(
+            fornavn = source.fornavn,
+            mellomnavn = source.mellomnavn,
+            etternavn = source.etternavn
         )
 }

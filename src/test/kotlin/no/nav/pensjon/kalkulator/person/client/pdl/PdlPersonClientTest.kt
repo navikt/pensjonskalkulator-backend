@@ -18,6 +18,7 @@ import no.nav.pensjon.kalkulator.testutil.arrangeResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
 import org.springframework.beans.factory.BeanFactory
+import org.springframework.beans.factory.getBean
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.WebClient
 import java.io.ByteArrayOutputStream
@@ -33,7 +34,7 @@ class PdlPersonClientTest : FunSpec({
     fun client(context: BeanFactory) =
         PdlPersonClient(
             baseUrl!!,
-            webClientBuilder = context.getBean(WebClient.Builder::class.java),
+            webClientBuilder = context.getBean<WebClient.Builder>(),
             traceAid,
             retryAttempts = "1"
         )
@@ -53,22 +54,7 @@ class PdlPersonClientTest : FunSpec({
 
         Arrange.webClientContextRunner().run {
             client(context = it).fetchPerson(pid = pid1, fetchFulltNavn = false)
-
-            ByteArrayOutputStream().use {
-                server.takeRequest().apply {
-                    body.copyTo(it)
-                    getHeader("behandlingsnummer") shouldBe "B353"
-                    getHeader("tema") shouldBe "PEN"
-                }
-                it.toString(StandardCharsets.UTF_8) shouldBe
-                        """{
-	"query": "query(${"$"}ident: ID!) { hentPerson(ident: ${"$"}ident) { navn(historikk: false) { fornavn }, foedselsdato { foedselsdato }, sivilstand(historikk: false) { type } } }",
-	"variables": {
-		"ident": "22925399748"
-	}
-}"""
-            }
-
+            assertRequest(server)
         }
     }
 
@@ -91,7 +77,7 @@ class PdlPersonClientTest : FunSpec({
             val response: Person = client(context = it).fetchPerson(pid1, fetchFulltNavn = false)!!
 
             with(response) {
-                navn shouldBe "Ola-Kari"
+                navn.formatert() shouldBe "Ola-Kari"
                 foedselsdato shouldBe LocalDate.of(1963, 12, 31)
                 harFoedselsdato shouldBe true
                 sivilstand shouldBe Sivilstand.UGIFT
@@ -106,7 +92,7 @@ class PdlPersonClientTest : FunSpec({
             val response: Person = client(context = it).fetchPerson(pid1, fetchFulltNavn = false)!!
 
             with(response) {
-                navn shouldBe "Ola-Kari"
+                navn.formatert() shouldBe "Ola-Kari"
                 foedselsdato shouldBe LocalDate.MIN
                 harFoedselsdato shouldBe false
                 sivilstand shouldBe Sivilstand.UOPPGITT
@@ -171,12 +157,29 @@ class PdlPersonClientTest : FunSpec({
             val response: Person = client(context = it).fetchPerson(pid1, fetchFulltNavn = false)!!
 
             with(response) {
-                navn shouldBe "Ola-Kari"
+                navn.formatert() shouldBe "Ola-Kari"
                 sivilstand shouldBe Sivilstand.UGIFT
             }
         }
     }
 })
+
+private fun assertRequest(server: MockWebServer) {
+    ByteArrayOutputStream().use {
+        server.takeRequest().apply {
+            body.copyTo(it)
+            getHeader("behandlingsnummer") shouldBe "B353"
+            getHeader("tema") shouldBe "PEN"
+        }
+        it.toString(StandardCharsets.UTF_8) shouldBe
+                $$"""{
+	"query": "query($ident: ID!) { hentPerson(ident: $ident) { navn(historikk: false) { fornavn }, foedselsdato { foedselsdato }, sivilstand(historikk: false) { type } } }",
+	"variables": {
+		"ident": "22925399748"
+	}
+}"""
+    }
+}
 
 private object PdlPersonClientTestObjects {
 

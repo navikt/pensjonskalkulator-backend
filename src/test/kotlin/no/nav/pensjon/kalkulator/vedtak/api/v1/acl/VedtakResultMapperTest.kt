@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.common.api.acl.CommonV1Sivilstatus
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.person.Navn
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.vedtak.*
 import java.math.BigDecimal
@@ -37,6 +38,12 @@ class VedtakResultMapperTest : ShouldSpec({
             ),
             privatAfp = LoependeEntitet(fom = LocalDate.of(2022, 10, 1)),
             tidsbegrensetOffentligAfp = LoependeEntitet(fom = LocalDate.of(2024, 2, 1)),
+            gjenlevenderett = Gjenlevenderett(
+                avdoedPid = pid,
+                doedsdato = LocalDate.of(2021, 2, 3),
+                foersteVirkningsdato = LocalDate.of(2022, 3, 1),
+                navn = Navn(fornavn = "F", mellomnavn = "M", etternavn = "E")
+            ),
             avdoed = InformasjonOmAvdoed(
                 pid = pid,
                 doedsdato = LocalDate.of(2025, 6, 14),
@@ -69,6 +76,12 @@ class VedtakResultMapperTest : ShouldSpec({
             ufoeretrygdgrad = 50,
             privatAfpFom = LocalDate.of(2022, 10, 1),
             tidsbegrensetOffentligAfpFom = LocalDate.of(2024, 2, 1),
+            gjenlevenderett = VedtakV1Gjenlevenderett(
+                avdoedPid = pid.value,
+                avdoedNavn = VedtakV1Navn(fornavn = "F", mellomnavn = "M", etternavn = "E"),
+                doedsdato = LocalDate.of(2021, 2, 3),
+                foersteVirkningsdato = LocalDate.of(2022, 3, 1)
+            ),
             avdoed = VedtakV1InformasjonOmAvdoed(
                 pid = pid.value,
                 doedsdato = LocalDate.of(2025, 6, 14),

@@ -22,15 +22,17 @@ class PdlPersonMapperTest : ShouldSpec({
 
         val person = PdlPersonMapper.fromDto(dto)
 
-        person.navn shouldBe "For-Navn"
-        person.foedselsdato shouldBe foedselsdato
-        person.harFoedselsdato shouldBe true
-        person.sivilstand shouldBe Sivilstand.UGIFT
+        with(person) {
+            navn.formatert() shouldBe "For-Navn"
+            this.foedselsdato shouldBe foedselsdato
+            harFoedselsdato shouldBe true
+            sivilstand shouldBe Sivilstand.UGIFT
+        }
     }
 
     should("pick first fornavn") {
         val dto = responseDto(fornavnListe = listOf("Kari", "Ola"))
-        PdlPersonMapper.fromDto(dto).navn shouldBe "Kari"
+        PdlPersonMapper.fromDto(dto).navn.formatert() shouldBe "Kari"
     }
 
     should("pick first foedselsdato") {
@@ -55,7 +57,7 @@ class PdlPersonMapperTest : ShouldSpec({
     }
 
     should("map missing fornavn to empty string") {
-        PdlPersonMapper.fromDto(responseDto(fornavnListe = emptyList())).navn shouldBe ""
+        PdlPersonMapper.fromDto(responseDto(fornavnListe = emptyList())).navn.formatert() shouldBe "Ukjent"
     }
 
     should("fornavn and etternavn to properly cased navn") {
@@ -64,16 +66,16 @@ class PdlPersonMapperTest : ShouldSpec({
             etternavn = "ETTERPÅ"
         )
 
-        val person = PdlPersonMapper.fromDto(dto)
-
-        person.navn shouldBe "Før Etterpå"
-        person.fornavn shouldBe "Før"
+        PdlPersonMapper.fromDto(dto).navn.formatert() shouldBe "Før Etterpå"
     }
 
     should("map missing foedselsdato to minimum date") {
         val person = PdlPersonMapper.fromDto(responseDto(foedselsdatoListe = emptyList()))
-        person.foedselsdato shouldBe LocalDate.MIN
-        person.harFoedselsdato shouldBe false
+
+        with(person) {
+            this.foedselsdato shouldBe LocalDate.MIN
+            harFoedselsdato shouldBe false
+        }
     }
 
     should("map missing sivilstand to sivilstand null") {
