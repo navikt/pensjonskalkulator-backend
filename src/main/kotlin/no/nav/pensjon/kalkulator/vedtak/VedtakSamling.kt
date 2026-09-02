@@ -29,10 +29,10 @@ data class VedtakSamling(
     fun hasContent(): Boolean =
         loependeAlderspensjon != null
                 || fremtidigAlderspensjon != null
-                || ufoeretrygd != null
                 || privatAfp != null
                 || tidsbegrensetOffentligAfp != null
                 || gjenlevenderett != null
+                || ufoeretrygd != null
     // Informasjon om avdød regnes ikke som "content" i form av vedtak
 }
 
@@ -57,12 +57,12 @@ data class FremtidigAlderspensjon(
 
 data class Gjenlevenderett(
     val avdoedPid: Pid,
+    val avdoedNavn: Navn? = null,
     val doedsdato: LocalDate?,
-    val foersteVirkningsdato: LocalDate?,
-    val navn: Navn? = null
-){
+    val foersteVirkningsdato: LocalDate?
+) {
     fun medNavn(navn: Navn) =
-        copy(navn = navn)
+        copy(avdoedNavn = navn)
 }
 
 data class LoependeUfoeretrygd(

@@ -46,7 +46,7 @@ private fun vedtakSamling(avdoedNavn: Navn?) =
             avdoedPid = pid,
             doedsdato = LocalDate.of(2020, 1, 1),
             foersteVirkningsdato = LocalDate.of(2020, 1, 1),
-            navn = avdoedNavn
+            avdoedNavn = avdoedNavn
         ),
         ufoeretrygd = LoependeUfoeretrygd(grad = 2, fom = LocalDate.of(2021, 10, 1)),
         avdoed = InformasjonOmAvdoed(

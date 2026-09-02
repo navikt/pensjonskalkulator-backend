@@ -46,7 +46,7 @@ object VedtakResultMapper {
     private fun gjenlevenderett(source: Gjenlevenderett) =
         VedtakV1Gjenlevenderett(
             avdoedPid = source.avdoedPid.value,
-            avdoedNavn = source.navn?.let(::navn),
+            avdoedNavn = source.avdoedNavn?.let(::navn),
             doedsdato = source.doedsdato,
             foersteVirkningsdato = source.foersteVirkningsdato
         )
