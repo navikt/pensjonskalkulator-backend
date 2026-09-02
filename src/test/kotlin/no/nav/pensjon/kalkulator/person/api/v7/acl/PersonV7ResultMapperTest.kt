@@ -8,6 +8,7 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.foedselsdato
 import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
 import no.nav.pensjon.kalkulator.normalder.VerdiStatus
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
+import no.nav.pensjon.kalkulator.person.Navn
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Sivilstand
 
@@ -16,8 +17,7 @@ class PersonV7ResultMapperTest : ShouldSpec({
     should("map person to data transfer object version 7") {
         PersonResultMapper.toDto(
             source = Person(
-                navn = "Fornavn1 Etternavn1",
-                fornavn = "Fornavn1",
+                navn = Navn(fornavn = "Fornavn1", etternavn = "Etternavn1"),
                 foedselsdato = foedselsdato,
                 pensjoneringAldre = Aldersgrenser(
                     aarskull = 1963,

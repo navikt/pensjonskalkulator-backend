@@ -10,6 +10,7 @@ import no.nav.pensjon.kalkulator.general.UttaksalderGradertUttak
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService
+import no.nav.pensjon.kalkulator.person.Navn
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.Sivilstatus
@@ -112,26 +113,21 @@ class LavesteUttaksalderServiceTest : ShouldSpec({
     }
 })
 
-private fun arrangeService(
-    foedselsdato: LocalDate,
-    dagensDato: LocalDate
-): LavesteUttaksalderService {
-    val service = LavesteUttaksalderService(
+private fun arrangeService(foedselsdato: LocalDate, dagensDato: LocalDate) =
+    LavesteUttaksalderService(
         personService = arrangePerson(foedselsdato),
         normalderService = arrangeNormalder(),
         todayProvider = { dagensDato })
-    return service
-}
 
 private fun arrangeNormalder(): NormertPensjonsalderService =
-    mockk<NormertPensjonsalderService>().apply {
+    mockk {
         every { nedreAlder(any()) } returns Alder(aar = 62, maaneder = 0)
         every { normalder(any()) } returns Alder(aar = 67, maaneder = 0)
     }
 
 private fun arrangePerson(foedselsdato: LocalDate): PersonService =
-    mockk<PersonService>().apply {
-        every { getPerson() } returns Person(navn = "", fornavn = "", foedselsdato = foedselsdato)
+    mockk {
+        every { getPerson() } returns Person(navn = Navn.ukjent, foedselsdato)
     }
 
 private fun impersonalSpec(foedselsdato: LocalDate, angiGradertUttak: Boolean) =

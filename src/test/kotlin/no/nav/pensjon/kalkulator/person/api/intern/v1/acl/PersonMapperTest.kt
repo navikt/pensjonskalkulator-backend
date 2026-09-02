@@ -7,6 +7,7 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.foedselsdato
 import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
 import no.nav.pensjon.kalkulator.normalder.VerdiStatus
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
+import no.nav.pensjon.kalkulator.person.Navn
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.Sivilstatus
@@ -16,8 +17,7 @@ class PersonMapperTest : ShouldSpec({
     should("map a domain-represented 'person' to a transferable representation") {
         PersonMapper.transferable(
             Person(
-                navn = "Fornavn1 Etternavn1",
-                fornavn = "Fornavn1", // not mapped
+                navn = Navn(fornavn = "Fornavn1", etternavn = "Etternavn1"),
                 foedselsdato = foedselsdato,
                 pensjoneringAldre = Aldersgrenser(
                     aarskull = 1963, // not mapped
