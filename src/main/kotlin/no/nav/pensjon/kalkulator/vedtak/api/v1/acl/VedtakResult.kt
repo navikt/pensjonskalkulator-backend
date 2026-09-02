@@ -105,7 +105,7 @@ data class VedtakV1Gjenlevenderett(
     @field:Schema(description = "Dødsdato")
     val doedsdato: LocalDate?,
 
-    @field:Schema(description = "Føerste virkningsdato for gjenlevenderetten")
+    @field:Schema(description = "Første virkningsdato for gjenlevenderetten")
     val foersteVirkningsdato: LocalDate?
 )
 

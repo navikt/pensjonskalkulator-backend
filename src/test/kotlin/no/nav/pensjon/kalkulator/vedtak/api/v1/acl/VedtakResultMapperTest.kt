@@ -42,7 +42,7 @@ class VedtakResultMapperTest : ShouldSpec({
                 avdoedPid = pid,
                 doedsdato = LocalDate.of(2021, 2, 3),
                 foersteVirkningsdato = LocalDate.of(2022, 3, 1),
-                navn = Navn(fornavn = "F", mellomnavn = "M", etternavn = "E")
+                avdoedNavn = Navn(fornavn = "F", mellomnavn = "M", etternavn = "E")
             ),
             avdoed = InformasjonOmAvdoed(
                 pid = pid,
