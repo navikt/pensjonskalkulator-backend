@@ -14,8 +14,8 @@ object PersonResultMapper {
 
     private fun person(source: Person) =
         PersonV7Result(
-            navn = source.navn.formatert(),
-            fornavn = source.navn.fornavn ?: "",
+            navn = source.navn.formatertStreng,
+            fornavn = source.navn.formatert.fornavn ?: "",
             foedselsdato = source.foedselsdato,
             sivilstatus = CommonV1Sivilstatus.fromInternalValue(source.sivilstatus),
             pensjoneringAldre = source.pensjoneringAldre.let(::pensjonsaldre)

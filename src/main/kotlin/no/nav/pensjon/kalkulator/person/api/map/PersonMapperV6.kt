@@ -17,8 +17,8 @@ object PersonMapperV6 {
 
     private fun person(source: Person) =
         PersonResultV6(
-            navn = source.navn.formatert(),
-            fornavn = source.navn.fornavn ?: "",
+            navn = source.navn.formatertStreng,
+            fornavn = source.navn.formatert.fornavn ?: "",
             foedselsdato = source.foedselsdato,
             sivilstand = PersonSivilstandV6.fromInternalValue(source.sivilstand),
             pensjoneringAldre = source.pensjoneringAldre.let(::pensjonsaldre)
