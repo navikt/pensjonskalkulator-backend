@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
+import no.nav.pensjon.kalkulator.person.Navn
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.pdl.dto.*
 import java.time.LocalDate
@@ -23,7 +24,7 @@ class PdlPersonMapperTest : ShouldSpec({
         val person = PdlPersonMapper.fromDto(dto)
 
         with(person) {
-            navn.formatert() shouldBe "For-Navn"
+            navn shouldBe Navn(fornavn = "For-Navn", mellomnavn = null, etternavn = null)
             this.foedselsdato shouldBe foedselsdato
             harFoedselsdato shouldBe true
             sivilstand shouldBe Sivilstand.UGIFT
@@ -32,7 +33,7 @@ class PdlPersonMapperTest : ShouldSpec({
 
     should("pick first fornavn") {
         val dto = responseDto(fornavnListe = listOf("Kari", "Ola"))
-        PdlPersonMapper.fromDto(dto).navn.formatert() shouldBe "Kari"
+        PdlPersonMapper.fromDto(dto).navn shouldBe Navn(fornavn = "Kari", mellomnavn = null, etternavn = null)
     }
 
     should("pick first foedselsdato") {
@@ -57,16 +58,8 @@ class PdlPersonMapperTest : ShouldSpec({
     }
 
     should("map missing fornavn to empty string") {
-        PdlPersonMapper.fromDto(responseDto(fornavnListe = emptyList())).navn.formatert() shouldBe "Ukjent"
-    }
-
-    should("fornavn and etternavn to properly cased navn") {
-        val dto = responseDto(
-            fornavnListe = listOf("FØR"),
-            etternavn = "ETTERPÅ"
-        )
-
-        PdlPersonMapper.fromDto(dto).navn.formatert() shouldBe "Før Etterpå"
+        PdlPersonMapper.fromDto(responseDto(fornavnListe = emptyList())).navn shouldBe
+                Navn(fornavn = "", mellomnavn = "", etternavn = "ukjent")
     }
 
     should("map missing foedselsdato to minimum date") {

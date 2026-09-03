@@ -8,6 +8,7 @@ import io.mockk.mockk
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.mock.TestObjects.pid1
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
+import no.nav.pensjon.kalkulator.person.Navn
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
@@ -77,7 +78,7 @@ class PdlPersonClientTest : FunSpec({
             val response: Person = client(context = it).fetchPerson(pid1, fetchFulltNavn = false)!!
 
             with(response) {
-                navn.formatert() shouldBe "Ola-Kari"
+                navn shouldBe Navn(fornavn = "Ola-Kari", mellomnavn = null, etternavn = null)
                 foedselsdato shouldBe LocalDate.of(1963, 12, 31)
                 harFoedselsdato shouldBe true
                 sivilstand shouldBe Sivilstand.UGIFT
@@ -92,7 +93,7 @@ class PdlPersonClientTest : FunSpec({
             val response: Person = client(context = it).fetchPerson(pid1, fetchFulltNavn = false)!!
 
             with(response) {
-                navn.formatert() shouldBe "Ola-Kari"
+                navn shouldBe Navn(fornavn = "Ola-Kari", mellomnavn = null, etternavn = null)
                 foedselsdato shouldBe LocalDate.MIN
                 harFoedselsdato shouldBe false
                 sivilstand shouldBe Sivilstand.UOPPGITT
@@ -157,7 +158,7 @@ class PdlPersonClientTest : FunSpec({
             val response: Person = client(context = it).fetchPerson(pid1, fetchFulltNavn = false)!!
 
             with(response) {
-                navn.formatert() shouldBe "Ola-Kari"
+                navn shouldBe Navn(fornavn = "Ola-Kari", mellomnavn = null, etternavn = null)
                 sivilstand shouldBe Sivilstand.UGIFT
             }
         }
