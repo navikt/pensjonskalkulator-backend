@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.mock
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
 import no.nav.pensjon.kalkulator.normalder.VerdiStatus
+import no.nav.pensjon.kalkulator.person.Navn
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.Sivilstand
@@ -18,16 +19,14 @@ object PersonFactory {
 
     fun person(sivilstand: Sivilstand = Sivilstand.UOPPGITT, foedselsdato: LocalDate = defaultFoedselsdato) =
         Person(
-            navn = "Fornavn1 Etternavn1",
-            fornavn = "Fornavn1",
+            navn = Navn(fornavn = "Fornavn1", etternavn = "Etternavn1"),
             foedselsdato,
             sivilstand = sivilstand
         )
 
     fun personWithPensjoneringAldre() =
         Person(
-            navn = "Fornavn1 Etternavn1",
-            fornavn = "Fornavn1",
+            navn = Navn(fornavn = "Fornavn1", etternavn = "Etternavn1"),
             foedselsdato = foedselsdato,
             sivilstand = Sivilstand.SKILT,
             sivilstatus = Sivilstatus.SAMBOER,

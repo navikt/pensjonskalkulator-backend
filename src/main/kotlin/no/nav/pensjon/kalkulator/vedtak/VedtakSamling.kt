@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.vedtak
 
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
+import no.nav.pensjon.kalkulator.person.Navn
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import java.math.BigDecimal
@@ -9,27 +10,25 @@ import java.time.LocalDate
 data class VedtakSamling(
     val loependeAlderspensjon: LoependeAlderspensjon?,
     val fremtidigAlderspensjon: FremtidigAlderspensjon?,
-    val ufoeretrygd: LoependeUfoeretrygd?,
     val privatAfp: LoependeEntitet?,
     val tidsbegrensetOffentligAfp: LoependeEntitet? = null,
+    val gjenlevenderett: Gjenlevenderett? = null,
+    val ufoeretrygd: LoependeUfoeretrygd?,
     val avdoed: InformasjonOmAvdoed?
 ) {
     fun withAlderspensjonUtbetalingSisteMaaned(utbetaling: Utbetaling) =
-        VedtakSamling(
-            loependeAlderspensjon = loependeAlderspensjon?.withUtbetalingSisteMaaned(utbetaling),
-            fremtidigAlderspensjon = fremtidigAlderspensjon,
-            ufoeretrygd = ufoeretrygd,
-            privatAfp = privatAfp,
-            tidsbegrensetOffentligAfp = tidsbegrensetOffentligAfp,
-            avdoed = avdoed
-        )
+        copy(loependeAlderspensjon = loependeAlderspensjon?.withUtbetalingSisteMaaned(utbetaling))
+
+    fun medAvdoedNavn(navn: Navn) =
+        copy(gjenlevenderett = gjenlevenderett?.medNavn(navn))
 
     fun hasContent(): Boolean =
         loependeAlderspensjon != null
                 || fremtidigAlderspensjon != null
-                || ufoeretrygd != null
                 || privatAfp != null
                 || tidsbegrensetOffentligAfp != null
+                || gjenlevenderett != null
+                || ufoeretrygd != null
     // Informasjon om avdød regnes ikke som "content" i form av vedtak
 }
 
@@ -43,15 +42,7 @@ data class LoependeAlderspensjon(
     val harUtenlandsopphold: Boolean
 ) {
     fun withUtbetalingSisteMaaned(utbetaling: Utbetaling) =
-        LoependeAlderspensjon(
-            grad = grad,
-            fom = fom,
-            uttaksgradFom = uttaksgradFom,
-            utbetalingSisteMaaned = utbetaling,
-            sivilstatus = sivilstatus,
-            harGjenlevenderett = harGjenlevenderett,
-            harUtenlandsopphold = harUtenlandsopphold
-        )
+        copy(utbetalingSisteMaaned = utbetaling)
 }
 
 data class FremtidigAlderspensjon(
@@ -59,6 +50,16 @@ data class FremtidigAlderspensjon(
     val fom: LocalDate,
     val sivilstatus: Sivilstatus
 )
+
+data class Gjenlevenderett(
+    val avdoedPid: Pid,
+    val avdoedNavn: Navn? = null,
+    val doedsdato: LocalDate?,
+    val foersteVirkningsdato: LocalDate?
+) {
+    fun medNavn(navn: Navn) =
+        copy(avdoedNavn = navn)
+}
 
 data class LoependeUfoeretrygd(
     val grad: Int,
