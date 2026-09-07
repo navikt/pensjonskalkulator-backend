@@ -26,7 +26,19 @@
         <logback.version>1.6.3</logback.version>
         <okhttp3.version>5.5.0</okhttp3.version>
         <kotest.version>6.2.4</kotest.version>
+        <google-cloud-libraries-bom.version>26.88.0</google-cloud-libraries-bom.version>
     </properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>libraries-bom</artifactId>
+                <version>${google-cloud-libraries-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <build>
         <finalName>pensjonskalkulator-backend</finalName>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
@@ -107,6 +119,10 @@
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-secretmanager</artifactId>
         </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
@@ -219,6 +235,12 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>mockwebserver</artifactId>
+            <version>${okhttp3.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp-tls</artifactId>
             <version>${okhttp3.version}</version>
             <scope>test</scope>
         </dependency>

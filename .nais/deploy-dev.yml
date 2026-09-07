@@ -145,6 +145,8 @@ spec:
         - host: sokos-utbetaldata.dev-fss-pub.nais.io
         - host: tp-api-q2.dev-fss-pub.nais.io
         - host: g2by7q6m.apicdn.sanity.io
+        - host: api.preprod.norskpensjon.no
+        - host: secretmanager.googleapis.com
   env:
     - name: FSS_GATEWAY_SERVICE_ID
       value: dev-fss:pensjonselvbetjening:pensjon-selvbetjening-fss-gateway
@@ -155,7 +157,17 @@ spec:
     - name: NAV_ANSATT_URL
       value: http://navansatt.pensjon-saksbehandling
     - name: NORSK_PENSJON_URL
-      value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
+      value: https://api.preprod.norskpensjon.no
+    - name: NORSK_PENSJON_MTLS_ENABLED
+      value: "false"
+    - name: NORSK_PENSJON_CREDENTIALS_SECRET_ID
+      value: norsk-pensjon-credentials-json
+    - name: NORSK_PENSJON_CREDENTIALS_SECRET_VERSION
+      value: "latest"
+    - name: NORSK_PENSJON_CERTIFICATE_SECRET_ID
+      value: norsk-pensjon-p12-auth-enc
+    - name: NORSK_PENSJON_CERTIFICATE_SECRET_VERSION
+      value: "latest"
     - name: NORSK_PENSJON_MOCK_URL
       value: https://pensjon-testdata-facade.dev-fss-pub.nais.io # only in dev
     - name: OMSTILLINGSSTOENAD_SERVICE_ID
@@ -257,3 +269,4 @@ spec:
   envFrom:
     - secret: pensjonskalkulator-backend-unleash-api-token
     - secret: pkb-pid-encryption
+    - secret: norsk-pensjon-client-certificate
