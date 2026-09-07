@@ -28,7 +28,7 @@ import org.springframework.web.reactive.function.client.bodyToMono
 
 @Component("norsk-pensjon-rest")
 class NorskPensjonRestClient(
-    @param:Value($$"${norsk-pensjon.rest.url}") private val baseUrl: String,
+    @param:Value($$"${norsk-pensjon.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     ssl: WebClientSsl,
     cacheManager: CaffeineCacheManager,
