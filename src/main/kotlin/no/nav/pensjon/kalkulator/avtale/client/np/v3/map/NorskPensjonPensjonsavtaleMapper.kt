@@ -115,7 +115,7 @@ object NorskPensjonPensjonsavtaleMapper {
 
     private fun utbetalingsperiode(source: UtbetalingsperiodeDto) =
         Utbetalingsperiode(
-            startAlder = NorskPensjonAlderDto(source.startAlder, source.startMaaned - STARTMAANED_FORSKYVNING),
+            startAlder = Alder(source.startAlder, source.startMaaned - STARTMAANED_FORSKYVNING),
             sluttAlder = source.sluttAlder?.let { sluttalder(it, source.sluttMaaned!!) },
             aarligUtbetalingForventet = source.aarligUtbetalingForventet ?: 0,
             aarligUtbetalingNedreGrense = source.aarligUtbetalingNedreGrense ?: 0,
@@ -123,13 +123,13 @@ object NorskPensjonPensjonsavtaleMapper {
             grad = source.grad.let { Uttaksgrad.from(it) }
         )
 
-    private fun sluttalder(norskPensjonSluttAlder: Int, norskPensjonSluttMaaned: Int): NorskPensjonAlderDto {
+    private fun sluttalder(norskPensjonSluttAlder: Int, norskPensjonSluttMaaned: Int): Alder {
         val maaneder = norskPensjonSluttMaaned - SLUTTMAANED_FORSKYVNING
 
         return if (maaneder < 0)
-            NorskPensjonAlderDto(aar = norskPensjonSluttAlder - 1, maaned = maaneder + MAANEDER_PER_AAR)
+            Alder(aar = norskPensjonSluttAlder - 1, maaneder = maaneder + MAANEDER_PER_AAR)
         else
-            NorskPensjonAlderDto(aar = norskPensjonSluttAlder, maaned = maaneder)
+            Alder(aar = norskPensjonSluttAlder, maaneder = maaneder)
     }
 
     private fun emptyOrFault(dto: EnvelopeDto) =

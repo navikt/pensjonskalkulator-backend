@@ -1,7 +1,6 @@
 package no.nav.pensjon.kalkulator.mock
 
 import no.nav.pensjon.kalkulator.avtale.*
-import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.NorskPensjonAlderDto
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 
@@ -45,15 +44,15 @@ object PensjonsavtaleFactory {
 
     private fun utbetalingsperiodeMedSluttalder() =
         Utbetalingsperiode(
-            startAlder = NorskPensjonAlderDto(71, 1),
-            sluttAlder = NorskPensjonAlderDto(81, 2),
+            startAlder = Alder(71, 0),
+            sluttAlder = Alder(81, 1),
             aarligUtbetaling = 10000,
             grad = Uttaksgrad.HUNDRE_PROSENT
         )
 
     private fun utbetalingsperiodeUtenSluttalder() =
         Utbetalingsperiode(
-            startAlder = NorskPensjonAlderDto(72, 2),
+            startAlder = Alder(72, 1),
             sluttAlder = null,
             aarligUtbetaling = 20000,
             grad = Uttaksgrad.AATTI_PROSENT
@@ -79,8 +78,8 @@ object PensjonsavtaleFactory {
 
     private fun utbetalingsperiode() =
         Utbetalingsperiode(
-            startAlder = NorskPensjonAlderDto(68, 2),
-            sluttAlder = NorskPensjonAlderDto(78, 12),
+            startAlder = Alder(68, 1),
+            sluttAlder = Alder(78, 11),
             aarligUtbetaling = 123000,
             grad = Uttaksgrad.HUNDRE_PROSENT
         )

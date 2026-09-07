@@ -4,7 +4,6 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.avtale.*
 import no.nav.pensjon.kalkulator.avtale.api.dto.*
-import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.NorskPensjonAlderDto
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 
@@ -21,8 +20,8 @@ class PensjonsavtaleResultMapperV3Test : ShouldSpec({
                         sluttalder = 77,
                         utbetalingsperioder = listOf(
                             Utbetalingsperiode(
-                                startAlder = NorskPensjonAlderDto(aar = 68, maaned = 6),
-                                sluttAlder = NorskPensjonAlderDto(aar = 78, maaned = 5),
+                                startAlder = Alder(aar = 68, maaneder = 6),
+                                sluttAlder = Alder(aar = 78, maaneder = 5),
                                 aarligUtbetaling = 12000,
                                 grad = Uttaksgrad.AATTI_PROSENT
                             )
@@ -41,8 +40,8 @@ class PensjonsavtaleResultMapperV3Test : ShouldSpec({
                             sluttAar = 77,
                             utbetalingsperioder = listOf(
                                 UtbetalingsperiodeV3(
-                                    startAlder = NorskPensjonAlderDto(aar = 68, maaned = 6),
-                                    sluttAlder = NorskPensjonAlderDto(aar = 78, maaned = 5),
+                                    startAlder = Alder(aar = 68, maaneder = 6),
+                                    sluttAlder = Alder(aar = 78, maaneder = 5),
                                     aarligUtbetaling = 12000,
                                     grad = 80
                                 )
