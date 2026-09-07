@@ -21,7 +21,7 @@ class PensjonsavtaleServiceTest : ShouldSpec({
             avtaleClient = arrangeAvtaler(pensjonsavtalerV3()),
             mockAvtaleClient = mockk(),
             pidGetter = mockk(relaxed = true),
-            featureToggleService = mockk(relaxed = true)
+            featureToggleService = arrangeFeature(enabled = false)
         )
 
         avtaleService.fetchAvtaler(avtaleSpecMedLivsvarigInntekt()) shouldBe pensjonsavtalerV3()
@@ -40,7 +40,7 @@ class PensjonsavtaleServiceTest : ShouldSpec({
             ),
             mockAvtaleClient = mockk(),
             pidGetter = mockk(relaxed = true),
-            featureToggleService = mockk(relaxed = true)
+            featureToggleService = arrangeFeature(enabled = false)
         )
 
         avtaleService.fetchAvtaler(avtaleSpecMedLivsvarigInntekt()) shouldBe
@@ -112,6 +112,7 @@ private fun arrangeAvtaler(kategorier: List<AvtaleKategori>): PensjonsavtaleClie
 private fun arrangeFeature(enabled: Boolean): FeatureToggleService =
     mockk<FeatureToggleService>().apply {
         every { isEnabled(featureName = "mock-norsk-pensjon") } returns enabled
+        every { isEnabled(featureName = "norsk-pensjon-via-rest") } returns true
     }
 
 private fun avtaleSpecMedLivsvarigInntekt() =

@@ -15,8 +15,9 @@ import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
+import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.webclient.autoconfigure.WebClientSsl
+import org.springframework.boot.ssl.SslBundles
 import org.springframework.cache.caffeine.CaffeineCacheManager
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -28,16 +29,17 @@ import org.springframework.web.reactive.function.client.bodyToMono
 
 @Component("norsk-pensjon-rest")
 class NorskPensjonRestClient(
-    @param:Value($$"${norsk-pensjon.rest.url}") private val baseUrl: String,
+    @param:Value($$"${norsk-pensjon.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
-    ssl: WebClientSsl,
+    sslBundles: SslBundles,
+    webClientConfig: WebClientConfig,
     cacheManager: CaffeineCacheManager,
     private val traceAid: TraceAid,
     @Value($$"${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), PensjonsavtaleClient {
 
     private val webClient = webClientBuilder.baseUrl(baseUrl)
-        .apply(ssl.fromBundle("norsk-pensjon"))
+        .clientConnector(webClientConfig.clientConnector(sslBundles.getBundle("norsk-pensjon")))
         .build()
     private val log = KotlinLogging.logger {}
 

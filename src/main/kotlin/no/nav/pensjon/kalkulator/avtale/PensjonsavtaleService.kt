@@ -24,17 +24,18 @@ class PensjonsavtaleService(
     private val comparisonScope = CoroutineScope(Dispatchers.IO)
 
     fun fetchAvtaler(spec: PensjonsavtaleSpec): Pensjonsavtaler {
-        return if (featureToggleService.isEnabled("mock-norsk-pensjon"))
+        return if (featureToggleService.isEnabled("mock-norsk-pensjon")) {
             filter(mockAvtaleClient.fetchAvtaler(spec, pidGetter.pid()))
-        else {
-//            val avtalerFraSoap = filter(avtaleClientSoap.fetchAvtaler(spec, pidGetter.pid()))
-//
-//            if (featureToggleService.isEnabled("compare-norsk-pensjon-via-soap-and-rest")) {
-//                compareAvtalerAsync(spec = spec, avtalerFraSoap = avtalerFraSoap, pid = pidGetter.pid())
-//            }
-//
-//            avtalerFraSoap //dev-prod
-            filter(avtaleClient.fetchAvtaler(spec, pidGetter.pid())) //lokalt
+        } else if (featureToggleService.isEnabled("norsk-pensjon-via-rest")) {
+            filter(avtaleClient.fetchAvtaler(spec, pidGetter.pid()))
+        } else if (featureToggleService.isEnabled("norsk-pensjon-compare-rest-and-soap")) {
+            val avtalerFraSoap = filter(avtaleClientSoap.fetchAvtaler(spec, pidGetter.pid()))
+
+            compareAvtalerAsync(spec = spec, avtalerFraSoap = avtalerFraSoap, pid = pidGetter.pid())
+
+            avtalerFraSoap //dev-prod
+        } else {
+            filter(avtaleClientSoap.fetchAvtaler(spec, pidGetter.pid()))
         }
     }
 
