@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.v3.dto
 
+import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.person.Pid
 
@@ -64,4 +65,8 @@ data class NorskPensjonAlderDto(val aar: Int, val maaned: Int) {
         require(aar in 0..200) { "0 <= aar <= 200" }
         require(maaned in 1..12) { "1 <= maaned <= 12" }
     }
+
+    infix fun lessThanOrEqualTo(other: NorskPensjonAlderDto?): Boolean =
+        other?.let { aar < it.aar || aar == it.aar && maaned <= it.maaned } ?: true
+
 }

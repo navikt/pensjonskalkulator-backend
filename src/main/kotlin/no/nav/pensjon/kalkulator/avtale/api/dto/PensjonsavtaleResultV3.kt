@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.avtale.api.dto
 import com.fasterxml.jackson.annotation.JsonInclude
 import jakarta.validation.constraints.NotNull
 import no.nav.pensjon.kalkulator.avtale.AvtaleKategori
-import no.nav.pensjon.kalkulator.general.Alder
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.NorskPensjonAlderDto
 
 data class PensjonsavtaleResultV3(
     @field:NotNull val avtaler: List<PensjonsavtaleV3>,
@@ -26,8 +26,8 @@ data class SelskapV3(
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class UtbetalingsperiodeV3(
-    @field:NotNull val startAlder: Alder,
-    val sluttAlder: Alder?,
+    @field:NotNull val startAlder: NorskPensjonAlderDto,
+    val sluttAlder: NorskPensjonAlderDto?,
     @field:NotNull val aarligUtbetaling: Int,
     @field:NotNull val grad: Int
 )

@@ -5,6 +5,7 @@ import no.nav.pensjon.kalkulator.avtale.Pensjonsavtaler
 import no.nav.pensjon.kalkulator.avtale.Selskap
 import no.nav.pensjon.kalkulator.avtale.Utbetalingsperiode
 import no.nav.pensjon.kalkulator.avtale.client.np.rest.acl.NorskPensjonSluttAlderMapper.sluttAar
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.NorskPensjonAlderDto
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.tech.time.DateUtil.MAANEDER_PER_AAR
@@ -62,7 +63,7 @@ object NorskPensjonResultMapper {
 
     private fun utbetalingsperiode(source: UtbetalingsperiodeDto) =
         Utbetalingsperiode(
-            startAlder = Alder(aar = source.startAlder, maaneder = source.startMaaned),
+            startAlder = NorskPensjonAlderDto(aar = source.startAlder, maaned = source.startMaaned),
             sluttAlder = source.sluttAlder?.let { sluttalder(it, source.sluttMaaned!!) },
             aarligUtbetalingForventet = source.aarligUtbetalingForventet ?: 0,
             aarligUtbetalingNedreGrense = source.aarligUtbetalingNedreGrense ?: 0,
@@ -70,13 +71,13 @@ object NorskPensjonResultMapper {
             grad = source.grad.let { Uttaksgrad.from(it) }
         )
 
-    private fun sluttalder(norskPensjonSluttAlder: Int, norskPensjonSluttMaaned: Int): Alder {
+    private fun sluttalder(norskPensjonSluttAlder: Int, norskPensjonSluttMaaned: Int): NorskPensjonAlderDto {
         val maaneder = norskPensjonSluttMaaned - SLUTTMAANED_FORSKYVNING
 
         return if (maaneder < 0)
-            Alder(aar = norskPensjonSluttAlder - 1, maaneder = maaneder + MAANEDER_PER_AAR)
+            NorskPensjonAlderDto(aar = norskPensjonSluttAlder - 1, maaned = maaneder + MAANEDER_PER_AAR)
         else
-            Alder(aar = norskPensjonSluttAlder, maaneder = maaneder)
+            NorskPensjonAlderDto(aar = norskPensjonSluttAlder, maaned = maaneder)
     }
 
     private fun emptyOrFault(dto: NorskPensjonResult) =

@@ -18,6 +18,7 @@ import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleC
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.avtaleMedEnUtbetalingsperiode
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.avtaleSpec
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.avtaleUtenUtbetalingsperioder
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.NorskPensjonAlderDto
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.avtaleMedToUtbetalingsperioder
@@ -214,8 +215,8 @@ object NorskPensjonPensjonsavtaleClientTestObjects {
 
     private val utbetalingsperiodeMedSluttalder =
         Utbetalingsperiode(
-            startAlder = Alder(aar = 71, maaneder = 0),
-            sluttAlder = Alder(aar = 81, maaneder = 1),
+            startAlder = NorskPensjonAlderDto(aar = 71, maaned = 0),
+            sluttAlder = NorskPensjonAlderDto(aar = 81, maaned = 1),
             aarligUtbetaling = 10000,
             grad = Uttaksgrad.HUNDRE_PROSENT
         )

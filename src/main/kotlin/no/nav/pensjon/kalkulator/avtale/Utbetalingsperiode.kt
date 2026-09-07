@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.avtale
 
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.NorskPensjonAlderDto
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 
@@ -10,8 +11,8 @@ import no.nav.pensjon.kalkulator.general.Uttaksgrad
  * grad: Påkrevd; hvis en rettighet ikke kan leveres med ønsket gradert beregning, så skal verdien til være 100 (for alle utbetalingsperiodene) og «Årsak til manglende gradering» ha en relevant feilkode.
  */
 data class Utbetalingsperiode(
-    val startAlder: Alder,
-    val sluttAlder: Alder?,
+    val startAlder: NorskPensjonAlderDto,
+    val sluttAlder: NorskPensjonAlderDto?,
     val aarligUtbetalingForventet: Int,
     val aarligUtbetalingNedreGrense: Int,
     val aarligUtbetalingOvreGrense: Int,
@@ -24,8 +25,8 @@ data class Utbetalingsperiode(
     }
 
     constructor(
-        startAlder: Alder,
-        sluttAlder: Alder?,
+        startAlder: NorskPensjonAlderDto,
+        sluttAlder: NorskPensjonAlderDto?,
         aarligUtbetaling: Int,
         grad: Uttaksgrad
     ) :
