@@ -12,14 +12,14 @@ data class SimuleringBrevDtoV1(
     val pensjonsopptjeningListe: List<PensjonsopptjeningBrevDtoV1>?,
     val forbehold: ForbeholdBrevDtoV1?,
     val kortforbehold: KortforbeholdBrevDtoV1?,
-) : SaksbehandlerValgBrevdata
+) : StatiskFagsystemBrevdata
 
 data class ServiceberegningBrevDtoV1(
     val uttaksalder: AlderBrevDtoV1,
     val uttaksdato: String,
     val forventetFremtidigInntekt: Int?,
     val afp: TidsbegrensetOffentligAfpBrevDtoV1,
-) : SaksbehandlerValgBrevdata
+) : StatiskFagsystemBrevdata
 
 data class SimuleringBrevV1(
     val alderspensjonListe: List<AlderspensjonBrevDtoV1>,
