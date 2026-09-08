@@ -24,10 +24,12 @@ class EgressAccessTokenFacade(
         when (authType) {
             AuthType.MACHINE_INSIDE_NAV -> clientCredentialsTokenService
             AuthType.MACHINE_OUTSIDE_NAV -> jwtBearerTokenService
+            AuthType.MUTUAL_TLS -> NoTokenGetter()
             AuthType.PERSON_SELF -> tokenExchangeService
             AuthType.PERSON_ON_BEHALF -> onBehalfOfTokenService
             else -> unsupported(authType)
         }
+
 
     companion object {
         private fun <T> unsupported(authType: AuthType): T {

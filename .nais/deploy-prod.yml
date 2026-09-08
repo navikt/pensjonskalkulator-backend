@@ -118,6 +118,7 @@ spec:
         - host: ofa.api.gabler.no
         - host: ofa.gabler.no
         - host: g2by7q6m.apicdn.sanity.io
+        - host: api.norskpensjon.no
   env:
     - name: FSS_GATEWAY_SERVICE_ID
       value: prod-fss:pensjonselvbetjening:pensjon-selvbetjening-fss-gateway
@@ -128,7 +129,7 @@ spec:
     - name: NAV_ANSATT_URL
       value: http://navansatt.pensjon-saksbehandling
     - name: NORSK_PENSJON_URL
-      value: https://pensjon-selvbetjening-fss-gateway.prod-fss-pub.nais.io
+      value: https://api.norskpensjon.no
     - name: OMSTILLINGSSTOENAD_SERVICE_ID
       value: prod-gcp:etterlatte:etterlatte-api
     - name: OMSTILLINGSSTOENAD_URL

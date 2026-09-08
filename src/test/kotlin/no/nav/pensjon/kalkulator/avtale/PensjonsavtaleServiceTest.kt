@@ -17,10 +17,11 @@ class PensjonsavtaleServiceTest : ShouldSpec({
 
     should("fetch avtaler") {
         val avtaleService = PensjonsavtaleService(
+            avtaleClientSoap = arrangeAvtaler(pensjonsavtalerV3()),
             avtaleClient = arrangeAvtaler(pensjonsavtalerV3()),
             mockAvtaleClient = mockk(),
             pidGetter = mockk(relaxed = true),
-            featureToggleService = mockk(relaxed = true)
+            featureToggleService = arrangeFeature(enabled = false)
         )
 
         avtaleService.fetchAvtaler(avtaleSpecMedLivsvarigInntekt()) shouldBe pensjonsavtalerV3()
@@ -28,6 +29,7 @@ class PensjonsavtaleServiceTest : ShouldSpec({
 
     should("exclude avtaler of kategori 'Folketrygd', 'Offentlig tjenestepensjon', 'Privat AFP'") {
         val avtaleService = PensjonsavtaleService(
+            avtaleClientSoap = mockk(relaxed = true),
             avtaleClient = arrangeAvtaler(
                 kategorier = listOf(
                     AvtaleKategori.FOLKETRYGD,
@@ -38,7 +40,7 @@ class PensjonsavtaleServiceTest : ShouldSpec({
             ),
             mockAvtaleClient = mockk(),
             pidGetter = mockk(relaxed = true),
-            featureToggleService = mockk(relaxed = true)
+            featureToggleService = arrangeFeature(enabled = false)
         )
 
         avtaleService.fetchAvtaler(avtaleSpecMedLivsvarigInntekt()) shouldBe
@@ -47,7 +49,8 @@ class PensjonsavtaleServiceTest : ShouldSpec({
 
     should("exclude avtaler uten startår") {
         val avtaleService = PensjonsavtaleService(
-            avtaleClient = arrangeAvtaler(enAvtaleUtenStart()),
+            avtaleClient = mockk(relaxed = true),
+            avtaleClientSoap = arrangeAvtaler(enAvtaleUtenStart()),
             mockAvtaleClient = mockk(),
             pidGetter = mockk(relaxed = true),
             featureToggleService = mockk(relaxed = true)
@@ -59,9 +62,11 @@ class PensjonsavtaleServiceTest : ShouldSpec({
 
     should("use mocked avtaler when 'mock' feature is enabled") {
         val spec = avtaleSpecMedLivsvarigInntekt()
+        val restAvtaleClient = mockk<PensjonsavtaleClient>()
         val realAvtaleClient = mockk<PensjonsavtaleClient>()
         val mockAvtaleClient = arrangeAvtaler(pensjonsavtalerV3())
         val avtaleService = PensjonsavtaleService(
+            restAvtaleClient,
             realAvtaleClient,
             mockAvtaleClient,
             pidGetter = mockk(relaxed = true),
@@ -76,9 +81,11 @@ class PensjonsavtaleServiceTest : ShouldSpec({
 
     should("use real avtale-service when 'mock' feature is disabled") {
         val spec = avtaleSpecMedLivsvarigInntekt()
+        val restAvtaleClient = mockk<PensjonsavtaleClient>()
         val realAvtaleClient = arrangeAvtaler(pensjonsavtalerV3())
         val mockAvtaleClient = mockk<PensjonsavtaleClient>()
         val avtaleService = PensjonsavtaleService(
+            restAvtaleClient,
             realAvtaleClient,
             mockAvtaleClient,
             pidGetter = mockk(relaxed = true),
@@ -105,6 +112,7 @@ private fun arrangeAvtaler(kategorier: List<AvtaleKategori>): PensjonsavtaleClie
 private fun arrangeFeature(enabled: Boolean): FeatureToggleService =
     mockk<FeatureToggleService>().apply {
         every { isEnabled(featureName = "mock-norsk-pensjon") } returns enabled
+        every { isEnabled(featureName = "norsk-pensjon-via-rest") } returns true
     }
 
 private fun avtaleSpecMedLivsvarigInntekt() =
