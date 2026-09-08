@@ -6,7 +6,7 @@ data class OpprettBrevRequestDtoV1<out T : StatiskFagsystemBrevdata>(
         val spraak: String,
         val avsenderEnhetsId: String,
         val statiskFagsystemBrevdata: T,
-        val saksbehandlerValg: SaksbehandlerValgDtoV1,
+        val saksbehandlerValg: SaksbehandlerValgDtoV1?,
         val reserverForRedigering: Boolean,
     )
 

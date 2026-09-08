@@ -18,6 +18,7 @@ object OpprettBrevDtoV1Mapper {
                     forventetFremtidigInntekt = source.serviceberegning.forventetFremtidigInntekt,
                     afp = mapToTidsbegrensetOffentligAfpDto(afp),
                 ),
+                saksbehandlerValg = SaksbehandlerValgDtoV1(ingenYtelser = true),
             )
         }
 
@@ -50,6 +51,7 @@ object OpprettBrevDtoV1Mapper {
         saksId: Long,
         brevkode: String,
         statiskFagsystemBrevdata: T,
+        saksbehandlerValg: SaksbehandlerValgDtoV1? = null,
     ) = OpprettBrevRequestDtoV1(
         saksId = saksId,
         brevkode = brevkode,
@@ -57,7 +59,7 @@ object OpprettBrevDtoV1Mapper {
         avsenderEnhetsId = source.enhetsId,
         reserverForRedigering = false,
         statiskFagsystemBrevdata = statiskFagsystemBrevdata,
-        saksbehandlerValg = SaksbehandlerValgDtoV1(ingenYtelser = true),
+        saksbehandlerValg = saksbehandlerValg,
     )
 
     fun fromDto(source: BrevResponseDtoV1) = LagreSimuleringResponse(
