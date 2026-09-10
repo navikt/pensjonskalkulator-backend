@@ -10,7 +10,7 @@ import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.tech.time.DateUtil.MAANEDER_PER_AAR
 
 object NorskPensjonResultMapper {
-
+    val log = mu.KotlinLogging.logger {}
     /**
      *  Norsk Pensjon regner "til", vi regner "til og med" => forskyvning 1
      */
@@ -18,11 +18,13 @@ object NorskPensjonResultMapper {
 
     private const val DEFAULT_VALUE = "ukjent"
 
-    fun fromDto(dto: NorskPensjonResult) =
-        Pensjonsavtaler(
+    fun fromDto(dto: NorskPensjonResult): Pensjonsavtaler {
+        log.info { "Pensjonsavtalerespons: $dto" }
+        return Pensjonsavtaler(
             avtaler = pensjonsavtaler(dto) ?: emptyOrFault(dto),
             utilgjengeligeSelskap = utilgjengeligeSelskap(dto) ?: emptyList()
         )
+    }
 
     private fun pensjonsavtaler(dto: NorskPensjonResult) =
         dto.pensjonsRettigheter?.map {

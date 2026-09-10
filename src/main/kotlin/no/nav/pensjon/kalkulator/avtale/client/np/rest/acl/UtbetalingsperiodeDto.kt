@@ -9,4 +9,8 @@ class UtbetalingsperiodeDto {
     var aarligUtbetalingNedreGrense: Int? = null
     var aarligUtbetalingOvreGrense: Int? = null
     var grad: Int = 0
+    override fun toString(): String {
+        return "{\"startAlder\":$startAlder,\"startMaaned\":$startMaaned,\"sluttAlder\":$sluttAlder,\"sluttMaaned\":$sluttMaaned,\"aarligUtbetalingForventet\":$aarligUtbetalingForventet,\"aarligUtbetalingNedreGrense\":$aarligUtbetalingNedreGrense,\"aarligUtbetalingOvreGrense\":$aarligUtbetalingOvreGrense,\"grad\":$grad}"
+    }
+
 }

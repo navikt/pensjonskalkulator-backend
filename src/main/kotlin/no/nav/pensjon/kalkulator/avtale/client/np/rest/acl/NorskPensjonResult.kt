@@ -1,8 +1,14 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.rest.acl
 
+private fun jsonStr(value: String?): String = if (value == null) "null" else "\"$value\""
+
 class NorskPensjonResult {
     var pensjonsRettigheter: List<NorskPensjonPensjonsrettighet>? = null
     var utilgjengeligeInnretninger: List<NorskPensjonUtilgjengeligInnretning>? = null
+    override fun toString(): String {
+        return "{\"pensjonsRettigheter\":$pensjonsRettigheter,\"utilgjengeligeInnretninger\":$utilgjengeligeInnretninger}"
+    }
+
 }
 
 class NorskPensjonUtilgjengeligInnretning {
@@ -11,6 +17,10 @@ class NorskPensjonUtilgjengeligInnretning {
     var antallManglendeRettigheter: Int? = null
     var kategori: String? = null
     var feilkode: String? = null
+    override fun toString(): String {
+        return "{\"selskapsnavn\":${jsonStr(selskapsnavn)},\"heltUtilgjengelig\":$heltUtilgjengelig,\"antallManglendeRettigheter\":$antallManglendeRettigheter,\"kategori\":${jsonStr(kategori)},\"feilkode\":${jsonStr(feilkode)}}"
+    }
+
 }
 
 class NorskPensjonPensjonsrettighet {
@@ -32,6 +42,10 @@ class NorskPensjonPensjonsrettighet {
     var opplysningsdato: String? = null
     var aarsakManglendeGradering: String? = null
     var aarsakIkkeBeregnet: String? = null
+    override fun toString(): String {
+        return "{\"avtalenummer\":${jsonStr(avtalenummer)},\"arbeidsgiver\":${jsonStr(arbeidsgiver)},\"selskapsnavn\":${jsonStr(selskapsnavn)},\"produktbetegnelse\":${jsonStr(produktbetegnelse)},\"kategori\":${jsonStr(kategori)},\"underkategori\":${jsonStr(underkategori)},\"merknad\":${jsonStr(merknad)},\"innskuddssaldo\":$innskuddssaldo,\"naavaerendeAvtaltAarligInnskudd\":$naavaerendeAvtaltAarligInnskudd,\"pensjonsbeholdningForventet\":$pensjonsbeholdningForventet,\"avkastningsgaranti\":$avkastningsgaranti,\"beregningsmodell\":${jsonStr(beregningsmodell)},\"startAlder\":$startAlder,\"sluttAlder\":$sluttAlder,\"utbetalingsperioder\":$utbetalingsperioder,\"opplysningsdato\":${jsonStr(opplysningsdato)},\"aarsakManglendeGradering\":${jsonStr(aarsakManglendeGradering)},\"aarsakIkkeBeregnet\":${jsonStr(aarsakIkkeBeregnet)}}"
+    }
+
 }
 
 enum class NorskPensjonError(val beskrivelse: String) {
