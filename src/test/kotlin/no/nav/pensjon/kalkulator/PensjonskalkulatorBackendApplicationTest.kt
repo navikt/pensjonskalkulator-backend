@@ -10,11 +10,6 @@ import org.springframework.test.context.TestPropertySource
 
 @SpringBootTest
 @ActiveProfiles("test")
-@TestPropertySource(
-    properties = [
-        "spring.ssl.bundle.pem.norsk-pensjon.keystore.certificate=classpath:test-cert.pem"
-    ]
-)
 class PensjonskalkulatorBackendApplicationTest : StringSpec({
 
     "context loads" { }
