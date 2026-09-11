@@ -159,13 +159,13 @@ spec:
     - name: NORSK_PENSJON_URL
       value: https://api.preprod.norskpensjon.no
     - name: NORSK_PENSJON_MTLS_ENABLED
-      value: "false"
+      value: "true"
     - name: NORSK_PENSJON_CREDENTIALS_SECRET_ID
-      value: norsk-pensjon-credentials-json
+      value: test-keystore-credentials-json
     - name: NORSK_PENSJON_CREDENTIALS_SECRET_VERSION
       value: "latest"
     - name: NORSK_PENSJON_CERTIFICATE_SECRET_ID
-      value: norsk-pensjon-p12-auth-enc
+      value: test-virksomhetssertifikat-felles-keystore-jceks_2018-2021
     - name: NORSK_PENSJON_CERTIFICATE_SECRET_VERSION
       value: "latest"
     - name: NORSK_PENSJON_MOCK_URL
