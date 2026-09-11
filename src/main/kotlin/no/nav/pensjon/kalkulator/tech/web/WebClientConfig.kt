@@ -2,9 +2,11 @@ package no.nav.pensjon.kalkulator.tech.web
 
 import io.netty.channel.ChannelOption
 import io.netty.handler.logging.LogLevel
+import io.netty.handler.ssl.SslContextBuilder
 import io.netty.handler.timeout.ReadTimeoutHandler
 import io.netty.handler.timeout.WriteTimeoutHandler
 import org.springframework.boot.webclient.WebClientCustomizer
+import org.springframework.boot.ssl.SslBundle
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -27,21 +29,31 @@ class WebClientConfig : WebClientCustomizer {
 
     override fun customize(webClientBuilder: WebClient.Builder) {
         webClientBuilder
-            .clientConnector(
-                ReactorClientHttpConnector(
-                    HttpClient.create(connectionProvider())
-                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, TIMEOUT.toInt())
-                        .responseTimeout(Duration.ofMillis(TIMEOUT))
-                        .doOnConnected(::addTimeoutHandlers)
-                        .wiretap(
-                            "reactor.netty.http.client.HttpClient",
-                            LogLevel.DEBUG,
-                            AdvancedByteBufFormat.TEXTUAL
-                        )
-                )
-            )
+            .clientConnector(clientConnector())
             .exchangeStrategies(largeBufferStrategies())
             .filter(filterResponse())
+    }
+
+    fun clientConnector(sslBundle: SslBundle? = null): ReactorClientHttpConnector {
+        var httpClient = HttpClient.create(connectionProvider())
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, TIMEOUT.toInt())
+            .responseTimeout(Duration.ofMillis(TIMEOUT))
+            .doOnConnected(::addTimeoutHandlers)
+            .wiretap(
+                "reactor.netty.http.client.HttpClient",
+                LogLevel.DEBUG,
+                AdvancedByteBufFormat.TEXTUAL
+            )
+
+        if (sslBundle != null) {
+            val managers = sslBundle.managers
+            val sslContext = SslContextBuilder.forClient()
+                .keyManager(managers.keyManagerFactory)
+                .trustManager(managers.trustManagerFactory)
+                .build()
+            httpClient = httpClient.secure { it.sslContext(sslContext) }
+        }
+        return ReactorClientHttpConnector(httpClient)
     }
 
     companion object {

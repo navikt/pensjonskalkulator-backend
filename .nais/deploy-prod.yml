@@ -119,6 +119,7 @@ spec:
         - host: ofa.gabler.no
         - host: g2by7q6m.apicdn.sanity.io
         - host: api.norskpensjon.no
+        - host: secretmanager.googleapis.com
   env:
     - name: FSS_GATEWAY_SERVICE_ID
       value: prod-fss:pensjonselvbetjening:pensjon-selvbetjening-fss-gateway
@@ -130,6 +131,16 @@ spec:
       value: http://navansatt.pensjon-saksbehandling
     - name: NORSK_PENSJON_URL
       value: https://api.norskpensjon.no
+    - name: NORSK_PENSJON_MTLS_ENABLED
+      value: "false"
+    - name: NORSK_PENSJON_CREDENTIALS_SECRET_ID
+      value: norsk-pensjon-credentials-json
+    - name: NORSK_PENSJON_CREDENTIALS_SECRET_VERSION
+      value: "latest"
+    - name: NORSK_PENSJON_CERTIFICATE_SECRET_ID
+      value: norsk-pensjon-p12-auth-enc
+    - name: NORSK_PENSJON_CERTIFICATE_SECRET_VERSION
+      value: "latest"
     - name: OMSTILLINGSSTOENAD_SERVICE_ID
       value: prod-gcp:etterlatte:etterlatte-api
     - name: OMSTILLINGSSTOENAD_URL
@@ -229,3 +240,4 @@ spec:
   envFrom:
     - secret: pensjonskalkulator-backend-unleash-api-token
     - secret: pkb-pid-encryption
+    - secret: norsk-pensjon-client-certificate
