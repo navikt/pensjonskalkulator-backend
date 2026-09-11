@@ -269,3 +269,4 @@ spec:
   envFrom:
     - secret: pensjonskalkulator-backend-unleash-api-token
     - secret: pkb-pid-encryption
+    - secret: norsk-pensjon-client-certificate
