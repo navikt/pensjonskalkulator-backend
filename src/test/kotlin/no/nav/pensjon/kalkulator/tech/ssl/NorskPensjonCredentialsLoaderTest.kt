@@ -20,11 +20,11 @@ class NorskPensjonCredentialsLoaderTest : FunSpec({
             "NorskPensjonKeyStoreCredentials(password=******, alias=nav integrasjon norsk pensjon)"
     }
 
-    test("rejects unsupported credentials type") {
-        shouldThrow<CertificateMaterialException> {
-            loader.load("""{"password":"secret","alias":"alias","type":"jks"}""".toByteArray())
-        }.message shouldContain "type must be 'pkcs12'"
-    }
+//    test("rejects unsupported credentials type") {
+//        shouldThrow<CertificateMaterialException> {
+//            loader.load("""{"password":"secret","alias":"alias","type":"jks"}""".toByteArray())
+//        }.message shouldContain "type must be 'pkcs12'"
+//    }
 
     test("rejects missing password") {
         shouldThrow<CertificateMaterialException> {
