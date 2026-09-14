@@ -1,10 +1,13 @@
 package no.nav.pensjon.kalkulator.tech.ssl
 
+import mu.KotlinLogging
 import tools.jackson.databind.ObjectMapper
 
 class NorskPensjonCredentialsLoader(
     private val objectMapper: ObjectMapper
 ) {
+    private val log = KotlinLogging.logger {}
+
     fun load(payload: ByteArray): NorskPensjonKeyStoreCredentials {
         val dto = try {
             objectMapper.readValue(payload, CredentialsDto::class.java)
@@ -14,6 +17,7 @@ class NorskPensjonCredentialsLoader(
                 exception
             )
         }
+        log.warn { "Credentials dto type: ${dto.type}, dto alias: ${dto.alias}" }
 
         if (!dto.type.equals("pkcs12", ignoreCase = true)) {
             throw CertificateMaterialException("Norsk Pensjon credentials type must be 'pkcs12'")
