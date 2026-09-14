@@ -7,6 +7,7 @@ import no.nav.pensjon.kalkulator.vedtak.*
 import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenGjeldendeUfoeregradDto
 import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenGjeldendeVedtakApDto
 import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenGjeldendeVedtakDto
+import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenGjenlevenderettDto
 import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenInformasjonOmAvdoedDto
 import no.nav.pensjon.kalkulator.vedtak.client.pen.dto.PenLoependeVedtakDto
 import java.time.LocalDate
@@ -23,9 +24,10 @@ object PenLoependeVedtakMapper {
                 loependeAlderspensjon(source = it, uttaksgradFom = source.gjeldendeUttaksgradFom)
             },
             fremtidigAlderspensjon = fremtidigUttakgradsendring(source),
-            ufoeretrygd = source.ufoeretrygd?.let(::ufoeretrygd),
             privatAfp = source.afpPrivat?.let(::vedtak),
             tidsbegrensetOffentligAfp = source.afpOffentlig?.let(::vedtak),
+            gjenlevenderett = source.gjenlevenderett?.let(::gjenlevenderett),
+            ufoeretrygd = source.ufoeretrygd?.let(::ufoeretrygd),
             avdoed = source.avdoed?.let(::avdoed)
         )
 
@@ -53,6 +55,13 @@ object PenLoependeVedtakMapper {
         source.alderspensjonIFremtid
             ?.takeIf { it.grad != source.alderspensjon?.grad }
             ?.let(::fremtidigAlderspensjon)
+
+    private fun gjenlevenderett(source: PenGjenlevenderettDto) =
+        Gjenlevenderett(
+            avdoedPid = Pid(source.pid),
+            doedsdato = source.doedsdato,
+            foersteVirkningsdato = source.foersteVirkningsdato
+        )
 
     private fun ufoeretrygd(source: PenGjeldendeUfoeregradDto) =
         LoependeUfoeretrygd(

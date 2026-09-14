@@ -120,7 +120,8 @@ data class LagreSimuleringsinformasjonDto(
     val utenlandsperioder: List<LagreUtenlandsperiodeDto>?,
     val kull: Kull,
     val normertPensjonsalderPlassering: NormertPensjonsalderPlassering?,
-    val forbeholdVisningsvilkaar: List<ForbeholdVisningsvilkaar>
+    val forbeholdVisningsvilkaar: List<ForbeholdVisningsvilkaar>,
+    @field:NotNull val simulererEndringMedAfpPrivat: Boolean,
 )
 
 data class LagreUttaksinformasjonDto(
@@ -166,8 +167,7 @@ data class LagreMaanedligAlderspensjonDto(
     val kapittel20AndelTeller: Int?,
     val kapittel20Trygdetid: Int?,
     val garantipensjonBeloep: Int?,
-    val garantipensjonsnivaaBeloep: Int?,
-    val garantipensjonSats: Double?,
+    val garantipensjonSats: Int?,
     val garantitilleggBeloep: Int?,
     val grunnbeloep: Int?
 )

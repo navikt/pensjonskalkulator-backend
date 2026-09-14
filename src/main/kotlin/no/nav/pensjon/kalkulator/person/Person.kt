@@ -5,8 +5,7 @@ import no.nav.pensjon.kalkulator.normalder.NormertPensjonsalderService.Companion
 import java.time.LocalDate
 
 data class Person(
-    val navn: String,
-    val fornavn: String,
+    val navn: Navn,
     val foedselsdato: LocalDate,
     val pensjoneringAldre: Aldersgrenser = defaultAldersgrenser,
     val sivilstand: Sivilstand = Sivilstand.UOPPGITT,
@@ -16,26 +15,10 @@ data class Person(
     val harFoedselsdato = foedselsdato >= minimumFoedselsdato
 
     fun withPensjoneringAldre(pensjoneringAldre: Aldersgrenser) =
-        Person(
-            navn,
-            fornavn,
-            foedselsdato,
-            pensjoneringAldre,
-            sivilstand,
-            sivilstatus,
-            adressebeskyttelse
-        )
+        copy(pensjoneringAldre = pensjoneringAldre)
 
     fun withSivilstatus(sivilstatus: Sivilstatus) =
-        Person(
-            navn,
-            fornavn,
-            foedselsdato,
-            pensjoneringAldre,
-            sivilstand,
-            sivilstatus,
-            adressebeskyttelse
-        )
+        copy(sivilstatus = sivilstatus)
 
     private companion object {
         private val minimumFoedselsdato: LocalDate = LocalDate.of(1901, 1, 1)

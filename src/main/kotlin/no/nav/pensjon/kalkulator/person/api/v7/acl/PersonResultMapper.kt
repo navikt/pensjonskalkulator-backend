@@ -14,8 +14,8 @@ object PersonResultMapper {
 
     private fun person(source: Person) =
         PersonV7Result(
-            navn = source.navn,
-            fornavn = source.fornavn,
+            navn = source.navn.formatertStreng,
+            fornavn = source.navn.formatert.fornavn ?: "",
             foedselsdato = source.foedselsdato,
             sivilstatus = CommonV1Sivilstatus.fromInternalValue(source.sivilstatus),
             pensjoneringAldre = source.pensjoneringAldre.let(::pensjonsaldre)
@@ -34,7 +34,7 @@ object PersonResultMapper {
         PersonV7Pensjonsaldre(
             normertPensjoneringsalder = alder(source.normalder),
             nedreAldersgrense = alder(source.nedreAlder),
-            oevreAldersgrense = alder(source.oevreAlder),
+            oevreAldersgrense = alder(source.oevreAlder)
         )
 
     private fun alder(source: Alder) =

@@ -12,14 +12,14 @@ data class SimuleringBrevDtoV1(
     val pensjonsopptjeningListe: List<PensjonsopptjeningBrevDtoV1>?,
     val forbehold: ForbeholdBrevDtoV1?,
     val kortforbehold: KortforbeholdBrevDtoV1?,
-) : SaksbehandlerValgBrevdata
+) : StatiskFagsystemBrevdata
 
 data class ServiceberegningBrevDtoV1(
     val uttaksalder: AlderBrevDtoV1,
     val uttaksdato: String,
     val forventetFremtidigInntekt: Int?,
     val afp: TidsbegrensetOffentligAfpBrevDtoV1,
-) : SaksbehandlerValgBrevdata
+) : StatiskFagsystemBrevdata
 
 data class SimuleringBrevV1(
     val alderspensjonListe: List<AlderspensjonBrevDtoV1>,
@@ -125,7 +125,8 @@ data class SimuleringsinformasjonBrevDtoV1(
     val sivilstatus: String?,
     val utenlandsperioder: List<UtenlandsperiodeBrevDtoV1>?,
     val kull: String,
-    val normertPensjonsalderPlassering: String?
+    val normertPensjonsalderPlassering: String?,
+    val simulererEndringMedAfpPrivat: Boolean,
 )
 
 data class UtenlandsperiodeBrevDtoV1(
@@ -165,8 +166,7 @@ data class MaanedligAlderspensjonBrevDtoV1(
     val kapittel20AndelTeller: Int?,
     val kapittel20Trygdetid: Int?,
     val garantipensjonBeloep: Int?,
-    val garantipensjonsnivaaBeloep: Int?,
-    val garantipensjonSats: Double?,
+    val garantipensjonSats: Int?,
     val garantitilleggBeloep: Int?,
     val grunnbeloep: Int?
 )

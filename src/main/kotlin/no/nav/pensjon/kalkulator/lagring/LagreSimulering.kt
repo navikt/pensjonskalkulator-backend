@@ -116,7 +116,8 @@ data class LagreSimuleringsinformasjon(
     val utenlandsperioder: List<LagreUtenlandsperiode>?,
     val kull: Kull,
     val normertPensjonsalderPlassering: NormertPensjonsalderPlassering?,
-    val sanityVisningsvilkaar: List<SanityVisningsvilkaar>
+    val sanityVisningsvilkaar: List<SanityVisningsvilkaar>,
+    val simulererEndringMedAfpPrivat: Boolean,
 )
 
 data class LagreUttaksinformasjon(
@@ -162,8 +163,7 @@ data class LagreMaanedligAlderspensjon(
     val kapittel20AndelTeller: Int?,
     val kapittel20Trygdetid: Int?,
     val garantipensjonBeloep: Int?,
-    val garantipensjonsnivaaBeloep: Int?,
-    val garantipensjonSats: Double?,
+    val garantipensjonSats: Int?,
     val garantitilleggBeloep: Int?,
     val grunnbeloep: Int?
 )

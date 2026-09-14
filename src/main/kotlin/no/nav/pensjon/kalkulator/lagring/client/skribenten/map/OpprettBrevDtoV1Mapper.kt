@@ -6,18 +6,19 @@ import no.nav.pensjon.kalkulator.lagring.client.skribenten.dto.*
 
 object OpprettBrevDtoV1Mapper {
 
-    fun toDto(source: LagreSimulering, saksId: Long, forbehold: ForbeholdInnhold?, kortforbehold: Kortforbehold?): OpprettBrevRequestDtoV1<SaksbehandlerValgBrevdata> {
+    fun toDto(source: LagreSimulering, saksId: Long, forbehold: ForbeholdInnhold?, kortforbehold: Kortforbehold?): OpprettBrevRequestDtoV1<StatiskFagsystemBrevdata> {
         source.serviceberegning?.afp?.let { afp ->
             return opprettBrevRequest(
                 source = source,
                 saksId = saksId,
                 brevkode = "SERVICEBEREGNING_SIMULERINGSBREV",
-                saksbehandlerValg = ServiceberegningBrevDtoV1(
+                statiskFagsystemBrevdata = ServiceberegningBrevDtoV1(
                     uttaksalder = mapToAlderDto(source.serviceberegning.uttaksalder),
                     uttaksdato = source.serviceberegning.uttaksdato,
                     forventetFremtidigInntekt = source.serviceberegning.forventetFremtidigInntekt,
                     afp = mapToTidsbegrensetOffentligAfpDto(afp),
                 ),
+                saksbehandlerValg = SaksbehandlerValgDtoV1(ingenYtelser = true),
             )
         }
 
@@ -25,7 +26,7 @@ object OpprettBrevDtoV1Mapper {
             source = source,
             saksId = saksId,
             brevkode = "PENSJONSKALKULATOR_AP_SIMULERING",
-            saksbehandlerValg = SimuleringBrevDtoV1(
+            statiskFagsystemBrevdata = SimuleringBrevDtoV1(
                 simulering = SimuleringBrevV1(
                     alderspensjonListe = source.alderspensjonListe.map { AlderspensjonBrevDtoV1(it.alderAar, it.beloep, it.gjenlevendetillegg) },
                     maanedligAlderspensjonForKnekkpunkter = source.maanedligAlderspensjonForKnekkpunkter?.let(::mapToKnekkpunkterDto),
@@ -45,17 +46,19 @@ object OpprettBrevDtoV1Mapper {
         )
     }
 
-    private fun <T : SaksbehandlerValgBrevdata> opprettBrevRequest(
+    private fun <T : StatiskFagsystemBrevdata> opprettBrevRequest(
         source: LagreSimulering,
         saksId: Long,
         brevkode: String,
-        saksbehandlerValg: T,
+        statiskFagsystemBrevdata: T,
+        saksbehandlerValg: SaksbehandlerValgDtoV1? = null,
     ) = OpprettBrevRequestDtoV1(
         saksId = saksId,
         brevkode = brevkode,
         spraak = "NB",
         avsenderEnhetsId = source.enhetsId,
         reserverForRedigering = false,
+        statiskFagsystemBrevdata = statiskFagsystemBrevdata,
         saksbehandlerValg = saksbehandlerValg,
     )
 
@@ -161,7 +164,8 @@ object OpprettBrevDtoV1Mapper {
             sivilstatus = source.sivilstatus,
             utenlandsperioder = source.utenlandsperioder?.map(::mapToUtenlandsperiodeDto),
             kull = source.kull.name,
-            normertPensjonsalderPlassering = source.normertPensjonsalderPlassering?.name
+            normertPensjonsalderPlassering = source.normertPensjonsalderPlassering?.name,
+            simulererEndringMedAfpPrivat = source.simulererEndringMedAfpPrivat
         )
 
     private fun mapToUttaksinformasjonDto(source: LagreUttaksinformasjon) =
@@ -211,7 +215,6 @@ object OpprettBrevDtoV1Mapper {
             kapittel20AndelTeller = source.kapittel20AndelTeller,
             kapittel20Trygdetid = source.kapittel20Trygdetid,
             garantipensjonBeloep = source.garantipensjonBeloep,
-            garantipensjonsnivaaBeloep = source.garantipensjonsnivaaBeloep,
             garantipensjonSats = source.garantipensjonSats,
             garantitilleggBeloep = source.garantitilleggBeloep,
             grunnbeloep = source.grunnbeloep

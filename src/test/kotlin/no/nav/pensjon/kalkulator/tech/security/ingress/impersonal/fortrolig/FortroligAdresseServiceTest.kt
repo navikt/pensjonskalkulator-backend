@@ -6,6 +6,7 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
+import no.nav.pensjon.kalkulator.person.Navn
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.PersonClient
@@ -14,12 +15,11 @@ import java.time.LocalDate
 class FortroligAdresseServiceTest : ShouldSpec({
 
     should("return person's adressebeskyttelsesgradering") {
-        val personClient = mockk<PersonClient>().apply {
+        val personClient: PersonClient = mockk {
             every {
                 fetchAdressebeskyttelse(any())
             } returns Person(
-                navn = "F E",
-                fornavn = "F",
+                navn = Navn(fornavn = "F", etternavn = "E"),
                 foedselsdato = LocalDate.MIN,
                 sivilstand = Sivilstand.UOPPGITT,
                 adressebeskyttelse = AdressebeskyttelseGradering.STRENGT_FORTROLIG
@@ -31,7 +31,7 @@ class FortroligAdresseServiceTest : ShouldSpec({
     }
 
     should("return 'unknown' by default") {
-        val personClient = mockk<PersonClient>().apply {
+        val personClient: PersonClient = mockk {
             every { fetchAdressebeskyttelse(any()) } returns null
         }
 

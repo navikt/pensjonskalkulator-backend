@@ -150,7 +150,8 @@ object LagreSimuleringMapperV1 {
             utenlandsperioder = source.utenlandsperioder?.map(::utenlandsperiode),
             kull = source.kull,
             normertPensjonsalderPlassering = source.normertPensjonsalderPlassering,
-            sanityVisningsvilkaar = source.forbeholdVisningsvilkaar.map { it.internalValue }
+            sanityVisningsvilkaar = source.forbeholdVisningsvilkaar.map { it.internalValue },
+            simulererEndringMedAfpPrivat = source.simulererEndringMedAfpPrivat
         )
 
     private fun uttaksinformasjon(source: LagreUttaksinformasjonDto) =
@@ -200,7 +201,6 @@ object LagreSimuleringMapperV1 {
             kapittel20AndelTeller = source.kapittel20AndelTeller,
             kapittel20Trygdetid = source.kapittel20Trygdetid,
             garantipensjonBeloep = source.garantipensjonBeloep,
-            garantipensjonsnivaaBeloep = source.garantipensjonsnivaaBeloep,
             garantipensjonSats = source.garantipensjonSats,
             garantitilleggBeloep = source.garantitilleggBeloep,
             grunnbeloep = source.grunnbeloep

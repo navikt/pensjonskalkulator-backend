@@ -7,12 +7,9 @@ import java.time.LocalDate
 data class ServiceberegnetAfpResult(
     val afpOrdning: AfpOrdningType?,
     val beregnetAfp: BeregnetAfp?,
-    val opptjeningListe: List<AarligOpptjening> = emptyList(),
+    val opptjeningListe: List<AarligOpptjening>,
     val problem: ServiceberegnetAfpProblem?
-) {
-    fun withOpptjening(opptjeningListe: List<AarligOpptjening>) =
-        copy(opptjeningListe = opptjeningListe)
-}
+)
 
 data class BeregnetAfp(
     val totalbelopAfp: Int?,

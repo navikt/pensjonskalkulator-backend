@@ -15,6 +15,7 @@ class VedtakSamlingTest : ShouldSpec({
             ufoeretrygd = null,
             privatAfp = null,
             tidsbegrensetOffentligAfp = null,
+            gjenlevenderett = null,
             avdoed = null
         ).hasContent() shouldBe false
     }

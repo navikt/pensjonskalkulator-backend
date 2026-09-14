@@ -7,6 +7,7 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.foedselsdato
 import no.nav.pensjon.kalkulator.normalder.Aldersgrenser
 import no.nav.pensjon.kalkulator.normalder.VerdiStatus
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
+import no.nav.pensjon.kalkulator.person.Navn
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.api.dto.PersonAlderV6
@@ -19,8 +20,7 @@ class PersonMapperV6Test : ShouldSpec({
     should("map person to data transfer object version 6") {
         PersonMapperV6.dtoV6(
             Person(
-                navn = "Fornavn1 Etternavn1",
-                fornavn = "Fornavn1",
+                navn = Navn(fornavn = "Fornavn1", etternavn = "Etternavn1"),
                 foedselsdato = foedselsdato,
                 pensjoneringAldre = Aldersgrenser(
                     aarskull = 1963,

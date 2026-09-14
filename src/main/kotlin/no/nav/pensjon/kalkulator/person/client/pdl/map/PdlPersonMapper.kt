@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.person.client.pdl.map
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
-import no.nav.pensjon.kalkulator.person.NavnFormatter.formatNavn
+import no.nav.pensjon.kalkulator.person.Navn
 import no.nav.pensjon.kalkulator.person.Person
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.client.pdl.dto.*
@@ -18,8 +18,7 @@ object PdlPersonMapper {
 
     private fun person(dto: PdlPerson) =
         Person(
-            navn = dto.navn.orEmpty().let(::navn) ?: "",
-            fornavn = dto.navn.orEmpty().let(::fornavn) ?: "",
+            navn = dto.navn.orEmpty().let(::navn) ?: Navn.ukjent,
             foedselsdato = dto.foedselsdato.orEmpty().let(::foedselsdato) ?: LocalDate.MIN,
             sivilstand = dto.sivilstand.orEmpty().let(::fromDto),
             adressebeskyttelse = dto.adressebeskyttelse.orEmpty().let(::adressebeskyttelse)
@@ -31,11 +30,8 @@ object PdlPersonMapper {
     private fun foedselsdato(dto: List<PdlFoedselsdato>): LocalDate? =
         dto.firstOrNull()?.foedselsdato?.value
 
-    private fun navn(dto: List<PdlNavn>): String? =
-        dto.firstOrNull()?.let { formatNavn(it.fornavn, it.mellomnavn, it.etternavn) }
-
-    private fun fornavn(dto: List<PdlNavn>): String? =
-        dto.firstOrNull()?.fornavn?.let(::formatNavn)
+    private fun navn(dto: List<PdlNavn>): Navn? =
+        dto.firstOrNull()?.let { Navn(it.fornavn, it.mellomnavn, it.etternavn) }
 
     private fun fromDto(sivilstand: List<PdlSivilstand>): Sivilstand =
         PdlSivilstandType.fromExternalValue(sivilstand.firstOrNull()?.type).internalValue

@@ -8,9 +8,10 @@ import java.time.LocalDate
 data class PenLoependeVedtakDto(
     val alderspensjon: PenGjeldendeVedtakApDto?,
     val alderspensjonIFremtid: PenGjeldendeVedtakApDto?,
-    val ufoeretrygd: PenGjeldendeUfoeregradDto?,
     val afpPrivat: PenGjeldendeVedtakDto?,
     val afpOffentlig: PenGjeldendeVedtakDto?, // AFP i offentlig sektor for brukere født før 1963
+    val gjenlevenderett: PenGjenlevenderettDto? = null,
+    val ufoeretrygd: PenGjeldendeUfoeregradDto?,
     val gjeldendeUttaksgradFom: LocalDate? = null,
     val avdoed: PenInformasjonOmAvdoedDto?
 )
@@ -30,6 +31,15 @@ data class PenGjeldendeVedtakApDto(
 
 data class PenGjeldendeVedtakDto(
     val fraOgMed: LocalDate
+)
+
+/**
+ * Tilsvarer LoependeVedtakGjenlevenderettDto i pensjon-pen
+ */
+data class PenGjenlevenderettDto(
+    val pid: String, // påkrevd
+    val doedsdato: LocalDate?,
+    val foersteVirkningsdato: LocalDate? = null
 )
 
 data class PenInformasjonOmAvdoedDto(

@@ -13,7 +13,8 @@ import java.time.LocalDate
 @JsonInclude(NON_NULL)
 data class VedtakV1Samling(
     @field:Schema(description = "Hvorvidt personen har løpende eller fremtidig vedtak")
-    @field:NotNull val harVedtak: Boolean,
+    @field:NotNull
+    val harVedtak: Boolean,
 
     @field:Schema(description = "Løpende alderspensjon")
     val loependeAlderspensjon: VedtakV1LoependeAlderspensjon?,
@@ -31,6 +32,9 @@ data class VedtakV1Samling(
     @field:Schema(description = "Startdato (fra og med) for tidsbegrenset AFP i offentlig sektor ('gammel ordning')")
     @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val tidsbegrensetOffentligAfpFom: LocalDate? = null,
+
+    @field:Schema(description = "Gjenlevenderett")
+    val gjenlevenderett: VedtakV1Gjenlevenderett? = null,
 
     @field:Schema(description = "Informasjon om eventuell avdød ektefelle/partner/samboer")
     val avdoed: VedtakV1InformasjonOmAvdoed? = null
@@ -75,7 +79,8 @@ data class VedtakV1Alderspensjonsuttak(
 
     @field:Schema(description = "Startdato (fra og med) for alderspensjonen")
     @field:NotNull
-    @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd") val fom: LocalDate
+    @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
+    val fom: LocalDate
 )
 
 data class VedtakV1Utbetaling(
@@ -86,6 +91,22 @@ data class VedtakV1Utbetaling(
     @field:Schema(description = "Dato for utbetalingen")
     @field:NotNull @param:JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     val utbetalingsdato: LocalDate
+)
+
+@JsonInclude(NON_NULL)
+data class VedtakV1Gjenlevenderett(
+    @field:Schema(description = "Avdødes personidentifikator (som oftest fødselsnummer)")
+    @field:NotNull
+    val avdoedPid: String,
+
+    @field:Schema(description = "Avdødes navn")
+    val avdoedNavn: VedtakV1Navn?,
+
+    @field:Schema(description = "Dødsdato")
+    val doedsdato: LocalDate?,
+
+    @field:Schema(description = "Første virkningsdato for gjenlevenderetten")
+    val foersteVirkningsdato: LocalDate?
 )
 
 data class VedtakV1InformasjonOmAvdoed(
@@ -111,4 +132,16 @@ data class VedtakV1InformasjonOmAvdoed(
 
     @field:Schema(description = "Hvorvidt avdøde var flyktning")
     val erFlyktning: Boolean?
+)
+
+@JsonInclude(NON_NULL)
+data class VedtakV1Navn(
+    @field:Schema(description = "Fornavn")
+    val fornavn: String?,
+
+    @field:Schema(description = "Mellomnavn")
+    val mellomnavn: String?,
+
+    @field:Schema(description = "Etternavn")
+    val etternavn: String?
 )

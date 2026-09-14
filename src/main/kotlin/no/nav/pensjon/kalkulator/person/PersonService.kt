@@ -16,14 +16,16 @@ class PersonService(
     private val navnRequirement: NavnRequirement,
     private val normalderService: NormertPensjonsalderService
 ) {
+    //TODO bruk Caffeine
     private val cachedPersonerVedPid: MutableMap<Pid, Person> = synchronizedMap(mutableMapOf())
 
     fun getPerson(): Person =
-        with(pidGetter.pid()) {
-            cachedPersonerVedPid[this] ?: fetchPerson(pid = this).also {
-                limitCacheSize()
-                cachedPersonerVedPid[this] = it
-            }
+        getPerson(pidGetter.pid())
+
+    fun getPerson(pid: Pid): Person =
+        cachedPersonerVedPid[pid] ?: fetchPerson(pid).also {
+            limitCacheSize()
+            cachedPersonerVedPid[pid] = it
         }
 
     private fun fetchPerson(pid: Pid): Person =

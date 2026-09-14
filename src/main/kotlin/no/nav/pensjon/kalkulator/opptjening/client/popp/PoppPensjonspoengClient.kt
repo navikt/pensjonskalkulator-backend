@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.opptjening.client.popp
 import com.github.benmanes.caffeine.cache.Cache
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
-import no.nav.pensjon.kalkulator.opptjening.AarligBeholdning
+import no.nav.pensjon.kalkulator.opptjening.DatertBeholdning
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengClient
 import no.nav.pensjon.kalkulator.opptjening.client.popp.dto.PensjonspoengRequestDto
@@ -46,15 +46,15 @@ class PoppPensjonspoengClient(
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
     private val log = KotlinLogging.logger {}
 
-    private val cache: Cache<Pid, Pair<List<AarligOpptjening>, List<AarligBeholdning>>> =
+    private val cache: Cache<Pid, Pair<List<AarligOpptjening>, List<DatertBeholdning>>> =
         createCache("opptjening", cacheManager)
 
     override fun service() = service
 
-    override fun fetchOpptjeningOgBeholdning(pid: Pid): Pair<List<AarligOpptjening>, List<AarligBeholdning>> =
+    override fun fetchOpptjeningOgBeholdning(pid: Pid): Pair<List<AarligOpptjening>, List<DatertBeholdning>> =
         cache.getIfPresent(pid) ?: fetchFreshOpptjeningOgBeholdning(pid).also { cache.put(pid, it) }
 
-    private fun fetchFreshOpptjeningOgBeholdning(pid: Pid): Pair<List<AarligOpptjening>, List<AarligBeholdning>> =
+    private fun fetchFreshOpptjeningOgBeholdning(pid: Pid): Pair<List<AarligOpptjening>, List<DatertBeholdning>> =
         Mono.zip(
             fetchOpptjening(pid),
             fetchBeholdninger(pid)
@@ -147,13 +147,13 @@ class PoppPensjonspoengClient(
 
         private fun asListPair(
             responser: Tuple2<PensjonspoengResponseDto, PoppBeholdningResult>
-        ): Pair<List<AarligOpptjening>, List<AarligBeholdning>> =
+        ): Pair<List<AarligOpptjening>, List<DatertBeholdning>> =
             Pair(
                 PensjonspoengMapper.fromDto(responser.t1),
                 BeholdningMapper.fromDto(responser.t2)
             )
 
-        private fun emptyListPair(): Pair<List<AarligOpptjening>, List<AarligBeholdning>> =
+        private fun emptyListPair(): Pair<List<AarligOpptjening>, List<DatertBeholdning>> =
             Pair(emptyList(), emptyList())
     }
 }

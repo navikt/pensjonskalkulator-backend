@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.0</version>
+        <version>4.1.1</version>
         <relativePath/> <!-- lookup parent from the repository -->
     </parent>
     <groupId>no.nav.pensjon</groupId>
@@ -26,6 +26,7 @@
         <logback.version>1.6.3</logback.version>
         <okhttp3.version>5.5.0</okhttp3.version>
         <kotest.version>6.2.4</kotest.version>
+        <tomcat.version>11.0.25</tomcat.version> <!-- Avoid critically vulnerable 11.0.24 coming from Spring Boot 4.1.1 -->
         <google-cloud-libraries-bom.version>26.88.0</google-cloud-libraries-bom.version>
     </properties>
     <dependencyManagement>
@@ -71,7 +72,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.6</version>
+                <version>3.6.0</version>
                 <configuration>
                     <argLine>-XX:+EnableDynamicAgentLoading</argLine>
                     <systemPropertyVariables>
@@ -157,7 +158,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>3.1.0</version>
+            <version>3.1.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.yaml</groupId>
@@ -168,7 +169,7 @@
         <dependency>
             <groupId>io.getunleash</groupId>
             <artifactId>unleash-client-java</artifactId>
-            <version>12.2.3</version>
+            <version>12.3.0</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
