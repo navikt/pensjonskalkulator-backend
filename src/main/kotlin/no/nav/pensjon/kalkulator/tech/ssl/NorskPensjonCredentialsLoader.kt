@@ -17,10 +17,9 @@ class NorskPensjonCredentialsLoader(
                 exception
             )
         }
-        log.warn { "Credentials dto type: ${dto.type}, dto alias: ${dto.alias}" }
 
         if (!dto.type.equals("pkcs12", ignoreCase = true)) {
-            throw CertificateMaterialException("Norsk Pensjon credentials type must be 'pkcs12'")
+            log.error {"Norsk Pensjon credentials type must be 'pkcs12'. Nå er det ${dto.type}"}
         }
         if (dto.password.isNullOrEmpty()) {
             throw CertificateMaterialException("Norsk Pensjon credentials secret does not contain a password")
