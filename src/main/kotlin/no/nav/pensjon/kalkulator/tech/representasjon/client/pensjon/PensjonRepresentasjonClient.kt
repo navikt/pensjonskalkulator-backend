@@ -1,19 +1,21 @@
 package no.nav.pensjon.kalkulator.tech.representasjon.client.pensjon
 
-import mu.KotlinLogging
+import com.github.benmanes.caffeine.cache.Cache
 import no.nav.pensjon.kalkulator.common.client.PingableServiceClient
-import no.nav.pensjon.kalkulator.person.EncryptedPid
+import no.nav.pensjon.kalkulator.tech.cache.CacheConfigurator.createCache
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.representasjon.Representasjon
+import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonSpec
 import no.nav.pensjon.kalkulator.tech.representasjon.client.RepresentasjonClient
 import no.nav.pensjon.kalkulator.tech.representasjon.client.pensjon.dto.PensjonRepresentasjonResult
-import no.nav.pensjon.kalkulator.tech.representasjon.client.pensjon.map.PensjonRepresentasjonMapper.fromDto
+import no.nav.pensjon.kalkulator.tech.representasjon.client.pensjon.dto.PensjonRepresentasjonSpec
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.caffeine.CaffeineCacheManager
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -21,7 +23,6 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.reactive.function.client.bodyToMono
-import org.springframework.web.util.UriComponentsBuilder
 
 /**
  * Client for accessing the 'pensjon-representasjon' service
@@ -31,28 +32,33 @@ import org.springframework.web.util.UriComponentsBuilder
 class PensjonRepresentasjonClient(
     @param:Value($$"${pensjon-representasjon.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
+    cacheManager: CaffeineCacheManager,
     private val traceAid: TraceAid,
     @Value($$"${web-client.retry-attempts}") retryAttempts: String
 ) : PingableServiceClient(null, webClientBuilder, retryAttempts),
     RepresentasjonClient {
 
-    private val log = KotlinLogging.logger {}
+    private val cache: Cache<RepresentasjonSpec, Representasjon> =
+        createCache("representasjon", cacheManager)
 
-    override fun hasValidRepresentasjonsforhold(fullmaktsgiverPid: EncryptedPid): Representasjon {
-        val uri = uri()
-        log.debug { "GET from URI: '$uri'" }
+    override fun fetchRepresentasjon(spec: RepresentasjonSpec): Representasjon =
+        cache.getIfPresent(spec) ?: fetchFreshRepresentasjon(spec).also { cache.put(spec, it) }
+
+    private fun fetchFreshRepresentasjon(spec: RepresentasjonSpec): Representasjon {
+        val uri = "$baseUrl/$PATH"
 
         return try {
             webClient
-                .get()
+                .post()
                 .uri(uri)
                 .accept(MediaType.APPLICATION_JSON)
-                .headers { setHeaders(it, fullmaktsgiverPid) }
+                .headers(::setHeaders)
+                .bodyValue(PensjonRepresentasjonSpec.from(spec))
                 .retrieve()
                 .bodyToMono<PensjonRepresentasjonResult>()
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
-                ?.let(::fromDto)
+                ?.toInternalValue()
                 .also { countCalls(MetricResult.OK) }
                 ?: noRepresentasjonForhold()
         } catch (e: WebClientRequestException) {
@@ -72,32 +78,13 @@ class PensjonRepresentasjonClient(
 
     override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
 
-    private fun uri(): String =
-        UriComponentsBuilder.fromUriString(baseUrl)
-            .path(PATH)
-            .queryParam(VALID_REPRESENTASJON_TYPER_QUERY_PARAM_NAME, representasjonTypeListe)
-            .queryParam(INCLUDE_FULLMAKT_GIVER_NAVN_QUERY_PARAM_NAME, false)
-            .build()
-            .toUriString()
-
-    private fun setHeaders(headers: HttpHeaders, fullmaktsgiverPid: EncryptedPid) {
+    private fun setHeaders(headers: HttpHeaders) {
         headers.setBearerAuth(EgressAccess.token(service).value)
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
-        headers[CustomHttpHeaders.FULLMAKT_GIVER_PID] = fullmaktsgiverPid.value
     }
 
     companion object {
         private const val PATH = "/representasjon/hasValidRepresentasjonsforhold"
-        private const val INCLUDE_FULLMAKT_GIVER_NAVN_QUERY_PARAM_NAME = "includeFullmaktsgiverNavn"
-        private const val VALID_REPRESENTASJON_TYPER_QUERY_PARAM_NAME = "validRepresentasjonstyper"
-
-        private val representasjonTypeListe: List<String> =
-            listOf(
-                "PENSJON_LES",
-                "PENSJON_SKRIV",
-                "VERGE_PENSJON_LES",
-                "VERGE_PENSJON_SKRIV"
-            )
 
         private val service = EgressService.PENSJON_REPRESENTASJON
 
