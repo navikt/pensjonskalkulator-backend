@@ -43,8 +43,8 @@ class PensjonsavtaleService(
 
     private fun compareAvtalerAsync(spec: PensjonsavtaleSpec, avtalerFraSoap: Pensjonsavtaler, pid: Pid) {
         comparisonScope.launch(SecurityCoroutineContext()) {
-            delay(1000.milliseconds) // Sleep for 1 second to avoid overwhelming the REST service with requests
-            val avtalerFraRest = filter(avtaleClient.fetchAvtaler(spec, pid))
+            delay(100.milliseconds) // Sleep for 100 msc
+            val avtalerFraRest = filter(avtaleClientSoap.fetchAvtaler(spec, pid)) // filter(avtaleClient.fetchAvtaler(spec, pid))
             if (avtalerFraSoap != avtalerFraRest) {
                 log.warn { "Ulikheter i pensjonsavtaler fra SOAP og REST: SOAP: $avtalerFraSoap, REST: $avtalerFraRest" }
             } else {
