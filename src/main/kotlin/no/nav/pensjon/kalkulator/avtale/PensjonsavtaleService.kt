@@ -13,6 +13,7 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.SecurityCoroutineContext
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.cancellation.CancellationException
 
 @Service
@@ -25,6 +26,7 @@ class PensjonsavtaleService(
 ) {
     private val log = KotlinLogging.logger {}
     private val comparisonScope = CoroutineScope(Dispatchers.IO)
+    private val comparisonCounter = AtomicInteger()
 
     fun fetchAvtaler(spec: PensjonsavtaleSpec): Pensjonsavtaler {
         return if (featureToggleService.isEnabled("mock-norsk-pensjon")) {
@@ -34,7 +36,9 @@ class PensjonsavtaleService(
         } else if (featureToggleService.isEnabled("norsk-pensjon-compare-rest-and-soap")) {
             val avtalerFraSoap = filter(avtaleClient.fetchAvtaler(spec, pidGetter.pid())) //filter(avtaleClientSoap.fetchAvtaler(spec, pidGetter.pid()))
 
-            compareAvtalerAsync(spec = spec, avtalerFraSoap = avtalerFraSoap, pid = pidGetter.pid())
+            if (shouldCompare()) {
+                compareAvtalerAsync(spec = spec, avtalerFraSoap = avtalerFraSoap, pid = pidGetter.pid())
+            }
 
             avtalerFraSoap //dev-prod
         } else {
@@ -60,6 +64,11 @@ class PensjonsavtaleService(
             }
         }
     }
+
+    private fun shouldCompare(): Boolean =
+        comparisonCounter.updateAndGet { current ->
+            if (current == 9) 0 else current + 1
+        } == 0
 
     @PreDestroy
     fun stop() {
