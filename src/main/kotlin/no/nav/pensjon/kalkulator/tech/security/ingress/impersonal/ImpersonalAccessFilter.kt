@@ -29,9 +29,6 @@ class ImpersonalAccessFilter(
     private val log = KotlinLogging.logger {}
 
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
-        // Spring Securitys filterkjede kjører også ved ERROR-dispatch (til /error). Uten denne sjekken
-        // ville tilgangssjekken blitt kjørt på nytt der, og sendError under ERROR-dispatch fører til at
-        // responsbodyen – med årsaken til tilgangsnekt – forkastes.
         if (request.dispatcherType != DispatcherType.REQUEST) {
             chain.doFilter(request, response)
             return
