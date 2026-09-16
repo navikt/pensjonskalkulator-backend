@@ -24,7 +24,9 @@ class RepresentasjonService(
         private val representasjonstyper: List<Representasjonstype> =
             listOf(
                 Representasjonstype.PENSJON_LES,
-                Representasjonstype.PENSJON_SKRIV
+                Representasjonstype.PENSJON_SKRIV,
+                Representasjonstype.VERGE_PENSJON_LES,
+                Representasjonstype.VERGE_PENSJON_SKRIV
             )
     }
 }

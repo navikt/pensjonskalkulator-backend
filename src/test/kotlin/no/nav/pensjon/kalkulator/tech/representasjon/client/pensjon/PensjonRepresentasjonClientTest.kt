@@ -8,6 +8,7 @@ import no.nav.pensjon.kalkulator.person.PossiblyEncryptedPid
 import no.nav.pensjon.kalkulator.tech.representasjon.Personalia
 import no.nav.pensjon.kalkulator.tech.representasjon.Representasjon
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonSpec
+import no.nav.pensjon.kalkulator.tech.representasjon.Representasjonstype
 import no.nav.pensjon.kalkulator.testutil.Arrange
 import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -47,7 +48,10 @@ class PensjonRepresentasjonClientTest : ShouldSpec({
                     spec = RepresentasjonSpec(
                         fullmaktsgiverPid = PossiblyEncryptedPid("kryptert.verdi"),
                         fullmektigPid = pid,
-                        gyldigeRepresentasjonstyper = emptyList(),
+                        gyldigeRepresentasjonstyper = listOf(
+                            Representasjonstype.PENSJON_SKRIV,
+                            Representasjonstype.VERGE_PENSJON_LES
+                        ),
                         inkluderRepresentertNavn = false
                     )
                 ) shouldBe Representasjon(
@@ -56,7 +60,7 @@ class PensjonRepresentasjonClientTest : ShouldSpec({
                 )
 
                 server.takeRequest().body.readUtf8() shouldBe
-                        """{"representertPid":"kryptert.verdi","representantPid":"12906498357","validRepresentasjonstyper":[],"includeRepresentertNavn":false}"""
+                        """{"representertPid":"kryptert.verdi","representantPid":"12906498357","validRepresentasjonstyper":["PENSJON_SKRIV","VERGE_PENSJON_LES"],"includeRepresentertNavn":false}"""
             }
         }
     }
