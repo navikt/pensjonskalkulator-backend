@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.avtale
 import mu.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
 import no.nav.pensjon.kalkulator.person.Pid
@@ -11,6 +12,7 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.SecurityCoroutineContext
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
+import kotlin.time.Duration.Companion.milliseconds
 
 @Service
 class PensjonsavtaleService(
@@ -29,7 +31,7 @@ class PensjonsavtaleService(
         } else if (featureToggleService.isEnabled("norsk-pensjon-via-rest")) {
             filter(avtaleClient.fetchAvtaler(spec, pidGetter.pid()))
         } else if (featureToggleService.isEnabled("norsk-pensjon-compare-rest-and-soap")) {
-            val avtalerFraSoap = filter(avtaleClientSoap.fetchAvtaler(spec, pidGetter.pid()))
+            val avtalerFraSoap = filter(avtaleClient.fetchAvtaler(spec, pidGetter.pid())) //filter(avtaleClientSoap.fetchAvtaler(spec, pidGetter.pid()))
 
             compareAvtalerAsync(spec = spec, avtalerFraSoap = avtalerFraSoap, pid = pidGetter.pid())
 
@@ -41,9 +43,12 @@ class PensjonsavtaleService(
 
     private fun compareAvtalerAsync(spec: PensjonsavtaleSpec, avtalerFraSoap: Pensjonsavtaler, pid: Pid) {
         comparisonScope.launch(SecurityCoroutineContext()) {
+            delay(1000.milliseconds) // Sleep for 1 second to avoid overwhelming the REST service with requests
             val avtalerFraRest = filter(avtaleClient.fetchAvtaler(spec, pid))
             if (avtalerFraSoap != avtalerFraRest) {
                 log.warn { "Ulikheter i pensjonsavtaler fra SOAP og REST: SOAP: $avtalerFraSoap, REST: $avtalerFraRest" }
+            } else {
+                log.warn { "Pensjonsavtaler fra SOAP og REST er like." }
             }
         }
     }
