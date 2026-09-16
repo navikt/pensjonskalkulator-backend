@@ -4,5 +4,5 @@ enum class Representasjonstype {
     PENSJON_LES,
     PENSJON_SKRIV,
     VERGE_PENSJON_LES,
-    VERGE_PENSJON_SKRIV,
+    VERGE_PENSJON_SKRIV
 }

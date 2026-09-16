@@ -23,6 +23,8 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.reactive.function.client.bodyToMono
+import java.time.Duration
+import java.time.temporal.ChronoUnit.HOURS
 
 /**
  * Client for accessing the 'pensjon-representasjon' service
@@ -39,7 +41,7 @@ class PensjonRepresentasjonClient(
     RepresentasjonClient {
 
     private val cache: Cache<RepresentasjonSpec, Representasjon> =
-        createCache("representasjon", cacheManager)
+        createCache(name = "representasjon", manager = cacheManager, expiry = Duration.of(1, HOURS))
 
     override fun fetchRepresentasjon(spec: RepresentasjonSpec): Representasjon =
         cache.getIfPresent(spec) ?: fetchFreshRepresentasjon(spec).also { cache.put(spec, it) }
