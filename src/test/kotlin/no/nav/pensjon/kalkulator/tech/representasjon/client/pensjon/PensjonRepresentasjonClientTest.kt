@@ -4,10 +4,11 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
-import no.nav.pensjon.kalkulator.person.EncryptedPid
+import no.nav.pensjon.kalkulator.person.PossiblyEncryptedPid
 import no.nav.pensjon.kalkulator.tech.representasjon.Personalia
 import no.nav.pensjon.kalkulator.tech.representasjon.Representasjon
-import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonSpec
+import no.nav.pensjon.kalkulator.tech.representasjon.Representasjonstype
 import no.nav.pensjon.kalkulator.testutil.Arrange
 import no.nav.pensjon.kalkulator.testutil.arrangeOkJsonResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -38,27 +39,34 @@ class PensjonRepresentasjonClientTest : ShouldSpec({
                 val client = PensjonRepresentasjonClient(
                     baseUrl = baseUrl!!,
                     webClientBuilder = it.getBean<WebClient.Builder>(),
-                    traceAid = mockk<TraceAid>(relaxed = true),
+                    cacheManager = mockk(relaxed = true),
+                    traceAid = mockk(relaxed = true),
                     retryAttempts = "0"
                 )
 
-                client.hasValidRepresentasjonsforhold(fullmaktsgiverPid = EncryptedPid("kryptert.verdi")) shouldBe
-                        Representasjon(isValid = true, fullmaktsgiver = Personalia(navn = "Abc Æøå", pid))
+                client.fetchRepresentasjon(
+                    spec = RepresentasjonSpec(
+                        fullmaktsgiverPid = PossiblyEncryptedPid("kryptert.verdi"),
+                        fullmektigPid = pid,
+                        gyldigeRepresentasjonstyper = listOf(
+                            Representasjonstype.PENSJON_SKRIV,
+                            Representasjonstype.VERGE_PENSJON_LES
+                        ),
+                        inkluderRepresentertNavn = false
+                    )
+                ) shouldBe Representasjon(
+                    isValid = true,
+                    fullmaktsgiver = Personalia(navn = "Abc Æøå", pid)
+                )
 
-                server.takeRequest().requestUrl?.query shouldBe
-                        "validRepresentasjonstyper=PENSJON_LES" +
-                        "&validRepresentasjonstyper=PENSJON_SKRIV" +
-                        "&validRepresentasjonstyper=VERGE_PENSJON_LES" +
-                        "&validRepresentasjonstyper=VERGE_PENSJON_SKRIV" +
-                        "&includeFullmaktsgiverNavn=false"
+                server.takeRequest().body.readUtf8() shouldBe
+                        """{"representertPid":"kryptert.verdi","representantPid":"12906498357","validRepresentasjonstyper":["PENSJON_SKRIV","VERGE_PENSJON_LES"],"includeRepresentertNavn":false}"""
             }
         }
     }
 })
 
 @Language("JSON")
-private const val RESPONSE_BODY = """{
-  "hasValidRepresentasjonsforhold": true,
-  "fullmaktsgiverNavn": "Abc Æøå",
-  "fullmaktsgiverFnr": "12906498357"
-}"""
+private const val RESPONSE_BODY =
+    """{"hasValidRepresentasjonsforhold":true,"representertNavn":"Abc Æøå","representertPidKryptert":"bd3f6f90.cqwvjk4El6mr1k935Ta39hpq2jkrSgzGydO684tpR1RhthhDtuMjle38KFRhJpbO2dYW1y5pF7-IzopIl7fcJQ","representertPid":"12906498357"}
+"""

@@ -1,9 +1,9 @@
 package no.nav.pensjon.kalkulator.tech.representasjon.client
 
-import no.nav.pensjon.kalkulator.person.EncryptedPid
 import no.nav.pensjon.kalkulator.tech.representasjon.Representasjon
+import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonSpec
 
 interface RepresentasjonClient {
 
-    fun hasValidRepresentasjonsforhold(fullmaktsgiverPid: EncryptedPid): Representasjon
+    fun fetchRepresentasjon(spec: RepresentasjonSpec): Representasjon
 }

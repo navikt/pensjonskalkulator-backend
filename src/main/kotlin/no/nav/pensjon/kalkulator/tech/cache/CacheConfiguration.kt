@@ -18,10 +18,14 @@ class CacheConfiguration {
 
 object CacheConfigurator {
 
-    fun <K : Any, V> createCache(name: String, manager: CaffeineCacheManager): Cache<K, V> =
+    fun <K : Any, V> createCache(
+        name: String,
+        manager: CaffeineCacheManager,
+        expiry: Duration = Duration.of(1, DAYS)
+    ): Cache<K, V> =
         Caffeine.newBuilder()
             .maximumSize(1_000)
-            .expireAfterWrite(Duration.of(1, DAYS))
+            .expireAfterWrite(expiry)
             .recordStats()
             .build<K, V>()
             .also {
