@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import jakarta.servlet.DispatcherType
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletResponse
 import jakarta.servlet.http.HttpServletRequest
@@ -117,6 +118,30 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         verify(exactly = 1) { chain.doFilter(request, response) }
     }
 
+    should("skip access check and continue filter chain on ERROR dispatch") {
+        // Sikrer at tilgangssjekken ikke kjøres på nytt ved ERROR-dispatch til /error,
+        // som ellers ville forkastet responsbodyen med årsak til tilgangsnekt.
+        val chain = mockk<FilterChain>(relaxed = true)
+        val response = mockk<HttpServletResponse>(relaxed = true)
+        val fagtilgangService = mockk<FagtilgangService>()
+        val request = arrangeRequest(
+            pid = pid.value,
+            uri = "/error",
+            dispatcherType = DispatcherType.ERROR
+        )
+
+        ImpersonalAccessFilter(
+            pidGetter = mockk(),
+            fagtilgangService = fagtilgangService,
+            populasjonstilgangService = mockk(),
+            auditor = mockk(),
+        ).doFilter(request, response, chain)
+
+        verify(exactly = 0) { fagtilgangService.tilgangInnvilget() }
+        verify(exactly = 0) { response.sendError(any(), any()) }
+        verify(exactly = 1) { chain.doFilter(request, response) }
+    }
+
     should("interrupt filter chain when 'populasjonstilgangssjekk feiler'") {
         val chain = mockk<FilterChain>(relaxed = true)
         val auditor = mockk<Auditor>(relaxed = true)
@@ -155,10 +180,15 @@ private fun arrangePid(): PidExtractor =
 private fun arrangePidError(): PidExtractor =
     mockk { every { pid() } throws RuntimeException("feil") }
 
-private fun arrangeRequest(pid: String?, uri: String): HttpServletRequest =
+private fun arrangeRequest(
+    pid: String?,
+    uri: String,
+    dispatcherType: DispatcherType = DispatcherType.REQUEST
+): HttpServletRequest =
     mockk {
         every { getHeader("fnr") } returns pid
         every { requestURI } returns uri
+        every { this@mockk.dispatcherType } returns dispatcherType
     }
 
 private fun arrangeFagtilgang(innvilget: Boolean): FagtilgangService =
