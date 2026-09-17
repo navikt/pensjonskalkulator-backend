@@ -132,7 +132,7 @@ spec:
     - name: NORSK_PENSJON_URL
       value: https://api.norskpensjon.no
     - name: NORSK_PENSJON_MTLS_ENABLED
-      value: "false"
+      value: "true"
     - name: NORSK_PENSJON_CREDENTIALS_SECRET_ID
       value: norsk-pensjon-credentials-json
     - name: NORSK_PENSJON_CREDENTIALS_SECRET_VERSION
