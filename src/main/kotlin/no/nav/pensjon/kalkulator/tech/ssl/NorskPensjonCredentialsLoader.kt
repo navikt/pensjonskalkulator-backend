@@ -19,7 +19,7 @@ class NorskPensjonCredentialsLoader(
         }
 
         if (!dto.type.equals("pkcs12", ignoreCase = true)) {
-            log.error {"Norsk Pensjon credentials type must be 'pkcs12'. Nå er det ${dto.type}"}
+            log.error { "Norsk Pensjon credentials type must be 'pkcs12', but was '${dto.type}'" }
         }
         if (dto.password.isNullOrEmpty()) {
             throw CertificateMaterialException("Norsk Pensjon credentials secret does not contain a password")

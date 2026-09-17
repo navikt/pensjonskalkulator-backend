@@ -34,13 +34,13 @@ class PensjonsavtaleService(
         } else if (featureToggleService.isEnabled("norsk-pensjon-via-rest")) {
             filter(avtaleClient.fetchAvtaler(spec, pidGetter.pid()))
         } else if (featureToggleService.isEnabled("norsk-pensjon-compare-rest-and-soap")) {
-            val avtalerFraSoap = filter(avtaleClient.fetchAvtaler(spec, pidGetter.pid())) //filter(avtaleClientSoap.fetchAvtaler(spec, pidGetter.pid()))
+            val avtalerFraSoap = filter(avtaleClientSoap.fetchAvtaler(spec, pidGetter.pid()))
 
-            if (shouldCompare()) {
+            if (shouldCompare()){
                 compareAvtalerAsync(spec = spec, avtalerFraSoap = avtalerFraSoap, pid = pidGetter.pid())
             }
 
-            avtalerFraSoap //dev-prod
+            avtalerFraSoap
         } else {
             filter(avtaleClientSoap.fetchAvtaler(spec, pidGetter.pid()))
         }
@@ -49,9 +49,7 @@ class PensjonsavtaleService(
     private fun compareAvtalerAsync(spec: PensjonsavtaleSpec, avtalerFraSoap: Pensjonsavtaler, pid: Pid) {
         comparisonScope.launch(SecurityCoroutineContext()) {
             try {
-
-                val avtalerFraRest =
-                    filter(avtaleClientSoap.fetchAvtaler(spec, pid)) // filter(avtaleClient.fetchAvtaler(spec, pid))
+                val avtalerFraRest = filter(avtaleClient.fetchAvtaler(spec, pid))
                 if (avtalerFraSoap != avtalerFraRest) {
                     log.warn { "Ulikheter i pensjonsavtaler fra SOAP og REST: SOAP: $avtalerFraSoap, REST: $avtalerFraRest" }
                 } else {
@@ -60,15 +58,13 @@ class PensjonsavtaleService(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                log.warn(e) { "Sammenligning mot Norsk Pensjon REST feilet" }
+                log.warn(e) { "Sammenligning mot Norsk Pensjon REST feilet, SOAP avtaler: $avtalerFraSoap" }
             }
         }
     }
 
     private fun shouldCompare(): Boolean =
-        comparisonCounter.updateAndGet { current ->
-            if (current == 9) 0 else current + 1
-        } == 0
+        comparisonCounter.updateAndGet { current -> if (current == 9) 0 else current + 1 } == 0
 
     @PreDestroy
     fun stop() {
