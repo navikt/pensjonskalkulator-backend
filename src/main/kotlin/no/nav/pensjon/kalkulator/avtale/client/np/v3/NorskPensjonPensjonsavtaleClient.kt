@@ -38,7 +38,7 @@ import java.nio.charset.StandardCharsets
  */
 @Component("norskPensjon")
 class NorskPensjonPensjonsavtaleClient(
-    @param:Value("\${norsk-pensjon.url}") private val baseUrl: String,
+    @param:Value("\${norsk-pensjon.soap.url}") private val baseUrl: String,
     private val tokenGetter: SamlTokenService,
     webClientBuilder: WebClient.Builder,
     private val xmlMapper: XmlMapper,

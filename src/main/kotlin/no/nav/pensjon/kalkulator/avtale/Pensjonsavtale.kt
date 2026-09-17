@@ -38,6 +38,17 @@ data class Pensjonsavtale(
     val harStartAar = startAar > 0
     val erLivsvarig = sluttAar == null
 
+    override fun toString(): String =
+        "Pensjonsavtale(avtalenummer=****, arbeidsgiver=****, selskapsnavn=$selskapsnavn, " +
+            "produktbetegnelse=$produktbetegnelse, kategori=$kategori, underkategori=$underkategori, " +
+            "innskuddssaldo=$innskuddssaldo, naavaerendeAvtaltAarligInnskudd=$naavaerendeAvtaltAarligInnskudd, " +
+            "pensjonsbeholdningForventet=$pensjonsbeholdningForventet, " +
+            "pensjonsbeholdningNedreGrense=$pensjonsbeholdningNedreGrense, " +
+            "pensjonsbeholdningOvreGrense=$pensjonsbeholdningOvreGrense, avkastningsgaranti=$avkastningsgaranti, " +
+            "beregningsmodell=$beregningsmodell, startAar=$startAar, sluttAar=$sluttAar, " +
+            "opplysningsdato=$opplysningsdato, manglendeGraderingAarsak=$manglendeGraderingAarsak, " +
+            "manglendeBeregningAarsak=$manglendeBeregningAarsak, utbetalingsperioder=$utbetalingsperioder)"
+
     constructor(
         produktbetegnelse: String,
         kategori: AvtaleKategori,
