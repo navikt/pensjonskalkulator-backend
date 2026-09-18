@@ -56,23 +56,8 @@ class NorskPensjonPensjonsavtaleClient(
     override fun service() = service
 
     override fun fetchAvtaler(spec: PensjonsavtaleSpec, pid: Pid): Pensjonsavtaler {
-        val responseXml = fetchAvtalerXml(NorskPensjonPensjonsavtaleMapper.toDto(spec, pid))
-        countCalls(MetricResult.OK)
-
-        return try {
-            val dto = xmlMapper.readValue(responseXml, EnvelopeDto::class.java).also(::updateMetrics)
-            fromDto(dto)
-        } catch (e: JsonProcessingException) {
-            log.error(e) { "Failed to process XML: $responseXml" }
-            countCalls(MetricResult.BAD_XML)
-            ingenAvtaler()
-        } catch (e: PensjonsavtaleException) {
-            log.warn(e) { "Pensjonsavtaler respons fault - ${e.message}" }
-            ingenAvtaler()
-        } catch (e: Exception) {
-            log.error(e) { "Sandbox Unexpected exception: ${e.message}" }
-            ingenAvtaler()
-        }
+        NorskPensjonPensjonsavtaleMapper.toDto(spec, pid)
+        return ingenAvtaler()
     }
 
     protected fun fetchAvtalerXml(spec: NorskPensjonPensjonsavtaleSpecDto): String {
