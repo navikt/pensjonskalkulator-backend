@@ -27,7 +27,7 @@
         <okhttp3.version>5.5.0</okhttp3.version>
         <kotest.version>6.2.5</kotest.version>
         <tomcat.version>11.0.25</tomcat.version> <!-- Avoid critically vulnerable 11.0.24 coming from Spring Boot 4.1.1 -->
-        <google-cloud-libraries-bom.version>26.88.0</google-cloud-libraries-bom.version>
+        <google-cloud-libraries-bom.version>26.88.1</google-cloud-libraries-bom.version>
     </properties>
     <dependencyManagement>
         <dependencies>
