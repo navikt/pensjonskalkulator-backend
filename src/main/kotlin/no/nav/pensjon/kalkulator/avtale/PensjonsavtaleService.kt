@@ -34,6 +34,7 @@ class PensjonsavtaleService(
         } else if (featureToggleService.isEnabled("norsk-pensjon-via-rest")) {
             filter(avtaleClient.fetchAvtaler(spec, pidGetter.pid()))
         } else if (featureToggleService.isEnabled("norsk-pensjon-compare-rest-and-soap")) {
+            log.info { "Comparing pensjonsavtaler from SOAP and REST for spec: $spec" }
             val avtalerFraSoap = filter(avtaleClientSoap.fetchAvtaler(spec, pidGetter.pid()))
 
             compareAvtalerAsync(spec = spec, avtalerFraSoap = avtalerFraSoap, pid = pidGetter.pid())

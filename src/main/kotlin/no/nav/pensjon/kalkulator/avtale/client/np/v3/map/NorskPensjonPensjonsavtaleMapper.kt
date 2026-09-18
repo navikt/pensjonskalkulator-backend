@@ -43,8 +43,7 @@ object NorskPensjonPensjonsavtaleMapper {
         )
 
     fun toDto(spec: PensjonsavtaleSpec, pid: Pid): NorskPensjonPensjonsavtaleSpecDto {
-        log.info { "XML norskPensjonSpecDto: $spec" }
-        return NorskPensjonPensjonsavtaleSpecDto(
+        val norskPensjonPensjonsavtaleSpecDto = NorskPensjonPensjonsavtaleSpecDto(
             pid = pid,
             aarligInntektFoerUttak = spec.aarligInntektFoerUttak,
             uttaksperioder = spec.uttaksperioder.map(::uttaksperiodeSpecDto),
@@ -57,6 +56,8 @@ object NorskPensjonPensjonsavtaleMapper {
             sivilstatus = Sivilstatus.fromInternalValue(spec.sivilstatus),
             oenskesSimuleringAvFolketrygd = false
         )
+        log.info { "XML norskPensjonSpecDto: $norskPensjonPensjonsavtaleSpecDto" }
+        return norskPensjonPensjonsavtaleSpecDto
     }
 
     private fun antallInntektAarUnderHeltUttak(perioder: List<UttaksperiodeSpec>): Int {
