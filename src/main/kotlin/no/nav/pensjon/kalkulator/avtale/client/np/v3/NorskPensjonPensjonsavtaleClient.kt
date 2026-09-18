@@ -69,6 +69,9 @@ class NorskPensjonPensjonsavtaleClient(
         } catch (e: PensjonsavtaleException) {
             log.warn(e) { "Pensjonsavtaler respons fault - ${e.message}" }
             ingenAvtaler()
+        } catch (e: Exception) {
+            log.error(e) { "Sandbox Unexpected exception: ${e.message}" }
+            ingenAvtaler()
         }
     }
 

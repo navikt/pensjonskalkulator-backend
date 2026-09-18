@@ -12,6 +12,8 @@ import no.nav.pensjon.kalkulator.tech.time.DateUtil.MAANEDER_PER_AAR
 
 object NorskPensjonPensjonsavtaleMapper {
 
+    private val log = mu.KotlinLogging.logger { }
+
     /**
      * Norsk Pensjon angir måned 1..12, vi angir antall måneder 0..11 => forskyvning 1
      */
@@ -40,8 +42,9 @@ object NorskPensjonPensjonsavtaleMapper {
             utilgjengeligeSelskap = utilgjengeligeSelskap(dto) ?: emptyList()
         )
 
-    fun toDto(spec: PensjonsavtaleSpec, pid: Pid) =
-        NorskPensjonPensjonsavtaleSpecDto(
+    fun toDto(spec: PensjonsavtaleSpec, pid: Pid): NorskPensjonPensjonsavtaleSpecDto {
+        log.info { "XML norskPensjonSpecDto: $spec" }
+        return NorskPensjonPensjonsavtaleSpecDto(
             pid = pid,
             aarligInntektFoerUttak = spec.aarligInntektFoerUttak,
             uttaksperioder = spec.uttaksperioder.map(::uttaksperiodeSpecDto),
@@ -54,6 +57,7 @@ object NorskPensjonPensjonsavtaleMapper {
             sivilstatus = Sivilstatus.fromInternalValue(spec.sivilstatus),
             oenskesSimuleringAvFolketrygd = false
         )
+    }
 
     private fun antallInntektAarUnderHeltUttak(perioder: List<UttaksperiodeSpec>): Int {
         val heltUttakPeriode = perioder.firstOrNull { it.grad == Uttaksgrad.HUNDRE_PROSENT } ?: return 0

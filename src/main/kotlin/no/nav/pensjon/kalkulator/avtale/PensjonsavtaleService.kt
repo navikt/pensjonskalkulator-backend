@@ -36,9 +36,7 @@ class PensjonsavtaleService(
         } else if (featureToggleService.isEnabled("norsk-pensjon-compare-rest-and-soap")) {
             val avtalerFraSoap = filter(avtaleClientSoap.fetchAvtaler(spec, pidGetter.pid()))
 
-            if (shouldCompare()){
-                compareAvtalerAsync(spec = spec, avtalerFraSoap = avtalerFraSoap, pid = pidGetter.pid())
-            }
+            compareAvtalerAsync(spec = spec, avtalerFraSoap = avtalerFraSoap, pid = pidGetter.pid())
 
             avtalerFraSoap
         } else {
