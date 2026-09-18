@@ -52,6 +52,7 @@ class PensjonsavtaleService(
                 val avtalerFraRest = filter(avtaleClient.fetchAvtaler(spec, pid))
                 if (avtalerFraSoap != avtalerFraRest) {
                     log.warn { "Ulikheter i pensjonsavtaler fra SOAP og REST: SOAP: $avtalerFraSoap, REST: $avtalerFraRest" }
+                    log.warn { "Ulikheter i pensjonsavtaler for spec: $spec" }
                 } else {
                     log.warn { "Pensjonsavtaler fra SOAP og REST er like." }
                 }
