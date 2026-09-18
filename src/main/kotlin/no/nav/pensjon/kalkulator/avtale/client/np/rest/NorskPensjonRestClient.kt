@@ -33,7 +33,6 @@ class NorskPensjonRestClient(
     webClientBuilder: WebClient.Builder,
     sslBundles: SslBundles,
     webClientConfig: WebClientConfig,
-    cacheManager: CaffeineCacheManager,
     private val traceAid: TraceAid,
     @Value($$"${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), PensjonsavtaleClient {
@@ -43,15 +42,9 @@ class NorskPensjonRestClient(
         .build()
     private val log = KotlinLogging.logger {}
 
-    private val cache: Cache<Pid, Pensjonsavtaler> =
-        createCache("pensjonsavtaler", cacheManager)
-
     override fun service() = service
 
-    override fun fetchAvtaler(spec: PensjonsavtaleSpec, pid: Pid): Pensjonsavtaler =
-        cache.getIfPresent(pid) ?: fetchFreshAvtaler(spec, pid) //.also { cache.put(pid, it) }
-
-    private fun fetchFreshAvtaler(spec: PensjonsavtaleSpec, pid: Pid): Pensjonsavtaler {
+    override fun fetchAvtaler(spec: PensjonsavtaleSpec, pid: Pid): Pensjonsavtaler {
         val url = "$baseUrl/$BEREGN_PATH"
         log.debug { "POST to URL: '$url'" }
 
