@@ -21,7 +21,6 @@ import okhttp3.tls.HeldCertificate
 import org.springframework.boot.ssl.DefaultSslBundleRegistry
 import org.springframework.boot.ssl.SslBundle
 import org.springframework.boot.ssl.SslStoreBundle
-import org.springframework.cache.caffeine.CaffeineCacheManager
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 
@@ -55,7 +54,6 @@ class NorskPensjonRestClientMtlsTest : FunSpec({
             webClientBuilder = webClientBuilder,
             sslBundles = bundles,
             webClientConfig = webClientConfig,
-            cacheManager = CaffeineCacheManager(),
             traceAid = traceAid,
             retryAttempts = "0"
         )
