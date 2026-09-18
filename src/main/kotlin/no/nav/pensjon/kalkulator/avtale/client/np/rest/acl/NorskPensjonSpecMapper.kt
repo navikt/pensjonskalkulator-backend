@@ -17,8 +17,10 @@ object NorskPensjonSpecMapper {
     private const val DEFAULT_HAR_EPS_PENSJON = true // Norsk Pensjon default
     private const val DEFAULT_HAR_EPS_PENSJONSGIVENDE_INNTEKT_OVER_2G = true // Norsk Pensjon default
 
-    fun toDto(spec: PensjonsavtaleSpec, pid: Pid) =
-        NorskPensjonSpecDto(
+    private val log = mu.KotlinLogging.logger {}
+
+    fun toDto(spec: PensjonsavtaleSpec, pid: Pid): NorskPensjonSpecDto {
+        val norskPensjonSpecDto = NorskPensjonSpecDto(
             foedselsnummer = pid.value,
             aarligInntektFoerUttak = spec.aarligInntektFoerUttak,
             uttaksperioder = spec.uttaksperioder.map(::uttaksperiodeSpecDto),
@@ -31,6 +33,9 @@ object NorskPensjonSpecMapper {
             sivilstatus = Sivilstatus.fromInternalValue(spec.sivilstatus),
             oenskesSimuleringAvFolketrygd = false
         )
+        log.warn { "norskPensjonSpecDto: $norskPensjonSpecDto" }
+        return norskPensjonSpecDto
+    }
 
     private fun antallInntektAarUnderHeltUttak(perioder: List<UttaksperiodeSpec>): Int {
         val heltUttakPeriode = perioder.firstOrNull { it.grad == Uttaksgrad.HUNDRE_PROSENT } ?: return 0
