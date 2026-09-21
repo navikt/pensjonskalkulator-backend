@@ -1,21 +1,28 @@
 package no.nav.pensjon.kalkulator.tech.security.ingress
 
 import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
 import jakarta.servlet.DispatcherType
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletResponse
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import java.io.PrintWriter
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.ImpersonalAccessFilter
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.TilgangsnektResponse
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.fag.FagtilgangService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.AvvisningAarsak
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.CacheAwarePopulasjonstilgangService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.TilgangResult
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
+import tools.jackson.databind.ObjectMapper
+
+private val objectMapper = ObjectMapper()
 
 class ImpersonalAccessFilterTest : ShouldSpec({
 
@@ -29,6 +36,7 @@ class ImpersonalAccessFilterTest : ShouldSpec({
             fagtilgangService = mockk(),
             populasjonstilgangService = mockk(),
             auditor = mockk(),
+            objectMapper = objectMapper,
         ).doFilter(request, response, chain)
 
         verify(exactly = 1) { chain.doFilter(request, response) }
@@ -45,6 +53,7 @@ class ImpersonalAccessFilterTest : ShouldSpec({
             fagtilgangService = mockk(),
             populasjonstilgangService = mockk(),
             auditor = mockk(),
+            objectMapper = objectMapper,
         ).doFilter(request, response, chain)
 
         verify(exactly = 0) { pidExtractor.pid() }
@@ -55,15 +64,19 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         val chain = mockk<FilterChain>(relaxed = true)
         val request = arrangeRequest(pid = pid.value, uri = "/api/foo")
         val response = mockk<HttpServletResponse>(relaxed = true)
+        val writer = mockk<PrintWriter>(relaxed = true)
+        every { response.writer } returns writer
 
         ImpersonalAccessFilter(
             pidGetter = arrangePid(),
             fagtilgangService = arrangeFagtilgang(innvilget = false),
             populasjonstilgangService = arrangePopulasjonstilgang(result = null),
             auditor = mockk(),
+            objectMapper = objectMapper,
         ).doFilter(request, response, chain)
 
-        verify(exactly = 1) { response.sendError(403, "Tilgang nektet pga. manglende faggruppemedlemskap") }
+        verify(exactly = 1) { response.status = 403 }
+        verifyTilgangsnektBody(writer, forventetDetail = "manglende faggruppemedlemskap")
         verify(exactly = 0) { chain.doFilter(request, response) }
     }
 
@@ -71,15 +84,19 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         val chain = mockk<FilterChain>(relaxed = true)
         val request = arrangeRequest(pid = pid.value, uri = "/api/foo")
         val response = mockk<HttpServletResponse>(relaxed = true)
+        val writer = mockk<PrintWriter>(relaxed = true)
+        every { response.writer } returns writer
 
         ImpersonalAccessFilter(
             pidGetter = arrangePid(),
             fagtilgangService = arrangeFagtilgang(innvilget = true),
             populasjonstilgangService = arrangePopulasjonstilgang(result = avvist),
             auditor = mockk(),
+            objectMapper = objectMapper,
         ).doFilter(request, response, chain)
 
-        verify(exactly = 1) { response.sendError(403, "Tilgang nektet pga. some reason") }
+        verify(exactly = 1) { response.status = 403 }
+        verifyTilgangsnektBody(writer, forventetDetail = "some reason")
         verify(exactly = 0) { chain.doFilter(request, response) }
     }
 
@@ -87,17 +104,19 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         val chain = mockk<FilterChain>(relaxed = true)
         val request = arrangeRequest(pid = pid.value, uri = "/api/foo")
         val response = mockk<HttpServletResponse>(relaxed = true)
+        val writer = mockk<PrintWriter>(relaxed = true)
+        every { response.writer } returns writer
 
         ImpersonalAccessFilter(
             pidGetter = arrangePidError(),
             fagtilgangService = arrangeFagtilgang(innvilget = true),
             populasjonstilgangService = arrangePopulasjonstilgang(result = null),
             auditor = mockk(),
+            objectMapper = objectMapper,
         ).doFilter(request, response, chain)
 
-        verify(exactly = 1) {
-            response.sendError(403, "Tilgang nektet pga. feil - se logg for detaljer")
-        }
+        verify(exactly = 1) { response.status = 403 }
+        verifyTilgangsnektBody(writer, forventetDetail = "Tilgang nektet pga. feil - se logg for detaljer")
         verify(exactly = 0) { chain.doFilter(request, response) }
     }
 
@@ -112,6 +131,7 @@ class ImpersonalAccessFilterTest : ShouldSpec({
             fagtilgangService = arrangeFagtilgang(innvilget = true),
             populasjonstilgangService = arrangePopulasjonstilgang(result = null),
             auditor = auditor,
+            objectMapper = objectMapper,
         ).doFilter(request, response, chain)
 
         verify(exactly = 1) { auditor.audit(onBehalfOfPid = pid, requestUri = "/foo") }
@@ -135,6 +155,7 @@ class ImpersonalAccessFilterTest : ShouldSpec({
             fagtilgangService = fagtilgangService,
             populasjonstilgangService = mockk(),
             auditor = mockk(),
+            objectMapper = objectMapper,
         ).doFilter(request, response, chain)
 
         verify(exactly = 0) { fagtilgangService.tilgangInnvilget() }
@@ -153,6 +174,7 @@ class ImpersonalAccessFilterTest : ShouldSpec({
             fagtilgangService = arrangeFagtilgang(innvilget = true),
             populasjonstilgangService = arrangePopulasjonstilgang(feil),
             auditor = auditor,
+            objectMapper = objectMapper,
         ).doFilter(request, response, chain)
 
         verify(exactly = 0) { auditor.audit(onBehalfOfPid = pid, requestUri = "/foo") }
@@ -173,6 +195,15 @@ private val feil =
         avvisningAarsak = AvvisningAarsak.POPULASJONSTILGANGSSJEKK_FEIL,
         begrunnelse = "feil"
     )
+
+private fun verifyTilgangsnektBody(writer: PrintWriter, forventetDetail: String) {
+    val body = slot<String>()
+    verify(exactly = 1) { writer.write(capture(body)) }
+
+    val tilgangsnektResponse = objectMapper.readTree(body.captured)
+    tilgangsnektResponse["type"].asString() shouldBe TilgangsnektResponse.TILGANGSNEKT_TYPE
+    tilgangsnektResponse["detail"].asString() shouldBe forventetDetail
+}
 
 private fun arrangePid(): PidExtractor =
     mockk { every { pid() } returns pid }

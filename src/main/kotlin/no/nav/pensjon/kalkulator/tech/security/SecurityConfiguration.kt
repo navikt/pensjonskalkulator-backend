@@ -33,6 +33,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler
 import org.springframework.util.StringUtils.hasLength
+import tools.jackson.databind.ObjectMapper
 
 @Configuration
 @EnableWebSecurity
@@ -95,6 +96,7 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
         securityContextEnricher: SecurityContextEnricher,
         pidGetter: PidGetter,
         auditor: Auditor,
+        objectMapper: ObjectMapper,
         adresseService: FortroligAdresseService,
         fagtilgangService: FagtilgangService,
         populasjonstilgangService: CacheAwarePopulasjonstilgangService,
@@ -111,7 +113,8 @@ class SecurityConfiguration(private val requestClaimExtractor: RequestClaimExtra
                     pidGetter,
                     fagtilgangService,
                     populasjonstilgangService,
-                    auditor
+                    auditor,
+                    objectMapper = objectMapper
                 ),
                 AuthenticationEnricherFilter::class.java
             )
