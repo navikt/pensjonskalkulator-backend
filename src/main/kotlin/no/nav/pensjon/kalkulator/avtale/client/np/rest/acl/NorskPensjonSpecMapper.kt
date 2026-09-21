@@ -8,7 +8,6 @@ import no.nav.pensjon.kalkulator.person.Pid
 
 object NorskPensjonSpecMapper {
 
-    private val log = mu.KotlinLogging.logger { }
     /**
      * NB: Norsk Pensjon's documentation says that 14 represents "livsvarig".
      * However, using 14 makes Norsk Pensjon return error "No signature in message!".
@@ -17,6 +16,8 @@ object NorskPensjonSpecMapper {
     private const val ANTALL_AAR_REPRESENTING_LIVSVARIG = 13
     private const val DEFAULT_HAR_EPS_PENSJON = true // Norsk Pensjon default
     private const val DEFAULT_HAR_EPS_PENSJONSGIVENDE_INNTEKT_OVER_2G = true // Norsk Pensjon default
+
+    private val log = mu.KotlinLogging.logger {}
 
     fun toDto(spec: PensjonsavtaleSpec, pid: Pid): NorskPensjonSpecDto {
         val norskPensjonSpecDto = NorskPensjonSpecDto(
@@ -32,7 +33,7 @@ object NorskPensjonSpecMapper {
             sivilstatus = Sivilstatus.fromInternalValue(spec.sivilstatus),
             oenskesSimuleringAvFolketrygd = false
         )
-        log.info { "norskPensjonSpecDto: $norskPensjonSpecDto" }
+        log.warn { "norskPensjonSpecDto: $norskPensjonSpecDto" }
         return norskPensjonSpecDto
     }
 

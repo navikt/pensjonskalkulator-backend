@@ -28,7 +28,18 @@ data class NorskPensjonSpecDto(
     val harEpsPensjon: Boolean = true, // Norsk Pensjon default
     val harEpsPensjonsgivendeInntektOver2G: Boolean = true, // Norsk Pensjon default
     val oenskesSimuleringAvFolketrygd: Boolean = false
-)
+){
+    override fun toString(): String {
+        return "NorskPensjonSpecDto(oenskesSimuleringAvFolketrygd=$oenskesSimuleringAvFolketrygd, " +
+                "harEpsPensjonsgivendeInntektOver2G=$harEpsPensjonsgivendeInntektOver2G, " +
+                "harEpsPensjon=$harEpsPensjon, sivilstatus=$sivilstatus, " +
+                "antallAarIUtlandetEtter16=$antallAarIUtlandetEtter16, " +
+                "harAfp=$harAfp, " +
+                "antallInntektsaarEtterUttak=$antallInntektsaarEtterUttak, " +
+                "uttaksperioder=$uttaksperioder, " +
+                "aarligInntektFoerUttak=$aarligInntektFoerUttak)"
+    }
+}
 
 /**
  * Beskrivelse av felter:
