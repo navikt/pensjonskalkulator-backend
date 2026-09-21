@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.tech.security.ingress.impersonal
 /**
  * Responsbody ved tilgangsnekt.
  *
- * 'type' er en stabil, maskinlesbar diskriminator som frontend kan rute på,
+ * 'type' skal hjelpe frontend å skille tilgangsnekt fra andre feiltyper,
  * mens 'detail' er menneskelesbar tekst som ikke må brukes til logikk.
  */
 data class TilgangsnektResponse(
