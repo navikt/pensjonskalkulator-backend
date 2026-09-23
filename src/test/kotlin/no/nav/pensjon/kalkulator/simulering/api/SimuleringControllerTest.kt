@@ -60,6 +60,7 @@ class SimuleringControllerTest : ShouldSpec() {
             every { pidExtractor.pid() } returns pid
             every { adresseService.adressebeskyttelseGradering(any()) } returns AdressebeskyttelseGradering.UGRADERT
             every { auditor.audit(any(), any()) } returns Unit
+            every { feature.isEnabled("norsk-pensjon-via-rest") } returns true
         }
 
         should("simulere hel alderspensjon V9") {

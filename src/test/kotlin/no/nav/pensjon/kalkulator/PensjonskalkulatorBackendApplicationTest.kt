@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.StringSpec
+import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.test.context.ActiveProfiles
@@ -18,4 +19,7 @@ class PensjonskalkulatorBackendApplicationTest : StringSpec({
 
     @MockkBean(name = "entra-id-provider")
     private lateinit var entraIdProvider: AuthenticationProvider
+
+    @MockkBean(name = "norsk-pensjon-rest")
+    private lateinit var norskPensjonRestClient: PensjonsavtaleClient
 }
