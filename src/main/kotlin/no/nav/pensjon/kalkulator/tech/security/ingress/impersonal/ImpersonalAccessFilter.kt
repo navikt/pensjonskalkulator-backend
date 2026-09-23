@@ -16,14 +16,17 @@ import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.Ca
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.util.StringUtils.hasLength
 import org.springframework.web.filter.GenericFilterBean
+import tools.jackson.databind.ObjectMapper
 
 class ImpersonalAccessFilter(
     private val pidGetter: PidGetter,
     private val fagtilgangService: FagtilgangService,
     private val populasjonstilgangService: CacheAwarePopulasjonstilgangService,
-    private val auditor: Auditor
+    private val auditor: Auditor,
+    private val objectMapper: ObjectMapper
 ) : GenericFilterBean() {
 
     private val log = KotlinLogging.logger {}
@@ -68,7 +71,7 @@ class ImpersonalAccessFilter(
         "Tilgang nektet pga. ${aarsak.begrunnelse}".let {
             if (e == null) {
                 log.warn { it }
-                respondForbidden(response, aarsak = it)
+                respondForbidden(response, aarsak = aarsak.begrunnelse)
             } else {
                 log.error(e) { "$it - ${e.message}" }
                 respondForbidden(response, aarsak = "$it - se logg for detaljer")
@@ -76,14 +79,21 @@ class ImpersonalAccessFilter(
         }
     }
 
+    private fun respondForbidden(response: ServletResponse, aarsak: String?) {
+        val tilgangsnektResponse = TilgangsnektResponse(detail = aarsak)
+
+        (response as HttpServletResponse).apply {
+            status = HttpStatus.FORBIDDEN.value()
+            characterEncoding = Charsets.UTF_8.name()
+            contentType = MediaType.APPLICATION_JSON_VALUE
+            writer.write(objectMapper.writeValueAsString(tilgangsnektResponse))
+        }
+    }
+
     private companion object {
 
         private fun hasPid(request: HttpServletRequest): Boolean =
             hasLength(request.getHeader(CustomHttpHeaders.PID))
-
-        private fun respondForbidden(response: ServletResponse, aarsak: String) {
-            (response as HttpServletResponse).sendError(HttpStatus.FORBIDDEN.value(), aarsak)
-        }
 
         private fun manglendeFaggruppemedlemskap() =
             TilgangResult(
