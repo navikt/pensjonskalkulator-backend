@@ -41,6 +41,6 @@ object TestObjects {
                 garantipensjon = Garantipensjon(aarligBeloep = 2, maanedligBeloep = null, sats = 2.34),
                 garantitillegg = 201
             ),
-            garantitillegg = 0
+            garantitillegg = null
         )
 }
