@@ -267,7 +267,8 @@ private fun alderspensjon(alder: Int, beloep: Int = 222612) =
         pensjonstillegg = 0,
         skjermingstillegg = 0,
         kapittel19Pensjon = null,
-        kapittel20Pensjon = null
+        kapittel20Pensjon = null,
+        garantitillegg = 0
     )
 
 @Language("json")

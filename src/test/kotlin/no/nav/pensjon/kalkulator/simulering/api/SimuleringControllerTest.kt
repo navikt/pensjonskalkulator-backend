@@ -477,7 +477,8 @@ class SimuleringControllerTest : ShouldSpec() {
                 pensjonstillegg = 0,
                 skjermingstillegg = 0,
                 kapittel19Pensjon = null,
-                kapittel20Pensjon = null
+                kapittel20Pensjon = null,
+                garantitillegg = 0,
             )
 
         private fun maanedsbeloep(heltUttak: Boolean) =
