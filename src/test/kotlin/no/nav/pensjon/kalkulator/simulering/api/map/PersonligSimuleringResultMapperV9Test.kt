@@ -476,7 +476,8 @@ private fun alderspensjon(alder: Int, beloep: Int) =
                 sats = 2.34
             ),
             garantitillegg = 201
-        )
+        ),
+        garantitillegg = null
     )
 
 private fun livsvarigOffentligAfpListe(): List<SimulertAfpOffentlig> =

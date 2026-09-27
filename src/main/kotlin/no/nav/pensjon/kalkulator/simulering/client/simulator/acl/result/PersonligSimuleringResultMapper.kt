@@ -38,6 +38,7 @@ object PersonligSimuleringResultMapper {
             grunnpensjon = dto.grunnpensjon ?: 0,
             tilleggspensjon = dto.tilleggspensjon ?: 0,
             pensjonstillegg = dto.pensjonstillegg ?: 0,
+            garantitillegg = dto.garantitillegg ?: 0,
             skjermingstillegg = dto.skjermingstillegg ?: 0,
             kapittel19Pensjon = dto.kapittel19Pensjon?.let(::kapittel19Pensjon),
             kapittel20Pensjon = dto.kapittel20Pensjon?.let(::kapittel20Pensjon),

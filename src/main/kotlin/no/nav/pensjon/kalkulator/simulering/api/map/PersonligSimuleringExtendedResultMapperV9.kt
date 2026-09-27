@@ -49,6 +49,7 @@ object PersonligSimuleringExtendedResultMapperV9 {
             tilleggspensjon = source.tilleggspensjon,
             pensjonstillegg = source.pensjonstillegg,
             skjermingstillegg = source.skjermingstillegg,
+            garantitillegg = source.garantitillegg,
             kapittel19Gjenlevendetillegg = source.kapittel19Pensjon?.gjenlevendetillegg
         )
 
