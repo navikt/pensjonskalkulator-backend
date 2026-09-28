@@ -42,6 +42,7 @@ data class PersonligSimuleringAlderspensjonResultV9(
     val tilleggspensjon: Int? = null,
     val pensjonstillegg: Int? = null,
     val skjermingstillegg: Int? = null,
+    val garantitillegg: Int? = null,
     val kapittel19Gjenlevendetillegg: Int? = null
 )
 
