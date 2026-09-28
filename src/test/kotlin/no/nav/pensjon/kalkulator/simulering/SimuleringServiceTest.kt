@@ -120,8 +120,7 @@ private val simuleringResult =
                 pensjonstillegg = 0,
                 skjermingstillegg = 0,
                 kapittel19Pensjon = null,
-                kapittel20Pensjon = null,
-                garantitillegg = 0
+                kapittel20Pensjon = null
             )
         ),
         alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(

@@ -40,7 +40,6 @@ object TestObjects {
                 trygdetidAntallAar = 39,
                 garantipensjon = Garantipensjon(aarligBeloep = 2, maanedligBeloep = null, sats = 2.34),
                 garantitillegg = 201
-            ),
-            garantitillegg = null
+            )
         )
 }
