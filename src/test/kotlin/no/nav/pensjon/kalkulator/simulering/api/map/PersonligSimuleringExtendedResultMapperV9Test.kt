@@ -73,6 +73,7 @@ class PersonligSimuleringExtendedResultMapperV9Test : ShouldSpec({
                     tilleggspensjon = 134641,
                     pensjonstillegg = -70243,
                     skjermingstillegg = 14,
+                    garantitillegg = 201,
                     kapittel19Gjenlevendetillegg = 15
                 )
             ),
