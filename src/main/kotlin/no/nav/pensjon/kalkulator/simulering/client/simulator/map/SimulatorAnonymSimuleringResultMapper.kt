@@ -42,7 +42,6 @@ object SimulatorAnonymSimuleringResultMapper {
             tilleggspensjon = 0, // ditto
             pensjonstillegg = 0, // ditto
             skjermingstillegg = 0, // ditto
-            garantitillegg = 0, // ditto
             kapittel19Pensjon = null, // ditto
             kapittel20Pensjon = null // ditto
         )
