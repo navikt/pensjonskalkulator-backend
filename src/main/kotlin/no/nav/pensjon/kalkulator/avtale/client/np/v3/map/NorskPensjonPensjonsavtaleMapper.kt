@@ -71,10 +71,16 @@ object NorskPensjonPensjonsavtaleMapper {
 
     private fun uttaksperiodeSpecDto(spec: UttaksperiodeSpec) =
         NorskPensjonUttaksperiodeSpecDto(
-            startAlder = NorskPensjonAlderDto(spec.startAlder.aar, spec.startAlder.maaneder + STARTMAANED_FORSKYVNING),
+            startAlder = alderDto(spec.startAlder),
             grad = spec.grad,
             aarligInntekt = spec.aarligInntekt?.aarligBeloep ?: 0
         )
+
+    private fun alderDto(spec: Alder): NorskPensjonAlderDto =
+        if (spec.maaneder == 0)
+            NorskPensjonAlderDto(aar = spec.aar - 1, maaned = MAANEDER_PER_AAR)
+        else
+            NorskPensjonAlderDto(aar = spec.aar, maaned = spec.maaneder)
 
     fun faultToString(fault: FaultDto) =
         fault.let {

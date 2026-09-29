@@ -37,6 +37,50 @@ class NorskPensjonPensjonsavtaleMapperTest : ShouldSpec({
         }
 
         /**
+         * NB: Gjelder kun SOAP-tjenesten.
+         */
+        should("mappe alder 67 år 0 måneder til 66 år 12 måneder") {
+            NorskPensjonPensjonsavtaleMapper.toDto(
+                spec = PensjonsavtaleSpec(
+                    aarligInntektFoerUttak = 1,
+                    uttaksperioder = listOf(
+                        UttaksperiodeSpec(
+                            startAlder = Alder(aar = 67, maaneder = 0),
+                            grad = Uttaksgrad.FEMTI_PROSENT,
+                            aarligInntekt = null
+                        ),
+                        UttaksperiodeSpec(
+                            startAlder = Alder(aar = 68, maaneder = 1),
+                            grad = Uttaksgrad.HUNDRE_PROSENT,
+                            aarligInntekt = InntektSpec(
+                                aarligBeloep = 123,
+                                tomAlder = Alder(aar = 69, maaneder = 11)
+                            )
+                        )
+                    )
+                ),
+                pid
+            ) shouldBe
+                    NorskPensjonPensjonsavtaleSpecDto(
+                        pid = pid,
+                        aarligInntektFoerUttak = 1,
+                        uttaksperioder = listOf(
+                            NorskPensjonUttaksperiodeSpecDto(
+                                startAlder = NorskPensjonAlderDto(aar = 66, maaned = 12),
+                                grad = Uttaksgrad.FEMTI_PROSENT,
+                                aarligInntekt = 0
+                            ),
+                            NorskPensjonUttaksperiodeSpecDto(
+                                startAlder = NorskPensjonAlderDto(aar = 68, maaned = 1),
+                                grad = Uttaksgrad.HUNDRE_PROSENT,
+                                aarligInntekt = 123
+                            )
+                        ),
+                        antallInntektsaarEtterUttak = 1 // perioden 68 år 1 md – 69 år 11 md regnes som 1 år
+                    )
+        }
+
+        /**
          * NB: Norsk Pensjon's documentation says that 14 represents "livsvarig".
          * However, using 14 makes Norsk Pensjon return the error "No signature in message!".
          * As a workoround 13 is used instead (although this represents "13 years" instead of "livsvarig").
