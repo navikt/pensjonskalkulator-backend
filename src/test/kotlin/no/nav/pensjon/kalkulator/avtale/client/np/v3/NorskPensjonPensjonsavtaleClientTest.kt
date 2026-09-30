@@ -7,6 +7,17 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.avtale.*
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.EN_AVTALE_RESPONSE_BODY
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.ERROR_RESPONSE_BODY
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.EXPECTED_REQUEST_BODY
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.INGEN_AVTALER_RESPONSE_BODY
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.TO_AVTALER_RESPONSE_BODY
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.UKJENTE_AARSAKER_RESPONSE_BODY
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.UTILGJENGELIGE_SELSKAP_RESPONSE_BODY
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.UTILSTREKKELIG_DATA_RESPONSE_BODY
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.avtaleMedEnUtbetalingsperiode
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.avtaleSpec
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.avtaleUtenUtbetalingsperioder
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.avtaleMedToUtbetalingsperioder
@@ -21,7 +32,6 @@ import no.nav.pensjon.kalkulator.testutil.arrangeOkXmlResponse
 import no.nav.pensjon.kalkulator.testutil.arrangeResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
-import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.assertj.AssertableApplicationContext
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.WebClient
@@ -33,14 +43,14 @@ class NorskPensjonPensjonsavtaleClientTest : FunSpec({
     var server: MockWebServer? = null
     var baseUrl: String? = null
     val xmlMapper = xmlMapper()
-    val traceAid: TraceAid = mockk { every { callId() } returns "id1" }
-    val tokenGetter:SamlTokenService = mockk { every { assertion() } returns Saml.ASSERTION }
+    val traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" }
+    val tokenGetter = mockk<SamlTokenService>().apply { every { assertion() } returns Saml.ASSERTION }
 
     fun pensjonsavtaleClient(context: AssertableApplicationContext) =
         NorskPensjonPensjonsavtaleClient(
             baseUrl!!,
             tokenGetter,
-            webClientBuilder = context.getBean<WebClient.Builder>(),
+            webClientBuilder = context.getBean(WebClient.Builder::class.java),
             xmlMapper,
             traceAid,
             retryAttempts = "1"
@@ -64,7 +74,11 @@ class NorskPensjonPensjonsavtaleClientTest : FunSpec({
 
             avtaler shouldHaveSize 1
             avtaler[0] shouldBe avtaleMedToUtbetalingsperioder
-            assertBody(server)
+
+            ByteArrayOutputStream().use {
+                server.takeRequest().apply { body.copyTo(it) }
+                it.toString(StandardCharsets.UTF_8) shouldBe EXPECTED_REQUEST_BODY
+            }
         }
     }
 
@@ -167,75 +181,77 @@ class NorskPensjonPensjonsavtaleClientTest : FunSpec({
     }
 })
 
-val avtaleSpec =
-    PensjonsavtaleSpec(
-        aarligInntektFoerUttak = 123000,
-        uttaksperioder = listOf(uttaksperiodeSpec(1), uttaksperiodeSpec(2)),
-    )
+object NorskPensjonPensjonsavtaleClientTestObjects {
 
-private val avtaleUtenUtbetalingsperioder =
-    Pensjonsavtale(
-        avtalenummer = "",
-        arbeidsgiver = "ukjent",
-        selskapsnavn = "Selskap2",
-        produktbetegnelse = "Produkt2",
-        kategori = AvtaleKategori.FOLKETRYGD,
-        underkategori = AvtaleUnderkategori.NONE,
-        innskuddssaldo = 0,
-        naavaerendeAvtaltAarligInnskudd = 0,
-        pensjonsbeholdningForventet = 0,
-        pensjonsbeholdningNedreGrense = 0,
-        pensjonsbeholdningOvreGrense = 0,
-        avkastningsgaranti = false,
-        beregningsmodell = EksternBeregningsmodell.NONE,
-        startAar = 0,
-        sluttAar = null,
-        opplysningsdato = "ukjent",
-        manglendeGraderingAarsak = ManglendeEksternGraderingAarsak.NONE,
-        manglendeBeregningAarsak = ManglendeEksternBeregningAarsak.NONE,
-        utbetalingsperioder = emptyList()
-    )
+    val avtaleSpec =
+        PensjonsavtaleSpec(
+            aarligInntektFoerUttak = 123000,
+            uttaksperioder = listOf(uttaksperiodeSpec(1), uttaksperiodeSpec(2)),
+        )
 
-private val utbetalingsperiodeMedSluttalder =
-    Utbetalingsperiode(
-        startAlder = Alder(aar = 71, maaneder = 0),
-        sluttAlder = Alder(aar = 81, maaneder = 1),
-        aarligUtbetaling = 10000,
-        grad = Uttaksgrad.HUNDRE_PROSENT
-    )
+    val avtaleUtenUtbetalingsperioder =
+        Pensjonsavtale(
+            avtalenummer = "",
+            arbeidsgiver = "ukjent",
+            selskapsnavn = "Selskap2",
+            produktbetegnelse = "Produkt2",
+            kategori = AvtaleKategori.FOLKETRYGD,
+            underkategori = AvtaleUnderkategori.NONE,
+            innskuddssaldo = 0,
+            naavaerendeAvtaltAarligInnskudd = 0,
+            pensjonsbeholdningForventet = 0,
+            pensjonsbeholdningNedreGrense = 0,
+            pensjonsbeholdningOvreGrense = 0,
+            avkastningsgaranti = false,
+            beregningsmodell = EksternBeregningsmodell.NONE,
+            startAar = 0,
+            sluttAar = null,
+            opplysningsdato = "ukjent",
+            manglendeGraderingAarsak = ManglendeEksternGraderingAarsak.NONE,
+            manglendeBeregningAarsak = ManglendeEksternBeregningAarsak.NONE,
+            utbetalingsperioder = emptyList()
+        )
 
-private val avtaleMedEnUtbetalingsperiode =
-    Pensjonsavtale(
-        avtalenummer = "Avtale1",
-        arbeidsgiver = "Firma1",
-        selskapsnavn = "Selskap1",
-        produktbetegnelse = "Produkt1",
-        kategori = AvtaleKategori.INDIVIDUELL_ORDNING,
-        underkategori = AvtaleUnderkategori.FORENINGSKOLLEKTIV,
-        innskuddssaldo = 1000,
-        naavaerendeAvtaltAarligInnskudd = 100,
-        pensjonsbeholdningForventet = 0,
-        pensjonsbeholdningNedreGrense = 0,
-        pensjonsbeholdningOvreGrense = 0,
-        avkastningsgaranti = false,
-        beregningsmodell = EksternBeregningsmodell.BRANSJEAVTALE,
-        startAar = 70,
-        sluttAar = 80,
-        opplysningsdato = "2023-01-01",
-        manglendeGraderingAarsak = ManglendeEksternGraderingAarsak.NONE,
-        manglendeBeregningAarsak = ManglendeEksternBeregningAarsak.NONE,
-        utbetalingsperioder = listOf(utbetalingsperiodeMedSluttalder)
-    )
+    private val utbetalingsperiodeMedSluttalder =
+        Utbetalingsperiode(
+            startAlder = Alder(aar = 71, maaneder = 0),
+            sluttAlder = Alder(aar = 81, maaneder = 1),
+            aarligUtbetaling = 10000,
+            grad = Uttaksgrad.HUNDRE_PROSENT
+        )
 
-private fun uttaksperiodeSpec(value: Int) =
-    UttaksperiodeSpec(
-        startAlder = Alder(aar = value + 62, maaneder = value),
-        grad = if (value < 2) Uttaksgrad.AATTI_PROSENT else Uttaksgrad.HUNDRE_PROSENT,
-        aarligInntekt = InntektSpec(aarligBeloep = value * 100000, tomAlder = null)
-    )
+    val avtaleMedEnUtbetalingsperiode =
+        Pensjonsavtale(
+            avtalenummer = "Avtale1",
+            arbeidsgiver = "Firma1",
+            selskapsnavn = "Selskap1",
+            produktbetegnelse = "Produkt1",
+            kategori = AvtaleKategori.INDIVIDUELL_ORDNING,
+            underkategori = AvtaleUnderkategori.FORENINGSKOLLEKTIV,
+            innskuddssaldo = 1000,
+            naavaerendeAvtaltAarligInnskudd = 100,
+            pensjonsbeholdningForventet = 0,
+            pensjonsbeholdningNedreGrense = 0,
+            pensjonsbeholdningOvreGrense = 0,
+            avkastningsgaranti = false,
+            beregningsmodell = EksternBeregningsmodell.BRANSJEAVTALE,
+            startAar = 70,
+            sluttAar = 80,
+            opplysningsdato = "2023-01-01",
+            manglendeGraderingAarsak = ManglendeEksternGraderingAarsak.NONE,
+            manglendeBeregningAarsak = ManglendeEksternBeregningAarsak.NONE,
+            utbetalingsperioder = listOf(utbetalingsperiodeMedSluttalder)
+        )
 
-@Language("xml")
-private const val EXPECTED_REQUEST_BODY = """<?xml version="1.0" ?>
+    fun uttaksperiodeSpec(value: Int) =
+        UttaksperiodeSpec(
+            startAlder = Alder(aar = value + 62, maaneder = value),
+            grad = if (value < 2) Uttaksgrad.AATTI_PROSENT else Uttaksgrad.HUNDRE_PROSENT,
+            aarligInntekt = InntektSpec(aarligBeloep = value * 100000, tomAlder = null)
+        )
+
+    @Language("xml")
+    const val EXPECTED_REQUEST_BODY = """<?xml version="1.0" ?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:typ="http://norskpensjon.no/api/pensjonskalkulator/v3/typer">
     <S:Header>
         ${Saml.ASSERTION}
@@ -249,12 +265,12 @@ private const val EXPECTED_REQUEST_BODY = """<?xml version="1.0" ?>
                 <aarligInntektFoerUttak>123000</aarligInntektFoerUttak>
                 <uttaksperiode>
                     <startAlder>63</startAlder>
-                    <startMaaned>1</startMaaned>
+                    <startMaaned>2</startMaaned>
                     <grad>80</grad>
                     <aarligInntekt>100000</aarligInntekt>
                 </uttaksperiode><uttaksperiode>
                     <startAlder>64</startAlder>
-                    <startMaaned>2</startMaaned>
+                    <startMaaned>3</startMaaned>
                     <grad>100</grad>
                     <aarligInntekt>200000</aarligInntekt>
                 </uttaksperiode>
@@ -270,18 +286,18 @@ private const val EXPECTED_REQUEST_BODY = """<?xml version="1.0" ?>
     </S:Body>
 </S:Envelope>"""
 
-@Language("xml")
-private const val INGEN_AVTALER_RESPONSE_BODY =
-    """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    @Language("xml")
+    const val INGEN_AVTALER_RESPONSE_BODY =
+        """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Header/>
     <soap:Body wsu:Id="x" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
         <ns2:pensjonsrettigheter xmlns:ns2="http://x.no/api/pensjonskalkulator/v3/typer" />
     </soap:Body>
 </soap:Envelope>"""
 
-@Language("xml")
-const val EN_AVTALE_RESPONSE_BODY =
-    """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    @Language("xml")
+    const val EN_AVTALE_RESPONSE_BODY =
+        """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Header/>
     <soap:Body wsu:Id="x" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
         <ns2:pensjonsrettigheter xmlns:ns2="http://x.no/api/pensjonskalkulator/v3/typer">
@@ -323,9 +339,9 @@ const val EN_AVTALE_RESPONSE_BODY =
     </soap:Body>
 </soap:Envelope>"""
 
-@Language("xml")
-private const val TO_AVTALER_RESPONSE_BODY =
-    """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    @Language("xml")
+    const val TO_AVTALER_RESPONSE_BODY =
+        """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Header/>
     <soap:Body wsu:Id="x" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
         <ns2:pensjonsrettigheter xmlns:ns2="http://x.no/api/pensjonskalkulator/v3/typer">
@@ -361,8 +377,8 @@ private const val TO_AVTALER_RESPONSE_BODY =
     </soap:Body>
 </soap:Envelope>"""
 
-@Language("xml")
-private const val UTILGJENGELIGE_SELSKAP_RESPONSE_BODY = """
+    @Language("xml")
+    const val UTILGJENGELIGE_SELSKAP_RESPONSE_BODY = """
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Header/>
     <soap:Body wsu:Id="id-54ce654f-eb05-465e-bd30-36b2c081c3b8" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
@@ -382,8 +398,8 @@ private const val UTILGJENGELIGE_SELSKAP_RESPONSE_BODY = """
     </soap:Body>
 </soap:Envelope>"""
 
-@Language("xml")
-private const val ERROR_RESPONSE_BODY = """
+    @Language("xml")
+    const val ERROR_RESPONSE_BODY = """
 <soap11:Envelope xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:soap11="http://schemas.xmlsoap.org/soap/envelope/">
     <soap11:Header>
         <wsa:Action>http://www.w3.org/2005/08/addressing/soap/fault</wsa:Action>
@@ -402,9 +418,9 @@ private const val ERROR_RESPONSE_BODY = """
 </soap11:Envelope>
 """
 
-@Language("xml")
-private const val UTILSTREKKELIG_DATA_RESPONSE_BODY =
-    """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    @Language("xml")
+    const val UTILSTREKKELIG_DATA_RESPONSE_BODY =
+        """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Header/>
     <soap:Body wsu:Id="id-cc25c7d6-15cb-4b45-a11b-164e92644ff4" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
         <ns2:pensjonsrettigheter xmlns:ns2="http://norskpensjon.no/api/pensjonskalkulator/v3/typer">
@@ -437,9 +453,9 @@ private const val UTILSTREKKELIG_DATA_RESPONSE_BODY =
     </soap:Body>
 </soap:Envelope>"""
 
-@Language("xml")
-private const val UKJENTE_AARSAKER_RESPONSE_BODY =
-    """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    @Language("xml")
+    const val UKJENTE_AARSAKER_RESPONSE_BODY =
+        """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Header/>
     <soap:Body wsu:Id="id-cc25c7d6-15cb-4b45-a11b-164e92644ff4" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
         <ns2:pensjonsrettigheter xmlns:ns2="http://norskpensjon.no/api/pensjonskalkulator/v3/typer">
@@ -450,10 +466,4 @@ private const val UKJENTE_AARSAKER_RESPONSE_BODY =
         </ns2:pensjonsrettigheter>
     </soap:Body>
 </soap:Envelope>"""
-
-private fun assertBody(server: MockWebServer) {
-    ByteArrayOutputStream().use {
-        server.takeRequest().apply { body.copyTo(it) }
-        it.toString(StandardCharsets.UTF_8) shouldBe EXPECTED_REQUEST_BODY
-    }
 }

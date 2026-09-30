@@ -5,15 +5,19 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonMockPensjonsavtaleClientTestObjects.BODY_WITHOUT_HEADER
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.EN_AVTALE_RESPONSE_BODY
+import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleClientTestObjects.avtaleSpec
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.avtaleMedToUtbetalingsperioder
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.Saml
 import no.nav.pensjon.kalkulator.mock.XmlMapperFactory.xmlMapper
+import no.nav.pensjon.kalkulator.tech.security.egress.token.saml.SamlTokenService
+import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.testutil.Arrange
 import no.nav.pensjon.kalkulator.testutil.arrangeOkXmlResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
-import org.springframework.beans.factory.getBean
 import org.springframework.web.reactive.function.client.WebClient
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
@@ -38,23 +42,29 @@ class NorskPensjonMockPensjonsavtaleClientTest : FunSpec({
 
         Arrange.webClientContextRunner().run {
             val avtaler = NorskPensjonMockPensjonsavtaleClient(
-                mockUrl = baseUrl!!,
-                tokenGetter = mockk { every { assertion() } returns Saml.ASSERTION },
-                webClientBuilder = it.getBean<WebClient.Builder>(),
-                traceAid = mockk { every { callId() } returns "id1" },
+                baseUrl!!,
+                tokenGetter = mockk<SamlTokenService>().apply { every { assertion() } returns Saml.ASSERTION },
+                webClientBuilder = it.getBean(WebClient.Builder::class.java),
+                traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" },
                 xmlMapper = xmlMapper(),
                 retryAttempts = "1"
             ).fetchAvtaler(avtaleSpec, pid).avtaler
 
             avtaler shouldHaveSize 1
             avtaler[0] shouldBe avtaleMedToUtbetalingsperioder
-            assertBody(server)
+
+            ByteArrayOutputStream().use {
+                server.takeRequest().apply { body.copyTo(it) }
+                it.toString(StandardCharsets.UTF_8) shouldBe BODY_WITHOUT_HEADER
+            }
         }
     }
 })
 
-@Language("xml")
-private const val BODY_WITHOUT_HEADER = """<?xml version="1.0" ?>
+private object NorskPensjonMockPensjonsavtaleClientTestObjects {
+
+    @Language("xml")
+    const val BODY_WITHOUT_HEADER = """<?xml version="1.0" ?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:typ="http://norskpensjon.no/api/pensjonskalkulator/v3/typer">
     <S:Header>
     </S:Header>
@@ -67,12 +77,12 @@ private const val BODY_WITHOUT_HEADER = """<?xml version="1.0" ?>
                 <aarligInntektFoerUttak>123000</aarligInntektFoerUttak>
                 <uttaksperiode>
                     <startAlder>63</startAlder>
-                    <startMaaned>1</startMaaned>
+                    <startMaaned>2</startMaaned>
                     <grad>80</grad>
                     <aarligInntekt>100000</aarligInntekt>
                 </uttaksperiode><uttaksperiode>
                     <startAlder>64</startAlder>
-                    <startMaaned>2</startMaaned>
+                    <startMaaned>3</startMaaned>
                     <grad>100</grad>
                     <aarligInntekt>200000</aarligInntekt>
                 </uttaksperiode>
@@ -87,10 +97,4 @@ private const val BODY_WITHOUT_HEADER = """<?xml version="1.0" ?>
         </typ:kalkulatorForespoersel>
     </S:Body>
 </S:Envelope>"""
-
-private fun assertBody(server: MockWebServer) {
-    ByteArrayOutputStream().use {
-        server.takeRequest().apply { body.copyTo(it) }
-        it.toString(StandardCharsets.UTF_8) shouldBe BODY_WITHOUT_HEADER
-    }
 }
