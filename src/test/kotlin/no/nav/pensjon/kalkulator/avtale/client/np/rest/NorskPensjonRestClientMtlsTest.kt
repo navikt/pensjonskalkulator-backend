@@ -6,6 +6,7 @@ import io.kotest.matchers.string.shouldContain
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
+import no.nav.pensjon.kalkulator.avtale.PersonSpec
 import no.nav.pensjon.kalkulator.avtale.UttaksperiodeSpec
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
@@ -23,6 +24,7 @@ import org.springframework.boot.ssl.SslBundle
 import org.springframework.boot.ssl.SslStoreBundle
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
+import java.time.LocalDate
 
 class NorskPensjonRestClientMtlsTest : FunSpec({
     val certificateAuthority = TestCertificates.certificateAuthority
@@ -92,19 +94,21 @@ class NorskPensjonRestClientMtlsTest : FunSpec({
 
         client(bundle).fetchAvtaler(
             PensjonsavtaleSpec(
+                person = PersonSpec(Pid("01017012345"), foedselsdato = LocalDate.of(1970, 1, 1)),
                 aarligInntektFoerUttak = 500_000,
                 uttaksperioder = listOf(
                     UttaksperiodeSpec(Alder(67, 0), Uttaksgrad.HUNDRE_PROSENT, null)
                 )
-            ),
-            Pid("01017012345")
+            )
         )
 
         val request = server.takeRequest()
         request.handshake?.peerPrincipal?.name shouldContain "Norsk Pensjon test client"
         request.getHeader("Organization-Number") shouldContain "889640782"
         request.getHeader("Correlation-Id") shouldContain "correlation-id"
-        request.body.readUtf8() shouldContain """"foedselsnummer":"01017012345""""
+        val requestBody = request.body.readUtf8()
+        requestBody shouldContain """"foedselsnummer":"01017012345""""
+        requestBody shouldContain """"datoFom":"2037-02-01""""
     }
 
     test("TLS server rejects a request without client certificate") {

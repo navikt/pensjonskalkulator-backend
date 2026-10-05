@@ -44,7 +44,7 @@ class NorskPensjonRestClient(
 
     override fun service() = service
 
-    override fun fetchAvtaler(spec: PensjonsavtaleSpec, pid: Pid): Pensjonsavtaler {
+    override fun fetchAvtaler(spec: PensjonsavtaleSpec): Pensjonsavtaler {
         val url = "$baseUrl/$BEREGN_PATH"
         log.debug { "POST to URL: '$url'" }
 
@@ -53,7 +53,7 @@ class NorskPensjonRestClient(
                 .post()
                 .uri("/$BEREGN_PATH")
                 .headers { setHeaders(it) }
-                .bodyValue(NorskPensjonSpecMapper.toDto(spec, pid))
+                .bodyValue(NorskPensjonSpecMapper.toDto(spec))
                 .retrieve()
                 .bodyToMono<NorskPensjonResult>()
                 .retryWhen(retryBackoffSpec(url))

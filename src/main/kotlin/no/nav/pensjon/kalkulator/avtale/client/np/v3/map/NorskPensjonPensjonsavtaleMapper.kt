@@ -40,9 +40,9 @@ object NorskPensjonPensjonsavtaleMapper {
             utilgjengeligeSelskap = utilgjengeligeSelskap(dto) ?: emptyList()
         )
 
-    fun toDto(spec: PensjonsavtaleSpec, pid: Pid) =
+    fun toDto(spec: PensjonsavtaleSpec) =
         NorskPensjonPensjonsavtaleSpecDto(
-            pid = pid,
+            pid = spec.person.pid,
             aarligInntektFoerUttak = spec.aarligInntektFoerUttak,
             uttaksperioder = spec.uttaksperioder.map(::uttaksperiodeSpecDto),
             antallInntektsaarEtterUttak = antallInntektAarUnderHeltUttak(spec.uttaksperioder),

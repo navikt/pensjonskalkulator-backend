@@ -55,8 +55,8 @@ class NorskPensjonPensjonsavtaleClient(
 
     override fun service() = service
 
-    override fun fetchAvtaler(spec: PensjonsavtaleSpec, pid: Pid): Pensjonsavtaler {
-        val responseXml = fetchAvtalerXml(NorskPensjonPensjonsavtaleMapper.toDto(spec, pid))
+    override fun fetchAvtaler(spec: PensjonsavtaleSpec): Pensjonsavtaler {
+        val responseXml = fetchAvtalerXml(NorskPensjonPensjonsavtaleMapper.toDto(spec))
         countCalls(MetricResult.OK)
 
         return try {

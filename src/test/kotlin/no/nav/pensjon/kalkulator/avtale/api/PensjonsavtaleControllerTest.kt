@@ -5,14 +5,18 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.mockk.every
 import no.nav.pensjon.kalkulator.avtale.InntektSpec
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleService
+import no.nav.pensjon.kalkulator.avtale.PersonSpec
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.UttaksperiodeSpec
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtaler
+import no.nav.pensjon.kalkulator.mock.PersonFactory.foedselsdato
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.mock.PersonFactory.person
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
+import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
@@ -39,6 +43,9 @@ class PensjonsavtaleControllerTest : ShouldSpec() {
     @MockkBean
     private lateinit var avtaleService: PensjonsavtaleService
 
+    @MockkBean
+    private lateinit var personService: PersonService
+
     @MockkBean(relaxed = true)
     private lateinit var traceAid: TraceAid
 
@@ -55,6 +62,7 @@ class PensjonsavtaleControllerTest : ShouldSpec() {
         beforeSpec {
             every { traceAid.begin() } returns Unit
             every { pidExtractor.pid() } returns pid
+            every { personService.getPerson() } returns person()
             every { adresseService.adressebeskyttelseGradering(any()) } returns AdressebeskyttelseGradering.UGRADERT
             every { auditor.audit(any(), any()) } returns Unit
         }
@@ -177,6 +185,7 @@ class PensjonsavtaleControllerTest : ShouldSpec() {
 
         private fun avtaleSpecMedTidsbegrensetInntekt() =
             PensjonsavtaleSpec(
+                person = PersonSpec(pid, foedselsdato),
                 aarligInntektFoerUttak = 456000,
                 uttaksperioder = listOf(gradertUttak(), heltUttak()),
                 harEpsPensjon = true,

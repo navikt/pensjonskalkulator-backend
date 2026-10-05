@@ -12,6 +12,8 @@ import no.nav.pensjon.kalkulator.avtale.api.dto.PensjonsavtaleSpecV3
 import no.nav.pensjon.kalkulator.avtale.api.map.PensjonsavtaleResultMapperV3.toDtoV3
 import no.nav.pensjon.kalkulator.avtale.api.map.PensjonsavtaleSpecMapperV3.fromDtoV3
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
+import no.nav.pensjon.kalkulator.person.PersonService
+import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.web.bind.annotation.PostMapping
@@ -23,7 +25,9 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("api")
 class PensjonsavtaleController(
     private val service: PensjonsavtaleService,
-    private val traceAid: TraceAid
+    private val traceAid: TraceAid,
+    private val pidGetter: PidGetter,
+    private val personService: PersonService,
 ) : ControllerBase(traceAid) {
 
     private val log = KotlinLogging.logger {}
@@ -51,7 +55,8 @@ class PensjonsavtaleController(
         log.debug { "Request for pensjonsavtaler $version: $spec" }
 
         return try {
-            toDtoV3(timed(service::fetchAvtaler, fromDtoV3(spec), "pensjonsavtaler $version"))
+            toDtoV3(timed(service::fetchAvtaler,
+                fromDtoV3(source = spec, pidFunction = { pidGetter.pid() }, personFunction = { personService.getPerson() }), "pensjonsavtaler $version"))
                 .also { log.debug { "Pensjonsavtaler respons $version: $it" } }
         } catch (e: EgressException) {
             handleError(e, version)!!

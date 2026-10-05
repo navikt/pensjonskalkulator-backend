@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.avtale.client.np.v3.map
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.avtale.InntektSpec
+import no.nav.pensjon.kalkulator.avtale.PersonSpec
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.UttaksperiodeSpec
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.*
@@ -10,6 +11,7 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtalerV3
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.mock.PersonFactory.foedselsdato
 
 class NorskPensjonPensjonsavtaleMapperTest : ShouldSpec({
 
@@ -23,10 +25,10 @@ class NorskPensjonPensjonsavtaleMapperTest : ShouldSpec({
         should("map domain object to data transfer object") {
             NorskPensjonPensjonsavtaleMapper.toDto(
                 spec = PensjonsavtaleSpec(
+                    person = PersonSpec(pid, foedselsdato),
                     aarligInntektFoerUttak = 1,
                     uttaksperioder = emptyList()
-                ),
-                pid
+                )
             ) shouldBe
                     NorskPensjonPensjonsavtaleSpecDto(
                         pid = pid,
@@ -45,6 +47,7 @@ class NorskPensjonPensjonsavtaleMapperTest : ShouldSpec({
             val antallInntektsaarEtterUttak = 20 // more than max. value of 13
             val startAlderAar = 62
             val domainObject = PensjonsavtaleSpec(
+                person = PersonSpec(pid, foedselsdato),
                 aarligInntektFoerUttak = 20_000,
                 uttaksperioder = listOf(
                     UttaksperiodeSpec(
@@ -67,13 +70,13 @@ class NorskPensjonPensjonsavtaleMapperTest : ShouldSpec({
             )
 
             NorskPensjonPensjonsavtaleMapper.toDto(
-                spec = domainObject,
-                pid
+                spec = domainObject
             ).antallInntektsaarEtterUttak shouldBe 13 // max. is 13 (which represents 'livsvarig')
         }
 
         should("gi antall inntektsår etter uttak = 0 når årlig inntekt er udefinert") {
             val domainObject = PensjonsavtaleSpec(
+                person = PersonSpec(pid, foedselsdato),
                 aarligInntektFoerUttak = 20_000,
                 uttaksperioder = listOf(
                     UttaksperiodeSpec(
@@ -85,8 +88,7 @@ class NorskPensjonPensjonsavtaleMapperTest : ShouldSpec({
             )
 
             NorskPensjonPensjonsavtaleMapper.toDto(
-                spec = domainObject,
-                pid
+                spec = domainObject
             ).antallInntektsaarEtterUttak shouldBe 0
         }
     }
