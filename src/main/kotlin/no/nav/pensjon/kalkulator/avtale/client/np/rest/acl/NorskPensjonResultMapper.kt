@@ -7,24 +7,19 @@ import no.nav.pensjon.kalkulator.avtale.Utbetalingsperiode
 import no.nav.pensjon.kalkulator.avtale.client.np.rest.acl.NorskPensjonSluttAlderMapper.sluttAar
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
-import no.nav.pensjon.kalkulator.tech.time.DateUtil.MAANEDER_PER_AAR
+import java.time.LocalDate
 
 object NorskPensjonResultMapper {
 
-    /**
-     *  Norsk Pensjon regner "til", vi regner "til og med" => forskyvning 1
-     */
-    const val SLUTTMAANED_FORSKYVNING = 1
-
     private const val DEFAULT_VALUE = "ukjent"
 
-    fun fromDto(dto: NorskPensjonResult) =
+    fun fromDto(dto: NorskPensjonResult, foedselsdato: LocalDate) =
         Pensjonsavtaler(
-            avtaler = pensjonsavtaler(dto) ?: emptyOrFault(dto),
+            avtaler = pensjonsavtaler(dto, foedselsdato) ?: emptyOrFault(),
             utilgjengeligeSelskap = utilgjengeligeSelskap(dto) ?: emptyList()
         )
 
-    private fun pensjonsavtaler(dto: NorskPensjonResult) =
+    private fun pensjonsavtaler(dto: NorskPensjonResult, foedselsdato: LocalDate) =
         dto.pensjonsRettigheter?.map {
             Pensjonsavtale(
                 avtalenummer = it.avtalenummer ?: "",
@@ -41,11 +36,11 @@ object NorskPensjonResultMapper {
                 avkastningsgaranti = it.avkastningsgaranti ?: false,
                 beregningsmodell = Beregningsmodell.fromExternalValue(it.beregningsmodell).internalValue,
                 startAar = it.startAlder ?: 0,
-                sluttAar = sluttAar(it.sluttAlder, it.utbetalingsperioder),
+                sluttAar = sluttAar(it.sluttAlder, it.utbetalingsperioder.orEmpty(), foedselsdato),
                 opplysningsdato = it.opplysningsdato ?: DEFAULT_VALUE,
                 manglendeGraderingAarsak = AarsakManglendeGradering.fromExternalValue(it.aarsakManglendeGradering).internalValue,
                 manglendeBeregningAarsak = AarsakIkkeBeregnet.internalValue(externalValue = it.aarsakIkkeBeregnet),
-                utbetalingsperioder = it.utbetalingsperioder?.map(::utbetalingsperiode) ?: emptyList()
+                utbetalingsperioder = it.utbetalingsperioder.orEmpty().map { utbetalingsperiode(it, foedselsdato) }
             )
         }
 
@@ -60,25 +55,15 @@ object NorskPensjonResultMapper {
             )
         }
 
-    private fun utbetalingsperiode(source: UtbetalingsperiodeDto) =
+    private fun utbetalingsperiode(source: UtbetalingsperiodeDto, foedselsdato: LocalDate) =
         Utbetalingsperiode(
-            startAlder = Alder(aar = source.startAlder, maaneder = source.startMaaned),
-            sluttAlder = source.sluttAlder?.let { sluttalder(it, source.sluttMaaned!!) },
+            startAlder = source.datoFom?.let { Alder.from(foedselsdato, it)}
+                ?: throw IllegalArgumentException("UtbetalingsperiodeDto mangler datoFom"),
+            sluttAlder = source.datoTom?.let { Alder.from(foedselsdato, it)},
             aarligUtbetalingForventet = source.aarligUtbetalingForventet ?: 0,
-            aarligUtbetalingNedreGrense = source.aarligUtbetalingNedreGrense ?: 0,
-            aarligUtbetalingOvreGrense = source.aarligUtbetalingOvreGrense ?: 0,
             grad = source.grad.let { Uttaksgrad.from(it) }
         )
 
-    private fun sluttalder(norskPensjonSluttAlder: Int, norskPensjonSluttMaaned: Int): Alder {
-        val maaneder = norskPensjonSluttMaaned - SLUTTMAANED_FORSKYVNING
-
-        return if (maaneder < 0)
-            Alder(aar = norskPensjonSluttAlder - 1, maaneder = maaneder + MAANEDER_PER_AAR)
-        else
-            Alder(aar = norskPensjonSluttAlder, maaneder = maaneder)
-    }
-
-    private fun emptyOrFault(dto: NorskPensjonResult) =
+    private fun emptyOrFault() =
         emptyList<Pensjonsavtale>()
 }

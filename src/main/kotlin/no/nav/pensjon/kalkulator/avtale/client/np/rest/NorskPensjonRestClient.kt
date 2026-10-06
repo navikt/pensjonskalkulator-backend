@@ -1,6 +1,5 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.rest
 
-import com.github.benmanes.caffeine.cache.Cache
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.Pensjonsavtaler
@@ -9,8 +8,6 @@ import no.nav.pensjon.kalkulator.avtale.client.np.rest.acl.NorskPensjonResult
 import no.nav.pensjon.kalkulator.avtale.client.np.rest.acl.NorskPensjonResultMapper
 import no.nav.pensjon.kalkulator.avtale.client.np.rest.acl.NorskPensjonSpecMapper
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
-import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.tech.cache.CacheConfigurator.createCache
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
@@ -18,7 +15,6 @@ import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.ssl.SslBundles
-import org.springframework.cache.caffeine.CaffeineCacheManager
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -58,7 +54,7 @@ class NorskPensjonRestClient(
                 .bodyToMono<NorskPensjonResult>()
                 .retryWhen(retryBackoffSpec(url))
                 .block()
-                ?.let(NorskPensjonResultMapper::fromDto)
+                ?.let { NorskPensjonResultMapper.fromDto(it, spec.person.foedselsdato) }
                 ?: Pensjonsavtaler(
                     avtaler = emptyList(),
                     utilgjengeligeSelskap = emptyList()

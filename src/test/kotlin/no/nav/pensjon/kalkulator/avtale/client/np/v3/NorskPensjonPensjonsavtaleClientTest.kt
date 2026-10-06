@@ -221,7 +221,7 @@ object NorskPensjonPensjonsavtaleClientTestObjects {
         Utbetalingsperiode(
             startAlder = Alder(aar = 71, maaneder = 0),
             sluttAlder = Alder(aar = 81, maaneder = 1),
-            aarligUtbetaling = 10000,
+            aarligUtbetalingForventet = 10000,
             grad = Uttaksgrad.HUNDRE_PROSENT
         )
 

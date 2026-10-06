@@ -3,10 +3,12 @@ package no.nav.pensjon.kalkulator.avtale.client.np.rest
 import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.PersonSpec
+import no.nav.pensjon.kalkulator.avtale.Utbetalingsperiode
 import no.nav.pensjon.kalkulator.avtale.UttaksperiodeSpec
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
@@ -77,7 +79,9 @@ class NorskPensjonRestClientMtlsTest : FunSpec({
         server.enqueue(
             MockResponse()
                 .addHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .setBody("""{"pensjonsRettigheter":[],"utilgjengeligeInnretninger":[]}""")
+                .setBody(
+                    """{"pensjonsRettigheter":[{"startAlder":67,"sluttAlder":77,"utbetalingsperioder":[{"datoFom":"2037-02-01","datoTom":"2047-01-31","aarligUtbetalingForventet":80000,"grad":100}]}],"utilgjengeligeInnretninger":[]}"""
+                )
         )
         val bundle = SslBundle.of(
             SslStoreBundle.of(
@@ -92,7 +96,7 @@ class NorskPensjonRestClientMtlsTest : FunSpec({
             org.springframework.boot.ssl.SslBundleKey.of(String(password), clientAlias)
         )
 
-        client(bundle).fetchAvtaler(
+        val result = client(bundle).fetchAvtaler(
             PensjonsavtaleSpec(
                 person = PersonSpec(Pid("01017012345"), foedselsdato = LocalDate.of(1970, 1, 1)),
                 aarligInntektFoerUttak = 500_000,
@@ -100,6 +104,13 @@ class NorskPensjonRestClientMtlsTest : FunSpec({
                     UttaksperiodeSpec(Alder(67, 0), Uttaksgrad.HUNDRE_PROSENT, null)
                 )
             )
+        )
+
+        result.avtaler.single().utbetalingsperioder.single() shouldBe Utbetalingsperiode(
+            startAlder = Alder(67, 0),
+            sluttAlder = Alder(77, 0),
+            aarligUtbetalingForventet = 80_000,
+            grad = Uttaksgrad.HUNDRE_PROSENT
         )
 
         val request = server.takeRequest()

@@ -118,8 +118,6 @@ object NorskPensjonPensjonsavtaleMapper {
             startAlder = Alder(source.startAlder, source.startMaaned - STARTMAANED_FORSKYVNING),
             sluttAlder = source.sluttAlder?.let { sluttalder(it, source.sluttMaaned!!) },
             aarligUtbetalingForventet = source.aarligUtbetalingForventet ?: 0,
-            aarligUtbetalingNedreGrense = source.aarligUtbetalingNedreGrense ?: 0,
-            aarligUtbetalingOvreGrense = source.aarligUtbetalingOvreGrense ?: 0,
             grad = source.grad.let { Uttaksgrad.from(it) }
         )
 
