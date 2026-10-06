@@ -1,8 +1,13 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.rest.acl
 
+import tools.jackson.databind.json.JsonMapper
+
+private val jsonMapper = JsonMapper.builder().build()
+
 class NorskPensjonResult {
     var pensjonsRettigheter: List<NorskPensjonPensjonsrettighet>? = null
     var utilgjengeligeInnretninger: List<NorskPensjonUtilgjengeligInnretning>? = null
+    override fun toString(): String = jsonMapper.writeValueAsString(this)
 }
 
 class NorskPensjonUtilgjengeligInnretning {
@@ -11,6 +16,7 @@ class NorskPensjonUtilgjengeligInnretning {
     var antallManglendeRettigheter: Int? = null
     var kategori: String? = null
     var feilkode: String? = null
+    override fun toString(): String = jsonMapper.writeValueAsString(this)
 }
 
 class NorskPensjonPensjonsrettighet {
@@ -32,6 +38,7 @@ class NorskPensjonPensjonsrettighet {
     var opplysningsdato: String? = null
     var aarsakManglendeGradering: String? = null
     var aarsakIkkeBeregnet: String? = null
+    override fun toString(): String = jsonMapper.writeValueAsString(this)
 }
 
 enum class NorskPensjonError(val beskrivelse: String) {

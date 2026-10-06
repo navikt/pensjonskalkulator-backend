@@ -4,11 +4,16 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import jakarta.validation.constraints.NotNull
 import no.nav.pensjon.kalkulator.avtale.AvtaleKategori
 import no.nav.pensjon.kalkulator.general.Alder
+import tools.jackson.databind.json.JsonMapper
+
+private val jsonMapper = JsonMapper.builder().build()
 
 data class PensjonsavtaleResultV3(
     @field:NotNull val avtaler: List<PensjonsavtaleV3>,
     @field:NotNull val utilgjengeligeSelskap: List<SelskapV3>
-)
+) {
+    override fun toString(): String = jsonMapper.writeValueAsString(this)
+}
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class PensjonsavtaleV3(
@@ -17,12 +22,16 @@ data class PensjonsavtaleV3(
     @field:NotNull val startAar: Int, // år som i alder – NB: avtaler uten startår returneres ikke
     val sluttAar: Int?, // år som i alder
     @field:NotNull val utbetalingsperioder: List<UtbetalingsperiodeV3>
-)
+) {
+    override fun toString(): String = jsonMapper.writeValueAsString(this)
+}
 
 data class SelskapV3(
     @field:NotNull val navn: String,
     @field:NotNull val heltUtilgjengelig: Boolean
-)
+) {
+    override fun toString(): String = jsonMapper.writeValueAsString(this)
+}
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class UtbetalingsperiodeV3(
@@ -30,7 +39,9 @@ data class UtbetalingsperiodeV3(
     val sluttAlder: Alder?,
     @field:NotNull val aarligUtbetaling: Int,
     @field:NotNull val grad: Int
-)
+) {
+    override fun toString(): String = jsonMapper.writeValueAsString(this)
+}
 
 enum class AvtaleKategoriV3(val internalValue: AvtaleKategori) {
     UNKNOWN(AvtaleKategori.UNKNOWN),

@@ -54,6 +54,7 @@ class NorskPensjonRestClient(
                 .bodyToMono<NorskPensjonResult>()
                 .retryWhen(retryBackoffSpec(url))
                 .block()
+                ?.also { log.info { "Response from Norsk Pensjon: $it"} }
                 ?.let { NorskPensjonResultMapper.fromDto(it, spec.person.foedselsdato) }
                 ?: Pensjonsavtaler(
                     avtaler = emptyList(),
