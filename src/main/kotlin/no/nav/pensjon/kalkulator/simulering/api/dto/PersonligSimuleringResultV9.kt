@@ -105,7 +105,7 @@ data class PersonligSimuleringAlderResultV9(
 
 data class SimuleringProblem(
     @field:NotNull
-    val kode: SimuleringV1ProblemType,
+    val kode: SimuleringV1ProblemType, //Bruker samme type som V1
     @field:NotNull
     val beskrivelse: String
 )
