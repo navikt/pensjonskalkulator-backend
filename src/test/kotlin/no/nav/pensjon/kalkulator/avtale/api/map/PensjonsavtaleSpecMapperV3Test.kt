@@ -3,11 +3,13 @@ package no.nav.pensjon.kalkulator.avtale.api.map
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.avtale.InntektSpec
+import no.nav.pensjon.kalkulator.avtale.PersonSpec
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.UttaksperiodeSpec
 import no.nav.pensjon.kalkulator.avtale.api.dto.*
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
+import no.nav.pensjon.kalkulator.mock.PersonFactory
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 
 class PensjonsavtaleSpecMapperV3Test : ShouldSpec({
@@ -30,9 +32,12 @@ class PensjonsavtaleSpecMapperV3Test : ShouldSpec({
                 epsHarPensjon = true,
                 epsHarInntektOver2G = true,
                 sivilstand = PensjonsavtaleSivilstandSpecV3.SEPARERT_PARTNER
-            )
+            ),
+            pidFunction = { PersonFactory.pid },
+            personFunction = { PersonFactory.person() }
         ) shouldBe
                 PensjonsavtaleSpec(
+                    person = PersonSpec(PersonFactory.pid, PersonFactory.foedselsdato),
                     aarligInntektFoerUttak = 234000,
                     uttaksperioder = listOf(
                         UttaksperiodeSpec(
@@ -57,9 +62,12 @@ class PensjonsavtaleSpecMapperV3Test : ShouldSpec({
                 uttaksperioder = emptyList(),
                 epsHarInntektOver2G = false,
                 epsHarPensjon = false
-            )
+            ),
+            pidFunction = { PersonFactory.pid },
+            personFunction = { PersonFactory.person() }
         ) shouldBe
                 PensjonsavtaleSpec(
+                    person = PersonSpec(PersonFactory.pid, PersonFactory.foedselsdato),
                     aarligInntektFoerUttak = -1,
                     uttaksperioder = emptyList(),
                     harEpsPensjon = false,

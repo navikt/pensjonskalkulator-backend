@@ -1,14 +1,12 @@
 package no.nav.pensjon.kalkulator.avtale
 
 import jakarta.annotation.PreDestroy
-import mu.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
-import no.nav.pensjon.kalkulator.person.Pid
-import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.security.ingress.SecurityCoroutineContext
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import org.springframework.beans.factory.annotation.Qualifier
@@ -21,7 +19,6 @@ class PensjonsavtaleService(
     @param:Qualifier("norskPensjon") private val avtaleClientSoap: PensjonsavtaleClient,
     @param:Qualifier("norsk-pensjon-rest") private val avtaleClient: PensjonsavtaleClient,
     @param:Qualifier("norskPensjonMock") private val mockAvtaleClient: PensjonsavtaleClient,
-    private val pidGetter: PidGetter,
     private val featureToggleService: FeatureToggleService
 ) {
     private val log = KotlinLogging.logger {}
@@ -30,25 +27,27 @@ class PensjonsavtaleService(
 
     fun fetchAvtaler(spec: PensjonsavtaleSpec): Pensjonsavtaler {
         return if (featureToggleService.isEnabled("mock-norsk-pensjon")) {
-            filter(mockAvtaleClient.fetchAvtaler(spec, pidGetter.pid()))
+            filter(mockAvtaleClient.fetchAvtaler(spec))
         } else if (featureToggleService.isEnabled("norsk-pensjon-via-rest")) {
-            filter(avtaleClient.fetchAvtaler(spec, pidGetter.pid()))
+            filter(avtaleClient.fetchAvtaler(spec))
         } else if (featureToggleService.isEnabled("norsk-pensjon-compare-rest-and-soap")) {
             log.info { "Comparing pensjonsavtaler from SOAP and REST for spec: $spec" }
-            val avtalerFraSoap = filter(avtaleClientSoap.fetchAvtaler(spec, pidGetter.pid()))
+            val avtalerFraSoap = filter(avtaleClientSoap.fetchAvtaler(spec))
 
-            compareAvtalerAsync(spec = spec, avtalerFraSoap = avtalerFraSoap, pid = pidGetter.pid())
+            if (shouldCompare()){
+                compareAvtalerAsync(spec = spec, avtalerFraSoap = avtalerFraSoap)
+            }
 
             avtalerFraSoap
         } else {
-            filter(avtaleClientSoap.fetchAvtaler(spec, pidGetter.pid()))
+            filter(avtaleClientSoap.fetchAvtaler(spec))
         }
     }
 
-    private fun compareAvtalerAsync(spec: PensjonsavtaleSpec, avtalerFraSoap: Pensjonsavtaler, pid: Pid) {
+    private fun compareAvtalerAsync(spec: PensjonsavtaleSpec, avtalerFraSoap: Pensjonsavtaler) {
         comparisonScope.launch(SecurityCoroutineContext()) {
             try {
-                val avtalerFraRest = filter(avtaleClient.fetchAvtaler(spec, pid))
+                val avtalerFraRest = filter(avtaleClient.fetchAvtaler(spec))
                 if (avtalerFraSoap != avtalerFraRest) {
                     log.warn { "Ulikheter i pensjonsavtaler fra SOAP og REST: SOAP: $avtalerFraSoap, REST: $avtalerFraRest" }
                     log.warn { "Ulikheter i pensjonsavtaler for spec: $spec" }

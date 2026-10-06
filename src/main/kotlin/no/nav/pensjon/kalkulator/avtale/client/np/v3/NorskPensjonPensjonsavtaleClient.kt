@@ -55,8 +55,8 @@ class NorskPensjonPensjonsavtaleClient(
 
     override fun service() = service
 
-    override fun fetchAvtaler(spec: PensjonsavtaleSpec, pid: Pid): Pensjonsavtaler {
-        NorskPensjonPensjonsavtaleMapper.toDto(spec, pid)
+    override fun fetchAvtaler(spec: PensjonsavtaleSpec): Pensjonsavtaler {
+        NorskPensjonPensjonsavtaleMapper.toDto(spec)
         return ingenAvtaler()
     }
 

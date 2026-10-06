@@ -1,12 +1,10 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.rest.acl
 
+import java.time.LocalDate
+
 class UtbetalingsperiodeDto {
-    var startAlder: Int = 0
-    var startMaaned: Int = 0
-    var sluttAlder: Int? = null
-    var sluttMaaned: Int? = null
+    var datoFom: LocalDate? = null
+    var datoTom: LocalDate? = null
     var aarligUtbetalingForventet: Int? = null
-    var aarligUtbetalingNedreGrense: Int? = null
-    var aarligUtbetalingOvreGrense: Int? = null
     var grad: Int = 0
 }

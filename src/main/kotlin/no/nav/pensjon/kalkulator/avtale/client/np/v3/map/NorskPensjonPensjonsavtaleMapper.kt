@@ -42,9 +42,9 @@ object NorskPensjonPensjonsavtaleMapper {
             utilgjengeligeSelskap = utilgjengeligeSelskap(dto) ?: emptyList()
         )
 
-    fun toDto(spec: PensjonsavtaleSpec, pid: Pid): NorskPensjonPensjonsavtaleSpecDto {
-        val norskPensjonPensjonsavtaleSpecDto = NorskPensjonPensjonsavtaleSpecDto(
-            pid = pid,
+    fun toDto(spec: PensjonsavtaleSpec) =
+        NorskPensjonPensjonsavtaleSpecDto(
+            pid = spec.person.pid,
             aarligInntektFoerUttak = spec.aarligInntektFoerUttak,
             uttaksperioder = spec.uttaksperioder.map(::uttaksperiodeSpecDto),
             antallInntektsaarEtterUttak = antallInntektAarUnderHeltUttak(spec.uttaksperioder),
@@ -56,9 +56,6 @@ object NorskPensjonPensjonsavtaleMapper {
             sivilstatus = Sivilstatus.fromInternalValue(spec.sivilstatus),
             oenskesSimuleringAvFolketrygd = false
         )
-        log.info { "XML norskPensjonSpecDto: $norskPensjonPensjonsavtaleSpecDto" }
-        return norskPensjonPensjonsavtaleSpecDto
-    }
 
     private fun antallInntektAarUnderHeltUttak(perioder: List<UttaksperiodeSpec>): Int {
         val heltUttakPeriode = perioder.firstOrNull { it.grad == Uttaksgrad.HUNDRE_PROSENT } ?: return 0
@@ -123,8 +120,6 @@ object NorskPensjonPensjonsavtaleMapper {
             startAlder = Alder(source.startAlder, source.startMaaned - STARTMAANED_FORSKYVNING),
             sluttAlder = source.sluttAlder?.let { sluttalder(it, source.sluttMaaned!!) },
             aarligUtbetalingForventet = source.aarligUtbetalingForventet ?: 0,
-            aarligUtbetalingNedreGrense = source.aarligUtbetalingNedreGrense ?: 0,
-            aarligUtbetalingOvreGrense = source.aarligUtbetalingOvreGrense ?: 0,
             grad = source.grad.let { Uttaksgrad.from(it) }
         )
 

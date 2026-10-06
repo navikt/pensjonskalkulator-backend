@@ -5,6 +5,8 @@ import no.nav.pensjon.kalkulator.avtale.UttaksperiodeSpec
 import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.Sivilstatus
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.person.Pid
+import no.nav.pensjon.kalkulator.simulering.PensjonUtil
+import java.time.LocalDate
 
 object NorskPensjonSpecMapper {
 
@@ -19,11 +21,11 @@ object NorskPensjonSpecMapper {
 
     private val log = mu.KotlinLogging.logger {}
 
-    fun toDto(spec: PensjonsavtaleSpec, pid: Pid): NorskPensjonSpecDto {
+    fun toDto(spec: PensjonsavtaleSpec): NorskPensjonSpecDto {
         val norskPensjonSpecDto = NorskPensjonSpecDto(
-            foedselsnummer = pid.value,
+            foedselsnummer = spec.person.pid.value,
             aarligInntektFoerUttak = spec.aarligInntektFoerUttak,
-            uttaksperioder = spec.uttaksperioder.map(::uttaksperiodeSpecDto),
+            uttaksperioder = spec.uttaksperioder.map { uttaksperiodeSpecDto(it, spec.person.foedselsdato) },
             antallInntektsaarEtterUttak = antallInntektAarUnderHeltUttak(spec.uttaksperioder),
             harAfp = false, // avoids Norsk Pensjon calling Nav's AFP simulation
             harEpsPensjon = spec.harEpsPensjon ?: DEFAULT_HAR_EPS_PENSJON,
@@ -46,10 +48,9 @@ object NorskPensjonSpecMapper {
             ?: ANTALL_AAR_REPRESENTING_LIVSVARIG
     }
 
-    private fun uttaksperiodeSpecDto(spec: UttaksperiodeSpec) =
+    private fun uttaksperiodeSpecDto(spec: UttaksperiodeSpec, foedselsdato: LocalDate) =
         NorskPensjonUttaksperiodeSpec(
-            startAlder = spec.startAlder.aar,
-            startMaaned = spec.startAlder.maaneder,
+            datoFom = PensjonUtil.uttakDato( foedselsdato,spec.startAlder),
             grad = spec.grad.prosentsats,
             aarligInntekt = spec.aarligInntekt?.aarligBeloep ?: 0
         )

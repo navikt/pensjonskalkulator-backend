@@ -22,7 +22,7 @@ class PensjonsavtaleResultMapperV3Test : ShouldSpec({
                             Utbetalingsperiode(
                                 startAlder = Alder(aar = 68, maaneder = 6),
                                 sluttAlder = Alder(aar = 78, maaneder = 5),
-                                aarligUtbetaling = 12000,
+                                aarligUtbetalingForventet = 12000,
                                 grad = Uttaksgrad.AATTI_PROSENT
                             )
                         )

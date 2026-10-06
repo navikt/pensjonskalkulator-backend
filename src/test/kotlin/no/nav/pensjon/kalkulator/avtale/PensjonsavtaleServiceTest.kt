@@ -10,6 +10,7 @@ import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtalerV3
+import no.nav.pensjon.kalkulator.mock.PersonFactory
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 
@@ -20,7 +21,6 @@ class PensjonsavtaleServiceTest : ShouldSpec({
             avtaleClientSoap = arrangeAvtaler(pensjonsavtalerV3()),
             avtaleClient = arrangeAvtaler(pensjonsavtalerV3()),
             mockAvtaleClient = mockk(),
-            pidGetter = mockk(relaxed = true),
             featureToggleService = arrangeFeature(enabled = false)
         )
 
@@ -39,7 +39,6 @@ class PensjonsavtaleServiceTest : ShouldSpec({
                 )
             ),
             mockAvtaleClient = mockk(),
-            pidGetter = mockk(relaxed = true),
             featureToggleService = arrangeFeature(enabled = false)
         )
 
@@ -52,7 +51,6 @@ class PensjonsavtaleServiceTest : ShouldSpec({
             avtaleClient = mockk(relaxed = true),
             avtaleClientSoap = arrangeAvtaler(enAvtaleUtenStart()),
             mockAvtaleClient = mockk(),
-            pidGetter = mockk(relaxed = true),
             featureToggleService = mockk(relaxed = true)
         )
 
@@ -69,13 +67,12 @@ class PensjonsavtaleServiceTest : ShouldSpec({
             restAvtaleClient,
             realAvtaleClient,
             mockAvtaleClient,
-            pidGetter = mockk(relaxed = true),
             featureToggleService = arrangeFeature(enabled = true)
         )
 
         avtaleService.fetchAvtaler(spec)
 
-        verify(exactly = 1) { mockAvtaleClient.fetchAvtaler(spec = eq(spec), pid = any()) }
+        verify(exactly = 1) { mockAvtaleClient.fetchAvtaler(spec = eq(spec)) }
         verify { realAvtaleClient wasNot Called }
     }
 
@@ -88,25 +85,24 @@ class PensjonsavtaleServiceTest : ShouldSpec({
             restAvtaleClient,
             realAvtaleClient,
             mockAvtaleClient,
-            pidGetter = mockk(relaxed = true),
             featureToggleService = arrangeFeature(enabled = false)
         )
 
         avtaleService.fetchAvtaler(spec)
 
-        verify(exactly = 1) { realAvtaleClient.fetchAvtaler(spec = eq(spec), pid = any()) }
+        verify(exactly = 1) { realAvtaleClient.fetchAvtaler(spec = eq(spec)) }
         verify { mockAvtaleClient wasNot Called }
     }
 })
 
 private fun arrangeAvtaler(avtaler: Pensjonsavtaler): PensjonsavtaleClient =
     mockk<PensjonsavtaleClient>().apply {
-        every { fetchAvtaler(any(), any()) } returns avtaler
+        every { fetchAvtaler(any()) } returns avtaler
     }
 
 private fun arrangeAvtaler(kategorier: List<AvtaleKategori>): PensjonsavtaleClient =
     mockk<PensjonsavtaleClient>().apply {
-        every { fetchAvtaler(any(), any()) } returns pensjonsavtalerV3(kategorier)
+        every { fetchAvtaler(any()) } returns pensjonsavtalerV3(kategorier)
     }
 
 private fun arrangeFeature(enabled: Boolean): FeatureToggleService =
@@ -117,6 +113,7 @@ private fun arrangeFeature(enabled: Boolean): FeatureToggleService =
 
 private fun avtaleSpecMedLivsvarigInntekt() =
     PensjonsavtaleSpec(
+        person = PersonSpec(pid = PersonFactory.pid, foedselsdato = PersonFactory.foedselsdato),
         aarligInntektFoerUttak = 456000,
         uttaksperioder = listOf(gradertUttak(), heltUttak()),
         harEpsPensjon = true,
