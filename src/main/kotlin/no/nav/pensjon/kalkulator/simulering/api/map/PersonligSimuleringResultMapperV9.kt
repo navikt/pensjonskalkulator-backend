@@ -4,6 +4,8 @@ import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
+import no.nav.pensjon.kalkulator.simulering.api.v1.acl.result.SimuleringV1ProblemType
+import no.nav.pensjon.kalkulator.validity.Problem
 import java.time.LocalDate
 
 /**
@@ -23,6 +25,14 @@ object PersonligSimuleringResultMapperV9 {
             afpOffentlig = source.livsvarigOffentligAfpListe.map(::offentligAfp),
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving),
             harForLiteTrygdetid = source.harForLiteTrygdetid,
+            problem = source.problem?.let(::problem)
+        )
+
+    fun problem(source: Problem) =
+        SimuleringProblem(
+            kode = SimuleringV1ProblemType.entries.firstOrNull { it.internalValue == source.type }
+                ?: SimuleringV1ProblemType.SERVERFEIL,
+            beskrivelse = source.beskrivelse
         )
 
     private fun alderspensjon(source: SimulertAlderspensjon) =

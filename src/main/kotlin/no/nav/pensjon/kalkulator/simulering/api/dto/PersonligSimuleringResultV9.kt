@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.simulering.api.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import jakarta.validation.constraints.NotNull
+import no.nav.pensjon.kalkulator.simulering.api.v1.acl.result.SimuleringV1ProblemType
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class PersonligSimuleringResultV9(
@@ -13,7 +14,8 @@ data class PersonligSimuleringResultV9(
     @field:NotNull val vilkaarsproeving: PersonligSimuleringVilkaarsproevingResultV9,
     val harForLiteTrygdetid: Boolean? = false,
     val trygdetid: Int? = null,
-    val opptjeningGrunnlagListe: List<PersonligSimuleringAarligInntektResultV9>? = null
+    val opptjeningGrunnlagListe: List<PersonligSimuleringAarligInntektResultV9>? = null,
+    val problem: SimuleringProblem? = null
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -100,4 +102,11 @@ data class PersonligSimuleringAlternativResultV9(
 data class PersonligSimuleringAlderResultV9(
     @field:NotNull val aar: Int,
     @field:NotNull val maaneder: Int
+)
+
+data class SimuleringProblem(
+    @field:NotNull
+    val kode: SimuleringV1ProblemType,
+    @field:NotNull
+    val beskrivelse: String
 )
