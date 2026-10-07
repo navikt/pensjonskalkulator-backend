@@ -7,6 +7,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
+import no.nav.pensjon.kalkulator.avtale.client.np.compare.PensjonsavtaleComparator
 import no.nav.pensjon.kalkulator.tech.security.ingress.SecurityCoroutineContext
 import no.nav.pensjon.kalkulator.tech.toggle.FeatureToggleService
 import org.springframework.beans.factory.annotation.Qualifier
@@ -47,11 +48,11 @@ class PensjonsavtaleService(
         comparisonScope.launch(SecurityCoroutineContext()) {
             try {
                 val avtalerFraRest = filter(avtaleClient.fetchAvtaler(spec))
-                if (avtalerFraSoap != avtalerFraRest) {
-                    log.warn { "Ulikheter i pensjonsavtaler fra SOAP og REST: SOAP: $avtalerFraSoap, REST: $avtalerFraRest" }
+                if (PensjonsavtaleComparator.finnDiff(avtalerFraSoap, avtalerFraRest)) {
                     log.warn { "Ulikheter i pensjonsavtaler for spec: $spec" }
+                    log.warn { "Ulikheter i pensjonsavtaler fra SOAP og REST: SOAP: $avtalerFraSoap, REST: $avtalerFraRest" }
                 } else {
-                    log.warn { "Pensjonsavtaler fra SOAP og REST er like." }
+                    log.warn { "Pensjonsavtaler fra SOAP og REST er like. SOAP: $avtalerFraSoap, REST: $avtalerFraRest" }
                 }
             } catch (e: CancellationException) {
                 throw e

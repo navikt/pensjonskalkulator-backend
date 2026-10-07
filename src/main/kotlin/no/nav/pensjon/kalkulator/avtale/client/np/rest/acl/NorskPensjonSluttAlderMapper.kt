@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.rest.acl
 
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.general.Alder
 import java.time.LocalDate
 
@@ -9,12 +10,13 @@ import java.time.LocalDate
  * Sluttalder justeres kun når alle utbetalingsperiodene har sluttdato.
  */
 object NorskPensjonSluttAlderMapper {
+    private val log = KotlinLogging.logger {}
 
     fun sluttAar(sluttAlder: Int?, perioder: List<UtbetalingsperiodeDto>, foedselsdato: LocalDate): Int? =
         sluttAlder
             ?.let { if (perioder.isEmpty()) return sluttAlder }
             ?.let { if (perioder.any { it.datoTom == null }) return sluttAlder }
             ?.let { perioder.mapNotNull { periode -> periode.datoTom }.maxOrNull() ?: return sluttAlder }
-            ?.let { datoTom -> Alder.from(foedselsdato, datoTom) }
+            ?.let { datoTom -> Alder.from(foedselsdato, datoTom).also { log.debug { "Justerer sluttalder fra $sluttAlder til ${it.aar}" } } }
             ?.aar
 }
