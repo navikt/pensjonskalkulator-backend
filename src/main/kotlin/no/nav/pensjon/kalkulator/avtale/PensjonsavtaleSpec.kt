@@ -19,7 +19,11 @@ data class PensjonsavtaleSpec(
 data class PersonSpec(
     val pid: Pid,
     val foedselsdato: LocalDate,
-)
+) {
+    override fun toString(): String {
+        return "$foedselsdato"
+    }
+}
 
 data class UttaksperiodeSpec(
     val startAlder: Alder,
