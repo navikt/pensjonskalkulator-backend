@@ -31,8 +31,6 @@ private fun utbetalingsperiode(start: Alder, slutt: Alder?) =
         startAlder = start,
         sluttAlder = slutt,
         aarligUtbetalingForventet = 123,
-        aarligUtbetalingNedreGrense = 1,
-        aarligUtbetalingOvreGrense = 999,
         grad = Uttaksgrad.NULL
     )
 
@@ -42,7 +40,7 @@ private fun utbetalingsperiode2(slutt: Alder?) =
     Utbetalingsperiode(
         startAlder = startalder,
         sluttAlder = slutt,
-        aarligUtbetaling = 0,
+        aarligUtbetalingForventet = 0,
         grad = Uttaksgrad.HUNDRE_PROSENT
     )
 

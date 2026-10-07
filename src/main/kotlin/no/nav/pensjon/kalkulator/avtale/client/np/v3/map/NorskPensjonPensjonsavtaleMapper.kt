@@ -40,9 +40,9 @@ object NorskPensjonPensjonsavtaleMapper {
             utilgjengeligeSelskap = utilgjengeligeSelskap(dto) ?: emptyList()
         )
 
-    fun toDto(spec: PensjonsavtaleSpec, pid: Pid) =
+    fun toDto(spec: PensjonsavtaleSpec) =
         NorskPensjonPensjonsavtaleSpecDto(
-            pid = pid,
+            pid = spec.person.pid,
             aarligInntektFoerUttak = spec.aarligInntektFoerUttak,
             uttaksperioder = spec.uttaksperioder.map(::uttaksperiodeSpecDto),
             antallInntektsaarEtterUttak = antallInntektAarUnderHeltUttak(spec.uttaksperioder),
@@ -118,8 +118,6 @@ object NorskPensjonPensjonsavtaleMapper {
             startAlder = Alder(source.startAlder, source.startMaaned - STARTMAANED_FORSKYVNING),
             sluttAlder = source.sluttAlder?.let { sluttalder(it, source.sluttMaaned!!) },
             aarligUtbetalingForventet = source.aarligUtbetalingForventet ?: 0,
-            aarligUtbetalingNedreGrense = source.aarligUtbetalingNedreGrense ?: 0,
-            aarligUtbetalingOvreGrense = source.aarligUtbetalingOvreGrense ?: 0,
             grad = source.grad.let { Uttaksgrad.from(it) }
         )
 

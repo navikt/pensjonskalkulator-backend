@@ -21,6 +21,7 @@ import no.nav.pensjon.kalkulator.avtale.client.np.v3.NorskPensjonPensjonsavtaleC
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.avtaleMedToUtbetalingsperioder
+import no.nav.pensjon.kalkulator.mock.PersonFactory.foedselsdato
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.mock.Saml
 import no.nav.pensjon.kalkulator.mock.XmlMapperFactory.xmlMapper
@@ -70,7 +71,7 @@ class NorskPensjonPensjonsavtaleClientTest : FunSpec({
         server!!.arrangeOkXmlResponse(EN_AVTALE_RESPONSE_BODY)
 
         Arrange.webClientContextRunner().run {
-            val avtaler = pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid).avtaler
+            val avtaler = pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec).avtaler
 
             avtaler shouldHaveSize 1
             avtaler[0] shouldBe avtaleMedToUtbetalingsperioder
@@ -86,7 +87,7 @@ class NorskPensjonPensjonsavtaleClientTest : FunSpec({
         server?.arrangeOkXmlResponse(TO_AVTALER_RESPONSE_BODY)
 
         Arrange.webClientContextRunner().run {
-            val avtaler = pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid).avtaler
+            val avtaler = pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec).avtaler
 
             avtaler shouldHaveSize 2
             avtaler[0] shouldBe avtaleMedEnUtbetalingsperiode
@@ -98,7 +99,7 @@ class NorskPensjonPensjonsavtaleClientTest : FunSpec({
         server?.arrangeOkXmlResponse(INGEN_AVTALER_RESPONSE_BODY)
 
         Arrange.webClientContextRunner().run {
-            pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid).avtaler.isEmpty() shouldBe true
+            pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec).avtaler.isEmpty() shouldBe true
         }
     }
 
@@ -106,7 +107,7 @@ class NorskPensjonPensjonsavtaleClientTest : FunSpec({
         server?.arrangeOkXmlResponse(UTILGJENGELIGE_SELSKAP_RESPONSE_BODY)
 
         Arrange.webClientContextRunner().run {
-            val selskaper = pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid).utilgjengeligeSelskap
+            val selskaper = pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec).utilgjengeligeSelskap
 
             selskaper shouldHaveSize 2
             selskaper[0] shouldBe Selskap("Selskap1", true, 1, AvtaleKategori.PRIVAT_AFP, "Feil1")
@@ -118,7 +119,7 @@ class NorskPensjonPensjonsavtaleClientTest : FunSpec({
         server?.arrangeOkXmlResponse(UTILSTREKKELIG_DATA_RESPONSE_BODY)
 
         Arrange.webClientContextRunner().run {
-            pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid)
+            pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec)
                 .avtaler[0].manglendeBeregningAarsak shouldBe ManglendeEksternBeregningAarsak.UTILSTREKKELIG_DATA
         }
     }
@@ -127,7 +128,7 @@ class NorskPensjonPensjonsavtaleClientTest : FunSpec({
         server?.arrangeOkXmlResponse(UKJENTE_AARSAKER_RESPONSE_BODY)
 
         Arrange.webClientContextRunner().run {
-            val avtale = pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid).avtaler[0]
+            val avtale = pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec).avtaler[0]
 
             with(avtale) {
                 manglendeBeregningAarsak shouldBe ManglendeEksternBeregningAarsak.UNKNOWN
@@ -141,7 +142,7 @@ class NorskPensjonPensjonsavtaleClientTest : FunSpec({
         server?.arrangeOkXmlResponse(INGEN_AVTALER_RESPONSE_BODY)
 
         Arrange.webClientContextRunner().run {
-            pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid).avtaler.isEmpty() shouldBe true
+            pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec).avtaler.isEmpty() shouldBe true
         }
     }
 
@@ -151,7 +152,7 @@ class NorskPensjonPensjonsavtaleClientTest : FunSpec({
 
         Arrange.webClientContextRunner().run {
             shouldThrow<EgressException> {
-                pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid)
+                pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec)
             }.message shouldBe "My bad"
         }
     }
@@ -162,7 +163,7 @@ class NorskPensjonPensjonsavtaleClientTest : FunSpec({
 
         Arrange.webClientContextRunner().run {
             shouldThrow<EgressException> {
-                pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid)
+                pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec)
             }.message shouldBe "Code: soap11:Client | String: A problem occurred." +
                     " | Actor: urn:nav:ikt:plattform:samhandling:q1_partner-gw-pep-sbs:OutboundDynamicSecurityGateway" +
                     " | Detail: { Transaction: 4870241 | Global transaction: da10915547fa547004a2951 }"
@@ -175,7 +176,7 @@ class NorskPensjonPensjonsavtaleClientTest : FunSpec({
 
         Arrange.webClientContextRunner().run {
             shouldThrow<EgressException> {
-                pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec, pid)
+                pensjonsavtaleClient(context = it).fetchAvtaler(avtaleSpec)
             }.message shouldBe """Failed to call http://localhost:${server?.port}/kalkulator.pensjonsrettighetstjeneste/v3/kalkulatorPensjonTjeneste - (non-XML response) - { "x": "y" }"""
         }
     }
@@ -185,6 +186,10 @@ object NorskPensjonPensjonsavtaleClientTestObjects {
 
     val avtaleSpec =
         PensjonsavtaleSpec(
+            person = PersonSpec(
+                pid = pid,
+                foedselsdato = foedselsdato
+            ),
             aarligInntektFoerUttak = 123000,
             uttaksperioder = listOf(uttaksperiodeSpec(1), uttaksperiodeSpec(2)),
         )
@@ -216,7 +221,7 @@ object NorskPensjonPensjonsavtaleClientTestObjects {
         Utbetalingsperiode(
             startAlder = Alder(aar = 71, maaneder = 0),
             sluttAlder = Alder(aar = 81, maaneder = 1),
-            aarligUtbetaling = 10000,
+            aarligUtbetalingForventet = 10000,
             grad = Uttaksgrad.HUNDRE_PROSENT
         )
 

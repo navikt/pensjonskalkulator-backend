@@ -46,7 +46,7 @@ object PensjonsavtaleFactory {
         Utbetalingsperiode(
             startAlder = Alder(71, 0),
             sluttAlder = Alder(81, 1),
-            aarligUtbetaling = 10000,
+            aarligUtbetalingForventet = 10000,
             grad = Uttaksgrad.HUNDRE_PROSENT
         )
 
@@ -54,7 +54,7 @@ object PensjonsavtaleFactory {
         Utbetalingsperiode(
             startAlder = Alder(72, 1),
             sluttAlder = null,
-            aarligUtbetaling = 20000,
+            aarligUtbetalingForventet = 20000,
             grad = Uttaksgrad.AATTI_PROSENT
         )
 
@@ -80,7 +80,7 @@ object PensjonsavtaleFactory {
         Utbetalingsperiode(
             startAlder = Alder(68, 1),
             sluttAlder = Alder(78, 11),
-            aarligUtbetaling = 123000,
+            aarligUtbetalingForventet = 123000,
             grad = Uttaksgrad.HUNDRE_PROSENT
         )
 

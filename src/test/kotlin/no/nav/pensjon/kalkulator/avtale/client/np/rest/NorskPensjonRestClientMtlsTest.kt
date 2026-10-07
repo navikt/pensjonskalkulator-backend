@@ -3,9 +3,12 @@ package no.nav.pensjon.kalkulator.avtale.client.np.rest
 import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
+import no.nav.pensjon.kalkulator.avtale.PersonSpec
+import no.nav.pensjon.kalkulator.avtale.Utbetalingsperiode
 import no.nav.pensjon.kalkulator.avtale.UttaksperiodeSpec
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
@@ -23,6 +26,7 @@ import org.springframework.boot.ssl.SslBundle
 import org.springframework.boot.ssl.SslStoreBundle
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
+import java.time.LocalDate
 
 class NorskPensjonRestClientMtlsTest : FunSpec({
     val certificateAuthority = TestCertificates.certificateAuthority
@@ -75,7 +79,9 @@ class NorskPensjonRestClientMtlsTest : FunSpec({
         server.enqueue(
             MockResponse()
                 .addHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .setBody("""{"pensjonsRettigheter":[],"utilgjengeligeInnretninger":[]}""")
+                .setBody(
+                    """{"pensjonsRettigheter":[{"startAlder":67,"sluttAlder":77,"utbetalingsperioder":[{"datoFom":"2037-02-01","datoTom":"2047-01-31","aarligUtbetalingForventet":80000,"grad":100}]}],"utilgjengeligeInnretninger":[]}"""
+                )
         )
         val bundle = SslBundle.of(
             SslStoreBundle.of(
@@ -90,21 +96,30 @@ class NorskPensjonRestClientMtlsTest : FunSpec({
             org.springframework.boot.ssl.SslBundleKey.of(String(password), clientAlias)
         )
 
-        client(bundle).fetchAvtaler(
+        val result = client(bundle).fetchAvtaler(
             PensjonsavtaleSpec(
+                person = PersonSpec(Pid("01017012345"), foedselsdato = LocalDate.of(1970, 1, 1)),
                 aarligInntektFoerUttak = 500_000,
                 uttaksperioder = listOf(
                     UttaksperiodeSpec(Alder(67, 0), Uttaksgrad.HUNDRE_PROSENT, null)
                 )
-            ),
-            Pid("01017012345")
+            )
+        )
+
+        result.avtaler.single().utbetalingsperioder.single() shouldBe Utbetalingsperiode(
+            startAlder = Alder(67, 0),
+            sluttAlder = Alder(77, 0),
+            aarligUtbetalingForventet = 80_000,
+            grad = Uttaksgrad.HUNDRE_PROSENT
         )
 
         val request = server.takeRequest()
         request.handshake?.peerPrincipal?.name shouldContain "Norsk Pensjon test client"
         request.getHeader("Organization-Number") shouldContain "889640782"
         request.getHeader("Correlation-Id") shouldContain "correlation-id"
-        request.body.readUtf8() shouldContain """"foedselsnummer":"01017012345""""
+        val requestBody = request.body.readUtf8()
+        requestBody shouldContain """"foedselsnummer":"01017012345""""
+        requestBody shouldContain """"datoFom":"2037-02-01""""
     }
 
     test("TLS server rejects a request without client certificate") {

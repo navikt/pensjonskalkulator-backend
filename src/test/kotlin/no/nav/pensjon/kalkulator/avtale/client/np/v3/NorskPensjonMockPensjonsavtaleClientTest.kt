@@ -48,7 +48,7 @@ class NorskPensjonMockPensjonsavtaleClientTest : FunSpec({
                 traceAid = mockk<TraceAid>().apply { every { callId() } returns "id1" },
                 xmlMapper = xmlMapper(),
                 retryAttempts = "1"
-            ).fetchAvtaler(avtaleSpec, pid).avtaler
+            ).fetchAvtaler(avtaleSpec).avtaler
 
             avtaler shouldHaveSize 1
             avtaler[0] shouldBe avtaleMedToUtbetalingsperioder

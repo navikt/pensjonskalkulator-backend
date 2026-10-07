@@ -13,8 +13,6 @@ data class Utbetalingsperiode(
     val startAlder: Alder,
     val sluttAlder: Alder?,
     val aarligUtbetalingForventet: Int,
-    val aarligUtbetalingNedreGrense: Int,
-    val aarligUtbetalingOvreGrense: Int,
     val grad: Uttaksgrad
 ) {
     val erLivsvarig = sluttAlder == null
@@ -22,19 +20,4 @@ data class Utbetalingsperiode(
     init {
         require(startAlder lessThanOrEqualTo sluttAlder) { "startAlder <= sluttAlder" }
     }
-
-    constructor(
-        startAlder: Alder,
-        sluttAlder: Alder?,
-        aarligUtbetaling: Int,
-        grad: Uttaksgrad
-    ) :
-            this(
-                startAlder = startAlder,
-                sluttAlder = sluttAlder,
-                aarligUtbetalingForventet = aarligUtbetaling,
-                aarligUtbetalingNedreGrense = 0,
-                aarligUtbetalingOvreGrense = 0,
-                grad = grad
-            )
 }
