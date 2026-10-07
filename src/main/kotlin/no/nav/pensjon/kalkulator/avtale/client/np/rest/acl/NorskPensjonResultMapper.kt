@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.rest.acl
 
+import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.avtale.Pensjonsavtale
 import no.nav.pensjon.kalkulator.avtale.Pensjonsavtaler
 import no.nav.pensjon.kalkulator.avtale.Selskap
@@ -12,6 +13,7 @@ import java.time.LocalDate
 object NorskPensjonResultMapper {
 
     private const val DEFAULT_VALUE = "ukjent"
+    private val log = KotlinLogging.logger {}
 
     fun fromDto(dto: NorskPensjonResult, foedselsdato: LocalDate) =
         Pensjonsavtaler(
@@ -59,7 +61,8 @@ object NorskPensjonResultMapper {
         Utbetalingsperiode(
             startAlder = source.datoFom?.let { Alder.from(foedselsdato, it)}
                 ?: throw IllegalArgumentException("UtbetalingsperiodeDto mangler datoFom"),
-            sluttAlder = source.datoTom?.let { Alder.from(foedselsdato, it)},
+            sluttAlder = source.datoTom?.let { Alder.from(foedselsdato, it)
+                .also { log.warn { "Norsk pensjon REST: Utledet $it fra ${source.datoTom}" } }},
             aarligUtbetalingForventet = source.aarligUtbetalingForventet ?: 0,
             grad = source.grad.let { Uttaksgrad.from(it) }
         )
