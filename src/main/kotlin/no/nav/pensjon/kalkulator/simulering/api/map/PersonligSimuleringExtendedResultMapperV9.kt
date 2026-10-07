@@ -6,6 +6,7 @@ import no.nav.pensjon.kalkulator.simulering.*
 import no.nav.pensjon.kalkulator.simulering.api.dto.*
 import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultMapperV9.justerPrivatAfpInnevaerendeAar
 import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultMapperV9.justerAlderspensjonInnevaerendeAar
+import no.nav.pensjon.kalkulator.simulering.api.map.PersonligSimuleringResultMapperV9.problem
 import java.time.LocalDate
 
 /**
@@ -26,7 +27,8 @@ object PersonligSimuleringExtendedResultMapperV9 {
             vilkaarsproeving = vilkaarsproeving(source.vilkaarsproeving),
             harForLiteTrygdetid = source.harForLiteTrygdetid,
             trygdetid = source.trygdetid,
-            opptjeningGrunnlagListe = source.opptjeningListe.map(::inntekt)
+            opptjeningGrunnlagListe = source.opptjeningListe.map(::inntekt),
+            problem = source.problem?.let(::problem)
         )
 
     private fun alderspensjon(source: SimulertAlderspensjon) =
