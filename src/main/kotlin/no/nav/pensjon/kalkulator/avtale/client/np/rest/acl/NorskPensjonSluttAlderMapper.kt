@@ -17,6 +17,7 @@ object NorskPensjonSluttAlderMapper {
             ?.let { if (perioder.isEmpty()) return sluttAlder }
             ?.let { if (perioder.any { it.datoTom == null }) return sluttAlder }
             ?.let { perioder.mapNotNull { periode -> periode.datoTom }.maxOrNull() ?: return sluttAlder }
-            ?.let { datoTom -> Alder.from(foedselsdato, datoTom).also { log.debug { "Justerer sluttalder fra $sluttAlder til ${it.aar}" } } }
+            ?.let { datoTom -> Alder.from(foedselsdato, datoTom)
+                .also { log.warn { "Norsk pensjon REST: justerer sluttalder fra $sluttAlder til ${it.aar}" } } }
             ?.aar
 }
