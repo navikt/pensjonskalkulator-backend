@@ -42,6 +42,34 @@ class NorskPensjonSluttAlderMapperTest : ShouldSpec({
             foedselsdato = LocalDate.of(1970, 1, 31)
         ) shouldBe 69
     }
+
+    should("return null when sluttalder is null") {
+        NorskPensjonSluttAlderMapper.sluttAar(
+            sluttAlder = null,
+            perioder = listOf(periode(LocalDate.of(2040, 1, 1))),
+            foedselsdato = FOEDSELSDATO
+        ) shouldBe null
+    }
+
+    should("use the latest payment period regardless of list order") {
+        NorskPensjonSluttAlderMapper.sluttAar(
+            sluttAlder = 70,
+            perioder = listOf(
+                periode(LocalDate.of(2040, 2, 1)),
+                periode(LocalDate.of(2040, 1, 1)),
+                periode(LocalDate.of(2039, 12, 1))
+            ),
+            foedselsdato = FOEDSELSDATO
+        ) shouldBe 70
+    }
+
+    should("not reduce sluttår when the last payment period ends after the birth month") {
+        NorskPensjonSluttAlderMapper.sluttAar(
+            sluttAlder = 70,
+            perioder = listOf(periode(LocalDate.of(2040, 2, 29))),
+            foedselsdato = LocalDate.of(1970, 1, 31)
+        ) shouldBe 70
+    }
 })
 
 private val FOEDSELSDATO = LocalDate.of(1970, 1, 1)
