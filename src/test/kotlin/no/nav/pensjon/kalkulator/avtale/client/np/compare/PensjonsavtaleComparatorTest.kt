@@ -17,11 +17,11 @@ class PensjonsavtaleComparatorTest : ShouldSpec({
         PensjonsavtaleComparator.finnDiff(avtaler, avtaler) shouldBe false
     }
 
-    should("ikke finne diff når REST-sluttalder er én måned senere") {
+    should("finne diff når REST-sluttalder er én måned senere") {
         val soap = pensjonsavtaler(avtale(periode(sluttAlder = Alder(67, 11))))
         val rest = pensjonsavtaler(avtale(periode(sluttAlder = Alder(68, 0))))
 
-        PensjonsavtaleComparator.finnDiff(soap, rest) shouldBe false
+        PensjonsavtaleComparator.finnDiff(soap, rest) shouldBe true
     }
 
     should("finne diff når sluttalder avviker med to måneder") {

@@ -80,7 +80,7 @@ class NorskPensjonRestClientMtlsTest : FunSpec({
             MockResponse()
                 .addHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .setBody(
-                    """{"pensjonsRettigheter":[{"startAlder":67,"sluttAlder":77,"utbetalingsperioder":[{"datoFom":"2037-02-01","datoTom":"2047-01-31","aarligUtbetalingForventet":80000,"grad":100}]}],"utilgjengeligeInnretninger":[]}"""
+                    """{"pensjonsRettigheter":[{"startAlder":67,"sluttAlder":76,"utbetalingsperioder":[{"datoFom":"2037-02-01","datoTom":"2047-01-31","aarligUtbetalingForventet":80000,"grad":100}]}],"utilgjengeligeInnretninger":[]}"""
                 )
         )
         val bundle = SslBundle.of(
@@ -108,7 +108,7 @@ class NorskPensjonRestClientMtlsTest : FunSpec({
 
         result.avtaler.single().utbetalingsperioder.single() shouldBe Utbetalingsperiode(
             startAlder = Alder(67, 0),
-            sluttAlder = Alder(77, 0),
+            sluttAlder = Alder(76, 11),
             aarligUtbetalingForventet = 80_000,
             grad = Uttaksgrad.HUNDRE_PROSENT
         )

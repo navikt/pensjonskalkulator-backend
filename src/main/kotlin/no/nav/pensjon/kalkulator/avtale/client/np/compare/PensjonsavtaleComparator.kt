@@ -2,7 +2,6 @@ package no.nav.pensjon.kalkulator.avtale.client.np.compare
 
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.avtale.Pensjonsavtaler
-import no.nav.pensjon.kalkulator.general.Alder
 
 object PensjonsavtaleComparator {
     private val log = KotlinLogging.logger {}
@@ -34,7 +33,7 @@ object PensjonsavtaleComparator {
                                 restAvtale.utbetalingsperioder.any {
                                     soapPeriode.aarligUtbetalingForventet == it.aarligUtbetalingForventet &&
                                             soapPeriode.startAlder == it.startAlder &&
-                                            erLikInnenforEnMaaned(soapPeriode.sluttAlder, it.sluttAlder)
+                                            soapPeriode.sluttAlder == it.sluttAlder
                                 }
                             }
                 }
@@ -65,14 +64,4 @@ object PensjonsavtaleComparator {
             )
         )
     }
-
-
-    private fun erLikInnenforEnMaaned(
-        soapAlder: Alder?,
-        restAlder: Alder?
-    ): Boolean =
-        when {
-            soapAlder == null || restAlder == null -> soapAlder == restAlder
-            else -> soapAlder == restAlder || soapAlder.plussMaaneder(1) == restAlder
-        }
 }
