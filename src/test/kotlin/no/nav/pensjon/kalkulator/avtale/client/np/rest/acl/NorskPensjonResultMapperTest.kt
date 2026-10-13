@@ -12,12 +12,27 @@ class NorskPensjonResultMapperTest : ShouldSpec({
     should("map utbetalingsperiodens LocalDate-felter til Alder") {
         withUtbetalingsperiode(
             datoFom = LocalDate.of(2037, 2, 1),
-            datoTom = LocalDate.of(2047, 2, 1),
+            datoTom = LocalDate.of(2047, 1, 31),
             aarligUtbetalingForventet = 80_000,
             grad = 100
         ).let {
             it.startAlder shouldBe Alder(67, 0)
-            it.sluttAlder shouldBe Alder(77, 0)
+            it.sluttAlder shouldBe Alder(76, 11)
+            it.aarligUtbetalingForventet shouldBe 80_000
+            it.grad shouldBe Uttaksgrad.HUNDRE_PROSENT
+        }
+    }
+
+    should("map utbetalingsperiodens LocalDate-felter to Alder with months") {
+        withUtbetalingsperiode(
+            datoFom = LocalDate.of(2037, 2, 1),
+            datoTom = LocalDate.of(2047, 1, 31),
+            foedselsdato = LocalDate.of(1970, 1, 15),
+            aarligUtbetalingForventet = 80_000,
+            grad = 100
+        ).let {
+            it.startAlder shouldBe Alder(67, 0)
+            it.sluttAlder shouldBe Alder(76, 11)
             it.aarligUtbetalingForventet shouldBe 80_000
             it.grad shouldBe Uttaksgrad.HUNDRE_PROSENT
         }

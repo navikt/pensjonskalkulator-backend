@@ -61,7 +61,7 @@ object NorskPensjonResultMapper {
         Utbetalingsperiode(
             startAlder = source.datoFom?.let { Alder.from(foedselsdato, it)}
                 ?: throw IllegalArgumentException("UtbetalingsperiodeDto mangler datoFom"),
-            sluttAlder = source.datoTom?.let { Alder.from(foedselsdato, it)
+            sluttAlder = source.datoTom?.let { Alder.from(foedselsdato, it.withDayOfMonth(1))
                 .also { log.warn { "Norsk pensjon REST: Utledet $it fra ${source.datoTom}" } }},
             aarligUtbetalingForventet = source.aarligUtbetalingForventet ?: 0,
             grad = source.grad.let { Uttaksgrad.from(it) }
