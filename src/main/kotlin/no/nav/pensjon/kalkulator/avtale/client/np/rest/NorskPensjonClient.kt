@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.Pensjonsavtaler
 import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
+import no.nav.pensjon.kalkulator.avtale.client.np.metric.NorskPensjonPensjonsavtaleMetrics
 import no.nav.pensjon.kalkulator.avtale.client.np.rest.acl.NorskPensjonResult
 import no.nav.pensjon.kalkulator.avtale.client.np.rest.acl.NorskPensjonResultMapper
 import no.nav.pensjon.kalkulator.avtale.client.np.rest.acl.NorskPensjonSpecMapper
@@ -23,8 +24,8 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.reactive.function.client.bodyToMono
 
-@Component("norsk-pensjon-rest")
-class NorskPensjonRestClient(
+@Component
+class NorskPensjonClient(
     @param:Value($$"${norsk-pensjon.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     sslBundles: SslBundles,
@@ -55,6 +56,7 @@ class NorskPensjonRestClient(
                 .retryWhen(retryBackoffSpec(url))
                 .block()
                 ?.let { NorskPensjonResultMapper.fromDto(it, spec.person.foedselsdato) }
+                ?.also { NorskPensjonPensjonsavtaleMetrics.updateMetrics(it) }
                 ?: Pensjonsavtaler(
                     avtaler = emptyList(),
                     utilgjengeligeSelskap = emptyList()

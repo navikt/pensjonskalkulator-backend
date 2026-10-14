@@ -1,6 +1,5 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.rest.acl
 
-import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.general.Alder
 import java.time.LocalDate
 
@@ -17,14 +16,12 @@ import java.time.LocalDate
  * Det vurderes som unødvendig detaljert gitt pensjonskalkulatorens tidshorisont på 10+ år.
  */
 object NorskPensjonSluttAlderMapper {
-    private val log = KotlinLogging.logger {}
 
     fun sluttAar(sluttAlder: Int?, perioder: List<UtbetalingsperiodeDto>, foedselsdato: LocalDate): Int? =
         sluttAlder
             ?.let { if (perioder.isEmpty()) return sluttAlder }
             ?.let { if (perioder.any { it.datoTom == null }) return sluttAlder }
             ?.let { perioder.mapNotNull { periode -> periode.datoTom }.maxOrNull() ?: return sluttAlder }
-            ?.let { datoTom -> Alder.from(foedselsdato, datoTom.withDayOfMonth(1))
-                .also { log.warn { "Norsk pensjon REST: justerer sluttalder fra $sluttAlder til ${it.aar}" } } }
+            ?.let { datoTom -> Alder.from(foedselsdato, datoTom.withDayOfMonth(1)) }
             ?.aar
 }

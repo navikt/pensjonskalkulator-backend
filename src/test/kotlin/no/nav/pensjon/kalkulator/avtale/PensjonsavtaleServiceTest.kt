@@ -18,10 +18,7 @@ class PensjonsavtaleServiceTest : ShouldSpec({
 
     should("fetch avtaler") {
         val avtaleService = PensjonsavtaleService(
-            avtaleClientSoap = arrangeAvtaler(pensjonsavtalerV3()),
-            avtaleClient = arrangeAvtaler(pensjonsavtalerV3()),
-            mockAvtaleClient = mockk(),
-            featureToggleService = arrangeFeature(enabled = false)
+            client = arrangeAvtaler(pensjonsavtalerV3()),
         )
 
         avtaleService.fetchAvtaler(avtaleSpecMedLivsvarigInntekt()) shouldBe pensjonsavtalerV3()
@@ -29,8 +26,7 @@ class PensjonsavtaleServiceTest : ShouldSpec({
 
     should("exclude avtaler of kategori 'Folketrygd', 'Offentlig tjenestepensjon', 'Privat AFP'") {
         val avtaleService = PensjonsavtaleService(
-            avtaleClientSoap = mockk(relaxed = true),
-            avtaleClient = arrangeAvtaler(
+            client = arrangeAvtaler(
                 kategorier = listOf(
                     AvtaleKategori.FOLKETRYGD,
                     AvtaleKategori.OFFENTLIG_TJENESTEPENSJON,
@@ -38,8 +34,6 @@ class PensjonsavtaleServiceTest : ShouldSpec({
                     AvtaleKategori.PRIVAT_AFP
                 )
             ),
-            mockAvtaleClient = mockk(),
-            featureToggleService = arrangeFeature(enabled = false)
         )
 
         avtaleService.fetchAvtaler(avtaleSpecMedLivsvarigInntekt()) shouldBe
@@ -48,50 +42,11 @@ class PensjonsavtaleServiceTest : ShouldSpec({
 
     should("exclude avtaler uten startår") {
         val avtaleService = PensjonsavtaleService(
-            avtaleClient = mockk(relaxed = true),
-            avtaleClientSoap = arrangeAvtaler(enAvtaleUtenStart()),
-            mockAvtaleClient = mockk(),
-            featureToggleService = mockk(relaxed = true)
+            client = arrangeAvtaler(enAvtaleUtenStart()),
         )
 
         avtaleService.fetchAvtaler(avtaleSpecMedLivsvarigInntekt()) shouldBe
                 Pensjonsavtaler(avtaler = emptyList(), utilgjengeligeSelskap = emptyList())
-    }
-
-    should("use mocked avtaler when 'mock' feature is enabled") {
-        val spec = avtaleSpecMedLivsvarigInntekt()
-        val restAvtaleClient = mockk<PensjonsavtaleClient>()
-        val realAvtaleClient = mockk<PensjonsavtaleClient>()
-        val mockAvtaleClient = arrangeAvtaler(pensjonsavtalerV3())
-        val avtaleService = PensjonsavtaleService(
-            restAvtaleClient,
-            realAvtaleClient,
-            mockAvtaleClient,
-            featureToggleService = arrangeFeature(enabled = true)
-        )
-
-        avtaleService.fetchAvtaler(spec)
-
-        verify(exactly = 1) { mockAvtaleClient.fetchAvtaler(spec = eq(spec)) }
-        verify { realAvtaleClient wasNot Called }
-    }
-
-    should("use real avtale-service when 'mock' feature is disabled") {
-        val spec = avtaleSpecMedLivsvarigInntekt()
-        val restAvtaleClient = mockk<PensjonsavtaleClient>()
-        val realAvtaleClient = arrangeAvtaler(pensjonsavtalerV3())
-        val mockAvtaleClient = mockk<PensjonsavtaleClient>()
-        val avtaleService = PensjonsavtaleService(
-            restAvtaleClient,
-            realAvtaleClient,
-            mockAvtaleClient,
-            featureToggleService = arrangeFeature(enabled = false)
-        )
-
-        avtaleService.fetchAvtaler(spec)
-
-        verify(exactly = 1) { realAvtaleClient.fetchAvtaler(spec = eq(spec)) }
-        verify { mockAvtaleClient wasNot Called }
     }
 })
 
@@ -103,12 +58,6 @@ private fun arrangeAvtaler(avtaler: Pensjonsavtaler): PensjonsavtaleClient =
 private fun arrangeAvtaler(kategorier: List<AvtaleKategori>): PensjonsavtaleClient =
     mockk<PensjonsavtaleClient>().apply {
         every { fetchAvtaler(any()) } returns pensjonsavtalerV3(kategorier)
-    }
-
-private fun arrangeFeature(enabled: Boolean): FeatureToggleService =
-    mockk<FeatureToggleService>().apply {
-        every { isEnabled(featureName = "mock-norsk-pensjon") } returns enabled
-        every { isEnabled(featureName = "norsk-pensjon-via-rest") } returns true
     }
 
 private fun avtaleSpecMedLivsvarigInntekt() =

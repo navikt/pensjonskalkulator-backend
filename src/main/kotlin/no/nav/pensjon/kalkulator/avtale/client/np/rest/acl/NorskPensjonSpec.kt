@@ -1,6 +1,5 @@
 package no.nav.pensjon.kalkulator.avtale.client.np.rest.acl
 
-import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.Sivilstatus
 import java.time.LocalDate
 
 /**
