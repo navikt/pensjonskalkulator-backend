@@ -3,7 +3,7 @@ package no.nav.pensjon.kalkulator.afp
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.afp.client.ServiceberegnetAfpClient
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
-import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengClient
+import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengOgBeholdningClient
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.relasjon.eps.EpsService
@@ -16,7 +16,7 @@ import java.time.LocalDate
 @Service
 class ServiceberegnetAfpService(
     private val client: ServiceberegnetAfpClient,
-    private val opptjeningClient: PensjonspoengClient,
+    private val opptjeningClient: PensjonspoengOgBeholdningClient,
     private val pidGetter: PidGetter,
     private val epsService: EpsService,
     private val personService: PersonService
@@ -54,7 +54,7 @@ class ServiceberegnetAfpService(
         }
 
     private fun registrertOpptjeningListe(pid: Pid, spec: InternServiceberegnetAfpSpec): List<OpptjeningAar> =
-        opptjeningClient.fetchOpptjeningOgBeholdning(pid).first
+        opptjeningClient.fetchPensjonspoengOgBeholdning(pid).first
             .map(::mapOpptjeningAar) + mapInntektOpptjening(spec)
 
     private fun mapOpptjeningAar(dto: AarligOpptjening) =

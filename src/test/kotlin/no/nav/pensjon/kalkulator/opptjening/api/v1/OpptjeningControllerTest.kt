@@ -7,6 +7,7 @@ import no.nav.pensjon.kalkulator.merknad.MerknadCode
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.opptjening.OpptjeningService
+import no.nav.pensjon.kalkulator.opptjening.PensjonspoengType
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import org.intellij.lang.annotations.Language
 import org.springframework.beans.factory.annotation.Autowired
@@ -47,7 +48,7 @@ class OpptjeningControllerTest : ShouldSpec() {
                         pensjonspoeng = 2.1,
                         omsorgspoeng = 3,
                         maksimalUfoeregrad = 4,
-                        pensjonspoengType = "T1",
+                        pensjonspoengType = PensjonspoengType.PENSJONSPOENG_FOR_PENSJONSGIVENDE_INNTEKT,
                         beholdning = 12,
                         merknadListe = listOf(MerknadCode.AFP, MerknadCode.DAGPENGER)
                     )

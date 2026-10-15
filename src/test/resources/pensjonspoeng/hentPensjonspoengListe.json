@@ -5,7 +5,7 @@
       "fnr": "01015400044",
       "fnrOmsorgFor": "01015400044",
       "kilde": "k",
-      "pensjonspoengType": "ORDINAR",
+      "pensjonspoengType": "PPI",
       "inntekt": {
         "inntektId": 10,
         "fnr": "01015400044",
@@ -31,7 +31,7 @@
       "fnr": "01015400044",
       "fnrOmsorgFor": "01015400044",
       "kilde": "k2",
-      "pensjonspoengType": "OMSORG",
+      "pensjonspoengType": "OSFE",
       "inntekt": {
         "inntektId": 11,
         "fnr": "01015400044",
