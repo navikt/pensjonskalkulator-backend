@@ -2,11 +2,13 @@ package no.nav.pensjon.kalkulator.tech.web
 
 import io.netty.channel.ChannelOption
 import io.netty.handler.logging.LogLevel
+import io.netty.handler.ssl.SslContext
 import io.netty.handler.ssl.SslContextBuilder
 import io.netty.handler.timeout.ReadTimeoutHandler
 import io.netty.handler.timeout.WriteTimeoutHandler
 import org.springframework.boot.webclient.WebClientCustomizer
 import org.springframework.boot.ssl.SslBundle
+import org.springframework.boot.ssl.SslManagerBundle
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -16,6 +18,7 @@ import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction
 import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
 import reactor.netty.Connection
 import reactor.netty.http.client.HttpClient
@@ -45,14 +48,10 @@ class WebClientConfig : WebClientCustomizer {
                 AdvancedByteBufFormat.TEXTUAL
             )
 
-        if (sslBundle != null) {
-            val managers = sslBundle.managers
-            val sslContext = SslContextBuilder.forClient()
-                .keyManager(managers.keyManagerFactory)
-                .trustManager(managers.trustManagerFactory)
-                .build()
-            httpClient = httpClient.secure { it.sslContext(sslContext) }
+        sslBundle?.let {
+            httpClient = secureClient(httpClient, sslBundle = it)
         }
+
         return ReactorClientHttpConnector(httpClient)
     }
 
@@ -91,36 +90,43 @@ class WebClientConfig : WebClientCustomizer {
 
         private fun filterResponse() = ExchangeFilterFunction.ofResponseProcessor(::filter)
 
-        private fun filter(response: ClientResponse): Mono<ClientResponse> {
-            val statusCode = response.statusCode()
+        private fun filter(response: ClientResponse): Mono<ClientResponse> =
+            response.statusCode().let {
+                if (it.is4xxClientError)
+                    clientError(it, response)
+                else if (it.is5xxServerError)
+                    serverError(response)
+                else
+                    Mono.just(response)
+            }
 
-            return if (statusCode.is4xxClientError)
-                clientError(statusCode, response)
-            else if (statusCode.is5xxServerError)
-                serverError(response)
-            else
-                Mono.just(response)
-        }
+        private fun secureClient(httpClient: HttpClient, sslBundle: SslBundle): HttpClient =
+            httpClient.secure { it.sslContext(sslContext(sslBundle.managers)) }
+
+        private fun sslContext(managers: SslManagerBundle): SslContext =
+            SslContextBuilder.forClient()
+                .keyManager(managers.keyManagerFactory)
+                .trustManager(managers.trustManagerFactory)
+                .build()
 
         private fun clientError(statusCode: HttpStatusCode, response: ClientResponse): Mono<ClientResponse> =
             response
-                .bodyToMono(String::class.java)
+                .bodyToMono<String>()
                 .defaultIfEmpty(emptyResponseInfo(response))
                 .flatMap { Mono.error(EgressException(message = it, statusCode = statusCode)) }
 
         private fun serverError(response: ClientResponse): Mono<ClientResponse> =
             response
-                .bodyToMono(String::class.java)
+                .bodyToMono<String>()
                 .flatMap { Mono.error(EgressException(message = it)) }
 
-        private fun emptyResponseInfo(response: ClientResponse): String {
-            val statusCode = response.statusCode()
-
-            return if (isAccessDenied(statusCode))
-                "$statusCode: ${reasonForAccessDenial(response)}"
-            else
-                statusCode.toString()
-        }
+        private fun emptyResponseInfo(response: ClientResponse): String =
+            response.statusCode().let {
+                if (isAccessDenied(it))
+                    "$it: ${reasonForAccessDenial(response)}"
+                else
+                    it.toString()
+            }
 
         private fun isAccessDenied(statusCode: HttpStatusCode) =
             statusCode == HttpStatus.FORBIDDEN || statusCode == HttpStatus.UNAUTHORIZED
