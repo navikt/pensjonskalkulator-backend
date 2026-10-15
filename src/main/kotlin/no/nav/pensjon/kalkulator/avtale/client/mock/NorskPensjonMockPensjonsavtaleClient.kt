@@ -1,20 +1,15 @@
-package no.nav.pensjon.kalkulator.avtale.client.np.rest
+package no.nav.pensjon.kalkulator.avtale.client.mock
 
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.Pensjonsavtaler
-import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
 import no.nav.pensjon.kalkulator.avtale.client.np.rest.acl.NorskPensjonResult
 import no.nav.pensjon.kalkulator.avtale.client.np.rest.acl.NorskPensjonResultMapper
 import no.nav.pensjon.kalkulator.avtale.client.np.rest.acl.NorskPensjonSpecMapper
-import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
-import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import no.nav.pensjon.kalkulator.tech.web.EgressException
-import no.nav.pensjon.kalkulator.tech.web.WebClientConfig
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.ssl.SslBundles
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -23,38 +18,32 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.reactive.function.client.bodyToMono
 
-@Component("norsk-pensjon-rest")
-class NorskPensjonRestClient(
-    @param:Value($$"${norsk-pensjon.url}") private val baseUrl: String,
+/**
+ * Denne klienten skal hente mockede pensjonsavtaler i dev
+ */
+@Component
+class NorskPensjonMockPensjonsavtaleClient(
+    @param:Value($$"${norsk.pensjon.mock.url}") private val mockUrl: String,
     webClientBuilder: WebClient.Builder,
-    sslBundles: SslBundles,
-    webClientConfig: WebClientConfig,
-    private val traceAid: TraceAid,
-    @Value($$"${web-client.retry-attempts}") retryAttempts: String
-) : ExternalServiceClient(retryAttempts), PensjonsavtaleClient {
+    val traceAid: TraceAid,
+) {
 
-    private val webClient = webClientBuilder.baseUrl(baseUrl)
-        .clientConnector(webClientConfig.clientConnector(sslBundles.getBundle("norsk-pensjon")))
-        .build()
     private val log = KotlinLogging.logger {}
+    private val webClient = webClientBuilder.baseUrl(mockUrl).build()
 
-    override fun service() = service
-
-    override fun fetchAvtaler(spec: PensjonsavtaleSpec): Pensjonsavtaler {
-        val url = "$baseUrl/$BEREGN_PATH"
-        log.debug { "POST to URL: '$url'" }
+    fun hent(spec: PensjonsavtaleSpec): Pensjonsavtaler {
+        val url = "$mockUrl/$PATH"
+        log.info { "POST to URL: '$url'" }
 
         return try {
             webClient
                 .post()
-                .uri("/$BEREGN_PATH")
+                .uri("/$PATH")
                 .headers { setHeaders(it) }
                 .bodyValue(NorskPensjonSpecMapper.toDto(spec))
                 .retrieve()
                 .bodyToMono<NorskPensjonResult>()
-                .retryWhen(retryBackoffSpec(url))
                 .block()
-                ?.also { log.info { "Response from Norsk Pensjon: $it"} }
                 ?.let { NorskPensjonResultMapper.fromDto(it, spec.person.foedselsdato) }
                 ?: Pensjonsavtaler(
                     avtaler = emptyList(),
@@ -67,19 +56,14 @@ class NorskPensjonRestClient(
         }
     }
 
-    override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
-
     private fun setHeaders(headers: HttpHeaders) {
         headers[HttpHeaders.ACCEPT] = MediaType.APPLICATION_JSON_VALUE
         headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_JSON_VALUE
-        headers[CustomHttpHeaders.NORSK_PENSJON_CORRELATION_ID] = traceAid.callId()
-        headers[CustomHttpHeaders.ORGANIZATION_NUMBER] = ORGANISASJONSNUMMER
+        headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
     }
 
-    companion object {
-        private const val BASE_PATH = "pensjonsportal-v1"
-        private const val BEREGN_PATH = "$BASE_PATH/beregn"
-        private const val ORGANISASJONSNUMMER = "889640782" // ARBEIDS- OG VELFERDSETATEN
-        private val service = EgressService.NORSK_PENSJON_REST
+    companion object{
+        const val PATH = "api/v3/pensjonsavtale/hent"
     }
+
 }

@@ -12,8 +12,6 @@ enum class EgressService(
     val gatewayUsage: GatewayUsage = GatewayUsage.NONE,
     val authType: AuthType = AuthType.MACHINE_INSIDE_NAV
 ) {
-    FSS_GATEWAY("Fagsystemsone-gateway", "FSS", "Tilgang til Fagsystemsonen", GatewayUsage.INTERNAL),
-    GANDALF_STS("Gandalf Security Token Service", "STS", "Tokenveksling til SAML", GatewayUsage.INTERNAL),
     ID_PORTEN("ID-porten", "IDP", "Token-utsteder"),
     MICROSOFT_ENTRA_ID("Microsoft Entra ID", "MEID", "OAuth2 configuration data"),
     NAV_ANSATT("Nav-ansatt", "NA", "Info om Nav-ansatt"),

@@ -4,7 +4,6 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.pensjon.kalkulator.common.client.fssgw.FssGatewayPingClient
 import no.nav.pensjon.kalkulator.common.client.pen.PenPingClient
 import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningsgrunnlagClient
 import no.nav.pensjon.kalkulator.person.client.pdl.PdlPersonClient
@@ -66,7 +65,6 @@ $TABLE_BODY
 
 private fun selfTest(status: ServiceStatus) =
     TestClass(
-        fssGatewayClient = arrangeFssGateway(status),
         entraIdOAuth2MetadataClient = arrangeEntraId(status),
         opptjeningClient = arrangePopp(status),
         penClient = arrangePen(status),
@@ -74,16 +72,6 @@ private fun selfTest(status: ServiceStatus) =
         representasjonClient = arrangePensjonRepresentasjon(status),
         tjenestepensjonClient = arrangeTp(status)
     )
-
-private fun arrangeFssGateway(status: ServiceStatus): FssGatewayPingClient =
-    mockk<FssGatewayPingClient>().apply {
-        every { ping() } returns PingResult(
-            service = EgressService.FSS_GATEWAY,
-            status = status,
-            endpoint = "fssgw-endpoint",
-            message = "fssgw-message"
-        )
-    }
 
 private fun arrangeEntraId(status: ServiceStatus): AzureAdOAuth2MetadataClient =
     mockk<AzureAdOAuth2MetadataClient>().apply {
@@ -146,7 +134,6 @@ private fun arrangeTp(status: ServiceStatus): TpTjenestepensjonClient =
     }
 
 private class TestClass(
-    fssGatewayClient: FssGatewayPingClient,
     entraIdOAuth2MetadataClient: AzureAdOAuth2MetadataClient,
     opptjeningClient: PoppOpptjeningsgrunnlagClient,
     penClient: PenPingClient,
@@ -155,7 +142,6 @@ private class TestClass(
     tjenestepensjonClient: TpTjenestepensjonClient
 ) :
     SelfTest(
-        fssGatewayClient,
         entraIdOAuth2MetadataClient,
         opptjeningClient,
         penClient,
@@ -170,7 +156,6 @@ private class TestClass(
 
 @Language("json")
 private const val UP_CHECKS: String = "[" +
-        "{\"endpoint\":\"fssgw-endpoint\",\"description\":\"Fagsystemsone-gateway\",\"result\":0}, " +
         "{\"endpoint\":\"entraid-endpoint\",\"description\":\"Microsoft Entra ID\",\"result\":0}, " +
         "{\"endpoint\":\"popp-endpoint\",\"description\":\"Pensjonsopptjening\",\"result\":0}, " +
         "{\"endpoint\":\"pen-endpoint\",\"description\":\"Pensjonsfaglig kjerne\",\"result\":0}, " +
@@ -181,7 +166,6 @@ private const val UP_CHECKS: String = "[" +
 
 @Language("json")
 private const val DOWN_CHECKS: String = "[" +
-        "{\"endpoint\":\"fssgw-endpoint\",\"description\":\"Fagsystemsone-gateway\",\"errorMessage\":\"fssgw-message\",\"result\":1}, " +
         "{\"endpoint\":\"entraid-endpoint\",\"description\":\"Microsoft Entra ID\",\"errorMessage\":\"entraid-message\",\"result\":1}, " +
         "{\"endpoint\":\"popp-endpoint\",\"description\":\"Pensjonsopptjening\",\"errorMessage\":\"popp-message\",\"result\":1}, " +
         "{\"endpoint\":\"pen-endpoint\",\"description\":\"Pensjonsfaglig kjerne\",\"errorMessage\":\"pen-message\",\"result\":1}, " +
@@ -192,7 +176,6 @@ private const val DOWN_CHECKS: String = "[" +
 
 @Language("html")
 private const val TABLE_BODY: String = "<tbody>" +
-        "<tr><td>Fagsystemsone-gateway</td><td style=\"background-color:green;text-align:center;\">UP</td><td>fssgw-message</td><td>fssgw-endpoint</td><td>Tilgang til Fagsystemsonen</td></tr>" +
         "<tr><td>Microsoft Entra ID</td><td style=\"background-color:green;text-align:center;\">UP</td><td>entraid-message</td><td>entraid-endpoint</td><td>OAuth2 configuration data</td></tr>" +
         "<tr><td>Pensjonsopptjening</td><td style=\"background-color:green;text-align:center;\">UP</td><td>popp-message</td><td>popp-endpoint</td><td>Pensjonsopptjeningsdata</td></tr>" +
         "<tr><td>Pensjonsfaglig kjerne</td><td style=\"background-color:green;text-align:center;\">UP</td><td>pen-message</td><td>pen-endpoint</td><td>Simulering, pensjonsdata</td></tr>" +
