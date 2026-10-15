@@ -28,7 +28,7 @@ import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDate
 
-class NorskPensjonRestClientMtlsTest : FunSpec({
+class NorskPensjonClientMtlsTest : FunSpec({
     val certificateAuthority = TestCertificates.certificateAuthority
     val clientCertificate = TestCertificates.clientCertificate()
     val serverCertificate = HeldCertificate.Builder()
@@ -46,14 +46,14 @@ class NorskPensjonRestClientMtlsTest : FunSpec({
 
     lateinit var server: MockWebServer
 
-    fun client(bundle: SslBundle): NorskPensjonRestClient {
+    fun client(bundle: SslBundle): NorskPensjonClient {
         val bundles = DefaultSslBundleRegistry("norsk-pensjon", bundle)
         val traceAid = mockk<TraceAid> {
             every { callId() } returns "correlation-id"
         }
         val webClientConfig = WebClientConfig()
         val webClientBuilder = WebClient.builder().also(webClientConfig::customize)
-        return NorskPensjonRestClient(
+        return NorskPensjonClient(
             baseUrl = server.url("/").toString().removeSuffix("/"),
             webClientBuilder = webClientBuilder,
             sslBundles = bundles,

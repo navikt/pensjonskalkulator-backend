@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.avtale.client.np.v3.dto
+package no.nav.pensjon.kalkulator.avtale.client.np.rest.acl
 
 import mu.KotlinLogging
 import org.springframework.util.StringUtils.hasLength

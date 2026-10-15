@@ -2,9 +2,7 @@ package no.nav.pensjon.kalkulator.avtale.client.np.rest.acl
 
 import no.nav.pensjon.kalkulator.avtale.PensjonsavtaleSpec
 import no.nav.pensjon.kalkulator.avtale.UttaksperiodeSpec
-import no.nav.pensjon.kalkulator.avtale.client.np.v3.dto.Sivilstatus
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
-import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.simulering.PensjonUtil
 import java.time.LocalDate
 

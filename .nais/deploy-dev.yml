@@ -120,9 +120,6 @@ spec:
         - application: pensjon-representasjon-q2
           namespace: pensjon-person
           cluster: dev-fss
-        - application: pensjon-selvbetjening-fss-gateway
-          namespace: pensjonselvbetjening
-          cluster: dev-fss
         - application: pensjon-selvbetjening-opptjening-backend
           namespace: pensjonselvbetjening
         - application: pensjonssimulator
@@ -139,7 +136,6 @@ spec:
         - host: pensjon-persondata-q2.dev-fss-pub.nais.io
         - host: pensjon-popp-q2.dev-fss-pub.nais.io
         - host: pensjon-representasjon-q2.dev-fss-pub.nais.io
-        - host: pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
         - host: pensjon-testdata-facade.dev-fss-pub.nais.io # only in dev
         - host: pensjonskalkulator-unleash-api.nav.cloud.nais.io
         - host: sokos-utbetaldata.dev-fss-pub.nais.io
@@ -148,10 +144,6 @@ spec:
         - host: api.preprod.norskpensjon.no
         - host: secretmanager.googleapis.com
   env:
-    - name: FSS_GATEWAY_SERVICE_ID
-      value: dev-fss:pensjonselvbetjening:pensjon-selvbetjening-fss-gateway
-    - name: FSS_GATEWAY_URL
-      value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: NAV_ANSATT_SERVICE_ID
       value: dev-gcp:pensjon-saksbehandling:navansatt
     - name: NAV_ANSATT_URL
@@ -214,8 +206,6 @@ spec:
       value: dev-fss:okonomi:sokos-utbetaldata
     - name: SOKOS_UTBETALDATA_URL
       value: https://sokos-utbetaldata.dev-fss-pub.nais.io
-    - name: STS_URL
-      value: https://pensjon-selvbetjening-fss-gateway.dev-fss-pub.nais.io
     - name: TILGANGSMASKINEN_SERVICE_ID
       value: dev-gcp:tilgangsmaskin:populasjonstilgangskontroll
     - name: TILGANGSMASKINEN_TILGANG_URL

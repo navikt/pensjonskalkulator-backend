@@ -19,7 +19,4 @@ class PensjonskalkulatorBackendApplicationTest : StringSpec({
 
     @MockkBean(name = "entra-id-provider")
     private lateinit var entraIdProvider: AuthenticationProvider
-
-    @MockkBean(name = "norsk-pensjon-rest")
-    private lateinit var norskPensjonRestClient: PensjonsavtaleClient
 }
