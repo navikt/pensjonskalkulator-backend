@@ -9,6 +9,7 @@ import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.dto.Serviceberegni
 import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.dto.ServiceberegningOpptjeningDto
 import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.dto.ServiceberegningProblemDto
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
+import no.nav.pensjon.kalkulator.opptjening.PensjonspoengType
 
 object ServiceberegningAfpResultMapper {
 
@@ -47,7 +48,7 @@ object ServiceberegningAfpResultMapper {
             pensjonspoeng = dto.pensjonspoeng,
             omsorgspoeng = null, // ikke relevant her
             maksimalUfoeregrad = null, // ditto
-            pensjonspoengType = "", // ditto
+            pensjonspoengType = PensjonspoengType.UNKNOWN, // ditto
             beholdning = 0, // ditto
             merknadListe = emptyList() // ditto
         )

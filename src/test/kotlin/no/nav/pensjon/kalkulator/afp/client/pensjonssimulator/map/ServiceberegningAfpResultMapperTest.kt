@@ -11,6 +11,7 @@ import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.dto.Serviceberegni
 import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.dto.ServiceberegningOpptjeningDto
 import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.dto.ServiceberegningProblemDto
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
+import no.nav.pensjon.kalkulator.opptjening.PensjonspoengType
 import java.time.LocalDate
 
 class ServiceberegningAfpResultMapperTest : ShouldSpec({
@@ -73,7 +74,7 @@ class ServiceberegningAfpResultMapperTest : ShouldSpec({
                         pensjonspoeng = 4.6,
                         omsorgspoeng = null,
                         maksimalUfoeregrad = null,
-                        pensjonspoengType = "",
+                        pensjonspoengType = PensjonspoengType.UNKNOWN,
                         beholdning = 0,
                         merknadListe = emptyList()
                     )

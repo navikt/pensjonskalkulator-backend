@@ -1,4 +1,4 @@
-package no.nav.pensjon.kalkulator.opptjening.client.popp.dto
+package no.nav.pensjon.kalkulator.opptjening.client.popp.acl
 
 /**
  * Data transfer object for the specificatinn (parameters) of a request to the pensjon-popp beholdning API.

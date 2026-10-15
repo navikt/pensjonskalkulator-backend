@@ -92,7 +92,7 @@ class PoppOpptjeningsgrunnlagClientTest : FunSpec({
             }
 
             with(exception) {
-                message shouldBe "Failed calling $baseUrl/popp/api/opptjeningsgrunnlag"
+                message shouldBe "Failed calling $baseUrl/popp/api/opptjeningsgrunnlag/hent"
                 (cause as EgressException).message shouldBe "Feil"
             }
         }

@@ -4,7 +4,7 @@ import no.nav.pensjon.kalkulator.general.Aarlig
 import no.nav.pensjon.kalkulator.merknad.MerknadCode
 import no.nav.pensjon.kalkulator.merknad.client.MerknadClient
 import no.nav.pensjon.kalkulator.opptjening.BeholdningVelger.velg
-import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengClient
+import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengOgBeholdningClient
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import org.springframework.stereotype.Service
@@ -12,14 +12,14 @@ import kotlin.collections.emptyList
 
 @Service
 class OpptjeningService(
-    private val opptjeningClient: PensjonspoengClient,
+    private val opptjeningClient: PensjonspoengOgBeholdningClient,
     private val merknadClient: MerknadClient,
     private val pidGetter: PidGetter
 ) {
     fun opptjening(): List<AarligOpptjening> {
         val pid = pidGetter.pid()
 
-        return opptjeningClient.fetchOpptjeningOgBeholdning(pid).let {
+        return opptjeningClient.fetchPensjonspoengOgBeholdning(pid).let {
             opptjeningMedMerknader(pid, opptjeningListe = it.first, beholdningListe = it.second)
         }
     }
@@ -109,7 +109,7 @@ class OpptjeningService(
                 pensjonspoeng = 0.0,
                 omsorgspoeng = 0,
                 maksimalUfoeregrad = 0,
-                pensjonspoengType = "",
+                pensjonspoengType = PensjonspoengType.UNKNOWN,
                 beholdning,
                 merknadListe = emptyList()
             )
@@ -121,7 +121,7 @@ class OpptjeningService(
                 pensjonspoeng = 0.0,
                 omsorgspoeng = 0,
                 maksimalUfoeregrad = 0,
-                pensjonspoengType = "",
+                pensjonspoengType = PensjonspoengType.UNKNOWN,
                 beholdning = 0,
                 merknadListe
             )

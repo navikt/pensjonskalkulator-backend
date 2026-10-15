@@ -7,7 +7,7 @@ import io.mockk.mockk
 import no.nav.pensjon.kalkulator.merknad.MerknadCode
 import no.nav.pensjon.kalkulator.merknad.Merknader
 import no.nav.pensjon.kalkulator.merknad.client.MerknadClient
-import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengClient
+import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengOgBeholdningClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import java.time.LocalDate
 
@@ -35,7 +35,7 @@ class OpptjeningServiceTest : ShouldSpec({
                 pensjonspoeng = 0.0,
                 omsorgspoeng = 0,
                 maksimalUfoeregrad = 0,
-                pensjonspoengType = "",
+                pensjonspoengType = PensjonspoengType.UNKNOWN,
                 beholdning = 12,
                 merknadListe = emptyList()
             )
@@ -62,7 +62,7 @@ class OpptjeningServiceTest : ShouldSpec({
                 pensjonspoeng = 2.1,
                 omsorgspoeng = 3,
                 maksimalUfoeregrad = 4,
-                pensjonspoengType = "T1",
+                pensjonspoengType = PensjonspoengType.OMSORG_FOR_SYKE_FUNKSJONSHEMMEDE_ELDRE,
                 beholdning = 12,
                 merknadListe = emptyList()
             )
@@ -81,7 +81,7 @@ class OpptjeningServiceTest : ShouldSpec({
                 pensjonspoeng = 2.1,
                 omsorgspoeng = 3,
                 maksimalUfoeregrad = 4,
-                pensjonspoengType = "T1",
+                pensjonspoengType = PensjonspoengType.OMSORG_FOR_SYKE_FUNKSJONSHEMMEDE_ELDRE,
                 beholdning = 12,
                 merknadListe = listOf(MerknadCode.AFP)
             )
@@ -120,7 +120,7 @@ class OpptjeningServiceTest : ShouldSpec({
                 pensjonspoeng = 0.0,
                 omsorgspoeng = 0,
                 maksimalUfoeregrad = 0,
-                pensjonspoengType = "",
+                pensjonspoengType = PensjonspoengType.UNKNOWN,
                 beholdning = 0,
                 merknadListe = emptyList()
             ),
@@ -131,7 +131,7 @@ class OpptjeningServiceTest : ShouldSpec({
                 pensjonspoeng = 0.0,
                 omsorgspoeng = 0,
                 maksimalUfoeregrad = 0,
-                pensjonspoengType = "",
+                pensjonspoengType = PensjonspoengType.UNKNOWN,
                 beholdning = 12,
                 merknadListe = emptyList()
             ),
@@ -142,7 +142,7 @@ class OpptjeningServiceTest : ShouldSpec({
                 pensjonspoeng = 0.0,
                 omsorgspoeng = 0,
                 maksimalUfoeregrad = 0,
-                pensjonspoengType = "",
+                pensjonspoengType = PensjonspoengType.UNKNOWN,
                 beholdning = 0,
                 merknadListe = listOf(MerknadCode.DAGPENGER)
             )
@@ -215,9 +215,9 @@ private fun arrangeMerknader(aar: Int, merknad: MerknadCode): MerknadClient =
 private fun arrangeOpptjening(
     opptjeningListe: List<AarligOpptjening>,
     beholdningListe: List<DatertBeholdning>
-): PensjonspoengClient =
+): PensjonspoengOgBeholdningClient =
     mockk {
-        every { fetchOpptjeningOgBeholdning(any()) } returns Pair(opptjeningListe, beholdningListe)
+        every { fetchPensjonspoengOgBeholdning(any()) } returns Pair(opptjeningListe, beholdningListe)
     }
 
 private fun opptjeningListe(aar: Int) =
@@ -230,7 +230,7 @@ private fun kunOpptjening(aar: Int, pensjonsgivendeInntekt: Int = 1) =
         pensjonspoeng = 2.1,
         omsorgspoeng = 3,
         maksimalUfoeregrad = 4,
-        pensjonspoengType = "T1",
+        pensjonspoengType = PensjonspoengType.OMSORG_FOR_SYKE_FUNKSJONSHEMMEDE_ELDRE,
         beholdning = 0,
         merknadListe = emptyList()
     )
@@ -256,7 +256,7 @@ private fun opptjeningCombo(
         pensjonspoeng = 2.1,
         omsorgspoeng = 3,
         maksimalUfoeregrad = 4,
-        pensjonspoengType = "T1",
+        pensjonspoengType = PensjonspoengType.OMSORG_FOR_SYKE_FUNKSJONSHEMMEDE_ELDRE,
         beholdning,
         merknadListe = listOf(merknad)
     )

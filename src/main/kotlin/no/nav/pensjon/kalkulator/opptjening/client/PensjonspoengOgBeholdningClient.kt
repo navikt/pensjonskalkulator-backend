@@ -4,7 +4,7 @@ import no.nav.pensjon.kalkulator.opptjening.DatertBeholdning
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.person.Pid
 
-interface PensjonspoengClient {
+interface PensjonspoengOgBeholdningClient {
 
-    fun fetchOpptjeningOgBeholdning(pid: Pid): Pair<List<AarligOpptjening>, List<DatertBeholdning>>
+    fun fetchPensjonspoengOgBeholdning(pid: Pid): Pair<List<AarligOpptjening>, List<DatertBeholdning>>
 }
