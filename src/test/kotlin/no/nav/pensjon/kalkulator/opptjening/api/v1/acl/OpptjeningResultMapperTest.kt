@@ -14,7 +14,6 @@ class OpptjeningResultMapperTest : ShouldSpec({
                 aar = 2021,
                 pensjonsgivendeInntekt = 1,
                 pensjonspoeng = 2.1,
-                omsorgspoeng = 3, // not mapped
                 maksimalUfoeregrad = 4, // not mapped
                 pensjonspoengType = PensjonspoengType.PENSJONSPOENG_FOR_PENSJONSGIVENDE_INNTEKT, // not mapped
                 beholdning = 12,

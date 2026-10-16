@@ -25,7 +25,6 @@ data class PoppPensjonspoeng(
                 pensjonspoeng = poeng ?: 0.0,
                 pensjonspoengType = PoppPensjonspoengType.toInternalValue(externalValue = pensjonspoengType),
                 maksimalUfoeregrad = maxUforegrad,
-                omsorgspoeng = omsorg?.ar, //TODO er denne riktig? (ble innført i pensjonskalkulator-backend PR 471)
                 beholdning = 0, // not available here
                 merknadListe = emptyList() // not available here
             )

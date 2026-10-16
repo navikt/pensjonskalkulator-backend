@@ -46,7 +46,6 @@ class OpptjeningControllerTest : ShouldSpec() {
                         aar = 2021,
                         pensjonsgivendeInntekt = 1,
                         pensjonspoeng = 2.1,
-                        omsorgspoeng = 3,
                         maksimalUfoeregrad = 4,
                         pensjonspoengType = PensjonspoengType.PENSJONSPOENG_FOR_PENSJONSGIVENDE_INNTEKT,
                         beholdning = 12,

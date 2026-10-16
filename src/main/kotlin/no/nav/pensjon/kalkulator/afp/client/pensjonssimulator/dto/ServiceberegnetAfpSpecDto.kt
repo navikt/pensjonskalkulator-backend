@@ -33,7 +33,6 @@ data class EpsDataDto(
 data class OpptjeningFolketrygdenDataDto(
     val aar: Int? = null,
     val pensjonsgivendeInntekt: Int? = null,
-    val omsorgspoeng: Double? = null,
     val registrertePensjonspoeng: Double? = null,
     val maxUfoeregrad: Int? = null
 )

@@ -72,7 +72,6 @@ class ServiceberegningAfpResultMapperTest : ShouldSpec({
                         aar = 2000,
                         pensjonsgivendeInntekt = 555000,
                         pensjonspoeng = 4.6,
-                        omsorgspoeng = null,
                         maksimalUfoeregrad = null,
                         pensjonspoengType = PensjonspoengType.UNKNOWN,
                         beholdning = 0,

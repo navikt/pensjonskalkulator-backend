@@ -40,7 +40,6 @@ object ServiceberegningAfpSpecMapper {
         OpptjeningFolketrygdenDataDto(
             aar = opptjening.ar,
             pensjonsgivendeInntekt = opptjening.pensjonsgivendeInntekt,
-            omsorgspoeng = opptjening.omsorgspoeng,
             registrertePensjonspoeng = opptjening.registrertePensjonspoeng,
             maxUfoeregrad = opptjening.maksUforegrad
         )

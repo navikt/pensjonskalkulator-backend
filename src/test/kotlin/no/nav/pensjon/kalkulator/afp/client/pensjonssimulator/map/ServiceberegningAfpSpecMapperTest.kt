@@ -44,7 +44,6 @@ class ServiceberegningAfpSpecMapperTest : ShouldSpec({
                         OpptjeningAar(
                             ar = 2000,
                             pensjonsgivendeInntekt = 4,
-                            omsorgspoeng = 5.1,
                             maksUforegrad = 6,
                             registrertePensjonspoeng = 7.2
                         )
@@ -87,7 +86,6 @@ class ServiceberegningAfpSpecMapperTest : ShouldSpec({
                     OpptjeningFolketrygdenDataDto(
                         aar = 2000,
                         pensjonsgivendeInntekt = 4,
-                        omsorgspoeng = 5.1,
                         registrertePensjonspoeng = 7.2,
                         maxUfoeregrad = 6
                     )
