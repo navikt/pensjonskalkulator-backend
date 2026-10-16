@@ -9,6 +9,7 @@ import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.opptjening.DatertBeholdning
+import no.nav.pensjon.kalkulator.opptjening.PensjonspoengType
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
 import no.nav.pensjon.kalkulator.testutil.Arrange
 import org.springframework.beans.factory.BeanFactory
@@ -23,7 +24,7 @@ import java.time.LocalDate
 /**
  * Bruker WireMock istedenfor MockWebServer her, siden WireMock støtter testing av parallelle kall.
  */
-class PoppPensjonspoengClientTest : FunSpec({
+class PoppPensjonspoengOgBeholdningClientTest : FunSpec({
 
     var server: WireMockServer? = null
     var baseUrl: String? = null
@@ -33,7 +34,7 @@ class PoppPensjonspoengClientTest : FunSpec({
     val beholdningResponseBody: String = loadJson(tema = "poppBeholdningListe")
 
     fun pensjonspoengClient(context: BeanFactory) =
-        PoppPensjonspoengClient(
+        PoppPensjonspoengOgBeholdningClient(
             baseUrl!!,
             webClientBuilder = context.getBean<WebClient.Builder>(),
             cacheManager,
@@ -58,16 +59,15 @@ class PoppPensjonspoengClientTest : FunSpec({
             arrangeOkJsonResponse(resource = "beholdning", body = beholdningResponseBody)
 
             Arrange.webClientContextRunner().run {
-                val response = pensjonspoengClient(context = it).fetchOpptjeningOgBeholdning(pid)
+                val response = pensjonspoengClient(context = it).fetchPensjonspoengOgBeholdning(pid)
 
                 response.first shouldBe listOf(
                     AarligOpptjening(
                         aar = 2000,
                         pensjonsgivendeInntekt = 100000,
                         pensjonspoeng = 20.0,
-                        pensjonspoengType = "ORDINAR",
+                        pensjonspoengType = PensjonspoengType.PENSJONSPOENG_FOR_PENSJONSGIVENDE_INNTEKT,
                         maksimalUfoeregrad = 70,
-                        omsorgspoeng = 2000,
                         beholdning = 0,
                         merknadListe = emptyList()
                     ),
@@ -75,9 +75,8 @@ class PoppPensjonspoengClientTest : FunSpec({
                         aar = 2001,
                         pensjonsgivendeInntekt = 110000,
                         pensjonspoeng = 21.5,
-                        pensjonspoengType = "OMSORG",
+                        pensjonspoengType = PensjonspoengType.OMSORG_FOR_SYKE_FUNKSJONSHEMMEDE_ELDRE,
                         maksimalUfoeregrad = 0,
-                        omsorgspoeng = null,
                         beholdning = 0,
                         merknadListe = emptyList()
                     )

@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.merknad.MerknadCode
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
+import no.nav.pensjon.kalkulator.opptjening.PensjonspoengType
 
 class OpptjeningResultMapperTest : ShouldSpec({
 
@@ -13,9 +14,8 @@ class OpptjeningResultMapperTest : ShouldSpec({
                 aar = 2021,
                 pensjonsgivendeInntekt = 1,
                 pensjonspoeng = 2.1,
-                omsorgspoeng = 3, // not mapped
                 maksimalUfoeregrad = 4, // not mapped
-                pensjonspoengType = "T1", // not mapped
+                pensjonspoengType = PensjonspoengType.PENSJONSPOENG_FOR_PENSJONSGIVENDE_INNTEKT, // not mapped
                 beholdning = 12,
                 merknadListe = listOf(MerknadCode.AFP, MerknadCode.DAGPENGER)
             ),

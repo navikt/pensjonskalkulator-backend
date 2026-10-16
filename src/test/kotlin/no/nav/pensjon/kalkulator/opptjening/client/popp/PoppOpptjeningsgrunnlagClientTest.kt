@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.opptjening.Inntekt
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningsgrunnlag
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
 import no.nav.pensjon.kalkulator.opptjening.client.popp.PoppOpptjeningsgrunnlagClientTestObjects.RESPONSE_BODY
@@ -16,6 +17,7 @@ import no.nav.pensjon.kalkulator.testutil.arrangeResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.intellij.lang.annotations.Language
 import org.springframework.beans.factory.BeanFactory
+import org.springframework.beans.factory.getBean
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.WebClient
 import java.math.BigDecimal
@@ -29,7 +31,7 @@ class PoppOpptjeningsgrunnlagClientTest : FunSpec({
     fun opptjeningClient(context: BeanFactory) =
         PoppOpptjeningsgrunnlagClient(
             baseUrl!!,
-            webClientBuilder = context.getBean(WebClient.Builder::class.java),
+            webClientBuilder = context.getBean<WebClient.Builder>(),
             traceAid,
             retryAttempts = "1"
         )
@@ -50,11 +52,11 @@ class PoppOpptjeningsgrunnlagClientTest : FunSpec({
         Arrange.webClientContextRunner().run {
             val response: Opptjeningsgrunnlag = opptjeningClient(context = it).fetchOpptjeningsgrunnlag(pid)
 
-            with(response.inntekter.first { it.aar == 2017 }) {
+            with(inntekt(response, aar = 2017)) {
                 beloep shouldBe BigDecimal("280241")
                 type shouldBe Opptjeningstype.OTHER
             }
-            with(response.inntekter.first { it.aar == 2018 }) {
+            with(inntekt(response, aar = 2018)) {
                 beloep shouldBe BigDecimal("280242")
                 type shouldBe Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT
             }
@@ -92,12 +94,15 @@ class PoppOpptjeningsgrunnlagClientTest : FunSpec({
             }
 
             with(exception) {
-                message shouldBe "Failed calling $baseUrl/popp/api/opptjeningsgrunnlag"
+                message shouldBe "Failed calling $baseUrl/popp/api/opptjeningsgrunnlag/hent"
                 (cause as EgressException).message shouldBe "Feil"
             }
         }
     }
 })
+
+private fun inntekt(grunnlag: Opptjeningsgrunnlag, aar: Int): Inntekt =
+    grunnlag.inntekter.first { it.aar == aar }
 
 private object PoppOpptjeningsgrunnlagClientTestObjects {
 

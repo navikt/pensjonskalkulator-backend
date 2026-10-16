@@ -1,25 +1,13 @@
-package no.nav.pensjon.kalkulator.opptjening.client.popp.dto
+package no.nav.pensjon.kalkulator.opptjening.client.popp.acl
 
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.opptjening.Beholdningsoppdateringsaarsak
 import org.springframework.util.StringUtils.hasLength
-import java.util.*
 
-/**
- * Data transfer object for the result of a request to the pensjon-popp beholdning API.
- * Field names are dictated by pensjon-popp.
- */
-data class PoppBeholdningResult(
-    val beholdninger: List<PoppBeholdning>
-)
-
-data class PoppBeholdning(
-    val belop: Double,
-    val oppdateringArsak: String?,
-    val fomDato: Date
-)
-
-enum class PoppBeholdningsoppdateringsaarsak(val externalValue: String, val internalValue: Beholdningsoppdateringsaarsak) {
+enum class PoppBeholdningsoppdateringsaarsak(
+    val externalValue: String,
+    val internalValue: Beholdningsoppdateringsaarsak
+) {
     NY_OPPTJENING(
         externalValue = "NY_OPPTJENING",
         internalValue = Beholdningsoppdateringsaarsak.NY_OPPTJENING

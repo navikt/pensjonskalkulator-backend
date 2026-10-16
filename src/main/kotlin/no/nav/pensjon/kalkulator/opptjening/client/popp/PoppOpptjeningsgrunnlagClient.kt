@@ -4,8 +4,8 @@ import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningsgrunnlag
 import no.nav.pensjon.kalkulator.opptjening.client.OpptjeningsgrunnlagClient
-import no.nav.pensjon.kalkulator.opptjening.client.popp.dto.OpptjeningsgrunnlagResponseDto
-import no.nav.pensjon.kalkulator.opptjening.client.popp.map.OpptjeningsgrunnlagMapper
+import no.nav.pensjon.kalkulator.opptjening.client.popp.acl.PoppOpptjeningsgrunnlagResult
+import no.nav.pensjon.kalkulator.opptjening.client.popp.acl.PoppOpptjeningsgrunnlagSpec
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.EgressAccess
@@ -42,21 +42,22 @@ class PoppOpptjeningsgrunnlagClient(
     override fun service() = service
 
     override fun fetchOpptjeningsgrunnlag(pid: Pid): Opptjeningsgrunnlag {
-        val url = "$baseUrl/$OPPTJENINGSGRUNNLAG_PATH"
-        log.debug { "GET from URL: '$url'" }
+        val url = "$baseUrl/$HENT_PATH"
+        log.debug { "POST to URL: '$url'" }
 
         return try {
             webClient
-                .get()
-                .uri("/$OPPTJENINGSGRUNNLAG_PATH")
-                .headers { setHeaders(it, pid) }
+                .post()
+                .uri("/$HENT_PATH")
+                .headers(::setHeaders)
+                .bodyValue(PoppOpptjeningsgrunnlagSpec(fnr = pid.value))
                 .retrieve()
-                .bodyToMono<OpptjeningsgrunnlagResponseDto>()
+                .bodyToMono<PoppOpptjeningsgrunnlagResult>()
                 .retryWhen(retryBackoffSpec(url))
                 .block()
-                ?.let(OpptjeningsgrunnlagMapper::fromDto)
+                ?.opptjeningsGrunnlag?.toInternalValue()
                 .also { countCalls(MetricResult.OK) }
-                ?: Opptjeningsgrunnlag(emptyList())
+                ?: Opptjeningsgrunnlag.empty()
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
@@ -88,11 +89,10 @@ class PoppOpptjeningsgrunnlagClient(
 
     override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
 
-    private fun setHeaders(headers: HttpHeaders, pid: Pid) {
+    private fun setHeaders(headers: HttpHeaders) {
         headers.setBearerAuth(EgressAccess.token(service).value)
         headers[HttpHeaders.CONTENT_TYPE] = MediaType.APPLICATION_JSON_VALUE
         headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
-        headers[CustomHttpHeaders.PID] = pid.value
     }
 
     private fun setPingHeaders(headers: HttpHeaders) {
@@ -101,8 +101,9 @@ class PoppOpptjeningsgrunnlagClient(
     }
 
     companion object {
-        private const val OPPTJENINGSGRUNNLAG_PATH = "popp/api/opptjeningsgrunnlag"
-        private const val PING_PATH = "$OPPTJENINGSGRUNNLAG_PATH/ping"
-        private val service = EgressService.PENSJONSOPPTJENING
+        private const val PATH = "popp/api/opptjeningsgrunnlag"
+        private const val HENT_PATH = "$PATH/hent"
+        private const val PING_PATH = "$PATH/ping"
+        private val service: EgressService = EgressService.PENSJONSOPPTJENING
     }
 }
