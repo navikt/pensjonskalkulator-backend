@@ -68,7 +68,6 @@ class PoppPensjonspoengOgBeholdningClientTest : FunSpec({
                         pensjonspoeng = 20.0,
                         pensjonspoengType = PensjonspoengType.PENSJONSPOENG_FOR_PENSJONSGIVENDE_INNTEKT,
                         maksimalUfoeregrad = 70,
-                        omsorgspoeng = 2000,
                         beholdning = 0,
                         merknadListe = emptyList()
                     ),
@@ -78,7 +77,6 @@ class PoppPensjonspoengOgBeholdningClientTest : FunSpec({
                         pensjonspoeng = 21.5,
                         pensjonspoengType = PensjonspoengType.OMSORG_FOR_SYKE_FUNKSJONSHEMMEDE_ELDRE,
                         maksimalUfoeregrad = 0,
-                        omsorgspoeng = null,
                         beholdning = 0,
                         merknadListe = emptyList()
                     )

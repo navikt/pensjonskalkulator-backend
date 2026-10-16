@@ -27,7 +27,6 @@ data class ServiceberegnetAfpSpec(
 data class OpptjeningAar(
     val ar: Int,
     val pensjonsgivendeInntekt: Int?,
-    val omsorgspoeng: Double?,
     val maksUforegrad: Int?,
     val registrertePensjonspoeng: Double?
 )

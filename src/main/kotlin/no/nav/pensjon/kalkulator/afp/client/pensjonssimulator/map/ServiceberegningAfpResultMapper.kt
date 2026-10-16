@@ -46,7 +46,6 @@ object ServiceberegningAfpResultMapper {
             aar = dto.aarstall,
             pensjonsgivendeInntekt = dto.pensjonsgivendeInntekt,
             pensjonspoeng = dto.pensjonspoeng,
-            omsorgspoeng = null, // ikke relevant her
             maksimalUfoeregrad = null, // ditto
             pensjonspoengType = PensjonspoengType.UNKNOWN, // ditto
             beholdning = 0, // ditto

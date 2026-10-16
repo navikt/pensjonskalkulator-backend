@@ -10,7 +10,6 @@ data class AarligOpptjening(
     override val aar: Int,
     val pensjonsgivendeInntekt: Int,
     val pensjonspoeng: Double,
-    val omsorgspoeng: Int?,
     val maksimalUfoeregrad: Int?,
     val pensjonspoengType: PensjonspoengType,
     val beholdning: Int,

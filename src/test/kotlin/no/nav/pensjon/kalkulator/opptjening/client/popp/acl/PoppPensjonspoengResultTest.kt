@@ -43,7 +43,6 @@ class PoppPensjonspoengResultTest : ShouldSpec({
                 aar = 2000,
                 pensjonsgivendeInntekt = 11,
                 pensjonspoeng = 3.1,
-                omsorgspoeng = 2002,
                 maksimalUfoeregrad = 4,
                 pensjonspoengType = PensjonspoengType.PENSJONSPOENG_FOR_PENSJONSGIVENDE_INNTEKT,
                 beholdning = 0, // mappes ikke i denne sammenheng
@@ -66,7 +65,6 @@ class PoppPensjonspoengResultTest : ShouldSpec({
                 aar = 0,
                 pensjonsgivendeInntekt = 0,
                 pensjonspoeng = 0.0,
-                omsorgspoeng = null,
                 maksimalUfoeregrad = null,
                 pensjonspoengType = PensjonspoengType.UNKNOWN,
                 beholdning = 0,

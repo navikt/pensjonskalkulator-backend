@@ -62,17 +62,16 @@ class ServiceberegnetAfpService(
             ar = dto.aar,
             pensjonsgivendeInntekt = dto.pensjonsgivendeInntekt,
             registrertePensjonspoeng = dto.pensjonspoeng,
-            omsorgspoeng = dto.omsorgspoeng?.toDouble(),
             maksUforegrad = dto.maksimalUfoeregrad,
         )
 
     private fun mapInntektOpptjening(dto: InternServiceberegnetAfpSpec): List<OpptjeningAar> =
         listOfNotNull(dto.inntektForrigeKalenderaar?.let {
-            OpptjeningAar(LocalDate.now().year - 1, it, registrertePensjonspoeng = null, omsorgspoeng = null, maksUforegrad = null)
+            OpptjeningAar(LocalDate.now().year - 1, it, registrertePensjonspoeng = null, maksUforegrad = null)
         }) +
         (dto.inntektFremTilUttak?.let { inntekt ->
             (LocalDate.now().year until dto.uttaksdato.year).map { year ->
-                OpptjeningAar(year, inntekt, registrertePensjonspoeng = null, omsorgspoeng = null, maksUforegrad = null)
+                OpptjeningAar(year, inntekt, registrertePensjonspoeng = null, maksUforegrad = null)
             }
         } ?: emptyList())
 }
