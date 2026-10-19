@@ -22,6 +22,16 @@ enum class AarsakIkkeBeregnet(val externalValue: String, val internalValue: Mang
         internalValue = ManglendeEksternBeregningAarsak.UTILSTREKKELIG_DATA
     ),
 
+    UNDER_FLYTTING(
+        externalValue = "UNDER_FLYTTING",
+        internalValue = ManglendeEksternBeregningAarsak.UNDER_FLYTTING
+    ),
+
+    UNDER_UTBETALING(
+        externalValue = "UNDER_UTBETALING",
+        internalValue = ManglendeEksternBeregningAarsak.UNDER_UTBETALING
+    ),
+
     // Special values not used by Norsk Pensjon (used for missing/unknown values):
     NONE(
         externalValue = "",

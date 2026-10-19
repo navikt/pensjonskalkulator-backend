@@ -14,18 +14,26 @@ class PensjonsavtaleService(
 ) {
     fun fetchAvtaler(spec: PensjonsavtaleSpec): Pensjonsavtaler {
         return if (EnvironmentUtil.isDevelopment() && featureToggleService.isEnabled("mock-norsk-pensjon")) {
-            filter(mockClient.hent(spec))
+            filterAndPopulateUnavailable(mockClient.hent(spec))
         } else {
-            filter(client.fetchAvtaler(spec))
+            filterAndPopulateUnavailable(client.fetchAvtaler(spec))
         }
     }
 
     private companion object {
 
-        private fun filter(avtaler: Pensjonsavtaler) =
+        private fun filterAndPopulateUnavailable(avtaler: Pensjonsavtaler) =
             Pensjonsavtaler(
                 avtaler = avtaler.avtaler.filter { it.kategori.included && it.harStartAar },
-                utilgjengeligeSelskap = avtaler.utilgjengeligeSelskap
+                utilgjengeligeSelskap = avtaler.utilgjengeligeSelskap + utilgjengeligePgaManglendeBeregning(avtaler)
             )
+
+        private fun utilgjengeligePgaManglendeBeregning(avtaler: Pensjonsavtaler) =
+            avtaler.avtaler.filter {
+                it.utbetalingsperioder.isEmpty() && it.manglendeBeregningAarsak !in listOf(
+                    ManglendeEksternBeregningAarsak.NONE,
+                    ManglendeEksternBeregningAarsak.UNKNOWN
+                )
+            }.map { Selskap(it.selskapsnavn, true) }
     }
 }
