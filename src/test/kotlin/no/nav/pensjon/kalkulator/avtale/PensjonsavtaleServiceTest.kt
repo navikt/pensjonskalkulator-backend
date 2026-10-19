@@ -12,6 +12,7 @@ import no.nav.pensjon.kalkulator.avtale.client.PensjonsavtaleClient
 import no.nav.pensjon.kalkulator.avtale.client.mock.NorskPensjonMockPensjonsavtaleClient
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
+import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.avtaleMedToUtbetalingsperioder
 import no.nav.pensjon.kalkulator.mock.PensjonsavtaleFactory.pensjonsavtalerV3
 import no.nav.pensjon.kalkulator.mock.PersonFactory
 import no.nav.pensjon.kalkulator.person.Sivilstatus
@@ -119,6 +120,42 @@ class PensjonsavtaleServiceTest : ShouldSpec({
         avtaleService.fetchAvtaler(avtaleSpecMedLivsvarigInntekt()) shouldBe
                 Pensjonsavtaler(avtaler = emptyList(), utilgjengeligeSelskap = emptyList())
     }
+
+    should("legge til selskap som utilgjengelig for alle kjente årsaker til manglende beregning") {
+        val eksisterendeUtilgjengeligSelskap = Selskap("Eksisterende selskap", true)
+        val avtaler = ManglendeEksternBeregningAarsak.entries
+            .filterNot { it in listOf(ManglendeEksternBeregningAarsak.NONE, ManglendeEksternBeregningAarsak.UNKNOWN) }
+            .mapIndexed { index, aarsak -> avtaleUtenUtbetalingsperioder("Selskap $index", aarsak) }
+        val avtaleService = arrangeService(
+            client = arrangeAvtaler(Pensjonsavtaler(avtaler, listOf(eksisterendeUtilgjengeligSelskap)))
+        )
+
+        avtaleService.fetchAvtaler(avtaleSpecMedLivsvarigInntekt()) shouldBe
+                Pensjonsavtaler(
+                    avtaler = avtaler,
+                    utilgjengeligeSelskap = listOf(eksisterendeUtilgjengeligSelskap) +
+                            avtaler.map { Selskap(it.selskapsnavn, true) }
+                )
+    }
+
+    should("ikke legge til selskap som utilgjengelig når manglende beregningsårsak er none eller unknown") {
+        val avtaler = listOf(
+            avtaleUtenUtbetalingsperioder("Selskap uten årsak", ManglendeEksternBeregningAarsak.NONE),
+            avtaleUtenUtbetalingsperioder("Selskap med ukjent årsak", ManglendeEksternBeregningAarsak.UNKNOWN)
+        )
+        val avtaleService = arrangeService(client = arrangeAvtaler(Pensjonsavtaler(avtaler, emptyList())))
+
+        avtaleService.fetchAvtaler(avtaleSpecMedLivsvarigInntekt()) shouldBe
+                Pensjonsavtaler(avtaler = avtaler, utilgjengeligeSelskap = emptyList())
+    }
+
+    should("ikke legge til selskap som utilgjengelig når avtalen har utbetalingsperioder") {
+        val avtaler = listOf(avtaleMedToUtbetalingsperioder)
+        val avtaleService = arrangeService(client = arrangeAvtaler(Pensjonsavtaler(avtaler, emptyList())))
+
+        avtaleService.fetchAvtaler(avtaleSpecMedLivsvarigInntekt()) shouldBe
+                Pensjonsavtaler(avtaler = avtaler, utilgjengeligeSelskap = emptyList())
+    }
 })
 
 private fun arrangeService(
@@ -180,3 +217,14 @@ private fun avtaleUtenStart() =
         sluttalder = null,
         utbetalingsperioder = emptyList()
     )
+
+private fun avtaleUtenUtbetalingsperioder(
+    selskapsnavn: String,
+    manglendeBeregningAarsak: ManglendeEksternBeregningAarsak
+) =
+    avtaleMedToUtbetalingsperioder.copy(
+        selskapsnavn = selskapsnavn,
+        manglendeBeregningAarsak = manglendeBeregningAarsak,
+        utbetalingsperioder = emptyList()
+    )
+
