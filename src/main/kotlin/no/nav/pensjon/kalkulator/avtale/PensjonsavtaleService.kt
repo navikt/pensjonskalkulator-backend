@@ -22,18 +22,23 @@ class PensjonsavtaleService(
 
     private companion object {
 
-        private fun filterAndPopulateUnavailable(avtaler: Pensjonsavtaler) =
-            Pensjonsavtaler(
-                avtaler = avtaler.avtaler.filter { it.kategori.included && it.harStartAar },
-                utilgjengeligeSelskap = avtaler.utilgjengeligeSelskap + utilgjengeligePgaManglendeBeregning(avtaler)
+        private fun filterAndPopulateUnavailable(avtaler: Pensjonsavtaler): Pensjonsavtaler {
+            val avtalerMedManglendeBeregning = utilgjengeligeAvtalerPgaManglendeBeregning(avtaler)
+            return Pensjonsavtaler(
+                avtaler = avtaler.avtaler
+                    .filter { it.kategori.included && it.harStartAar }
+                    .filter { it !in avtalerMedManglendeBeregning },
+                utilgjengeligeSelskap = avtaler.utilgjengeligeSelskap
+                            + avtalerMedManglendeBeregning.map { Selskap(it.selskapsnavn, true) }
             )
+        }
 
-        private fun utilgjengeligePgaManglendeBeregning(avtaler: Pensjonsavtaler) =
+        private fun utilgjengeligeAvtalerPgaManglendeBeregning(avtaler: Pensjonsavtaler) =
             avtaler.avtaler.filter {
                 it.utbetalingsperioder.isEmpty() && it.manglendeBeregningAarsak !in listOf(
                     ManglendeEksternBeregningAarsak.NONE,
                     ManglendeEksternBeregningAarsak.UNKNOWN
                 )
-            }.map { Selskap(it.selskapsnavn, true) }
+            }
     }
 }
