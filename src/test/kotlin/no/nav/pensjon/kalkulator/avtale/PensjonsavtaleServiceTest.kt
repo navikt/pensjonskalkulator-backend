@@ -121,20 +121,25 @@ class PensjonsavtaleServiceTest : ShouldSpec({
                 Pensjonsavtaler(avtaler = emptyList(), utilgjengeligeSelskap = emptyList())
     }
 
-    should("legge til selskap som utilgjengelig for alle kjente årsaker til manglende beregning") {
+    should("fjerne avtaler og legge til selskap som utilgjengelig for alle kjente årsaker til manglende beregning") {
         val eksisterendeUtilgjengeligSelskap = Selskap("Eksisterende selskap", true)
-        val avtaler = ManglendeEksternBeregningAarsak.entries
+        val utilgjengeligeAvtaler = ManglendeEksternBeregningAarsak.entries
             .filterNot { it in listOf(ManglendeEksternBeregningAarsak.NONE, ManglendeEksternBeregningAarsak.UNKNOWN) }
             .mapIndexed { index, aarsak -> avtaleUtenUtbetalingsperioder("Selskap $index", aarsak) }
         val avtaleService = arrangeService(
-            client = arrangeAvtaler(Pensjonsavtaler(avtaler, listOf(eksisterendeUtilgjengeligSelskap)))
+            client = arrangeAvtaler(
+                Pensjonsavtaler(
+                    avtaler = utilgjengeligeAvtaler + avtaleMedToUtbetalingsperioder,
+                    utilgjengeligeSelskap = listOf(eksisterendeUtilgjengeligSelskap)
+                )
+            )
         )
 
         avtaleService.fetchAvtaler(avtaleSpecMedLivsvarigInntekt()) shouldBe
                 Pensjonsavtaler(
-                    avtaler = avtaler,
+                    avtaler = listOf(avtaleMedToUtbetalingsperioder),
                     utilgjengeligeSelskap = listOf(eksisterendeUtilgjengeligSelskap) +
-                            avtaler.map { Selskap(it.selskapsnavn, true) }
+                            utilgjengeligeAvtaler.map { Selskap(it.selskapsnavn, true) }
                 )
     }
 
