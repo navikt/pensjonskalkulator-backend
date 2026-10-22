@@ -20,8 +20,6 @@ import org.springframework.web.reactive.function.client.WebClient
 
 class OpptjeningMerknadClientTest : ShouldSpec({
 
-    should("fetchMerknader") { }
-
     var server: MockWebServer? = null
     var baseUrl: String? = null
     val traceAid: TraceAid = mockk { every { callId() } returns "id1" }
