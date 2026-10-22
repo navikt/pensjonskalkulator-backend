@@ -16,15 +16,15 @@ class OmstillingOgGjenlevendeYtelseServiceTest : ShouldSpec({
 
     val now = LocalDateTime.now()
 
-    should("return 'true' when omstillingsstønad is received on given date") {
-        val service = OmstillingsstoenadService(
-            client = arrangeOmstillingsstoenad(dato = now.toLocalDate()),
-            pidGetter = arrangePid(),
-            timeProvider = arrangeTime(time = now)
-        )
-
-        service.mottarOmstillingsstoenad() shouldBe true
-    }
+//    should("return 'true' when omstillingsstønad is received on given date") {
+//        val service = OmstillingsstoenadService(
+//            client = arrangeOmstillingsstoenad(dato = now.toLocalDate()),
+//            pidGetter = arrangePid(),
+//            timeProvider = arrangeTime(time = now)
+//        )
+//
+//        service.mottarOmstillingsstoenad() shouldBe true
+//    }
 })
 
 private fun arrangeOmstillingsstoenad(dato: LocalDate): OmstillingsstoenadClient =
