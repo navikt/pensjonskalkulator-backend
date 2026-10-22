@@ -20,7 +20,7 @@ data class SimuleringV2MaanedligAlderspensjon(
     @field:Schema(description = "Pensjonsbeholdning før uttak (beløp i norske kroner)")
     val pensjonsbeholdningFoerUttakBeloep: Int?,
 
-    @field:Schema(description = "Pensjonsbeholdning ettr uttak (beløp i norske kroner)")
+    @field:Schema(description = "Pensjonsbeholdning etter uttak (beløp i norske kroner)")
     val pensjonsbeholdningEtterUttakBeloep: Int?,
 
     @field:Schema(description = "Sluttpoengtall")

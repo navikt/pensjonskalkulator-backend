@@ -13,7 +13,6 @@ data class MerknadV2(
     val kode: MerknadCodeV2,
 
     @field:Schema(description = "Informasjon om uttaksgrad – kun angitt for kode GRADERT_UTTAK, HELT_UTTAK og UTTAK_STOPPET")
-    @field:NotNull
     val uttaksgrad: UttaksgradV2?
 ) {
     companion object {

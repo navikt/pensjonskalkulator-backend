@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotNull
 import no.nav.pensjon.kalkulator.general.GradertUttak
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
+import no.nav.pensjon.kalkulator.tech.web.BadRequestException
 
 data class SimuleringV2GradertUttakSpec(
     @field:Schema(description = "Uttaksgrad i prosent")
@@ -19,8 +20,15 @@ data class SimuleringV2GradertUttakSpec(
 ) {
     fun toInternalValue() =
         GradertUttak(
-            grad = Uttaksgrad.from(grad),
+            grad = uttaksgrad(),
             uttakFomAlder = uttaksalder.toInternalValue(),
             aarligInntekt = aarligInntektVsaPensjonBeloep ?: 0
         )
+
+    private fun uttaksgrad(): Uttaksgrad =
+        try {
+            Uttaksgrad.from(prosentsats = grad)
+        } catch (e: IllegalArgumentException) {
+            throw BadRequestException("Ugyldig grad for gradert uttak $grad", e)
+        }
 }
