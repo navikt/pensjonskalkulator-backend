@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.pensjon.kalkulator.merknad.Merknad
 import no.nav.pensjon.kalkulator.merknad.MerknadCode
 import no.nav.pensjon.kalkulator.merknad.Merknader
 import no.nav.pensjon.kalkulator.merknad.client.MerknadClient
@@ -70,7 +71,7 @@ class OpptjeningServiceTest : ShouldSpec({
     should("slå sammen opptjening, beholdning og merknader for samme år") {
         OpptjeningService(
             opptjeningClient = arrangeOpptjening(opptjeningListe(aar = 2021), beholdningListe(aar = 2021)),
-            merknadClient = arrangeMerknader(aar = 2021, merknad = MerknadCode.AFP),
+            merknadClient = arrangeMerknader(aar = 2021, kode = MerknadCode.AFP),
             pidGetter
         ).opptjening() shouldBe listOf(
             AarligOpptjening(
@@ -80,7 +81,7 @@ class OpptjeningServiceTest : ShouldSpec({
                 maksimalUfoeregrad = 4,
                 pensjonspoengType = PensjonspoengType.OMSORG_FOR_SYKE_FUNKSJONSHEMMEDE_ELDRE,
                 beholdning = 12,
-                merknadListe = listOf(MerknadCode.AFP)
+                merknadListe = listOf(Merknad(kode = MerknadCode.AFP))
             )
         )
     }
@@ -105,7 +106,7 @@ class OpptjeningServiceTest : ShouldSpec({
     should("inkludere ikke-overlappende opptjening/beholdning/merknader, og fylle inn manglende år") {
         OpptjeningService(
             opptjeningClient = arrangeOpptjening(opptjeningListe(aar = 2020), beholdningListe(aar = 2022)),
-            merknadClient = arrangeMerknader(aar = 2023, merknad = MerknadCode.DAGPENGER),
+            merknadClient = arrangeMerknader(aar = 2023, kode = MerknadCode.DAGPENGER),
             pidGetter
         ).opptjening() shouldBe listOf(
             // År med kun opptjening:
@@ -138,7 +139,7 @@ class OpptjeningServiceTest : ShouldSpec({
                 maksimalUfoeregrad = 0,
                 pensjonspoengType = PensjonspoengType.UNKNOWN,
                 beholdning = 0,
-                merknadListe = listOf(MerknadCode.DAGPENGER)
+                merknadListe = listOf(Merknad(kode = MerknadCode.DAGPENGER))
             )
         )
     }
@@ -171,9 +172,9 @@ class OpptjeningServiceTest : ShouldSpec({
             ),
             merknadClient = arrangeMerknader(
                 perAar = mapOf(
-                    2021 to listOf(MerknadCode.DAGPENGER),
-                    2023 to listOf(MerknadCode.AFP),
-                    2022 to listOf(MerknadCode.HELT_UTTAK)
+                    2021 to listOf(Merknad(kode = MerknadCode.DAGPENGER)),
+                    2023 to listOf(Merknad(kode = MerknadCode.AFP)),
+                    2022 to listOf(Merknad(kode = MerknadCode.HELT_UTTAK))
                 )
             ),
             pidGetter
@@ -182,29 +183,32 @@ class OpptjeningServiceTest : ShouldSpec({
                 aar = 2021,
                 pensjonsgivendeInntekt = 1,
                 beholdning = 11,
-                merknad = MerknadCode.DAGPENGER
+                merknadKode = MerknadCode.DAGPENGER
             ),
             opptjeningCombo(
                 aar = 2022,
                 pensjonsgivendeInntekt = 2,
                 beholdning = 12,
-                merknad = MerknadCode.HELT_UTTAK
+                merknadKode = MerknadCode.HELT_UTTAK
             ),
             opptjeningCombo(
                 aar = 2023,
                 pensjonsgivendeInntekt = 3,
                 beholdning = 13,
-                merknad = MerknadCode.AFP
+                merknadKode = MerknadCode.AFP
             )
         )
     }
 })
 
-private fun arrangeMerknader(perAar: Map<Int, List<MerknadCode>>): MerknadClient =
+private fun arrangeMerknader(perAar: Map<Int, List<Merknad>>): MerknadClient =
     mockk { every { fetchMerknader(any()) } returns Merknader(perAar) }
 
-private fun arrangeMerknader(aar: Int, merknad: MerknadCode): MerknadClient =
+private fun arrangeMerknader(aar: Int, merknad: Merknad): MerknadClient =
     arrangeMerknader(perAar = mapOf(aar to listOf(merknad)))
+
+private fun arrangeMerknader(aar: Int, kode: MerknadCode): MerknadClient =
+    arrangeMerknader(aar = aar, merknad = Merknad(kode))
 
 private fun arrangeOpptjening(
     opptjeningListe: List<AarligOpptjening>,
@@ -241,7 +245,7 @@ private fun opptjeningCombo(
     aar: Int,
     pensjonsgivendeInntekt: Int,
     beholdning: Int,
-    merknad: MerknadCode
+    merknad: Merknad
 ) =
     AarligOpptjening(
         aar,
@@ -251,4 +255,17 @@ private fun opptjeningCombo(
         pensjonspoengType = PensjonspoengType.OMSORG_FOR_SYKE_FUNKSJONSHEMMEDE_ELDRE,
         beholdning,
         merknadListe = listOf(merknad)
+    )
+
+private fun opptjeningCombo(
+    aar: Int,
+    pensjonsgivendeInntekt: Int,
+    beholdning: Int,
+    merknadKode: MerknadCode
+) =
+    opptjeningCombo(
+        aar,
+        pensjonsgivendeInntekt,
+        beholdning,
+        merknad = Merknad(merknadKode)
     )
