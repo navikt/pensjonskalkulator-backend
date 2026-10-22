@@ -7,7 +7,7 @@ import java.time.LocalDate
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class SimuleringV2BeregnetAfp(
-    @field:Schema(description = "Totalbeløp (beløp i norske kroner)")
+    @field:Schema(description = "Totalbeløp (norske kroner)")
     val totalbelopAfp: Int?,
 
     @field:Schema(description = "Virkningsdato (fra og med) på formatet yyyy-MM-dd")
@@ -16,7 +16,7 @@ data class SimuleringV2BeregnetAfp(
     @field:Schema(description = "Tidligere arbeidsinntekt (beløp i norske kroner)")
     val tidligereArbeidsinntekt: Int?,
 
-    @field:Schema(description = "Grunnbeløp (beløp i norske kroner)")
+    @field:Schema(description = "Grunnbeløp (norske kroner)")
     val grunnbelop: Int?,
 
     @field:Schema(description = "Sluttpoengtall")

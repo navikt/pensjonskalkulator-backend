@@ -11,7 +11,7 @@ data class SimuleringV2PrivatAfp(
     @field:NotNull
     val alderAar: Int,
 
-    @field:Schema(description = "Årlig beløp (beløp i norske kroner)")
+    @field:Schema(description = "Årlig beløp (norske kroner)")
     @field:NotNull
     val aarligBeloep: Int,
 
@@ -27,7 +27,7 @@ data class SimuleringV2PrivatAfp(
     @field:NotNull
     val livsvarig: Int,
 
-    @field:Schema(description = "Månedlig beløp (beløp i norske kroner)")
+    @field:Schema(description = "Månedlig beløp (norske kroner)")
     val maanedligBeloep: Int?
 ) {
     companion object {
