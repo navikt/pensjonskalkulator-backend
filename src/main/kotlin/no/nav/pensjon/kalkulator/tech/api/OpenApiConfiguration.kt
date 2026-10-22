@@ -51,8 +51,10 @@ class OpenApiConfiguration {
                 "/api/intern/v1/enheter",
                 "/api/intern/v1/eps",
                 "/api/intern/v1/lagre-simulering",
-                "/api/intern/v1/opptjening",
-                "/api/intern/v1/pensjon/simulering",
+                "/api/intern/v1/opptjening", // deprecated
+                "/api/intern/v2/opptjening",
+                "/api/intern/v1/pensjon/simulering", // deprecated
+                "/api/intern/v2/pensjon/simulering",
                 "/api/intern/v1/person",
                 "/api/intern/v1/sivilstatus",
                 "/api/ekstern/v1/pensjon/simulering",

@@ -1,14 +1,13 @@
 package no.nav.pensjon.kalkulator.opptjening
 
 import no.nav.pensjon.kalkulator.general.Aarlig
-import no.nav.pensjon.kalkulator.merknad.MerknadCode
+import no.nav.pensjon.kalkulator.merknad.Merknad
 import no.nav.pensjon.kalkulator.merknad.client.MerknadClient
 import no.nav.pensjon.kalkulator.opptjening.BeholdningVelger.velg
 import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengOgBeholdningClient
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import org.springframework.stereotype.Service
-import kotlin.collections.emptyList
 
 @Service
 class OpptjeningService(
@@ -65,7 +64,7 @@ class OpptjeningService(
 
     private fun merge(
         opptjeningPerAar: Map<Int, AarligOpptjening>,
-        merknadListePerAar: Map<Int, List<MerknadCode>>,
+        merknadListePerAar: Map<Int, List<Merknad>>,
         foersteAar: Int,
         sisteAar: Int
     ): List<AarligOpptjening> =
@@ -98,7 +97,7 @@ class OpptjeningService(
         private fun opptjeningCombo(
             aar: Int,
             opptjening: AarligOpptjening?,
-            merknadListe: List<MerknadCode>
+            merknadListe: List<Merknad>
         ): AarligOpptjening =
             opptjening?.withMerknadListe(merknadListe) ?: kunMerknadListe(aar, merknadListe)
 
@@ -113,7 +112,7 @@ class OpptjeningService(
                 merknadListe = emptyList()
             )
 
-        private fun kunMerknadListe(aar: Int, merknadListe: List<MerknadCode>) =
+        private fun kunMerknadListe(aar: Int, merknadListe: List<Merknad>) =
             AarligOpptjening(
                 aar,
                 pensjonsgivendeInntekt = 0,

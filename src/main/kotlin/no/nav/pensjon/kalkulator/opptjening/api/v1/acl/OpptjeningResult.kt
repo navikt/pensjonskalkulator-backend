@@ -40,13 +40,16 @@ enum class MerknadCodeV1(private val internalValue: MerknadCode) {
     OMSORGSOPPTJENING(internalValue = MerknadCode.OMSORGSOPPTJENING),
     GRADERT_UTTAK(internalValue = MerknadCode.GRADERT_UTTAK),
     HELT_UTTAK(internalValue = MerknadCode.HELT_UTTAK),
+    // NB: UTTAK_STOPPET is not supported in V1 of this API
+
     // Special value representing missing/unknown value:
     UNKNOWN(internalValue = MerknadCode.UNKNOWN),
     NONE(internalValue = MerknadCode.NONE);
 
     companion object {
-        fun fromInternalValue(value: MerknadCode): MerknadCodeV1 =
-            entries.singleOrNull { it.internalValue == value }
-                ?: throw IllegalArgumentException("Intern verdi ikke støttet i API v1 - MerknadCode $value")
+        private val valuesByInternal = entries.associateBy { it.internalValue }
+
+        fun fromInternalValue(value: MerknadCode): MerknadCodeV1? =
+            valuesByInternal[value]
     }
 }
