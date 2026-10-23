@@ -1,13 +1,13 @@
 package no.nav.pensjon.kalkulator.simulering
 
 import mu.KotlinLogging
+import no.nav.pensjon.kalkulator.afp.InternServiceberegnetAfpSpec
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpProblem
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpProblemType
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpService
-import no.nav.pensjon.kalkulator.afp.InternServiceberegnetAfpSpec
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.merknad.MerknadCode
+import no.nav.pensjon.kalkulator.merknad.Merknad
 import no.nav.pensjon.kalkulator.merknad.client.MerknadClient
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.opptjening.InntektService
@@ -161,7 +161,7 @@ class SimuleringService(
 
         private fun merge(
             opptjeningListe: List<SimulertOpptjening>,
-            merknaderPerAar: Map<Int, List<MerknadCode>>
+            merknaderPerAar: Map<Int, List<Merknad>>
         ): List<SimulertOpptjening> {
             val nonEmptyMerknaderPerAar = merknaderPerAar.filter { it.value.isNotEmpty() }
             val foersteMerknadAar = nonEmptyMerknaderPerAar.minOfOrNull { it.key } ?: 9999
@@ -201,7 +201,7 @@ class SimuleringService(
         private fun maxAar(aarligListe: List<SimulertOpptjening>): Int =
             aarligListe.maxOfOrNull { it.aarstall } ?: 0
 
-        private fun bareMerknader(aar: Int, merknadListe: List<MerknadCode>) =
+        private fun bareMerknader(aar: Int, merknadListe: List<Merknad>) =
             SimulertOpptjening(
                 aarstall = aar,
                 pensjonsgivendeInntektBeloep = 0,

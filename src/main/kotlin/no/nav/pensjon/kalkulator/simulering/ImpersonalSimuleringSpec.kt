@@ -44,7 +44,14 @@ data class ImpersonalSimuleringSpec(
 data class EpsSpec(
     val levende: LevendeEps? = null,
     val avdoed: AvdoedEps? = null
-)
+) {
+    companion object {
+        val default =
+            EpsSpec(
+                levende = LevendeEps(harInntektOver2G = false, harPensjon = false)
+            )
+    }
+}
 
 data class LevendeEps(
     val harInntektOver2G: Boolean, // 2G = 2 ganger grunnbeløpet
@@ -64,12 +71,12 @@ data class AvdoedEps(
 )
 
 
-data class Utenlandsopphold (
+data class Utenlandsopphold(
     val periodeListe: List<Opphold>,
     val antallAar: Int? = 0
 )
 
-data class Opphold (
+data class Opphold(
     val fom: LocalDate,
     val tom: LocalDate?,
     val land: Land,

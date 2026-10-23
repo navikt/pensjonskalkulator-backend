@@ -10,6 +10,7 @@ enum class MerknadCode {
     OMSORGSOPPTJENING,
     GRADERT_UTTAK,
     HELT_UTTAK,
+    UTTAK_STOPPET,
 
     // Special values representing missing/unknown value:
     NONE,
