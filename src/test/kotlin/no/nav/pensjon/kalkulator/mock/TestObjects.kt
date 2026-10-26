@@ -27,6 +27,7 @@ object TestObjects {
             tilleggspensjon = 134641,
             pensjonstillegg = -70243,
             skjermingstillegg = 14,
+            minstenivaatilleggIndividuelt = 16,
             kapittel19Pensjon = Kapittel19Pensjon(
                 andelsbroek = 0.6,
                 trygdetidAntallAar = 40,
