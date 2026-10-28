@@ -6,8 +6,8 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.pensjon.kalkulator.merknad.Merknad
 import no.nav.pensjon.kalkulator.merknad.MerknadCode
+import no.nav.pensjon.kalkulator.merknad.MerknadService
 import no.nav.pensjon.kalkulator.merknad.Merknader
-import no.nav.pensjon.kalkulator.merknad.client.MerknadClient
 import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengOgBeholdningClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import java.time.LocalDate
@@ -19,7 +19,7 @@ class OpptjeningServiceTest : ShouldSpec({
     should("håndtere tomme lister") {
         OpptjeningService(
             opptjeningClient = arrangeOpptjening(opptjeningListe = emptyList(), beholdningListe = emptyList()),
-            merknadClient = arrangeMerknader(perAar = emptyMap()),
+            merknadService = arrangeMerknader(perAar = emptyMap()),
             pidGetter
         ).opptjening() shouldBe emptyList()
     }
@@ -27,7 +27,7 @@ class OpptjeningServiceTest : ShouldSpec({
     should("håndtere tom opptjeningsliste og tom merknadsliste") {
         OpptjeningService(
             opptjeningClient = arrangeOpptjening(opptjeningListe = emptyList(), beholdningListe(aar = 2025)),
-            merknadClient = arrangeMerknader(perAar = emptyMap()),
+            merknadService = arrangeMerknader(perAar = emptyMap()),
             pidGetter
         ).opptjening() shouldBe listOf(
             AarligOpptjening(
@@ -45,7 +45,7 @@ class OpptjeningServiceTest : ShouldSpec({
     should("håndtere tom beholdningsliste og tom merknadsliste") {
         OpptjeningService(
             opptjeningClient = arrangeOpptjening(opptjeningListe(aar = 2022), beholdningListe = emptyList()),
-            merknadClient = arrangeMerknader(perAar = emptyMap()),
+            merknadService = arrangeMerknader(perAar = emptyMap()),
             pidGetter
         ).opptjening() shouldBe listOf(kunOpptjening(2022))
     }
@@ -53,7 +53,7 @@ class OpptjeningServiceTest : ShouldSpec({
     should("slå sammen opptjening og beholdning for samme år") {
         OpptjeningService(
             opptjeningClient = arrangeOpptjening(opptjeningListe(aar = 2021), beholdningListe(aar = 2021)),
-            merknadClient = arrangeMerknader(perAar = emptyMap()),
+            merknadService = arrangeMerknader(perAar = emptyMap()),
             pidGetter
         ).opptjening() shouldBe listOf(
             AarligOpptjening(
@@ -71,7 +71,7 @@ class OpptjeningServiceTest : ShouldSpec({
     should("slå sammen opptjening, beholdning og merknader for samme år") {
         OpptjeningService(
             opptjeningClient = arrangeOpptjening(opptjeningListe(aar = 2021), beholdningListe(aar = 2021)),
-            merknadClient = arrangeMerknader(aar = 2021, kode = MerknadCode.AFP),
+            merknadService = arrangeMerknader(aar = 2021, kode = MerknadCode.AFP),
             pidGetter
         ).opptjening() shouldBe listOf(
             AarligOpptjening(
@@ -97,7 +97,7 @@ class OpptjeningServiceTest : ShouldSpec({
                         DatertBeholdning(dato = LocalDate.of(2021, 2, 1), beholdning = 13)
                     )
                 ),
-                merknadClient = arrangeMerknader(perAar = emptyMap()),
+                merknadService = arrangeMerknader(perAar = emptyMap()),
                 pidGetter
             ).opptjening().singleOrNull()?.beholdning shouldBe 12
         }
@@ -106,7 +106,7 @@ class OpptjeningServiceTest : ShouldSpec({
     should("inkludere ikke-overlappende opptjening/beholdning/merknader, og fylle inn manglende år") {
         OpptjeningService(
             opptjeningClient = arrangeOpptjening(opptjeningListe(aar = 2020), beholdningListe(aar = 2022)),
-            merknadClient = arrangeMerknader(aar = 2023, kode = MerknadCode.DAGPENGER),
+            merknadService = arrangeMerknader(aar = 2023, kode = MerknadCode.DAGPENGER),
             pidGetter
         ).opptjening() shouldBe listOf(
             // År med kun opptjening:
@@ -144,16 +144,12 @@ class OpptjeningServiceTest : ShouldSpec({
         )
     }
 
-    should("utelate tom merknadliste for år uten opptjening") {
+    should("håndtere tomt marknad-map") {
         OpptjeningService(
             opptjeningClient = arrangeOpptjening(opptjeningListe(aar = 2020), beholdningListe = emptyList()),
-            merknadClient = arrangeMerknader(perAar = mapOf(2021 to emptyList())), // tom merknadliste
+            merknadService = arrangeMerknader(perAar = emptyMap()),
             pidGetter
-        ).opptjening() shouldBe listOf(
-            // År 2020 har kun opptjening:
-            kunOpptjening(2020)
-            // År 2021 har kun en tom merknadliste (ingen opptjening) og utelates derfor
-        )
+        ).opptjening() shouldBe listOf(kunOpptjening(2020))
     }
 
     should("håndtere usorterte lister") {
@@ -170,7 +166,7 @@ class OpptjeningServiceTest : ShouldSpec({
                     beholdning(aar = 2022, beloep = 12),
                 )
             ),
-            merknadClient = arrangeMerknader(
+            merknadService = arrangeMerknader(
                 perAar = mapOf(
                     2021 to listOf(Merknad(kode = MerknadCode.DAGPENGER)),
                     2023 to listOf(Merknad(kode = MerknadCode.AFP)),
@@ -201,13 +197,13 @@ class OpptjeningServiceTest : ShouldSpec({
     }
 })
 
-private fun arrangeMerknader(perAar: Map<Int, List<Merknad>>): MerknadClient =
-    mockk { every { fetchMerknader(any()) } returns Merknader(perAar) }
+private fun arrangeMerknader(perAar: Map<Int, List<Merknad>>): MerknadService =
+    mockk { every { merknader() } returns Merknader(perAar) }
 
-private fun arrangeMerknader(aar: Int, merknad: Merknad): MerknadClient =
+private fun arrangeMerknader(aar: Int, merknad: Merknad): MerknadService =
     arrangeMerknader(perAar = mapOf(aar to listOf(merknad)))
 
-private fun arrangeMerknader(aar: Int, kode: MerknadCode): MerknadClient =
+private fun arrangeMerknader(aar: Int, kode: MerknadCode): MerknadService =
     arrangeMerknader(aar = aar, merknad = Merknad(kode))
 
 private fun arrangeOpptjening(
