@@ -2,29 +2,24 @@ package no.nav.pensjon.kalkulator.opptjening
 
 import no.nav.pensjon.kalkulator.general.Aarlig
 import no.nav.pensjon.kalkulator.merknad.Merknad
-import no.nav.pensjon.kalkulator.merknad.client.MerknadClient
+import no.nav.pensjon.kalkulator.merknad.MerknadService
 import no.nav.pensjon.kalkulator.opptjening.BeholdningVelger.velg
 import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengOgBeholdningClient
-import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import org.springframework.stereotype.Service
 
 @Service
 class OpptjeningService(
     private val opptjeningClient: PensjonspoengOgBeholdningClient,
-    private val merknadClient: MerknadClient,
+    private val merknadService: MerknadService,
     private val pidGetter: PidGetter
 ) {
-    fun opptjening(): List<AarligOpptjening> {
-        val pid = pidGetter.pid()
-
-        return opptjeningClient.fetchPensjonspoengOgBeholdning(pid).let {
-            opptjeningMedMerknader(pid, opptjeningListe = it.first, beholdningListe = it.second)
+    fun opptjening(): List<AarligOpptjening> =
+        opptjeningClient.fetchPensjonspoengOgBeholdning(pidGetter.pid()).let {
+            opptjeningMedMerknader(opptjeningListe = it.first, beholdningListe = it.second)
         }
-    }
 
     fun opptjeningMedMerknader(
-        pid: Pid,
         opptjeningListe: List<AarligOpptjening>,
         beholdningListe: List<DatertBeholdning>
     ): List<AarligOpptjening> {
@@ -33,13 +28,13 @@ class OpptjeningService(
         val foersteComboAar = minAar(opptjeningListePerAar).coerceAtMost(minAar(beholdningListePerAar))
         val sisteComboAar = maxAar(opptjeningListePerAar).coerceAtLeast(maxAar(beholdningListePerAar))
         val opptjeningComboPerAar = merge(opptjeningListePerAar, beholdningListePerAar, foersteComboAar, sisteComboAar)
-        val nonEmptyMerknaderPerAar = merknadClient.fetchMerknader(pid).perAar.filter { it.value.isNotEmpty() }
-        val foersteMerknadAar = nonEmptyMerknaderPerAar.minOfOrNull { it.key } ?: foersteComboAar
-        val sisteMerknadAar = nonEmptyMerknaderPerAar.maxOfOrNull { it.key } ?: sisteComboAar
+        val merknadListePerAar = merknadService.merknader().perAar
+        val foersteMerknadAar = merknadListePerAar.minOfOrNull { it.key } ?: foersteComboAar
+        val sisteMerknadAar = merknadListePerAar.maxOfOrNull { it.key } ?: sisteComboAar
 
         return merge(
             opptjeningPerAar = opptjeningComboPerAar,
-            merknadListePerAar = nonEmptyMerknaderPerAar,
+            merknadListePerAar,
             foersteAar = foersteComboAar.coerceAtMost(foersteMerknadAar),
             sisteAar = sisteComboAar.coerceAtLeast(sisteMerknadAar)
         )
@@ -68,7 +63,7 @@ class OpptjeningService(
         foersteAar: Int,
         sisteAar: Int
     ): List<AarligOpptjening> =
-         if (foersteAar > sisteAar)
+        if (foersteAar > sisteAar)
             emptyList()
         else
             (foersteAar..sisteAar).map {
