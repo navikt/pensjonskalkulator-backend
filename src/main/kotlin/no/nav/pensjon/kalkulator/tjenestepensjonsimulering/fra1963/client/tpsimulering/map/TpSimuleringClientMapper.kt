@@ -6,6 +6,7 @@ import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.ResultatType
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringOffentligTjenestepensjonSpec
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringsResultat
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringsResultatStatus
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.TpOrdning
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.Utbetaling
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.dto.FremtidigInntektSimuleringOFTPSpecDto
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimulering.dto.SimulerTjenestepensjonResponseDto
@@ -20,7 +21,7 @@ object TpSimuleringClientMapper {
         ),
         simuleringsResultat = dto.simuleringsResultat?.let {
             SimuleringsResultat(
-                tpOrdning = it.tpLeverandoer,
+                tpLeverandoerNavn = it.tpLeverandoer,
                 tpNummer = it.tpNummer,
                 perioder = it.utbetalingsperioder
                     .map { utbetalingDto ->
@@ -33,7 +34,7 @@ object TpSimuleringClientMapper {
                 betingetTjenestepensjonInkludert = it.betingetTjenestepensjonErInkludert,
             )
         },
-        tpOrdninger = dto.relevanteTpOrdninger,
+        tpOrdninger = dto.relevanteTpOrdninger.map { TpOrdning(it.navn, it.tpNummer) },
         serviceData = dto.serviceData.orEmpty(),
     )
 

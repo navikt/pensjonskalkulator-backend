@@ -18,7 +18,7 @@ class TpSimuleringClientMapperTest : ShouldSpec({
                 feilmelding = "feilmelding"
             ),
             simuleringsResultat = SimuleringsResultatDto(
-                tpLeverandoer = "tpOrdningX",
+                tpLeverandoer = "tpLeverandoerX",
                 tpNummer = "1",
                 utbetalingsperioder = listOf(
                     UtbetalingPerAlder(
@@ -29,7 +29,8 @@ class TpSimuleringClientMapperTest : ShouldSpec({
                 ),
                 betingetTjenestepensjonErInkludert = true
             ),
-            relevanteTpOrdninger = listOf("tpOrdningY")
+            relevanteTpOrdninger = listOf(RelevantOrdningDto(navn = "tpOrdningY", tpNummer = "2")),
+            serviceData = listOf("serviceData")
         )
 
         TpSimuleringClientMapper.fromDto(dto) shouldBe
@@ -39,7 +40,7 @@ class TpSimuleringClientMapperTest : ShouldSpec({
                         feilmelding = "feilmelding"
                     ),
                     simuleringsResultat = SimuleringsResultat(
-                        tpOrdning = "tpOrdningX",
+                        tpLeverandoerNavn = "tpLeverandoerX",
                         tpNummer = "1",
                         perioder = listOf(
                             Utbetaling(
@@ -50,8 +51,8 @@ class TpSimuleringClientMapperTest : ShouldSpec({
                         ),
                         betingetTjenestepensjonInkludert = true
                     ),
-                    tpOrdninger = listOf("tpOrdningY"),
-                    serviceData = listOf()
+                    tpOrdninger = listOf(TpOrdning(tpOrdningNavn = "tpOrdningY", tpNummer = "2")),
+                    serviceData = listOf("serviceData")
                 )
     }
 

@@ -75,7 +75,7 @@ class TpSimuleringClient(
     override fun service(): EgressService = service
 
     companion object {
-        private const val API_PATH = "api/nav/v1/simuler-oftp/fra-2025"
+        private const val API_PATH = "api/nav/v2/simuler-oftp/fra-2025"
         private val service = EgressService.PENSJONSSIMULATOR
         private const val ON_CONNECTED_READ_TIMEOUT_SECONDS = 45
     }
