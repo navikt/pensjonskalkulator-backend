@@ -18,8 +18,8 @@ class TpSimuleringClientMapperTest : ShouldSpec({
                 feilmelding = "feilmelding"
             ),
             simuleringsResultat = SimuleringsResultatDto(
-                tpLeverandoer = "tpOrdningX",
-                tpNummer = "1",
+                tpLeverandoer = "tpLeverandoerX",
+                tpOrdning = RelevantOrdningDto(navn = "tpOrdningX", tpNummer = "1"),
                 utbetalingsperioder = listOf(
                     UtbetalingPerAlder(
                         startAlder = Alder(aar = 62, maaneder = 0),
@@ -29,7 +29,8 @@ class TpSimuleringClientMapperTest : ShouldSpec({
                 ),
                 betingetTjenestepensjonErInkludert = true
             ),
-            relevanteTpOrdninger = listOf("tpOrdningY")
+            relevanteTpOrdninger = listOf(RelevantOrdningDto(navn = "tpOrdningY", tpNummer = "2")),
+            serviceData = listOf("serviceData")
         )
 
         TpSimuleringClientMapper.fromDto(dto) shouldBe
@@ -39,8 +40,8 @@ class TpSimuleringClientMapperTest : ShouldSpec({
                         feilmelding = "feilmelding"
                     ),
                     simuleringsResultat = SimuleringsResultat(
-                        tpOrdning = "tpOrdningX",
-                        tpNummer = "1",
+                        tpLeverandoerNavn = "tpLeverandoerX",
+                        tpOrdning = TpOrdning(tpOrdningNavn = "tpOrdningX", tpNummer = "1"),
                         perioder = listOf(
                             Utbetaling(
                                 startAlder = Alder(aar = 62, maaneder = 0),
@@ -50,8 +51,8 @@ class TpSimuleringClientMapperTest : ShouldSpec({
                         ),
                         betingetTjenestepensjonInkludert = true
                     ),
-                    tpOrdninger = listOf("tpOrdningY"),
-                    serviceData = listOf()
+                    tpOrdninger = listOf(TpOrdning(tpOrdningNavn = "tpOrdningY", tpNummer = "2")),
+                    serviceData = listOf("serviceData")
                 )
     }
 

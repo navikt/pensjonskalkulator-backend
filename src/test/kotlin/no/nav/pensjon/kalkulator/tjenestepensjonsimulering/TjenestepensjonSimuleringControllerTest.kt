@@ -131,10 +131,114 @@ class TjenestepensjonSimuleringControllerTest : FunSpec() {
             )
                 .andExpect(status().is5xxServerError())
         }
+
+        test("simuler offentlig tjenestepensjon V3") {
+            every { service.hentTjenestepensjonSimulering(any()) } returns RESULTAT_OK_V2
+
+            mvc.perform(
+                post(URL_V3)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(REQUEST_BODY_V2)
+            )
+                .andExpect(status().isOk())
+                .andExpect(content().json(RESPONSE_BODY_OK_V3))
+        }
+
+        listOf(
+            Triple(
+                RESULTAT_TEKNISK_FEIL_V2,
+                "TEKNISK_FEIL",
+                """[
+                    {"tpNavn": "Bodø kommunale pensjonskasse", "tpNummer": "222222"},
+                    {"tpNavn": "Statens pensjonskasse", "tpNummer": "111111"}
+                ]"""
+            ),
+            Triple(RESULTAT_BRUKER_ER_IKKE_MEDLEM_V2, "BRUKER_ER_IKKE_MEDLEM_AV_TP_ORDNING", "[]"),
+            Triple(
+                RESULTAT_TP_ORDNING_STOETTES_IKKE_V2,
+                "TP_ORDNING_STOETTES_IKKE",
+                """[{"tpNavn": "Pensjonstrygden uten navn", "tpNummer": "333333"}]"""
+            ),
+            Triple(
+                RESULTAT_TOM_RESPONS_FRA_TP_ORDNING_V2,
+                "TOM_SIMULERING_FRA_TP_ORDNING",
+                """[{"tpNavn": "Pensjonstrygden med navn", "tpNummer": "444444"}]"""
+            )
+        ).forEach { (resultat, resultatStatus, tpOrdninger) ->
+            test("simuler offentlig tjenestepensjon V3 med status $resultatStatus") {
+                every { service.hentTjenestepensjonSimulering(any()) } returns resultat
+
+                mvc.perform(
+                    post(URL_V3)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(REQUEST_BODY_V2)
+                )
+                    .andExpect(status().isOk())
+                    .andExpect(
+                        content().json(
+                            """{
+                                "simuleringsresultatStatus": "$resultatStatus",
+                                "muligeTpLeverandoerListe": $tpOrdninger,
+                                "serviceData": []
+                            }"""
+                        )
+                    )
+            }
+        }
+
+        test("simuler offentlig tjenestepensjon V3 feiler") {
+            every { service.hentTjenestepensjonSimulering(any()) } throws EgressException("Pesys tok kvelden")
+
+            mvc.perform(
+                post(URL_V3)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(REQUEST_BODY_V2)
+            )
+                .andExpect(status().is5xxServerError())
+        }
     }
 
     private companion object {
         private const val URL_V2 = "/api/v2/simuler-oftp"
+        private const val URL_V3 = "/api/v3/simuler-oftp/fra-1963"
+
+        @Language("json")
+        private const val RESPONSE_BODY_OK_V3 = """{
+    "simuleringsresultatStatus": "OK",
+    "muligeTpLeverandoerListe": [
+        {"tpNavn": "Statens pensjonskasse", "tpNummer": "111111"}
+    ],
+    "simulertTjenestepensjon": {
+        "tpLeverandoer": "Statens Pensjonskasse",
+        "tpOrdning": {"tpNavn": "Statens pensjonskasse", "tpNummer": "111111"},
+        "simuleringsresultat": {
+            "utbetalingsperioder": [
+                {
+                    "startAlder": {"aar": 63, "maaneder": 0},
+                    "sluttAlder": {"aar": 66, "maaneder": 11},
+                    "aarligUtbetaling": 2640000,
+                    "maanedligUtbetaling": 220000
+                },
+                {
+                    "startAlder": {"aar": 67, "maaneder": 0},
+                    "sluttAlder": {"aar": 72, "maaneder": 0},
+                    "aarligUtbetaling": 3000000,
+                    "maanedligUtbetaling": 250000
+                },
+                {
+                    "startAlder": {"aar": 72, "maaneder": 1},
+                    "aarligUtbetaling": 1200000,
+                    "maanedligUtbetaling": 100000
+                }
+            ],
+            "betingetTjenestepensjonErInkludert": true
+        }
+    },
+    "serviceData": []
+}"""
 
         @Language("json")
         private const val RESPONSE_BODY_OK_V2 = """{
@@ -144,6 +248,7 @@ class TjenestepensjonSimuleringControllerTest : FunSpec() {
     ],
     "simulertTjenestepensjon": {
         "tpLeverandoer": "Statens Pensjonskasse",
+        "tpNummer": "111111",
         "simuleringsresultat": {
             "utbetalingsperioder": [
                 {
@@ -210,8 +315,8 @@ class TjenestepensjonSimuleringControllerTest : FunSpec() {
         private val RESULTAT_OK_V2 = OffentligTjenestepensjonSimuleringsresultat(
             simuleringsResultatStatus = SimuleringsResultatStatus(resultatType = ResultatType.OK, feilmelding = null),
             simuleringsResultat = SimuleringsResultat(
-                tpOrdning = "Statens Pensjonskasse",
-                tpNummer = "111111",
+                tpLeverandoerNavn = "Statens Pensjonskasse",
+                tpOrdning = TpOrdning(tpOrdningNavn = "Statens pensjonskasse", tpNummer = "111111"),
                 perioder = listOf(
                     Utbetaling(
                         startAlder = Alder(63, 0),
@@ -231,7 +336,7 @@ class TjenestepensjonSimuleringControllerTest : FunSpec() {
                 ),
                 betingetTjenestepensjonInkludert = true
             ),
-            tpOrdninger = listOf("Statens pensjonskasse")
+            tpOrdninger = listOf(TpOrdning(tpOrdningNavn = "Statens pensjonskasse", tpNummer = "111111"))
         )
 
         @Language("json")
@@ -248,7 +353,10 @@ class TjenestepensjonSimuleringControllerTest : FunSpec() {
                 resultatType = ResultatType.TEKNISK_FEIL,
                 feilmelding = "Noe gikk galt"
             ),
-            tpOrdninger = listOf("Bodø kommunale pensjonskasse", "Statens pensjonskasse")
+            tpOrdninger = listOf(
+                TpOrdning(tpOrdningNavn = "Bodø kommunale pensjonskasse", tpNummer = "222222"),
+                TpOrdning(tpOrdningNavn = "Statens pensjonskasse", tpNummer = "111111")
+            )
         )
 
         @Language("json")
@@ -275,7 +383,7 @@ class TjenestepensjonSimuleringControllerTest : FunSpec() {
                 resultatType = ResultatType.TP_ORDNING_STOETTES_IKKE,
                 feilmelding = "TP-ordning støttes ikke"
             ),
-            tpOrdninger = listOf("Pensjonstrygden uten navn")
+            tpOrdninger = listOf(TpOrdning(tpOrdningNavn = "Pensjonstrygden uten navn", tpNummer = "333333"))
         )
 
         @Language("json")
@@ -289,7 +397,7 @@ class TjenestepensjonSimuleringControllerTest : FunSpec() {
                 resultatType = ResultatType.TOM_RESPONS,
                 feilmelding = "Ingen utbetalingsperioder fra TP-ordning"
             ),
-            tpOrdninger = listOf("Pensjonstrygden med navn")
+            tpOrdninger = listOf(TpOrdning(tpOrdningNavn = "Pensjonstrygden med navn", tpNummer = "444444"))
         )
     }
 }

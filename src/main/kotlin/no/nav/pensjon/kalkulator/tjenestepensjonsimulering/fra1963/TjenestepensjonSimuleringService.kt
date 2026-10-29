@@ -26,9 +26,9 @@ class TjenestepensjonSimuleringService(
             val tpForhold = tpclient.tjenestepensjonsforhold(pid)
             return OffentligTjenestepensjonSimuleringsresultat(
                 simuleringsResultatStatus = SimuleringsResultatStatus(ResultatType.TP_ORDNING_STOETTES_IKKE),
-                tpOrdninger = tpForhold.tpOrdninger
+                tpOrdninger = tpForhold.tpOrdninger.map { TpOrdning(it, it) }
             )
-        }
+        } //TODO bruk et annet endepunkt fra tpregisteret som har tpnumre og navn
 
         return tjenestepensjonSimuleringClient.hentTjenestepensjonSimulering(request = spec, pid = pid)
     }

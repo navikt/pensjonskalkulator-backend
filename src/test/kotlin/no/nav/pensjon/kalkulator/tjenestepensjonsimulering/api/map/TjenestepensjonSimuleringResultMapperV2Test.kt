@@ -16,8 +16,8 @@ class TjenestepensjonSimuleringResultMapperV2Test : ShouldSpec({
                 feilmelding = "feilmelding"
             ),
             simuleringsResultat = SimuleringsResultat(
-                tpOrdning = "tpOrdningX",
-                tpNummer = "1",
+                tpLeverandoerNavn = "tpLeverandoerX",
+                tpOrdning = TpOrdning(tpOrdningNavn = "tpOrdningX", tpNummer = "1"),
                 perioder = listOf(
                     Utbetaling(
                         startAlder = Alder(aar = 62, maaneder = 0),
@@ -27,7 +27,7 @@ class TjenestepensjonSimuleringResultMapperV2Test : ShouldSpec({
                 ),
                 betingetTjenestepensjonInkludert = true
             ),
-            tpOrdninger = listOf("tpOrdningY")
+            tpOrdninger = listOf(TpOrdning(tpOrdningNavn = "tpOrdningY", tpNummer = "2"))
         )
 
         TjenestepensjonSimuleringResultMapperV2.toDtoV2(source) shouldBe
@@ -35,7 +35,7 @@ class TjenestepensjonSimuleringResultMapperV2Test : ShouldSpec({
                     simuleringsresultatStatus = SimuleringsresultatStatusV2.OK,
                     muligeTpLeverandoerListe = listOf("tpOrdningY"),
                     simulertTjenestepensjon = SimulertTjenestepensjonV2(
-                        tpLeverandoer = "tpOrdningX",
+                        tpLeverandoer = "tpLeverandoerX",
                         tpNummer = "1",
                         simuleringsresultat = SimuleringsresultatV2(
                             utbetalingsperioder = listOf(

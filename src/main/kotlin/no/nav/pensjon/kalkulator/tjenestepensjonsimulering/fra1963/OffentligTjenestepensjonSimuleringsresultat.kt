@@ -6,7 +6,7 @@ import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.client.tpsimu
 data class OffentligTjenestepensjonSimuleringsresultat(
     val simuleringsResultatStatus: SimuleringsResultatStatus,
     val simuleringsResultat: SimuleringsResultat? = null,
-    val tpOrdninger: List<String> = emptyList(),
+    val tpOrdninger: List<TpOrdning> = emptyList(),
     var serviceData: List<String> = emptyList(),
 )
 
@@ -28,8 +28,8 @@ enum class ResultatType(val externalValue: ResultatTypeDto) {
 }
 
 data class SimuleringsResultat(
-    val tpOrdning: String,
-    val tpNummer: String,
+    val tpLeverandoerNavn: String,
+    val tpOrdning: TpOrdning,
     val perioder: List<Utbetaling>,
     val betingetTjenestepensjonInkludert: Boolean,
 )
@@ -38,4 +38,9 @@ data class Utbetaling(
     val startAlder: Alder,
     val sluttAlder: Alder?,
     val maanedligBeloep: Int,
+)
+
+data class TpOrdning(
+    val tpOrdningNavn: String,
+    val tpNummer: String,
 )

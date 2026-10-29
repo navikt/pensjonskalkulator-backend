@@ -5,7 +5,7 @@ import no.nav.pensjon.kalkulator.general.Alder
 data class SimulerTjenestepensjonResponseDto(
     val simuleringsResultatStatus: SimuleringsResultatStatusDto,
     val simuleringsResultat: SimuleringsResultatDto? = null,
-    val relevanteTpOrdninger: List<String> = emptyList(),
+    val relevanteTpOrdninger: List<RelevantOrdningDto> = emptyList(),
     var serviceData: List<String>? = emptyList(),
 )
 
@@ -24,7 +24,7 @@ enum class ResultatTypeDto {
 
 data class SimuleringsResultatDto(
     val tpLeverandoer: String,
-    val tpNummer: String,
+    val tpOrdning: RelevantOrdningDto,
     val utbetalingsperioder: List<UtbetalingPerAlder>,
     val betingetTjenestepensjonErInkludert: Boolean,
 )
@@ -33,4 +33,9 @@ data class UtbetalingPerAlder(
     val startAlder: Alder,
     val sluttAlder: Alder?,
     val maanedligBeloep: Int,
+)
+
+data class RelevantOrdningDto(
+    val navn: String,
+    val tpNummer: String,
 )

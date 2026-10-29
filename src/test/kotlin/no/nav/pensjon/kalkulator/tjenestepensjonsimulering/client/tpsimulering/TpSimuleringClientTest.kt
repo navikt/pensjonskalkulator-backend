@@ -14,6 +14,7 @@ import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.ResultatType
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringOffentligTjenestepensjonSpec
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringsResultat
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.SimuleringsResultatStatus
+import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.TpOrdning
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.fra1963.Utbetaling
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.TpSimuleringClientTestObjects.IKKE_MEDLEM
 import no.nav.pensjon.kalkulator.tjenestepensjonsimulering.client.tpsimulering.TpSimuleringClientTestObjects.INGEN_UTBETALINGSPERIODER
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.BeanFactory
 import org.springframework.beans.factory.getBean
 import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDate
+import java.util.concurrent.TimeUnit
 
 class TpSimuleringClientTest : FunSpec({
 
@@ -53,6 +55,12 @@ class TpSimuleringClientTest : FunSpec({
         server?.shutdown()
     }
 
+    afterTest {
+        val request = server?.takeRequest(1, TimeUnit.SECONDS)
+        request?.method shouldBe "POST"
+        request?.path shouldBe "/api/nav/v2/simuler-oftp/fra-2025"
+    }
+
     test("hent tjenestepensjonssimulering hvor responsen har ingen utbetalingsperioder") {
         server?.arrangeOkJsonResponse(INGEN_UTBETALINGSPERIODER)
 
@@ -65,7 +73,7 @@ class TpSimuleringClientTest : FunSpec({
                     feilmelding = "Simulering fra Statens Pensjonskasse inneholder ingen utbetalingsperioder"
                 ),
                 simuleringsResultat = null,
-                tpOrdninger = listOf("Statens pensjonskasse"),
+                tpOrdninger = listOf(TpOrdning(tpOrdningNavn = "Statens pensjonskasse", tpNummer = "1")),
                 serviceData = emptyList()
             )
         }
@@ -83,8 +91,8 @@ class TpSimuleringClientTest : FunSpec({
                     feilmelding = null
                 ),
                 simuleringsResultat = SimuleringsResultat(
-                    tpOrdning = "Statens Pensjonskasse",
-                    tpNummer = "1",
+                    tpLeverandoerNavn = "Statens Pensjonskasse",
+                    tpOrdning = TpOrdning(tpOrdningNavn = "Statens pensjonskasse", tpNummer = "1"),
                     perioder = listOf(
                         Utbetaling(
                             startAlder = Alder(62, 1),
@@ -104,7 +112,7 @@ class TpSimuleringClientTest : FunSpec({
                     ),
                     betingetTjenestepensjonInkludert = false
                 ),
-                tpOrdninger = listOf("Statens pensjonskasse"),
+                tpOrdninger = listOf(TpOrdning(tpOrdningNavn = "Statens pensjonskasse", tpNummer = "1")),
                 serviceData = emptyList()
             )
         }
@@ -140,7 +148,7 @@ class TpSimuleringClientTest : FunSpec({
                     feilmelding = "Stoettes ikke"
                 ),
                 simuleringsResultat = null,
-                tpOrdninger = listOf("Pensjonskasse A"),
+                tpOrdninger = listOf(TpOrdning(tpOrdningNavn = "Pensjonskasse A", tpNummer = "2")),
                 serviceData = emptyList()
             )
         }
@@ -158,7 +166,7 @@ class TpSimuleringClientTest : FunSpec({
                     feilmelding = "Bruker er bare 2 år gammel"
                 ),
                 simuleringsResultat = null,
-                tpOrdninger = listOf("Pensjonskasse A"),
+                tpOrdninger = listOf(TpOrdning(tpOrdningNavn = "Pensjonskasse A", tpNummer = "2")),
                 serviceData = emptyList()
             )
         }
@@ -175,7 +183,7 @@ object TpSimuleringClientTestObjects {
   },
   "simuleringsResultat": null,
   "relevanteTpOrdninger": [
-    "Statens pensjonskasse"
+    { "navn": "Statens pensjonskasse", "tpNummer": "1" }
   ]
 }"""
 
@@ -196,7 +204,7 @@ object TpSimuleringClientTestObjects {
     "feilmelding": "Stoettes ikke"
   },
   "simuleringsResultat": null,
-  "relevanteTpOrdninger": ["Pensjonskasse A"]
+  "relevanteTpOrdninger": [{ "navn": "Pensjonskasse A", "tpNummer": "2" }]
 }"""
 
     @Language("json")
@@ -206,7 +214,7 @@ object TpSimuleringClientTestObjects {
     "feilmelding": "Bruker er bare 2 år gammel"
   },
   "simuleringsResultat": null,
-  "relevanteTpOrdninger": ["Pensjonskasse A"]
+  "relevanteTpOrdninger": [{ "navn": "Pensjonskasse A", "tpNummer": "2" }]
 }"""
 
     @Language("json")
@@ -217,7 +225,7 @@ object TpSimuleringClientTestObjects {
   },
   "simuleringsResultat": {
     "tpLeverandoer": "Statens Pensjonskasse",
-    "tpNummer": "1",
+    "tpOrdning": { "navn": "Statens pensjonskasse", "tpNummer": "1" },
     "utbetalingsperioder": [
     {
         "startAlder": {
@@ -253,7 +261,7 @@ object TpSimuleringClientTestObjects {
     "betingetTjenestepensjonErInkludert": false
   },
   "relevanteTpOrdninger": [
-    "Statens pensjonskasse"
+    { "navn": "Statens pensjonskasse", "tpNummer": "1" }
   ]
 }"""
 
