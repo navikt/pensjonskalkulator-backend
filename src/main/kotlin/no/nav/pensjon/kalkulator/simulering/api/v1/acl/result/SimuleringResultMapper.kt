@@ -222,7 +222,7 @@ object SimuleringResultMapper {
             pensjonsgivendeInntektBeloep = source.pensjonsgivendeInntektBeloep,
             pensjonspoeng = source.pensjonspoeng,
             pensjonsbeholdningBeloep = source.pensjonsbeholdningBeloep,
-            merknadListe = source.merknadListe.map(MerknadCodeV1::fromInternalValue)
+            merknadListe = source.merknadListe.mapNotNull { MerknadCodeV1.fromInternalValue(it.kode) }
         )
 
     private fun alternativ(source: Alternativ) =

@@ -1,5 +1,6 @@
 package no.nav.pensjon.kalkulator.opptjening.api.v1.acl
 
+import no.nav.pensjon.kalkulator.merknad.MerknadCode
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 
 object OpptjeningResultMapper {
@@ -13,6 +14,11 @@ object OpptjeningResultMapper {
             pensjonsgivendeInntektBeloep = opptjening.pensjonsgivendeInntekt,
             pensjonspoeng = opptjening.pensjonspoeng,
             pensjonsbeholdningBeloep = opptjening.beholdning,
-            merknadListe = opptjening.merknadListe.map(MerknadCodeV1::fromInternalValue)
+            merknadListe = opptjening.merknadListe.mapNotNull { transferable(it.kode) }
         )
+
+    private fun transferable(kode: MerknadCode): MerknadCodeV1? =
+        MerknadCodeV1.fromInternalValue(kode).let {
+            if (it == MerknadCodeV1.UNKNOWN) null else it
+        }
 }

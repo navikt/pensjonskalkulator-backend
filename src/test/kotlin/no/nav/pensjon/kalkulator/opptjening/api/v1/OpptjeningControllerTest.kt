@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.opptjening.api.v1
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.ShouldSpec
 import io.mockk.every
+import no.nav.pensjon.kalkulator.merknad.Merknad
 import no.nav.pensjon.kalkulator.merknad.MerknadCode
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
@@ -49,7 +50,10 @@ class OpptjeningControllerTest : ShouldSpec() {
                         maksimalUfoeregrad = 4,
                         pensjonspoengType = PensjonspoengType.PENSJONSPOENG_FOR_PENSJONSGIVENDE_INNTEKT,
                         beholdning = 12,
-                        merknadListe = listOf(MerknadCode.AFP, MerknadCode.DAGPENGER)
+                        merknadListe = listOf(
+                            Merknad(kode = MerknadCode.AFP),
+                            Merknad(kode = MerknadCode.DAGPENGER)
+                        )
                     )
                 )
 
