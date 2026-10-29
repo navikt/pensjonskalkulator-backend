@@ -2,6 +2,7 @@ package no.nav.pensjon.kalkulator.simulering.api.intern.v2.acl.result
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.merknad.Merknad
 import no.nav.pensjon.kalkulator.merknad.MerknadCode
 import no.nav.pensjon.kalkulator.merknad.UttaksgradMerknad
@@ -45,7 +46,7 @@ class SimuleringV2ResultTest : ShouldSpec({
                             Merknad(
                                 kode = MerknadCode.GRADERT_UTTAK,
                                 uttaksgrad = UttaksgradMerknad(
-                                    grad = 50,
+                                    grad = Uttaksgrad.FEMTI_PROSENT,
                                     kalendermaanedFom = 6
                                 )
                             )

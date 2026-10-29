@@ -9,9 +9,8 @@ data class SimuleringV2Uttaksgrad(
     @field:NotNull
     val grad: Int,
 
-    @field:Schema(description = "Hvilken kalendermåned (1..12) uttaket med denne graden startet (fra og med)")
-    @field:NotNull
-    val kalendermaanedFom: Int
+    @field:Schema(description = "Hvilken kalendermåned (1..12) uttaket med denne graden startet (fra og med) - kun angitt for året da uttaket startet")
+    val kalendermaanedFom: Int? = null
 ) {
     companion object {
         /**
@@ -19,7 +18,7 @@ data class SimuleringV2Uttaksgrad(
          */
         fun transferable(source: UttaksgradMerknad) =
             SimuleringV2Uttaksgrad(
-                grad = source.grad,
+                grad = source.grad.prosentsats,
                 kalendermaanedFom = source.kalendermaanedFom
             )
     }
