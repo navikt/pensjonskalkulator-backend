@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils.hasLength
  * relatert til opptjening.
  * – Intern verdi er den som er brukt i denne appens domene
  * – Ekstern verdi er definert i MerknadCodeV2 i pensjon-selvbetjening-opptjening-backend
+ * Ref. github.com/navikt/pensjon-selvbetjening-opptjening-backend/.../api/merknad/v2/acl/MerknaderV2.kt
  */
 enum class OpptjeningMerknadkode(
     private val externalValue: String,

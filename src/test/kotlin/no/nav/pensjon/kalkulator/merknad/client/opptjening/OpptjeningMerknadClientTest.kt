@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.pensjon.kalkulator.general.Uttaksgrad
 import no.nav.pensjon.kalkulator.merknad.Merknad
 import no.nav.pensjon.kalkulator.merknad.MerknadCode
 import no.nav.pensjon.kalkulator.merknad.Merknader
@@ -60,17 +61,17 @@ class OpptjeningMerknadClientTest : ShouldSpec({
                         2025 to listOf(
                             Merknad(
                                 kode = MerknadCode.UTTAK_STOPPET,
-                                uttaksgrad = UttaksgradMerknad(grad = 0, kalendermaanedFom = 4)
+                                uttaksgrad = UttaksgradMerknad(grad = Uttaksgrad.NULL, kalendermaanedFom = 4)
                             ),
                             Merknad(
                                 kode = MerknadCode.GRADERT_UTTAK,
-                                uttaksgrad = UttaksgradMerknad(grad = 20, kalendermaanedFom = 2)
+                                uttaksgrad = UttaksgradMerknad(grad = Uttaksgrad.TJUE_PROSENT, kalendermaanedFom = 2)
                             )
                         ),
                         2026 to listOf(
                             Merknad(
                                 kode = MerknadCode.HELT_UTTAK,
-                                uttaksgrad = UttaksgradMerknad(grad = 100, kalendermaanedFom = 6)
+                                uttaksgrad = UttaksgradMerknad(grad = Uttaksgrad.HUNDRE_PROSENT, kalendermaanedFom = 6)
                             )
                         )
                     )
