@@ -191,6 +191,7 @@ object LagreSimuleringMapperV1 {
             tilleggspensjonBeloep = source.tilleggspensjonBeloep,
             pensjonstillegg = source.pensjonstillegg,
             skjermingstillegg = source.skjermingstillegg,
+            minstenivaatilleggIndividuelt = source.minstenivaatilleggIndividuelt,
             kapittel19AndelTeller = source.kapittel19AndelTeller,
             kapittel19Trygdetid = source.kapittel19Trygdetid,
             basispensjonBeloep = source.basispensjonBeloep,

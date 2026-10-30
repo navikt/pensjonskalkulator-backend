@@ -153,6 +153,7 @@ data class LagreMaanedligAlderspensjon(
     val tilleggspensjonBeloep: Int?,
     val pensjonstillegg: Int?,
     val skjermingstillegg: Int?,
+    val minstenivaatilleggIndividuelt: Int? = null,
     val kapittel19AndelTeller: Int?,
     val kapittel19Trygdetid: Int?,
     val basispensjonBeloep: Int?,
