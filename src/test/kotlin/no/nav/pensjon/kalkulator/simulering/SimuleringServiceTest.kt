@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.simulering
 
 import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.mockk.Called
 import io.mockk.every
@@ -9,6 +10,9 @@ import io.mockk.verify
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.land.Land
+import no.nav.pensjon.kalkulator.merknad.Merknad
+import no.nav.pensjon.kalkulator.merknad.MerknadCode
+import no.nav.pensjon.kalkulator.merknad.Merknader
 import no.nav.pensjon.kalkulator.mock.PersonFactory.person
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.opptjening.Inntekt
@@ -26,64 +30,106 @@ class SimuleringServiceTest : ShouldSpec({
 
     val pidGetter: PidGetter = mockk { every { pid() } returns pid }
 
-    should("use specified inntekt and sivilstatus") {
-        val incomingSpec = impersonalSimuleringSpec(
-            forventetInntekt = REGISTRERT_INNTEKT,
-            sivilstatus = Sivilstatus.UOPPGITT
-        )
-        val simuleringClient = arrangeSimuleringClient(incomingSpec)
-        val inntektService: InntektService = mockk()
-        val personService: PersonService = mockk {
-            every { getPerson() } returns person(sivilstand = Sivilstand.SKILT)
+    context("funksjonen 'simulerPersonligAlderspensjon'") {
+        should("use specified inntekt and sivilstatus") {
+            val incomingSpec = impersonalSimuleringSpec(
+                sivilstatus = Sivilstatus.UOPPGITT // angitt sivilstatus
+            )
+            val simuleringClient = arrangeSimuleringClient(incomingSpec)
+            val inntektService: InntektService = mockk()
+            val personService: PersonService = arrangePerson(sivilstand = Sivilstand.SKILT)
+
+            val service =
+                SimuleringService(
+                    simuleringClient,
+                    inntektService,
+                    personService,
+                    pidGetter = pidGetter,
+                    time = arrangeTime(),
+                    serviceberegnetAfpService = mockk(),
+                    merknadService = mockk()
+                )
+
+            val response = service.simulerPersonligAlderspensjon(incomingSpec)
+
+            response.alderspensjonListe[0].beloep shouldBe PENSJONSBELOEP
+            verify { inntektService wasNot Called }
+            verify(exactly = 1) { personService.getPerson() } // for fødselsdato (ikke sivilstatus)
+            verify {
+                simuleringClient.simulerPersonligAlderspensjon(
+                    impersonalSpec = any(),
+                    personalSpec = match { it.sivilstatus == Sivilstatus.UOPPGITT }, // = angitt sivilstatus
+                )
+            }
         }
 
-        val service =
-            SimuleringService(
-                simuleringClient,
-                inntektService,
-                personService,
-                pidGetter = pidGetter,
-                time = arrangeTime(),
-                serviceberegnetAfpService = mockk(),
-                merknadClient = mockk()
+        should("obtain registrert inntekt and sivilstatus when not specified") {
+            val incomingSpec = impersonalSimuleringSpec(
+                forventetInntekt = null, // inntekt ikke angitt
+                sivilstatus = null // sivilstatus ikke angitt
             )
+            val simuleringClient = arrangeSimuleringClient(incomingSpec)
+            val inntektService = arrangeInntekt()
+            val personService = arrangePerson(sivilstand = Sivilstand.UOPPGITT) // registrert sivilstatus
 
-        val response = service.simulerPersonligAlderspensjon(incomingSpec)
+            val service =
+                SimuleringService(
+                    simuleringClient,
+                    inntektService,
+                    personService,
+                    pidGetter,
+                    time = arrangeTime(),
+                    serviceberegnetAfpService = mockk(),
+                    merknadService = mockk()
+                )
 
-        response.alderspensjonListe[0].beloep shouldBe 123456
-        verify { inntektService wasNot Called }
-        verify(exactly = 1) { personService.getPerson() } // for fødselsdato (not sivilstatus)
+            val response = service.simulerPersonligAlderspensjon(incomingSpec)
 
-        verify {
-            simuleringClient.simulerPersonligAlderspensjon(
-                impersonalSpec = any(),
-                personalSpec = match { it.sivilstatus == Sivilstatus.UOPPGITT }, // specified sivilstatus
-            )
+            response.alderspensjonListe[0].beloep shouldBe PENSJONSBELOEP
+            verify(exactly = 1) { inntektService.sistePensjonsgivendeInntekt() }
+            verify(exactly = 2) { personService.getPerson() } // for sivilstatus og fødselsdato
+            verify {
+                simuleringClient.simulerPersonligAlderspensjon(
+                    impersonalSpec = any(),
+                    personalSpec = match { it.sivilstatus == Sivilstatus.UOPPGITT }, // = registrert sivilstatus
+                )
+            }
         }
     }
 
-    should("obtain registrert inntekt and sivilstatus when not specified") {
-        val incomingSpec = impersonalSimuleringSpec(forventetInntekt = null, sivilstatus = null)
-        val simuleringClient = arrangeSimuleringClient(incomingSpec)
-        val inntektService = arrangeInntekt()
-        val personService = arrangePerson()
+    context("funksjonen 'simulerPensjon'") {
+        should("inkludere alderspensjon og merknader i resultatet") {
+            val incomingSpec = impersonalSimuleringSpec()
+            val simuleringClient = arrangeSimuleringClient(incomingSpec)
+            val inntektService: InntektService = mockk()
+            val personService: PersonService = arrangePerson(sivilstand = Sivilstand.UOPPGITT)
 
-        val service =
-            SimuleringService(
-                simuleringClient,
-                inntektService,
-                personService,
-                pidGetter,
-                time = arrangeTime(),
-                serviceberegnetAfpService = mockk(),
-                merknadClient = mockk()
-            )
+            val service =
+                SimuleringService(
+                    simuleringClient,
+                    inntektService,
+                    personService,
+                    pidGetter = pidGetter,
+                    time = arrangeTime(),
+                    serviceberegnetAfpService = mockk(),
+                    merknadService = mockk {
+                        every { merknader() } returns Merknader(
+                            perAar = mapOf(2021 to listOf(Merknad(kode = MerknadCode.AFP)))
+                        )
+                    }
+                )
 
-        val response = service.simulerPersonligAlderspensjon(incomingSpec)
+            val response = service.simulerPensjon(incomingSpec)
 
-        response.alderspensjonListe[0].beloep shouldBe PENSJONSBELOEP
-        verify(exactly = 1) { inntektService.sistePensjonsgivendeInntekt() }
-        verify(exactly = 2) { personService.getPerson() } // for sivilstatus and fødselsdato
+            with(response) {
+                alderspensjonListe shouldHaveSize 1
+                alderspensjonListe.first().alder shouldBe 67
+                with(opptjeningListe[0]) {
+                    merknadListe shouldHaveSize 1
+                    merknadListe.first().kode shouldBe MerknadCode.AFP
+                }
+            }
+        }
     }
 })
 
@@ -135,7 +181,7 @@ private val simuleringResult =
         opptjeningListe = emptyList()
     )
 
-private fun impersonalSimuleringSpec(forventetInntekt: Int?, sivilstatus: Sivilstatus?) =
+private fun impersonalSimuleringSpec(forventetInntekt: Int? = REGISTRERT_INNTEKT, sivilstatus: Sivilstatus? = null) =
     ImpersonalSimuleringSpec(
         simuleringType = SimuleringType.ALDERSPENSJON,
         sivilstatus = sivilstatus,
@@ -162,9 +208,9 @@ private fun arrangeInntekt(): InntektService =
         every { sistePensjonsgivendeInntekt() } returns inntekt
     }
 
-private fun arrangePerson(): PersonService =
+private fun arrangePerson(sivilstand: Sivilstand): PersonService =
     mockk {
-        every { getPerson() } returns person()
+        every { getPerson() } returns person(sivilstand)
     }
 
 private fun arrangeSimuleringClient(incomingSpec: ImpersonalSimuleringSpec): SimuleringClient =
