@@ -8,7 +8,7 @@ import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpService
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.merknad.Merknad
-import no.nav.pensjon.kalkulator.merknad.client.MerknadClient
+import no.nav.pensjon.kalkulator.merknad.MerknadService
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.person.PersonService
@@ -32,7 +32,7 @@ class SimuleringService(
     private val pidGetter: PidGetter,
     private val time: TodayProvider,
     private val serviceberegnetAfpService: ServiceberegnetAfpService,
-    private val merknadClient: MerknadClient
+    private val merknadService: MerknadService
 ) {
     private val log = KotlinLogging.logger {}
 
@@ -64,7 +64,7 @@ class SimuleringService(
 
         val opptjeningComboListe: List<SimulertOpptjening> = merge(
             opptjeningListe = result.opptjeningListe,
-            merknaderPerAar = merknadClient.fetchMerknader(pid = pidGetter.pid()).perAar
+            merknaderPerAar = merknadService.merknader().perAar
         )
 
         return result.withOpptjeningListe(opptjeningComboListe)
