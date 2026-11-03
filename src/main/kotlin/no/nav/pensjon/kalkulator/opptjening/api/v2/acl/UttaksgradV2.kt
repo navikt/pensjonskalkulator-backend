@@ -1,0 +1,28 @@
+package no.nav.pensjon.kalkulator.opptjening.api.v2.acl
+
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
+import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.constraints.NotNull
+import no.nav.pensjon.kalkulator.merknad.UttaksgradMerknad
+
+@JsonInclude(NON_NULL)
+data class UttaksgradV2(
+    @field:Schema(description = "Uttaksgrad angitt i prosent")
+    @field:NotNull
+    val grad: Int,
+
+    @field:Schema(description = "Hvilken kalendermåned (1..12) uttaket med denne graden startet (fra og med) - kun angitt for året da uttaket startet")
+    val kalendermaanedFom: Int? = null
+) {
+    companion object {
+        /**
+         * Maps from domain representation to transferable representation (data transfer object).
+         */
+        fun transferable(source: UttaksgradMerknad) =
+            UttaksgradV2(
+                grad = source.grad.prosentsats,
+                kalendermaanedFom = source.kalendermaanedFom
+            )
+    }
+}

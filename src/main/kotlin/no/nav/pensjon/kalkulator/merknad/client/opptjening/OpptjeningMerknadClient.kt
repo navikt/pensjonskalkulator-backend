@@ -4,7 +4,6 @@ import com.github.benmanes.caffeine.cache.Cache
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.merknad.Merknader
 import no.nav.pensjon.kalkulator.merknad.client.MerknadClient
-import no.nav.pensjon.kalkulator.merknad.client.opptjening.acl.OpptjeningMerknadMapper
 import no.nav.pensjon.kalkulator.merknad.client.opptjening.acl.OpptjeningMerknader
 import no.nav.pensjon.kalkulator.person.EncryptedPid
 import no.nav.pensjon.kalkulator.person.Pid
@@ -48,7 +47,7 @@ class OpptjeningMerknadClient(
     override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
 
     private fun fetchFreshData(pid: Pid): Merknader {
-        val uri = "$BASE_PATH/merknader"
+        val uri = "$BASE_PATH/v2/merknader"
 
         return try {
             webClient
@@ -60,7 +59,7 @@ class OpptjeningMerknadClient(
                 .bodyToMono<OpptjeningMerknader>()
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
-                ?.let(OpptjeningMerknadMapper::fromDto)
+                ?.toInternalValue()
                 ?: Merknader(perAar = emptyMap())
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $uri", e)

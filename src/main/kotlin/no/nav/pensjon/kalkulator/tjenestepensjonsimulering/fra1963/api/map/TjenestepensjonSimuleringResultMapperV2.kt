@@ -11,14 +11,14 @@ object TjenestepensjonSimuleringResultMapperV2 {
     fun toDtoV2(resultat: OffentligTjenestepensjonSimuleringsresultat) =
         OffentligTjenestepensjonSimuleringResultV2(
             simuleringsresultatStatus = SimuleringsresultatStatusV2.fromResultatType(resultat.simuleringsResultatStatus.resultatType),
-            muligeTpLeverandoerListe = resultat.tpOrdninger,
+            muligeTpLeverandoerListe = resultat.tpOrdninger.map { it.tpOrdningNavn },
             simulertTjenestepensjon = resultat.simuleringsResultat?.let(TjenestepensjonSimuleringResultMapperV2::simulertTjenestepensjon),
             serviceData = resultat.serviceData
         )
 
     private fun simulertTjenestepensjon(resultat: SimuleringsResultat) =
         SimulertTjenestepensjonV2(
-            tpLeverandoer = resultat.tpOrdning,
+            tpLeverandoer = resultat.tpLeverandoerNavn,
             tpNummer = resultat.tpNummer,
             simuleringsresultat = SimuleringsresultatV2(
                 utbetalingsperioder = resultat.perioder.map(TjenestepensjonSimuleringResultMapperV2::utbetalingsperiode),
