@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.opptjening.api.v1.acl
 
-import no.nav.pensjon.kalkulator.opptjening.behandlet.MerknadCode
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
+import no.nav.pensjon.kalkulator.opptjening.behandlet.MerknadCode
 
 object OpptjeningResultMapper {
 

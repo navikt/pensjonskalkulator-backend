@@ -5,6 +5,7 @@ import no.nav.pensjon.kalkulator.opptjening.behandlet.BeholdningOgMerknader
 import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import org.springframework.stereotype.Service
+import kotlin.collections.map
 
 @Service
 class OpptjeningService(
@@ -29,14 +30,13 @@ class OpptjeningService(
         return if (foersteAar > sisteAar)
             emptyList()
         else
-            IntRange(foersteAar, sisteAar)
-                .map {
-                    merge(
-                        aar = it,
-                        poeng = pensjonspoeng(poengListe, aar = it),
-                        beholdningOgMerknader = beholdningOgMerknaderPerAar[it]
-                    )
-                }
+            (foersteAar..sisteAar).map {
+                merge(
+                    aar = it,
+                    poeng = pensjonspoeng(poengListe, aar = it),
+                    beholdningOgMerknader = beholdningOgMerknaderPerAar[it]
+                )
+            }
     }
 
     private fun merge(
@@ -53,7 +53,7 @@ class OpptjeningService(
 
         private fun kunBeholdningOgMerknader(aar: Int, beholdningOgMerknader: BeholdningOgMerknader?) =
             AarligOpptjening(
-                aar = aar,
+                aar,
                 pensjonsgivendeInntekt = 0,
                 pensjonspoeng = 0.0,
                 maksimalUfoeregrad = null,
@@ -71,10 +71,10 @@ class OpptjeningService(
         private fun maxAar(aarligListe: List<AarligOpptjening>): Int =
             aarligListe.maxOfOrNull { it.aar } ?: 0
 
-        private fun maxAar(perAar: Map<Int, BeholdningOgMerknader>): Int =
-            perAar.maxOfOrNull { it.key } ?: 0
-
         private fun minAar(perAar: Map<Int, BeholdningOgMerknader>): Int =
             perAar.minOfOrNull { it.key } ?: 9999
+
+        private fun maxAar(perAar: Map<Int, BeholdningOgMerknader>): Int =
+            perAar.maxOfOrNull { it.key } ?: 0
     }
 }

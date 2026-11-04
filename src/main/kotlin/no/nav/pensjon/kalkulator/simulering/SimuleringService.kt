@@ -7,10 +7,10 @@ import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpProblemType
 import no.nav.pensjon.kalkulator.afp.ServiceberegnetAfpService
 import no.nav.pensjon.kalkulator.common.exception.NotFoundException
 import no.nav.pensjon.kalkulator.general.Alder
-import no.nav.pensjon.kalkulator.opptjening.behandlet.BeholdningOgMerknadService
-import no.nav.pensjon.kalkulator.opptjening.behandlet.BeholdningOgMerknader
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.opptjening.InntektService
+import no.nav.pensjon.kalkulator.opptjening.behandlet.BeholdningOgMerknadService
+import no.nav.pensjon.kalkulator.opptjening.behandlet.BeholdningOgMerknader
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.simulering.PensjonUtil.uttakDato
 import no.nav.pensjon.kalkulator.simulering.client.SimuleringClient
@@ -135,9 +135,9 @@ class SimuleringService(
             problem(e, type = ProblemType.ANNEN_KLIENTFEIL)
         }
     //TODO: Fiks når feilkodenavn er klar
-    /*catch (e: EgressException) {
-        problem(e, type = ProblemType.ANNEN_SERVERFEIL)
-    }*/
+        /*catch (e: EgressException) {
+            problem(e, type = ProblemType.ANNEN_SERVERFEIL)
+        }*/
 
     private fun sivilstatus() =
         personService.getPerson().sivilstand.sivilstatus
@@ -171,7 +171,7 @@ class SimuleringService(
             return if (foersteAar > sisteAar)
                 emptyList()
             else
-                IntRange(foersteAar, sisteAar).map {
+                (foersteAar..sisteAar).map {
                     merge(
                         aar = it,
                         opptjening = opptjening(opptjeningListe, aar = it),
