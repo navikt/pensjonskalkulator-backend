@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering.api.intern.v2.acl.result
 
-import no.nav.pensjon.kalkulator.merknad.MerknadCode
+import no.nav.pensjon.kalkulator.opptjening.behandlet.MerknadCode
 
 enum class SimuleringV2Merknadkode(private val internalValue: MerknadCode) {
 

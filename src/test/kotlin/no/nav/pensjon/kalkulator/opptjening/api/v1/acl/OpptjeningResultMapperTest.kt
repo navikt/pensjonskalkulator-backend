@@ -2,10 +2,10 @@ package no.nav.pensjon.kalkulator.opptjening.api.v1.acl
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
-import no.nav.pensjon.kalkulator.merknad.Merknad
-import no.nav.pensjon.kalkulator.merknad.MerknadCode
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.opptjening.PensjonspoengType
+import no.nav.pensjon.kalkulator.opptjening.behandlet.Merknad
+import no.nav.pensjon.kalkulator.opptjening.behandlet.MerknadCode
 
 class OpptjeningResultMapperTest : ShouldSpec({
 

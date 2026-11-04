@@ -4,13 +4,9 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.pensjon.kalkulator.merknad.Merknad
-import no.nav.pensjon.kalkulator.merknad.MerknadCode
-import no.nav.pensjon.kalkulator.merknad.MerknadService
-import no.nav.pensjon.kalkulator.merknad.Merknader
-import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengOgBeholdningClient
+import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengClient
+import no.nav.pensjon.kalkulator.opptjening.behandlet.*
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
-import java.time.LocalDate
 
 class OpptjeningServiceTest : ShouldSpec({
 
@@ -18,25 +14,27 @@ class OpptjeningServiceTest : ShouldSpec({
 
     should("håndtere tomme lister") {
         OpptjeningService(
-            opptjeningClient = arrangeOpptjening(opptjeningListe = emptyList(), beholdningListe = emptyList()),
-            merknadService = arrangeMerknader(perAar = emptyMap()),
+            poengClient = arrangePoeng(opptjeningListe = emptyList()),
+            beholdningOgMerknadService = arrangeBeholdningOgMerknader(perAar = emptyMap()),
             pidGetter
         ).opptjening() shouldBe emptyList()
     }
 
     should("håndtere tom opptjeningsliste og tom merknadsliste") {
         OpptjeningService(
-            opptjeningClient = arrangeOpptjening(opptjeningListe = emptyList(), beholdningListe(aar = 2025)),
-            merknadService = arrangeMerknader(perAar = emptyMap()),
+            poengClient = arrangePoeng(opptjeningListe = emptyList()),
+            beholdningOgMerknadService = arrangeBeholdningOgMerknader(
+                perAar = mapOf(2025 to beholdningOgMerknader(beholdningBeloep = 111000)) // tom merknadsliste
+            ),
             pidGetter
         ).opptjening() shouldBe listOf(
             AarligOpptjening(
                 aar = 2025,
                 pensjonsgivendeInntekt = 0,
                 pensjonspoeng = 0.0,
-                maksimalUfoeregrad = 0,
+                maksimalUfoeregrad = null,
                 pensjonspoengType = PensjonspoengType.UNKNOWN,
-                beholdning = 12,
+                beholdning = 111000,
                 merknadListe = emptyList()
             )
         )
@@ -44,16 +42,18 @@ class OpptjeningServiceTest : ShouldSpec({
 
     should("håndtere tom beholdningsliste og tom merknadsliste") {
         OpptjeningService(
-            opptjeningClient = arrangeOpptjening(opptjeningListe(aar = 2022), beholdningListe = emptyList()),
-            merknadService = arrangeMerknader(perAar = emptyMap()),
+            poengClient = arrangePoeng(opptjeningListe(aar = 2022)),
+            beholdningOgMerknadService = arrangeBeholdningOgMerknader(perAar = emptyMap()),
             pidGetter
         ).opptjening() shouldBe listOf(kunOpptjening(2022))
     }
 
     should("slå sammen opptjening og beholdning for samme år") {
         OpptjeningService(
-            opptjeningClient = arrangeOpptjening(opptjeningListe(aar = 2021), beholdningListe(aar = 2021)),
-            merknadService = arrangeMerknader(perAar = emptyMap()),
+            poengClient = arrangePoeng(opptjeningListe(aar = 2021)),
+            beholdningOgMerknadService = arrangeBeholdningOgMerknader(
+                perAar = mapOf(2021 to beholdningOgMerknader(beholdningBeloep = 111000))
+            ),
             pidGetter
         ).opptjening() shouldBe listOf(
             AarligOpptjening(
@@ -62,7 +62,7 @@ class OpptjeningServiceTest : ShouldSpec({
                 pensjonspoeng = 2.1,
                 maksimalUfoeregrad = 4,
                 pensjonspoengType = PensjonspoengType.OMSORG_FOR_SYKE_FUNKSJONSHEMMEDE_ELDRE,
-                beholdning = 12,
+                beholdning = 111000,
                 merknadListe = emptyList()
             )
         )
@@ -70,8 +70,10 @@ class OpptjeningServiceTest : ShouldSpec({
 
     should("slå sammen opptjening, beholdning og merknader for samme år") {
         OpptjeningService(
-            opptjeningClient = arrangeOpptjening(opptjeningListe(aar = 2021), beholdningListe(aar = 2021)),
-            merknadService = arrangeMerknader(aar = 2021, kode = MerknadCode.AFP),
+            poengClient = arrangePoeng(opptjeningListe(aar = 2021)),
+            beholdningOgMerknadService = arrangeBeholdningOgMerknader(
+                perAar = mapOf(2021 to beholdningOgMerknader(beholdningBeloep = 111000, merknadkode = MerknadCode.AFP))
+            ),
             pidGetter
         ).opptjening() shouldBe listOf(
             AarligOpptjening(
@@ -80,33 +82,21 @@ class OpptjeningServiceTest : ShouldSpec({
                 pensjonspoeng = 2.1,
                 maksimalUfoeregrad = 4,
                 pensjonspoengType = PensjonspoengType.OMSORG_FOR_SYKE_FUNKSJONSHEMMEDE_ELDRE,
-                beholdning = 12,
+                beholdning = 111000,
                 merknadListe = listOf(Merknad(kode = MerknadCode.AFP))
             )
         )
     }
 
-    context("flere beholdninger for samme år") {
-        should("bruke beholdning med seneste dato") {
-            OpptjeningService(
-                opptjeningClient = arrangeOpptjening(
-                    opptjeningListe = emptyList(),
-                    beholdningListe = listOf(
-                        DatertBeholdning(dato = LocalDate.of(2021, 1, 1), beholdning = 11),
-                        DatertBeholdning(dato = LocalDate.of(2021, 3, 1), beholdning = 12),
-                        DatertBeholdning(dato = LocalDate.of(2021, 2, 1), beholdning = 13)
-                    )
-                ),
-                merknadService = arrangeMerknader(perAar = emptyMap()),
-                pidGetter
-            ).opptjening().singleOrNull()?.beholdning shouldBe 12
-        }
-    }
-
     should("inkludere ikke-overlappende opptjening/beholdning/merknader, og fylle inn manglende år") {
         OpptjeningService(
-            opptjeningClient = arrangeOpptjening(opptjeningListe(aar = 2020), beholdningListe(aar = 2022)),
-            merknadService = arrangeMerknader(aar = 2023, kode = MerknadCode.DAGPENGER),
+            poengClient = arrangePoeng(opptjeningListe(aar = 2020)),
+            beholdningOgMerknadService = arrangeBeholdningOgMerknader(
+                perAar = mapOf(
+                    2022 to beholdningOgMerknader(beholdningBeloep = 111000), // kun beholdning
+                    2023 to beholdningOgMerknader(beholdningBeloep = 0, merknadkode = MerknadCode.DAGPENGER)
+                )
+            ),
             pidGetter
         ).opptjening() shouldBe listOf(
             // År med kun opptjening:
@@ -116,7 +106,7 @@ class OpptjeningServiceTest : ShouldSpec({
                 aar = 2021,
                 pensjonsgivendeInntekt = 0,
                 pensjonspoeng = 0.0,
-                maksimalUfoeregrad = 0,
+                maksimalUfoeregrad = null,
                 pensjonspoengType = PensjonspoengType.UNKNOWN,
                 beholdning = 0,
                 merknadListe = emptyList()
@@ -126,9 +116,9 @@ class OpptjeningServiceTest : ShouldSpec({
                 aar = 2022,
                 pensjonsgivendeInntekt = 0,
                 pensjonspoeng = 0.0,
-                maksimalUfoeregrad = 0,
+                maksimalUfoeregrad = null,
                 pensjonspoengType = PensjonspoengType.UNKNOWN,
-                beholdning = 12,
+                beholdning = 111000,
                 merknadListe = emptyList()
             ),
             // År med kun merknader:
@@ -136,7 +126,7 @@ class OpptjeningServiceTest : ShouldSpec({
                 aar = 2023,
                 pensjonsgivendeInntekt = 0,
                 pensjonspoeng = 0.0,
-                maksimalUfoeregrad = 0,
+                maksimalUfoeregrad = null,
                 pensjonspoengType = PensjonspoengType.UNKNOWN,
                 beholdning = 0,
                 merknadListe = listOf(Merknad(kode = MerknadCode.DAGPENGER))
@@ -144,33 +134,28 @@ class OpptjeningServiceTest : ShouldSpec({
         )
     }
 
-    should("håndtere tomt marknad-map") {
+    should("håndtere tomt 'beholdning og merknader'-map") {
         OpptjeningService(
-            opptjeningClient = arrangeOpptjening(opptjeningListe(aar = 2020), beholdningListe = emptyList()),
-            merknadService = arrangeMerknader(perAar = emptyMap()),
+            poengClient = arrangePoeng(opptjeningListe(aar = 2020)),
+            beholdningOgMerknadService = arrangeBeholdningOgMerknader(perAar = emptyMap()),
             pidGetter
         ).opptjening() shouldBe listOf(kunOpptjening(2020))
     }
 
     should("håndtere usorterte lister") {
         OpptjeningService(
-            opptjeningClient = arrangeOpptjening(
+            poengClient = arrangePoeng(
                 opptjeningListe = listOf(
                     kunOpptjening(aar = 2022, pensjonsgivendeInntekt = 2),
                     kunOpptjening(aar = 2023, pensjonsgivendeInntekt = 3),
                     kunOpptjening(aar = 2021, pensjonsgivendeInntekt = 1)
-                ),
-                beholdningListe = listOf(
-                    beholdning(aar = 2023, beloep = 13),
-                    beholdning(aar = 2021, beloep = 11),
-                    beholdning(aar = 2022, beloep = 12),
                 )
             ),
-            merknadService = arrangeMerknader(
+            beholdningOgMerknadService = arrangeBeholdningOgMerknader(
                 perAar = mapOf(
-                    2021 to listOf(Merknad(kode = MerknadCode.DAGPENGER)),
-                    2023 to listOf(Merknad(kode = MerknadCode.AFP)),
-                    2022 to listOf(Merknad(kode = MerknadCode.HELT_UTTAK))
+                    2021 to beholdningOgMerknader(beholdningBeloep = 11, merknadkode = MerknadCode.DAGPENGER),
+                    2023 to beholdningOgMerknader(beholdningBeloep = 13, merknadkode = MerknadCode.AFP),
+                    2022 to beholdningOgMerknader(beholdningBeloep = 12, merknadkode = MerknadCode.HELT_UTTAK)
                 )
             ),
             pidGetter
@@ -197,22 +182,17 @@ class OpptjeningServiceTest : ShouldSpec({
     }
 })
 
-private fun arrangeMerknader(perAar: Map<Int, List<Merknad>>): MerknadService =
-    mockk { every { merknader() } returns Merknader(perAar) }
+private fun arrangeBeholdningOgMerknader(perAar: Map<Int, BeholdningOgMerknader>): BeholdningOgMerknadService =
+    mockk { every { beholdningOgMerknader() } returns AarvisBeholdningOgMerknader(perAar) }
 
-private fun arrangeMerknader(aar: Int, merknad: Merknad): MerknadService =
-    arrangeMerknader(perAar = mapOf(aar to listOf(merknad)))
+private fun arrangePoeng(opptjeningListe: List<AarligOpptjening>): PensjonspoengClient =
+    mockk { every { fetchPensjonspoeng(any()) } returns opptjeningListe }
 
-private fun arrangeMerknader(aar: Int, kode: MerknadCode): MerknadService =
-    arrangeMerknader(aar = aar, merknad = Merknad(kode))
-
-private fun arrangeOpptjening(
-    opptjeningListe: List<AarligOpptjening>,
-    beholdningListe: List<DatertBeholdning>
-): PensjonspoengOgBeholdningClient =
-    mockk {
-        every { fetchPensjonspoengOgBeholdning(any()) } returns Pair(opptjeningListe, beholdningListe)
-    }
+private fun beholdningOgMerknader(beholdningBeloep: Int, merknadkode: MerknadCode? = null) =
+    BeholdningOgMerknader(
+        beholdning = Beholdning(beloep = beholdningBeloep),
+        merknadListe = merknadkode?.let { listOf(Merknad(kode = it)) }.orEmpty()
+    )
 
 private fun opptjeningListe(aar: Int) =
     listOf(kunOpptjening(aar))
@@ -227,15 +207,6 @@ private fun kunOpptjening(aar: Int, pensjonsgivendeInntekt: Int = 1) =
         beholdning = 0,
         merknadListe = emptyList()
     )
-
-private fun beholdning(aar: Int, beloep: Int) =
-    DatertBeholdning(
-        dato = LocalDate.of(aar, 1, 1),
-        beholdning = beloep
-    )
-
-private fun beholdningListe(aar: Int) =
-    listOf(beholdning(aar, beloep = 12))
 
 private fun opptjeningCombo(
     aar: Int,

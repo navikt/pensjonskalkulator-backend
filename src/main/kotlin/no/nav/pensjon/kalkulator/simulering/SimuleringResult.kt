@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.simulering
 
 import no.nav.pensjon.kalkulator.afp.BeregnetAfp
-import no.nav.pensjon.kalkulator.merknad.Merknad
+import no.nav.pensjon.kalkulator.opptjening.behandlet.Merknad
 import no.nav.pensjon.kalkulator.validity.Problem
 
 data class SimuleringResult(
@@ -63,6 +63,9 @@ data class SimulertOpptjening(
     val pensjonsbeholdningBeloep: Int,
     val merknadListe: List<Merknad>
 ) {
-    fun withMerknadListe(merknadListe: List<Merknad>) =
-        copy(merknadListe = merknadListe)
+    fun medBeholdningOgMerknader(beholdningBeloep: Int, merknadListe: List<Merknad>) =
+        copy(
+            pensjonsbeholdningBeloep = beholdningBeloep,
+            merknadListe = merknadListe
+        )
 }

@@ -10,14 +10,12 @@ import io.mockk.verify
 import no.nav.pensjon.kalkulator.general.Alder
 import no.nav.pensjon.kalkulator.general.HeltUttak
 import no.nav.pensjon.kalkulator.land.Land
-import no.nav.pensjon.kalkulator.merknad.Merknad
-import no.nav.pensjon.kalkulator.merknad.MerknadCode
-import no.nav.pensjon.kalkulator.merknad.Merknader
 import no.nav.pensjon.kalkulator.mock.PersonFactory.person
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.opptjening.Inntekt
 import no.nav.pensjon.kalkulator.opptjening.InntektService
 import no.nav.pensjon.kalkulator.opptjening.Opptjeningstype
+import no.nav.pensjon.kalkulator.opptjening.behandlet.*
 import no.nav.pensjon.kalkulator.person.PersonService
 import no.nav.pensjon.kalkulator.person.Sivilstand
 import no.nav.pensjon.kalkulator.person.Sivilstatus
@@ -47,7 +45,7 @@ class SimuleringServiceTest : ShouldSpec({
                     pidGetter = pidGetter,
                     time = arrangeTime(),
                     serviceberegnetAfpService = mockk(),
-                    merknadService = mockk()
+                    beholdningOgMerknadService = mockk()
                 )
 
             val response = service.simulerPersonligAlderspensjon(incomingSpec)
@@ -80,7 +78,7 @@ class SimuleringServiceTest : ShouldSpec({
                     pidGetter,
                     time = arrangeTime(),
                     serviceberegnetAfpService = mockk(),
-                    merknadService = mockk()
+                    beholdningOgMerknadService = mockk()
                 )
 
             val response = service.simulerPersonligAlderspensjon(incomingSpec)
@@ -112,9 +110,14 @@ class SimuleringServiceTest : ShouldSpec({
                     pidGetter = pidGetter,
                     time = arrangeTime(),
                     serviceberegnetAfpService = mockk(),
-                    merknadService = mockk {
-                        every { merknader() } returns Merknader(
-                            perAar = mapOf(2021 to listOf(Merknad(kode = MerknadCode.AFP)))
+                    beholdningOgMerknadService = mockk {
+                        every { beholdningOgMerknader() } returns AarvisBeholdningOgMerknader(
+                            perAar = mapOf(
+                                2021 to BeholdningOgMerknader(
+                                    beholdning = Beholdning(beloep = 111000),
+                                    merknadListe = listOf(Merknad(kode = MerknadCode.AFP))
+                                )
+                            )
                         )
                     }
                 )
@@ -125,6 +128,7 @@ class SimuleringServiceTest : ShouldSpec({
                 alderspensjonListe shouldHaveSize 1
                 alderspensjonListe.first().alder shouldBe 67
                 with(opptjeningListe[0]) {
+                    pensjonsbeholdningBeloep shouldBe 111000
                     merknadListe shouldHaveSize 1
                     merknadListe.first().kode shouldBe MerknadCode.AFP
                 }
@@ -204,14 +208,10 @@ private fun impersonalSimuleringSpec(forventetInntekt: Int? = REGISTRERT_INNTEKT
     )
 
 private fun arrangeInntekt(): InntektService =
-    mockk {
-        every { sistePensjonsgivendeInntekt() } returns inntekt
-    }
+    mockk { every { sistePensjonsgivendeInntekt() } returns inntekt }
 
 private fun arrangePerson(sivilstand: Sivilstand): PersonService =
-    mockk {
-        every { getPerson() } returns person(sivilstand)
-    }
+    mockk { every { getPerson() } returns person(sivilstand) }
 
 private fun arrangeSimuleringClient(incomingSpec: ImpersonalSimuleringSpec): SimuleringClient =
     mockk {
@@ -219,6 +219,4 @@ private fun arrangeSimuleringClient(incomingSpec: ImpersonalSimuleringSpec): Sim
     }
 
 private fun arrangeTime(): TodayProvider =
-    mockk {
-        every { date() } returns LocalDate.of(2026, 1, 1)
-    }
+    mockk { every { date() } returns LocalDate.of(2026, 1, 1) }

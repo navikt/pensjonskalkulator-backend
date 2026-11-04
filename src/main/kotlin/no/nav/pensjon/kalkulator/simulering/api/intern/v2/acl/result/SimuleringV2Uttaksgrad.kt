@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.simulering.api.intern.v2.acl.result
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotNull
-import no.nav.pensjon.kalkulator.merknad.UttaksgradMerknad
+import no.nav.pensjon.kalkulator.opptjening.behandlet.UttaksgradMerknad
 
 data class SimuleringV2Uttaksgrad(
     @field:Schema(description = "Uttaksgrad angitt i prosent")

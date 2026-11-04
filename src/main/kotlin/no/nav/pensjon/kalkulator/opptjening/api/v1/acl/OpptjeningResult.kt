@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.opptjening.api.v1.acl
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotNull
-import no.nav.pensjon.kalkulator.merknad.MerknadCode
+import no.nav.pensjon.kalkulator.opptjening.behandlet.MerknadCode
 
 /**
  * NB: Should be kept in sync with SimuleringV1Opptjening
