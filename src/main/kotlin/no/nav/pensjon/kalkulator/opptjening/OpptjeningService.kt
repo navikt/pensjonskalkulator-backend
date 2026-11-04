@@ -1,121 +1,80 @@
 package no.nav.pensjon.kalkulator.opptjening
 
-import no.nav.pensjon.kalkulator.general.Aarlig
-import no.nav.pensjon.kalkulator.merknad.Merknad
-import no.nav.pensjon.kalkulator.merknad.MerknadService
-import no.nav.pensjon.kalkulator.opptjening.BeholdningVelger.velg
-import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengOgBeholdningClient
+import no.nav.pensjon.kalkulator.opptjening.behandlet.BeholdningOgMerknadService
+import no.nav.pensjon.kalkulator.opptjening.behandlet.BeholdningOgMerknader
+import no.nav.pensjon.kalkulator.opptjening.client.PensjonspoengClient
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import org.springframework.stereotype.Service
 
 @Service
 class OpptjeningService(
-    private val opptjeningClient: PensjonspoengOgBeholdningClient,
-    private val merknadService: MerknadService,
+    private val poengClient: PensjonspoengClient,
+    private val beholdningOgMerknadService: BeholdningOgMerknadService,
     private val pidGetter: PidGetter
 ) {
     fun opptjening(): List<AarligOpptjening> =
-        opptjeningClient.fetchPensjonspoengOgBeholdning(pidGetter.pid()).let {
-            opptjeningMedMerknader(opptjeningListe = it.first, beholdningListe = it.second)
-        }
-
-    fun opptjeningMedMerknader(
-        opptjeningListe: List<AarligOpptjening>,
-        beholdningListe: List<DatertBeholdning>
-    ): List<AarligOpptjening> {
-        val opptjeningListePerAar: Map<Int, List<AarligOpptjening>> = opptjeningListe.groupBy { it.aar }
-        val beholdningListePerAar: Map<Int, List<DatertBeholdning>> = beholdningListe.groupBy { it.aar }
-        val foersteComboAar = minAar(opptjeningListePerAar).coerceAtMost(minAar(beholdningListePerAar))
-        val sisteComboAar = maxAar(opptjeningListePerAar).coerceAtLeast(maxAar(beholdningListePerAar))
-        val opptjeningComboPerAar = merge(opptjeningListePerAar, beholdningListePerAar, foersteComboAar, sisteComboAar)
-        val merknadListePerAar = merknadService.merknader().perAar
-        val foersteMerknadAar = merknadListePerAar.minOfOrNull { it.key } ?: foersteComboAar
-        val sisteMerknadAar = merknadListePerAar.maxOfOrNull { it.key } ?: sisteComboAar
-
-        return merge(
-            opptjeningPerAar = opptjeningComboPerAar,
-            merknadListePerAar,
-            foersteAar = foersteComboAar.coerceAtMost(foersteMerknadAar),
-            sisteAar = sisteComboAar.coerceAtLeast(sisteMerknadAar)
+        merge(
+            poengListe = poengClient.fetchPensjonspoeng(pidGetter.pid()),
+            beholdningOgMerknaderPerAar = beholdningOgMerknadService.beholdningOgMerknader().perAar
         )
+
+    private fun merge(
+        poengListe: List<AarligOpptjening>,
+        beholdningOgMerknaderPerAar: Map<Int, BeholdningOgMerknader>
+    ): List<AarligOpptjening> {
+        val relevantePerAar = beholdningOgMerknaderPerAar.filter { it.value.erRelevant() }
+        val foersteAar = minAar(poengListe).coerceAtMost(minAar(relevantePerAar))
+        val sisteAar = maxAar(poengListe).coerceAtLeast(maxAar(relevantePerAar))
+
+        return if (foersteAar > sisteAar)
+            emptyList()
+        else
+            IntRange(foersteAar, sisteAar)
+                .map {
+                    merge(
+                        aar = it,
+                        poeng = pensjonspoeng(poengListe, aar = it),
+                        beholdningOgMerknader = beholdningOgMerknaderPerAar[it]
+                    )
+                }
     }
 
     private fun merge(
-        opptjeningListePerAar: Map<Int, List<AarligOpptjening>>,
-        beholdningListePerAar: Map<Int, List<DatertBeholdning>>,
-        foersteAar: Int,
-        sisteAar: Int
-    ): Map<Int, AarligOpptjening> =
-        if (foersteAar > sisteAar)
-            emptyMap()
-        else
-            (foersteAar..sisteAar).associateWith {
-                opptjeningCombo(
-                    aar = it,
-                    opptjening = opptjeningListePerAar[it]?.firstOrNull(),
-                    beholdning = beholdningListePerAar[it]?.let(::velg)?.beholdning ?: 0
-                )
-            }
-
-    private fun merge(
-        opptjeningPerAar: Map<Int, AarligOpptjening>,
-        merknadListePerAar: Map<Int, List<Merknad>>,
-        foersteAar: Int,
-        sisteAar: Int
-    ): List<AarligOpptjening> =
-        if (foersteAar > sisteAar)
-            emptyList()
-        else
-            (foersteAar..sisteAar).map {
-                opptjeningCombo(
-                    aar = it,
-                    opptjening = opptjeningPerAar[it],
-                    merknadListe = merknadListePerAar[it].orEmpty()
-                )
-            }
+        aar: Int,
+        poeng: AarligOpptjening?,
+        beholdningOgMerknader: BeholdningOgMerknader?
+    ): AarligOpptjening =
+        poeng?.medBeholdningOgMerknader(
+            beholdningBeloep = beholdningOgMerknader?.beholdning?.beloep ?: 0,
+            merknadListe = beholdningOgMerknader?.merknadListe.orEmpty()
+        ) ?: kunBeholdningOgMerknader(aar, beholdningOgMerknader)
 
     private companion object {
 
-        private fun minAar(map: Map<Int, List<Aarlig>>): Int =
-            map.minOfOrNull { it.key } ?: 9999
-
-        private fun maxAar(map: Map<Int, List<Aarlig>>): Int =
-            map.maxOfOrNull { it.key } ?: 0
-
-        private fun opptjeningCombo(
-            aar: Int,
-            opptjening: AarligOpptjening?,
-            beholdning: Int
-        ): AarligOpptjening =
-            opptjening?.withBeholdning(beholdning) ?: kunBeholdning(aar, beholdning)
-
-        private fun opptjeningCombo(
-            aar: Int,
-            opptjening: AarligOpptjening?,
-            merknadListe: List<Merknad>
-        ): AarligOpptjening =
-            opptjening?.withMerknadListe(merknadListe) ?: kunMerknadListe(aar, merknadListe)
-
-        private fun kunBeholdning(aar: Int, beholdning: Int) =
+        private fun kunBeholdningOgMerknader(aar: Int, beholdningOgMerknader: BeholdningOgMerknader?) =
             AarligOpptjening(
-                aar,
+                aar = aar,
                 pensjonsgivendeInntekt = 0,
                 pensjonspoeng = 0.0,
-                maksimalUfoeregrad = 0,
+                maksimalUfoeregrad = null,
                 pensjonspoengType = PensjonspoengType.UNKNOWN,
-                beholdning,
-                merknadListe = emptyList()
+                beholdning = beholdningOgMerknader?.beholdning?.beloep ?: 0,
+                merknadListe = beholdningOgMerknader?.merknadListe.orEmpty()
             )
 
-        private fun kunMerknadListe(aar: Int, merknadListe: List<Merknad>) =
-            AarligOpptjening(
-                aar,
-                pensjonsgivendeInntekt = 0,
-                pensjonspoeng = 0.0,
-                maksimalUfoeregrad = 0,
-                pensjonspoengType = PensjonspoengType.UNKNOWN,
-                beholdning = 0,
-                merknadListe
-            )
+        private fun pensjonspoeng(poengListe: List<AarligOpptjening>, aar: Int): AarligOpptjening? =
+            poengListe.firstOrNull { it.aar == aar }
+
+        private fun minAar(aarligListe: List<AarligOpptjening>): Int =
+            aarligListe.minOfOrNull { it.aar } ?: 9999
+
+        private fun maxAar(aarligListe: List<AarligOpptjening>): Int =
+            aarligListe.maxOfOrNull { it.aar } ?: 0
+
+        private fun maxAar(perAar: Map<Int, BeholdningOgMerknader>): Int =
+            perAar.maxOfOrNull { it.key } ?: 0
+
+        private fun minAar(perAar: Map<Int, BeholdningOgMerknader>): Int =
+            perAar.minOfOrNull { it.key } ?: 9999
     }
 }

@@ -1,15 +1,14 @@
-package no.nav.pensjon.kalkulator.merknad.client.opptjening.acl
+package no.nav.pensjon.kalkulator.opptjening.behandlet.client.backend.acl
 
 import mu.KotlinLogging
-import no.nav.pensjon.kalkulator.merknad.MerknadCode
+import no.nav.pensjon.kalkulator.opptjening.behandlet.MerknadCode
 import org.springframework.util.StringUtils.hasLength
 
 /**
- * Definerer mapping mellom ekstern og intern representasjon av merknadskoder
- * relatert til opptjening.
+ * Definerer mapping mellom ekstern og intern representasjon av merknadskoder relatert til opptjening.
  * – Intern verdi er den som er brukt i denne appens domene
- * – Ekstern verdi er definert i MerknadCodeV2 i pensjon-selvbetjening-opptjening-backend
- * Ref. github.com/navikt/pensjon-selvbetjening-opptjening-backend/.../api/merknad/v2/acl/MerknaderV2.kt
+ * – Ekstern verdi er definert i MerknadkodeV1 i pensjon-selvbetjening-opptjening-backend
+ * Ref. github.com/navikt/pensjon-selvbetjening-opptjening-backend/.../api/opptjening/v1/acl/MerknadkodeV1.kt
  */
 enum class OpptjeningMerknadkode(
     private val externalValue: String,
@@ -22,10 +21,6 @@ enum class OpptjeningMerknadkode(
     REFORM(
         externalValue = "REFORM",
         internalValue = MerknadCode.REFORM
-    ),
-    INGEN_OPPTJENING(
-        externalValue = "INGEN_OPPTJENING",
-        internalValue = MerknadCode.INGEN_OPPTJENING
     ),
     UFOEREGRAD(
         externalValue = "UFOREGRAD",
@@ -56,7 +51,7 @@ enum class OpptjeningMerknadkode(
         internalValue = MerknadCode.UTTAK_STOPPET
     ),
 
-    // Special values representing missing/unknown value:
+    // Spesialverdier som representerer manglende/ukjent verdi:
     NONE(
         externalValue = "",
         internalValue = MerknadCode.NONE
@@ -78,7 +73,7 @@ enum class OpptjeningMerknadkode(
 
         private fun default(externalValue: String?) =
             if (hasLength(externalValue))
-                UNKNOWN.also { log.warn { "Unknown merknad '$externalValue'" } }
+                UNKNOWN.also { log.warn { "ukjent merknadskode '$externalValue'" } }
             else
                 NONE
     }

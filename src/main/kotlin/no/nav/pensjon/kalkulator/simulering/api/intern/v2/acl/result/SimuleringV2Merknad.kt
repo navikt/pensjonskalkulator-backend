@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotNull
-import no.nav.pensjon.kalkulator.merknad.Merknad
+import no.nav.pensjon.kalkulator.opptjening.behandlet.Merknad
 
 @JsonInclude(NON_NULL)
 data class SimuleringV2Merknad(

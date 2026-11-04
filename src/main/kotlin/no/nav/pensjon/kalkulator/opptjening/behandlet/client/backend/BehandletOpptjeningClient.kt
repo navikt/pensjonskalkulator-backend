@@ -1,10 +1,10 @@
-package no.nav.pensjon.kalkulator.merknad.client.opptjening
+package no.nav.pensjon.kalkulator.opptjening.behandlet.client.backend
 
 import com.github.benmanes.caffeine.cache.Cache
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
-import no.nav.pensjon.kalkulator.merknad.Merknader
-import no.nav.pensjon.kalkulator.merknad.client.MerknadClient
-import no.nav.pensjon.kalkulator.merknad.client.opptjening.acl.OpptjeningMerknader
+import no.nav.pensjon.kalkulator.opptjening.behandlet.AarvisBeholdningOgMerknader
+import no.nav.pensjon.kalkulator.opptjening.behandlet.client.BeholdningOgMerknadClient
+import no.nav.pensjon.kalkulator.opptjening.behandlet.client.backend.acl.OpptjeningAarvisBeholdningOgMerknader
 import no.nav.pensjon.kalkulator.person.EncryptedPid
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.tech.cache.CacheConfigurator.createCache
@@ -24,30 +24,34 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.reactive.function.client.bodyToMono
 
+/**
+ * Gjør kall til pensjon-selvbetjening-opptjening-backend
+ * (som behandler opptjening fra opptjeningsregisteret).
+ */
 @Component
-class OpptjeningMerknadClient(
+class BehandletOpptjeningClient(
     @Value($$"${opptjening.url}") baseUrl: String,
     @Value($$"${web-client.retry-attempts}") retryAttempts: String,
     webClientBuilder: WebClient.Builder,
     cacheManager: CaffeineCacheManager,
     private val pidEncrypter: CryptoService,
     private val traceAid: TraceAid,
-) : ExternalServiceClient(retryAttempts), MerknadClient {
+) : ExternalServiceClient(retryAttempts), BeholdningOgMerknadClient {
 
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
 
-    private val cache: Cache<Pid, Merknader> =
-        createCache("merknader", cacheManager)
+    private val cache: Cache<Pid, AarvisBeholdningOgMerknader> =
+        createCache(name = "beholdninger-og-merknader", cacheManager)
 
-    override fun fetchMerknader(pid: Pid): Merknader =
+    override fun fetchBeholdningOgMerknader(pid: Pid): AarvisBeholdningOgMerknader =
         cache.getIfPresent(pid) ?: fetchFreshData(pid).also { cache.put(pid, it) }
 
     override fun service() = service
 
     override fun toString(e: EgressException, uri: String) = "Failed calling $uri"
 
-    private fun fetchFreshData(pid: Pid): Merknader {
-        val uri = "$BASE_PATH/v2/merknader"
+    private fun fetchFreshData(pid: Pid): AarvisBeholdningOgMerknader {
+        val uri = PATH
 
         return try {
             webClient
@@ -56,11 +60,11 @@ class OpptjeningMerknadClient(
                 .accept(MediaType.APPLICATION_JSON)
                 .headers { setHeaders(it, encryptedPid(pid)) }
                 .retrieve()
-                .bodyToMono<OpptjeningMerknader>()
+                .bodyToMono<OpptjeningAarvisBeholdningOgMerknader>()
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
                 ?.toInternalValue()
-                ?: Merknader(perAar = emptyMap())
+                ?: AarvisBeholdningOgMerknader(perAar = emptyMap())
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $uri", e)
         } catch (e: WebClientResponseException) {
@@ -81,7 +85,7 @@ class OpptjeningMerknadClient(
     }
 
     private companion object {
-        private const val BASE_PATH = "/api"
+        private const val PATH = "/api/v1/beholdninger-og-merknader"
 
         private val service = EgressService.OPPTJENING_SELVBETJENING
     }

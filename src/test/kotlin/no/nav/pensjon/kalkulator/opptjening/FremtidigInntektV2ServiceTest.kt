@@ -13,7 +13,7 @@ class FremtidigInntektV2ServiceTest : ShouldSpec({
 
     should("returnere beløp for 'sum pensjonsgivende inntekt'") {
         val result = InntektService(
-            client = arrangeOpptjening(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT),
+            client = arrangePoeng(Opptjeningstype.SUM_PENSJONSGIVENDE_INNTEKT),
             pidGetter
         ) { now }.sistePensjonsgivendeInntekt()
 
@@ -25,7 +25,7 @@ class FremtidigInntektV2ServiceTest : ShouldSpec({
 
     should("returnere 0 når ingen 'sum pensjonsgivende inntekt' finnes") {
         val result = InntektService(
-            client = arrangeOpptjening(Opptjeningstype.PENSJONSGIVENDE_INNTEKT),
+            client = arrangePoeng(Opptjeningstype.PENSJONSGIVENDE_INNTEKT),
             pidGetter
         ) { now }.sistePensjonsgivendeInntekt()
 
@@ -40,7 +40,7 @@ private const val CURRENT_AAR = 2024
 private val now = LocalDateTime.of(CURRENT_AAR, 1, 1, 12, 0, 0)
 private val pidGetter = mockk<PidGetter>(relaxed = true)
 
-private fun arrangeOpptjening(opptjeningstype: Opptjeningstype): OpptjeningsgrunnlagClient =
+private fun arrangePoeng(opptjeningstype: Opptjeningstype): OpptjeningsgrunnlagClient =
     mockk<OpptjeningsgrunnlagClient>().apply {
         every {
             fetchOpptjeningsgrunnlag(any())

@@ -1,11 +1,11 @@
-package no.nav.pensjon.kalkulator.merknad.client.opptjening.acl
+package no.nav.pensjon.kalkulator.opptjening.behandlet.client.backend.acl
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
-import no.nav.pensjon.kalkulator.merknad.Merknad
-import no.nav.pensjon.kalkulator.merknad.MerknadCode
-import no.nav.pensjon.kalkulator.merknad.UttaksgradMerknad
+import no.nav.pensjon.kalkulator.opptjening.behandlet.Merknad
+import no.nav.pensjon.kalkulator.opptjening.behandlet.MerknadCode
+import no.nav.pensjon.kalkulator.opptjening.behandlet.UttaksgradMerknad
 
 class OpptjeningMerknadTest : ShouldSpec({
 
