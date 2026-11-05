@@ -1,7 +1,7 @@
 package no.nav.pensjon.kalkulator.opptjening
 
 import no.nav.pensjon.kalkulator.general.Aarlig
-import no.nav.pensjon.kalkulator.merknad.Merknad
+import no.nav.pensjon.kalkulator.opptjening.behandlet.Merknad
 
 /**
  * Årlig opptjening av pensjonsrettigheter.
@@ -15,9 +15,9 @@ data class AarligOpptjening(
     val beholdning: Int,
     val merknadListe: List<Merknad>
 ) : Aarlig {
-    fun withBeholdning(beholdning: Int) =
-        copy(beholdning = beholdning)
-
-    fun withMerknadListe(merknadListe: List<Merknad>) =
-        copy(merknadListe = merknadListe)
+    fun medBeholdningOgMerknader(beholdningBeloep: Int, merknadListe: List<Merknad>) =
+        copy(
+            beholdning = beholdningBeloep,
+            merknadListe = merknadListe
+        )
 }

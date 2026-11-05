@@ -1,5 +1,8 @@
-package no.nav.pensjon.kalkulator.merknad
+package no.nav.pensjon.kalkulator.opptjening.behandlet
 
+/**
+ * Opplisting av koder for merknadstyper relatert til pensjonsopptjening.
+ */
 enum class MerknadCode {
     AFP,
     REFORM,

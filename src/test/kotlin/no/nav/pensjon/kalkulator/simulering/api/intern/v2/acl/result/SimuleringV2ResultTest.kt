@@ -3,15 +3,11 @@ package no.nav.pensjon.kalkulator.simulering.api.intern.v2.acl.result
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import no.nav.pensjon.kalkulator.general.Uttaksgrad
-import no.nav.pensjon.kalkulator.merknad.Merknad
-import no.nav.pensjon.kalkulator.merknad.MerknadCode
-import no.nav.pensjon.kalkulator.merknad.UttaksgradMerknad
 import no.nav.pensjon.kalkulator.mock.TestObjects
-import no.nav.pensjon.kalkulator.simulering.AlderspensjonMaanedsbeloep
-import no.nav.pensjon.kalkulator.simulering.SimuleringResult
-import no.nav.pensjon.kalkulator.simulering.SimulertAfpPrivat
-import no.nav.pensjon.kalkulator.simulering.SimulertOpptjening
-import no.nav.pensjon.kalkulator.simulering.Vilkaarsproeving
+import no.nav.pensjon.kalkulator.opptjening.behandlet.Merknad
+import no.nav.pensjon.kalkulator.opptjening.behandlet.MerknadCode
+import no.nav.pensjon.kalkulator.opptjening.behandlet.UttaksgradMerknad
+import no.nav.pensjon.kalkulator.simulering.*
 
 class SimuleringV2ResultTest : ShouldSpec({
 
