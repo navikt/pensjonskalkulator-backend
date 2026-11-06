@@ -167,23 +167,6 @@ class SimuleringControllerTest : ShouldSpec() {
                 .andExpect(content().json(responseBodyForGradertUttakV9()))
         }
 
-        should("simulere endring av alderspensjon med privat AFP V9") {
-            val spec = impersonalGradertUttakSpec(SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT)
-            every {
-                simuleringService.simulerPersonligAlderspensjon(spec)
-            } returns simuleringsresultat(spec.simuleringType, heltUttak = false)
-            enableUtvidetResult()
-
-            mvc.perform(
-                post(URL_V9)
-                    .with(csrf())
-                    .content(gradertUttakRequestBody(SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT))
-                    .contentType(MediaType.APPLICATION_JSON)
-            )
-                .andExpect(status().isOk())
-                .andExpect(content().json(responseBodyForGradertUttakV9()))
-        }
-
         should("simulere endring av alderspensjon med livsvarig offentlig AFP V9") {
             val spec = impersonalGradertUttakSpec(SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG)
             every {
@@ -421,17 +404,6 @@ class SimuleringControllerTest : ShouldSpec() {
                     alderspensjonMaanedsbeloep = maanedsbeloep(heltUttak),
                     livsvarigOffentligAfpListe = emptyList(),
                     privatAfpListe = emptyList(),
-                    vilkaarsproeving = vilkaarsproeving(),
-                    harForLiteTrygdetid = false,
-                    trygdetid = 0,
-                    opptjeningListe = emptyList()
-                )
-
-                SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT -> SimuleringResult(
-                    alderspensjonListe = listOf(alderspensjon()),
-                    alderspensjonMaanedsbeloep = maanedsbeloep(heltUttak),
-                    livsvarigOffentligAfpListe = emptyList(),
-                    privatAfpListe = listOf(privatAfp()),
                     vilkaarsproeving = vilkaarsproeving(),
                     harForLiteTrygdetid = false,
                     trygdetid = 0,
