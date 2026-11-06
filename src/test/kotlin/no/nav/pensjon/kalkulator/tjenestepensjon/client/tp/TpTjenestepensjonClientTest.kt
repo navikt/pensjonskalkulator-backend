@@ -205,13 +205,13 @@ object TpTjenestepensjonClientTestObjects {
                     "datoYtelseIverksattTom": "2027-08-15",
                     "_links": {
                         "self": {
-                            "href": "https://tp-q2.dev.intern.nav.no/api/tjenestepensjon/forhold/80000470763/ytelse/22584987"
+                            "href": "https://tp-q2.intern.dev.nav.no/api/tjenestepensjon/forhold/80000470763/ytelse/22584987"
                         },
                         "edit": {
-                            "href": "https://tp-q2.dev.intern.nav.no/api/tjenestepensjon/forhold/3100/ytelse/22584987"
+                            "href": "https://tp-q2.intern.dev.nav.no/api/tjenestepensjon/forhold/3100/ytelse/22584987"
                         },
                         "delete": {
-                            "href": "https://tp-q2.dev.intern.nav.no/api/tjenestepensjon/forhold/3100/ytelse/22584987"
+                            "href": "https://tp-q2.intern.dev.nav.no/api/tjenestepensjon/forhold/3100/ytelse/22584987"
                         }
                     }
                 }
@@ -222,17 +222,17 @@ object TpTjenestepensjonClientTestObjects {
             "datoSistOpptjening": null,
             "_links": {
                 "ordning": {
-                    "href": "https://tp-q2.dev.intern.nav.no/api/ordninger/3100"
+                    "href": "https://tp-q2.intern.dev.nav.no/api/ordninger/3100"
                 },
                 "addYtelse": {
-                    "href": "https://tp-q2.dev.intern.nav.no/api/tjenestepensjon/forhold/3100/ytelse"
+                    "href": "https://tp-q2.intern.dev.nav.no/api/tjenestepensjon/forhold/3100/ytelse"
                 }
             }
         }
     ],
     "_links": {
         "addForhold": {
-            "href": "https://tp-q2.dev.intern.nav.no/api/tjenestepensjon/forhold"
+            "href": "https://tp-q2.intern.dev.nav.no/api/tjenestepensjon/forhold"
         }
     }
 }"""
