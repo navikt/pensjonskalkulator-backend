@@ -39,6 +39,7 @@ object PersonligSimuleringResultMapper {
             tilleggspensjon = dto.tilleggspensjon ?: 0,
             pensjonstillegg = dto.pensjonstillegg ?: 0,
             skjermingstillegg = dto.skjermingstillegg ?: 0,
+            minstenivaatilleggIndividuelt = dto.minstenivaatilleggIndividuelt,
             kapittel19Pensjon = dto.kapittel19Pensjon?.let(::kapittel19Pensjon),
             kapittel20Pensjon = dto.kapittel20Pensjon?.let(::kapittel20Pensjon),
         )
@@ -156,6 +157,7 @@ object PersonligSimuleringResultMapper {
             tilleggspensjon = dto.tilleggspensjon,
             pensjonstillegg = dto.pensjonstillegg,
             skjermingstillegg = dto.skjermingstillegg,
+            minstenivaatilleggIndividuelt = dto.minstenivaatilleggIndividuelt,
             kapittel19Pensjon = dto.kapittel19Pensjon?.let(::kapittel19Pensjon),
             kapittel20Pensjon = dto.kapittel20Pensjon?.let(::kapittel20Pensjon)
         )

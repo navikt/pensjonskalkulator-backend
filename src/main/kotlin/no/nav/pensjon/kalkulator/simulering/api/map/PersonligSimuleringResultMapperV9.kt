@@ -76,7 +76,8 @@ object PersonligSimuleringResultMapperV9 {
                         it.grunnpensjon,
                         it.tilleggspensjon,
                         it.pensjonstillegg,
-                        it.skjermingstillegg
+                        it.skjermingstillegg,
+                        minstenivaatilleggIndividuelt = it.minstenivaatilleggIndividuelt
                     )
                 )
                 oppdatertAlderspensjonList.sortedBy { it.alder }

@@ -51,6 +51,7 @@ object SimuleringResultAdjuster {
                 tilleggspensjonBeloep = pensjonForAlder0.tilleggspensjonBeloep,
                 pensjonstillegg = pensjonForAlder0.pensjonstillegg,
                 skjermingstillegg = pensjonForAlder0.skjermingstillegg,
+                minstenivaatilleggIndividuelt = pensjonForAlder0.minstenivaatilleggIndividuelt,
                 gjenlevendetillegg = pensjonForAlder0.gjenlevendetillegg,
                 minstePensjonsnivaaSats = pensjonForAlder0.minstePensjonsnivaaSats,
                 delingstall = pensjonForAlder0.delingstall,

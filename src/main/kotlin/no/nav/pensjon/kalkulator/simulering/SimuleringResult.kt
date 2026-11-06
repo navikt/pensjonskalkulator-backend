@@ -51,6 +51,7 @@ data class SimulertMaanedligAlderspensjon(
     val tilleggspensjon: Int?,
     val pensjonstillegg: Int?,
     val skjermingstillegg: Int?,
+    val minstenivaatilleggIndividuelt: Int? = null,
     val kapittel19Pensjon: Kapittel19Pensjon?,
     val kapittel20Pensjon: Kapittel20Pensjon?
 )
