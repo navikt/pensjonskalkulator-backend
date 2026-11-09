@@ -119,7 +119,7 @@ object PersonligSimuleringResultMapperV9 {
             heltUttakMaanedligBeloep = source?.heltUttak ?: 0
         )
 
-    private fun pre2025OffentligAfp(source: SimulertPre2025OffentligAfp) =
+    private fun pre2025OffentligAfp(source: SimulertTidsbegrensetOffentligAfp) =
         PersonligSimuleringPre2025OffentligAfpResultV9(
             alderAar = source.alderAar,
             totaltAfpBeloep = source.totaltAfpBeloep,
@@ -134,7 +134,7 @@ object PersonligSimuleringResultMapperV9 {
             afpTillegg = source.afpTillegg,
             saertillegg = source.saertillegg,
             afpGrad = source.afpGrad,
-            afpAvkortetTil70Prosent = source.afpAvkortetTil70Prosent
+            afpAvkortetTil70Prosent = source.erAvkortet
         )
 
     private fun privatAfp(source: SimulertAfpPrivat) =

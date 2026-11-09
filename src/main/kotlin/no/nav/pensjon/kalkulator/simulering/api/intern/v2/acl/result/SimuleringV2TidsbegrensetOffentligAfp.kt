@@ -2,7 +2,7 @@ package no.nav.pensjon.kalkulator.simulering.api.intern.v2.acl.result
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotNull
-import no.nav.pensjon.kalkulator.simulering.SimulertPre2025OffentligAfp
+import no.nav.pensjon.kalkulator.simulering.SimulertTidsbegrensetOffentligAfp
 
 data class SimuleringV2TidsbegrensetOffentligAfp(
     @field:Schema(description = "Personens alder (år) som informasjonen gjelder for")
@@ -59,10 +59,14 @@ data class SimuleringV2TidsbegrensetOffentligAfp(
 
     @field:Schema(description = "Hvorvidt AFP-ytelsen er avkortet i.h.t. 70-prosentregelen")
     @field:NotNull
-    val erAvkortet: Boolean
+    val erAvkortet: Boolean,
+
+    @field:Schema(description = "Fremtidige pensjonspoeng (registrert eller simulert verdi)")
+    @field:NotNull
+    val fremtidigePensjonspoeng: Double
 ) {
     companion object {
-        fun transferable(source: SimulertPre2025OffentligAfp) =
+        fun transferable(source: SimulertTidsbegrensetOffentligAfp) =
             SimuleringV2TidsbegrensetOffentligAfp(
                 alderAar = source.alderAar,
                 totaltAfpBeloep = source.totaltAfpBeloep,
@@ -77,7 +81,8 @@ data class SimuleringV2TidsbegrensetOffentligAfp(
                 afpTillegg = source.afpTillegg,
                 saertillegg = source.saertillegg,
                 afpGrad = source.afpGrad,
-                erAvkortet = source.afpAvkortetTil70Prosent
+                erAvkortet = source.erAvkortet,
+                fremtidigePensjonspoeng = source.fremtidigePensjonspoeng
             )
     }
 }

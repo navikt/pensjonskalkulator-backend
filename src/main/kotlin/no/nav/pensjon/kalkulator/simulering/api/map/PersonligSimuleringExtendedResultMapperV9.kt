@@ -20,7 +20,7 @@ object PersonligSimuleringExtendedResultMapperV9 {
             alderspensjon = source.alderspensjonListe.map(::alderspensjon)
                 .let { justerAlderspensjonInnevaerendeAar(alderspensjonList = it, foedselsdato) },
             alderspensjonMaanedligVedEndring = maanedligPensjon(source.alderspensjonMaanedsbeloep),
-            pre2025OffentligAfp = source.tidsbegrensetOffentligAfp?.let(::pre2025OffentligAfp),
+            pre2025OffentligAfp = source.tidsbegrensetOffentligAfp?.let(::tidsbegrensetOffentligAfp),
             afpPrivat = source.privatAfpListe.map(::privatAfp)
                 .let { justerPrivatAfpInnevaerendeAar(afpListe = it, foedselsdato) },
             afpOffentlig = source.livsvarigOffentligAfpListe.map(::livsvarigOffentligAfp),
@@ -69,7 +69,7 @@ object PersonligSimuleringExtendedResultMapperV9 {
             maanedligBeloep = source.maanedligBeloep
         )
 
-    private fun pre2025OffentligAfp(source: SimulertPre2025OffentligAfp) =
+    private fun tidsbegrensetOffentligAfp(source: SimulertTidsbegrensetOffentligAfp) =
         PersonligSimuleringPre2025OffentligAfpResultV9(
             alderAar = source.alderAar,
             totaltAfpBeloep = source.totaltAfpBeloep,
@@ -84,7 +84,8 @@ object PersonligSimuleringExtendedResultMapperV9 {
             afpTillegg = source.afpTillegg,
             saertillegg = source.saertillegg,
             afpGrad = source.afpGrad,
-            afpAvkortetTil70Prosent = source.afpAvkortetTil70Prosent
+            afpAvkortetTil70Prosent = source.erAvkortet
+            // fremtidigePensjonspoeng ikke relevant for ekstern kalkulator
         )
 
     private fun privatAfp(source: SimulertAfpPrivat) =
