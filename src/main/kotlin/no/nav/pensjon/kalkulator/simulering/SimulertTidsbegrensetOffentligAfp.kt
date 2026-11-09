@@ -1,6 +1,6 @@
 package no.nav.pensjon.kalkulator.simulering
 
-data class SimulertPre2025OffentligAfp (
+data class SimulertTidsbegrensetOffentligAfp (
     val alderAar: Int,
     val totaltAfpBeloep: Int,
     val tidligereArbeidsinntekt: Int,
@@ -14,5 +14,6 @@ data class SimulertPre2025OffentligAfp (
     val afpTillegg: Int,
     val saertillegg: Int,
     val afpGrad: Int,
-    val afpAvkortetTil70Prosent: Boolean
+    val erAvkortet: Boolean,
+    val fremtidigePensjonspoeng: Double
 )

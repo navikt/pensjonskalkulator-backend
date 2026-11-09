@@ -170,7 +170,7 @@ object SimuleringResultMapper {
             maanedligBeloep = source.maanedligBeloep
         )
 
-    private fun tidsbegrensetOffentligAfp(source: SimulertPre2025OffentligAfp) =
+    private fun tidsbegrensetOffentligAfp(source: SimulertTidsbegrensetOffentligAfp) =
         SimuleringV1TidsbegrensetOffentligAfp(
             alderAar = source.alderAar,
             totaltAfpBeloep = source.totaltAfpBeloep,
@@ -185,7 +185,7 @@ object SimuleringResultMapper {
             afpTillegg = source.afpTillegg,
             saertillegg = source.saertillegg,
             afpGrad = source.afpGrad,
-            erAvkortet = source.afpAvkortetTil70Prosent
+            erAvkortet = source.erAvkortet
         )
 
     private fun privatAfp(source: SimulertAfpPrivat) =

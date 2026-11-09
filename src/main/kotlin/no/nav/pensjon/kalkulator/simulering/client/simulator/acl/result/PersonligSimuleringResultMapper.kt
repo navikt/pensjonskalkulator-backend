@@ -13,7 +13,7 @@ object PersonligSimuleringResultMapper {
             alderspensjonMaanedsbeloep = dto.alderspensjonMaanedsbeloep?.let(::alderspensjonMaanedsbeloep),
             maanedligAlderspensjonForKnekkpunkter = dto.maanedligAlderspensjonForKnekkpunkter?.let(::maanedligAlderspensjonForKnekkpunkter),
             livsvarigOffentligAfpListe = dto.livsvarigOffentligAfpListe.map(::livsvarigOffentligAfp),
-            tidsbegrensetOffentligAfp = dto.tidsbegrensetOffentligAfp?.let(::tidsbegrensetOffentligAfp),
+            tidsbegrensetOffentligAfp = dto.tidsbegrensetOffentligAfp?.toInternalValue(),
             serviceberegnetAfp = null, // ikke relevant her
             privatAfpListe = dto.privatAfpListe.map(::privatAfp),
             vilkaarsproeving = vilkaarsproeving(dto.vilkaarsproevingsresultat),
@@ -73,24 +73,6 @@ object PersonligSimuleringResultMapper {
             alder = dto.alderAar,
             beloep = dto.beloep,
             maanedligBeloep = dto.maanedligBeloep
-        )
-
-    private fun tidsbegrensetOffentligAfp(dto: TidsbegrensetOffentligAfpDto) =
-        SimulertPre2025OffentligAfp(
-            alderAar = dto.alderAar,
-            totaltAfpBeloep = dto.totaltAfpBeloep,
-            tidligereArbeidsinntekt = dto.tidligereArbeidsinntekt,
-            grunnbeloep = dto.grunnbeloep,
-            sluttpoengtall = dto.sluttpoengtall,
-            trygdetid = dto.trygdetid,
-            poengaarTom1991 = dto.poengaarTom1991,
-            poengaarFom1992 = dto.poengaarFom1992,
-            grunnpensjon = dto.grunnpensjon,
-            tilleggspensjon = dto.tilleggspensjon,
-            afpTillegg = dto.afpTillegg,
-            saertillegg = dto.saertillegg,
-            afpGrad = dto.afpGrad,
-            afpAvkortetTil70Prosent = dto.erAvkortet
         )
 
     private fun privatAfp(dto: PrivatAfpDto) =
