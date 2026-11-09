@@ -47,6 +47,10 @@ data class SimuleringV2MaanedligAlderspensjon(
     @field:Schema(description = "Skjermingstillegg (beløp i norske kroner)")
     val skjermingstillegg: Int?,
 
+    @field:Schema(description = "Individuelt minstenivåtillegg; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val minstenivaatilleggIndividuelt: Int? = null,
+
+
     @field:Schema(description = "Andel av pensjonen som er beregnet i henhold til kapittel 19 i Folketrygdloven")
     val kapittel19Andel: Double?,
 
@@ -106,7 +110,8 @@ data class SimuleringV2MaanedligAlderspensjon(
                 kapittel20Trygdetid = source.kapittel20Pensjon?.trygdetidAntallAar,
                 garantipensjonBeloep = source.kapittel20Pensjon?.garantipensjon?.maanedligBeloep,
                 garantipensjonSats = source.kapittel20Pensjon?.garantipensjon?.sats,
-                garantitilleggBeloep = source.kapittel20Pensjon?.garantitillegg
+                garantitilleggBeloep = source.kapittel20Pensjon?.garantitillegg,
+                minstenivaatilleggIndividuelt = source.minstenivaatilleggIndividuelt
             )
     }
 }

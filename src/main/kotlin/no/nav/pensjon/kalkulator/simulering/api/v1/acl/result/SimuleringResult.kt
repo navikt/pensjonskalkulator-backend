@@ -91,6 +91,9 @@ data class SimuleringV1Alderspensjon(
     @field:Schema(description = "Skjermingstillegg; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
     val skjermingstillegg: Int? = null,
 
+    @field:Schema(description = "Individuelt minstenivåtillegg; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
+    val minstenivaatilleggIndividuelt: Int? = null,
+
     @field:Schema(description = "Årlig beløp for gjenlevendetillegg; feltet er ikke inkludert i eksternvariant når funksjonsbryter 'utvidet-simuleringsresultat' er 'av'")
     val gjenlevendetillegg: Int?,
 
@@ -181,6 +184,9 @@ data class SimuleringV1MaanedligAlderspensjon(
 
     @field:Schema(description = "Skjermingstillegg (beløp i norske kroner)")
     val skjermingstillegg: Int?,
+
+    @field:Schema(description = "Individuelt minstenivåtillegg (beløp i norske kroner)")
+    val minstenivaatilleggIndividuelt: Int? = null,
 
     @field:Schema(description = "Andel av pensjonen som er beregnet i henhold til kapittel 19 i Folketrygdloven")
     val kapittel19Andel: Double?,
