@@ -144,6 +144,8 @@ spec:
         - host: api.preprod.norskpensjon.no
         - host: secretmanager.googleapis.com
   env:
+    - name: LOGVIEWER_URL
+      value: https://pensjon-regler-logviewer-app-dev.intern.dev.nav.no
     - name: NAV_ANSATT_SERVICE_ID
       value: dev-gcp:pensjon-saksbehandling:navansatt
     - name: NAV_ANSATT_URL
