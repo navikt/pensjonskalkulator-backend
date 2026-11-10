@@ -11,6 +11,7 @@ import no.nav.pensjon.kalkulator.simulering.api.intern.v2.acl.spec.SimuleringV2S
 import no.nav.pensjon.kalkulator.tech.json.writeValueAsRedactedString
 import no.nav.pensjon.kalkulator.tech.metric.Metrics
 import no.nav.pensjon.kalkulator.tech.trace.TraceAid
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -21,7 +22,8 @@ import tools.jackson.databind.json.JsonMapper
 class InternSimuleringControllerV2(
     private val service: SimuleringService,
     private val traceAid: TraceAid,
-    private val jsonMapper: JsonMapper
+    private val jsonMapper: JsonMapper,
+    @Value($$"${pkb.logviewer.url}") private val logViewerUrl: String
 ) : ControllerBase(traceAid) {
 
     private val log = KotlinLogging.logger {}
@@ -70,7 +72,8 @@ class InternSimuleringControllerV2(
 
             val resultDto: SimuleringV2Result = SimuleringV2Result.transferable(
                 source = result,
-                naavaerendeAlderAar = result.alderAar ?: 0
+                naavaerendeAlderAar = result.alderAar ?: 0,
+                logViewerUrl = logViewerUrl()
             ).also {
                 log.debug { "Simulering respons ${jsonMapper.writeValueAsRedactedString(it)}" }
             }
@@ -90,6 +93,9 @@ class InternSimuleringControllerV2(
         ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(SimuleringV2Result.serverfeil(e))
 
     override fun errorMessage() = ERROR_MESSAGE
+
+    private fun logViewerUrl(): String =
+        "$logViewerUrl/?transaction=${traceAid.callId()}&showResponse=true&showDollyAndOrkestratoren=false"
 
     companion object {
         private const val ERROR_MESSAGE = "feil ved simulering v2"
