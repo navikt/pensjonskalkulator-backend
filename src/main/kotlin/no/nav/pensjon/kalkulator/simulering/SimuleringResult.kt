@@ -9,7 +9,7 @@ data class SimuleringResult(
     val alderspensjonMaanedsbeloep: AlderspensjonMaanedsbeloep? = null,
     val maanedligAlderspensjonForKnekkpunkter: SimulertMaanedligAlderspensjonForKnekkpunkter? = null,
     val livsvarigOffentligAfpListe: List<SimulertAfpOffentlig>,
-    val tidsbegrensetOffentligAfp: SimulertPre2025OffentligAfp? = null,
+    val tidsbegrensetOffentligAfp: SimulertTidsbegrensetOffentligAfp? = null,
     val serviceberegnetAfp: BeregnetAfp? = null,
     val privatAfpListe: List<SimulertAfpPrivat>,
     val vilkaarsproeving: Vilkaarsproeving,

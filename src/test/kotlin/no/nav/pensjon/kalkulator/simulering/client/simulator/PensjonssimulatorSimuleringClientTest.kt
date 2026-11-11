@@ -194,6 +194,44 @@ class PensjonssimulatorSimuleringClientTest : ShouldSpec({
             }
         }
     }
+    context("person med tidsbegrenset offentlig AFP") {
+        should("inkludere tidsbegrenset offentlig AFP i resultatet") {
+            server?.arrangeOkJsonResponse(PENSJON_MED_TIDSBEGRENSET_OFFENTLIG_AFP)
+
+            Arrange.webClientContextRunner().run {
+                client(context = it).simulerPersonligAlderspensjon(
+                    impersonalSpec = impersonalGradertUttakSpec(),
+                    personalSpec = personalSpec(Sivilstatus.UGIFT)
+                ) shouldBe SimuleringResult(
+                    alderspensjonListe = emptyList(),
+                    alderspensjonMaanedsbeloep = AlderspensjonMaanedsbeloep(gradertUttak = 13000, heltUttak = 26000),
+                    livsvarigOffentligAfpListe = emptyList(),
+                    tidsbegrensetOffentligAfp = SimulertTidsbegrensetOffentligAfp(
+                        alderAar = 62,
+                        totaltAfpBeloep = 55000,
+                        tidligereArbeidsinntekt = 555000,
+                        grunnbeloep = 123000,
+                        sluttpoengtall = 4.3,
+                        trygdetid = 35,
+                        poengaarTom1991 = 20,
+                        poengaarFom1992 = 15,
+                        grunnpensjon = 25000,
+                        tilleggspensjon = 15000,
+                        afpTillegg = 5000,
+                        saertillegg = 3000,
+                        afpGrad = 80,
+                        erAvkortet = true,
+                        fremtidigePensjonspoeng = 2.6
+                    ),
+                    privatAfpListe = emptyList(),
+                    vilkaarsproeving = Vilkaarsproeving(innvilget = true, alternativ = null),
+                    harForLiteTrygdetid = false,
+                    trygdetid = 0,
+                    opptjeningListe = emptyList()
+                )
+            }
+        }
+    }
 
     context("person med gjenlevenderett") {
         should("inkludere gjenlevendetillegg i kapittel19-delen av resultatet") {
@@ -209,6 +247,24 @@ class PensjonssimulatorSimuleringClientTest : ShouldSpec({
                     alderspensjonListe[0].kapittel19Pensjon?.gjenlevendetillegg shouldBe 3416
                     alderspensjonListe[1].kapittel19Pensjon?.gjenlevendetillegg shouldBe 3417
                     alderspensjonListe[2].kapittel19Pensjon?.gjenlevendetillegg shouldBe null
+                }
+            }
+        }
+    }
+
+    context("utilstrekkelig trygdetid") {
+        should("gi status OK med problembeskrivelse") {
+            server?.arrangeJsonResponse(status = HttpStatus.OK, body = JSON_FOR_UTILSTREKKELIG_TRYGDETID)
+
+            Arrange.webClientContextRunner().run {
+                val result = client(context = it).simulerPersonligAlderspensjon(
+                    impersonalSpec = impersonalGradertUttakSpec(),
+                    personalSpec = personalSpec(Sivilstatus.UGIFT)
+                )
+
+                with(result.problem!!) {
+                    type shouldBe ProblemType.UTILSTREKKELIG_TRYGDETID
+                    beskrivelse shouldBe "UtilstrekkeligTrygdetidException"
                 }
             }
         }
@@ -279,12 +335,30 @@ const val JSON_FOR_UGYLDIG_UTTAKSDATO = """{
     "livsvarigOffentligAfpListe": [],
     "privatAfpListe": [],
     "vilkaarsproevingsresultat": {
-        "erInnvilget": true
+        "erInnvilget": false
     },
     "opptjeningListe": [],
     "problem": {
         "kode": "UGYLDIG_UTTAKSDATO",
         "beskrivelse": "Dato for første uttak (2022-02-01) er for tidlig"
+    }
+}"""
+
+@Language("json")
+const val JSON_FOR_UTILSTREKKELIG_TRYGDETID = """{
+    "alderspensjonListe": [],
+    "alderspensjonMaanedsbeloep": {
+        "heltUttakBeloep": 0
+    },
+    "livsvarigOffentligAfpListe": [],
+    "privatAfpListe": [],
+    "vilkaarsproevingsresultat": {
+        "erInnvilget": false
+    },
+    "opptjeningListe": [],
+    "problem": {
+        "kode": "UTILSTREKKELIG_TRYGDETID",
+        "beskrivelse": "UtilstrekkeligTrygdetidException"
     }
 }"""
 
@@ -486,6 +560,39 @@ const val PENSJON_MED_LIVSVARIG_OFFENTLIG_AFP_OG_OPPTJENING = """{
             "beloep": 65000
         }
     ],
+    "vilkaarsproevingsresultat": {
+        "erInnvilget": true,
+        "alternativ": null
+    }
+}"""
+
+@Language("json")
+const val PENSJON_MED_TIDSBEGRENSET_OFFENTLIG_AFP = """{
+    "alderspensjonListe": [],
+    "alderspensjonMaanedsbeloep": {
+        "gradertUttakBeloep": 13000,
+        "heltUttakBeloep": 26000
+    },
+    "opptjeningListe": [],
+    "privatAfpListe": [],
+    "livsvarigOffentligAfpListe": [],
+    "tidsbegrensetOffentligAfp": {
+        "alderAar": 62,
+        "totaltAfpBeloep": 55000,
+        "tidligereArbeidsinntekt": 555000,
+        "grunnbeloep": 123000,
+        "sluttpoengtall": 4.3,
+        "trygdetid": 35,
+        "poengaarTom1991": 20,
+        "poengaarFom1992": 15,
+        "grunnpensjon": 25000,
+        "tilleggspensjon": 15000,
+        "afpTillegg": 5000,
+        "saertillegg": 3000,
+        "afpGrad": 80,
+        "erAvkortet": true,
+        "fremtidigePensjonspoeng": 2.6
+    },
     "vilkaarsproevingsresultat": {
         "erInnvilget": true,
         "alternativ": null
