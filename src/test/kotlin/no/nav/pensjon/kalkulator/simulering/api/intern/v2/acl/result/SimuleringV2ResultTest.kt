@@ -51,7 +51,8 @@ class SimuleringV2ResultTest : ShouldSpec({
                 ),
                 problem = null
             ),
-            naavaerendeAlderAar = 65
+            naavaerendeAlderAar = 65,
+            logViewerUrl = "https://example.org"
         ) shouldBe SimuleringV2Result(
             alderspensjonListe = listOf(expectedAlderspensjon()),
             maanedligAlderspensjonVedUttaksendring = expectedUttaksbeloep(),
@@ -89,7 +90,8 @@ class SimuleringV2ResultTest : ShouldSpec({
                     )
                 )
             ),
-            problem = null
+            problem = null,
+            logViewerUrl = "https://example.org"
         )
     }
 })

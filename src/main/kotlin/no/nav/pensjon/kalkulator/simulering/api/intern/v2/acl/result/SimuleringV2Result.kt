@@ -44,10 +44,13 @@ data class SimuleringV2Result(
     val opptjeningListe: List<SimuleringV2Opptjening>,
 
     @field:Schema(description = "Eventuelt problem som oppstod under simuleringen")
-    val problem: SimuleringV2Problem?
+    val problem: SimuleringV2Problem?,
+
+    @field:Schema(description = "Lenke (URL) til pensjon-reglers 'log viewer'")
+    val logViewerUrl: String? = null
 ) {
     companion object {
-        fun transferable(source: SimuleringResult, naavaerendeAlderAar: Int) =
+        fun transferable(source: SimuleringResult, naavaerendeAlderAar: Int, logViewerUrl: String?) =
             SimuleringV2Result(
                 alderspensjonListe = source.alderspensjonListe.map(SimuleringV2Alderspensjon::transferable)
                     .let { justerAlderspensjonListe(pensjonListe = it, naavaerendeAlderAar) },
@@ -63,7 +66,8 @@ data class SimuleringV2Result(
                 vilkaarsproevingsresultat = SimuleringV2Vilkaarsproevingsresultat.transferable(source.vilkaarsproeving),
                 trygdetid = SimuleringV2Trygdetid.transferable(source),
                 opptjeningListe = source.opptjeningListe.map(SimuleringV2Opptjening::transferable),
-                problem = source.problem?.let(SimuleringV2Problem::transferable)
+                problem = source.problem?.let(SimuleringV2Problem::transferable),
+                logViewerUrl = logViewerUrl
             )
 
         fun serverfeil(e: Exception) =
