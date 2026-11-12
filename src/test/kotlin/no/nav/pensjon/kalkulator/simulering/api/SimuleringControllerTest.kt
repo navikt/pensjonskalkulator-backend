@@ -2,7 +2,10 @@ package no.nav.pensjon.kalkulator.simulering.api
 
 import com.ninjasquad.springmockk.MockkBean
 import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.clearMocks
 import io.mockk.every
+import io.mockk.verify
 import no.nav.pensjon.kalkulator.general.*
 import no.nav.pensjon.kalkulator.land.Land
 import no.nav.pensjon.kalkulator.mock.MockSecurityConfiguration
@@ -10,6 +13,7 @@ import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.person.AdressebeskyttelseGradering
 import no.nav.pensjon.kalkulator.person.Sivilstatus
 import no.nav.pensjon.kalkulator.simulering.*
+import no.nav.pensjon.kalkulator.simulering.api.dto.PersonligSimuleringTypeV9
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidExtractor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.fortrolig.FortroligAdresseService
@@ -167,21 +171,61 @@ class SimuleringControllerTest : ShouldSpec() {
                 .andExpect(content().json(responseBodyForGradertUttakV9()))
         }
 
-        should("simulere endring av alderspensjon med privat AFP V9") {
-            val spec = impersonalGradertUttakSpec(SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT)
-            every {
-                simuleringService.simulerPersonligAlderspensjon(spec)
-            } returns simuleringsresultat(spec.simuleringType, heltUttak = false)
-            enableUtvidetResult()
+        listOf(true, false).forEach { utvidetResult ->
+            should("simulere endring av alderspensjon med privat AFP V9 med utvidet resultat $utvidetResult") {
+                clearMocks(simuleringService)
+                val spec = impersonalGradertUttakSpec(SimuleringType.ENDRING_ALDERSPENSJON)
+                every { simuleringService.simulerPersonligAlderspensjon(spec) } returns
+                    simuleringsresultat(spec.simuleringType, heltUttak = false)
+                every { feature.isEnabled("utvidet-simuleringsresultat") } returns utvidetResult
+
+                mvc.perform(
+                    post(URL_V9)
+                        .with(csrf())
+                        .content(gradertUttakRequestBody(SimuleringType.ENDRING_ALDERSPENSJON).replace(
+                            "\"simuleringstype\": \"ENDRING_ALDERSPENSJON\"",
+                            "\"simuleringstype\": \"ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT\""
+                        ))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                    .andExpect(status().isOk())
+
+                verify(exactly = 1) { simuleringService.simulerPersonligAlderspensjon(spec) }
+            }
+        }
+
+        should("avvise ukjent simuleringstype ENDR_AP_M_AFP_PRIVAT V9") {
+            clearMocks(simuleringService)
 
             mvc.perform(
                 post(URL_V9)
                     .with(csrf())
-                    .content(gradertUttakRequestBody(SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT))
+                    .content(gradertUttakRequestBody(SimuleringType.ENDRING_ALDERSPENSJON).replace(
+                        "\"simuleringstype\": \"ENDRING_ALDERSPENSJON\"",
+                        "\"simuleringstype\": \"ENDR_AP_M_AFP_PRIVAT\""
+                    ))
                     .contentType(MediaType.APPLICATION_JSON)
             )
-                .andExpect(status().isOk())
-                .andExpect(content().json(responseBodyForGradertUttakV9()))
+                .andExpect(status().isBadRequest())
+
+            verify(exactly = 0) { simuleringService.simulerPersonligAlderspensjon(any()) }
+        }
+
+        should("mappe alle simuleringstyper V9 til interne verdier") {
+            PersonligSimuleringTypeV9.entries.associate { it.name to it.internalValue } shouldBe mapOf(
+                "ALDERSPENSJON" to SimuleringType.ALDERSPENSJON,
+                "PRE2025_OFFENTLIG_AFP_ETTERFULGT_AV_ALDERSPENSJON" to
+                    SimuleringType.PRE2025_OFFENTLIG_AFP_ETTERFULGT_AV_ALDERSPENSJON,
+                "ALDERSPENSJON_MED_AFP_PRIVAT" to SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT,
+                "ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG" to SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG,
+                "ALDERSPENSJON_MED_GJENLEVENDERETT" to SimuleringType.ALDERSPENSJON_MED_GJENLEVENDERETT,
+                "ENDRING_ALDERSPENSJON" to SimuleringType.ENDRING_ALDERSPENSJON,
+                "ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT" to SimuleringType.ENDRING_ALDERSPENSJON,
+                "ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG" to
+                    SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG,
+                "ENDRING_ALDERSPENSJON_MED_GJENLEVENDERETT" to SimuleringType.ENDRING_ALDERSPENSJON_MED_GJENLEVENDERETT,
+                "SERVICEBEREGN_AFP" to SimuleringType.SERVICEBEREGN_AFP
+            )
         }
 
         should("simulere endring av alderspensjon med livsvarig offentlig AFP V9") {
@@ -421,17 +465,6 @@ class SimuleringControllerTest : ShouldSpec() {
                     alderspensjonMaanedsbeloep = maanedsbeloep(heltUttak),
                     livsvarigOffentligAfpListe = emptyList(),
                     privatAfpListe = emptyList(),
-                    vilkaarsproeving = vilkaarsproeving(),
-                    harForLiteTrygdetid = false,
-                    trygdetid = 0,
-                    opptjeningListe = emptyList()
-                )
-
-                SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT -> SimuleringResult(
-                    alderspensjonListe = listOf(alderspensjon()),
-                    alderspensjonMaanedsbeloep = maanedsbeloep(heltUttak),
-                    livsvarigOffentligAfpListe = emptyList(),
-                    privatAfpListe = listOf(privatAfp()),
                     vilkaarsproeving = vilkaarsproeving(),
                     harForLiteTrygdetid = false,
                     trygdetid = 0,
