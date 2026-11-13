@@ -13,7 +13,7 @@ import java.time.LocalDate
  * for simulering av alderspensjon i personlig (innlogget) kontekst.
  */
 data class PersonligSimuleringSpecV9(
-    @field:NotNull val simuleringstype: PersonligSimuleringTypeV9,
+    @field:NotNull val simuleringstype: SimuleringType,
     @field:NotNull val foedselsdato: LocalDate,
     val aarligInntektFoerUttakBeloep: Int?,
     val gradertUttak: PersonligSimuleringGradertUttakSpecV9? = null, // default is helt uttak (100 %)
@@ -26,19 +26,6 @@ data class PersonligSimuleringSpecV9(
     val afpOrdning: AfpOrdningType? = null,
     val innvilgetLivsvarigOffentligAfp: List<PersonligSimuleringInnvilgetLivsvarigOffentligAfpSpecV9>? = null
 )
-
-enum class PersonligSimuleringTypeV9(val internalValue: SimuleringType) {
-    ALDERSPENSJON(SimuleringType.ALDERSPENSJON),
-    PRE2025_OFFENTLIG_AFP_ETTERFULGT_AV_ALDERSPENSJON(SimuleringType.PRE2025_OFFENTLIG_AFP_ETTERFULGT_AV_ALDERSPENSJON),
-    ALDERSPENSJON_MED_AFP_PRIVAT(SimuleringType.ALDERSPENSJON_MED_AFP_PRIVAT),
-    ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG(SimuleringType.ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG),
-    ALDERSPENSJON_MED_GJENLEVENDERETT(SimuleringType.ALDERSPENSJON_MED_GJENLEVENDERETT),
-    ENDRING_ALDERSPENSJON(SimuleringType.ENDRING_ALDERSPENSJON),
-    ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT(SimuleringType.ENDRING_ALDERSPENSJON),
-    ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG(SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG),
-    ENDRING_ALDERSPENSJON_MED_GJENLEVENDERETT(SimuleringType.ENDRING_ALDERSPENSJON_MED_GJENLEVENDERETT),
-    SERVICEBEREGN_AFP(SimuleringType.SERVICEBEREGN_AFP)
-}
 
 data class PersonligSimuleringGradertUttakSpecV9(
     @field:NotNull val grad: Int,

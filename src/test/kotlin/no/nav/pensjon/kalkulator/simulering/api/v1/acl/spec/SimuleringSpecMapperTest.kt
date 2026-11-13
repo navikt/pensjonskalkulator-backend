@@ -9,18 +9,6 @@ import java.time.LocalDate
 
 class SimuleringSpecMapperTest : ShouldSpec({
 
-    should("map private AFP change to old-age pension change") {
-        SimuleringSpecMapper.fromDto(
-            source = SimuleringV1Spec(
-                simuleringstype = SimuleringV1SimuleringstypeSpec.ENDRING_ALDERSPENSJON_MED_PRIVAT_AFP,
-                heltUttak = SimuleringV1HeltUttakSpec(
-                    uttaksalder = SimuleringV1AlderSpec(aar = 65, maaneder = 7)
-                )
-            ),
-            tillatSenereFoersteuttakForUfoere = false
-        ).simuleringType shouldBe SimuleringType.ENDRING_ALDERSPENSJON
-    }
-
     should("map required fields and use default EPS specification") {
         SimuleringSpecMapper.fromDto(
             source = SimuleringV1Spec(
