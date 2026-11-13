@@ -7,7 +7,7 @@ import no.nav.pensjon.kalkulator.general.Alder
 
 class PensjonsavtaleResultV3Test : ShouldSpec({
 
-    val periode = UtbetalingsperiodeV3(
+    val periode = PensjonsavtaleUtbetalingsperiodeV3(
         startAlder = Alder(67, 0),
         sluttAlder = Alder(77, 0),
         aarligUtbetaling = 80_000,
@@ -41,7 +41,7 @@ class PensjonsavtaleResultV3Test : ShouldSpec({
         selskap.toString() shouldContain "\"heltUtilgjengelig\":true"
     }
 
-    should("serialize UtbetalingsperiodeV3 to JSON") {
+    should("serialize PensjonsavtaleUtbetalingsperiodeV3 to JSON") {
         periode.toString() shouldContain "\"aarligUtbetaling\":80000"
     }
 })
