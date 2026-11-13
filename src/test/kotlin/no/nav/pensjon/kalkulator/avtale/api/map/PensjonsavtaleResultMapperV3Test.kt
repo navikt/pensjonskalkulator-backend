@@ -39,7 +39,7 @@ class PensjonsavtaleResultMapperV3Test : ShouldSpec({
                             startAar = 67,
                             sluttAar = 77,
                             utbetalingsperioder = listOf(
-                                UtbetalingsperiodeV3(
+                                PensjonsavtaleUtbetalingsperiodeV3(
                                     startAlder = Alder(aar = 68, maaneder = 6),
                                     sluttAlder = Alder(aar = 78, maaneder = 5),
                                     aarligUtbetaling = 12000,
