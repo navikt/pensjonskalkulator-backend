@@ -24,7 +24,7 @@ object PensjonsavtaleResultMapperV3 {
         )
 
     private fun periode(source: Utbetalingsperiode) =
-        UtbetalingsperiodeV3(
+        PensjonsavtaleUtbetalingsperiodeV3(
             startAlder = source.startAlder,
             sluttAlder = source.sluttAlder,
             aarligUtbetaling = source.aarligUtbetalingForventet,

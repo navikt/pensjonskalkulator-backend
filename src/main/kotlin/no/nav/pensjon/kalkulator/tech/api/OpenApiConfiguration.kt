@@ -88,6 +88,7 @@ class OpenApiConfiguration {
                 "/api/v3/tpo-livsvarig-offentlig-afp",
                 "/api/v2/simuler-oftp",
                 "/api/v2/simuler-oftp/foer-1963",
+                "/api/v3/simuler-oftp/fra-1963",
                 "/api/status",
             )
             .build()

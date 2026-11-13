@@ -21,7 +21,7 @@ data class PensjonsavtaleV3(
     @field:NotNull val kategori: AvtaleKategoriV3,
     @field:NotNull val startAar: Int, // år som i alder – NB: avtaler uten startår returneres ikke
     val sluttAar: Int?, // år som i alder
-    @field:NotNull val utbetalingsperioder: List<UtbetalingsperiodeV3>
+    @field:NotNull val utbetalingsperioder: List<PensjonsavtaleUtbetalingsperiodeV3>
 ) {
     override fun toString(): String = jsonMapper.writeValueAsString(this)
 }
@@ -34,7 +34,7 @@ data class SelskapV3(
 }
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class UtbetalingsperiodeV3(
+data class PensjonsavtaleUtbetalingsperiodeV3(
     @field:NotNull val startAlder: Alder,
     val sluttAlder: Alder?,
     @field:NotNull val aarligUtbetaling: Int,
