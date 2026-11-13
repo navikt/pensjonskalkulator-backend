@@ -35,6 +35,10 @@ enum class SimulatorSimuleringType(
         externalValue = "ENDR_ALDER",
         internalValue = SimuleringType.ENDRING_ALDERSPENSJON
     ),
+    ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT(
+        externalValue = "ENDR_AP_M_AFP_PRIVAT",
+        internalValue = SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_PRIVAT
+    ),
     ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG(
         externalValue = "ENDR_AP_M_AFP_OFFENTLIG_LIVSVARIG",
         internalValue = SimuleringType.ENDRING_ALDERSPENSJON_MED_AFP_OFFENTLIG_LIVSVARIG

@@ -13,7 +13,7 @@ object PersonligSimuleringSpecMapperV9 {
 
     fun fromSpecV9(source: PersonligSimuleringSpecV9) =
         ImpersonalSimuleringSpec(
-            simuleringType = source.simuleringstype.internalValue,
+            simuleringType = source.simuleringstype,
             eps = eps(source),
             forventetAarligInntektFoerUttak = source.aarligInntektFoerUttakBeloep,
             sivilstatus = source.sivilstand?.sivilstatus,
