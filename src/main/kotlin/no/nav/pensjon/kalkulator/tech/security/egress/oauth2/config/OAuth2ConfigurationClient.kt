@@ -9,6 +9,7 @@ import no.nav.pensjon.kalkulator.tech.web.EgressException
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
+import org.springframework.web.reactive.function.client.bodyToMono
 
 /**
  * Only used for self-test (testing the connection to the authorization provider).
@@ -35,7 +36,7 @@ open class OAuth2ConfigurationClient(
             val responseBody = webClient
                 .get()
                 .retrieve()
-                .bodyToMono(String::class.java)
+                .bodyToMono<String>()
                 .retryWhen(retryBackoffSpec(uri))
                 .block()
                 ?: ""

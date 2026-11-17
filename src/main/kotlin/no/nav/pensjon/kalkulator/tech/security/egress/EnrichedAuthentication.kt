@@ -5,6 +5,7 @@ import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonTarget
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentertRolle
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
+import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenTypeDecisionBasis
 import no.nav.pensjon.kalkulator.tech.security.egress.token.RawJwt
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
@@ -19,11 +20,11 @@ import org.springframework.security.oauth2.jwt.Jwt
 class EnrichedAuthentication(
     private val initialAuth: Authentication?,
     private val egressTokenSuppliersByService: EgressTokenSuppliersByService,
-    private val target: RepresentasjonTarget
+    val target: RepresentasjonTarget
 ) : Authentication {
 
-    fun getEgressAccessToken(service: EgressService, ingressToken: String?): RawJwt =
-        egressTokenSuppliersByService.value[service]?.apply(ingressToken) ?: RawJwt("")
+    fun getEgressAccessToken(service: EgressService, tokenTypeDecisionBasis: EgressTokenTypeDecisionBasis): RawJwt =
+        egressTokenSuppliersByService.value[service]?.apply(tokenTypeDecisionBasis) ?: RawJwt("")
 
     fun needFulltNavn(): Boolean = target.rolle.needFulltNavn
 

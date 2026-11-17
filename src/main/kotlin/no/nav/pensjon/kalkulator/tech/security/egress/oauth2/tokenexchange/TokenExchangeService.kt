@@ -1,6 +1,5 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.oauth2.tokenexchange
 
-import no.nav.pensjon.kalkulator.tech.security.egress.azuread.AzureAdUtil.getDefaultScope
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.tokenexchange.client.TokenExchangeClient
 import no.nav.pensjon.kalkulator.tech.security.egress.token.CacheKey
 import no.nav.pensjon.kalkulator.tech.security.egress.token.EgressTokenGetter
@@ -16,13 +15,11 @@ class TokenExchangeService(
 ) : EgressTokenGetter {
 
     override fun getEgressToken(ingressToken: String?, audience: String): RawJwt {
-        val scope = getDefaultScope(fullyQualifiedApplicationName = audience)
-
         val accessParameter = ingressToken?.let(TokenAccessParameter::tokenExchange)
             ?: throw IllegalArgumentException("Missing ingressToken")
 
         val tokenValue = loggedInPidProvider.pid()?.let {
-            exchanger.exchange(accessParameter, CacheKey(scope, pid = it)).accessToken
+            exchanger.exchange(accessParameter, CacheKey(scope = audience, pid = it)).accessToken
         } ?: throw IllegalStateException("Missing PID of logged in user")
 
         return RawJwt(tokenValue)

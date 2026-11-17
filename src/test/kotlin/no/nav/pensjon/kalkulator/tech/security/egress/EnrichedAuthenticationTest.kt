@@ -10,6 +10,7 @@ import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonTarget
 import no.nav.pensjon.kalkulator.tech.representasjon.RepresentertRolle
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenSuppliersByService
+import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenTypeDecisionBasis
 import no.nav.pensjon.kalkulator.tech.security.egress.token.RawJwt
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
@@ -24,7 +25,9 @@ class EnrichedAuthenticationTest : ShouldSpec({
             target = RepresentasjonTarget(pid, rolle = RepresentertRolle.SELV)
         ).getEgressAccessToken(
             service = EgressService.PENSJONSSIMULATOR,
-            ingressToken = ""
+            tokenTypeDecisionBasis = EgressTokenTypeDecisionBasis(
+                RepresentasjonTarget(pid = pid, rolle = RepresentertRolle.SELV)
+            )
         ).value shouldBe "token1"
     }
 
