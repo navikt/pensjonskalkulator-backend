@@ -69,7 +69,7 @@ class EgressServiceSecurityConfiguration {
         serviceListsByAudience: EgressServiceListsByAudience,
         egressTokenGetter: EgressAccessTokenFacade
     ): EgressTokenSuppliersByService {
-        val suppliersByService: MutableMap<EgressService, Function<String?, RawJwt>> =
+        val suppliersByService: MutableMap<EgressService, Function<EgressTokenTypeDecisionBasis, RawJwt>> =
             EnumMap(EgressService::class.java)
 
         serviceListsByAudience.entries.forEach { (audience, services) ->
@@ -92,10 +92,10 @@ class EgressServiceSecurityConfiguration {
             services: List<EgressService>,
             authType: AuthType,
             egressTokenGetter: EgressAccessTokenFacade,
-            tokenSuppliersByService: MutableMap<EgressService, Function<String?, RawJwt>>
+            tokenSuppliersByService: MutableMap<EgressService, Function<EgressTokenTypeDecisionBasis, RawJwt>>
         ) {
-            val tokenSupplier = Function<String?, RawJwt> {
-                egressTokenGetter.getAccessToken(authType, audience, ingressToken = it)
+            val tokenSupplier = Function<EgressTokenTypeDecisionBasis, RawJwt> {
+                egressTokenGetter.getAccessToken(authType, audience, tokenTypeDecisionBasis = it)
             }
 
             services.forEach { tokenSuppliersByService[it] = tokenSupplier }

@@ -9,31 +9,20 @@ enum class EgressService(
     val description: String,
     val shortName: String,
     val purpose: String,
-    val gatewayUsage: GatewayUsage = GatewayUsage.NONE,
-    val authType: AuthType = AuthType.MACHINE_INSIDE_NAV
+    val authType: AuthType
 ) {
-    ID_PORTEN("ID-porten", "IDP", "Token-utsteder"),
-    MICROSOFT_ENTRA_ID("Microsoft Entra ID", "MEID", "OAuth2 configuration data"),
-    NAV_ANSATT("Nav-ansatt", "NA", "Info om Nav-ansatt"),
-    NORSK_PENSJON("Norsk Pensjon", "NP", "Private pensjonsavtaler", GatewayUsage.INTERNAL),
-    NORSK_PENSJON_REST(
-        description = "Norsk Pensjon",
-        shortName = "NP",
-        purpose = "Private pensjonsavtaler",
-        authType = AuthType.MUTUAL_TLS
-    ),
-    OAUTH2_TOKEN("OAuth2 token", "OA2", "OAuth2 access token"),
+    // Nav-interne tjenester:
     OPPTJENING_SELVBETJENING(
         description = "Prosesserte pensjonsopptjeningsdata",
         shortName = "OS",
         purpose = "Hente merknader relatert til pensjonsopptjening",
-        authType = AuthType.MACHINE_INSIDE_NAV
+        authType = AuthType.PERSONAL_NOT_TOKEN_X
     ),
     PENSJON_PERSONDATA(
         description = "Pensjonsrelaterte persondata",
         shortName = "PPD",
         purpose = "Hente persondata relatert til pensjon",
-        authType = AuthType.MACHINE_INSIDE_NAV
+        authType = AuthType.PERSONAL
     ),
     PENSJON_PID_ENCRYPTION(
         description = "PID-kryptering for pensjon",
@@ -45,18 +34,76 @@ enum class EgressService(
         description = "Pensjon-representasjon",
         shortName = "Rep",
         purpose = "Representasjonsforhold (fullmakt m.m.)",
-        authType = AuthType.PERSON_SELF // personal token required
+        authType = AuthType.PERSON_SELF // tokenet må inneholde fullmektigens person-ID
     ),
-    PENSJONSFAGLIG_KJERNE("Pensjonsfaglig kjerne", "PEN", "Simulering, pensjonsdata"),
-    PENSJONSOPPTJENING("Pensjonsopptjening", "POPP", "Pensjonsopptjeningsdata"),
-    PERSONDATALOESNINGEN("Persondataløsningen", "PDL", "Persondata"),
+    PENSJONSFAGLIG_KJERNE(
+        description = "Pensjonsfaglig kjerne",
+        shortName = "PEN",
+        purpose = "Simulering, pensjonsdata",
+        authType = AuthType.MACHINE_INSIDE_NAV
+    ),
+    PENSJONSOPPTJENING(
+        description = "Pensjonsopptjening",
+        shortName = "POPP",
+        purpose = "Pensjonsopptjeningsdata",
+        authType = AuthType.PERSONAL_NOT_TOKEN_X
+    ),
+    PERSONDATALOESNINGEN(
+        description = "Persondataløsningen",
+        shortName = "PDL",
+        purpose = "Persondata",
+        authType = AuthType.PERSONAL
+    ),
     PENSJONSSIMULATOR(
         description = "Pensjonssimulator",
         shortName = "PS",
         purpose = "Simulering av alderspensjon",
         authType = AuthType.MACHINE_INSIDE_NAV
     ),
-    TJENESTEPENSJON("Tjenestepensjon", "TP", "Tjenestepensjonsforhold"),
+    TJENESTEPENSJON(
+        description = "Tjenestepensjon",
+        shortName = "TP",
+        purpose = "Tjenestepensjonsforhold",
+        authType = AuthType.PERSONAL_NOT_TOKEN_X
+    ),
+    UTBETALING_DATA(
+        description = "Oekonomi utbetalingsdata",
+        shortName = "Sokos",
+        purpose = "Finne siste maaneds utbetaling",
+        authType = AuthType.PERSONAL
+    ),
+    OMSTILLINGSSTOENAD(
+        description = "Omstillingsstoenad",
+        shortName = "OS",
+        purpose = "Finne om bruker mottar omstillingsstoenad",
+        authType = AuthType.MACHINE_INSIDE_NAV
+    ),
+    NAV_ANSATT(
+        description = "Nav-ansatt",
+        shortName = "NA",
+        purpose = "Info om Nav-ansatt",
+        authType = AuthType.NAV_ANSATT
+    ),
+    TILGANGSMASKINEN(
+        description = "Tilgangsmaskinen",
+        shortName = "Tilgangsmaskinen",
+        purpose = "Sjekk av veileders tilgang til person",
+        authType = AuthType.NAV_ANSATT
+    ),
+    SKRIBENTEN(
+        description = "Skribenten",
+        shortName = "Skribenten",
+        purpose = "Lagring av simulering",
+        authType = AuthType.NAV_ANSATT
+    ),
+
+    // Eksterne tjenester:
+    NORSK_PENSJON_REST(
+        description = "Norsk Pensjon",
+        shortName = "NP",
+        purpose = "Private pensjonsavtaler",
+        authType = AuthType.MUTUAL_TLS
+    ),
     AKSIO(
         description = "Aksio",
         shortName = "aksio",
@@ -105,22 +152,20 @@ enum class EgressService(
         purpose = "Hente løpende livsvarig offentlig AFP fra Storebrand Pensjonstjenester",
         authType = AuthType.MACHINE_OUTSIDE_NAV
     ),
-    UTBETALING_DATA("Oekonomi utbetalingsdata", "Sokos", "Finne siste maaneds utbetaling"),
-    OMSTILLINGSSTOENAD("Omstillingsstoenad", "OS", "Finne om bruker mottar omstillingsstoenad"),
-    TILGANGSMASKINEN(
-        description = "Tilgangsmaskinen",
-        shortName = "Tilgangsmaskinen",
-        purpose = "Sjekk av veileders tilgang til person",
-        authType = AuthType.PERSON_ON_BEHALF
-    ),
-    SKRIBENTEN(
-        description = "Skribenten",
-        shortName = "Skribenten",
-        purpose = "Lagring av simulering",
-        authType = AuthType.PERSON_ON_BEHALF
-    );
 
-    companion object {
-        val servicesAccessibleViaProxy = entries.filter { it.gatewayUsage == GatewayUsage.INTERNAL }
-    }
+    // Entra-konfigurasjonen her gjelder self-test:
+    MICROSOFT_ENTRA_ID(
+        description = "Microsoft Entra ID",
+        shortName = "MEID",
+        purpose = "OAuth2 configuration data",
+        authType = AuthType.NONE
+    ),
+
+    // Felles-konfigurasjon for tjenester som leverer egress-token:
+    OAUTH2_TOKEN(
+        description = "OAuth2 token",
+        shortName = "OA2",
+        purpose = "OAuth2 access token",
+        authType = AuthType.NONE
+    )
 }

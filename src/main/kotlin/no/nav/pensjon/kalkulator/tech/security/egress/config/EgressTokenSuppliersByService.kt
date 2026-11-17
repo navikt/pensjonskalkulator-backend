@@ -10,5 +10,5 @@ import java.util.function.Function
  * By holding suppliers instead of actual tokens, the tokens are obtained "lazily" (when needed).
  */
 data class EgressTokenSuppliersByService(
-    val value: Map<EgressService, Function<String?, RawJwt>>
+    val value: Map<EgressService, Function<EgressTokenTypeDecisionBasis, RawJwt>>
 )

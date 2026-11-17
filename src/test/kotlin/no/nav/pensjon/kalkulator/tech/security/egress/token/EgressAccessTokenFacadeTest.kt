@@ -4,7 +4,11 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
+import no.nav.pensjon.kalkulator.tech.representasjon.RepresentasjonTarget
+import no.nav.pensjon.kalkulator.tech.representasjon.RepresentertRolle
 import no.nav.pensjon.kalkulator.tech.security.egress.AuthType
+import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenTypeDecisionBasis
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.clientcred.ClientCredentialsEgressTokenService
 
 class EgressAccessTokenFacadeTest : ShouldSpec({
@@ -18,13 +22,15 @@ class EgressAccessTokenFacadeTest : ShouldSpec({
         ).getAccessToken(
             authType = AuthType.MACHINE_INSIDE_NAV,
             audience = "audience1",
-            ingressToken = null
+            tokenTypeDecisionBasis = EgressTokenTypeDecisionBasis(
+                RepresentasjonTarget(pid = pid, rolle = RepresentertRolle.SELV)
+            )
         ).value shouldBe "token1"
     }
 })
 
 private fun arrangeToken(): ClientCredentialsEgressTokenService =
-    mockk<ClientCredentialsEgressTokenService>().apply {
+    mockk {
         every {
             getEgressToken(ingressToken = null, audience = "audience1")
         } returns RawJwt(value = "token1")

@@ -29,7 +29,7 @@ class OekonomiUtbetalingClient(
     @param:Value($$"${sokos.utbetaldata.url}") private val baseUrl: String,
     webClientBuilder: WebClient.Builder,
     private val traceAid: TraceAid,
-    @param:Value($$"${web-client.retry-attempts}") private val retryAttempts: String
+    @Value($$"${web-client.retry-attempts}") retryAttempts: String
 ) : ExternalServiceClient(retryAttempts), UtbetalingClient {
 
     private val webClient = webClientBuilder.baseUrl(baseUrl).build()
