@@ -70,7 +70,7 @@ enum class EgressService(
         description = "Oekonomi utbetalingsdata",
         shortName = "Sokos",
         purpose = "Finne siste maaneds utbetaling",
-        authType = AuthType.PERSONAL
+        authType = AuthType.PERSONAL_NOT_TOKEN_X
     ),
     OMSTILLINGSSTOENAD(
         description = "Omstillingsstoenad",
