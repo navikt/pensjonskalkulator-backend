@@ -1,6 +1,8 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.token
 
+import no.nav.pensjon.kalkulator.tech.representasjon.RepresentertRolle
 import no.nav.pensjon.kalkulator.tech.security.egress.AuthType
+import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenTypeDecisionBasis
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.clientcred.ClientCredentialsEgressTokenService
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.jwtbearer.JwtBearerEgressTokenService
 import no.nav.pensjon.kalkulator.tech.security.egress.oauth2.onbehalfof.OnBehalfOfEgressTokenService
@@ -17,23 +19,30 @@ class EgressAccessTokenFacade(
     private val tokenExchangeService: TokenExchangeService,
     private val onBehalfOfTokenService: OnBehalfOfEgressTokenService
 ) {
-    fun getAccessToken(authType: AuthType, audience: String, ingressToken: String?): RawJwt =
-        tokenGetter(authType).getEgressToken(ingressToken, audience)
+    fun getAccessToken(
+        authType: AuthType,
+        audience: String,
+        tokenTypeDecisionBasis: EgressTokenTypeDecisionBasis
+    ): RawJwt =
+        tokenGetter(authType, tokenTypeDecisionBasis.representasjonTarget.rolle)
+            .getEgressToken(tokenTypeDecisionBasis.ingressToken, audience)
 
-    private fun tokenGetter(authType: AuthType): EgressTokenGetter =
+    private fun tokenGetter(authType: AuthType, rolle: RepresentertRolle): EgressTokenGetter =
         when (authType) {
             AuthType.MACHINE_INSIDE_NAV -> clientCredentialsTokenService
             AuthType.MACHINE_OUTSIDE_NAV -> jwtBearerTokenService
-            AuthType.MUTUAL_TLS -> NoTokenGetter()
+            AuthType.NAV_ANSATT -> onBehalfOfTokenService
             AuthType.PERSON_SELF -> tokenExchangeService
-            AuthType.PERSON_ON_BEHALF -> onBehalfOfTokenService
-            else -> unsupported(authType)
+            AuthType.PERSONAL -> tokenGetter(rolle, stoetterTokenX = true)
+            AuthType.PERSONAL_NOT_TOKEN_X -> tokenGetter(rolle, stoetterTokenX = false)
+            AuthType.MUTUAL_TLS -> NoTokenGetter()
+            AuthType.NONE -> NoTokenGetter()
         }
 
-
-    companion object {
-        private fun <T> unsupported(authType: AuthType): T {
-            throw IllegalArgumentException("Unsupported auth type: $authType")
+    private fun tokenGetter(rolle: RepresentertRolle, stoetterTokenX: Boolean): EgressTokenGetter =
+        when (rolle) {
+            RepresentertRolle.UNDER_VEILEDNING -> onBehalfOfTokenService
+            RepresentertRolle.FULLMAKT_GIVER -> clientCredentialsTokenService
+            else -> if (stoetterTokenX) tokenExchangeService else clientCredentialsTokenService
         }
-    }
 }
