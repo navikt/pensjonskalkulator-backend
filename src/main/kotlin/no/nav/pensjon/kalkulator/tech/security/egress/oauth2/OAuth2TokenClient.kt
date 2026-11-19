@@ -1,6 +1,5 @@
 package no.nav.pensjon.kalkulator.tech.security.egress.oauth2
 
-import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.client.ExternalServiceClient
 import no.nav.pensjon.kalkulator.tech.metric.MetricResult
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
@@ -21,12 +20,8 @@ abstract class OAuth2TokenClient(
     retryAttempts: String
 ) : ExternalServiceClient(retryAttempts) {
 
-    private val log = KotlinLogging.logger {}
-
-    fun getTokenData(accessParameter: TokenAccessParameter, audience: String): TokenData {
-        log.debug { "Fetching token for audience '$audience'" }
-
-        return try {
+    fun getTokenData(accessParameter: TokenAccessParameter, audience: String): TokenData =
+         try {
             val body: OAuth2TokenDto = webClient
                 .post()
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -40,14 +35,12 @@ abstract class OAuth2TokenClient(
             // Note: Do not use .body instead of .bodyValue, since this results in chunked encoding,
             // which the endpoint may not support, resulting in 404 Not Found
 
-            log.debug { "Token obtained for audience '$audience'" }
             OAuth2TokenDataMapper.map(body, expirationChecker.time())
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling token endpoint", e)
         } catch (e: WebClientResponseException) {
             throw EgressException(e.responseBodyAsString, e)
         }
-    }
 
     override fun service() = service
 

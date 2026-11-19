@@ -1,6 +1,7 @@
 package no.nav.pensjon.kalkulator.tech.security.egress
 
 import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressService
+import no.nav.pensjon.kalkulator.tech.security.egress.config.EgressTokenTypeDecisionBasis
 import no.nav.pensjon.kalkulator.tech.security.egress.token.RawJwt
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException
 import org.springframework.security.core.context.SecurityContextHolder
@@ -8,12 +9,23 @@ import org.springframework.security.oauth2.jwt.Jwt
 
 object EgressAccess {
 
-    fun token(service: EgressService): RawJwt {
-        val authentication = SecurityContextHolder.getContext().authentication
+    fun token(service: EgressService): RawJwt =
+        SecurityContextHolder.getContext().authentication?.enriched()?.let {
+            token(authentication = it, service)
+        } ?: throw AuthenticationCredentialsNotFoundException("failed to get egress access token")
 
-        return authentication?.enriched()?.getEgressAccessToken(
+    private fun token(
+        authentication: EnrichedAuthentication,
+        service: EgressService
+    ): RawJwt =
+        authentication.getEgressAccessToken(
             service,
+            tokenTypeDecisionBasis = tokenTypeDecisionBasis(authentication)
+        )
+
+    private fun tokenTypeDecisionBasis(authentication: EnrichedAuthentication) =
+        EgressTokenTypeDecisionBasis(
+            representasjonTarget = authentication.target,
             ingressToken = (authentication.credentials as? Jwt)?.tokenValue
-        ) ?: throw AuthenticationCredentialsNotFoundException("failed to get egress access token")
-    }
+        )
 }
