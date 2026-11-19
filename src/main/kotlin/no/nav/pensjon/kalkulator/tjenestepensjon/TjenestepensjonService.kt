@@ -21,7 +21,13 @@ class TjenestepensjonService(
     fun hentMedlemskapITjenestepensjonsordninger() =
         tjenestepensjonClient.tjenestepensjonsforhold(pidGetter.pid()).tpOrdninger
 
-    fun hentAfpOffentligLivsvarigDetaljer(): AfpOffentligLivsvarigResult {
+    fun hentAfpOffentligLivsvarigDetaljer(): AfpOffentligLivsvarigResult =
+        hentAfpOffentligLivsvarigDetaljer(medTpOrdning = false)
+
+    fun hentAfpOffentligLivsvarigDetaljerMedTpOrdning(): AfpOffentligLivsvarigResult =
+        hentAfpOffentligLivsvarigDetaljer(medTpOrdning = true)
+
+    private fun hentAfpOffentligLivsvarigDetaljer(medTpOrdning: Boolean): AfpOffentligLivsvarigResult {
         val pid = pidGetter.pid()
         val tpNumre = tjenestepensjonClient.afpOffentligLivsvarigTpNummerListe(pid)
 
@@ -43,7 +49,15 @@ class TjenestepensjonService(
         val tpNr = tpNumre.first()
         val uttaksdato = LocalDate.now().plusMonths(1).withDayOfMonth(1)
 
-        return tjenestepensjonClient.hentAfpOffentligLivsvarigDetaljer(pid, tpNr, uttaksdato)
+        val result: AfpOffentligLivsvarigResult = tjenestepensjonClient.hentAfpOffentligLivsvarigDetaljer(pid, tpNr, uttaksdato)
+
+        return if (medTpOrdning)
+            result.copy(
+                tpNummer = tpNr,
+                tpOrdningNavn = tjenestepensjonClient.hentTpOrdningNavn(tpNr)
+            )
+        else
+            result
     }
 
     fun erApoteker(): Boolean =
