@@ -85,7 +85,8 @@ class OpenApiConfiguration {
                 "/api/tpo-medlemskap",
                 "/api/v1/tpo-medlemskap",
                 "/api/v2/tpo-livsvarig-offentlig-afp", // deprecated
-                "/api/v3/tpo-livsvarig-offentlig-afp",
+                "/api/v3/tpo-livsvarig-offentlig-afp", //deprecated
+                "/api/v4/tpo-livsvarig-offentlig-afp",
                 "/api/v2/simuler-oftp",
                 "/api/v2/simuler-oftp/foer-1963",
                 "/api/v3/simuler-oftp/fra-1963",
