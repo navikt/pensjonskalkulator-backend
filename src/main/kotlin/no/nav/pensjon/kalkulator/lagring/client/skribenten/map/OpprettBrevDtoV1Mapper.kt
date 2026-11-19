@@ -77,8 +77,7 @@ object OpprettBrevDtoV1Mapper {
     private fun mapToAfpOffentligLivsvarigSimuleringDto(source: LagreAfpOffentligLivsvarigSimulering) =
         AfpOffentligLivsvarigSimuleringBrevDtoV1(
             vedGradertUttak = source.vedGradertUttak?.let(::mapToLivsvarigOffentligAfpDto),
-            vedHeltUttak = source.vedHeltUttak?.let(::mapToLivsvarigOffentligAfpDto),
-            beskrivelse = source.beskrivelse,
+            vedHeltUttak = mapToLivsvarigOffentligAfpDto(source.vedHeltUttak),
         )
 
     private fun mapToLivsvarigOffentligAfpDto(source: LagreLivsvarigOffentligAfp) =

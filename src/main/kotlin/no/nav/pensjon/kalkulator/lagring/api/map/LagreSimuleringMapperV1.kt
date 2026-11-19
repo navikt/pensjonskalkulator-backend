@@ -47,8 +47,7 @@ object LagreSimuleringMapperV1 {
     private fun afpOffentligLivsvarigSimulering(source: LagreAfpOffentligLivsvarigSimuleringDto) =
         LagreAfpOffentligLivsvarigSimulering(
             vedGradertUttak = source.vedGradertUttak?.let(::livsvarigOffentligAfp),
-            vedHeltUttak = source.vedHeltUttak?.let(::livsvarigOffentligAfp),
-            beskrivelse = source.beskrivelse,
+            vedHeltUttak = livsvarigOffentligAfp(source.vedHeltUttak),
         )
 
     private fun livsvarigOffentligAfp(source: LagreLivsvarigOffentligAfpDto) =

@@ -36,9 +36,8 @@ data class AfpPrivatSimuleringBrevDtoV1(
 )
 
 data class AfpOffentligLivsvarigSimuleringBrevDtoV1(
-    val vedGradertUttak: LivsvarigOffentligAfpBrevDtoV1? = null,
-    val vedHeltUttak: LivsvarigOffentligAfpBrevDtoV1? = null,
-    val beskrivelse: String? = null,
+    val vedGradertUttak: LivsvarigOffentligAfpBrevDtoV1?,
+    val vedHeltUttak: LivsvarigOffentligAfpBrevDtoV1,
 )
 
 data class AlderspensjonBrevDtoV1(
