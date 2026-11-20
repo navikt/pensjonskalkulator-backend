@@ -31,8 +31,9 @@ data class LagreAfpPrivatSimulering(
 )
 
 data class LagreAfpOffentligLivsvarigSimulering(
-    val vedGradertUttak: LagreLivsvarigOffentligAfp?,
-    val vedHeltUttak: LagreLivsvarigOffentligAfp,
+    val vedGradertUttak: LagreLivsvarigOffentligAfp? = null,
+    val vedHeltUttak: LagreLivsvarigOffentligAfp? = null,
+    val beskrivelse: String? = null,
 )
 
 data class LagreLivsvarigOffentligAfp(
