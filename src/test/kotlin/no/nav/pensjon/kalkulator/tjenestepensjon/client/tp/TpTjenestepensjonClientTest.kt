@@ -54,6 +54,40 @@ class TpTjenestepensjonClientTest : FunSpec({
         server?.shutdown()
     }
 
+    test("'hentTpOrdningNavn' returns the scheme name from the TP registry") {
+        server?.arrangeOkJsonResponse(
+            """{"navn":"Statens pensjonskasse","tpNr":"3010","orgNr":"982583462"}"""
+        )
+
+        Arrange.webClientContextRunner().run {
+            client(context = it).hentTpOrdningNavn("3010") shouldBe "Statens pensjonskasse"
+        }
+
+        val request = server?.takeRequest()
+        request?.path shouldBe "/api/ordning/3010"
+        request?.getHeader("Nav-Call-Id") shouldBe traceAid.callId()
+    }
+
+    test("'hentTpOrdningNavn' propagates registry errors") {
+        server?.arrangeResponse(HttpStatus.NOT_FOUND, "Ordning ikke funnet")
+
+        Arrange.webClientContextRunner().run {
+            shouldThrow<EgressException> {
+                client(context = it).hentTpOrdningNavn("3010")
+            }.message shouldBe "Ordning ikke funnet"
+        }
+    }
+
+    test("'hentTpOrdningNavn' rejects an empty response") {
+        server?.arrangeResponse(HttpStatus.NO_CONTENT, "")
+
+        Arrange.webClientContextRunner().run {
+            shouldThrow<EgressException> {
+                client(context = it).hentTpOrdningNavn("3010")
+            }.message shouldBe "Tom respons ved henting av TP-ordning for tpNr=3010"
+        }
+    }
+
     test("'harTjenestepensjonsforhold' gir 'true' når personen har tjenestepensjonsforhold") {
         server?.arrangeOkJsonResponse(statusResponseBody(true))
 

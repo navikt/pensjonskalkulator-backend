@@ -12,6 +12,7 @@ import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tjenestepensjon.Tjenestepensjonsforhold
 import no.nav.pensjon.kalkulator.tjenestepensjon.Tjenestepensjon
 import no.nav.pensjon.kalkulator.tjenestepensjon.FinnTjenestepensjonsforholdResponsDto
+import no.nav.pensjon.kalkulator.tjenestepensjon.OrdningDto
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.TjenestepensjonClient
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpApotekerDto
 import no.nav.pensjon.kalkulator.tjenestepensjon.client.tp.dto.TpTjenestepensjonStatusDto
@@ -178,6 +179,36 @@ class TpTjenestepensjonClient(
                 ?.also { log.info { "Parsed tpNr list: $it" } }
                 .also { countCalls(MetricResult.OK) }
                 ?: emptyList()
+        } catch (e: WebClientRequestException) {
+            throw EgressException("Failed calling $url", e)
+        } catch (e: WebClientResponseException) {
+            throw EgressException(e.responseBodyAsString, e)
+        } catch (e: TimeoutException) {
+            throw EgressException("Timeout calling $url", e)
+        }
+    }
+
+    override fun hentTpOrdningNavn(tpNr: String): String {
+        val uri = "/api/ordning/$tpNr"
+        val url = "$baseUrl$uri"
+        log.debug { "GET from URL: '$url'" }
+
+        return try {
+            webClient
+                .get()
+                .uri(uri)
+                .headers { headers ->
+                    headers.setBearerAuth(EgressAccess.token(service).value)
+                    headers[CustomHttpHeaders.CALL_ID] = traceAid.callId()
+                }
+                .retrieve()
+                .bodyToMono<OrdningDto>()
+                .retryWhen(retryBackoffSpec(url))
+                .withTimeout()
+                .block()
+                ?.navn
+                ?.also { countCalls(MetricResult.OK) }
+                ?: throw EgressException("Tom respons ved henting av TP-ordning for tpNr=$tpNr")
         } catch (e: WebClientRequestException) {
             throw EgressException("Failed calling $url", e)
         } catch (e: WebClientResponseException) {
