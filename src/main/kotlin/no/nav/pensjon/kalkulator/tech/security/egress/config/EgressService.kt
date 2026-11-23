@@ -22,7 +22,7 @@ enum class EgressService(
         description = "Pensjonsrelaterte persondata",
         shortName = "PPD",
         purpose = "Hente persondata relatert til pensjon",
-        authType = AuthType.PERSONAL
+        authType = AuthType.PERSONAL_NOT_TOKEN_X
     ),
     PENSJON_PID_ENCRYPTION(
         description = "PID-kryptering for pensjon",
@@ -52,7 +52,7 @@ enum class EgressService(
         description = "Persondataløsningen",
         shortName = "PDL",
         purpose = "Persondata",
-        authType = AuthType.PERSONAL
+        authType = AuthType.PERSONAL_NOT_TOKEN_X
     ),
     PENSJONSSIMULATOR(
         description = "Pensjonssimulator",
