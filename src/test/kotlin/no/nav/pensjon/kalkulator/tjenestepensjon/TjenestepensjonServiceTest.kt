@@ -58,6 +58,136 @@ class TjenestepensjonServiceTest : ShouldSpec({
         }
     }
 
+    context("hentAfpOffentligLivsvarigDetaljerMedTpOrdning") {
+        should("include the scheme number and registry name") {
+            val result = AfpOffentligLivsvarigResult(
+                afpInnvilget = true,
+                virkningFom = LocalDate.of(2025, 1, 1),
+                maanedligBeloepListe = listOf(
+                    MaanedligBeloep(LocalDate.of(2025, 1, 1), 15000),
+                    MaanedligBeloep(LocalDate.of(2026, 1, 1), 16000)
+                ),
+                sistBenyttetGrunnbeloep = 123000
+            )
+            val expectedUttaksdato = LocalDate.now().plusMonths(1).withDayOfMonth(1)
+            val client = mockk<TjenestepensjonClient>().apply {
+                every { afpOffentligLivsvarigTpNummerListe(pid) } returns listOf("3010")
+                every { hentAfpOffentligLivsvarigDetaljer(pid, "3010", expectedUttaksdato) } returns result
+                every { hentTpOrdningNavn("3010") } returns "Statens pensjonskasse"
+            }
+
+            TjenestepensjonService(client, arrangePid(), mockk(relaxed = true))
+                .hentAfpOffentligLivsvarigDetaljerMedTpOrdning() shouldBe result.copy(
+                    tpNummer = "3010",
+                    tpOrdningNavn = "Statens pensjonskasse"
+                )
+
+            result.tpNummer shouldBe null
+            result.tpOrdningNavn shouldBe null
+            verify(exactly = 1) { client.afpOffentligLivsvarigTpNummerListe(pid) }
+            verify(exactly = 1) { client.hentAfpOffentligLivsvarigDetaljer(pid, "3010", expectedUttaksdato) }
+            verify(exactly = 1) { client.hentTpOrdningNavn("3010") }
+            confirmVerified(client)
+        }
+
+        should("skip the registry lookup when no scheme exists") {
+            val client = mockk<TjenestepensjonClient>().apply {
+                every { afpOffentligLivsvarigTpNummerListe(pid) } returns emptyList()
+            }
+
+            TjenestepensjonService(client, arrangePid(), mockk(relaxed = true))
+                .hentAfpOffentligLivsvarigDetaljerMedTpOrdning() shouldBe
+                    AfpOffentligLivsvarigResult(null, null, emptyList(), null)
+
+            verify(exactly = 1) { client.afpOffentligLivsvarigTpNummerListe(pid) }
+            confirmVerified(client)
+        }
+
+        should("reject multiple schemes without fetching details or scheme names") {
+            val client = mockk<TjenestepensjonClient>().apply {
+                every { afpOffentligLivsvarigTpNummerListe(pid) } returns listOf("3010", "3020")
+            }
+
+            shouldThrow<EgressException> {
+                TjenestepensjonService(client, arrangePid(), mockk(relaxed = true))
+                    .hentAfpOffentligLivsvarigDetaljerMedTpOrdning()
+            }.message shouldBe "Bruker har flere ordninger for livsvarig offentlig AFP (2). Dette er ikke støttet."
+
+            verify(exactly = 1) { client.afpOffentligLivsvarigTpNummerListe(pid) }
+            confirmVerified(client)
+        }
+
+        listOf(false, null).forEach { afpInnvilget ->
+            should("include scheme details when afpInnvilget is $afpInnvilget") {
+                val result = AfpOffentligLivsvarigResult(
+                    afpInnvilget = afpInnvilget,
+                    virkningFom = null,
+                    maanedligBeloepListe = emptyList(),
+                    sistBenyttetGrunnbeloep = null
+                )
+                val client = mockk<TjenestepensjonClient>().apply {
+                    every { afpOffentligLivsvarigTpNummerListe(pid) } returns listOf("3020")
+                    every { hentAfpOffentligLivsvarigDetaljer(pid, "3020", any()) } returns result
+                    every { hentTpOrdningNavn("3020") } returns "Kommunal Landspensjonskasse"
+                }
+
+                TjenestepensjonService(client, arrangePid(), mockk(relaxed = true))
+                    .hentAfpOffentligLivsvarigDetaljerMedTpOrdning() shouldBe result.copy(
+                        tpNummer = "3020",
+                        tpOrdningNavn = "Kommunal Landspensjonskasse"
+                    )
+
+                verify(exactly = 1) { client.hentTpOrdningNavn("3020") }
+            }
+        }
+
+        should("propagate errors when fetching the scheme list") {
+            val exception = EgressException("Kunne ikke hente AFP-ordninger")
+            val client = mockk<TjenestepensjonClient>().apply {
+                every { afpOffentligLivsvarigTpNummerListe(pid) } throws exception
+            }
+
+            shouldThrow<EgressException> {
+                TjenestepensjonService(client, arrangePid(), mockk(relaxed = true))
+                    .hentAfpOffentligLivsvarigDetaljerMedTpOrdning()
+            } shouldBe exception
+
+            verify(exactly = 1) { client.afpOffentligLivsvarigTpNummerListe(pid) }
+            confirmVerified(client)
+        }
+
+        should("propagate AFP errors without fetching the scheme name") {
+            val exception = EgressException("Kunne ikke hente AFP-detaljer")
+            val client = mockk<TjenestepensjonClient>().apply {
+                every { afpOffentligLivsvarigTpNummerListe(pid) } returns listOf("3010")
+                every { hentAfpOffentligLivsvarigDetaljer(pid, "3010", any()) } throws exception
+            }
+
+            shouldThrow<EgressException> {
+                TjenestepensjonService(client, arrangePid(), mockk(relaxed = true))
+                    .hentAfpOffentligLivsvarigDetaljerMedTpOrdning()
+            } shouldBe exception
+
+            verify(exactly = 1) { client.afpOffentligLivsvarigTpNummerListe(pid) }
+            verify(exactly = 1) { client.hentAfpOffentligLivsvarigDetaljer(pid, "3010", any()) }
+            confirmVerified(client)
+        }
+
+        should("propagate registry errors") {
+            val client = mockk<TjenestepensjonClient>().apply {
+                every { afpOffentligLivsvarigTpNummerListe(pid) } returns listOf("3010")
+                every { hentAfpOffentligLivsvarigDetaljer(pid, "3010", any()) } returns
+                        AfpOffentligLivsvarigResult(false, null, emptyList(), null)
+                every { hentTpOrdningNavn("3010") } throws EgressException("Registry unavailable")
+            }
+
+            shouldThrow<EgressException> {
+                TjenestepensjonService(client, arrangePid(), mockk(relaxed = true))
+                    .hentAfpOffentligLivsvarigDetaljerMedTpOrdning()
+            }.message shouldBe "Registry unavailable"
+        }
+    }
+
     context("hentAfpOffentligLivsvarigDetaljer") {
         should("returnere korrekte detaljer når personen har en tjenestepensjonsordning") {
             val tpNr = "3010"
@@ -84,6 +214,7 @@ class TjenestepensjonServiceTest : ShouldSpec({
 
             verify { client.afpOffentligLivsvarigTpNummerListe(pid) }
             verify { client.hentAfpOffentligLivsvarigDetaljer(pid, tpNr, expectedUttaksdato) }
+            verify(exactly = 0) { client.hentTpOrdningNavn(any()) }
         }
 
         should("kaste exception når personen ikke har noen tjenestepensjonsordninger") {

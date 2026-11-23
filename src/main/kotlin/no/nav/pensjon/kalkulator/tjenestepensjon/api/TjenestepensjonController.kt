@@ -8,8 +8,10 @@ import no.nav.pensjon.kalkulator.tech.web.EgressException
 import no.nav.pensjon.kalkulator.tjenestepensjon.TjenestepensjonService
 import no.nav.pensjon.kalkulator.tjenestepensjon.api.dto.*
 import no.nav.pensjon.kalkulator.tjenestepensjon.api.dto.v3.LivsvarigOffentligAfpResultV3
+import no.nav.pensjon.kalkulator.tjenestepensjon.api.dto.v4.LivsvarigOffentligAfpResultV4
 import no.nav.pensjon.kalkulator.tjenestepensjon.api.map.LivsvarigOffentligAfpMapperV2.toDtoV2
 import no.nav.pensjon.kalkulator.tjenestepensjon.api.map.LivsvarigOffentligAfpMapperV3.toDtoV3
+import no.nav.pensjon.kalkulator.tjenestepensjon.api.map.LivsvarigOffentligAfpMapperV4.toDtoV4
 import no.nav.pensjon.kalkulator.tjenestepensjon.api.map.TjenestepensjonMapper.toDto
 import org.springframework.web.bind.annotation.*
 
@@ -93,6 +95,26 @@ class TjenestepensjonController(
         return try {
             toDtoV3(timed(service::hentAfpOffentligLivsvarigDetaljer, "hentAfpOffentligLivsvarigDetaljer$versjon"))
                 .also { log.info { "livsvarig offentlig AFP-detaljer respons $versjon: $it" } }
+        } catch (e: EgressException) {
+            handleError(e, versjon)!!
+        } finally {
+            traceAid.end()
+        }
+    }
+
+    @GetMapping("v4/tpo-livsvarig-offentlig-afp")
+    @Operation(
+        summary = "Hent løpende livsvarig offentlig AFP",
+        description = "Henter detaljer om løpende livsvarig AFP i offentlig sektor" +
+                " med tjenestepensjonsordning navn og nummer"
+    )
+    fun hentLivsvarigOffentligAfpDetaljerV4(): LivsvarigOffentligAfpResultV4 {
+        val versjon = "V4"
+        traceAid.begin()
+        log.debug { "Request for livsvarig offentlig AFP-detaljer $versjon" }
+
+        return try {
+            toDtoV4(timed(service::hentAfpOffentligLivsvarigDetaljerMedTpOrdning, "hentAfpOffentligLivsvarigDetaljer$versjon"))
         } catch (e: EgressException) {
             handleError(e, versjon)!!
         } finally {

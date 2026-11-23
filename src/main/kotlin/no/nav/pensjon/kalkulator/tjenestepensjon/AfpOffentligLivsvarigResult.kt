@@ -6,7 +6,9 @@ data class AfpOffentligLivsvarigResult(
     val afpInnvilget: Boolean?,
     val virkningFom: LocalDate?,
     val maanedligBeloepListe: List<MaanedligBeloep>,
-    val sistBenyttetGrunnbeloep: Int?
+    val sistBenyttetGrunnbeloep: Int?,
+    val tpNummer: String? = null,
+    val tpOrdningNavn: String? = null
 )
 
 data class MaanedligBeloep(

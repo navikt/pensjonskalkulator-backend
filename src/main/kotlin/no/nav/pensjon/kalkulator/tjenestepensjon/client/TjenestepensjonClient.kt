@@ -18,5 +18,7 @@ interface TjenestepensjonClient {
 
     fun afpOffentligLivsvarigTpNummerListe(pid: Pid): List<String>
 
+    fun hentTpOrdningNavn(tpNr: String): String
+
     fun hentAfpOffentligLivsvarigDetaljer(pid: Pid, tpNr: String, uttaksdato: LocalDate): AfpOffentligLivsvarigResult
 }
