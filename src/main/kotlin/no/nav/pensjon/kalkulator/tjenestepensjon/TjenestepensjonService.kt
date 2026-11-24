@@ -21,6 +21,8 @@ class TjenestepensjonService(
     fun hentMedlemskapITjenestepensjonsordninger() =
         tjenestepensjonClient.tjenestepensjonsforhold(pidGetter.pid()).tpOrdninger
 
+    fun harAfpOffentligLivsvarig() = hentTpOrdningHvorBrukerHarAfpOffentligLivsvarig().isNotEmpty()
+
     fun hentAfpOffentligLivsvarigDetaljer(): AfpOffentligLivsvarigResult =
         hentAfpOffentligLivsvarigDetaljer(medTpOrdning = false)
 
@@ -28,8 +30,7 @@ class TjenestepensjonService(
         hentAfpOffentligLivsvarigDetaljer(medTpOrdning = true)
 
     private fun hentAfpOffentligLivsvarigDetaljer(medTpOrdning: Boolean): AfpOffentligLivsvarigResult {
-        val pid = pidGetter.pid()
-        val tpNumre = tjenestepensjonClient.afpOffentligLivsvarigTpNummerListe(pid)
+        val tpNumre = hentTpOrdningHvorBrukerHarAfpOffentligLivsvarig()
 
         if (tpNumre.isEmpty()) {
             log.info { "Bruker har ingen livsvarig offentlig AFP-ordning" }
@@ -49,6 +50,7 @@ class TjenestepensjonService(
         val tpNr = tpNumre.first()
         val uttaksdato = LocalDate.now().plusMonths(1).withDayOfMonth(1)
 
+        val pid = pidGetter.pid()
         val result: AfpOffentligLivsvarigResult = tjenestepensjonClient.hentAfpOffentligLivsvarigDetaljer(pid, tpNr, uttaksdato)
 
         return if (medTpOrdning)
@@ -65,6 +67,9 @@ class TjenestepensjonService(
             true
         else
             tjenestepensjonClient.erApoteker(pidGetter.pid())
+
+    private fun hentTpOrdningHvorBrukerHarAfpOffentligLivsvarig(): List<String> =
+            tjenestepensjonClient.afpOffentligLivsvarigTpNummerListe(pidGetter.pid())
 
     private companion object {
         private fun harForhold(tjenestepensjon: Tjenestepensjon): Boolean =

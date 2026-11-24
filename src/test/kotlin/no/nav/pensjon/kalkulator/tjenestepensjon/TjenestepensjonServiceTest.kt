@@ -58,6 +58,41 @@ class TjenestepensjonServiceTest : ShouldSpec({
         }
     }
 
+    context("harAfpOffentligLivsvarig") {
+        listOf(
+            emptyList<String>() to false,
+            listOf("3010") to true,
+            listOf("3010", "3020") to true
+        ).forEach { (tpNumre, expected) ->
+            should("return $expected for ${tpNumre.size} AFP schemes without fetching details or scheme names") {
+                val client = mockk<TjenestepensjonClient>().apply {
+                    every { afpOffentligLivsvarigTpNummerListe(pid) } returns tpNumre
+                }
+
+                TjenestepensjonService(client, arrangePid(), mockk(relaxed = true))
+                    .harAfpOffentligLivsvarig() shouldBe expected
+
+                verify(exactly = 1) { client.afpOffentligLivsvarigTpNummerListe(pid) }
+                confirmVerified(client)
+            }
+        }
+
+        should("propagate errors when fetching the AFP scheme list") {
+            val exception = EgressException("Kunne ikke hente AFP-ordninger")
+            val client = mockk<TjenestepensjonClient>().apply {
+                every { afpOffentligLivsvarigTpNummerListe(pid) } throws exception
+            }
+
+            shouldThrow<EgressException> {
+                TjenestepensjonService(client, arrangePid(), mockk(relaxed = true))
+                    .harAfpOffentligLivsvarig()
+            } shouldBe exception
+
+            verify(exactly = 1) { client.afpOffentligLivsvarigTpNummerListe(pid) }
+            confirmVerified(client)
+        }
+    }
+
     context("hentAfpOffentligLivsvarigDetaljerMedTpOrdning") {
         should("include the scheme number and registry name") {
             val result = AfpOffentligLivsvarigResult(

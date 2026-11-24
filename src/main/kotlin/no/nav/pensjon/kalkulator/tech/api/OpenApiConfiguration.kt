@@ -84,6 +84,7 @@ class OpenApiConfiguration {
                 "/api/sak-status",
                 "/api/tpo-medlemskap",
                 "/api/v1/tpo-medlemskap",
+                "/api/v1/har-livsvarig-offentlig-afp",
                 "/api/v2/tpo-livsvarig-offentlig-afp", // deprecated
                 "/api/v3/tpo-livsvarig-offentlig-afp", //deprecated
                 "/api/v4/tpo-livsvarig-offentlig-afp",
