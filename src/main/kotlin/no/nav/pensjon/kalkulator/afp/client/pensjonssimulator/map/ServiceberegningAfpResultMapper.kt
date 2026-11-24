@@ -18,6 +18,7 @@ object ServiceberegningAfpResultMapper {
             afpOrdning = null, //TODO sjekk om behøves
             beregnetAfp = dto.beregnetAfp?.let(::mapBeregnetAfp),
             opptjeningListe = dto.opptjeningListe.map(::opptjening),
+            livsvarigOffentligAfpHarBetydningForInnvilgelse = dto.livsvarigOffentligAfpHarBetydningForInnvilgelse,
             problem = dto.problem?.let(::mapProblem)
         )
 

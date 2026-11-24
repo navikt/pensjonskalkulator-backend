@@ -89,7 +89,8 @@ object PersonligSimuleringResultMapper {
     private fun vilkaarsproeving(dto: VilkaarsproevingsresultatDto) =
         Vilkaarsproeving(
             innvilget = dto.erInnvilget,
-            alternativ = dto.alternativ?.let(::alternativ)
+            alternativ = dto.alternativ?.let(::alternativ),
+            livsvarigOffentligAfpHarBetydningForInnvilgelse = dto.livsvarigOffentligAfpHarBetydningForInnvilgelse
         )
 
     private fun opptjening(dto: OpptjeningDto) =
