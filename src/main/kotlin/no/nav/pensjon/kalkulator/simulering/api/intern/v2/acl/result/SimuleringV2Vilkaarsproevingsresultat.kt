@@ -12,19 +12,20 @@ data class SimuleringV2Vilkaarsproevingsresultat(
     val erInnvilget: Boolean,
 
     @field:Schema(description = "Et alternativ sett av uttaksparametre som vil resultere i innvilget pensjon (relevant når de opprinnelig angitte parametre ga avslag)")
-    val alternativ: SimuleringV2Uttaksparametre?
+    val alternativ: SimuleringV2Uttaksparametre? = null,
+
+    @field:Schema(description = "Hvorvidt livsvarig AFP i offentlig sektor har betydning for innvilgelse av alderspensjon")
+    val livsvarigOffentligAfpHarBetydningForInnvilgelse: Boolean? = null
 ) {
     companion object {
         fun transferable(source: Vilkaarsproeving) =
             SimuleringV2Vilkaarsproevingsresultat(
                 erInnvilget = source.innvilget,
-                alternativ = source.alternativ?.let(SimuleringV2Uttaksparametre::transferable)
+                alternativ = source.alternativ?.let(SimuleringV2Uttaksparametre::transferable),
+                livsvarigOffentligAfpHarBetydningForInnvilgelse = source.livsvarigOffentligAfpHarBetydningForInnvilgelse
             )
 
         fun serverfeil() =
-            SimuleringV2Vilkaarsproevingsresultat(
-                erInnvilget = false,
-                alternativ = null
-            )
+            SimuleringV2Vilkaarsproevingsresultat(erInnvilget = false)
     }
 }

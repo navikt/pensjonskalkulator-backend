@@ -97,7 +97,8 @@ data class OpptjeningDto(
 
 data class VilkaarsproevingsresultatDto(
     @field:NotNull val erInnvilget: Boolean,
-    val alternativ: UttaksparametreDto?
+    val alternativ: UttaksparametreDto? = null,
+    val livsvarigOffentligAfpHarBetydningForInnvilgelse: Boolean? = null
 )
 
 /**
