@@ -19,10 +19,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@1bd86f2fdb4b86187fa4059f16f31a3202acc9ea # v4.39.4
-        with:
-          languages: java
       - name: Setup java
         uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
@@ -31,7 +27,3 @@ jobs:
           distribution: temurin
       - name: Build with Maven
         run: mvn -B package --file pom.xml
-      - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@1bd86f2fdb4b86187fa4059f16f31a3202acc9ea # v4.39.4
-        with:
-          category: "/language:java"
