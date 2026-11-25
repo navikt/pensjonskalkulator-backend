@@ -39,7 +39,6 @@ class SecurityContextEnricherTest : ShouldSpec({
                 representasjonService = mockk()
             ).enrichAuthentication(
                 request = arrangeFoedselsnummer(pid.value), // => PID in the request header
-                response = mockk()
             )
 
             verify { securityContextPidExtractor wasNot Called }
@@ -57,8 +56,7 @@ class SecurityContextEnricherTest : ShouldSpec({
                 pidDecrypter = mockk(),
                 representasjonService = mockk()
             ).enrichAuthentication(
-                request = arrangeFoedselsnummer(value = null), // => no PID in the request header
-                response = mockk()
+                request = arrangeFoedselsnummer(value = null), // => no PID in the request heade
             )
 
             verify(exactly = 1) { securityContextPidExtractor.pid() }
@@ -74,8 +72,7 @@ class SecurityContextEnricherTest : ShouldSpec({
             pidDecrypter = arrangeDecryption(),
             representasjonService = mockk()
         ).enrichAuthentication(
-            request = arrangeFoedselsnummer(ENCRYPTED_PID),
-            response = mockk()
+            request = arrangeFoedselsnummer(ENCRYPTED_PID)
         )
 
         securityContextTargetPid()?.value shouldBe PID
@@ -90,8 +87,7 @@ class SecurityContextEnricherTest : ShouldSpec({
             pidDecrypter = mockk(),
             representasjonService = mockk()
         ).enrichAuthentication(
-            request = arrangeFoedselsnummer(PID), // not encrypted
-            response = mockk()
+            request = arrangeFoedselsnummer(PID), // not encrypte
         )
 
         securityContextTargetPid()?.value shouldBe PID
@@ -110,8 +106,7 @@ class SecurityContextEnricherTest : ShouldSpec({
                 pidDecrypter = mockk(),
                 representasjonService = arrange(validRepresentasjon)
             ).enrichAuthentication(
-                request = arrangeOnBehalfOfCookie(PID),
-                response = mockk()
+                request = arrangeOnBehalfOfCookie(PID)
             )
 
             securityContextTargetPid()?.value shouldBe PID
@@ -126,8 +121,7 @@ class SecurityContextEnricherTest : ShouldSpec({
                 pidDecrypter = arrangeDecryption(),
                 representasjonService = arrange(validRepresentasjon)
             ).enrichAuthentication(
-                request = arrangeOnBehalfOfCookie(ENCRYPTED_PID),
-                response = mockk()
+                request = arrangeOnBehalfOfCookie(ENCRYPTED_PID)
             )
 
             securityContextTargetPid()?.value shouldBe PID
@@ -145,8 +139,7 @@ class SecurityContextEnricherTest : ShouldSpec({
                     pidDecrypter = mockk(),
                     representasjonService = arrange(Representasjon(isValid = false, fullmaktsgiver = null))
                 ).enrichAuthentication(
-                    request = arrangeOnBehalfOfCookie(ENCRYPTED_PID),
-                    response = mockk()
+                    request = arrangeOnBehalfOfCookie(ENCRYPTED_PID)
                 )
             }.message shouldBe "INVALID_REPRESENTASJON"
 
@@ -172,8 +165,7 @@ class SecurityContextEnricherTest : ShouldSpec({
                 pidDecrypter = mockk(),
                 representasjonService
             ).enrichAuthentication(
-                request = arrangeOnBehalfOfCookieAndHeader(),
-                response = mockk()
+                request = arrangeOnBehalfOfCookieAndHeader()
             )
 
             verify(exactly = 0) { representasjonService.hasValidRepresentasjonsforhold(any()) }

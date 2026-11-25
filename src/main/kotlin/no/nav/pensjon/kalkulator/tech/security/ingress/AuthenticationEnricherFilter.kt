@@ -29,7 +29,7 @@ class AuthenticationEnricherFilter(private val enricher: SecurityContextEnricher
         val httpResponse = response as HttpServletResponse
 
         try {
-            enricher.enrichAuthentication(request, httpResponse)
+            enricher.enrichAuthentication(request)
         } catch (e: AccessDeniedException) {
             handleAccessDenied(response = httpResponse, reason = e.message ?: AccessDeniedReason.NONE.name)
             return
