@@ -13,6 +13,7 @@ import no.nav.pensjon.kalkulator.afp.client.pensjonssimulator.dto.Serviceberegni
 import no.nav.pensjon.kalkulator.opptjening.AarligOpptjening
 import no.nav.pensjon.kalkulator.opptjening.PensjonspoengType
 import java.time.LocalDate
+import java.time.Month
 
 class ServiceberegningAfpResultMapperTest : ShouldSpec({
 
@@ -22,7 +23,7 @@ class ServiceberegningAfpResultMapperTest : ShouldSpec({
                 dto = ServiceberegningAfpResultDto(
                     beregnetAfp = ServiceberegningFolketrygdberegnetAfpDto(
                         afpTotalbeloep = 1,
-                        virkningFom = LocalDate.of(2021, 2, 3),
+                        virkningFom = LocalDate.of(2021, Month.FEBRUARY, 3),
                         tidligereArbeidsinntekt = 2,
                         grunnbeloep = 3,
                         sluttpoengtall = 4.1,
@@ -45,13 +46,14 @@ class ServiceberegningAfpResultMapperTest : ShouldSpec({
                             pensjonspoeng = 4.6
                         )
                     ),
+                    livsvarigOffentligAfpHarBetydningForInnvilgelse = true,
                     problem = null
                 )
             ) shouldBe ServiceberegnetAfpResult(
                 afpOrdning = null, // hard-coded
                 beregnetAfp = BeregnetAfp(
                     totalbelopAfp = 1,
-                    virkFom = LocalDate.of(2021, 2, 3),
+                    virkFom = LocalDate.of(2021, Month.FEBRUARY, 3),
                     tidligereArbeidsinntekt = 2,
                     grunnbelop = 3,
                     sluttpoengtall = 4.1,
@@ -78,6 +80,7 @@ class ServiceberegningAfpResultMapperTest : ShouldSpec({
                         merknadListe = emptyList()
                     )
                 ),
+                livsvarigOffentligAfpHarBetydningForInnvilgelse = true,
                 problem = null
             )
         }
