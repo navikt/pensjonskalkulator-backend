@@ -1,13 +1,18 @@
 package no.nav.pensjon.kalkulator.tech.trace
 
+import io.opentelemetry.api.trace.Span
+import jakarta.servlet.http.HttpServletRequest
+import no.nav.pensjon.kalkulator.tech.web.CustomHttpHeaders
 import org.slf4j.MDC
 import org.springframework.stereotype.Component
 
 @Component
 class TraceAid(private val callIdGenerator: CallIdGenerator) {
+    fun begin(request: HttpServletRequest? = null) {
+        val suppliedRequestId = request?.getHeader(CustomHttpHeaders.NAV_CORRELATION_ID)
+            ?: request?.getHeader(CustomHttpHeaders.CALL_ID)
 
-    fun begin() {
-        MDC.put(CALL_ID_KEY, callIdGenerator.newId())
+        MDC.put(CALL_ID_KEY, suppliedRequestId ?: callIdGenerator.newId())
     }
 
     fun callId(): String =
@@ -17,7 +22,10 @@ class TraceAid(private val callIdGenerator: CallIdGenerator) {
         MDC.clear()
     }
 
-    private companion object {
+    companion object {
         private const val CALL_ID_KEY = "Nav-Call-Id"
+
+        fun traceId(): String =
+            Span.current().spanContext.traceId ?: "00000000000000000000000000000000"
     }
 }

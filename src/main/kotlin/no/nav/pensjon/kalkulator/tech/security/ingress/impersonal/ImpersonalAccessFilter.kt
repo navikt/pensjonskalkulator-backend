@@ -11,6 +11,7 @@ import no.nav.pensjon.kalkulator.tech.security.SecurityConfiguration.Companion.F
 import no.nav.pensjon.kalkulator.tech.security.ingress.PidGetter
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.AvvisningAarsak
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.TilgangResult
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.acl.TilgangsnektDto
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.fag.FagtilgangService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.CacheAwarePopulasjonstilgangService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
@@ -54,7 +55,7 @@ class ImpersonalAccessFilter(
             }
         } catch (e: Exception) {
             // Enhver feil skal gi 'tilgang avvist'
-            forbidden(response, aarsak = tilgangssjekkFeilet(e), e)
+            forbidden(response, e)
             return
         }
 
@@ -67,26 +68,24 @@ class ImpersonalAccessFilter(
         else
             manglendeFaggruppemedlemskap()
 
-    private fun forbidden(response: ServletResponse, aarsak: TilgangResult, e: Exception? = null) {
-        "Tilgang nektet pga. ${aarsak.begrunnelse}".let {
-            if (e == null) {
-                log.warn { it }
-                respondForbidden(response, aarsak = aarsak.begrunnelse)
-            } else {
-                log.error(e) { "$it - ${e.message}" }
-                respondForbidden(response, aarsak = "$it - se logg for detaljer")
-            }
+    private fun forbidden(response: ServletResponse, aarsak: TilgangResult) {
+        log.warn { "Tilgang nektet pga. ${aarsak.begrunnelse}" }
+        respondForbidden(response, aarsak = TilgangsnektDto.transferable(aarsak))
+    }
+
+    private fun forbidden(response: ServletResponse, e: Exception) {
+        "Tilgang nektet pga. feil i tilgangssjekk".let {
+            log.error(e) { it }
+            respondForbidden(response, aarsak = TilgangsnektDto.transferable("$it - se logg for detaljer"))
         }
     }
 
-    private fun respondForbidden(response: ServletResponse, aarsak: String?) {
-        val tilgangsnektResponse = TilgangsnektResponse(detail = aarsak)
-
+    private fun respondForbidden(response: ServletResponse, aarsak: TilgangsnektDto) {
         (response as HttpServletResponse).apply {
             status = HttpStatus.FORBIDDEN.value()
             characterEncoding = Charsets.UTF_8.name()
             contentType = MediaType.APPLICATION_JSON_VALUE
-            writer.write(objectMapper.writeValueAsString(tilgangsnektResponse))
+            writer.write(objectMapper.writeValueAsString(aarsak))
         }
     }
 
@@ -100,13 +99,6 @@ class ImpersonalAccessFilter(
                 innvilget = false,
                 avvisningAarsak = AvvisningAarsak.MANGLENDE_FAGGRUPPE_MEDLEMSKAP,
                 begrunnelse = "manglende faggruppemedlemskap",
-            )
-
-        private fun tilgangssjekkFeilet(e: Exception) =
-            TilgangResult(
-                innvilget = false,
-                avvisningAarsak = AvvisningAarsak.TILGANGSSJEKK_FEIL,
-                begrunnelse = e.message
             )
     }
 }

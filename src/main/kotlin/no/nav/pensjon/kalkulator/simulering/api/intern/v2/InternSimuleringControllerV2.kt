@@ -3,6 +3,7 @@ package no.nav.pensjon.kalkulator.simulering.api.intern.v2
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import jakarta.servlet.http.HttpServletRequest
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.common.api.ControllerBase
 import no.nav.pensjon.kalkulator.simulering.SimuleringService
@@ -61,8 +62,11 @@ class InternSimuleringControllerV2(
             )
         ]
     )
-    fun simulerPensjon(@RequestBody spec: SimuleringV2Spec): ResponseEntity<SimuleringV2Result> {
-        traceAid.begin()
+    fun simulerPensjon(
+        @RequestBody spec: SimuleringV2Spec,
+        request: HttpServletRequest
+    ): ResponseEntity<SimuleringV2Result> {
+        traceAid.begin(request)
         log.debug { "Simulering request ${jsonMapper.writeValueAsRedactedString(spec)}" }
 
         return try {
