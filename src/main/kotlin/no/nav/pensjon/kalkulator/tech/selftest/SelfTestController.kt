@@ -1,7 +1,6 @@
 package no.nav.pensjon.kalkulator.tech.selftest
 
 import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
 import no.nav.pensjon.kalkulator.tech.security.egress.SecurityContextEnricher
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -17,8 +16,8 @@ class SelfTestController(
     private val securityContextEnricher: SecurityContextEnricher
 ) {
     @GetMapping(path = ["internal/selftest"])
-    fun selfTest(request: HttpServletRequest, response: HttpServletResponse): ResponseEntity<String> {
-        securityContextEnricher.enrichAuthentication(request, response)
+    fun selfTest(request: HttpServletRequest): ResponseEntity<String> {
+        securityContextEnricher.enrichAuthentication(request)
         val accept = request.getHeader(HttpHeaders.ACCEPT)
 
         return if (MediaType.APPLICATION_JSON_VALUE == accept) responseEntity(

@@ -2,7 +2,6 @@ package no.nav.pensjon.kalkulator.tech.security.egress
 
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
 import no.nav.pensjon.kalkulator.person.Pid
 import no.nav.pensjon.kalkulator.person.PossiblyEncryptedPid
@@ -33,13 +32,7 @@ class SecurityContextEnricher(
 ) {
     private val log = KotlinLogging.logger {}
 
-    fun enrichAuthentication(request: HttpServletRequest, response: HttpServletResponse) {
-        log.info { "header names " + request.headerNames.toList().joinToString() }
-        val joinToString = listOf("x_correlation-id", "x-cloud-trace-context", "traceparent", "referer").joinToString {
-            "${request.requestURI} - $it - ${request.getHeader(it)}"
-        }
-        log.info { "headers $joinToString" }
-
+    fun enrichAuthentication(request: HttpServletRequest) {
         with(SecurityContextHolder.getContext()) {
             if (authentication == null) {
                 authentication = anonymousAuthentication()

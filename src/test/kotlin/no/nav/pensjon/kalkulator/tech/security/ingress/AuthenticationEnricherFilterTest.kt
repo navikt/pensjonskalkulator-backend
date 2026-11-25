@@ -23,7 +23,7 @@ class AuthenticationEnricherFilterTest : ShouldSpec({
             val chain = arrangeFilterChain(request, response)
 
             AuthenticationEnricherFilter(
-                enricher = arrangeSecurityContextEnricher(request, response)
+                enricher = arrangeSecurityContextEnricher(request)
             ).doFilter(request, response, chain)
 
             verify { chain wasNot called }
@@ -48,26 +48,23 @@ class AuthenticationEnricherFilterTest : ShouldSpec({
     }
 })
 
-private fun arrangeSecurityContextEnricher(
-    request: HttpServletRequest,
-    response: HttpServletResponse
-): SecurityContextEnricher =
-    mockk<SecurityContextEnricher>().apply {
-        every { enrichAuthentication(request, response) } throws AccessDeniedException("oops!")
+private fun arrangeSecurityContextEnricher(request: HttpServletRequest): SecurityContextEnricher =
+    mockk {
+        every { enrichAuthentication(request) } throws AccessDeniedException("oops!")
     }
 
 private fun arrangeFilterChain(request: HttpServletRequest, response: HttpServletResponse): FilterChain =
-    mockk<FilterChain>().apply {
+    mockk {
         every { doFilter(request, response) } returns Unit
     }
 
 private fun arrangeRequest(uri: String = "/api/foo"): HttpServletRequest =
-    mockk<HttpServletRequest>().apply {
+    mockk {
         every { requestURI } returns uri
     }
 
 private fun arrangeResponse(printWriter: PrintWriter = mockk()): HttpServletResponse =
-    mockk<HttpServletResponse>().apply {
+    mockk {
         every { writer } returns printWriter
     }
 
@@ -78,6 +75,6 @@ private fun arrangeForbiddenResponse(printWriter: PrintWriter): HttpServletRespo
     }
 
 private fun arrangeWriter(): PrintWriter =
-    mockk<PrintWriter>().apply {
+    mockk {
         every { append("""{ "reason": "oops!" }""") } returns this
     }
