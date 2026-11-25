@@ -35,6 +35,10 @@ class SecurityContextEnricher(
 
     fun enrichAuthentication(request: HttpServletRequest, response: HttpServletResponse) {
         log.info { "headers " + request.headerNames.toList().joinToString() }
+        listOf("x_correlation-id", "x-cloud-trace-context", "traceparent", "referer").joinToString {
+            "${request.requestURI} - $it - ${request.getHeader(it)}"
+        }
+        log.info { "headers " + request.headerNames.toList().joinToString() }
         with(SecurityContextHolder.getContext()) {
             if (authentication == null) {
                 authentication = anonymousAuthentication()
