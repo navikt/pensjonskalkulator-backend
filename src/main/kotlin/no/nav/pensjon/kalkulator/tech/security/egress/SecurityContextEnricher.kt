@@ -34,6 +34,7 @@ class SecurityContextEnricher(
     private val log = KotlinLogging.logger {}
 
     fun enrichAuthentication(request: HttpServletRequest, response: HttpServletResponse) {
+        log.info { "headers " + request.headerNames.toList().joinToString() }
         with(SecurityContextHolder.getContext()) {
             if (authentication == null) {
                 authentication = anonymousAuthentication()
