@@ -11,16 +11,15 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletResponse
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import java.io.PrintWriter
 import no.nav.pensjon.kalkulator.mock.PersonFactory.pid
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.ImpersonalAccessFilter
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.TilgangsnektResponse
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.fag.FagtilgangService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.AvvisningAarsak
-import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.CacheAwarePopulasjonstilgangService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.TilgangResult
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.fag.FagtilgangService
+import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.access.folk.CacheAwarePopulasjonstilgangService
 import no.nav.pensjon.kalkulator.tech.security.ingress.impersonal.audit.Auditor
 import tools.jackson.databind.ObjectMapper
+import java.io.PrintWriter
 
 private val objectMapper = ObjectMapper()
 
@@ -76,7 +75,11 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         ).doFilter(request, response, chain)
 
         verify(exactly = 1) { response.status = 403 }
-        verifyTilgangsnektBody(writer, forventetDetail = "manglende faggruppemedlemskap")
+        verifyTilgangsnektBody(
+            writer,
+            forventetType = "MANGLENDE_FAGGRUPPE_MEDLEMSKAP",
+            forventetDetail = "manglende faggruppemedlemskap"
+        )
         verify(exactly = 0) { chain.doFilter(request, response) }
     }
 
@@ -96,7 +99,7 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         ).doFilter(request, response, chain)
 
         verify(exactly = 1) { response.status = 403 }
-        verifyTilgangsnektBody(writer, forventetDetail = "some reason")
+        verifyTilgangsnektBody(writer, forventetType = "GEOGRAFISK", forventetDetail = "some reason")
         verify(exactly = 0) { chain.doFilter(request, response) }
     }
 
@@ -116,7 +119,11 @@ class ImpersonalAccessFilterTest : ShouldSpec({
         ).doFilter(request, response, chain)
 
         verify(exactly = 1) { response.status = 403 }
-        verifyTilgangsnektBody(writer, forventetDetail = "Tilgang nektet pga. feil - se logg for detaljer")
+        verifyTilgangsnektBody(
+            writer,
+            forventetType = "TILGANGSSJEKK_FEIL",
+            forventetDetail = "Tilgang nektet pga. feil i tilgangssjekk - se logg for detaljer"
+        )
         verify(exactly = 0) { chain.doFilter(request, response) }
     }
 
@@ -196,12 +203,12 @@ private val feil =
         begrunnelse = "feil"
     )
 
-private fun verifyTilgangsnektBody(writer: PrintWriter, forventetDetail: String) {
+private fun verifyTilgangsnektBody(writer: PrintWriter, forventetType: String, forventetDetail: String) {
     val body = slot<String>()
     verify(exactly = 1) { writer.write(capture(body)) }
 
     val tilgangsnektResponse = objectMapper.readTree(body.captured)
-    tilgangsnektResponse["type"].asString() shouldBe TilgangsnektResponse.TILGANGSNEKT_TYPE
+    tilgangsnektResponse["type"].asString() shouldBe forventetType
     tilgangsnektResponse["detail"].asString() shouldBe forventetDetail
 }
 
