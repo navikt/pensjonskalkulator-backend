@@ -66,7 +66,8 @@ class OpenApiConfiguration {
                 "/api/v3/pensjonsavtaler",
                 "/api/v2/pensjonsavtaler", // deprecated
                 "/api/v1/loepende-omstillingsstoenad-eller-gjenlevendeytelse",
-                "/api/v1/vedtak",
+                "/api/v1/vedtak", // deprecated
+                "/api/v2/vedtak",
                 "/api/v4/vedtak/loepende-vedtak", // deprecated - replaced by /api/v1/vedtak
                 "/api/v1/ekskludert", // deprecated
                 "/api/v2/ekskludert",
