@@ -8,6 +8,7 @@ import java.time.LocalDate
 data class ServiceberegningAfpResultDto(
     val beregnetAfp: ServiceberegningFolketrygdberegnetAfpDto?,
     val opptjeningListe: List<ServiceberegningOpptjeningDto>,
+    val livsvarigOffentligAfpHarBetydningForInnvilgelse: Boolean? = null,
     val problem: ServiceberegningProblemDto? = null
 )
 

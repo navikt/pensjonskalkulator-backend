@@ -123,7 +123,8 @@ class SimuleringService(
                 serviceberegnetAfp = afpResult.beregnetAfp,
                 privatAfpListe = emptyList(),
                 vilkaarsproeving = Vilkaarsproeving(
-                    innvilget = afpResult.beregnetAfp != null && afpResult.problem == null
+                    innvilget = afpResult.beregnetAfp != null && afpResult.problem == null,
+                    livsvarigOffentligAfpHarBetydningForInnvilgelse = afpResult.livsvarigOffentligAfpHarBetydningForInnvilgelse
                 ),
                 harForLiteTrygdetid = false,
                 trygdetid = 0,

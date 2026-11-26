@@ -8,7 +8,8 @@ data class ServiceberegnetAfpResult(
     val afpOrdning: AfpOrdningType?,
     val beregnetAfp: BeregnetAfp?,
     val opptjeningListe: List<AarligOpptjening>,
-    val problem: ServiceberegnetAfpProblem?
+    val livsvarigOffentligAfpHarBetydningForInnvilgelse: Boolean? = null,
+    val problem: ServiceberegnetAfpProblem? = null
 )
 
 data class BeregnetAfp(
