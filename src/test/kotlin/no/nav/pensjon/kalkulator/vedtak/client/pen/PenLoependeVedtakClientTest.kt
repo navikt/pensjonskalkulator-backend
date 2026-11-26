@@ -54,6 +54,7 @@ class PenLoependeVedtakClientTest : FunSpec({
 
             with(response) {
                 with(loependeAlderspensjon!!) {
+                    afpOffentligLivsvarig shouldBe 1234
                     grad shouldBe Uttaksgrad.HUNDRE_PROSENT
                     fom shouldBe LocalDate.of(2025, 10, 1)
                     sivilstatus shouldBe Sivilstatus.UGIFT
@@ -62,6 +63,7 @@ class PenLoependeVedtakClientTest : FunSpec({
                 }
                 ufoeretrygd shouldBe null
                 privatAfp shouldBe null
+                fremtidigAlderspensjon!!.afpOffentligLivsvarig shouldBe 2345
             }
         }
     }
@@ -92,6 +94,7 @@ class PenLoependeVedtakClientTest : FunSpec({
             with(response) {
                 with(loependeAlderspensjon!!) {
                     grad shouldBe Uttaksgrad.FEMTI_PROSENT
+                    afpOffentligLivsvarig shouldBe null
                     fom shouldBe LocalDate.of(2025, 10, 1)
                     sivilstatus shouldBe Sivilstatus.GIFT
                     harGjenlevenderett shouldBe true
@@ -163,6 +166,7 @@ class PenLoependeVedtakClientTest : FunSpec({
                 loependeAlderspensjon shouldBe null
                 ufoeretrygd shouldBe null
                 privatAfp shouldBe null
+                fremtidigAlderspensjon shouldBe null
             }
         }
     }
@@ -216,7 +220,7 @@ class PenLoependeVedtakClientTest : FunSpec({
 
 @Language("json")
 private const val VEDTAK_AP = """
-{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"UGIF","sivilstatus":"UGIF","harGjenlevenderett":false,"harUtenlandsopphold":true},"ufoeretrygd":null,"afpPrivat":null,"afpOffentlig":null}
+{"alderspensjon":{"grad":100,"fraOgMed":"2025-10-01","sivilstand":"UGIF","sivilstatus":"UGIF","harGjenlevenderett":false,"harUtenlandsopphold":true,"afpOffentligLivsvarig":1234},"alderspensjonIFremtid":{"grad":80,"fraOgMed":"2027-01-01","sivilstatus":"UGIF","harGjenlevenderett":false,"harUtenlandsopphold":true,"afpOffentligLivsvarig":2345},"ufoeretrygd":null,"afpPrivat":null,"afpOffentlig":null}
 """
 
 @Language("json")

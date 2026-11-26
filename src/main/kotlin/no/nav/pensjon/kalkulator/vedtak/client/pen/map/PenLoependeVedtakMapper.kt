@@ -41,14 +41,16 @@ object PenLoependeVedtakMapper {
             uttaksgradFom = uttaksgradFom ?: source.fraOgMed,
             sivilstatus = PenSivilstand.toInternalValue(source.sivilstatus),
             harGjenlevenderett = source.harGjenlevenderett,
-            harUtenlandsopphold = source.harUtenlandsopphold
+            harUtenlandsopphold = source.harUtenlandsopphold,
+            afpOffentligLivsvarig = source.afpOffentligLivsvarig
         )
 
     private fun fremtidigAlderspensjon(source: PenGjeldendeVedtakApDto) =
         FremtidigAlderspensjon(
             grad = Uttaksgrad.from(prosentsats = source.grad),
             fom = source.fraOgMed,
-            sivilstatus = PenSivilstand.toInternalValue(source.sivilstatus)
+            sivilstatus = PenSivilstand.toInternalValue(source.sivilstatus),
+            afpOffentligLivsvarig = source.afpOffentligLivsvarig
         )
 
     private fun fremtidigUttakgradsendring(source: PenLoependeVedtakDto) =

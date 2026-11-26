@@ -26,7 +26,8 @@ data class PenGjeldendeVedtakApDto(
     val fraOgMed: LocalDate,
     val sivilstatus: String,
     val harGjenlevenderett: Boolean,
-    val harUtenlandsopphold: Boolean
+    val harUtenlandsopphold: Boolean,
+    val afpOffentligLivsvarig: Int? = null
 )
 
 data class PenGjeldendeVedtakDto(
