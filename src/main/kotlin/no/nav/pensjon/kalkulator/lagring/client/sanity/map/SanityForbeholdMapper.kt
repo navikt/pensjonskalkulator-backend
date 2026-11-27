@@ -36,9 +36,11 @@ object SanityForbeholdMapper {
         return ForbeholdSeksjon(
             tittel = source.overskrift,
             avsnitt = avsnitt,
-            vilkaarsliste = source.vilkaar
-                ?.flatMap { it.betingelser.orEmpty() }
-                ?.mapNotNull { SanityVisningsvilkaar.fromExternalValue(it.tag) }
+            vilkaarGrupper = source.vilkaar
+                ?.map { gruppe ->
+                    gruppe.betingelser.orEmpty().mapNotNull { SanityVisningsvilkaar.fromExternalValue(it.tag) }
+                }
+                ?.filter { it.isNotEmpty() }
                 ?: emptyList()
         )
     }
