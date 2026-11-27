@@ -98,8 +98,8 @@ class VedtakV2ControllerTest : FunSpec() {
                     )
                 )
 
-                val afpFelt = afp?.let { ""","livsvarigOffentligAfp":$it""" } ?: ""
-                val fremtidigAfpFelt = fremtidigAfp?.let { ""","livsvarigOffentligAfp":$it""" } ?: ""
+                val afpFelt = afp?.let { ""","livsvarigOffentligAfpMaanedsbeloep":$it""" } ?: ""
+                val fremtidigAfpFelt = fremtidigAfp?.let { ""","livsvarigOffentligAfpMaanedsbeloep":$it""" } ?: ""
                 val result = mvc.get(URL).asyncDispatch().andReturn()
 
                 with(result.response) {
@@ -146,7 +146,7 @@ class VedtakV2ControllerTest : FunSpec() {
             with(result.response) {
                 status shouldBe 200
                 contentAsString shouldBe
-                        """{"harVedtak":true,"fremtidigAlderspensjon":{"grad":100,"fom":"2027-01-01","livsvarigOffentligAfp":2345}}"""
+                        """{"harVedtak":true,"fremtidigAlderspensjon":{"grad":100,"fom":"2027-01-01","livsvarigOffentligAfpMaanedsbeloep":2345}}"""
             }
         }
 
