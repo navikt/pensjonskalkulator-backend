@@ -28,14 +28,14 @@ object VedtakResultMapper {
             sivilstatus = CommonV1Sivilstatus.fromInternalValue(source.sivilstatus),
             harGjenlevenderett = source.harGjenlevenderett,
             harUtenlandsopphold = source.harUtenlandsopphold,
-            afpOffentligLivsvarig = source.afpOffentligLivsvarig
+            livsvarigOffentligAfpMaanedsbeloep = source.livsvarigOffentligAfp
         )
 
     private fun fremtidigAlderspensjon(source: FremtidigAlderspensjon) =
         VedtakV2Alderspensjonsuttak(
             grad = source.grad.prosentsats,
             fom = source.fom,
-            afpOffentligLivsvarig = source.afpOffentligLivsvarig
+            livsvarigOffentligAfpMaanedsbeloep = source.livsvarigOffentligAfp
         )
 
     private fun utbetaling(source: Utbetaling) =

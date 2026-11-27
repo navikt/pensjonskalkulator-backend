@@ -42,7 +42,7 @@ object PenLoependeVedtakMapper {
             sivilstatus = PenSivilstand.toInternalValue(source.sivilstatus),
             harGjenlevenderett = source.harGjenlevenderett,
             harUtenlandsopphold = source.harUtenlandsopphold,
-            afpOffentligLivsvarig = source.afpOffentligLivsvarig
+            livsvarigOffentligAfp = source.afpOffentligLivsvarig
         )
 
     private fun fremtidigAlderspensjon(source: PenGjeldendeVedtakApDto) =
@@ -50,7 +50,7 @@ object PenLoependeVedtakMapper {
             grad = Uttaksgrad.from(prosentsats = source.grad),
             fom = source.fraOgMed,
             sivilstatus = PenSivilstand.toInternalValue(source.sivilstatus),
-            afpOffentligLivsvarig = source.afpOffentligLivsvarig
+            livsvarigOffentligAfp = source.afpOffentligLivsvarig
         )
 
     private fun fremtidigUttakgradsendring(source: PenLoependeVedtakDto) =
