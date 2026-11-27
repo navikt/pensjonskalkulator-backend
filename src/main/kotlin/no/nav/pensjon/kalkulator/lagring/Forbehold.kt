@@ -30,6 +30,8 @@ enum class SanityVisningsvilkaar(val externalValue: String) {
     BEREGNER_AFP_PRIVAT("beregnerAfpPrivat"),
     BEREGNER_MED_GJENLEVENDERETT("beregnerMedGjenlevenderett"),
     HAR_UFOERETRYGD("harUfoeretrygd"),
+    HAR_UTENLANDSOPPHOLD("harUtenlandsopphold"),
+    HAR_VEDTAK_UTENLANDSOPPHOLD("harVedtakUtenlandsopphold"),
     HAR_GJENLEVENDE_ELLER_OMSTILLINGSSTOENAD("harGjenlevendeEllerOmstillingsstoenad");
 
     companion object {
