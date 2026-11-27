@@ -70,13 +70,13 @@ class VedtakV2ControllerTest : FunSpec() {
                         sivilstatus = Sivilstatus.GIFT,
                         harGjenlevenderett = true,
                         harUtenlandsopphold = true,
-                        afpOffentligLivsvarig = afp
+                        livsvarigOffentligAfp = afp
                     ),
                     fremtidigAlderspensjon = FremtidigAlderspensjon(
                         grad = Uttaksgrad.FOERTI_PROSENT,
                         fom = LocalDate.of(2027, 1, 1),
                         sivilstatus = Sivilstatus.GIFT,
-                        afpOffentligLivsvarig = fremtidigAfp
+                        livsvarigOffentligAfp = fremtidigAfp
                     ),
                     ufoeretrygd = LoependeUfoeretrygd(grad = 50, fom = LocalDate.of(2021, 12, 1)),
                     privatAfp = LoependeEntitet(fom = LocalDate.of(2022, 12, 1)),
@@ -98,8 +98,8 @@ class VedtakV2ControllerTest : FunSpec() {
                     )
                 )
 
-                val afpFelt = afp?.let { ""","afpOffentligLivsvarig":$it""" } ?: ""
-                val fremtidigAfpFelt = fremtidigAfp?.let { ""","afpOffentligLivsvarig":$it""" } ?: ""
+                val afpFelt = afp?.let { ""","livsvarigOffentligAfp":$it""" } ?: ""
+                val fremtidigAfpFelt = fremtidigAfp?.let { ""","livsvarigOffentligAfp":$it""" } ?: ""
                 val result = mvc.get(URL).asyncDispatch().andReturn()
 
                 with(result.response) {
@@ -134,7 +134,7 @@ class VedtakV2ControllerTest : FunSpec() {
                     grad = Uttaksgrad.HUNDRE_PROSENT,
                     fom = LocalDate.of(2027, 1, 1),
                     sivilstatus = Sivilstatus.UGIFT,
-                    afpOffentligLivsvarig = 2345
+                    livsvarigOffentligAfp = 2345
                 ),
                 ufoeretrygd = null,
                 privatAfp = null,
@@ -146,7 +146,7 @@ class VedtakV2ControllerTest : FunSpec() {
             with(result.response) {
                 status shouldBe 200
                 contentAsString shouldBe
-                        """{"harVedtak":true,"fremtidigAlderspensjon":{"grad":100,"fom":"2027-01-01","afpOffentligLivsvarig":2345}}"""
+                        """{"harVedtak":true,"fremtidigAlderspensjon":{"grad":100,"fom":"2027-01-01","livsvarigOffentligAfp":2345}}"""
             }
         }
 

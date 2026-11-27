@@ -72,7 +72,7 @@ data class VedtakV2LoependeAlderspensjon(
     val harUtenlandsopphold: Boolean,
 
     @field:Schema(description = "Livsvarig AFP i offentlig sektor")
-    val afpOffentligLivsvarig: Int?
+    val livsvarigOffentligAfp: Int?
 )
 
 @JsonInclude(NON_NULL)
@@ -87,7 +87,7 @@ data class VedtakV2Alderspensjonsuttak(
     val fom: LocalDate,
 
     @field:Schema(description = "Livsvarig AFP i offentlig sektor")
-    val afpOffentligLivsvarig: Int?
+    val livsvarigOffentligAfp: Int?
 )
 
 data class VedtakV2Utbetaling(

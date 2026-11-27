@@ -41,8 +41,8 @@ class PenLoependeVedtakMapperTest : ShouldSpec({
             )
 
             with(PenLoependeVedtakMapper.fromDto(dto)) {
-                loependeAlderspensjon!!.afpOffentligLivsvarig shouldBe afp
-                fremtidigAlderspensjon!!.afpOffentligLivsvarig shouldBe fremtidigAfp
+                loependeAlderspensjon!!.livsvarigOffentligAfp shouldBe afp
+                fremtidigAlderspensjon!!.livsvarigOffentligAfp shouldBe fremtidigAfp
             }
         }
     }

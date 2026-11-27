@@ -26,13 +26,13 @@ class VedtakResultMapperTest : ShouldSpec({
                 sivilstatus = Sivilstatus.UGIFT,
                 harGjenlevenderett = false,
                 harUtenlandsopphold = true,
-                afpOffentligLivsvarig = 1234
+                livsvarigOffentligAfp = 1234
             ),
             fremtidigAlderspensjon = FremtidigAlderspensjon(
                 grad = Uttaksgrad.FOERTI_PROSENT,
                 fom = fremtidigFom,
                 sivilstatus = Sivilstatus.UGIFT,
-                afpOffentligLivsvarig = 2345
+                livsvarigOffentligAfp = 2345
             ),
             privatAfp = null,
             ufoeretrygd = null,
@@ -52,12 +52,12 @@ class VedtakResultMapperTest : ShouldSpec({
                 sivilstatus = CommonV1Sivilstatus.UGIFT,
                 harGjenlevenderett = false,
                 harUtenlandsopphold = true,
-                afpOffentligLivsvarig = 1234
+                livsvarigOffentligAfp = 1234
             ),
             fremtidigAlderspensjon = VedtakV2Alderspensjonsuttak(
                 grad = 40,
                 fom = fremtidigFom,
-                afpOffentligLivsvarig = 2345
+                livsvarigOffentligAfp = 2345
             ),
             ufoeretrygdgrad = null,
             privatAfpFom = null

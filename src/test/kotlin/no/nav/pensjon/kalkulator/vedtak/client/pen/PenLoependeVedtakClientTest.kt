@@ -54,7 +54,7 @@ class PenLoependeVedtakClientTest : FunSpec({
 
             with(response) {
                 with(loependeAlderspensjon!!) {
-                    afpOffentligLivsvarig shouldBe 1234
+                    livsvarigOffentligAfp shouldBe 1234
                     grad shouldBe Uttaksgrad.HUNDRE_PROSENT
                     fom shouldBe LocalDate.of(2025, 10, 1)
                     sivilstatus shouldBe Sivilstatus.UGIFT
@@ -63,7 +63,7 @@ class PenLoependeVedtakClientTest : FunSpec({
                 }
                 ufoeretrygd shouldBe null
                 privatAfp shouldBe null
-                fremtidigAlderspensjon!!.afpOffentligLivsvarig shouldBe 2345
+                fremtidigAlderspensjon!!.livsvarigOffentligAfp shouldBe 2345
             }
         }
     }
@@ -94,7 +94,7 @@ class PenLoependeVedtakClientTest : FunSpec({
             with(response) {
                 with(loependeAlderspensjon!!) {
                     grad shouldBe Uttaksgrad.FEMTI_PROSENT
-                    afpOffentligLivsvarig shouldBe null
+                    livsvarigOffentligAfp shouldBe null
                     fom shouldBe LocalDate.of(2025, 10, 1)
                     sivilstatus shouldBe Sivilstatus.GIFT
                     harGjenlevenderett shouldBe true
