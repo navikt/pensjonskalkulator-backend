@@ -64,6 +64,7 @@ class TjenestepensjonController(
 
     @GetMapping("v2/tpo-livsvarig-offentlig-afp")
     @Operation(
+        deprecated = true,
         summary = "Hent løpende livsvarig offentlig AFP",
         description = "Henter detaljer om løpende livsvarig AFP i offentlig sektor for brukeren"
     )
@@ -84,6 +85,7 @@ class TjenestepensjonController(
 
     @GetMapping("v3/tpo-livsvarig-offentlig-afp")
     @Operation(
+        deprecated = true,
         summary = "Hent løpende livsvarig offentlig AFP",
         description = "Henter detaljer om løpende livsvarig AFP i offentlig sektor for brukeren"
     )

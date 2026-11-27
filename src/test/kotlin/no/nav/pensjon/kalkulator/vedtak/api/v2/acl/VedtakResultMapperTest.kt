@@ -52,12 +52,12 @@ class VedtakResultMapperTest : ShouldSpec({
                 sivilstatus = CommonV1Sivilstatus.UGIFT,
                 harGjenlevenderett = false,
                 harUtenlandsopphold = true,
-                livsvarigOffentligAfp = 1234
+                livsvarigOffentligAfpMaanedsbeloep = 1234
             ),
             fremtidigAlderspensjon = VedtakV2Alderspensjonsuttak(
                 grad = 40,
                 fom = fremtidigFom,
-                livsvarigOffentligAfp = 2345
+                livsvarigOffentligAfpMaanedsbeloep = 2345
             ),
             ufoeretrygdgrad = null,
             privatAfpFom = null
