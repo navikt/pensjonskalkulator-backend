@@ -20,11 +20,8 @@ class LagreSimuleringService(
         val forbeholdOgKortforbehold = forbeholdClient.fetchForbeholdOgKortforbehold()
         val forbehold = forbeholdOgKortforbehold.forbehold
         val kortforbehold = forbeholdOgKortforbehold.kortforbehold
-        val filteredForbehold = forbehold?.seksjoner?.filter { seksjon ->
-            seksjon.vilkaarsliste.all { vilkaar ->
-                simulering.simuleringsinformasjon?.sanityVisningsvilkaar?.contains(vilkaar) == true
-            }
-        }
+        val sendteVilkaar = simulering.simuleringsinformasjon?.sanityVisningsvilkaar.orEmpty()
+        val filteredForbehold = forbehold?.seksjoner?.filter { it.erSynligMed(sendteVilkaar) }
 
         return client.lagreSimulering(sakId, simulering, ForbeholdInnhold(filteredForbehold ?: emptyList()), kortforbehold)
     }

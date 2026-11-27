@@ -16,8 +16,12 @@ data class ForbeholdOgKortforbehold(
 data class ForbeholdSeksjon(
     val tittel: String?,
     val avsnitt: List<ForbeholdAvsnitt>,
-    val vilkaarsliste: List<SanityVisningsvilkaar>
-)
+    /** Regelgrupper fra Sanity: ELLER mellom gruppene, OG innenfor en gruppe. Tom liste = alltid synlig. */
+    val vilkaarGrupper: List<List<SanityVisningsvilkaar>>
+) {
+    fun erSynligMed(vilkaar: Collection<SanityVisningsvilkaar>): Boolean =
+        vilkaarGrupper.isEmpty() || vilkaarGrupper.any { gruppe -> vilkaar.containsAll(gruppe) }
+}
 
 data class ForbeholdAvsnitt(
     val tekst: String,
