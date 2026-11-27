@@ -15,6 +15,64 @@ import java.time.LocalDate
 
 class PenLoependeVedtakMapperTest : ShouldSpec({
 
+    listOf(1234 to 2345, 0 to 0, null to null, null to 2345, 1234 to null).forEach { (afp, fremtidigAfp) ->
+        should("map livsvarig offentlig AFP $afp og fremtidig AFP $fremtidigAfp") {
+            val dto = PenLoependeVedtakDto(
+                alderspensjon = PenGjeldendeVedtakApDto(
+                    grad = 20,
+                    fraOgMed = LocalDate.of(2026, 1, 1),
+                    sivilstatus = "GIFT",
+                    harGjenlevenderett = false,
+                    harUtenlandsopphold = false,
+                    afpOffentligLivsvarig = afp
+                ),
+                alderspensjonIFremtid = PenGjeldendeVedtakApDto(
+                    grad = 40,
+                    fraOgMed = LocalDate.of(2027, 1, 1),
+                    sivilstatus = "GIFT",
+                    harGjenlevenderett = false,
+                    harUtenlandsopphold = false,
+                    afpOffentligLivsvarig = fremtidigAfp
+                ),
+                afpPrivat = null,
+                afpOffentlig = null,
+                ufoeretrygd = null,
+                avdoed = null
+            )
+
+            with(PenLoependeVedtakMapper.fromDto(dto)) {
+                loependeAlderspensjon!!.livsvarigOffentligAfp shouldBe afp
+                fremtidigAlderspensjon!!.livsvarigOffentligAfp shouldBe fremtidigAfp
+            }
+        }
+    }
+
+    listOf(1234 to 2345, 0 to 0, null to null).forEach { (afp, fremtidigAfp) ->
+        should("ignore fremtidig vedtak med samme grad ved AFP $afp til $fremtidigAfp") {
+            val alderspensjon = PenGjeldendeVedtakApDto(
+                grad = 100,
+                fraOgMed = LocalDate.of(2026, 1, 1),
+                sivilstatus = "GIFT",
+                harGjenlevenderett = false,
+                harUtenlandsopphold = false,
+                afpOffentligLivsvarig = afp
+            )
+            val dto = PenLoependeVedtakDto(
+                alderspensjon = alderspensjon,
+                alderspensjonIFremtid = alderspensjon.copy(
+                    fraOgMed = LocalDate.of(2027, 1, 1),
+                    afpOffentligLivsvarig = fremtidigAfp
+                ),
+                afpPrivat = null,
+                afpOffentlig = null,
+                ufoeretrygd = null,
+                avdoed = null
+            )
+
+            PenLoependeVedtakMapper.fromDto(dto).fremtidigAlderspensjon shouldBe null
+        }
+    }
+
     should("map informasjon om avdød") {
         val dto = PenLoependeVedtakDto(
             alderspensjon = null,

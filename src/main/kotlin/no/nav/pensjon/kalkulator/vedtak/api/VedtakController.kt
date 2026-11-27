@@ -25,8 +25,10 @@ class VedtakController(
 
     private val log = KotlinLogging.logger {}
 
+    // Deprecated: replaced by /api/v1/vedtak.
     @GetMapping("/v4/vedtak/loepende-vedtak")
     @Operation(
+        deprecated = true,
         summary = "Har løpende vedtak",
         description = "Hvorvidt den innloggede brukeren har løpende uføretrygd med uttaksgrad, alderspensjon med uttaksgrad, AFP i privat eller offentlig sektor"
     )

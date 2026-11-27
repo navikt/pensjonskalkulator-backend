@@ -63,12 +63,14 @@ class VedtakControllerTest : FunSpec() {
                     uttaksgradFom = LocalDate.of(2021, 1, 1),
                     sivilstatus = Sivilstatus.GIFT,
                     harGjenlevenderett = true,
-                    harUtenlandsopphold = true
+                    harUtenlandsopphold = true,
+                    livsvarigOffentligAfp = 1234
                 ),
                 fremtidigAlderspensjon = FremtidigAlderspensjon(
                     grad = Uttaksgrad.FOERTI_PROSENT,
                     fom = LocalDate.parse("2021-12-01"),
-                    sivilstatus = Sivilstatus.SKILT
+                    sivilstatus = Sivilstatus.SKILT,
+                    livsvarigOffentligAfp = 2345
                 ),
                 ufoeretrygd = LoependeUfoeretrygd(grad = 2, fom = LocalDate.parse("2021-12-01")),
                 privatAfp = LoependeEntitet(fom = LocalDate.parse("2022-12-01")),

@@ -39,7 +39,8 @@ data class LoependeAlderspensjon(
     val utbetalingSisteMaaned: Utbetaling? = null,
     val sivilstatus: Sivilstatus,
     val harGjenlevenderett: Boolean,
-    val harUtenlandsopphold: Boolean
+    val harUtenlandsopphold: Boolean,
+    val livsvarigOffentligAfp: Int? = null
 ) {
     fun withUtbetalingSisteMaaned(utbetaling: Utbetaling) =
         copy(utbetalingSisteMaaned = utbetaling)
@@ -48,7 +49,8 @@ data class LoependeAlderspensjon(
 data class FremtidigAlderspensjon(
     val grad: Uttaksgrad,
     val fom: LocalDate,
-    val sivilstatus: Sivilstatus
+    val sivilstatus: Sivilstatus,
+    val livsvarigOffentligAfp: Int? = null
 )
 
 data class Gjenlevenderett(
